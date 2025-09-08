@@ -787,7 +787,7 @@ function exec_ogp_module()
 				if( isset($_REQUEST['set_ip']) )
 				{
 					$ip_id = $db->real_escape_string($_POST['ip']);
-					$ip_row = $db->resultQuery( "SELECT ip FROM OGP_DB_PREFIXremote_server_ips WHERE ip_id=".$ip_id );
+					$ip_row = $db->resultQuery( "SELECT ip FROM GSP_DB_PREFIXremote_server_ips WHERE ip_id=".$ip_id );
 					$ip = $ip_row['0']['ip'];
 					$port = $_POST['port'];
 					$port = (int)(trim($port));

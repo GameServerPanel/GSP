@@ -14,15 +14,15 @@ $module_menus = array(
 
 $install_queries = array();
 $install_queries[0] = array(
-"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."remote_server_ips`;",
-"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."remote_server_ips` (
+"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."remote_server_ips`;",
+"CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."remote_server_ips` (
   `ip_id` int(11) NOT NULL AUTO_INCREMENT,
   `remote_server_id` int(11) NOT NULL,
   `ip` varchar(255) NOT NULL,
   PRIMARY KEY (`ip_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
-"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."remote_servers`;",
-"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."remote_servers` (
+"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."remote_servers`;",
+"CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."remote_servers` (
   `remote_server_id` int(11) NOT NULL auto_increment,
   `remote_server_name` varchar(100) NOT NULL,
   `ogp_user` varchar(100) NOT NULL,
@@ -36,18 +36,18 @@ $install_queries[0] = array(
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COMMENT='Remote servers and IPs';");
 
 $install_queries[1] = array(	
-	"ALTER TABLE `".OGP_DB_PREFIX."remote_servers` 
+	"ALTER TABLE `".GSP_DB_PREFIX."remote_servers` 
 	 ADD `use_nat` int(11) NOT NULL;"); 
 $install_queries[2] = array(
-	"ALTER TABLE `OGP_DB_PREFIXremote_servers` 
+	"ALTER TABLE `GSP_DB_PREFIXremote_servers` 
 	 ADD `ufw_status` CHAR(8);");
 $install_queries[3] = array(
-	"ALTER TABLE `OGP_DB_PREFIXremote_servers` 
+	"ALTER TABLE `GSP_DB_PREFIXremote_servers` 
 	 ADD `ftp_ip` varchar(255) NOT NULL;");
 	 
 $install_queries[4] = array(
-"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."arrange_ports`;",
-"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."arrange_ports` (
+"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."arrange_ports`;",
+"CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."arrange_ports` (
   `range_id` int(11) NOT NULL auto_increment,
   `ip_id` int(11) NOT NULL,
   `home_cfg_id` int(11) NOT NULL,
@@ -59,17 +59,17 @@ $install_queries[4] = array(
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COMMENT='Remote servers and IPs';");
 
 $install_queries[5] = array(
-	"ALTER TABLE `OGP_DB_PREFIXremote_servers` 
+	"ALTER TABLE `GSP_DB_PREFIXremote_servers` 
 	 DROP COLUMN `ufw_status`;",
-	"ALTER TABLE `OGP_DB_PREFIXremote_servers` 
+	"ALTER TABLE `GSP_DB_PREFIXremote_servers` 
 	 ADD `firewall_settings` LONGTEXT NULL;");
 
 $install_queries[6] = array(
-        "ALTER TABLE `OGP_DB_PREFIXremote_servers`
+        "ALTER TABLE `GSP_DB_PREFIXremote_servers`
 	ADD `display_public_ip` varchar(15) NOT NULL;");
 
 $install_queries[7] = array(
-        "ALTER TABLE `OGP_DB_PREFIXremote_servers`
+        "ALTER TABLE `GSP_DB_PREFIXremote_servers`
         MODIFY `display_public_ip` varchar(255) NOT NULL;");
 
 ?>

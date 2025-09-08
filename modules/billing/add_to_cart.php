@@ -31,7 +31,7 @@ function exec_ogp_module()
 	$service_id = intval($_REQUEST['service_id']);
 
 	// Query for Selected service info.
-	$qry_service = "SELECT DISTINCT service_id, home_cfg_id, mod_cfg_id, service_name, remote_server_id, slot_max_qty, slot_min_qty, price_daily, price_monthly, price_year, description, img_url FROM OGP_DB_PREFIXbilling_services WHERE service_id=".$db->realEscapeSingle($service_id);
+	$qry_service = "SELECT DISTINCT service_id, home_cfg_id, mod_cfg_id, service_name, remote_server_id, slot_max_qty, slot_min_qty, price_daily, price_monthly, price_year, description, img_url FROM GSP_DB_PREFIXbilling_services WHERE service_id=".$db->realEscapeSingle($service_id);
 	$result_service = $db->resultQuery($qry_service);		
 	$row_service = $result_service[0];
 	//Compiling info about invoice to create an invoice order.
@@ -93,7 +93,7 @@ function exec_ogp_module()
 	Checking if it's higher than 0 because if it's a non-numeric value, after casting it to an int it'll be 0.
 	*/	
 	if($service_id !== 0) $where_service_id = " WHERE service_id=".$db->realEscapeSingle($service_id); else $where_service_id = "";
-	$qry_services = "SELECT * FROM OGP_DB_PREFIXbilling_services".$where_service_id;
+	$qry_services = "SELECT * FROM GSP_DB_PREFIXbilling_services".$where_service_id;
 	$services = $db->resultQuery($qry_services);			
 	foreach ($services as $key => $row) {	
 	if($max_players < $row['slot_min_qty'] || $qty < 1){

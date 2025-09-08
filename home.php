@@ -25,7 +25,7 @@ $db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name,
 // Load languages.
 include_once("includes/lang.php");
 
-if (!$db instanceof OGPDatabase) {
+if (!$db instanceof GSPDatabase) {
 	ogpLang();
 	die(get_lang('no_db_connection'));
 }

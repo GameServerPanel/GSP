@@ -14,7 +14,7 @@ function exec_ogp_module()
 		$service = $db->realEscapeSingle($_POST['service']);
 
 		//Create UPDATE query
-		$qry_change_url = "UPDATE OGP_DB_PREFIXbilling_services
+		$qry_change_url = "UPDATE GSP_DB_PREFIXbilling_services
 						   SET remote_server_id = '".$new_remote_server_id."',
 							   price_monthly ='".$new_price_monthly."', 
 							   remote_server_id = '".$new_remote_server_id."',
@@ -28,7 +28,7 @@ function exec_ogp_module()
 	//Querying UPDATE enabled/disabled remote servers DB
 	if (isset($_POST['update_remote_servers']))
 	{
-		$result = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXremote_servers");
+		$result = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXremote_servers");
 		foreach($result as $rs)
 		{
 			$server_enabled = 0;
@@ -40,7 +40,7 @@ function exec_ogp_module()
 			}
 						
 			//update the table with current value
-			$query = "UPDATE OGP_DB_PREFIXremote_servers SET enabled = '".$server_enabled."' WHERE remote_server_id=".$rs['remote_server_id'];
+			$query = "UPDATE GSP_DB_PREFIXremote_servers SET enabled = '".$server_enabled."' WHERE remote_server_id=".$rs['remote_server_id'];
 			$db->query($query);
 	
 		}
@@ -83,14 +83,14 @@ function exec_ogp_module()
 		if(isset($_POST['allow_ftp_usage']))$access_rights .= $db->realEscapeSingle($_POST['allow_ftp_usage']);
 		if(isset($_POST['allow_custom_fields']))$access_rights .= $db->realEscapeSingle($_POST['allow_custom_fields']);
 		
-		$qry_add_service = "INSERT INTO OGP_DB_PREFIXbilling_services(service_id, home_cfg_id, mod_cfg_id, service_name, remote_server_id, out_of_stock, slot_max_qty , slot_min_qty, price_daily, price_monthly, price_year, description, img_url, ftp, install_method, manual_url, access_rights,enabled) VALUES(NULL, '".$home_cfg_id."', '".$mod_cfg_id."', '".$service_name."', '".$remote_server_id."', 0,'".$slot_max_qty."', '".$slot_min_qty."', '".$price_daily."', '".$price_monthly."', '".$price_year."', '".$description."', '".$img_url."', '".$ftp."', '".$install_method."', '".$manual_url."', '".$access_rights."', '" . $enabled . "')";
+		$qry_add_service = "INSERT INTO GSP_DB_PREFIXbilling_services(service_id, home_cfg_id, mod_cfg_id, service_name, remote_server_id, out_of_stock, slot_max_qty , slot_min_qty, price_daily, price_monthly, price_year, description, img_url, ftp, install_method, manual_url, access_rights,enabled) VALUES(NULL, '".$home_cfg_id."', '".$mod_cfg_id."', '".$service_name."', '".$remote_server_id."', 0,'".$slot_max_qty."', '".$slot_min_qty."', '".$price_daily."', '".$price_monthly."', '".$price_year."', '".$description."', '".$img_url."', '".$ftp."', '".$install_method."', '".$manual_url."', '".$access_rights."', '" . $enabled . "')";
 		$db->query($qry_add_service);	
 	}
 	
 	//Querying REMOVE service FROM DB
 	if (isset($_POST['service_id']))
 	{
-		$db->query( "DELETE FROM OGP_DB_PREFIXbilling_services WHERE service_id=" . $db->realEscapeSingle($_POST['service_id']) );
+		$db->query( "DELETE FROM GSP_DB_PREFIXbilling_services WHERE service_id=" . $db->realEscapeSingle($_POST['service_id']) );
 	}
 	
 	?>
@@ -106,7 +106,7 @@ function exec_ogp_module()
 		<td>
 		<select name="modcfgid">
 		<?php
-		$mod_qry = $db->resultQuery("SELECT DISTINCT mod_cfg_id, mod_name, game_name FROM OGP_DB_PREFIXconfig_mods NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE home_cfg_id=" . $db->realEscapeSingle($_POST['home_cfg_id']));
+		$mod_qry = $db->resultQuery("SELECT DISTINCT mod_cfg_id, mod_name, game_name FROM GSP_DB_PREFIXconfig_mods NATURAL JOIN GSP_DB_PREFIXconfig_homes WHERE home_cfg_id=" . $db->realEscapeSingle($_POST['home_cfg_id']));
 		foreach($mod_qry as $array_mods) 
 		{ 
 			if($array_mods['mod_name'] == "none")$array_mods['mod_name']=$array_mods['game_name'];
@@ -128,7 +128,7 @@ function exec_ogp_module()
 		</tr>
 		<tr>
 		<?php 
-		$result3 = $db->resultQuery("SELECT DISTINCT remote_server_id, remote_server_name, agent_ip, ogp_user FROM OGP_DB_PREFIXremote_servers"); 
+		$result3 = $db->resultQuery("SELECT DISTINCT remote_server_id, remote_server_name, agent_ip, ogp_user FROM GSP_DB_PREFIXremote_servers"); 
 		?>
 		<td><?php print_lang('remote_server');?></td>
 		<td>
@@ -146,7 +146,7 @@ function exec_ogp_module()
 		</tr>
 		<tr>
 		<?php
-		$mods = $db->resultQuery("SELECT DISTINCT mod_cfg_id, mod_name, game_name FROM OGP_DB_PREFIXconfig_mods NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE mod_cfg_id=" . $db->realEscapeSingle($_POST['modcfgid']));
+		$mods = $db->resultQuery("SELECT DISTINCT mod_cfg_id, mod_name, game_name FROM GSP_DB_PREFIXconfig_mods NATURAL JOIN GSP_DB_PREFIXconfig_homes WHERE mod_cfg_id=" . $db->realEscapeSingle($_POST['modcfgid']));
 		foreach($mods as $mod) 
 		{ 
 		?>
@@ -257,7 +257,7 @@ function exec_ogp_module()
 	<h2>Enable/Disable Server Locations</h2>
 	<?php  
 	//ENABLE OR DISABLE REMOTE SERVERS FOR GAMES
-	$result = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXremote_servers");
+	$result = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXremote_servers");
 	echo "<form method='post' action=''>";
 	echo "<input type='hidden' name='update_remote_servers' value='update' />";																	 
 	foreach($result as $rs)
@@ -278,7 +278,7 @@ function exec_ogp_module()
 		<br><br>";
 	//end ENABLE REMOTE SERVERS
 
-	$services = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_services ORDER BY service_name");
+	$services = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_services ORDER BY service_name");
 	if ($services > 0)
 	{
 		?>

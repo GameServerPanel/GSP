@@ -28,7 +28,7 @@ function exec_ogp_module()
 	
 
     //show if new server created
-	$cartresult = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE user_id='".$_SESSION['user_id']."' AND paid='1' ");
+	$cartresult = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE user_id='".$_SESSION['user_id']."' AND paid='1' ");
 	 $newServices=0;
         foreach($cartresult as $res){
         $newServices=$newServices + 1;
@@ -50,7 +50,7 @@ function exec_ogp_module()
         </div>';
         }
     //Invoice is due. 
-	$orderresult = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = -1");
+	$orderresult = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = -1");
 	$invoicesDue=0;
 	foreach($orderresult as $res){
 	$invoicesDue=$invoicesDue + 1;
@@ -69,7 +69,7 @@ function exec_ogp_module()
 			</div>'; 
 	}
 	//Server is suspended DANGER
-	$orderresult = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = -2");
+	$orderresult = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = -2");
 	$invoicesDue=0;
 	foreach($orderresult as $res){
 	$invoicesDue=$invoicesDue + 1;
@@ -138,12 +138,12 @@ function exec_ogp_module()
 	
 
 
-	$widgets = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXwidgets_users WHERE user_id='".$_SESSION['user_id']."' ORDER BY sort_no");
+	$widgets = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXwidgets_users WHERE user_id='".$_SESSION['user_id']."' ORDER BY sort_no");
 	
 	if(!$widgets)
 	{
 		if($db->createUserWidgets($_SESSION['user_id']))
-			$widgets = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXwidgets_users WHERE user_id='".$_SESSION['user_id']."' ORDER BY sort_no");
+			$widgets = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXwidgets_users WHERE user_id='".$_SESSION['user_id']."' ORDER BY sort_no");
 	}
 	
 	if($widgets)

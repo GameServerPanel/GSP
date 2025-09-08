@@ -5,7 +5,7 @@ global $db,$view,$settings;
 $loadpage = "?m=billing&p=paid";
 $count = $_POST['count'] + 1;
 
-$result = $db->resultquery("SELECT * from OGP_DB_PREFIXbilling_carts WHERE cart_id= '". $_POST['cart_id'] . "'");
+$result = $db->resultquery("SELECT * from GSP_DB_PREFIXbilling_carts WHERE cart_id= '". $_POST['cart_id'] . "'");
 foreach($result as $cartID){
 	 $paid = $cartID['paid'];
 	}

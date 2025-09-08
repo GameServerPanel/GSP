@@ -16,11 +16,11 @@ function exec_ogp_module()
 	$cart_id = $db->realEscapeSingle($cart_id);
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
 	if ( $isAdmin )
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+		$orders = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 	else
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id)." AND user_id=".$db->realEscapeSingle($user_id) );
+		$orders = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id)." AND user_id=".$db->realEscapeSingle($user_id) );
 		
-	$cart = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+	$cart = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 	$tempdate = date_create( $cart[0]['date']);
 	$paid_date = date_format($tempdate,"d M Y H:m");
 
@@ -110,7 +110,7 @@ function exec_ogp_module()
 
 		$coupon_savings = 0;
 		if($cart[0]['coupon_id']>0) {
-			$result = $db->resultquery("SELECT discount from OGP_DB_PREFIXbilling_coupons WHERE id = '". $cart[0]['coupon_id'] . "'");
+			$result = $db->resultquery("SELECT discount from GSP_DB_PREFIXbilling_coupons WHERE id = '". $cart[0]['coupon_id'] . "'");
 			foreach($result as $coupon){
 				$coupon_savings = $subtotal2 * ($coupon['discount'] / 100);
 			}

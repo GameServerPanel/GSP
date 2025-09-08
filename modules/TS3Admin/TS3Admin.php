@@ -50,11 +50,11 @@ function exec_ogp_module()
 			$_SESSION['rserver_id'] = $_GET['rserver_id'];
 			if( $isAdmin )
 			{
-				$TS3_list = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXts3_homes WHERE rserver_id='".$_SESSION['rserver_id']."'");
+				$TS3_list = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXts3_homes WHERE rserver_id='".$_SESSION['rserver_id']."'");
 			}
 			else
 			{
-				$sql = "SELECT * FROM OGP_DB_PREFIXts3_homes WHERE";
+				$sql = "SELECT * FROM GSP_DB_PREFIXts3_homes WHERE";
 				if(!$isAdmin){
 					$sql .= " user_id='".$_SESSION['user_id']."' AND";
 				}	

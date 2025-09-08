@@ -12,12 +12,12 @@ function exec_ogp_module()
 	if(isset($_GET['cart_id'])){
 		$cart_id = $_GET['cart_id'];
 	}
-	$cart_paid = $db->resultQuery( "SELECT paid FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+	$cart_paid = $db->resultQuery( "SELECT paid FROM GSP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
 	if ( $isAdmin ){
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+		$orders = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 	} else {
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id)." AND user_id=".$db->realEscapeSingle($user_id) );
+		$orders = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id)." AND user_id=".$db->realEscapeSingle($user_id) );
 	}
 	if( !empty($orders) and !empty($cart_paid) )
 	{
@@ -35,7 +35,7 @@ function exec_ogp_module()
 			$extended = $order['extended'] == "1" ? TRUE : FALSE;
 			//Query service info	
 			$service = $db->resultQuery( "SELECT * 
-							   FROM OGP_DB_PREFIXbilling_services 
+							   FROM GSP_DB_PREFIXbilling_services 
 							   WHERE service_id=".$db->realEscapeSingle($service_id) );
 							   
 			if( !empty( $service[0] ) )
@@ -131,7 +131,7 @@ function exec_ogp_module()
 				
 				//Add IP:Port Pair to the Game Home
 			//need to get the IP_ID for this remote server.
-				$result = $db->resultQuery("SELECT ip_id FROM OGP_DB_PREFIXremote_server_ips WHERE remote_server_id=".$ip);
+				$result = $db->resultQuery("SELECT ip_id FROM GSP_DB_PREFIXremote_server_ips WHERE remote_server_id=".$ip);
 			    	foreach ($result as $rs)
 			{
 				$ip_id = $rs['ip_id'];
@@ -336,33 +336,33 @@ function exec_ogp_module()
 				
 			}
 			// set order status
-			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
+			$db->query("UPDATE GSP_DB_PREFIXbilling_orders
 						SET status='" . $db->realEscapeSingle($status) . "' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 	
 			// set the order expiration
-			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
+			$db->query("UPDATE GSP_DB_PREFIXbilling_orders
 						SET finish_date='" . $db->realEscapeSingle($finish_date) . "' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 						
 			// Save home id created by this order
-			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
+			$db->query("UPDATE GSP_DB_PREFIXbilling_orders
 						SET home_id='" . $db->realEscapeSingle($home_id) . "' WHERE order_id=".$db->realEscapeSingle($order_id));
 						
 		}
 
 		//Update Cart Payment Status as 3(paid and installed)
-		$db->query("UPDATE OGP_DB_PREFIXbilling_carts
+		$db->query("UPDATE GSP_DB_PREFIXbilling_carts
 					SET paid=3
 					WHERE cart_id=".$db->realEscapeSingle($cart_id));
 
 		// Set payment/creation date
 		$date = date('d M Y');
-		$db->query("UPDATE OGP_DB_PREFIXbilling_carts 
+		$db->query("UPDATE GSP_DB_PREFIXbilling_carts 
 					SET date='" . $db->realEscapeSingle($date) . "' 
 					WHERE cart_id=".$db->realEscapeSingle($cart_id));
 					
-        $db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
+        $db->query( "UPDATE GSP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
 
 		//Refresh to Game Monitor.

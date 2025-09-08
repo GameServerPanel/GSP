@@ -213,7 +213,7 @@ function exec_ogp_module()
 	
 	// Get blacklisted files
 	$current_blacklist = array();
-	$blacklisted_files = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
+	$blacklisted_files = $db->resultQuery('SELECT file_path FROM `GSP_DB_PREFIXupdate_blacklist`;');
 	if($blacklisted_files !== FALSE)
 	{
 		$current_blacklist = array();

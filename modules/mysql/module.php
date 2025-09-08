@@ -11,8 +11,8 @@ $module_required = TRUE;
 $module_menus = array( array( 'subpage' => 'mysql_admin', 'name'=>'MySQL Admin', 'group'=>'admin' ) );
 
 $install_queries[0] = array(
-    "DROP TABLE IF EXISTS `".OGP_DB_PREFIX."mysql_servers`;",
-    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."mysql_servers` (
+    "DROP TABLE IF EXISTS `".GSP_DB_PREFIX."mysql_servers`;",
+    "CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."mysql_servers` (
 	`mysql_server_id` int(11) NOT NULL auto_increment,
 	`remote_server_id` int(11) NOT NULL,
 	`mysql_name` varchar(100) NOT NULL,
@@ -23,8 +23,8 @@ $install_queries[0] = array(
 	PRIMARY KEY  (`mysql_server_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 
-"DROP TABLE IF EXISTS ".OGP_DB_PREFIX."mysql_databases",
-"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."mysql_databases` (
+"DROP TABLE IF EXISTS ".GSP_DB_PREFIX."mysql_databases",
+"CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."mysql_databases` (
 	`db_id` int(11) NOT NULL auto_increment,
 	`mysql_server_id` int(11) NOT NULL,
 	`home_id` int(11) NOT NULL,

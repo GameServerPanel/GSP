@@ -34,7 +34,7 @@ function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$
 			require_once("includes/database_mysqli.php");
 		else
 			die("<p class='failure'>OGP requires the <a href='http://php.net/manual/en/book.mysqli.php' target='_blank'>mysqli PHP extension</a>. Please install it, and then try again.</p>");
-        $database = new OGPDatabaseMysql();
+        $database = new GSPDatabaseMysql();
         $connect_value = $database->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
         
         if ($connect_value === TRUE)
@@ -51,7 +51,7 @@ function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$
 
 function get_db_error_text ($db_retval, &$error_text)
 {
-    if (is_a($db_retval,"OGPDatabase"))
+    if (is_a($db_retval,"GSPDatabase"))
         return FALSE;
 
     switch ($db_retval) {

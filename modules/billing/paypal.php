@@ -28,9 +28,9 @@ $debug =  $settings['debug'];
 
 if(!empty($cart_id))
 	{		
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id));
+		$orders = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id));
 		//get couponID then discount for this cart
-		$result= $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id));
+		$result= $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id));
 			foreach ($result as $cartDB){
 				$coupon_id = $cartDB['id'];
 			}

@@ -91,7 +91,7 @@ if (strcmp ($res, "VERIFIED") == 0) {
 	 $receiver_email = $_POST['receiver_email'];
 	 $payer_email = $_POST['payer_email'];	
 	  
-	$db->query("UPDATE OGP_DB_PREFIXbilling_carts
+	$db->query("UPDATE GSP_DB_PREFIXbilling_carts
                                   SET paid=1
                                   WHERE cart_id=".$db->realEscapeSingle($cart_id));
 	fwrite($fpx, "IPN Processed\n");

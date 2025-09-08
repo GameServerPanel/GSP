@@ -114,7 +114,7 @@ function exec_ogp_module()
 		$blacklist = array ('/install.php',
 							'/modules/gamemanager/rsync_sites_local.list');
 							
-		$blacklisted_files = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
+		$blacklisted_files = $db->resultQuery('SELECT file_path FROM `GSP_DB_PREFIXupdate_blacklist`;');
 		if($blacklisted_files !== FALSE)
 		{
 			$current_blacklist = array();
@@ -227,8 +227,8 @@ function exec_ogp_module()
 				// update version info in db
 
 				$version = $db->real_escape_string($_GET['version']);
-				$db->query("UPDATE OGP_DB_PREFIXsettings SET value = '$version' WHERE setting = 'ogp_version'");
-				$db->query("UPDATE OGP_DB_PREFIXsettings SET value = '$vtype' WHERE setting = 'version_type'");
+				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$version' WHERE setting = 'ogp_version'");
+				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$vtype' WHERE setting = 'version_type'");
 
 				// Remove the downloaded package
 				if( file_exists( $temp_dwl ) )

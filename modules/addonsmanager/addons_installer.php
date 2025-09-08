@@ -66,7 +66,7 @@ function exec_ogp_module() {
     {
         $addon_id = (int)$_REQUEST['addon_id'];
 		
-		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
+		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM GSP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
 
 		if (!$addons_rows) {
 			print_failure(get_lang('invalid_addon'));
@@ -241,7 +241,7 @@ function exec_ogp_module() {
             <td align='left'>
 			<select name="addon_id">
 			<?php
-			$addons = $db->resultQuery("SELECT addon_id, name FROM OGP_DB_PREFIXaddons WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . " ORDER BY name ASC");
+			$addons = $db->resultQuery("SELECT addon_id, name FROM GSP_DB_PREFIXaddons WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . " ORDER BY name ASC");
 			foreach($addons as $addon) 
 			{
 			?>

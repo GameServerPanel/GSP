@@ -12,7 +12,7 @@ function real_escape_string_recursive(&$item, $key, $link){
     $item = $this->realEscapeSingle($item);
 }
 
-class OGPDatabaseMySQL extends OGPDatabase
+class GSPDatabaseMySQL extends GSPDatabase
 {
 	protected $link;
 
@@ -1144,7 +1144,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 	{
 		if ( !$this->link ) return FALSE;
 
-		$query = str_replace( "OGP_DB_PREFIX", $this->table_prefix, $query );
+		$query = str_replace( "GSP_DB_PREFIX", $this->table_prefix, $query );
 
 		++$this->queries_;
 		mysqli_query($this->link,$query);
@@ -1159,7 +1159,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 
 	/// \brief This query return array of values or false on failure.
 	public function resultQuery( $query ) {
-		$query = str_replace( "OGP_DB_PREFIX", $this->table_prefix, $query );
+		$query = str_replace( "GSP_DB_PREFIX", $this->table_prefix, $query );
 		return $this->listQuery($query);
 	}
 	
@@ -3370,7 +3370,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 		$client_ip = getClientIPAddress();
 		$message = $this->realEscapeSingle($message);
-		$this->query("INSERT INTO OGP_DB_PREFIXlogger (date, user_id, ip, message) VALUE (FROM_UNIXTIME(UNIX_TIMESTAMP(), '%d-%m-%Y %H:%i:%s'), $user_id, '$client_ip', '$message');");
+		$this->query("INSERT INTO GSP_DB_PREFIXlogger (date, user_id, ip, message) VALUE (FROM_UNIXTIME(UNIX_TIMESTAMP(), '%d-%m-%Y %H:%i:%s'), $user_id, '$client_ip', '$message');");
 	}
 
 	public function get_logger_count($search_field) {

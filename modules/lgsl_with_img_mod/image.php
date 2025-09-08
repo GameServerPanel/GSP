@@ -82,7 +82,7 @@ function lgsl_lookup_ip($ip, $port)
 	$ip = $db->realEscapeSingle($ip);
 	$port = $db->realEscapeSingle($port);
 	
-	$result = $db->resultQuery("SELECT `id` FROM `OGP_DB_PREFIXlgsl` WHERE `ip`='{$ip}' AND c_port='{$port}' LIMIT 1");
+	$result = $db->resultQuery("SELECT `id` FROM `GSP_DB_PREFIXlgsl` WHERE `ip`='{$ip}' AND c_port='{$port}' LIMIT 1");
 	return $result[0];
 }
   
@@ -149,7 +149,7 @@ function lgsl_cache_info($id)
 {
 	global $db;	
 	$id = $db->realEscapeSingle($id);
-	$result = $db->resultQuery("SELECT `cache_time` FROM `OGP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
+	$result = $db->resultQuery("SELECT `cache_time` FROM `GSP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
 	return empty($result[0]['cache_time']) ? array(0,0,0) : explode("_", $result[0]['cache_time']);
 }
 

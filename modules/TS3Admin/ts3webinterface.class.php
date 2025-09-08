@@ -26,7 +26,7 @@ require_once('ts3remote.class.php');
 function getAssignedServerUsers()
 {
 	global $db;
-	$ts3vservers = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXts3_homes 
+	$ts3vservers = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXts3_homes 
 									 WHERE vserver_id='".
 									 TS3WEBINTERFACE_VSERVER_ID."' AND rserver_id=".
 									 $_SESSION['rserver_id'] );
@@ -637,7 +637,7 @@ class TS3webinterface
 					$vServerList = $tmp;
 				}
 
-				$getPublicIp = $db->resultQuery("SELECT display_public_ip FROM OGP_DB_PREFIXremote_servers WHERE remote_server_id=".$_SESSION['rserver_id']);
+				$getPublicIp = $db->resultQuery("SELECT display_public_ip FROM GSP_DB_PREFIXremote_servers WHERE remote_server_id=".$_SESSION['rserver_id']);
 				$display_ip = checkDisplayPublicIP($getPublicIp[0]['display_public_ip'],$this->serverIP);
 
 				$this->template->assign('IP', $this->serverIP);
@@ -799,7 +799,7 @@ class TS3webinterface
 						if( isset($_POST['assign_subuser']) and
 							in_array($_POST['user_id'],$assigned_info['subusers']) )
 						{
-							$db->query("INSERT INTO OGP_DB_PREFIXts3_homes 
+							$db->query("INSERT INTO GSP_DB_PREFIXts3_homes 
 										(`rserver_id`, `ip`, `pwd`, `vserver_id`, `user_id`) 
 										VALUES ('".$_SESSION['rserver_id']."', '".
 												   TS3WEBINTERFACE_IP."', '".
@@ -814,7 +814,7 @@ class TS3webinterface
 							in_array($_POST['user_id'],$assigned_info['users_assigned']) and
 							in_array($_POST['user_id'],$assigned_info['subusers']) )
 						{
-							$db->query( "DELETE FROM OGP_DB_PREFIXts3_homes WHERE vserver_id='". 
+							$db->query( "DELETE FROM GSP_DB_PREFIXts3_homes WHERE vserver_id='". 
 													TS3WEBINTERFACE_VSERVER_ID."' AND user_id='".
 													$_POST['user_id']."' AND rserver_id='".
 													$_SESSION['rserver_id'].
@@ -831,7 +831,7 @@ class TS3webinterface
 					$this->template->assign('is_parent_user', $is_parent_user);
 					$this->template->assign('subusers_installed', $subusers_installed);
 
-					$getPublicIp = $db->resultQuery("SELECT display_public_ip FROM OGP_DB_PREFIXremote_servers WHERE remote_server_id=".$_SESSION['rserver_id']);
+					$getPublicIp = $db->resultQuery("SELECT display_public_ip FROM GSP_DB_PREFIXremote_servers WHERE remote_server_id=".$_SESSION['rserver_id']);
 					$display_ip = checkDisplayPublicIP($getPublicIp[0]['display_public_ip'],$this->serverIP);
 
 					$this->template->assign('display_public_ip', $display_ip);

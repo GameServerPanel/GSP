@@ -15,8 +15,8 @@ $module_menus = array(
 
 $install_queries = array();
 $install_queries[0] = array(
-    "DROP TABLE IF EXISTS ".OGP_DB_PREFIX."users;",
-    "CREATE TABLE ".OGP_DB_PREFIX."users (
+    "DROP TABLE IF EXISTS ".GSP_DB_PREFIX."users;",
+    "CREATE TABLE ".GSP_DB_PREFIX."users (
         `user_id` int(11) NOT NULL auto_increment,
         `users_login` varchar(255) NOT NULL,
         `users_passwd` varchar(255) NOT NULL,
@@ -36,41 +36,41 @@ $install_queries[0] = array(
         PRIMARY KEY  (`users_login`),
 		UNIQUE KEY `id` (`user_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
-    "DROP TABLE IF EXISTS ".OGP_DB_PREFIX."user_groups;",
-    "CREATE TABLE ".OGP_DB_PREFIX."user_groups (
+    "DROP TABLE IF EXISTS ".GSP_DB_PREFIX."user_groups;",
+    "CREATE TABLE ".GSP_DB_PREFIX."user_groups (
         `user_id` int(11) NOT NULL,
         `role_id` int(11) NULL,
         `group_id` int(11) NOT NULL,
         PRIMARY KEY (`user_id`,`group_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
-    "DROP TABLE IF EXISTS ".OGP_DB_PREFIX."user_role_info;",
-    "CREATE TABLE ".OGP_DB_PREFIX."user_role_info (
+    "DROP TABLE IF EXISTS ".GSP_DB_PREFIX."user_role_info;",
+    "CREATE TABLE ".GSP_DB_PREFIX."user_role_info (
         `role_id` int(11) NOT NULL auto_increment,
         `role_name` varchar(100) NULL,
         PRIMARY KEY (`role_id`), UNIQUE KEY (`role_name`)
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
-    "DROP TABLE IF EXISTS ".OGP_DB_PREFIX."user_group_info;",
-    "CREATE TABLE ".OGP_DB_PREFIX."user_group_info (
+    "DROP TABLE IF EXISTS ".GSP_DB_PREFIX."user_group_info;",
+    "CREATE TABLE ".GSP_DB_PREFIX."user_group_info (
         `group_id` int(11) NOT NULL auto_increment,
         `group_name` varchar(255), PRIMARY KEY (`group_id`),
         UNIQUE KEY (`group_name`)
         ) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
 
-$install_queries[1] = array("ALTER TABLE `".OGP_DB_PREFIX."user_group_info` ADD `main_user_id` int(11) NULL;");
-$install_queries[2] = array("ALTER TABLE `".OGP_DB_PREFIX."users` ADD `users_parent` int(11) NULL;");
+$install_queries[1] = array("ALTER TABLE `".GSP_DB_PREFIX."user_group_info` ADD `main_user_id` int(11) NULL;");
+$install_queries[2] = array("ALTER TABLE `".GSP_DB_PREFIX."users` ADD `users_parent` int(11) NULL;");
 $install_queries[3] = array(
-	"ALTER TABLE `".OGP_DB_PREFIX."users` CHANGE `users_email` `users_email` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL",
-	"UPDATE ".OGP_DB_PREFIX."users
+	"ALTER TABLE `".GSP_DB_PREFIX."users` CHANGE `users_email` `users_email` VARCHAR( 255 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL",
+	"UPDATE ".GSP_DB_PREFIX."users
 	JOIN (
 		SELECT users_email, MIN(user_id) minID
-		FROM ".OGP_DB_PREFIX."users
+		FROM ".GSP_DB_PREFIX."users
 		GROUP BY users_email
 		HAVING COUNT(*) > 1
-	) t2 ON ".OGP_DB_PREFIX."users.users_email = t2.users_email AND ".OGP_DB_PREFIX."users.user_id != t2.minID
-	SET ".OGP_DB_PREFIX."users.users_email = DEFAULT;",
-	"ALTER TABLE `".OGP_DB_PREFIX."users` ADD UNIQUE `email` (`users_email`);");
-$install_queries[4] = array("UPDATE ".OGP_DB_PREFIX."users SET users_email = DEFAULT WHERE users_email = '';");
-$install_queries[5] = array("ALTER TABLE `".OGP_DB_PREFIX."user_groups` MODIFY group_id int(11) NOT NULL;");
-$install_queries[6] = array("ALTER TABLE `".OGP_DB_PREFIX."users` ADD `users_page_limit` int(11) NULL DEFAULT 25;");
-$install_queries[7] = array("ALTER TABLE `".OGP_DB_PREFIX."users` ADD `user_receives_emails` tinyint(1) NOT NULL DEFAULT 1;");
+	) t2 ON ".GSP_DB_PREFIX."users.users_email = t2.users_email AND ".GSP_DB_PREFIX."users.user_id != t2.minID
+	SET ".GSP_DB_PREFIX."users.users_email = DEFAULT;",
+	"ALTER TABLE `".GSP_DB_PREFIX."users` ADD UNIQUE `email` (`users_email`);");
+$install_queries[4] = array("UPDATE ".GSP_DB_PREFIX."users SET users_email = DEFAULT WHERE users_email = '';");
+$install_queries[5] = array("ALTER TABLE `".GSP_DB_PREFIX."user_groups` MODIFY group_id int(11) NOT NULL;");
+$install_queries[6] = array("ALTER TABLE `".GSP_DB_PREFIX."users` ADD `users_page_limit` int(11) NULL DEFAULT 25;");
+$install_queries[7] = array("ALTER TABLE `".GSP_DB_PREFIX."users` ADD `user_receives_emails` tinyint(1) NOT NULL DEFAULT 1;");
 ?>

@@ -123,7 +123,7 @@ function exec_ogp_module()
 	// Check if user is admin
 	global $db;
 	$isAdmin = false;
-	if(isset($_SESSION['user_id']) && $db && $db instanceof OGPDatabase) {
+	if(isset($_SESSION['user_id']) && $db && $db instanceof GSPDatabase) {
 		$isAdmin = $db->isAdmin($_SESSION['user_id']);
 	}
 	
