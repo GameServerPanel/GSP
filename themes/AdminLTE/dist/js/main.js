@@ -411,7 +411,7 @@ $(document).ready(function()
 		var boxClass = 'login-box';
 		var headerContent = '\
 		<!--<h1>' + headTitle + '</h1>-->\
-		<img src="themes/AdminLTE/dist/img/ogp_logo_dark.svg" class="brand-image">\
+		<img src="themes/AdminLTE/dist/img/gsp_logo_dark.svg" class="brand-image">\
 		';
 
 		if(new_form !== undefined)
@@ -1287,7 +1287,7 @@ function themeChanger(changeTo, save = false)
 
 		if(!localStorage.getItem('themeLogo'))
 		{
-			$('img.brand-image').attr('src', 'themes/AdminLTE/dist/img/ogp_logo_dark.svg');
+			$('img.brand-image').attr('src', 'themes/AdminLTE/dist/img/gsp_logo_dark.svg');
 		}
 
 		$('link[href*="jquery-ui.min"]').attr('href', 'themes/AdminLTE/plugins/jquery-ui/jquery-ui.min.dark.css');
@@ -1318,7 +1318,7 @@ function themeChanger(changeTo, save = false)
 
 		if(!localStorage.getItem('themeLogo'))
 		{
-			$('img.brand-image').attr('src', 'themes/AdminLTE/dist/img/ogp_logo_light.svg');
+			$('img.brand-image').attr('src', 'themes/AdminLTE/dist/img/gsp_logo_light.svg');
 		}
 
 		$('link[href*="jquery-ui.min"]').attr('href', 'themes/AdminLTE/plugins/jquery-ui/jquery-ui.min.light.css');
@@ -1349,7 +1349,7 @@ function themeChanger(changeTo, save = false)
 
 		if(!localStorage.getItem('themeLogo'))
 		{
-			$('img.brand-image').attr('src', 'themes/AdminLTE/dist/img/ogp_logo_dark.svg');
+			$('img.brand-image').attr('src', 'themes/AdminLTE/dist/img/gsp_logo_dark.svg');
 		}
 
 		$('link[href*="jquery-ui.min"]').attr('href', 'themes/AdminLTE/plugins/jquery-ui/jquery-ui.min.light.css');

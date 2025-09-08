@@ -6,10 +6,10 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "{OGP_AGENT_PATH}/agent_init start"
-ExecStop=/bin/sh -c "{OGP_AGENT_PATH}/agent_init stop"
+ExecStart=/bin/sh -c "{GSP_AGENT_PATH}/agent_init start"
+ExecStop=/bin/sh -c "{GSP_AGENT_PATH}/agent_init stop"
 RemainAfterExit=yes
-PIDFile="{OGP_AGENT_PATH}/agent_run.pid"
+PIDFile="{GSP_AGENT_PATH}/agent_run.pid"
 
 [Install]
 WantedBy=multi-user.target

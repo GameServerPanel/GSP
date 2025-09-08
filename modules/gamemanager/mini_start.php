@@ -85,7 +85,7 @@ if( !isset( $_POST['start_server'] ) )
 		<input type='hidden' name='home_id' value='$server_home[home_id]' />\n
 		<input type='hidden' name='remote_server_id' value='".$server_home['remote_server_id']."' />\n
 		<table class='start-server'>
-		<tr><td class='right'>". get_lang("ogp_agent_ip") .
+		<tr><td class='right'>". get_lang("gsp_agent_ip") .
 		":</td><td class='left'>".$server_home['agent_ip']."</td></tr>";
 	
 	$max_players = $server_home['max_players'];
@@ -565,7 +565,7 @@ elseif($server_home['home_id'] == $_POST['home_id'])
 	$db->changeLastParam($server_home['home_id'],json_encode($save_param)); 
 	
 	echo "<table class='server-starting'>";
-	echo "<tr><td class='right'>". get_lang("ogp_agent_ip") .
+	echo "<tr><td class='right'>". get_lang("gsp_agent_ip") .
 		":</td><td class='left'>".$server_home['agent_ip']."</td></tr>\n";
 	echo "<tr><td class='right'>". get_lang("game_home") .
 		":</td><td class='left'>".$server_home['home_path']."</td></tr>";

@@ -77,7 +77,7 @@ copySystemDInit(){
 			if [ ! -e "$SystemDDir/ogp_agent.service" ]; then
 				echo -e "Copying ogp_agent systemd service file to $SystemDDir"
 				echo "$sudoPass" | sudo -S -p "" cp "${AGENTDIR}/systemd/ogp_agent.service" "$SystemDDir"
-				echo "$sudoPass" | sudo -S -p "" sed -i "s#{OGP_AGENT_PATH}#$AGENTDIR#g" "${SystemDDir}/ogp_agent.service"
+				echo "$sudoPass" | sudo -S -p "" sed -i "s#{GSP_AGENT_PATH}#$AGENTDIR#g" "${SystemDDir}/ogp_agent.service"
 			fi
 		fi
 	fi
@@ -292,8 +292,8 @@ fi
 init_file=${init_dir}/ogp_agent
 
 cp -f $init_file_template $init_file || failed "Failed to create init file ($init_file)."
-# Next we replace the OGP_AGENT_DIR with the actual dir in init file.
-sed -i "s|OGP_AGENT_DIR|${agent_home}|" ${init_file} || failed "Failed to modify init file ($init_file)."
+# Next we replace the GSP_AGENT_DIR with the actual dir in init file.
+sed -i "s|GSP_AGENT_DIR|${agent_home}|" ${init_file} || failed "Failed to modify init file ($init_file)."
 sed -i "s|OGP_USER|${username}|" ${init_file} || failed "Failed to modify init file ($init_file)."
 chmod a+x $init_file
 

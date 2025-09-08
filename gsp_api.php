@@ -1,59 +1,59 @@
 <?php
 /*
 ______________ Token Management
-ogp_api.php?token/create/{panel_user}/{panel_password}
-ogp_api.php?token/test/{token}
+gsp_api.php?token/create/{panel_user}/{panel_password}
+gsp_api.php?token/test/{token}
 
 ______________ Remote Servers
-ogp_api.php?server/list						(POST/GET {token})
-ogp_api.php?server/status					(POST/GET {token}{remote_server_id})
-ogp_api.php?server/restart					(POST/GET {token}{remote_server_id})
-ogp_api.php?server/create 					(POST/GET {token}{agent_name}{agent_ip}{agent_port}{agent_user}{encryption_key}{ftp_ip}{ftp_port}{timeout}{use_nat}{display_public_ip})
-ogp_api.php?server/remove 					(POST/GET {token}{remote_server_id})
-ogp_api.php?server/add_ip					(POST/GET {token}{remote_server_id}{ip})
-ogp_api.php?server/remove_ip				(POST/GET {token}{remote_server_id}{ip})
-ogp_api.php?server/list_ips					(POST/GET {token}{remote_server_id})
-ogp_api.php?server/edit_ip					(POST/GET {token}{remote_server_id}{old_ip}{new_ip})
+gsp_api.php?server/list						(POST/GET {token})
+gsp_api.php?server/status					(POST/GET {token}{remote_server_id})
+gsp_api.php?server/restart					(POST/GET {token}{remote_server_id})
+gsp_api.php?server/create 					(POST/GET {token}{agent_name}{agent_ip}{agent_port}{agent_user}{encryption_key}{ftp_ip}{ftp_port}{timeout}{use_nat}{display_public_ip})
+gsp_api.php?server/remove 					(POST/GET {token}{remote_server_id})
+gsp_api.php?server/add_ip					(POST/GET {token}{remote_server_id}{ip})
+gsp_api.php?server/remove_ip				(POST/GET {token}{remote_server_id}{ip})
+gsp_api.php?server/list_ips					(POST/GET {token}{remote_server_id})
+gsp_api.php?server/edit_ip					(POST/GET {token}{remote_server_id}{old_ip}{new_ip})
 
 ______________ Game Servers
-ogp_api.php?user_games/list_games			(POST/GET {token}{system(windows|linux)}{architecture(32|64)})
-ogp_api.php?user_games/list_servers			(POST/GET {token})
-ogp_api.php?user_games/create 				(POST/GET {token}{remote_server_id}{server_name}{home_cfg_id}{mod_cfg_id}{ip}{port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
-ogp_api.php?user_games/clone 				(POST/GET {token}{origin_home_id}{new_server_name}{new_ip}{new_port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
-ogp_api.php?user_games/set_expiration 		(POST/GET {token}{home_id}{timestamp})
+gsp_api.php?user_games/list_games			(POST/GET {token}{system(windows|linux)}{architecture(32|64)})
+gsp_api.php?user_games/list_servers			(POST/GET {token})
+gsp_api.php?user_games/create 				(POST/GET {token}{remote_server_id}{server_name}{home_cfg_id}{mod_cfg_id}{ip}{port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
+gsp_api.php?user_games/clone 				(POST/GET {token}{origin_home_id}{new_server_name}{new_ip}{new_port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
+gsp_api.php?user_games/set_expiration 		(POST/GET {token}{home_id}{timestamp})
 
 ______________ Users
-ogp_api.php?user_admin/list 				(POST/GET {token})
-ogp_api.php?user_admin/get		 			(POST/GET {token}{email})
-ogp_api.php?user_admin/create 				(POST/GET {token}{email}{name}{password})
-ogp_api.php?user_admin/remove 				(POST/GET {token}{email})
-ogp_api.php?user_admin/set_expiration 		(POST/GET {token}{email}{timestamp})
-ogp_api.php?user_admin/list_assigned		(POST/GET {token}{email})
-ogp_api.php?user_admin/assign 				(POST/GET {token}{email}{home_id}{timestamp})
-ogp_api.php?user_admin/remove_assign 		(POST/GET {token}{email}{home_id})
+gsp_api.php?user_admin/list 				(POST/GET {token})
+gsp_api.php?user_admin/get		 			(POST/GET {token}{email})
+gsp_api.php?user_admin/create 				(POST/GET {token}{email}{name}{password})
+gsp_api.php?user_admin/remove 				(POST/GET {token}{email})
+gsp_api.php?user_admin/set_expiration 		(POST/GET {token}{email}{timestamp})
+gsp_api.php?user_admin/list_assigned		(POST/GET {token}{email})
+gsp_api.php?user_admin/assign 				(POST/GET {token}{email}{home_id}{timestamp})
+gsp_api.php?user_admin/remove_assign 		(POST/GET {token}{email}{home_id})
 
 ______________ Game Manager
-ogp_api.php?gamemanager/start 				(POST/GET {token}{ip}{port}{mod_key})
-ogp_api.php?gamemanager/stop 				(POST/GET {token}{ip}{port}{mod_key})
-ogp_api.php?gamemanager/restart 			(POST/GET {token}{ip}{port}{mod_key})
-ogp_api.php?gamemanager/rcon 				(POST/GET {token}{ip}{port}{mod_key}{command})
-ogp_api.php?gamemanager/update 				(POST/GET {token}{ip}{port}{mod_key}{type}{manual_url})
+gsp_api.php?gamemanager/start 				(POST/GET {token}{ip}{port}{mod_key})
+gsp_api.php?gamemanager/stop 				(POST/GET {token}{ip}{port}{mod_key})
+gsp_api.php?gamemanager/restart 			(POST/GET {token}{ip}{port}{mod_key})
+gsp_api.php?gamemanager/rcon 				(POST/GET {token}{ip}{port}{mod_key}{command})
+gsp_api.php?gamemanager/update 				(POST/GET {token}{ip}{port}{mod_key}{type}{manual_url})
 
 ______________ Lite File Manager
-ogp_api.php?litefm/list 					(POST/GET {token}{ip}{port}{relative_path})
-ogp_api.php?litefm/get 						(POST/GET {token}{ip}{port}{relative_path})
-ogp_api.php?litefm/save 					(POST/GET {token}{ip}{port}{relative_path}{contents})
-ogp_api.php?litefm/remove 					(POST/GET {token}{ip}{port}{relative_path})
+gsp_api.php?litefm/list 					(POST/GET {token}{ip}{port}{relative_path})
+gsp_api.php?litefm/get 						(POST/GET {token}{ip}{port}{relative_path})
+gsp_api.php?litefm/save 					(POST/GET {token}{ip}{port}{relative_path}{contents})
+gsp_api.php?litefm/remove 					(POST/GET {token}{ip}{port}{relative_path})
 
 ______________ Addons Manager
-ogp_api.php?addonsmanager/list				(POST/GET {token})
-ogp_api.php?addonsmanager/install			(POST/GET {token}{ip}{port}{mod_key}{addon_id})
+gsp_api.php?addonsmanager/list				(POST/GET {token})
+gsp_api.php?addonsmanager/install			(POST/GET {token}{ip}{port}{mod_key}{addon_id})
 
 ______________ Steam Workshop
-ogp_api.php?steam_workshop/install 			(POST/GET {token}{ip}{port}{mods_list})
+gsp_api.php?steam_workshop/install 			(POST/GET {token}{ip}{port}{mods_list})
 * 
  ______________ Panel Setting
-ogp_api.php?setting/get 			(POST/GET {token}{setting_name})
+gsp_api.php?setting/get 			(POST/GET {token}{setting_name})
 
 */
 $main_request = key($_GET);

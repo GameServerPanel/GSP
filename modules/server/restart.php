@@ -28,7 +28,7 @@ function exec_ogp_module() {
 		{
 			$remote->remote_readfile( "screenlogs/screenlog.agent_restart", $restart_log );
 			echo "<pre class='log'><xmp>".$restart_log."</xmp></pre>";
-			$remote->remote_readfile( "screenlogs/screenlog.ogp_agent", $agent_log );
+			$remote->remote_readfile( "screenlogs/screenlog.gsp_agent", $agent_log );
 			if($agent_log == "")
 			{
 				$view->refresh("?m=server&p=restart&rhost_id=".$rhost_id."&refresh",5);
@@ -54,7 +54,7 @@ function exec_ogp_module() {
 	} else if($_POST['re_check'] == "yes") {
 		// Confirmed... so restart the agent
 		$remote->exec(  "if [ -e 'screenlogs/screenlog.agent_restart' ]; then rm -f 'screenlogs/screenlog.agent_restart'; fi && ".
-						"if [ -e 'screenlogs/screenlog.ogp_agent' ]; then rm -f 'screenlogs/screenlog.ogp_agent'; fi" );
+						"if [ -e 'screenlogs/screenlog.gsp_agent' ]; then rm -f 'screenlogs/screenlog.gsp_agent'; fi" );
 		$file_info =  $remote->agent_restart();		
 		// 5 seconds should be enough for the agent to come back up
 		echo get_lang("restarting"); # "Restarting agent... Please wait."
