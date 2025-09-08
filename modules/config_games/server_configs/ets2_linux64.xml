@@ -1,0 +1,88 @@
+<game_config>
+
+  <game_key>ets2_linux</game_key>
+  <installer>steamcmd</installer>
+  <game_name>Euro Truck Simulator 2</game_name>
+  <server_exec_name>eurotrucks2_server</server_exec_name>
+  <query_port type='add'>1</query_port>
+  <cli_template>-nosingle</cli_template>
+	<exe_location>bin/linux_x64</exe_location>
+    <max_user_amount>8</max_user_amount>
+  <mods>
+    <mod key="default">
+      <name>None</name>
+      <installer_name>1948160</installer_name>
+      <installer_login>anonymous</installer_login>
+    </mod>
+  </mods>
+  <replace_texts>
+    <text key="home_name">
+      <default>lobby_name:.*</default>
+      <var>lobby_name:</var>
+      <filepath>Euro Truck Simulator 2/server_config.sii</filepath>
+      <options>sq</options>
+    </text>
+    <text key="max_players">
+      <default>max_players:.*</default>
+      <var>max_players:</var>
+      <filepath>Euro Truck Simulator 2/server_config.sii</filepath>
+      <options>s</options>
+    </text>
+	<text  key="port">
+      <default>connection_dedicated_port:.*</default>
+      <var>connection_dedicated_port:</var>
+      <filepath>Euro Truck Simulator 2/server_config.sii</filepath>
+      <options>s</options>
+    </text>
+    <text key="query_port">
+      <default>query_dedicated_port:.*</default>
+      <var>query_dedicated_port:</var>
+      <filepath>Euro Truck Simulator 2/server_config.sii</filepath>
+      <options>s</options>
+    </text>
+  </replace_texts>
+    <custom_fields>
+
+    <field key="connection_virtual_port" type="text">
+
+      <default>connection_virtual_port:.*</default>
+
+      <default_value>101</default_value>
+
+      <var>connection_virtual_port:</var>
+
+      <filepath>Euro Truck Simulator 2/server_config.sii</filepath>
+
+      <access>admin</access>
+
+      <desc>Porta virtual.</desc>
+
+    </field>
+
+    <field key="query_virtual_port" type="text">
+
+      <default>query_virtual_port:.*</default>
+
+      <default_value>102</default_value>
+
+      <var>query_virtual_port:</var>
+
+      <filepath>Euro Truck Simulator 2/server_config.sii</filepath>
+
+      <access>admin</access>
+
+      <desc>Query porta virtual.</desc>
+
+    </field>	
+
+  </custom_fields>
+
+  <environment_variables>
+LD_LIBRARY_PATH='$ORIGIN/../../linux64'
+export XDG_DATA_HOME=${XDG_DATA_HOME:="{OGP_HOME_DIR}"} 
+</environment_variables>
+    <configuration_files>
+    <file description="configure server">Euro Truck Simulator 2/server_config.sii</file>
+    <file description="Advanced Modifications">Euro Truck Simulator 2/server_packages.sii </file>
+  </configuration_files>
+</game_config>

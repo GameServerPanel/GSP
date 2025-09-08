@@ -1,0 +1,26 @@
+<?php
+// Setting error reporting to all errors
+	error_reporting(E_ALL);
+
+include "functions.php";
+
+function exec_ogp_module(){
+
+	if($_SERVER['REQUEST_METHOD'] === 'GET'){
+		$homeid = $_GET['home_id'];
+echo "<center><h4>This Module is Currently not Working - Testing phase - 
+	if you need to restore from backup see @shootingBlanks or @dimrod on discord</h4></center>";
+		echo '<center>';
+		echo '<h2>Backups Available for game server '.$homeid.'</h2>';
+		echo '<div><form method="POST">';
+		echo '<input type="hidden" name="home_id" value="'.$homeid.'"/>';
+			getAvailableBackups($homeid);
+		echo "</form></div>";
+		echo '</center>';
+	}elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		$action = $_POST['dothis'];
+		$homeid = $_POST['home_id'];
+		doButtons($action, $homeid);
+	}
+}
+

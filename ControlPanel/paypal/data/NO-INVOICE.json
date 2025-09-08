@@ -1,0 +1,10 @@
+{
+    "event_type": "PAYMENT.SALE.COMPLETED",
+    "status": "PAID",
+    "amount": "0.48",
+    "currency": "USD",
+    "payer": null,
+    "invoice": null,
+    "custom": null,
+    "ts": "2025-08-25T16:46:11-04:00"
+}

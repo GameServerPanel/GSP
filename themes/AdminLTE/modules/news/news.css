@@ -1,0 +1,25 @@
+.card-body p:last-of-type
+{
+    margin-bottom: 0px;
+}
+
+.pull-right {
+	float: right;
+}
+.pull-left {
+	float: left;
+}
+
+.news-img {
+    margin: 0px 10px 10px;
+}
+
+.news-img img,
+[rel="prettyPhoto[ad_gal]"] img {
+	max-width: 75px;
+	max-height: 75px;
+}
+
+.card-title a {
+	color: inherit;
+}

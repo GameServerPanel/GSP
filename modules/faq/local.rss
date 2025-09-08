@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<rss version="2.0" 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:admin="http://webns.net/mvcb/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+   xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+   xmlns:content="http://purl.org/rss/1.0/modules/content/"
+   >
+<channel>
+    
+    <title>IAREGAMER FAQ</title>
+    <link>https://iaregamer.com</link>
+    <description></description>
+    <dc:language>en</dc:language>
+    <generator>Serendipity 2.0.4 - http://www.s9y.org/</generator>
+    <pubDate>Wed, 17 Jun 2020 20:10:54 GMT</pubDate>
+
+    <image>
+    <url></url>
+    <title>RSS: IAREGAMER FAQ - </title>
+    <link>https://iaregamer.com</link>
+    <width>100</width>
+    <height>21</height>
+</image>
+
+<item>
+    <title>What if I need help with my server?</title>
+    <category>General</category>
+    
+    <content:encoded>
+    (1) if your server is broken, submit a tickit or contact us on Discord 
+    (2) if you need help with scripting, contact us on Discord and let us know what you need 
+    (3) confused? contact us on Discord
+
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>How do I contact support?</title>
+    <category>General</category>
+    <content:encoded>
+    (1) submit a ticket on our Panel menu
+    (2) join our &lt;a href=https://discord.gg/cWHAbav target=_blank &gt; Discord Server&lt;/a&gt;
+    (3) Look at the LOWER RIGHT of every page: Click the Discord icon
+
+
+    </content:encoded>
+
+</item>
+
+<item>
+    <title>What is the Query Port for my server?</title>
+    <category>General</category>
+    
+    <content:encoded>
+If your gameserver is not listed below, then the QueryPort is the same as your Connection Port.
+Add the number to your servers Connection port for your Query Port (or other port if available)
+
+For Example: 
+Query Port : +2
+If your serverport is 7777 then your query port will be 7779
+
+ArkSE      : QueryPort +1
+Arma2      : QueryPort +1
+Arma3      : QueryPort +1
+DayzMod    : QueryPort +1
+DayzSA     : QueryPort +3
+KillingFloor : QueryPort +1
+Miscreated : QueryPort +2
+TheForest : QueryPort +1
+UnrealTournament(all) : QueryPort +1
+
+    </content:encoded>
+
+    
+</item>
+<item>
+    <title>How to Assign Game Servers to Users and Sub Users</title>
+   <category>Panel</category>
+    
+    <content:encoded>
+    &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/NxA0O1YMZe4&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+ 
+    </content:encoded>
+    
+</item>
+<item>
+    <title>I have the error &quot;Failed to start the remote server. Error code: -1&quot; when starting my game server.</title>
+            <category>Panel</category>
+    
+    <content:encoded>
+Some games take a LONG time to start because they are building maps or loading lots of assets. 
+Our system only waits a few seconds and then you can return to the Game Monitor. 
+If the server is still starting, you will see this error code. 
+Be Patient.
+    </content:encoded>
+    
+</item>
+<item>
+    <title>How can I backup and restore my Gameserver database?</title>
+            <category>Panel</category>
+    
+    <content:encoded>
+In your Game Monitor, click on the MYSQL button and then login to PHPMYADMIN.  
+Select EXPORT and save the file on your local PC.  
+To RESTORE, delete ALL TABLES, FUNCTIONS and DATA from your DB then IMPORT your file 
+    </content:encoded>
+   
+</item>
+<item>
+    <title>Why doesn't my gameserver start?</title>
+    <category>Panel</category>
+
+    <content:encoded>
+Yes, there COULD be a problem with our server. BUT have you recently changed any files?
+The most common reason is the server is crashing or fails to start because of invalid, missing files
+or something is misconfigured.  
+Restore the BACKUP you made before editing your server. (You DID backup, right?)
+If you have NOT made any changes, contact support and we will investigate. 
+    </content:encoded>
+
+    
+</item>
+<item>
+    <title>Why can't I delete some files in my game server folder?</title>
+           <category>Panel</category>
+    
+    <content:encoded>
+    We protect the &lt;strong&gt;server executable&lt;/strong&gt; and the &lt;strong&gt;startup script&lt;/strong&gt; to disallow modifications by the user.
+If you need to change this file, contact support.
+
+ 
+    </content:encoded>
+
+    
+</item>
+<item>
+    <title>How to force game server files validation with SteamCMD from Panel?</title>
+     <category>Panel</category>
+    
+    <content:encoded>
+    Delete the &lt;strong&gt;SteamApps&lt;/strong&gt; folder located in the game server root folder, then run a normal update from the Game Monitor by clicking &lt;strong&gt;Install/Update via Steam&lt;/strong&gt; button in the game server own page. You will see the file verification progress in the logging window.
+ 
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I restart my server?</title>
+     <category>Dayz</category>
+
+    <content:encoded>
+BEC is preinstalled with your server. You can set the scheduler.xml to restart at intervals.
+There is a scheduler_faq.xml file inside your bec/config folder that will explain in detail 
+how to configure the scheduler.
+As always, if you need help just ask on Discord.
+    </content:encoded>
+</item>
+
+</channel>
+</rss>

@@ -1,0 +1,6 @@
+@ShutdownOnFailedCommand 1
+@NoPromptForPassword 1
+login shoootingblanks EdnaJ0an
+force_install_dir "C:\OGP64\home\gameserver\1460"
+workshop_download_item 107410 1128256978
+exit

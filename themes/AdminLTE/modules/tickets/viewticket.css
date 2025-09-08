@@ -1,0 +1,75 @@
+input.star { 
+    display: none;
+}
+
+label.star {
+    float: right;
+    transition: all .2s;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+input.star:checked ~ label.star:before {
+    content: '\2605';
+    color: #FD4;
+    transition: all .25s;
+}
+
+input.star-1:checked ~ label.star:before {
+    color: #F62;
+}
+
+label.star:hover {
+    transform: rotate(-15deg) scale(1.3);
+}
+
+label.star:before {
+    content: '\2605';
+}
+
+
+.attachment_add {
+	margin-bottom: 1rem;
+}
+
+.attachment_inputs > .custom-file {
+	margin-right: 0.4rem;
+}
+
+.attachment_info {
+	padding: 1rem 0;
+}
+
+.direct-chat {
+    max-height: calc(100% - 1rem);
+    overflow: scroll;
+}
+.direct-chat-messages
+{
+	max-height: 600px;
+	height: auto !important;
+}
+.direct-chat-footer
+{
+	font-size: 0.8rem;
+	opacity: 0.8;
+}
+.direct-chat-msg.right .direct-chat-footer
+{
+    padding-right: 55px;
+	padding-left: 20px;
+}
+.direct-chat-msg:not(.right) .direct-chat-footer
+{
+    padding-left: 55px;
+	padding-right: 20px;
+}
+.footer_row:not(.attachmentContainer) .left,
+.footer_row:not(.attachmentContainer) .right
+{
+	display: inline-block;
+}
+.direct-chat-footer .footer_row:not(.attachmentContainer) .right
+{
+	float: right;
+}

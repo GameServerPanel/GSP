@@ -1,0 +1,599 @@
+
+
+[2025-03-06 17:22:49] Client version: 1738027521
+[2025-03-06 17:22:49] Loading workshop items for 0 installed apps for user [a:1:3423550484]:
+[2025-03-06 17:23:12] [AppID 475370] Loaded workshop items in "c:\ogp64\home\gameserver\1470\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-07 16:30:56] Client version: 1738027521
+[2025-03-07 16:30:56] Loading workshop items for 0 installed apps for user [a:1:885062913]:
+[2025-03-07 16:31:18] Loading workshop items for 0 installed apps for user [a:1:885062913]:
+[2025-03-07 16:31:18] [AppID 376030] Loaded workshop items in "c:\ogp64\home\gameserver\1472\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-19 12:31:40] Client version: 1741737873
+[2025-03-19 12:31:40] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-03-19 12:32:25] Client version: 1741737873
+[2025-03-19 12:32:25] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-03-19 12:37:53] Client version: 1741737873
+[2025-03-19 12:37:53] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-19 12:38:18] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-19 12:38:18] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1480\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-19 13:16:08] Client version: 1741737873
+[2025-03-19 13:16:08] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-19 13:16:32] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-19 13:16:32] [AppID 223350] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-19 13:18:53] Client version: 1741737873
+[2025-03-19 13:18:53] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-19 13:19:17] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-19 13:19:17] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1481\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-22 14:03:00] Client version: 1742420332
+[2025-03-22 14:03:00] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-22 14:03:24] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-22 14:03:24] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1482\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-24 09:44:58] Client version: 1742420332
+[2025-03-24 09:44:58] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-24 09:45:22] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+
+
+[2025-03-24 11:22:02] Client version: 1742420332
+[2025-03-24 11:22:02] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-24 11:22:26] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-24 11:22:26] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1478\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-03-31 18:07:55] Client version: 1742420332
+[2025-03-31 18:07:55] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-31 18:07:59] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-03-31 18:07:59] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (0 installed, 0 needed)
+[2025-03-31 18:07:59] [AppID 221100] Download item 2572331007 requested by app
+[2025-03-31 18:07:59] [AppID 221100] Starting Workshop download job (requested item 2572331007 )
+[2025-03-31 18:07:59] [AppID 221100] Detected workshop change (latest from server) : changed cached item 2572331007, new manifest 7646904453517222010
+[2025-03-31 18:08:28] [AppID 221100] Download item 2572331007 result : OK
+[2025-03-31 18:08:28] [AppID 221100] Finished Workshop download job : No Error
+[2025-03-31 18:08:28] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-03-31 18:10:41] Client version: 1742420332
+[2025-03-31 18:10:41] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-31 18:10:44] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-03-31 18:10:44] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (1 installed, 1 needed)
+[2025-03-31 18:10:44] [AppID 221100] Download item 2116157322 requested by app
+[2025-03-31 18:10:44] [AppID 221100] Starting Workshop download job (requested item 2116157322 )
+[2025-03-31 18:10:44] [AppID 221100] Detected workshop change (latest from server) : changed cached item 2116157322, new manifest 1864575454200966016
+[2025-03-31 18:10:53] [AppID 221100] Download item 2116157322 result : OK
+[2025-03-31 18:10:53] [AppID 221100] Finished Workshop download job : No Error
+[2025-03-31 18:10:53] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-03-31 18:11:38] Client version: 1742420332
+[2025-03-31 18:11:38] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-31 18:11:41] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-03-31 18:11:41] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (2 installed, 2 needed)
+[2025-03-31 18:11:41] [AppID 221100] Download item 1559212036 requested by app
+[2025-03-31 18:11:42] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-03-31 18:11:42] [AppID 221100] Detected workshop change (latest from server) : changed cached item 1559212036, new manifest 1133891205939521112
+[2025-03-31 18:11:44] [AppID 221100] Download item 1559212036 result : OK
+[2025-03-31 18:11:44] [AppID 221100] Finished Workshop download job : No Error
+[2025-03-31 18:11:44] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-03-31 18:12:18] Client version: 1742420332
+[2025-03-31 18:12:18] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-31 18:12:20] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-03-31 18:12:21] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (3 installed, 3 needed)
+[2025-03-31 18:12:21] [AppID 221100] Download item 2545327648 requested by app
+[2025-03-31 18:12:21] [AppID 221100] Starting Workshop download job (requested item 2545327648 )
+[2025-03-31 18:12:21] [AppID 221100] Detected workshop change (latest from server) : changed cached item 2545327648, new manifest 5497789727485898981
+[2025-03-31 18:12:23] [AppID 221100] Download item 2545327648 result : OK
+[2025-03-31 18:12:23] [AppID 221100] Finished Workshop download job : No Error
+[2025-03-31 18:12:23] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-03-31 18:22:07] Client version: 1742420332
+[2025-03-31 18:22:07] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-31 18:22:10] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-03-31 18:22:10] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (4 installed, 4 needed)
+[2025-03-31 18:22:10] [AppID 221100] Download item 1559212036 requested by app
+[2025-03-31 18:22:10] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-03-31 18:22:10] [AppID 221100] Download item 1559212036 result : OK
+[2025-03-31 18:22:10] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-03-31 18:22:51] Client version: 1742420332
+[2025-03-31 18:22:51] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-03-31 18:23:09] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-03-31 18:23:09] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (4 installed, 4 needed)
+[2025-03-31 18:23:09] [AppID 221100] Download item 1564026768 requested by app
+[2025-03-31 18:23:09] [AppID 221100] Starting Workshop download job (requested item 1564026768 )
+[2025-03-31 18:23:09] [AppID 221100] Detected workshop change (latest from server) : changed cached item 1564026768, new manifest 3535506525101846930
+[2025-03-31 18:23:53] [AppID 221100] Download item 1564026768 result : OK
+[2025-03-31 18:23:53] [AppID 221100] Finished Workshop download job : No Error
+[2025-03-31 18:23:53] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-04-03 19:11:19] Client version: 1743712175
+[2025-04-03 19:11:19] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-03 19:11:22] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-04-04 20:21:30] Client version: 1743712175
+[2025-04-04 20:21:30] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-04 20:21:33] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-04 20:21:33] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1483\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-04-06 06:13:43] Client version: 1743712175
+[2025-04-06 06:13:43] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-06 06:13:46] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-04-06 06:13:47] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (5 installed, 5 needed)
+[2025-04-06 06:13:47] [AppID 221100] Download item 3371742728 requested by app
+[2025-04-06 06:13:47] [AppID 221100] Starting Workshop download job (requested item 3371742728 )
+[2025-04-06 06:13:47] [AppID 221100] Detected workshop change (latest from server) : changed cached item 3371742728, new manifest 1439588713322888885
+[2025-04-06 06:14:01] [AppID 221100] Download item 3371742728 result : OK
+[2025-04-06 06:14:01] [AppID 221100] Finished Workshop download job : No Error
+[2025-04-06 06:14:02] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-04-08 05:17:18] Client version: 1743712175
+[2025-04-08 05:17:18] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-08 05:17:22] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-08 05:17:22] [AppID 233780] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-04-08 05:23:37] Client version: 1743712175
+[2025-04-08 05:23:37] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-08 05:23:40] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-04-08 05:26:30] Client version: 1743712175
+[2025-04-08 05:26:30] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-08 05:26:47] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-04-08 05:27:29] Client version: 1743712175
+[2025-04-08 05:27:29] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-08 05:27:32] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-04-25 06:24:42] Client version: 1745270234
+[2025-04-25 06:24:42] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:24:46] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:24:46] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (0 installed, 0 needed)
+[2025-04-25 06:24:46] [AppID 107410] Download item 450814997 requested by app
+[2025-04-25 06:24:47] [AppID 107410] Starting Workshop download job (requested item 450814997 )
+[2025-04-25 06:24:47] [AppID 107410] Detected workshop change (latest from server) : changed cached item 450814997, new manifest 7595988810735173879
+[2025-04-25 06:24:49] [AppID 107410] Download item 450814997 result : OK
+[2025-04-25 06:24:49] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:24:49] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:25:52] Client version: 1745270234
+[2025-04-25 06:25:52] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:25:55] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:25:55] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (1 installed, 1 needed)
+[2025-04-25 06:25:55] [AppID 107410] Download item 1334412770 requested by app
+[2025-04-25 06:25:55] [AppID 107410] Starting Workshop download job (requested item 1334412770 )
+[2025-04-25 06:25:56] [AppID 107410] Detected workshop change (latest from server) : changed cached item 1334412770, new manifest 6026298813437310953
+[2025-04-25 06:25:57] [AppID 107410] Download item 1334412770 result : OK
+[2025-04-25 06:25:57] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:25:58] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:26:20] Client version: 1745270234
+[2025-04-25 06:26:20] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:26:23] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:26:24] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (2 installed, 2 needed)
+[2025-04-25 06:26:24] [AppID 107410] Download item 2791403093 requested by app
+[2025-04-25 06:26:24] [AppID 107410] Starting Workshop download job (requested item 2791403093 )
+[2025-04-25 06:26:24] [AppID 107410] Detected workshop change (latest from server) : changed cached item 2791403093, new manifest 5899262306366770570
+[2025-04-25 06:26:25] [AppID 107410] Download item 2791403093 result : OK
+[2025-04-25 06:26:25] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:26:26] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:26:58] Client version: 1745270234
+[2025-04-25 06:26:58] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:27:01] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:27:01] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (3 installed, 3 needed)
+[2025-04-25 06:27:01] [AppID 107410] Download item 861133494 requested by app
+[2025-04-25 06:27:01] [AppID 107410] Starting Workshop download job (requested item 861133494 )
+[2025-04-25 06:27:01] [AppID 107410] Detected workshop change (latest from server) : changed cached item 861133494, new manifest 1127842851624021661
+[2025-04-25 06:27:16] [AppID 107410] Download item 861133494 result : OK
+[2025-04-25 06:27:16] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:27:16] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:28:21] Client version: 1745270234
+[2025-04-25 06:28:21] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:28:23] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:28:23] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (4 installed, 4 needed)
+[2025-04-25 06:28:23] [AppID 107410] Download item 497661914 requested by app
+[2025-04-25 06:28:24] [AppID 107410] Starting Workshop download job (requested item 497661914 )
+[2025-04-25 06:28:24] [AppID 107410] Detected workshop change (latest from server) : changed cached item 497661914, new manifest 4743650893805724177
+[2025-04-25 06:29:23] [AppID 107410] Download item 497661914 result : OK
+[2025-04-25 06:29:23] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:29:23] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:34:21] Client version: 1745270234
+[2025-04-25 06:34:21] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:34:24] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:34:24] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (5 installed, 5 needed)
+[2025-04-25 06:34:24] [AppID 107410] Download item 541888371 requested by app
+[2025-04-25 06:34:24] [AppID 107410] Starting Workshop download job (requested item 541888371 )
+[2025-04-25 06:34:24] [AppID 107410] Detected workshop change (latest from server) : changed cached item 541888371, new manifest 2841826139466761131
+[2025-04-25 06:34:26] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "2b3174549c3596d8dfb4618d2a1e5cd90df52abf" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\Attributions.txt"
+[2025-04-25 06:34:26] [AppID 107410] Download item 541888371 result : Failure
+[2025-04-25 06:34:26] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:35:15] Client version: 1745270234
+[2025-04-25 06:35:15] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:35:17] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:35:17] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (5 installed, 6 needed)
+[2025-04-25 06:35:17] [AppID 107410] Download item 647753401 requested by app
+[2025-04-25 06:35:17] [AppID 107410] Starting Workshop download job (requested item 647753401 )
+[2025-04-25 06:35:18] [AppID 107410] Detected workshop change (latest from server) : changed cached item 647753401, new manifest 7113202655748771005
+[2025-04-25 06:35:24] [AppID 107410] Download item 647753401 result : OK
+[2025-04-25 06:35:24] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:35:24] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:35:54] Client version: 1745270234
+[2025-04-25 06:35:54] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:35:57] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:35:57] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (6 installed, 7 needed)
+[2025-04-25 06:35:57] [AppID 107410] Download item 1487484880 requested by app
+[2025-04-25 06:35:57] [AppID 107410] Starting Workshop download job (requested item 1487484880 )
+[2025-04-25 06:35:57] [AppID 107410] Detected workshop change (latest from server) : changed cached item 1487484880, new manifest 7886061937455919539
+[2025-04-25 06:36:11] [AppID 107410] Download item 1487484880 result : OK
+[2025-04-25 06:36:11] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-25 06:36:11] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:36:56] Client version: 1745270234
+[2025-04-25 06:36:56] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:37:00] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:37:00] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (7 installed, 8 needed)
+[2025-04-25 06:37:00] [AppID 107410] Download item 541888371 requested by app
+[2025-04-25 06:37:00] [AppID 107410] Starting Workshop download job (requested item 541888371 )
+[2025-04-25 06:37:00] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "2b3174549c3596d8dfb4618d2a1e5cd90df52abf" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\Attributions.txt"
+[2025-04-25 06:37:01] [AppID 107410] Download item 541888371 result : Failure
+
+
+[2025-04-25 06:38:20] Client version: 1745270234
+[2025-04-25 06:38:20] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:38:24] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:38:24] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (7 installed, 8 needed)
+[2025-04-25 06:38:24] [AppID 107410] Download item 497660133 requested by app
+[2025-04-25 06:38:24] [AppID 107410] Starting Workshop download job (requested item 497660133 )
+[2025-04-25 06:38:24] [AppID 107410] Detected workshop change (latest from server) : changed cached item 497660133, new manifest 8720498708667511271
+[2025-04-25 06:38:25] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "2b3174549c3596d8dfb4618d2a1e5cd90df52abf" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\Attributions.txt"
+[2025-04-25 06:38:26] [AppID 107410] Download item 497660133 result : Failure
+[2025-04-25 06:38:26] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-04-25 06:39:23] Client version: 1745270234
+[2025-04-25 06:39:23] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-25 06:39:26] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-25 06:39:26] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (7 installed, 9 needed)
+[2025-04-25 06:39:26] [AppID 107410] Download item 541888371 requested by app
+[2025-04-25 06:39:26] [AppID 107410] Starting Workshop download job (requested item 541888371 )
+[2025-04-25 06:39:27] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "2b3174549c3596d8dfb4618d2a1e5cd90df52abf" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\Attributions.txt"
+[2025-04-25 06:39:27] [AppID 107410] Download item 541888371 result : Failure
+
+
+[2025-04-28 16:24:25] Client version: 1745270234
+[2025-04-28 16:24:25] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-04-28 16:24:28] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-04-28 16:24:28] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (7 installed, 9 needed)
+[2025-04-28 16:24:28] [AppID 107410] Download item 485417177 requested by app
+[2025-04-28 16:24:28] [AppID 107410] Starting Workshop download job (requested item 485417177 )
+[2025-04-28 16:24:29] [AppID 107410] Detected workshop change (latest from server) : changed cached item 485417177, new manifest 8084470774319514396
+[2025-04-28 16:25:30] [AppID 107410] Download item 485417177 result : OK
+[2025-04-28 16:25:30] [AppID 107410] Finished Workshop download job : No Error
+[2025-04-28 16:25:30] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-05-08 14:24:24] Client version: 1745888136
+[2025-05-08 14:24:24] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-08 14:24:28] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-05-08 14:24:29] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (8 installed, 10 needed)
+[2025-05-08 14:24:29] [AppID 107410] Download item 1361461340 requested by app
+[2025-05-08 14:24:29] [AppID 107410] Starting Workshop download job (requested item 1361461340 )
+[2025-05-08 14:24:29] [AppID 107410] Detected workshop change (latest from server) : changed cached item 1361461340, new manifest 434769749033160441
+[2025-05-08 14:24:32] [AppID 107410] Download item 1361461340 result : OK
+[2025-05-08 14:24:32] [AppID 107410] Finished Workshop download job : No Error
+[2025-05-08 14:24:32] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-05-09 11:19:27] Client version: 1745888136
+[2025-05-09 11:19:27] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-09 11:19:30] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-05-09 11:19:30] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (9 installed, 11 needed)
+[2025-05-09 11:19:30] [AppID 107410] Download item 843425103 requested by app
+[2025-05-09 11:19:30] [AppID 107410] Starting Workshop download job (requested item 843425103 )
+[2025-05-09 11:19:31] [AppID 107410] Detected workshop change (latest from server) : changed cached item 843425103, new manifest 5942706292588186175
+[2025-05-09 11:19:32] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "0ab8318acaf6e678dd02e2b5c343ed41111b393d" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\addons\cup_creatures_people_civil_chernarus.pbo"
+[2025-05-09 11:19:32] [AppID 107410] Download item 843425103 result : Failure
+[2025-05-09 11:19:32] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-05-09 11:22:22] Client version: 1745888136
+[2025-05-09 11:22:22] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-09 11:22:25] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-05-09 11:22:25] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (9 installed, 12 needed)
+[2025-05-09 11:22:25] [AppID 107410] Download item 843425103 requested by app
+[2025-05-09 11:22:25] [AppID 107410] Starting Workshop download job (requested item 843425103 )
+[2025-05-09 11:22:26] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "0ab8318acaf6e678dd02e2b5c343ed41111b393d" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\addons\cup_creatures_people_civil_chernarus.pbo"
+[2025-05-09 11:22:26] [AppID 107410] Download item 843425103 result : Failure
+
+
+[2025-05-09 11:24:44] Client version: 1745888136
+[2025-05-09 11:24:44] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-09 11:24:47] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-05-09 11:24:48] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1485\steamapps\workshop" (9 installed, 12 needed)
+[2025-05-09 11:24:48] [AppID 107410] Download item 843425103 requested by app
+[2025-05-09 11:24:48] [AppID 107410] Starting Workshop download job (requested item 843425103 )
+[2025-05-09 11:24:48] [AppID 107410] Update canceled: Failed updating depot 107410 while reading chunk "0ab8318acaf6e678dd02e2b5c343ed41111b393d" (File Not Found) (Missing game files) "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914\addons\cup_creatures_people_civil_chernarus.pbo"
+[2025-05-09 11:24:48] [AppID 107410] Download item 843425103 result : Failure
+
+
+[2025-05-14 11:11:06] Client version: 1745888136
+[2025-05-14 11:11:06] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-14 11:11:10] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-05-14 11:11:10] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1460\steamapps\workshop" (0 installed, 0 needed)
+[2025-05-14 11:11:10] [AppID 107410] Download item 1361461340 requested by app
+[2025-05-14 11:11:10] [AppID 107410] Starting Workshop download job (requested item 1361461340 )
+[2025-05-14 11:11:10] [AppID 107410] Detected workshop change (latest from server) : changed cached item 1361461340, new manifest 434769749033160441
+[2025-05-14 11:11:13] [AppID 107410] Download item 1361461340 result : OK
+[2025-05-14 11:11:13] [AppID 107410] Finished Workshop download job : No Error
+[2025-05-14 11:11:13] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-05-28 12:25:45] Client version: 1747702063
+[2025-05-28 12:25:45] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-28 12:25:48] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-05-28 12:25:48] [AppID 107410] Loaded workshop items in "c:\ogp64\home\gameserver\1460\steamapps\workshop" (1 installed, 1 needed)
+[2025-05-28 12:25:48] [AppID 107410] Download item 1128256978 requested by app
+[2025-05-28 12:25:49] [AppID 107410] Starting Workshop download job (requested item 1128256978 )
+[2025-05-28 12:25:49] [AppID 107410] Detected workshop change (latest from server) : changed cached item 1128256978, new manifest 2376318411605233630
+[2025-05-28 12:26:39] [AppID 107410] Download item 1128256978 result : OK
+[2025-05-28 12:26:39] [AppID 107410] Finished Workshop download job : No Error
+[2025-05-28 12:26:40] [AppID 107410] Updating workshop item details failed with Failure
+
+
+[2025-05-31 13:15:59] Client version: 1747702063
+[2025-05-31 13:15:59] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-31 13:16:02] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-05-31 13:16:03] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (6 installed, 6 needed)
+[2025-05-31 13:16:03] [AppID 221100] Download item 3483534745 requested by app
+[2025-05-31 13:16:03] [AppID 221100] Starting Workshop download job (requested item 3483534745 )
+[2025-05-31 13:16:03] [AppID 221100] Detected workshop change (latest from server) : changed cached item 3483534745, new manifest 887451959938839262
+[2025-05-31 13:16:31] [AppID 221100] Download item 3483534745 result : OK
+[2025-05-31 13:16:31] [AppID 221100] Finished Workshop download job : No Error
+[2025-05-31 13:16:31] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-05-31 13:19:26] Client version: 1747702063
+[2025-05-31 13:19:26] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-31 13:19:28] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-05-31 13:19:29] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (7 installed, 7 needed)
+[2025-05-31 13:19:29] [AppID 221100] Download item 2966495799 requested by app
+[2025-05-31 13:19:29] [AppID 221100] Starting Workshop download job (requested item 2966495799 )
+[2025-05-31 13:19:29] [AppID 221100] Detected workshop change (latest from server) : changed cached item 2966495799, new manifest 5164780319067758356
+[2025-05-31 13:23:23] [AppID 221100] Download item 2966495799 result : OK
+[2025-05-31 13:23:23] [AppID 221100] Finished Workshop download job : No Error
+[2025-05-31 13:23:23] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-05-31 13:26:58] Client version: 1747702063
+[2025-05-31 13:26:58] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-31 13:27:01] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-05-31 13:27:01] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (8 installed, 8 needed)
+[2025-05-31 13:27:01] [AppID 221100] Download item 1559212036 requested by app
+[2025-05-31 13:27:01] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-05-31 13:27:01] [AppID 221100] Detected workshop change (latest from server) : changed cached item 1559212036, new manifest 7579014110955279300
+[2025-05-31 13:27:04] [AppID 221100] Download item 1559212036 result : OK
+[2025-05-31 13:27:04] [AppID 221100] Finished Workshop download job : No Error
+[2025-05-31 13:27:04] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-05-31 13:27:44] Client version: 1747702063
+[2025-05-31 13:27:44] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-31 13:27:47] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-05-31 13:27:47] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (8 installed, 8 needed)
+[2025-05-31 13:27:47] [AppID 221100] Download item 1828439124 requested by app
+[2025-05-31 13:27:47] [AppID 221100] Starting Workshop download job (requested item 1828439124 )
+[2025-05-31 13:27:48] [AppID 221100] Detected workshop change (latest from server) : changed cached item 1828439124, new manifest 9194960974333062716
+[2025-05-31 13:27:50] [AppID 221100] Download item 1828439124 result : OK
+[2025-05-31 13:27:50] [AppID 221100] Finished Workshop download job : No Error
+[2025-05-31 13:27:50] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-05-31 13:31:53] Client version: 1747702063
+[2025-05-31 13:31:53] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-05-31 13:31:56] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-05-31 13:31:57] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1479\steamapps\workshop" (9 installed, 9 needed)
+[2025-05-31 13:31:57] [AppID 221100] Download item 1828439124 requested by app
+[2025-05-31 13:31:57] [AppID 221100] Starting Workshop download job (requested item 1828439124 )
+[2025-05-31 13:31:57] [AppID 221100] Download item 1828439124 result : OK
+[2025-05-31 13:31:57] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-06-03 11:23:51] Client version: 1747702063
+[2025-06-03 11:23:51] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-06-03 11:23:54] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-06-03 12:44:37] Client version: 1747702063
+[2025-06-03 12:44:37] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-06-03 12:44:39] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-06-18 17:09:40] Client version: 1747702063
+[2025-06-18 17:09:40] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-06-18 17:09:45] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+
+
+[2025-06-18 17:25:23] Client version: 1747702063
+[2025-06-18 17:25:23] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-06-18 17:25:26] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+
+
+[2025-07-14 17:26:43] Client version: 1751406682
+[2025-07-14 17:26:43] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 17:26:47] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 17:26:48] [AppID 223350] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-07-14 17:54:07] Client version: 1751406682
+[2025-07-14 17:54:07] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 17:54:10] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-07-14 17:54:10] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (0 installed, 0 needed)
+[2025-07-14 17:54:10] [AppID 221100] Download item 1559212036 requested by app
+[2025-07-14 17:54:10] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-07-14 17:54:10] [AppID 221100] Detected workshop change (latest from server) : changed cached item 1559212036, new manifest 7579014110955279300
+[2025-07-14 17:54:11] [AppID 221100] Download item 1559212036 result : OK
+[2025-07-14 17:54:11] [AppID 221100] Finished Workshop download job : No Error
+[2025-07-14 17:54:11] [AppID 221100] Updating workshop item details failed with Failure
+
+
+[2025-07-14 17:55:20] Client version: 1751406682
+[2025-07-14 17:55:20] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 17:55:24] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-07-14 17:55:24] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (1 installed, 1 needed)
+[2025-07-14 17:55:24] [AppID 221100] Download item 1559212036 requested by app
+[2025-07-14 17:55:24] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-07-14 17:55:24] [AppID 221100] Download item 1559212036 result : OK
+[2025-07-14 17:55:24] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-07-14 17:56:38] Client version: 1751406682
+[2025-07-14 17:56:38] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 17:56:41] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-07-14 17:56:41] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (1 installed, 1 needed)
+[2025-07-14 17:56:41] [AppID 221100] Download item 1559212036 requested by app
+[2025-07-14 17:56:41] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-07-14 17:56:41] [AppID 221100] Download item 1559212036 result : OK
+[2025-07-14 17:56:41] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-07-14 17:57:34] Client version: 1751406682
+[2025-07-14 17:57:34] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 17:57:37] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-07-14 17:57:38] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (1 installed, 1 needed)
+[2025-07-14 17:57:38] [AppID 221100] Download item 1559212036 requested by app
+[2025-07-14 17:57:38] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-07-14 17:57:38] [AppID 221100] Download item 1559212036 result : OK
+[2025-07-14 17:57:38] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-07-14 18:05:40] Client version: 1751406682
+[2025-07-14 18:05:40] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 18:05:43] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-07-14 18:05:43] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (1 installed, 1 needed)
+[2025-07-14 18:05:43] [AppID 221100] Download item 1559212036 requested by app
+[2025-07-14 18:05:43] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-07-14 18:05:43] [AppID 221100] Download item 1559212036 result : OK
+[2025-07-14 18:05:43] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-07-14 18:06:02] Client version: 1751406682
+[2025-07-14 18:06:02] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-07-14 18:06:05] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+[2025-07-14 18:06:05] [AppID 221100] Loaded workshop items in "c:\ogp64\home\gameserver\1488\steamapps\workshop" (1 installed, 1 needed)
+[2025-07-14 18:06:05] [AppID 221100] Download item 1559212036 requested by app
+[2025-07-14 18:06:06] [AppID 221100] Starting Workshop download job (requested item 1559212036 )
+[2025-07-14 18:06:06] [AppID 221100] Download item 1559212036 result : OK
+[2025-07-14 18:06:06] [AppID 221100] Finished Workshop download job : No Error
+
+
+[2025-08-04 08:02:32] Client version: 1751406682
+[2025-08-04 08:02:32] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-04 08:02:36] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-08-07 13:12:25] Client version: 1751406682
+[2025-08-07 13:12:25] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-07 13:12:28] Loading workshop items for 2 installed apps for user [U:1:120543934]:
+
+
+[2025-08-07 13:26:09] Client version: 1751406682
+[2025-08-07 13:26:09] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-07 13:26:12] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-07 13:26:13] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1480\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-08-07 14:50:42] Client version: 1751406682
+[2025-08-07 14:50:42] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-07 14:50:46] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-08-07 18:38:47] Client version: 1751406682
+[2025-08-07 18:38:47] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-07 18:38:50] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+
+
+[2025-08-14 20:16:31] Client version: 1751406682
+[2025-08-14 20:16:31] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-14 20:16:35] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+
+
+[2025-08-14 20:29:55] Client version: 1751406682
+[2025-08-14 20:29:55] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-14 20:29:58] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+
+
+[2025-08-15 12:05:47] Client version: 1751406682
+[2025-08-15 12:05:47] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 12:05:51] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-08-15 12:08:03] Client version: 1751406682
+[2025-08-15 12:08:03] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 12:08:06] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-08-15 12:29:39] Client version: 1751406682
+[2025-08-15 12:29:39] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 12:29:43] Loading workshop items for 5 installed apps for user [U:1:120543934]:
+
+
+[2025-08-15 12:41:41] Client version: 1751406682
+[2025-08-15 12:41:41] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 12:41:45] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 12:41:45] [AppID 33930] Loaded workshop items in "c:\ogp64\home\gameserver\1510\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-08-15 12:50:16] Client version: 1751406682
+[2025-08-15 12:50:16] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 12:50:19] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-08-15 18:15:09] Client version: 1751406682
+[2025-08-15 18:15:09] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+[2025-08-15 18:16:03] [AppID 33930] Loaded workshop items in "C:\OGP64\OGP\steamcmd\steamapps\workshop" (0 installed, 0 needed)
+
+
+[2025-08-28 12:51:28] Client version: 1751406682
+[2025-08-28 12:51:28] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-08-28 12:51:31] Loading workshop items for 0 installed apps for user [U:1:120543934]:
+
+
+[2025-08-28 18:54:48] Client version: 1751406682
+[2025-08-28 18:54:48] Loading workshop items for 1 installed apps for user [U:1:120543934]:
+[2025-08-28 18:54:51] Loading workshop items for 5 installed apps for user [U:1:120543934]:

@@ -1,0 +1,9 @@
+Thu Aug 28 13:03:57 2025 The Steam client, steamcmd, does not exist yet, installing...
+Thu Aug 28 13:03:57 2025 Downloading the Steam client from http://media.steampowered.com/client/steamcmd_linux.tar.gz to '/home/gameserver/OGP/steamcmd/steamcmd_linux.tar.gz'.
+Thu Aug 28 13:03:57 2025 Uncompressing /home/gameserver/OGP/steamcmd/steamcmd_linux.tar.gz
+Thu Aug 28 13:03:57 2025 Uncompression called for file /home/gameserver/OGP/steamcmd/steamcmd_linux.tar.gz to dir /home/gameserver/OGP/steamcmd.
+Thu Aug 28 13:03:57 2025 File uncompressed/extracted successfully.
+Thu Aug 28 13:03:57 2025 Creating the startups directory /home/gameserver/OGP/startups
+Thu Aug 28 13:03:57 2025 Open Game Panel - Agent started - v1.4 - port 12679 - PID 8129
+Thu Aug 28 13:03:58 2025 Error reading tasks file No such file or directory
+Thu Aug 28 13:08:29 2025 Rotating log file

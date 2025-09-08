@@ -1,0 +1,139 @@
+<game_config>
+  <game_key>harsh_win64</game_key>
+  <installer>steamcmd</installer>
+<game_name>Operation Harsh Doorstop</game_name>
+  <server_exec_name>HarshDoorstopServer-Win64-Shipping.exe</server_exec_name>
+ 
+
+ <query_port type="add">1</query_port>
+  <cli_template>%MAP%?%bBotAutofill%%BLUFORFACTION%?%OPFORFACTION%?%BLUFORNUMBOTS%?%OPFORNUMBOTS%?%BLUFORTICKETS%?%OPFORTICKETS%?%bDisableKitRestrictions%%GAMEMODE% %IP% %PORT% %QUERY_PORT% -log %SERVERNAME%</cli_template>
+  <cli_params>
+    <cli_param id="IP" cli_string="-ip=" />
+    <cli_param id="PORT" cli_string="-port=" />
+    <cli_param id="MAP" cli_string=""  />
+     <cli_param id="PLAYERS" cli_string="Maxplayers=" options="s" />
+  </cli_params>
+<reserve_ports>
+	<port type="add" id="RCON_PORT" cli_string="-RCONport=">2</port>
+	<port type="add" id="QUERY_PORT" cli_string="-QueryPort=">3</port>
+</reserve_ports>
+  <cli_allow_chars>@;[]-_.</cli_allow_chars>
+
+<map_list>Maplist.txt</map_list>
+<console_log>HarshDoorstop\Saved\Logs\HarshDoorstop.log</console_log>
+
+ <exe_location>HarshDoorStop\Binaries\Win64\</exe_location>
+  <max_user_amount>64</max_user_amount>
+  <control_protocol>rcon2</control_protocol>
+  <mods>
+    <mod key="harsh">
+      <name>None</name>
+      <installer_name>950900</installer_name>
+  <installer_login>anonymous</installer_login>
+    </mod>
+  </mods>
+
+<server_params>
+
+
+<param id="NETPASSWORD" key="Net_Password=" type="text">
+<option>ns</option>
+<default></default>
+ <caption>Password required to join the server</caption>
+ <desc></desc>
+ </param>
+
+<param id="GAMEMODE" key="game=" type="text">
+<option>ns</option>
+<default></default>
+ <caption>Path to Gamemode file</caption>
+ <desc></desc>
+</param>
+<param id="MINPLAYERS" key="MinPlayers=" type="text">
+<option>ns</option>
+<default>4</default>
+ <caption>Mininum Player Count</caption>
+ <desc></desc>
+ </param>
+<param key="bBotAutofill?" type="checkbox_key_value" id="bBotAutofill">
+      <desc>Fill all empty player slots with bots</desc>
+    </param>
+
+<param id="BLUFORFACTION" key="BluforFaction=" type="text">
+<option>ns</option>
+<default>Default</default>
+ <caption>Which faction for BluFor</caption>
+ <desc></desc>
+ </param>
+
+<param id="OPFORFACTION" key="OpforFaction=" type="text">
+<option>ns</option>
+<default>Default</default>
+ <caption>Which faction for OpFor</caption>
+ <desc></desc>
+ </param>
+
+<param id="BLUFORNUMBOTS" key="BluforNumBots=" type="text">
+<option>ns</option>
+<default>0</default>
+ <caption>How many bots on Opfor</caption>
+ <desc></desc>
+ </param>
+
+<param id="OPFORNUMBOTS" key="OpforNumBots=" type="text">
+<option>ns</option>
+<default>0</default>
+ <caption>How many bots on Opfor</caption>
+ <desc></desc>
+ </param>
+<param id="BLUFORTICKETS" key="BluforTickets=" type="text">
+<option>ns</option>
+<default>500</default>
+ <caption>How many tickets on Blufor</caption>
+ <desc></desc>
+ </param>
+
+<param id="OPFORTICKETS" key="OpforTickets=" type="text">
+<option>ns</option>
+<default>500</default>
+ <caption>How many tickets on Opfor</caption>
+ <desc></desc>
+ </param>
+
+<param key="bDisableKitRestrictions?" type="checkbox_key_value" id="bDisableKitRestrictions">
+      <desc>Allow all Kits</desc>
+    </param>
+
+<param id="SERVERNAME" key="-ServerName=" type="text">
+<option>q</option>
+<default>BlackMarket Server</default>
+ <caption>Server name</caption>
+ <desc>Shown in server browser</desc>
+ </param>
+  </server_params>
+
+
+
+<post_install>
+echo "Argonne" >> Maplist.txt
+echo "Monte Cassino" >> Maplist.txt
+echo "Lam Dong" >> Maplist.txt
+echo "Khafji" >> Maplist.txt
+echo "Risala" >> Maplist.txt
+</post_install>
+<pre_start>
+</pre_start>
+
+<lock_files>
+HarshDoorstopServer-Win64-Shipping.exe
+</lock_files>
+
+<configuration_files>
+ <file description="Maplist.txt">Maplist.txt</file>
+ <file description="Game.ini">HarshDoorstop\Saved\Config\WindowsServer\Game.ini</file>
+ <file description="Engine.ini" >HarshDoorstop\Saved\Config\WindowsServer\Engine.ini</file>
+ <file description="Admins.cfg" >HarshDoorstop\Saved\Config\WindowsServer\Admins.cfg</file>
+ <file description="Mapcycle.cfg" >HarshDoorstop\Saved\Config\WindowsServer\Mapcycle.cfg</file>
+
+ </configuration_files>
+</game_config>

@@ -1,0 +1,45 @@
+<game_config>
+	<game_key>terraria_linux</game_key>
+	<installer>steamcmd</installer>
+	<game_name>Terraria</game_name>
+	<server_exec_name>TerrariaServer</server_exec_name>
+	<query_port type="add">1</query_port>
+	<cli_template>%IP% %PORT% %PLAYERS% %CONTROL_PASSWORD% -config terrariaserver.txt</cli_template>
+	<cli_params>
+		<cli_param id="IP" cli_string="-ip" options="s" />
+		<cli_param id="PORT" cli_string="-port" options="s" />
+		<cli_param id="PLAYERS" cli_string="-maxplayers" options="s" />
+		<cli_param id="CONTROL_PASSWORD" cli_string="-password" options="s" />
+		<cli_param id="HOME_PATH" cli_string="" options="s" />
+		<cli_param id="HOSTNAME" cli_string="" />
+	</cli_params>
+	<max_user_amount>255</max_user_amount>
+	<mods>
+		<mod key="default">
+			<name>None</name>
+		</mod>
+	</mods>
+	<replace_texts>
+		<text key="port">
+			 <default>port=.*</default>
+			<var>port=%key% </var>
+			<filepath>terrariaserver.txt</filepath>
+                        <options>key-regex</options>
+		</text>
+		<text key="query_port">
+			<default>RestApiPort":\s\d*</default>
+			<var>RestApiPort":</var>
+			<filepath>tshock/config.json</filepath>
+			<options>s</options>
+		</text>
+	</replace_texts>
+	<post_install>
+wget files.iaregamer.com/installers/terraria/1449/Linux/terraria.tar.gz
+tar -zxvf terraria.tar.gz
+rm terraria.tar.gz
+
+	</post_install>
+	<configuration_files>
+		<file description="Server Configurations">terrariaserver.txt</file>
+	</configuration_files>
+</game_config>

@@ -1,0 +1,1 @@
+1126,/home/gameserver/1126,arma2oaserver.exe,, -mod=ACR;@dayz_epoch;@epochserver -cfg=cfg\basic.cfg -config=cfg\server.cfg -name=dayz -profiles=cfg -ip=192.151.145.162 -port=2542,2542,192.151.145.162,NA,0,cd bec{OGPNEWLINE}start "BEC" bec.exe --dsc --dec -f config.cfg,,epochmod_win32,cfg/arma2oaserver.RPT

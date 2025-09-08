@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<servers>
+	<server>
+		<servername>kc.gameserver</servername>
+		<pass>Inc0rrect</pass>
+		<login>gameserver@kc.iaregamer.com</login>
+		<homedir>/home/gameserver/</homedir>
+		<backupdir>/sdb1/backup/gameserver</backupdir>
+	</server>
+
+	<server>
+		<servername>kcwin.C.drive</servername>
+		<pass>S4wihr6q8rzc!</pass>
+		<login>cyg_server@kcwin.iaregamer.com</login>
+		<homedir>/cygdrive/c/OGP64/home/gameserver/</homedir>
+		<backupdir>/sdb1/backup/gameserver</backupdir>
+	</server>
+
+	<server>
+		<servername>kcwin.D.drive</servername>
+		<pass>S4wihr6q8rzc!</pass>
+		<login>cyg_server@kcwin.iaregamer.com</login>
+		<homedir>/cygdrive/d/OGP64/home/gameserver/</homedir>
+		<backupdir>/sdb1/backup/gameserver</backupdir>
+	</server>
+
+	<server>
+		<servername>host.iaregamer.panel</servername>
+		<pass>Inc0rrect!</pass>
+		<login>gameserver@host.iaregamer.com</login>
+		<homedir>/var/www/html/panel/</homedir>
+		<backupdir>/sdb1/backup/panel</backupdir>
+	</server>
+</servers>
+

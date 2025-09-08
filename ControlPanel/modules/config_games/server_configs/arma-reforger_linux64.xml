@@ -1,0 +1,58 @@
+<game_config>
+  <game_key>arma-reforger_linux64</game_key>
+  <installer>steamcmd</installer>
+  <game_name>Arma Reforger</game_name>
+  <server_exec_name>ArmaReforgerServer</server_exec_name>
+  <cli_template>%IP% %PORT% %PLAYERS%</cli_template>
+  <cli_params>
+    <cli_param cli_string="-ip=" id="IP"/>
+    <cli_param cli_string="-port=" id="PORT"/>
+    <cli_param cli_string="-maxplayers=" id="PLAYERS"/>
+  </cli_params>
+  <cli_allow_chars>@</cli_allow_chars> <!-- escaped by default: \ " ' | & ; > < ` $ ( ) [ ] -->
+  <max_user_amount>32</max_user_amount>
+  <control_protocol>rcon</control_protocol>
+  <mods>
+    <mod key='ArmaReforger'>
+      <name>none</name>
+      <installer_name>1874900</installer_name>
+    </mod>
+  </mods>
+  <server_params>
+    <param id="CONFIG" key="-config=" type="text">
+      <default>./config/ArmaReforgerServer/config.json</default>
+      <option>ns</option>
+      <caption>Config file to load</caption>
+      <desc>
+        Selects the Server Config File. Config file for server
+        specific settings like admin password and mission selection
+      </desc>
+    </param>
+    <param id="PROFILE" key="-profile=" type="text">
+      <default>./config/ArmaReforgerServer</default>
+      <option>ns</option>
+      <caption>Arma Basic settings file to load</caption>
+      <desc>
+        Selects the Server Basic Config file. Config file for server
+        specific settings like network performance tuning
+      </desc>
+    </param>
+    <param id="FPS" key="-maxFPS=" type="text">
+      <default>60</default>
+      <option>ns</option>
+    </param>
+  </server_params>
+  <post_install>
+#    wget http://files.iaregamer.com/installers/armareforger/armareforger.tar
+#    tar -xvf arma3linux.tar
+#    chmod +x setup_db.sh
+#    ./setup_db.sh
+#    rm setup_db.sh
+#    rm arma3.tar
+  </post_install>
+  <pre_start>
+  </pre_start>
+  <lock_files>
+    ArmaReforgerServer
+  </lock_files>
+</game_config>

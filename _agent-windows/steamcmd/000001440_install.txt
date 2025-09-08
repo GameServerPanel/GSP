@@ -1,0 +1,7 @@
+@ShutdownOnFailedCommand 1
+@NoPromptForPassword 1
+set_steam_guard_code C3QCP
+login shoootingblanks EdnaJ0an
+force_install_dir "C:\OGP64\home\gameserver\1440"
+app_update 233780
+exit

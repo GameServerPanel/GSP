@@ -1,0 +1,47 @@
+.content-wrapper .log .table:first-of-type {
+	margin-bottom: 0px;
+}
+
+.content-wrapper .log b table {
+	width: 100%;
+}	
+
+.content-wrapper .log b table td:not(:last-of-type){
+	width: 60px !important;
+	text-align: center;
+}
+
+.content-wrapper input.form-control:not([name="command"]) {
+	width: 46px;
+	min-width: 46px;
+}
+
+.content-wrapper [id^="refreshed"] td:not(:last-of-type) {
+	width: 58px;
+	min-width: 58px;
+}
+
+.content-wrapper select[name="action"] {
+    width: auto;
+}
+
+.content-wrapper .log {
+	padding: 0px;
+}
+
+.content-wrapper .center td:not(:nth-last-child(1)):not(:nth-last-child(2)) {
+    width: 1px;
+}
+
+/* table responsive */
+.content-wrapper [id^="refreshed"] {
+	display: block;
+	width: 100%;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.content-wrapper select[name="homeid_ip_port"],
+.content-wrapper input[name="command"] {
+	min-width: 200px;
+}

@@ -1,0 +1,38 @@
+.main [href="?m=simple-billing&p=cart"] > img {
+	display: none;
+}
+.main [href="?m=simple-billing&p=cart"] .fa {
+	margin-right: 5px;
+}
+
+.shop-item:hover {
+	cursor: pointer;
+}
+
+.widget-user .widget-user-image {
+	position: absolute;
+	top: 25% !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	left: 0 !important;
+	right: 0 !important;
+	text-align: center !important;
+}
+
+.widget-user .widget-user-image > img {
+    width: 200px !important;
+	-webkit-transition: all 0.4s;
+    transition: all 0.4s;
+}
+
+.shop-item:hover .widget-user-image img {
+	width: 210px !important;
+}
+
+.widget-user .widget-user-username {
+	line-height: 0.9;
+}
+
+.main > div:not(.shop-items) > div {
+	text-align: center;
+}

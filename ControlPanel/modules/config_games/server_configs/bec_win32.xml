@@ -1,0 +1,34 @@
+<game_config>
+  <game_key>bec_win32</game_key>
+  <installer>steamcmd</installer>
+  <game_name>BEC</game_name>
+  <server_exec_name>bec.exe</server_exec_name>
+  <cli_template>--dsc --dec -f config.cfg</cli_template>
+<console_log>log/config/belog/be*.log</console_log>
+  <max_user_amount>1</max_user_amount>
+ <mods>
+    <mod key="bec">
+      <name>None</name>
+    </mod>
+  </mods>
+
+<post_install>
+wget files.iaregamer.com/installers/bec/bec.tar.gz
+tar -xzvf bec.tar.gz
+rm bec.tar.gz
+</post_install> 
+
+<pre_start>
+</pre_start>
+
+<lock_files>
+</lock_files>
+
+<configuration_files> 
+<file description="Config">bec\config\config.cfg</file> 
+<file description="Scheduler">bec\config\scheduler.xml</file> 
+<file description="Admins">bec\config\admins.xml</file> 
+<file description="Whitelist">bec\config\whitelist.xml</file> 
+<file description="Fortune">bec\config\fortune.xml</file> 
+</configuration_files> 
+</game_config> 

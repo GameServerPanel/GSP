@@ -1,0 +1,7 @@
+@ShutdownOnFailedCommand 1
+@NoPromptForPassword 1
+force_install_dir "C:\OGP64\home\gameserver\1470"
+set_steam_guard_code C3QCP
+login anonymous
+app_update 475370
+exit

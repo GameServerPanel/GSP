@@ -1,0 +1,50 @@
+.main [href*="&addon_type="]
+{
+	width: 150px;
+	height: 110px;
+	border-radius: 4px;
+}
+.main [href*="&addon_type="] span {
+	line-height: 14px;
+	max-height: 28px;
+}
+
+.main .addons {
+	display: inline-block;
+	width: 100%;
+}
+
+.main .addons a {
+	position: relative;
+}
+
+.main .addons a + a {
+	margin-left: 0.5rem;
+}
+
+.main .addons a > .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 25px;
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.main .addons a[href*="&addon_type="]:before
+{
+	display: block;
+	font-size: 40px;
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 900;
+	content: "\f1b2";
+}
+.main .addons a[href*="&addon_type=plugin"]:before {
+	content: "\f12e";
+}
+.main .addons a[href*="&addon_type=config"]:before {
+	content: "\f11b";
+}
+.main .addons a[href*="&addon_type=mappack"]:before {
+	content: "\f279";
+}
