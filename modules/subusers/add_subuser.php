@@ -6,7 +6,7 @@
 //Open Game Panel Sub User Registration Add On By
 //  own3mall
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db,$view;
 

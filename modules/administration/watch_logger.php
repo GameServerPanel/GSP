@@ -4,7 +4,7 @@
  * Component of the administration module
  */
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 	global $db, $view, $loggedInUserInfo;
 
 	$search_field = (isset($_GET['search']) && !empty($_GET['search'])) ? $_GET['search'] : false;

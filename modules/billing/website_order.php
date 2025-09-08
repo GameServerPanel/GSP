@@ -8,7 +8,7 @@ When the user clicks the "Add to Cart" button, the next page to load is "add_to_
 All the configuration info is passed to the add_to_cart.php in hidden fields 
  
 In our website, we are setting "post" pages with a "Tag". The first tag in our post should be the service ID from the services table
-There are other methods that might be better to get the info.  But all we need is the "service_ID" in the "gsp_billing_services" table
+There are other methods that might be better to get the info.  But all we need is the "service_ID" in the "ogp_billing_services" table
 This method means we can use one code block in every game page and fill in the data dynamically.   
 */
 include "website_db.php";
@@ -37,7 +37,7 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 	<?php 
 	// Shop Form
 	if(intval($_REQUEST['service_id']) !==0) $where_service_id = " WHERE enabled = 1 and service_id=".intval($_REQUEST['service_id']); else $where_service_id = " where enabled = 1";
-	$qry_services = "SELECT * FROM gsp_billing_services ".$where_service_id ." ORDER BY service_name";
+	$qry_services = "SELECT * FROM ogp_billing_services ".$where_service_id ." ORDER BY service_name";
 	$services = $db->query($qry_services);
 	
 	if (isset($_REQUEST['service_id']) && $services === false) {
@@ -173,7 +173,7 @@ if ($row['price_monthly'] == 0.0) {
 			//loop through each of the assigned servers and see if its disabled
 			foreach($rsiArray as $rsi)
 			{
-				$query = "SELECT * FROM gsp_remote_servers WHERE remote_server_id = ".$rsi;
+				$query = "SELECT * FROM ogp_remote_servers WHERE remote_server_id = ".$rsi;
 				$result = $db->query($query);
 				foreach($result as $rs)
 				{

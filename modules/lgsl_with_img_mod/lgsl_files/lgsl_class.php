@@ -84,7 +84,7 @@
     if ($id != NULL)
     {
       $id           = intval($id);
-      $result = $db->resultQuery("SELECT * FROM `GSP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
+      $result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
       if (!is_array($result)) { return FALSE; }
 	  $row = $result[0];
       list($type, $ip, $c_port, $q_port, $s_port) = array($row['type'], $row['ip'], $row['c_port'], $row['q_port'], $row['s_port']);
@@ -94,14 +94,14 @@
       list($type, $ip, $c_port, $q_port, $s_port) = array($db->real_escape_string($type), $db->real_escape_string($ip), intval($c_port), intval($q_port), intval($s_port));
 
       if (!$type || !$ip || !$c_port || !$q_port) { exit("LGSL PROBLEM: INVALID SERVER '{$type} : {$ip} : {$c_port} : {$q_port} : {$s_port}'"); }
-      $result = $db->resultQuery("SELECT * FROM `GSP_DB_PREFIXlgsl` WHERE `type`='{$type}' AND `ip`='{$ip}' AND `q_port`='{$q_port}' LIMIT 1");
+      $result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` WHERE `type`='{$type}' AND `ip`='{$ip}' AND `q_port`='{$q_port}' LIMIT 1");
       $row = $result[0];
 	  
       if (!is_array($result))
       {
         if (strpos($request, "a") === FALSE) { exit("LGSL PROBLEM: SERVER NOT IN DATABASE '{$type} : {$ip} : {$c_port} : {$q_port} : {$s_port}'"); }
-        $db->query("INSERT INTO `GSP_DB_PREFIXlgsl` (`type`,`ip`,`c_port`,`q_port`,`s_port`,`cache`,`cache_time`) VALUES ('{$type}','{$ip}','{$c_port}','{$q_port}','{$s_port}','','')");
-		$result = $db->resultQuery("SELECT * FROM `GSP_DB_PREFIXlgsl` WHERE `type`='{$type}' AND `ip`='{$ip}' AND `q_port`='{$q_port}' LIMIT 1");
+        $db->query("INSERT INTO `OGP_DB_PREFIXlgsl` (`type`,`ip`,`c_port`,`q_port`,`s_port`,`cache`,`cache_time`) VALUES ('{$type}','{$ip}','{$c_port}','{$q_port}','{$s_port}','','')");
+		$result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` WHERE `type`='{$type}' AND `ip`='{$ip}' AND `q_port`='{$q_port}' LIMIT 1");
 		$row = $result[0];
       }
     }
@@ -180,7 +180,7 @@
 
       $packed_times = time() + $lgsl_config['cache_time'] + 10;
       $packed_times = "{$packed_times}_{$packed_times}_{$packed_times}";
-      $reuslt = $db->query("UPDATE `GSP_DB_PREFIXlgsl` SET `cache_time`='{$packed_times}' WHERE `id`='{$row['id']}' LIMIT 1");
+      $reuslt = $db->query("UPDATE `OGP_DB_PREFIXlgsl` SET `cache_time`='{$packed_times}' WHERE `id`='{$row['id']}' LIMIT 1");
       if(!$result) return;
 
       // GET WHAT IS NEEDED
@@ -221,7 +221,7 @@
 
       $packed_cache = $db->real_escape_string(base64_encode(serialize($cache)));
       $packed_times = $db->real_escape_string(implode("_", $cache_time));
-      $result = $db->query("UPDATE `GSP_DB_PREFIXlgsl` SET `status`='{$cache['b']['status']}',`cache`='{$packed_cache}',`cache_time`='{$packed_times}' WHERE `id`='{$row['id']}' LIMIT 1");
+      $result = $db->query("UPDATE `OGP_DB_PREFIXlgsl` SET `status`='{$cache['b']['status']}',`cache`='{$packed_cache}',`cache_time`='{$packed_times}' WHERE `id`='{$row['id']}' LIMIT 1");
       if(!$result) return;
     }
 
@@ -256,7 +256,7 @@
     if ($zone != 0)  { $where[] = "FIND_IN_SET('{$zone}',`zone`)"; }
     if ($type != "") { $where[] = "`type`='{$type}'"; }
 
-    $result = $db->resultQuery("SELECT `id` FROM `GSP_DB_PREFIXlgsl` WHERE ".implode(" AND ", $where)." ORDER BY {$order}");
+    $result = $db->resultQuery("SELECT `id` FROM `OGP_DB_PREFIXlgsl` WHERE ".implode(" AND ", $where)." ORDER BY {$order}");
     $server_list  = array();
 
     foreach($result as $row)
@@ -324,7 +324,7 @@
   {
     global $db;
     $id           = intval($id);
-    $query  = $db->resultQuery("SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `GSP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
+    $query  = $db->resultQuery("SELECT `type`,`ip`,`c_port`,`q_port`,`s_port` FROM `OGP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
 	if (!$query) { return FALSE; }
     return $query[0];
   }

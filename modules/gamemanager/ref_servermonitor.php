@@ -6,7 +6,7 @@
 require_once('modules/gamemanager/home_handling_functions.php');
 require_once("modules/config_games/server_config_parser.php");
 require_once('includes/lib_remote.php');
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db;
 
@@ -99,7 +99,7 @@ function exec_gsp_module()
 		}
 		$remote_server_id = $server_home['remote_server_id'];
 		$rserver = $db->getRemoteServerById($remote_server_id);
-		$remote = new GSPRemoteLibrary($rserver['agent_ip'], $rserver['agent_port'], $rserver['encryption_key'], $rserver['timeout']);
+		$remote = new OGPRemoteLibrary($rserver['agent_ip'], $rserver['agent_port'], $rserver['encryption_key'], $rserver['timeout']);
 		$startup_file_exists = $remote->rfile_exists( "startups/".$ip."-".$port ) === 1;
 		$SrvCtrl = "<table class='srvctrl'><tr><td style='border:0;text-align:center;background:transparent'><a href='?m=gamemanager&amp;p=restart&amp;home_id=".
 					 $home_id."&amp;mod_id=".$mod_id."&amp;ip=".$ip."&amp;port=".$port.

@@ -21,21 +21,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
     $order_id = intval($_POST['delete_single']);
     if ($order_id > 0) {
         // First, check if the status is 'renew'
-        $stmt = $db->prepare("SELECT status FROM gsp_billing_orders WHERE order_id = ? AND user_id = ?");
+        $stmt = $db->prepare("SELECT status FROM ogp_billing_orders WHERE order_id = ? AND user_id = ?");
         $stmt->bind_param("ii", $order_id, $user_id);
         $stmt->execute();
         $stmt->bind_result($status);
         if ($stmt->fetch() && strtolower($status) === 'renew') {
             $stmt->close();
             // Set status to 'expired' if currently 'renew'
-            $update = $db->prepare("UPDATE gsp_billing_orders SET status = 'expired' WHERE order_id = ? AND user_id = ?");
+            $update = $db->prepare("UPDATE ogp_billing_orders SET status = 'expired' WHERE order_id = ? AND user_id = ?");
             $update->bind_param("ii", $order_id, $user_id);
             $update->execute();
             $update->close();
         } else {
             $stmt->close();
             // Otherwise, delete the order
-            $delete = $db->prepare("DELETE FROM gsp_billing_orders WHERE order_id = ? AND user_id = ?");
+            $delete = $db->prepare("DELETE FROM ogp_billing_orders WHERE order_id = ? AND user_id = ?");
             $delete->bind_param("ii", $order_id, $user_id);
             $delete->execute();
             $delete->close();
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
 }
 
 if ($db){
-        $carts = $db->query("SELECT * FROM gsp_billing_orders AS cart
+        $carts = $db->query("SELECT * FROM ogp_billing_orders AS cart
             WHERE (status = 'in-cart' OR status = 'renew') AND user_id = " . $user_id . " ORDER BY order_id ASC");
 	
 

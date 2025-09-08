@@ -5,7 +5,7 @@
 
 require_once(MODULES."/litefm/litefm.php");
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	$home_id = $_REQUEST['home_id'];
 
@@ -40,7 +40,7 @@ function exec_gsp_module()
 	{
 		$_REQUEST['file_content'] = strip_real_escape_string($_REQUEST['file_content']);
 
-		$remote = new GSPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
+		$remote = new OGPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
 		$file_info = $remote->remote_writefile($home_cfg['home_path']."/".$_SESSION['fm_cwd_'.$home_id], $_REQUEST['file_content']);
 		if ( $file_info === 1 )
 		{

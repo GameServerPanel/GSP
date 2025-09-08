@@ -1,7 +1,7 @@
 <?php
 /*
 This FTP addon works with EHCP (www.ehcp.net)
-It allows GSP - the GameServer Panel - to manage custom FTP user accounts
+It allows OGP - the open game panel - to manage custom FTP user accounts
 
 by own3mall
 */
@@ -37,7 +37,7 @@ function addToLog($errors) {
         $createLog = fopen($logFile, 'a+');
         
         if (!$createLog) {
-            trigger_error("Unable to create EHCP FTP Integration log file! Please create a file named \"ehcp_ftp_log.txt\" in the gsp_agent install directory under the EHCP folder with permissions of 777", E_USER_NOTICE);
+            trigger_error("Unable to create EHCP FTP Integration log file! Please create a file named \"ehcp_ftp_log.txt\" in the ogp_agent install directory under the EHCP folder with permissions of 777", E_USER_NOTICE);
         }
         fclose($createLog);
     }

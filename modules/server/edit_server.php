@@ -3,7 +3,7 @@
  * Component of the server module
  */
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 
     global $view;
     global $db;
@@ -95,7 +95,7 @@ function exec_gsp_module() {
             $_REQUEST['remote_host'],
             $_REQUEST['remote_host_port'],
             $_REQUEST['remote_host_name'],
-			$_REQUEST['gsp_user'],
+			$_REQUEST['ogp_user'],
 			$_REQUEST['remote_host_ftp_ip'],
 			$_REQUEST['remote_host_ftp_port'],
             $_REQUEST['remote_encryption_key'],
@@ -117,7 +117,7 @@ function exec_gsp_module() {
         $ft->add_field('string','remote_host',$remote_server['agent_ip']);
         $ft->add_field('string','remote_host_port',$remote_server['agent_port']);
         $ft->add_field('string','remote_host_name',$remote_server['remote_server_name']);
-		$ft->add_field('string','gsp_user',$remote_server['gsp_user']);
+		$ft->add_field('string','ogp_user',$remote_server['ogp_user']);
 		$ft->add_field('string','remote_host_ftp_ip',$ftp_ip);
 		$ft->add_field('string','remote_host_ftp_port',$remote_server['ftp_port']);
         $ft->add_field('string','remote_encryption_key',$remote_server['encryption_key']);
@@ -148,8 +148,8 @@ function exec_gsp_module() {
 				{
 					foreach ( $servers_match_ip_id as $home_info )
 					{
-						$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
-						$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
+						$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+						$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
 						if( $screen_running )
 						{
 							$servers_running = TRUE;

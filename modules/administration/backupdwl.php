@@ -3,7 +3,7 @@
  * Component of the administration module
  */
 
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 	$path = getcwd()."/".$_GET['randir']."/"; // change the path to fit your websites document structure
 	$fullPath = $path.$_GET['dwfile'];

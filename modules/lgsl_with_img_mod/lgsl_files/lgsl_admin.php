@@ -48,7 +48,7 @@
     if (!empty($_POST['lgsl_save_1']))
     {
       // LOAD SERVER CACHE INTO MEMORY
-      $results = $db->resultQuery("SELECT * FROM `GSP_DB_PREFIXlgsl`");
+      $results = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl`");
       foreach($results as $row)
       {
         $servers["{$row['type']}:{$row['ip']}:{$row['q_port']}"] = array($row['status'], $row['cache'], $row['cache_time']);
@@ -56,7 +56,7 @@
     }
 
     // EMPTY SQL TABLE
-    $db->query("TRUNCATE `GSP_DB_PREFIXlgsl`");
+    $db->query("TRUNCATE `OGP_DB_PREFIXlgsl`");
 
     // CONVERT ADVANCED TO NORMAL DATA FORMAT
     if (!empty($_POST['lgsl_management']))
@@ -109,7 +109,7 @@
       elseif ($q_port < 1 || $q_port > 99999)     { $disabled = 1; $q_port = 0; }
       elseif (!isset($lgsl_protocol_list[$type])) { $disabled = 1; }
 
-      $db->query("INSERT INTO `GSP_DB_PREFIXlgsl` (`type`,`ip`,`c_port`,`q_port`,`s_port`,`zone`,`disabled`,`comment`,`status`,`cache`,`cache_time`) VALUES ('{$type}','{$ip}','{$c_port}','{$q_port}','{$s_port}','{$zone}','{$disabled}','{$comment}','{$status}','{$cache}','{$cache_time}')");
+      $db->query("INSERT INTO `OGP_DB_PREFIXlgsl` (`type`,`ip`,`c_port`,`q_port`,`s_port`,`zone`,`disabled`,`comment`,`status`,`cache`,`cache_time`) VALUES ('{$type}','{$ip}','{$c_port}','{$q_port}','{$s_port}','{$zone}','{$disabled}','{$comment}','{$status}','{$cache}','{$cache_time}')");
     }
   }
 
@@ -161,7 +161,7 @@
         <textarea name='form_list' cols='90' rows='30' wrap='off' spellcheck='false' style='width:95%; height:500px; font-size:1.2em; font-family:courier new, monospace'>\r\n";
 
 //---------------------------------------------------------+
-        $result = $db->resultQuery("SELECT * FROM `GSP_DB_PREFIXlgsl` ORDER BY `id` ASC");
+        $result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` ORDER BY `id` ASC");
 
         foreach($result as $row)
         {
@@ -217,7 +217,7 @@
 
 //---------------------------------------------------------+
 
-      $result = $db->resultQuery("SELECT * FROM `GSP_DB_PREFIXlgsl` ORDER BY `id` ASC");
+      $result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` ORDER BY `id` ASC");
 
       foreach($result as $row)
       {

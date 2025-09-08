@@ -36,12 +36,12 @@ function assignOrdersToCart($user_id,$tax_amount,$currency,$coupon_id){
 	//discount coupon
 	if (!isset($coupon_id)) $coupon_id = "0";
 	$fields['coupon_id'] = $coupon_id;
-	$check_expired = $db->resultquery("SELECT id from GSP_DB_PREFIXbilling_coupons WHERE id = $fields[coupon_id] AND count > 0 AND expires >= NOW()");
+	$check_expired = $db->resultquery("SELECT id from OGP_DB_PREFIXbilling_coupons WHERE id = $fields[coupon_id] AND count > 0 AND expires >= NOW()");
 	if ($check_expired <= 0) $fields['coupon_id'] = 0;
 	return $db->resultInsertId( 'billing_carts', $fields );
 }
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	error_reporting(E_ALL);
 	
@@ -52,10 +52,10 @@ function exec_gsp_module()
  
 	if( isset($_POST["update_cart"] )) {
 		//print_r($_POST);
-		$db->query( "UPDATE GSP_DB_PREFIXbilling_orders SET max_players= ".$_POST['slots']." WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
-		$db->query( "UPDATE GSP_DB_PREFIXbilling_orders SET qty= ".$_POST['qty']." WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
-		$db->query( "UPDATE GSP_DB_PREFIXbilling_orders SET invoice_duration = 'month' WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
-		$db->query( "UPDATE GSP_DB_PREFIXgame_mods SET max_players= ".$_POST['slots']." WHERE home_id=".$db->realEscapeSingle($_POST['homeid']));
+		$db->query( "UPDATE OGP_DB_PREFIXbilling_orders SET max_players= ".$_POST['slots']." WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
+		$db->query( "UPDATE OGP_DB_PREFIXbilling_orders SET qty= ".$_POST['qty']." WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
+		$db->query( "UPDATE OGP_DB_PREFIXbilling_orders SET invoice_duration = 'month' WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
+		$db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$_POST['slots']." WHERE home_id=".$db->realEscapeSingle($_POST['homeid']));
 	
 	}
 		
@@ -63,7 +63,7 @@ function exec_gsp_module()
 	if( isset($_POST["coupon_code"] ) && $_POST["coupon_code"] != "") {
 	    $coupon_id = 0;
 		$coupon_code = "";
-		$result = $db->resultquery("SELECT * from GSP_DB_PREFIXbilling_coupons WHERE code= '". $_POST['coupon_code'] . "'");
+		$result = $db->resultquery("SELECT * from OGP_DB_PREFIXbilling_coupons WHERE code= '". $_POST['coupon_code'] . "'");
 		$coupon_name = "<b style='color:red'>NON-EXISTING COUPON</b>";
 		$coupon_discount = 0;
 		foreach($result as $couponDB){
@@ -84,7 +84,7 @@ function exec_gsp_module()
 
 			if ($coupon_count > 0) {
 				$coupon_count--;
-				$db->resultquery("UPDATE gsp_billing_coupons SET count = $coupon_count WHERE code = '$_POST[coupon_code]'");
+				$db->resultquery("UPDATE ogp_billing_coupons SET count = $coupon_count WHERE code = '$_POST[coupon_code]'");
 			}
         }
 	}
@@ -150,7 +150,7 @@ function exec_gsp_module()
 	if( isset( $_POST["extend"] ) or isset( $_POST["extend_and_pay_paypal"] ))
 	{
 		
-		$orders = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
+		$orders = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
 		
 		// *****************************************
 			//FIGURE OUT IF THIS IS ALREADY BEEN UPDATED 
@@ -175,7 +175,7 @@ function exec_gsp_module()
 			$status = 0;
 			$finish_date = $order['finish_date'];
 			$services = $db->resultQuery( "SELECT * 
-										   FROM GSP_DB_PREFIXbilling_services 
+										   FROM OGP_DB_PREFIXbilling_services 
 										   WHERE service_id=".$db->realEscapeSingle($service_id) );
 			$service = $services[0];
 			//Calculating Price
@@ -196,7 +196,7 @@ function exec_gsp_module()
 			//save the EXPIRED finish date into NEW finish date. Then check if FINISH DATE !=0 and move that + 1 month into status
 			$order_id = saveOrderToDb($user_id,$service_id,$home_name,$ip,$max_players,$qty,$invoice_duration,$price,$remote_control_password,$ftp_password,$cart_id,$home_id,$status,$finish_date,"1");
 			//Change the old order expiration to -3 so it can not be extended, since there is a new order managing the same game home.
-			$db->query( "UPDATE GSP_DB_PREFIXbilling_orders
+			$db->query( "UPDATE OGP_DB_PREFIXbilling_orders
 						 SET status=-3
 						 WHERE order_id=".$db->realEscapeSingle($_POST['order_id']));
 	   
@@ -221,11 +221,11 @@ function exec_gsp_module()
             unset($_SESSION['coupon_id']);
 		}
 		$order_id = $_POST['order_id'];
-		$db->query( "DELETE FROM GSP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id) );
-		$orders_in_cart = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+		$db->query( "DELETE FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id) );
+		$orders_in_cart = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 		if( !$orders_in_cart )
 		{
-			$db->query( "DELETE FROM GSP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+			$db->query( "DELETE FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 		}
 
 	}
@@ -262,7 +262,7 @@ function exec_gsp_module()
 		$carts[0] = $_SESSION['CART'];
 	}
 
-	$user_carts = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE user_id=".$db->realEscapeSingle($user_id) ." order by cart_id desc" );
+	$user_carts = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE user_id=".$db->realEscapeSingle($user_id) ." order by cart_id desc" );
 	
 
 	if( $user_carts >=1 )
@@ -273,8 +273,8 @@ function exec_gsp_module()
 		{
 			$cart_id = $user_cart['cart_id'];
 
-			$carts[$cart_id] = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts AS cart JOIN
-																GSP_DB_PREFIXbilling_orders AS orders  
+			$carts[$cart_id] = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts AS cart JOIN
+																OGP_DB_PREFIXbilling_orders AS orders  
 																ON orders.cart_id=cart.cart_id
 																WHERE orders.status IN (0, -1 , -2) AND (cart.cart_id=".$db->realEscapeSingle($cart_id). ") order by order_id asc");
 		}
@@ -369,7 +369,7 @@ function exec_gsp_module()
 				//see if user is a new customer, 
 				//check number of orders they have had or if user is an admin (to be able to create server)
 				$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
-				$result = $db->resultQuery("SELECT * FROM gsp_billing_orders WHERE user_id=".$user_id);
+				$result = $db->resultQuery("SELECT * FROM ogp_billing_orders WHERE user_id=".$user_id);
 				$server_price =  number_format( $order['price'], 2 );
 				if(isset($settings['display_free'])) {
 						$display_free = $settings['display_free'];
@@ -465,7 +465,7 @@ function exec_gsp_module()
 				//get max_slots and min_slots from the billing_services for this game.
 				
 					$services = $db->resultQuery( "SELECT * 
-										FROM GSP_DB_PREFIXbilling_services 
+										FROM OGP_DB_PREFIXbilling_services 
 										   WHERE service_id=".$db->realEscapeSingle($order['service_id']) );
 					$service = $services[0];
 					$min = $service['slot_min_qty'];

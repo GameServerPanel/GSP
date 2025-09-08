@@ -4,7 +4,7 @@
  * Component of the addonsmanager module
  */
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 
 	global $db;
 	
@@ -37,7 +37,7 @@ function exec_gsp_module() {
 		{
 			print_success(get_lang_f("addon_has_been_created",$_POST['name']));
 			if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
-				$db->query("DELETE FROM GSP_DB_PREFIXaddons WHERE addon_id=" . (int)$_POST['addon_id']);
+				$db->query("DELETE FROM OGP_DB_PREFIXaddons WHERE addon_id=" . (int)$_POST['addon_id']);
 		}
 	}
 
@@ -53,7 +53,7 @@ function exec_gsp_module() {
 
 	if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
 	{
-		$addons_rows = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXaddons WHERE addon_id=".(int)$_POST['addon_id']);
+		$addons_rows = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXaddons WHERE addon_id=".(int)$_POST['addon_id']);
 		$addon_info = $addons_rows[0];
 		$name = isset($addon_info['name']) ? $addon_info['name'] : "";
 		$url = isset($addon_info['url']) ? $addon_info['url'] : "";
@@ -291,7 +291,7 @@ function exec_gsp_module() {
 	<?php 
 	if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['remove']))
 	{
-		if (!$db->query("DELETE FROM GSP_DB_PREFIXaddons WHERE addon_id=" . (int)$_POST['addon_id']))
+		if (!$db->query("DELETE FROM OGP_DB_PREFIXaddons WHERE addon_id=" . (int)$_POST['addon_id']))
 			print_lang('can_not_remove_addon');
 	}
 	
@@ -301,24 +301,24 @@ function exec_gsp_module() {
 	
 	if ( isset($_GET['show']) )
 	{
-		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM GSP_DB_PREFIXaddons NATURAL JOIN GSP_DB_PREFIXconfig_homes WHERE addon_type='".$addon_type."' AND home_cfg_id=".$home_cfg_id);
+		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM OGP_DB_PREFIXaddons NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE addon_type='".$addon_type."' AND home_cfg_id=".$home_cfg_id);
 	}
 	elseif ( isset($_GET['show_all']) )
 	{
-		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM GSP_DB_PREFIXaddons NATURAL JOIN GSP_DB_PREFIXconfig_homes");
+		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM OGP_DB_PREFIXaddons NATURAL JOIN OGP_DB_PREFIXconfig_homes");
 	}
 	elseif ( isset($_GET['show_type']))
 	{
-		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM GSP_DB_PREFIXaddons NATURAL JOIN GSP_DB_PREFIXconfig_homes WHERE addon_type='".$addon_type."'");
+		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM OGP_DB_PREFIXaddons NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE addon_type='".$addon_type."'");
 	}
 	elseif ( isset($_GET['show_game']))
 	{
-		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM GSP_DB_PREFIXaddons NATURAL JOIN GSP_DB_PREFIXconfig_homes WHERE home_cfg_id=".$home_cfg_id);
+		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM OGP_DB_PREFIXaddons NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE home_cfg_id=".$home_cfg_id);
 	}
 	elseif ( isset($_GET['show_group']))
 	{
 		$group_id = $group_id == '0' ? $group_id." OR group_id IS NULL" : $group_id;
-		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM GSP_DB_PREFIXaddons NATURAL JOIN GSP_DB_PREFIXconfig_homes WHERE group_id=".$group_id);
+		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM OGP_DB_PREFIXaddons NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE group_id=".$group_id);
 	}
 	?>	
 	<table class="center">

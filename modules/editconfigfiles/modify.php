@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * GSP - GameServer Panel
- * Copyright (C) 2008 - 2017 The GSP Development Team
+ * OGP - Open Game Panel
+ * Copyright (C) 2008 - 2017 The OGP Development Team
  *
- * http://www.gameserver-panel.org/
+ * http://www.opengamepanel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@ require 'modules/editconfigfiles/functions.php';
 require_once 'modules/config_games/server_config_parser.php';
 require 'includes/lib_remote.php';
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
     global $db, $view;
     
@@ -59,7 +59,7 @@ function exec_gsp_module()
         return;
     }
     
-    $remote = new GSPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
+    $remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
     
     if ($remote->status_chk() === 0) {
         print_failure(get_lang('agent_offline'));

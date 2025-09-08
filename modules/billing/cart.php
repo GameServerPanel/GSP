@@ -36,12 +36,12 @@ function assignOrdersToCart($user_id,$tax_amount,$currency,$coupon_id){
 	//discount coupon
 	if (!isset($coupon_id)) $coupon_id = "0";
 	$fields['coupon_id'] = $coupon_id;
-	$check_expired = $db->resultquery("SELECT id from GSP_DB_PREFIXbilling_coupons WHERE id = $fields[coupon_id] AND count > 0 AND expires >= NOW()");
+	$check_expired = $db->resultquery("SELECT id from OGP_DB_PREFIXbilling_coupons WHERE id = $fields[coupon_id] AND count > 0 AND expires >= NOW()");
 	if ($check_expired <= 0) $fields['coupon_id'] = 0;
 	return $db->resultInsertId( 'billing_carts', $fields );
 }
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	error_reporting(E_ALL);
 	
@@ -101,7 +101,7 @@ function exec_gsp_module()
 		$carts[0] = $_SESSION['CART'];
 	}
 
-	$user_carts = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE user_id=".$db->realEscapeSingle($user_id) ." order by cart_id desc" );
+	$user_carts = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE user_id=".$db->realEscapeSingle($user_id) ." order by cart_id desc" );
 	
 
 	if( $user_carts >=1 )
@@ -112,8 +112,8 @@ function exec_gsp_module()
 		{
 			$cart_id = $user_cart['cart_id'];
 
-			$carts[$cart_id] = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts AS cart JOIN
-																GSP_DB_PREFIXbilling_orders AS orders  
+			$carts[$cart_id] = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts AS cart JOIN
+																OGP_DB_PREFIXbilling_orders AS orders  
 																ON orders.cart_id=cart.cart_id
 																WHERE orders.status IN (0, -1 , -2) AND (cart.cart_id=".$db->realEscapeSingle($cart_id). ") order by order_id asc");
 		}

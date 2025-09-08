@@ -15,13 +15,13 @@ $module_menus = array(
 
 $install_queries = array();
 $install_queries[0] = array(
-    "DROP TABLE IF EXISTS ".GSP_DB_PREFIX."settings;",
-    "CREATE TABLE ".GSP_DB_PREFIX."settings (
+    "DROP TABLE IF EXISTS ".OGP_DB_PREFIX."settings;",
+    "CREATE TABLE ".OGP_DB_PREFIX."settings (
         `setting` varchar(63) NOT NULL,
         `value` varchar(255) NOT NULL,
         PRIMARY KEY  (`setting`)
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
 
 $install_queries[1] = array(
-    "ALTER TABLE `".GSP_DB_PREFIX."settings` CHANGE `value` `value` VARCHAR( 1024 ) NOT NULL;");
+    "ALTER TABLE `".OGP_DB_PREFIX."settings` CHANGE `value` `value` VARCHAR( 1024 ) NOT NULL;");
 ?>

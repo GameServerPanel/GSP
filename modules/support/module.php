@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * GSP - GameServer Panel
- * Copyright (C) 2008 - 2017 The GSP Development Team
+ * OGP - Open Game Panel
+ * Copyright (C) 2008 - 2017 The OGP Development Team
  *
- * http://www.gameserver-panel.org/
+ * http://www.opengamepanel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

@@ -3,7 +3,7 @@
  * Component of the modulemanager module
  */
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
     global $db;
     global $view;

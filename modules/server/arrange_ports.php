@@ -1,7 +1,7 @@
 <script type="text/javascript" src="js/jquery/plugins/jquery.numeric.js"></script>
 <script type="text/javascript" src="js/modules/server.js"></script>
 <?php
-function exec_gsp_module()
+function exec_ogp_module()
 {		
 	global $db,$view;
 		
@@ -41,7 +41,7 @@ function exec_gsp_module()
 				$rhost_id = $_GET['rserver_id'];
 				$remote_server = $db->getRemoteServer($rhost_id);
 				require_once('includes/lib_remote.php');
-				$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+				$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 				$host_stat = $remote->status_chk();
 				if( $host_stat === 1)
 					$os = $remote->what_os();

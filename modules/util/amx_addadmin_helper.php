@@ -3,7 +3,7 @@
  * Administrative interface for the util module
  */
 require 'includes/lib_remote.php';
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 	global $db;
 	include 'modules/util/functions.php';
@@ -32,7 +32,7 @@ function exec_gsp_module()
 			}
 			
 			if(!empty($serverInfo)){
-				$remote = new GSPRemoteLibrary($serverInfo['agent_ip'], $serverInfo['agent_port'], $serverInfo['encryption_key'], $serverInfo['timeout']);
+				$remote = new OGPRemoteLibrary($serverInfo['agent_ip'], $serverInfo['agent_port'], $serverInfo['encryption_key'], $serverInfo['timeout']);
 				
 				if($remote->status_chk() === 1){
 					if(($_POST['amx_login_type'] == 'amx_login_steamid' && preg_match('/^STEAM_[01]:[01]:\d+$/', $_POST['amx_Steamid']))

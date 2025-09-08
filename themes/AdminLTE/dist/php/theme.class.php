@@ -84,7 +84,7 @@ class Theme
 		$firstRemoteServer = $this->getOGPServers();
 		if($firstRemoteServer)
 		{
-			$remote = new GSPRemoteLibrary($firstRemoteServer[0]['agent_ip'], $firstRemoteServer[0]['agent_port'], $firstRemoteServer[0]['encryption_key'], $firstRemoteServer[0]['timeout']);
+			$remote = new OGPRemoteLibrary($firstRemoteServer[0]['agent_ip'], $firstRemoteServer[0]['agent_port'], $firstRemoteServer[0]['encryption_key'], $firstRemoteServer[0]['timeout']);
 			if($remote->status_chk() != 1)
 			{
 				return false;
@@ -238,8 +238,8 @@ class Theme
 			foreach($serverHomes AS $key => $shData)
 			{
 				// check if the screen running the server is running.
-				$remote = new GSPRemoteLibrary($shData['agent_ip'], $shData['agent_port'], $shData['encryption_key'], $shData['timeout']);
-				if( $remote->is_screen_running(GSP_SCREEN_TYPE_HOME, $shData['home_id']))
+				$remote = new OGPRemoteLibrary($shData['agent_ip'], $shData['agent_port'], $shData['encryption_key'], $shData['timeout']);
+				if( $remote->is_screen_running(OGP_SCREEN_TYPE_HOME, $shData['home_id']))
 				{
 					$queryData = $this->getProtocolAndQuery($serverHomes[$key]);
 					$serverHomes[$key]['qProtocol'] = $queryData['qProtocol'];

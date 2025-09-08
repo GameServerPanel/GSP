@@ -1,4 +1,4 @@
-# GameServer Panel - Project Statistics
+# Open Game Panel - Project Statistics
 
 ## Codebase Analysis
 

@@ -3,10 +3,10 @@
  * Component of the user_games module
  */
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db;
-	$expired_servers = $db->resultQuery("SELECT home_name, home_id, server_expiration_date FROM GSP_DB_PREFIXserver_homes WHERE server_expiration_date NOT LIKE 'X' AND server_expiration_date <= ".time().";");
+	$expired_servers = $db->resultQuery("SELECT home_name, home_id, server_expiration_date FROM OGP_DB_PREFIXserver_homes WHERE server_expiration_date NOT LIKE 'X' AND server_expiration_date <= ".time().";");
 	if($expired_servers)
 	{
 		foreach($expired_servers as $expired_server)
@@ -16,7 +16,7 @@ function exec_gsp_module()
 		}
 	}
 
-	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM GSP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date <= ".time().";");
+	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM OGP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date <= ".time().";");
 	if($expired_users)
 	{
 		foreach($expired_users as $expired_user)
@@ -27,9 +27,9 @@ function exec_gsp_module()
 	}
 
 	$expired_groups	 = $db->resultQuery("SELECT g.group_id, g.home_id, g.user_group_expiration_date, ug.user_id
-										 FROM GSP_DB_PREFIXuser_group_homes g
+										 FROM OGP_DB_PREFIXuser_group_homes g
 										 INNER JOIN
-										 GSP_DB_PREFIXuser_groups ug
+										 OGP_DB_PREFIXuser_groups ug
 										 ON ug.group_id=g.group_id
 										 WHERE g.user_group_expiration_date NOT LIKE 'X' AND g.user_group_expiration_date <= ".time()." GROUP BY g.home_id;");
 	if($expired_groups)

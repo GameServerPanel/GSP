@@ -26,7 +26,7 @@ require(DSI_BASEPATH . 'includes/functions.php');
 require("modules/gamemanager/home_handling_functions.php");
 require('modules/config_games/server_config_parser.php'); 
 
-function exec_gsp_module(){
+function exec_ogp_module(){
 	global $db,$view,$settings;
 	
 	if(isset($_GET["s"])){

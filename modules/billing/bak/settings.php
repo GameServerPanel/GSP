@@ -4,7 +4,7 @@ function curPageName()
 	return substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
 }
 
-function exec_gsp_module()
+function exec_ogp_module()
 {		
 	require('includes/config.inc.php');
 	require_once('modules/settings/functions.php');

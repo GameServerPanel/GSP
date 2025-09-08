@@ -42,11 +42,11 @@ function dsi_make_img($im = false, $cache_on = false, $cache_data = false, $forc
 	exit;
 }
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 	global $db;
 	$remote_server = $db->getRemoteServer($_GET['remote_server_id']);
 
-	$remote = new GSPRemoteLibrary( $remote_server['agent_ip'], $remote_server['agent_port'],
+	$remote = new OGPRemoteLibrary( $remote_server['agent_ip'], $remote_server['agent_port'],
 									$remote_server['encryption_key'], $remote_server['timeout'] );
 	
 	$stats = $remote->mon_stats();	

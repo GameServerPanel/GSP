@@ -6,7 +6,7 @@
 require_once('home_handling_functions.php');
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_gsp_module() {
+function exec_ogp_module() {
     global $view,$db;
 
     $ip = $_REQUEST['ip'];
@@ -27,7 +27,7 @@ function exec_gsp_module() {
 	}
 
 	require_once('includes/lib_remote.php');
-	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	
 	$os = $remote->what_os();
 
@@ -66,7 +66,7 @@ function exec_gsp_module() {
 			}
 			else
 			{
-				$log_retval = $remote->get_log(GSP_SCREEN_TYPE_HOME,
+				$log_retval = $remote->get_log(OGP_SCREEN_TYPE_HOME,
 					$home_id,
 					clean_path($home_info['home_path']."/".$server_xml->exe_location),
 					$home_log);
@@ -247,7 +247,7 @@ function exec_gsp_module() {
 			}
 			else
 			{
-				$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_id);
+				$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_id);
 				if ( $screen_running == 1 )
 				{
 					print("<p class='note'>".get_lang('restarting_server')."</p>");

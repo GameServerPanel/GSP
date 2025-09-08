@@ -3,7 +3,7 @@
  * Component of the administration module
  */
 
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 
 if(isset($_POST['default']))

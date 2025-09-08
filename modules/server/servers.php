@@ -5,7 +5,7 @@
  */
 
 require_once('includes/lib_remote.php');
-function exec_gsp_module() {
+function exec_ogp_module() {
 
 	global $view;
 	global $db;
@@ -48,7 +48,7 @@ function exec_gsp_module() {
 	foreach ( $servers as $server_row )
 	{
 		#check to see if the remote daeomns are up status_chk is found in lib_remote.php
-		$remote = new GSPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
+		$remote = new OGPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
 
 		$host_stat = $remote->status_chk();
 
@@ -91,7 +91,7 @@ function exec_gsp_module() {
 		$ftp_ip = empty( $server_row['ftp_ip'] ) ? $server_row['agent_ip'] : $server_row['ftp_ip'];
 		$data = "<tr class='expand-child' >
 				   <td>$booble</td><td>
-					<b>". get_lang("gsp_user") .":</b> ".$server_row['gsp_user']."<br />
+					<b>". get_lang("ogp_user") .":</b> ".$server_row['ogp_user']."<br />
 					<b>". get_lang("agent_ip_port") .":</b> ".$server_row['agent_ip'].":".$server_row['agent_port']."<br />
 					<b>". get_lang("remote_host_ftp_ip") .":</b> ".$ftp_ip."<br />
 					<b>". get_lang("remote_host_ftp_port") .":</b> ".$server_row['ftp_port']."<br />

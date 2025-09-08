@@ -27,8 +27,8 @@ $db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name,
 // Load languages.
 include_once("includes/lang.php");
 
-if (!$db instanceof GSPDatabase) {
-    gspLang();
+if (!$db instanceof OGPDatabase) {
+    ogpLang();
     die(get_lang('no_db_connection'));
 }
 
@@ -44,7 +44,7 @@ $loggedInUserInfo = $db->getUserById($_SESSION['user_id']);
 // Get settings
 $settings = $db->getSettings();
 @$GLOBALS['panel_language'] = $settings['panel_language'];
-gspLang();
+ogpLang();
 
 function ping_host($host, $timeout = 5) {
     if (function_exists('exec')) {
@@ -85,7 +85,7 @@ $servers = $db->getRemoteServers();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Status - GSP</title>
+    <title>Server Status - OGP</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -210,7 +210,7 @@ $servers = $db->getRemoteServers();
                         $hostname = get_hostname($server_ip);
                         
                         // Check server status
-                        $remote = new GSPRemoteLibrary($server['agent_ip'], $server['agent_port'], 
+                        $remote = new OGPRemoteLibrary($server['agent_ip'], $server['agent_port'], 
                                                     $server['encryption_key'], $server['timeout']);
                         $status = $remote->status_chk();
                         $is_online = ($status === 1);

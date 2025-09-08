@@ -1,8 +1,8 @@
-# GameServer Panel (GSP) Architecture Documentation
+# Open Game Panel (OGP) Architecture Documentation
 
 ## Overview
 
-GameServer Panel is a distributed game server management system consisting of three main components:
+Open Game Panel is a distributed game server management system consisting of three main components:
 
 1. **Web Panel** (this repository) - PHP-based web interface for management
 2. **Linux Agent** - Remote agent for Linux game servers  

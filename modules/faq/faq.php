@@ -28,14 +28,14 @@
 <script type="text/javascript" src="modules/faq/faq.js"></script>
 <link type="text/css" rel="stylesheet" href="modules/faq/syntaxhighlighter/styles/shCoreDefault.css"/>
 <?php
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	echo '<h2>F.A.Q.</h2>';
 	echo '<div class="maincategory"><img class="headerimage" src="modules/faq/faq.png">Categories<div style="float:right" >'.
 		 '<input class=search name=search id=search type=text placeholder="Search"/></div><br></div>';
 
 	require 'modules/faq/rss_php.php';
-	$url = 'https://gameserver-panel.org/faq/rss.php';
+	$url = 'https://opengamepanel.org/faq/rss.php';
 	$local_copy = 'modules/faq/faq.rss'; ## Relative path
 	$save_as = realpath('modules' . DIRECTORY_SEPARATOR . 'faq') . DIRECTORY_SEPARATOR . 'faq.rss'; 
 	## Full path (adding the filename to realpath would fail if the file does not exists yet)
@@ -123,7 +123,7 @@ function exec_gsp_module()
 	// Check if user is admin
 	global $db;
 	$isAdmin = false;
-	if(isset($_SESSION['user_id']) && $db && $db instanceof GSPDatabase) {
+	if(isset($_SESSION['user_id']) && $db && $db instanceof OGPDatabase) {
 		$isAdmin = $db->isAdmin($_SESSION['user_id']);
 	}
 	

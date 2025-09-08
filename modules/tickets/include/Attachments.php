@@ -15,7 +15,7 @@ class Attachments
 
     private $errors = array();
         
-    public function __construct(GSPDatabase $db, $attachments, $path, $maxAttachments, $maxSize, $permittedExtensions)
+    public function __construct(OGPDatabase $db, $attachments, $path, $maxAttachments, $maxSize, $permittedExtensions)
     {
         $this->db = $db;
 

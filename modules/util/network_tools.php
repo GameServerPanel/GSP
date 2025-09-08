@@ -3,7 +3,7 @@
  * Component of the util module
  */
 require 'includes/lib_remote.php';
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 	global $db;
 	include 'modules/util/util_config.php';
@@ -18,7 +18,7 @@ function exec_gsp_module()
 		die(get_lang('agent_invalid'));
 	}
 	
-	$remote = new GSPRemoteLibrary($server['agent_ip'], $server['agent_port'], $server['encryption_key'], 60);
+	$remote = new OGPRemoteLibrary($server['agent_ip'], $server['agent_port'], $server['encryption_key'], 60);
 	
 	if($remote->status_chk() === 0){
 		echo get_lang('networktools_agent_offline');

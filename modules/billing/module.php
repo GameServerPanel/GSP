@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * GSP - GameServer Panel
- * Copyright (C) 2008 - 2017 The GSP Development Team
+ * OGP - Open Game Panel
+ * Copyright (C) 2008 - 2017 The OGP Development Team
  *
- * http://www.gameserver-panel.org/
+ * http://www.opengamepanel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,8 +36,8 @@ $module_menus = array(
 
 $install_queries = array();
 $install_queries[0] = array(
-	"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."billing_services`;",
-    "CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."billing_services` (
+	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_services`;",
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_services` (
 	`service_id` int(11) NOT NULL auto_increment,
 	`home_cfg_id` int(11) NOT NULL,
 	`mod_cfg_id` int(11) NOT NULL,
@@ -57,8 +57,8 @@ $install_queries[0] = array(
 	PRIMARY KEY  (`service_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=UTF8;",
 	
-    "DROP TABLE IF EXISTS `".GSP_DB_PREFIX."billing_orders`;",
-    "CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."billing_orders` (
+    "DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_orders`;",
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_orders` (
 	`order_id` int(11) NOT NULL auto_increment,	
 	`user_id` int(11) NOT NULL,
 	`service_id` int(11) NOT NULL,
@@ -80,16 +80,16 @@ $install_queries[0] = array(
 );
 
 $install_queries[1] = array(
-    "DROP TABLE IF EXISTS `".GSP_DB_PREFIX."billing_carts`;",
-    "CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."billing_carts` (
+    "DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_carts`;",
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_carts` (
 	`cart_id` int(11) NOT NULL auto_increment,
 	`user_id` int(11) NOT NULL,
 	`paid` int(11) NULL,
 	PRIMARY KEY  (`cart_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=UTF8;",
 	
-	"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."billing_orders`;",
-    "CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."billing_orders` (
+	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_orders`;",
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_orders` (
 	`order_id` int(11) NOT NULL auto_increment,
 	`user_id` int(11) NOT NULL,
 	`service_id` int(11) NOT NULL,
@@ -110,25 +110,25 @@ $install_queries[1] = array(
 );
 
 $install_queries[2] = array(
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` DROP `date`;",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` DROP `home_path`;",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` DROP `paid`;",
-    "ALTER TABLE `".GSP_DB_PREFIX."billing_orders` ADD `home_id` varchar(255) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` ADD `status` varchar(16) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_carts` ADD `date` varchar(16) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_carts` ADD `tax_amount` varchar(16) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_carts` ADD `currency` varchar(3) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `date`;",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `home_path`;",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `paid`;",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `home_id` varchar(255) NOT NULL DEFAULT '0';",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `status` varchar(16) NOT NULL DEFAULT '0';",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `date` varchar(16) NOT NULL DEFAULT '0';",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `tax_amount` varchar(16) NOT NULL DEFAULT '0';",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `currency` varchar(3) NOT NULL DEFAULT '0';"
 );
 
 $install_queries[3] = array(
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` ADD `finish_date` varchar(16) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `finish_date` varchar(16) NOT NULL DEFAULT '0';"
 );
 
 $install_queries[4] = array(
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` ADD `extended` tinyint(1) NOT NULL;",
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_services` ADD `enabled` int(11) NOT NULL;"
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_carts` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
-	"ALTER TABLE `".GSP_DB_PREFIX."billing_orders` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `extended` tinyint(1) NOT NULL;",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_services` ADD `enabled` int(11) NOT NULL;"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
 
 );
 

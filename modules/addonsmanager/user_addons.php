@@ -3,7 +3,7 @@
  * Component of the addonsmanager module
  */
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 	global $db;
 	$home_id = $_GET['home_id'];
 	$mod_id = $_GET['mod_id'];
@@ -31,8 +31,8 @@ function exec_gsp_module() {
 			 "<table class='center' >\n".
 			 "<tr><td>\n";
 		$plugins = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name ".
-									"FROM GSP_DB_PREFIXaddons ".
-									"NATURAL JOIN GSP_DB_PREFIXconfig_homes ".
+									"FROM OGP_DB_PREFIXaddons ".
+									"NATURAL JOIN OGP_DB_PREFIXconfig_homes ".
 									"WHERE addon_type='plugin' ".
 									"AND home_cfg_id=".$home_cfg_id.$query_groups);
 		$plugins_qty = count($plugins);
@@ -42,8 +42,8 @@ function exec_gsp_module() {
 				 "&amp;port=".$port."'>".get_lang('install_plugin')."(".$plugins_qty.")</a>\n";
 	
 		$mappacks = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name ".
-									 "FROM GSP_DB_PREFIXaddons ".
-									 "NATURAL JOIN GSP_DB_PREFIXconfig_homes ".
+									 "FROM OGP_DB_PREFIXaddons ".
+									 "NATURAL JOIN OGP_DB_PREFIXconfig_homes ".
 									 "WHERE addon_type='mappack' ".
 									 "AND home_cfg_id=".$home_cfg_id.$query_groups);
 		$mappacks_qty = count($mappacks);
@@ -54,8 +54,8 @@ function exec_gsp_module() {
 				 "&amp;port=".$port."'>".get_lang('install_mappack')."(".$mappacks_qty.")</a>\n";
 		}
 		$configs = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name ".
-									"FROM GSP_DB_PREFIXaddons ".
-									"NATURAL JOIN GSP_DB_PREFIXconfig_homes ".
+									"FROM OGP_DB_PREFIXaddons ".
+									"NATURAL JOIN OGP_DB_PREFIXconfig_homes ".
 									"WHERE addon_type='config' ".
 									"AND home_cfg_id=".$home_cfg_id.$query_groups);
 		$configs_qty = count($configs);

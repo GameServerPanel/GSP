@@ -42,20 +42,20 @@ require_once("modules/config_games/server_config_parser.php");
     }
 
     require_once('includes/lib_remote.php');
-    $remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+    $remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 
     $home_log = "";
 	
 	if( isset( $server_xml->console_log ) )
 	{
-		$log_retval = $remote->get_log(GSP_SCREEN_TYPE_HOME,
+		$log_retval = $remote->get_log(OGP_SCREEN_TYPE_HOME,
 			$home_info['home_id'],
 			clean_path($home_info['home_path']),
 			$home_log, 100, (string) $server_xml->console_log);
 	}
 	else
 	{
-		$log_retval = $remote->get_log(GSP_SCREEN_TYPE_HOME,
+		$log_retval = $remote->get_log(OGP_SCREEN_TYPE_HOME,
 			$home_info['home_id'],
 			clean_path($home_info['home_path']."/".$server_xml->exe_location),
 			$home_log);
@@ -68,7 +68,7 @@ require_once("modules/config_games/server_config_parser.php");
     }
     elseif ($log_retval == 1 || $log_retval == 2)
     {
-		// Force log file contents to be UTF-8 (fixes http://www.gameserver-panel.org/forum/viewthread.php?thread_id=5379)
+		// Force log file contents to be UTF-8 (fixes http://www.opengamepanel.org/forum/viewthread.php?thread_id=5379)
 		if(hasValue($home_log)){
 			$home_log = utf8_encode($home_log);
 		}

@@ -12,7 +12,7 @@ function real_escape_string_recursive(&$item, $key, $link){
     $item = $this->realEscapeSingle($item);
 }
 
-class GSPDatabaseMySQL extends GSPDatabase
+class OGPDatabaseMySQL extends OGPDatabase
 {
 	protected $link;
 
@@ -938,7 +938,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 		return false;
 	}
 	
-	public function updateGSPGameModsWithNewIDs($oldModStructure){
+	public function updateOGPGameModsWithNewIDs($oldModStructure){
 		$currentStructure = $this->getCurrentHomeConfigMods(false);
 		
 		if(isset($oldModStructure) && is_array($oldModStructure) && isset($currentStructure) && is_array($currentStructure)){
@@ -1144,7 +1144,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 	{
 		if ( !$this->link ) return FALSE;
 
-		$query = str_replace( "GSP_DB_PREFIX", $this->table_prefix, $query );
+		$query = str_replace( "OGP_DB_PREFIX", $this->table_prefix, $query );
 
 		++$this->queries_;
 		mysqli_query($this->link,$query);
@@ -1159,7 +1159,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 
 	/// \brief This query return array of values or false on failure.
 	public function resultQuery( $query ) {
-		$query = str_replace( "GSP_DB_PREFIX", $this->table_prefix, $query );
+		$query = str_replace( "OGP_DB_PREFIX", $this->table_prefix, $query );
 		return $this->listQuery($query);
 	}
 	
@@ -1217,7 +1217,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 			return false;
 
 		$rhost_name = trim($rhost_name);
-		$query = sprintf("INSERT INTO `%sremote_servers` (`agent_ip`,remote_server_name,gsp_user,agent_port,ftp_ip,ftp_port,`encryption_key`,timeout,use_nat,display_public_ip)
+		$query = sprintf("INSERT INTO `%sremote_servers` (`agent_ip`,remote_server_name,ogp_user,agent_port,ftp_ip,ftp_port,`encryption_key`,timeout,use_nat,display_public_ip)
 			VALUES('%s','%s','%s','%d','%s','%s','%s','%s','%s','%s');",
 				$this->table_prefix,
 				$this->realEscapeSingle($rhost_ip),
@@ -1379,7 +1379,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 		$query = sprintf("UPDATE %sremote_servers SET agent_ip='%s',
 			agent_port='%s', encryption_key='%s',
 			remote_server_name='%s',
-			gsp_user='%s',
+			ogp_user='%s',
 			ftp_ip='%s',
 			ftp_port='%s',
 			timeout='%s',
@@ -3370,7 +3370,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 		$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
 		$client_ip = getClientIPAddress();
 		$message = $this->realEscapeSingle($message);
-		$this->query("INSERT INTO GSP_DB_PREFIXlogger (date, user_id, ip, message) VALUE (FROM_UNIXTIME(UNIX_TIMESTAMP(), '%d-%m-%Y %H:%i:%s'), $user_id, '$client_ip', '$message');");
+		$this->query("INSERT INTO OGP_DB_PREFIXlogger (date, user_id, ip, message) VALUE (FROM_UNIXTIME(UNIX_TIMESTAMP(), '%d-%m-%Y %H:%i:%s'), $user_id, '$client_ip', '$message');");
 	}
 
 	public function get_logger_count($search_field) {
@@ -3762,7 +3762,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 					case 'server':
 						require_once('includes/lib_remote.php');
 						$home_info = $this->getGameHomeWithoutMods($home_id);
-						$remote = new GSPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
+						$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
 						$agent_online = $remote->status_chk() === 1;
 						if( $agent_online )
 						{

@@ -22,7 +22,7 @@ function do_progress($kbytes,$totalsize)
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 
 	global $db, $view;
 
@@ -53,7 +53,7 @@ function exec_gsp_module() {
 	if ( !empty($state) )
 	{
 		$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
-		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		if ( $state == "start" )
 		{
 			$postinstall = $server_xml->post_install ? $server_xml->post_install : "";

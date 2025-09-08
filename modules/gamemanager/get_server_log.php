@@ -16,14 +16,14 @@ if (!$home_id || !$mod_id) {
 $db = getOGPDBInstance(); // Replace with your DB instance
 $home_info = $db->getGameHome($home_id);
 $server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
-$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 
 $home_log = "";
 if( isset( $server_xml->console_log ) ) {
     $log_path = preg_replace("/%mod%/i", $home_info['mods'][$mod_id]['mod_key'], $server_xml->console_log);
     $log_retval = $remote->remote_readfile( $home_info['home_path'].'/'.$log_path, $home_log );
 } else {
-    $log_retval = $remote->get_log(GSP_SCREEN_TYPE_HOME, $home_info['home_id'], clean_path($home_info['home_path']."/".$server_xml->exe_location), $home_log);
+    $log_retval = $remote->get_log(OGP_SCREEN_TYPE_HOME, $home_info['home_id'], clean_path($home_info['home_path']."/".$server_xml->exe_location), $home_log);
 }
 $lines = explode("\n", $home_log);
 $home_log = implode("\n", array_slice($lines, -40));

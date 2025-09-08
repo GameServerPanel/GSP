@@ -6,7 +6,7 @@
 require_once('home_handling_functions.php');
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 
 	global $view,$db;
 
@@ -58,7 +58,7 @@ function exec_gsp_module() {
 	}
 	else
 	{
-		$remote = new GSPRemoteLibrary($rserver['agent_ip'],
+		$remote = new OGPRemoteLibrary($rserver['agent_ip'],
 									   $rserver['agent_port'],
 									   $rserver['encryption_key'],
 									   $rserver['timeout']);

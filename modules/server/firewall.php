@@ -6,7 +6,7 @@
 require_once('includes/lib_remote.php');
 require_once("includes/form_table_class.php");
 
-function exec_gsp_module() {
+function exec_ogp_module() {
 	global $view;
 	global $db;
 
@@ -23,7 +23,7 @@ function exec_gsp_module() {
 
 	$firewall_settings = $db->getFirewallSettings($remote_server['remote_server_id']);
 
-	$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+	$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 	$host_stat = $remote->status_chk();
 
 	if( isset($_POST['reset_firewall']) )

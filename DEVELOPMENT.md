@@ -1,8 +1,8 @@
-# GameServer Panel Development Guide
+# Open Game Panel Development Guide
 
 ## Understanding the Codebase
 
-This guide helps developers understand and work with the GameServer Panel codebase effectively.
+This guide helps developers understand and work with the Open Game Panel codebase effectively.
 
 ## Component Integration
 
@@ -128,7 +128,7 @@ $encrypted_data = $enc->encrypt($command_json);
    // modules/mymodule/mymodule.php
    
    // Security check
-   if (!defined('GSP_LANG')) {
+   if (!defined('OGP_LANG')) {
        exit('Direct access not allowed');
    }
    
@@ -145,8 +145,8 @@ $encrypted_data = $enc->encrypt($command_json);
    ```php
    <?php
    // lang/English/modules/mymodule.php
-   define('GSP_LANG_mymodule_title', 'My Module');
-   define('GSP_LANG_mymodule_description', 'Module description');
+   define('OGP_LANG_mymodule_title', 'My Module');
+   define('OGP_LANG_mymodule_description', 'Module description');
    ?>
    ```
 

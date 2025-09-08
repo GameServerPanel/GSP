@@ -103,7 +103,7 @@ print_r($file_replacements);
 echo "</xmp>"; */
 
 require_once('includes/lib_remote.php');
-$remote = new GSPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
+$remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 
 foreach($file_replacements as $filepath => $replacements)
 {

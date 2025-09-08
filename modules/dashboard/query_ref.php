@@ -17,7 +17,7 @@ function print_player_list_ogp_dashboard($player_list,$players,$playersmax,$game
 	return $data;
 }
 
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 	$server_key = 'server_'.$_GET['ip'].'_'.$_GET['port'];
 	if(isset($_GET['show']) and $_GET['show'] == "players")

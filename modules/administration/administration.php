@@ -3,7 +3,7 @@
  * Administrative interface for the administration module
  */
 
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 	global $db,$view;
 	echo "<h2>".get_lang('administration')."</h2>";

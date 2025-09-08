@@ -5,7 +5,7 @@
 
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db, $settings;
 	$home_id = $_GET['home_id'];
@@ -14,7 +14,7 @@ function exec_gsp_module()
 	$enabled_mods = $db->getHomeMods($home_id);
 	$home_info = $db->getGameHomeWithoutMods($home_id);
 	$server_xml = read_server_config(SERVER_CONFIG_LOCATION.$home_info['home_cfg_file']);
-	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'], $home_info['timeout']);
+	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'], $home_info['timeout']);
 	if( empty($enabled_mods) )
 	{	
 		$cpu_count = $remote->cpu_count();

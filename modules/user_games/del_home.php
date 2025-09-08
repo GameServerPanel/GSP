@@ -7,8 +7,8 @@ function logHandling($home_id, $action = 'delete', &$remote){
 	$fileId = str_pad($home_id, 9, '0', STR_PAD_LEFT);
 	
 	$files = array(
-		'screenlogs/screenlog.GSP_HOME_'.$fileId	=> 'file',
-		'screenlogs/screenlog.GSP_UPDATE_'.$fileId	=> 'file',
+		'screenlogs/screenlog.OGP_HOME_'.$fileId	=> 'file',
+		'screenlogs/screenlog.OGP_UPDATE_'.$fileId	=> 'file',
 		'screenlogs/home_id_'.$home_id.'/'			=> 'dir',
 	);
 	
@@ -29,7 +29,7 @@ function logHandling($home_id, $action = 'delete', &$remote){
 	}
 }
  
-function exec_gsp_module() {
+function exec_ogp_module() {
 	global $db, $view;
 	require_once('includes/lib_remote.php');
 	$home_id = $_GET['home_id'];
@@ -47,7 +47,7 @@ function exec_gsp_module() {
 		return;
 	}
 	
-	$remote = new GSPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
+	$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
 	$agent_online = $remote->status_chk() === 1;
 	
 	if($y != 'y')

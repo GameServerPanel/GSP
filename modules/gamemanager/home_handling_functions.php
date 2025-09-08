@@ -32,7 +32,7 @@ function get_start_cmd($remote,$server_xml,$home_info,$mod_id,$ip,$port,$db)
 	$cli_param_data['IP'] = $ip;
 	$cli_param_data['PORT'] = $port;
 	$cli_param_data['HOSTNAME'] = $home_info['home_name'];
-	$cli_param_data['PID_FILE'] = "gsp_game_startup.pid";
+	$cli_param_data['PID_FILE'] = "ogp_game_startup.pid";
 	
 	// Linux
 	if( preg_match("/Linux/", $os) )
@@ -217,7 +217,7 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
         return FALSE;
 	
 	require_once('includes/lib_remote.php');
-	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$os = $remote->what_os();
 		
 	if ( $action != "stop" )
@@ -231,7 +231,7 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 		}
 	}
 
-	$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
+	$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
 	
 	if ( $action == "stop" AND $screen_running )
 	{

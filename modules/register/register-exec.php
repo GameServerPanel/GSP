@@ -15,7 +15,7 @@ function checkEmail($email) {
 }
 
 require_once("includes/functions.php");
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db,$view,$settings;
 		

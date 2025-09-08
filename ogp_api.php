@@ -1,59 +1,59 @@
 <?php
 /*
 ______________ Token Management
-gsp_api.php?token/create/{panel_user}/{panel_password}
-gsp_api.php?token/test/{token}
+ogp_api.php?token/create/{panel_user}/{panel_password}
+ogp_api.php?token/test/{token}
 
 ______________ Remote Servers
-gsp_api.php?server/list						(POST/GET {token})
-gsp_api.php?server/status					(POST/GET {token}{remote_server_id})
-gsp_api.php?server/restart					(POST/GET {token}{remote_server_id})
-gsp_api.php?server/create 					(POST/GET {token}{agent_name}{agent_ip}{agent_port}{agent_user}{encryption_key}{ftp_ip}{ftp_port}{timeout}{use_nat}{display_public_ip})
-gsp_api.php?server/remove 					(POST/GET {token}{remote_server_id})
-gsp_api.php?server/add_ip					(POST/GET {token}{remote_server_id}{ip})
-gsp_api.php?server/remove_ip				(POST/GET {token}{remote_server_id}{ip})
-gsp_api.php?server/list_ips					(POST/GET {token}{remote_server_id})
-gsp_api.php?server/edit_ip					(POST/GET {token}{remote_server_id}{old_ip}{new_ip})
+ogp_api.php?server/list						(POST/GET {token})
+ogp_api.php?server/status					(POST/GET {token}{remote_server_id})
+ogp_api.php?server/restart					(POST/GET {token}{remote_server_id})
+ogp_api.php?server/create 					(POST/GET {token}{agent_name}{agent_ip}{agent_port}{agent_user}{encryption_key}{ftp_ip}{ftp_port}{timeout}{use_nat}{display_public_ip})
+ogp_api.php?server/remove 					(POST/GET {token}{remote_server_id})
+ogp_api.php?server/add_ip					(POST/GET {token}{remote_server_id}{ip})
+ogp_api.php?server/remove_ip				(POST/GET {token}{remote_server_id}{ip})
+ogp_api.php?server/list_ips					(POST/GET {token}{remote_server_id})
+ogp_api.php?server/edit_ip					(POST/GET {token}{remote_server_id}{old_ip}{new_ip})
 
 ______________ Game Servers
-gsp_api.php?user_games/list_games			(POST/GET {token}{system(windows|linux)}{architecture(32|64)})
-gsp_api.php?user_games/list_servers			(POST/GET {token})
-gsp_api.php?user_games/create 				(POST/GET {token}{remote_server_id}{server_name}{home_cfg_id}{mod_cfg_id}{ip}{port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
-gsp_api.php?user_games/clone 				(POST/GET {token}{origin_home_id}{new_server_name}{new_ip}{new_port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
-gsp_api.php?user_games/set_expiration 		(POST/GET {token}{home_id}{timestamp})
+ogp_api.php?user_games/list_games			(POST/GET {token}{system(windows|linux)}{architecture(32|64)})
+ogp_api.php?user_games/list_servers			(POST/GET {token})
+ogp_api.php?user_games/create 				(POST/GET {token}{remote_server_id}{server_name}{home_cfg_id}{mod_cfg_id}{ip}{port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
+ogp_api.php?user_games/clone 				(POST/GET {token}{origin_home_id}{new_server_name}{new_ip}{new_port}{control_password}{enable_ftp}{ftp_password}{slots}{affinity}{nice}{assign_to_username}{custom_user_login_homepath}) // {custom_user_login_homepath} is only used when a default_game_server_home_path_prefix setting is defined and used
+ogp_api.php?user_games/set_expiration 		(POST/GET {token}{home_id}{timestamp})
 
 ______________ Users
-gsp_api.php?user_admin/list 				(POST/GET {token})
-gsp_api.php?user_admin/get		 			(POST/GET {token}{email})
-gsp_api.php?user_admin/create 				(POST/GET {token}{email}{name}{password})
-gsp_api.php?user_admin/remove 				(POST/GET {token}{email})
-gsp_api.php?user_admin/set_expiration 		(POST/GET {token}{email}{timestamp})
-gsp_api.php?user_admin/list_assigned		(POST/GET {token}{email})
-gsp_api.php?user_admin/assign 				(POST/GET {token}{email}{home_id}{timestamp})
-gsp_api.php?user_admin/remove_assign 		(POST/GET {token}{email}{home_id})
+ogp_api.php?user_admin/list 				(POST/GET {token})
+ogp_api.php?user_admin/get		 			(POST/GET {token}{email})
+ogp_api.php?user_admin/create 				(POST/GET {token}{email}{name}{password})
+ogp_api.php?user_admin/remove 				(POST/GET {token}{email})
+ogp_api.php?user_admin/set_expiration 		(POST/GET {token}{email}{timestamp})
+ogp_api.php?user_admin/list_assigned		(POST/GET {token}{email})
+ogp_api.php?user_admin/assign 				(POST/GET {token}{email}{home_id}{timestamp})
+ogp_api.php?user_admin/remove_assign 		(POST/GET {token}{email}{home_id})
 
 ______________ Game Manager
-gsp_api.php?gamemanager/start 				(POST/GET {token}{ip}{port}{mod_key})
-gsp_api.php?gamemanager/stop 				(POST/GET {token}{ip}{port}{mod_key})
-gsp_api.php?gamemanager/restart 			(POST/GET {token}{ip}{port}{mod_key})
-gsp_api.php?gamemanager/rcon 				(POST/GET {token}{ip}{port}{mod_key}{command})
-gsp_api.php?gamemanager/update 				(POST/GET {token}{ip}{port}{mod_key}{type}{manual_url})
+ogp_api.php?gamemanager/start 				(POST/GET {token}{ip}{port}{mod_key})
+ogp_api.php?gamemanager/stop 				(POST/GET {token}{ip}{port}{mod_key})
+ogp_api.php?gamemanager/restart 			(POST/GET {token}{ip}{port}{mod_key})
+ogp_api.php?gamemanager/rcon 				(POST/GET {token}{ip}{port}{mod_key}{command})
+ogp_api.php?gamemanager/update 				(POST/GET {token}{ip}{port}{mod_key}{type}{manual_url})
 
 ______________ Lite File Manager
-gsp_api.php?litefm/list 					(POST/GET {token}{ip}{port}{relative_path})
-gsp_api.php?litefm/get 						(POST/GET {token}{ip}{port}{relative_path})
-gsp_api.php?litefm/save 					(POST/GET {token}{ip}{port}{relative_path}{contents})
-gsp_api.php?litefm/remove 					(POST/GET {token}{ip}{port}{relative_path})
+ogp_api.php?litefm/list 					(POST/GET {token}{ip}{port}{relative_path})
+ogp_api.php?litefm/get 						(POST/GET {token}{ip}{port}{relative_path})
+ogp_api.php?litefm/save 					(POST/GET {token}{ip}{port}{relative_path}{contents})
+ogp_api.php?litefm/remove 					(POST/GET {token}{ip}{port}{relative_path})
 
 ______________ Addons Manager
-gsp_api.php?addonsmanager/list				(POST/GET {token})
-gsp_api.php?addonsmanager/install			(POST/GET {token}{ip}{port}{mod_key}{addon_id})
+ogp_api.php?addonsmanager/list				(POST/GET {token})
+ogp_api.php?addonsmanager/install			(POST/GET {token}{ip}{port}{mod_key}{addon_id})
 
 ______________ Steam Workshop
-gsp_api.php?steam_workshop/install 			(POST/GET {token}{ip}{port}{mods_list})
+ogp_api.php?steam_workshop/install 			(POST/GET {token}{ip}{port}{mods_list})
 * 
  ______________ Panel Setting
-gsp_api.php?setting/get 			(POST/GET {token}{setting_name})
+ogp_api.php?setting/get 			(POST/GET {token}{setting_name})
 
 */
 $main_request = key($_GET);
@@ -281,7 +281,7 @@ function api_server()
 	{
 		$remote_server_id = $_POST['remote_server_id'];
 		$remote_server = $db->getRemoteServer($remote_server_id);
-		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$status = "200";
 		$message = $remote->status_chk() == 1?'online':'offline';
 	}
@@ -290,7 +290,7 @@ function api_server()
 	{
 		$remote_server_id = $_POST['remote_server_id'];
 		$remote_server = $db->getRemoteServer($remote_server_id);
-		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$remote->agent_restart();
 		$status = "200";
 		$message = "success";
@@ -480,7 +480,7 @@ function api_user_games()
 		if($mod_key === FALSE)
 			return array("status" => '307', "message" => "The mod_cfg_id #" . $mod_cfg_id . " does not belong to the game configuration for home_cfg_id #" . $home_cfg_id . ".");
 		
-		$ip_info = $db->resultQuery( "SELECT ip,ip_id FROM GSP_DB_PREFIXremote_server_ips WHERE ip='".$db->real_escape_string($ip)."' AND remote_server_id=".$db->real_escape_string($remote_server_id));
+		$ip_info = $db->resultQuery( "SELECT ip,ip_id FROM OGP_DB_PREFIXremote_server_ips WHERE ip='".$db->real_escape_string($ip)."' AND remote_server_id=".$db->real_escape_string($remote_server_id));
 		if($ip_info === FALSE)
 			return array("status" => '308', "message" => "The given IP address does not belongs to the given remote server.");
 		
@@ -488,7 +488,7 @@ function api_user_games()
 		if(!isPortValid($port))
 			return array("status" => '309', "message" => "The given port is not a valid port.");
 		
-		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");
@@ -510,7 +510,7 @@ function api_user_games()
 			}
 		}
 		else
-			$game_path = "/home/".$remote_server['gsp_user']."/User_Files/"; // Default
+			$game_path = "/home/".$remote_server['ogp_user']."/User_Files/"; // Default
 		
 		$game_path = clean_path($game_path); // Clean it
 		
@@ -581,12 +581,12 @@ function api_user_games()
 			}
 		}
 		
-		$remote = new GSPRemoteLibrary($game_home['agent_ip'],$game_home['agent_port'],$game_home['encryption_key'],$game_home['timeout']);
+		$remote = new OGPRemoteLibrary($game_home['agent_ip'],$game_home['agent_port'],$game_home['encryption_key'],$game_home['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");
 		
-		$ip_info = $db->resultQuery("SELECT ip,ip_id FROM GSP_DB_PREFIXremote_server_ips WHERE ip='".$db->real_escape_string($ip)."' AND remote_server_id=".$db->real_escape_string($game_home['remote_server_id']));
+		$ip_info = $db->resultQuery("SELECT ip,ip_id FROM OGP_DB_PREFIXremote_server_ips WHERE ip='".$db->real_escape_string($ip)."' AND remote_server_id=".$db->real_escape_string($game_home['remote_server_id']));
 		if($ip_info === FALSE)
 			return array("status" => '308', "message" => "The given IP address does not belongs to the given remote server.");
 		
@@ -611,7 +611,7 @@ function api_user_games()
 			}
 		}
 		else
-			$game_path = "/home/".$game_home['gsp_user']."/User_Files/"; // Default
+			$game_path = "/home/".$game_home['ogp_user']."/User_Files/"; // Default
 		
 		$game_path = clean_path($game_path); // Clean it
 		
@@ -641,7 +641,7 @@ function api_user_games()
 			$db->changeFtpStatus('enabled', $clone_home_id);
 		}
 		
-		$user_group = get_user_uid_gid_from_passwd(explode("\n", $remote->sudo_exec('cat /etc/passwd')), $game_home['gsp_user']);
+		$user_group = get_user_uid_gid_from_passwd(explode("\n", $remote->sudo_exec('cat /etc/passwd')), $game_home['ogp_user']);
 		
 		$status = "200";
 		$message = array("clone_home_id" => $clone_home_id, "cloning_status" => $remote->clone_home($game_home['home_path'], $game_path, $user_group));
@@ -957,7 +957,7 @@ function api_gamemanager()
     if($server_xml === FALSE)
 		return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 	
-	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$host_stat = $remote->status_chk();
 	if($host_stat !== 1)
 		return array("status" => '310', "message" => "The remote server is offline.");
@@ -1421,7 +1421,7 @@ function api_litefm()
     if($server_xml === FALSE)
 		return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 	
-	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$host_stat = $remote->status_chk();
 	if($host_stat !== 1)
 		return array("status" => '310', "message" => "The remote server is offline.");
@@ -1488,7 +1488,7 @@ function api_addonsmanager()
 	
 	if($request[0] == "list")
 	{
-		$addons_rows = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXaddons");
+		$addons_rows = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXaddons");
 		$status = "200";
 		$message = $addons_rows;
 	}
@@ -1514,7 +1514,7 @@ function api_addonsmanager()
 		if($server_xml === FALSE)
 			return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 		
-		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");
@@ -1545,7 +1545,7 @@ function api_addonsmanager()
 			$query_groups .= "group_id=0 OR group_id IS NULL)";
 		}
 
-		$addons_rows = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXaddons WHERE home_cfg_id=".$home_info['home_cfg_id']." AND addon_id=".$addon_id.$query_groups);
+		$addons_rows = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXaddons WHERE home_cfg_id=".$home_info['home_cfg_id']." AND addon_id=".$addon_id.$query_groups);
 
 		if($addons_rows === FALSE)
 			return array("status" => '341', "message" => "Invalid addon id #" . $addon_id . ".");
@@ -1632,7 +1632,7 @@ function api_steam_workshop()
 		if($server_xml === FALSE)
 			return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 		
-		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");

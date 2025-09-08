@@ -19,7 +19,7 @@ if (!$db) {
 //returning  true/false
 //$isAdmin = isAdmin(186);
 function isAdmin($userID){
-    $adminField = $db->query("SELECT 'users_role' FROM gsp_users WHERE userID = $userID");
+    $adminField = $db->query("SELECT 'users_role' FROM ogp_users WHERE userID = $userID");
     if($adminField == "admin"){
         $adminStatus = true;
         }else{

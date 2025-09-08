@@ -3,7 +3,7 @@
  * Component of the litefm module
  */
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	require_once(MODULES."/litefm/litefm.php");
 
@@ -61,7 +61,7 @@ function exec_gsp_module()
 	}
 	
 	set_time_limit(0);
-	$remote = new GSPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
+	$remote = new OGPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
 	$fp = fopen("$downloads_folder/$did", "w");
 	$_SESSION['download'][$did]['offset'] = $remote->remote_get_file_part($home_cfg['home_path']."/".$_SESSION['download'][$did]['fileph'], $_SESSION['download'][$did]['offset'], $data);
 	if($_SESSION['download'][$did]['offset'] != -1)

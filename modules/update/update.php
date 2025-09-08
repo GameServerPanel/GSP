@@ -5,10 +5,10 @@
 
  // todo, make checking and updating functions for updateing on the background.
  // todo, more specified updates in smaller packages
-function exec_gsp_module()
+function exec_ogp_module()
 {
         global $db, $settings;
-        define('REPONAME', 'GSP-Website');
+        define('REPONAME', 'OGP-Website');
 
         if ($_SESSION['users_group'] != "admin")
         {

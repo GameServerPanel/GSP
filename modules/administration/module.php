@@ -11,8 +11,8 @@ $module_required = TRUE;
 $module_menus = array( array( 'subpage' => 'watch_logger', 'name'=>'Watch Logger', 'group'=>'admin' ) );
 $install_queries = array();
 $install_queries[0] = array(
-"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."adminExternalLinks`;",
-"CREATE TABLE IF NOT EXISTS ".GSP_DB_PREFIX."adminExternalLinks
+"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."adminExternalLinks`;",
+"CREATE TABLE IF NOT EXISTS ".OGP_DB_PREFIX."adminExternalLinks
 (
   link_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(80) NOT NULL,
@@ -21,8 +21,8 @@ $install_queries[0] = array(
 ) ENGINE=MyISAM;");
 
 $install_queries[1] = array(
-"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."logger`;",
-"CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."logger` 
+"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."logger`;",
+"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."logger` 
 (
   `log_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,  
   `date` varchar(20) NOT NULL,

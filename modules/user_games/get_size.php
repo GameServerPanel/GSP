@@ -6,7 +6,7 @@ function numbersFormatting($bytes){
     return sprintf('%1.2f' , $bytes / pow($base,$class)) . ' ' . $si_prefix[$class];
 }
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db;
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
@@ -20,7 +20,7 @@ function exec_gsp_module()
 		if ( ! $game_home and ! $isAdmin )
 			return;
 
-		$remote = new GSPRemoteLibrary($game_home['agent_ip'], $game_home['agent_port'], $game_home['encryption_key'], $game_home['timeout']);
+		$remote = new OGPRemoteLibrary($game_home['agent_ip'], $game_home['agent_port'], $game_home['encryption_key'], $game_home['timeout']);
 		$r = $remote->rfile_exists($game_home['home_path']);
 		if($r == 1)
 		{
@@ -42,7 +42,7 @@ function exec_gsp_module()
 		$total_size = 0;
 		foreach($game_homes as $game_home)
 		{
-			$remote = new GSPRemoteLibrary($game_home['agent_ip'], $game_home['agent_port'], $game_home['encryption_key'], $game_home['timeout']);
+			$remote = new OGPRemoteLibrary($game_home['agent_ip'], $game_home['agent_port'], $game_home['encryption_key'], $game_home['timeout']);
 			$r = $remote->rfile_exists($game_home['home_path']);
 			if($r == 1)
 			{

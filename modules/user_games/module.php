@@ -13,22 +13,22 @@ $module_menus = array(
 );
 $install_queries = array();
 $install_queries[0] = array(
-	"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."user_homes`;",
-	"CREATE TABLE IF NOT EXISTS ".GSP_DB_PREFIX."user_homes (
+	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."user_homes`;",
+	"CREATE TABLE IF NOT EXISTS ".OGP_DB_PREFIX."user_homes (
 		`home_id` int(11) NOT NULL,
 		`user_id` int(11) NOT NULL,
 		`access_rights` varchar(63) default NULL,
 		PRIMARY KEY (`user_id`,`home_id`)
 	) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
-	"DROP TABLE IF EXISTS ".GSP_DB_PREFIX."user_group_remote_servers;",
-	"CREATE TABLE ".GSP_DB_PREFIX."user_group_remote_servers (
+	"DROP TABLE IF EXISTS ".OGP_DB_PREFIX."user_group_remote_servers;",
+	"CREATE TABLE ".OGP_DB_PREFIX."user_group_remote_servers (
 		`remote_server_id` int(11) NOT NULL,
 		`group_id` int(11) NOT NULL,
 		`access_rights` varchar(63) default NULL,
 		PRIMARY KEY (`remote_server_id`, `group_id`)
 	)ENGINE=MyISAM DEFAULT CHARSET=latin1;",
-	"DROP TABLE IF EXISTS ".GSP_DB_PREFIX."user_group_homes;",
-	"CREATE TABLE ".GSP_DB_PREFIX."user_group_homes (
+	"DROP TABLE IF EXISTS ".OGP_DB_PREFIX."user_group_homes;",
+	"CREATE TABLE ".OGP_DB_PREFIX."user_group_homes (
 		`home_id` int(11) NOT NULL,
 		`group_id` int(11) NOT NULL,
 		`access_rights` varchar(63) default NULL,
@@ -36,8 +36,8 @@ $install_queries[0] = array(
 	)ENGINE=MyISAM DEFAULT CHARSET=latin1;");
 
 $install_queries[1] = array(
-	"DROP TABLE IF EXISTS `".GSP_DB_PREFIX."master_server_homes`;",
-	"CREATE TABLE IF NOT EXISTS ".GSP_DB_PREFIX."master_server_homes (
+	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."master_server_homes`;",
+	"CREATE TABLE IF NOT EXISTS ".OGP_DB_PREFIX."master_server_homes (
 		`home_id` int(11) NOT NULL,
 		`home_cfg_id` int(11) NOT NULL,
 		`remote_server_id` int(11) NOT NULL,
@@ -45,9 +45,9 @@ $install_queries[1] = array(
 	)ENGINE=MyISAM DEFAULT CHARSET=latin1;");
 
 $install_queries[2] = array(
-	"ALTER TABLE `".GSP_DB_PREFIX."user_homes` ADD `user_expiration_date` VARCHAR(21) NOT NULL default 'X';",
-	"ALTER TABLE `".GSP_DB_PREFIX."user_group_homes` ADD `user_group_expiration_date` VARCHAR(21) NOT NULL default 'X';");
+	"ALTER TABLE `".OGP_DB_PREFIX."user_homes` ADD `user_expiration_date` VARCHAR(21) NOT NULL default 'X';",
+	"ALTER TABLE `".OGP_DB_PREFIX."user_group_homes` ADD `user_group_expiration_date` VARCHAR(21) NOT NULL default 'X';");
 
 $install_queries[3] = array(
-	"ALTER TABLE `".GSP_DB_PREFIX."game_mods` modify column `cpu_affinity` varchar(64) null AFTER `extra_params`, comment = 'utf8mb4_general_ci';");
+	"ALTER TABLE `".OGP_DB_PREFIX."game_mods` modify column `cpu_affinity` varchar(64) null AFTER `extra_params`, comment = 'utf8mb4_general_ci';");
 ?>

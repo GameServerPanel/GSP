@@ -3,7 +3,7 @@
  * Component of the util module
  */
 include 'includes/lib_remote.php';
-function exec_gsp_module() 
+function exec_ogp_module() 
 {
 	global $db;
 	$remoteServers = $db->getRemoteServers();
@@ -11,7 +11,7 @@ function exec_gsp_module()
 	
 	if(is_array($remoteServers)){
 		foreach($remoteServers as $server){
-			$remote = new GSPRemoteLibrary($server['agent_ip'], $server['agent_port'], $server['encryption_key'], 1);
+			$remote = new OGPRemoteLibrary($server['agent_ip'], $server['agent_port'], $server['encryption_key'], 1);
 			$status = (int)$remote->status_chk();
 			
 			$servers[] = array(

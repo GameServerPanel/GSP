@@ -11,7 +11,7 @@ if( isset($_GET['remote_server_id']) AND $_GET['remote_server_id'] != "webhost" 
 	$rhost_id = $_GET['remote_server_id'];
 	$remote_server = $db->getRemoteServer($rhost_id);
 	require_once('includes/lib_remote.php');
-	$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+	$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 	$os_string = $remote->what_os();
 	if( preg_match("/Linux/", $os_string) ) {
 		$os = "linux";

@@ -2,7 +2,7 @@
 /*
  * Component of the tshock module
  */
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	include "modules/tshock/shared.php";
 	if($continue)

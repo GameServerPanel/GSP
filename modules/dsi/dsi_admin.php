@@ -21,7 +21,7 @@
 define("DSI_BASEPATH", "modules/dsi/");
 require_once(DSI_BASEPATH . 'includes/functions_ui.php');
 require_once('modules/config_games/server_config_parser.php'); 
-function exec_gsp_module(){
+function exec_ogp_module(){
 	global $db;
 	global $view;
 	

@@ -7,7 +7,7 @@ require_once("modules/config_games/server_config_parser.php");
 require_once('includes/lib_remote.php');
 require_once('modules/fast_download/functions.php');
 require('includes/form_table_class.php');
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db,$view;
 	echo "<h2>".get_lang("fast_dl")."</h2>\n";
@@ -122,7 +122,7 @@ function exec_gsp_module()
 			$remote_server_id = $_GET['remote_server_id'];
 			$remote_server = $db->getRemoteServer($remote_server_id);
 			$rserver = $db->getRemoteServerById($remote_server_id);
-			$remote = new GSPRemoteLibrary( $rserver['agent_ip'],
+			$remote = new OGPRemoteLibrary( $rserver['agent_ip'],
 											$rserver['agent_port'],
 											$rserver['encryption_key'],
 											$rserver['timeout']);
@@ -206,7 +206,7 @@ function exec_gsp_module()
 		{
 			$remote_server_id = $_GET['remote_server_id'];
 			$rserver = $db->getRemoteServerById($remote_server_id);
-			$remote = new GSPRemoteLibrary( $rserver['agent_ip'],
+			$remote = new OGPRemoteLibrary( $rserver['agent_ip'],
 											$rserver['agent_port'],
 											$rserver['encryption_key'],
 											$rserver['timeout']);
@@ -317,7 +317,7 @@ function exec_gsp_module()
 				$server_home = $db->getGameHomeByIP($ip, $port);
 				if ( !$server_home )
 					return;
-				$remote = new GSPRemoteLibrary($server_home['agent_ip'], 
+				$remote = new OGPRemoteLibrary($server_home['agent_ip'], 
 											   $server_home['agent_port'], 
 											   $server_home['encryption_key'], 
 											   $server_home['timeout']);

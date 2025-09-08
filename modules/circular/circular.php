@@ -3,7 +3,7 @@
  * Component of the circular module
  */
 include 'modules/circular/functions.php';
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	global $db;
 	if(isset($_POST['send_circular']))

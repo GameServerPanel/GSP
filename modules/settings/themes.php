@@ -3,7 +3,7 @@
  * Component of the settings module
  */
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	require_once('modules/settings/functions.php');
 	require_once('includes/form_table_class.php');

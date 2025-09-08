@@ -4,7 +4,7 @@
  */
  
 
-$mysql_dbs = $db->resultQuery("SELECT db_id FROM GSP_DB_PREFIXmysql_databases WHERE enabled=1 AND home_id=".$server_home['home_id']);
+$mysql_dbs = $db->resultQuery("SELECT db_id FROM OGP_DB_PREFIXmysql_databases WHERE enabled=1 AND home_id=".$server_home['home_id']);
 if(!empty($mysql_dbs))
 {
 	$module_buttons = array(

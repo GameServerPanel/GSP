@@ -7,7 +7,7 @@ require 'include/TicketSettings.php';
 
 require 'include/functions.php';
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
     global $db, $view;
 

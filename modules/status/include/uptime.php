@@ -16,7 +16,7 @@ elseif ($os == "linux" or $os == "cygwin")
 		require_once('includes/lib_remote.php');
 		$rhost_id = $_GET['remote_server_id'];
 		$remote_server = $db->getRemoteServer($rhost_id);
-		$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+		$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 		list($uptime,$upsince) = $remote->shell_action('get_uptime', 'seconds');
 	}
 	else

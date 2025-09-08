@@ -3,7 +3,7 @@
  * Component of the litefm module
  */
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	require_once(MODULES."/litefm/litefm.php");
 
@@ -49,7 +49,7 @@ function exec_gsp_module()
 		 "<td colspan='3' ><h3>$show_path</h3></td>".
 		 "</tr></table>\n";
 	//Logic to open the file we're editing
-	$remote = new GSPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
+	$remote = new OGPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
 	$data = "";
 	$rel_path = isset($_SESSION['fm_cwd_'.$home_id]) ? $_SESSION['fm_cwd_'.$home_id]:'';
 	$filepath = clean_path($home_cfg['home_path']."/".$rel_path);

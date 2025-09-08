@@ -4,14 +4,14 @@
  */
 
 require_once('includes/lib_remote.php');
-function exec_gsp_module() {
+function exec_ogp_module() {
 
     global $view;
     global $db;
 	echo "<h2>".get_lang('reboot')."</h2>";
 	$rhost_id = @$_REQUEST['rhost_id'];
     $remote_server = $db->getRemoteServer($rhost_id);
-	$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+	$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 	$ipAndName = $remote_server['remote_server_name'] . " " . "(" . $remote_server['agent_ip'] . ")";
 
 	// Confirm user wants to reboot the server

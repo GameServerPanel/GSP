@@ -16,8 +16,8 @@ $module_menus = array(
 ## of the next array if you are updating from a version previous or equal to 2429:
 $install_queries[0] = array();
 $install_queries[1] = array();
-$install_queries[2] = array("DROP TABLE IF EXISTS ".GSP_DB_PREFIX."module_access_rights",
-							"CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."module_access_rights` (".
+$install_queries[2] = array("DROP TABLE IF EXISTS ".OGP_DB_PREFIX."module_access_rights",
+							"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."module_access_rights` (".
 							"`module_id` int(11) NOT NULL COMMENT 'This references to modules.id',".
 							"`flag` char(1) NOT NULL,".
 							"`description` varchar(64) NOT NULL,".

@@ -27,7 +27,7 @@ function litefm_check($home_id)
 	return TRUE;
 }
 
-function exec_gsp_module()
+function exec_ogp_module()
 {
 	$home_id = $_REQUEST['home_id'];
 
@@ -54,7 +54,7 @@ function exec_gsp_module()
 
 	litefm_check($home_id);
 	
-	$remote = new GSPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
+	$remote = new OGPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
 
 	if($isAdmin and isset($_GET['all_fs']))
 		$path = clean_path("/".@$_SESSION['browser_cwd_'.$home_id]);

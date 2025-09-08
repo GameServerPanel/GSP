@@ -3,7 +3,7 @@
  * Component of the user_admin module
  */
 
-function exec_gsp_module() {
+function exec_ogp_module() {
     global $db, $loggedInUserInfo;
 	
 	$page_user = (isset($_GET['page']) && (int)$_GET['page'] > 0) ? (int)$_GET['page'] : 1;

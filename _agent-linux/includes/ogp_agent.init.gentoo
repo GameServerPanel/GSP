@@ -4,7 +4,7 @@
 
 # GF: Config is in $agent_dir/Cfg/Config.pm
 
-agent_dir=GSP_AGENT_DIR
+agent_dir=OGP_AGENT_DIR
 agent_user=OGP_USER
 
 depend() {
