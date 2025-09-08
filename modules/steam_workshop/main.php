@@ -10,7 +10,7 @@ echo '<link rel="stylesheet" type="text/css" href="css/xbbcode/xbbcode.css">'."\
 	 '<script type="text/javascript" src="js/xbbcode/xbbcode.js"></script>'."\n".
 	 '<script type="text/javascript" src="js/modules/steam_workshop.js"></script>';
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	
 	Global $db,$view,$settings;

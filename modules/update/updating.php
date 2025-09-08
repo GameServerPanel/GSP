@@ -18,7 +18,7 @@ function rmdir_recurse($path) {
 
 function exec_gsp_module()
 {
-	define('REPONAME', 'OGP-Website');
+	define('REPONAME', 'GSP-Website');
 	if($_SESSION['users_group'] != "admin")
 	{
 		print_failure( get_lang("no_access") );
@@ -107,7 +107,7 @@ function exec_gsp_module()
 		$new_files = "";
 		
 		$unwanted_path = REPONAME . "-" . $_GET['version'];
-		$extract_path = $temp . DIRECTORY_SEPARATOR . "OGP_update";
+		$extract_path = $temp . DIRECTORY_SEPARATOR . "GSP_update";
 		if( !file_exists($extract_path) )
 			mkdir($extract_path, 0775);
 			

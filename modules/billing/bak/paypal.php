@@ -36,7 +36,7 @@ if(!empty($cart_id))
 			}
 
 		$coupon_discount = 0;
-		$result = $db->resultQuery( "SELECT discount FROM ogp_billing_coupons WHERE id=".$db->realEscapeSingle($cartDB['coupon_id']));
+		$result = $db->resultQuery( "SELECT discount FROM gsp_billing_coupons WHERE id=".$db->realEscapeSingle($cartDB['coupon_id']));
 		foreach ($result as $couponDB){
 			$coupon_discount=$couponDB['discount'];
 		}

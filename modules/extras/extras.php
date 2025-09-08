@@ -51,7 +51,7 @@ function installUpdate($info, $base_dir, $current_blacklist = array())
 	$not_overwritten_files = "";
 	$new_files = "";
 	
-	$temp_dir = $tmp . DIRECTORY_SEPARATOR . "OGP_Extras";
+	$temp_dir = $tmp . DIRECTORY_SEPARATOR . "GSP_Extras";
 	if( !file_exists($temp_dir) )
 		mkdir($temp_dir, 0775);
 	
@@ -207,7 +207,7 @@ function deeperPathFirst($a, $b)
 	return ($al > $bl) ? -1 : +1;
 }
  
-function exec_ogp_module() 
+function exec_gsp_module() 
 {
 	global $db, $settings;		
 	
@@ -374,7 +374,7 @@ function exec_ogp_module()
 
 	foreach($repos_info_array as $key => $repository)
 	{
-		if(preg_match('/^(OGP-Website|OGP-Agent-Linux|OGP-Agent-Windows)$/',$repository['name']))
+		if(preg_match('/^(GSP-Website|OGP-Agent-Linux|OGP-Agent-Windows)$/',$repository['name']))
 			continue;
 		
 		$REMOTE_REPO_FILE = $gitHubURL . $repository['name'] . '/commits/master.atom';

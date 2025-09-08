@@ -81,8 +81,8 @@ function exec_gsp_module()
  $settings = $db->getSettings();
          $subject = "Gameserver Renewel at " . $settings['panel_name'];
       $email = $db->resultQuery("   SELECT DISTINCT users_email
-                           FROM ogp_users, ogp_billing_orders
-                           WHERE ogp_users.user_id = $user_id")[0]["users_email"];
+                           FROM gsp_users, gsp_billing_orders
+                           WHERE gsp_users.user_id = $user_id")[0]["users_email"];
 
       $message = "Your server, " . $home_name ." ID #". $home_id . " at " . $settings['panel_name'] . "  has just been renewed.<br>
                   Thank You for your continued support.<br>
@@ -246,8 +246,8 @@ function exec_gsp_module()
 					$settings = $db->getSettings();
 					 $subject = "New Gameserver installed at " . $settings['panel_name'];
 					  $email = $db->resultQuery("   SELECT DISTINCT users_email
-										   FROM ogp_users, ogp_billing_orders
-										   WHERE ogp_users.user_id = $user_id")[0]["users_email"];
+										   FROM gsp_users, gsp_billing_orders
+										   WHERE gsp_users.user_id = $user_id")[0]["users_email"];
 
 					  $message =  "Your server, " . $home_name ." ID #". $home_id . " at " . $settings['panel_name'] . "  has just been created.<br>
 					               Thank You for your continued support.<br>
@@ -286,7 +286,7 @@ function exec_gsp_module()
 				
 				
 			}
-			// Set expiration date in ogp database
+			// Set expiration date in gsp database
 			//status is -3 -2 -1 0 and 1 
 			// deleted, suspended, invoiced, inactive, active
 			//finish_date the server will be suspended 

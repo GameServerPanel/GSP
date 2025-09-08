@@ -25,7 +25,7 @@ $install_queries[0] = array(
 "CREATE TABLE IF NOT EXISTS `".GSP_DB_PREFIX."remote_servers` (
   `remote_server_id` int(11) NOT NULL auto_increment,
   `remote_server_name` varchar(100) NOT NULL,
-  `ogp_user` varchar(100) NOT NULL,
+  `gsp_user` varchar(100) NOT NULL,
   `agent_ip` varchar(255) NOT NULL,
   `agent_port` int(11) NOT NULL,
   `ftp_port` int(11) NOT NULL,

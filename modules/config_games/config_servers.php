@@ -67,7 +67,7 @@ function exec_gsp_module() {
         
         // Update and remove invalid old game mod ids
         if($clear_old){
-			$db->updateOGPGameModsWithNewIDs($oldStructure);
+			$db->updateGSPGameModsWithNewIDs($oldStructure);
 		}
 
         print_success(get_lang('configs_updated_ok'));

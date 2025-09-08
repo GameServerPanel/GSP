@@ -41,7 +41,7 @@ function assignOrdersToCart($user_id,$tax_amount,$currency,$coupon_id){
 	return $db->resultInsertId( 'billing_carts', $fields );
 }
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	error_reporting(E_ALL);
 	
@@ -84,7 +84,7 @@ function exec_ogp_module()
 
 			if ($coupon_count > 0) {
 				$coupon_count--;
-				$db->resultquery("UPDATE ogp_billing_coupons SET count = $coupon_count WHERE code = '$_POST[coupon_code]'");
+				$db->resultquery("UPDATE gsp_billing_coupons SET count = $coupon_count WHERE code = '$_POST[coupon_code]'");
 			}
         }
 	}
@@ -369,7 +369,7 @@ function exec_ogp_module()
 				//see if user is a new customer, 
 				//check number of orders they have had or if user is an admin (to be able to create server)
 				$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
-				$result = $db->resultQuery("SELECT * FROM ogp_billing_orders WHERE user_id=".$user_id);
+				$result = $db->resultQuery("SELECT * FROM gsp_billing_orders WHERE user_id=".$user_id);
 				$server_price =  number_format( $order['price'], 2 );
 				if(isset($settings['display_free'])) {
 						$display_free = $settings['display_free'];

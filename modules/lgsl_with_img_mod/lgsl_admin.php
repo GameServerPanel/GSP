@@ -1,8 +1,8 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
  * http://www.gameserver-panel.org/
  *

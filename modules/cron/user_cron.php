@@ -45,7 +45,7 @@ function exec_gsp_module()
 		
 		if ( isset( $_POST['homeid_ip_port'] ) and isset($server_homes[$_POST['homeid_ip_port']]) )
 		{
-			$panelURL = getOGPSiteURL();
+			$panelURL = getGSPSiteURL();
 			if($panelURL === false)
 			{
 				print_failure('Failed to retrieve panel URL.');

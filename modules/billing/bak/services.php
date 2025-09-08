@@ -1,5 +1,5 @@
 <?php
-function exec_ogp_module()
+function exec_gsp_module()
 {		
 	global $db;
 	
@@ -128,7 +128,7 @@ function exec_ogp_module()
 		</tr>
 		<tr>
 		<?php 
-		$result3 = $db->resultQuery("SELECT DISTINCT remote_server_id, remote_server_name, agent_ip, ogp_user FROM GSP_DB_PREFIXremote_servers"); 
+		$result3 = $db->resultQuery("SELECT DISTINCT remote_server_id, remote_server_name, agent_ip, gsp_user FROM GSP_DB_PREFIXremote_servers"); 
 		?>
 		<td><?php print_lang('remote_server');?></td>
 		<td>

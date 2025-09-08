@@ -57,7 +57,7 @@ $settings = $db->getSettings();
 gspLang();
 
 require_once("includes/view.php");
-$view = new OGPView();
+$view = new GSPView();
 $view->setCharset( get_lang('lang_charset') );
 if(isset($_GET['type']) && $_GET['type'] == 'cleared')
 {

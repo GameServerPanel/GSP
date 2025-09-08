@@ -91,7 +91,7 @@ function exec_gsp_module() {
 		$ftp_ip = empty( $server_row['ftp_ip'] ) ? $server_row['agent_ip'] : $server_row['ftp_ip'];
 		$data = "<tr class='expand-child' >
 				   <td>$booble</td><td>
-					<b>". get_lang("ogp_user") .":</b> ".$server_row['ogp_user']."<br />
+					<b>". get_lang("gsp_user") .":</b> ".$server_row['gsp_user']."<br />
 					<b>". get_lang("agent_ip_port") .":</b> ".$server_row['agent_ip'].":".$server_row['agent_port']."<br />
 					<b>". get_lang("remote_host_ftp_ip") .":</b> ".$ftp_ip."<br />
 					<b>". get_lang("remote_host_ftp_port") .":</b> ".$server_row['ftp_port']."<br />

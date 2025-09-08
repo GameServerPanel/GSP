@@ -12,7 +12,7 @@ function exec_gsp_module()
 	$homes = $db->getIpPorts();
 	if(!$homes)
 	{
-		print_failure(get_lang('cron_admin_no_ogp_servers_to_display'));
+		print_failure(get_lang('cron_admin_no_gsp_servers_to_display'));
 		return 0;
 	}
 	
@@ -44,7 +44,7 @@ function exec_gsp_module()
 		
 		if(isset($_POST['homeid_ip_port']) and isset($server_homes[$_POST['homeid_ip_port']]))
 		{
-			$panelURL = getOGPSiteURL();
+			$panelURL = getGSPSiteURL();
 			if($panelURL === false)
 			{
 				print_failure('Failed to retrieve panel URL.');

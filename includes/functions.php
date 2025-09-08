@@ -626,7 +626,7 @@ function getClientIPAddress(){
 	return $_SERVER['REMOTE_ADDR'];
 }
 
-function getOGPSiteURL(){
+function getGSPSiteURL(){
 	$url = '';
 	$scheme = ( isset($_SERVER['HTTPS']) and get_true_boolean($_SERVER['HTTPS']) ) ? "https://" : "http://";
 	$url .= $scheme;

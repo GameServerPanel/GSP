@@ -1,8 +1,8 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
  * http://www.gameserver-panel.org/
  *
@@ -23,7 +23,7 @@
  */
 
 chdir(realpath(dirname(__FILE__))); /* Change to the current file path */
-chdir("../.."); /* Base path to ogp web files */
+chdir("../.."); /* Base path to gsp web files */
 // Report all PHP errors
 error_reporting(E_ALL);
 // Path definitions

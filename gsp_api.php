@@ -510,7 +510,7 @@ function api_user_games()
 			}
 		}
 		else
-			$game_path = "/home/".$remote_server['ogp_user']."/User_Files/"; // Default
+			$game_path = "/home/".$remote_server['gsp_user']."/User_Files/"; // Default
 		
 		$game_path = clean_path($game_path); // Clean it
 		
@@ -611,7 +611,7 @@ function api_user_games()
 			}
 		}
 		else
-			$game_path = "/home/".$game_home['ogp_user']."/User_Files/"; // Default
+			$game_path = "/home/".$game_home['gsp_user']."/User_Files/"; // Default
 		
 		$game_path = clean_path($game_path); // Clean it
 		
@@ -641,7 +641,7 @@ function api_user_games()
 			$db->changeFtpStatus('enabled', $clone_home_id);
 		}
 		
-		$user_group = get_user_uid_gid_from_passwd(explode("\n", $remote->sudo_exec('cat /etc/passwd')), $game_home['ogp_user']);
+		$user_group = get_user_uid_gid_from_passwd(explode("\n", $remote->sudo_exec('cat /etc/passwd')), $game_home['gsp_user']);
 		
 		$status = "200";
 		$message = array("clone_home_id" => $clone_home_id, "cloning_status" => $remote->clone_home($game_home['home_path'], $game_path, $user_group));

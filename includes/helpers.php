@@ -411,8 +411,8 @@ function runPostUpdateOperations(){
 }
 
 function getGSPGitHubURL($gitHubUsername, $repo){
-	$OGPGitHub = "https://github.com/OpenGamePanel/";
-	$gitHubURL = $OGPGitHub; 
+	$GSPGitHub = "https://github.com/Gameservers-World/";
+	$gitHubURL = $GSPGitHub; 
 	if(isset($gitHubUsername) && !empty($gitHubUsername)){
 		$gitHubURL = "https://github.com/" . $gitHubUsername . "/"; 
 	}
@@ -423,12 +423,12 @@ function getGSPGitHubURL($gitHubUsername, $repo){
 		return $gitHubURL;
 	}
 	
-	return $OGPGitHub;
+	return $GSPGitHub;
 }
 
 function getGSPGitHubURLUnstrict($gitHubUsername){
-	$OGPGitHub = "https://github.com/OpenGamePanel/";
-	$gitHubURL = $OGPGitHub; 
+	$GSPGitHub = "https://github.com/Gameservers-World/";
+	$gitHubURL = $GSPGitHub; 
 	if(isset($gitHubUsername) && !empty($gitHubUsername)){
 		$gitHubURL = "https://github.com/" . $gitHubUsername . "/"; 
 	}
@@ -440,7 +440,7 @@ function getGSPGitHubURLUnstrict($gitHubUsername){
 		return $gitHubURL;
 	}
 	
-	return $OGPGitHub;
+	return $GSPGitHub;
 }
 
 function getGitHubOrganization($gitHubURL){
@@ -456,7 +456,7 @@ function getGitHubOrganization($gitHubURL){
 	return $gitHubOrg;
 }
 
-function getOGPLangConstantsJSON(){
+function getGSPLangConstantsJSON(){
 	global $GSPLangPre;
 	$finalConsts = array();
 	

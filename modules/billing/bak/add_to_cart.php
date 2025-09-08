@@ -1,8 +1,8 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
  * http://www.gameserver-panel.org/
  *
@@ -52,7 +52,7 @@ function exec_gsp_module()
 
 	// request ogp user to create a home path.
 	$r_server = $db->getRemoteServer($remote_server_id);
-	$ogp_user = $r_server['ogp_user'];
+	$gsp_user = $r_server['gsp_user'];
 
 	// request the user name and the game name to generate a game home name.
 	$home_name = $_POST['home_name'];

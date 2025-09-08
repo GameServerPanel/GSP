@@ -7,8 +7,8 @@ function logHandling($home_id, $action = 'delete', &$remote){
 	$fileId = str_pad($home_id, 9, '0', STR_PAD_LEFT);
 	
 	$files = array(
-		'screenlogs/screenlog.OGP_HOME_'.$fileId	=> 'file',
-		'screenlogs/screenlog.OGP_UPDATE_'.$fileId	=> 'file',
+		'screenlogs/screenlog.GSP_HOME_'.$fileId	=> 'file',
+		'screenlogs/screenlog.GSP_UPDATE_'.$fileId	=> 'file',
 		'screenlogs/home_id_'.$home_id.'/'			=> 'dir',
 	);
 	

@@ -10,7 +10,7 @@ function create_selection($selection,$flag)
 		<td align='left'><input id='".clean_id_string($selection)."' type='checkbox' name='".$selection."' value='1' checked='checked' /></td></tr><tr>
 		<td align='left' class='info' colspan='2'>".get_lang($selection.'_info')."</td></tr>";
 }
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db, $settings;
 	global $view;
@@ -81,7 +81,7 @@ function exec_ogp_module()
 			}
 			foreach ( $remote_servers as $server )
 			{
-				if($server['remote_server_id'] == $rserver_id) $ogp_user = $server['ogp_user'];
+				if($server['remote_server_id'] == $rserver_id) $gsp_user = $server['gsp_user'];
 			}
 			foreach ( $users as $user )
 			{
@@ -90,7 +90,7 @@ function exec_ogp_module()
 			$ftppassword = genRandomString(8);
 			
 			// Game path logic
-			$game_path = "/home/".$ogp_user."/OGP_User_Files/"; // Default
+			$game_path = "/home/".$gsp_user."/GSP_User_Files/"; // Default
 	
 			$skipId = false;
 			if(hasValue($default_home_dir)){

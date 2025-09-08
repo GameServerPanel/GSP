@@ -134,7 +134,7 @@ abstract class GSPDatabase {
 
 	abstract public function getCurrentHomeConfigMods($clear_all);
 	
-	abstract public function updateOGPGameModsWithNewIDs($oldModStructure);
+	abstract public function updateGSPGameModsWithNewIDs($oldModStructure);
 
     abstract public function clearGameCfgs($clear_all);
 

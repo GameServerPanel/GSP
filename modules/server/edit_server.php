@@ -95,7 +95,7 @@ function exec_gsp_module() {
             $_REQUEST['remote_host'],
             $_REQUEST['remote_host_port'],
             $_REQUEST['remote_host_name'],
-			$_REQUEST['ogp_user'],
+			$_REQUEST['gsp_user'],
 			$_REQUEST['remote_host_ftp_ip'],
 			$_REQUEST['remote_host_ftp_port'],
             $_REQUEST['remote_encryption_key'],
@@ -117,7 +117,7 @@ function exec_gsp_module() {
         $ft->add_field('string','remote_host',$remote_server['agent_ip']);
         $ft->add_field('string','remote_host_port',$remote_server['agent_port']);
         $ft->add_field('string','remote_host_name',$remote_server['remote_server_name']);
-		$ft->add_field('string','ogp_user',$remote_server['ogp_user']);
+		$ft->add_field('string','gsp_user',$remote_server['gsp_user']);
 		$ft->add_field('string','remote_host_ftp_ip',$ftp_ip);
 		$ft->add_field('string','remote_host_ftp_port',$remote_server['ftp_port']);
         $ft->add_field('string','remote_encryption_key',$remote_server['encryption_key']);

@@ -5,7 +5,7 @@
 
 define("DEFAULT_REFRESH_TIME","2");
 
-class OGPView {
+class GSPView {
 
     private $meta;
     private $title;
@@ -80,7 +80,7 @@ class OGPView {
 		$this->title = $title == "" ? $this->title : $this->title . " [$title]";
 		
 		// Dump defined constants to json (for language javascript)
-		$jsonStrConsts = getOGPLangConstantsJSON();
+		$jsonStrConsts = getGSPLangConstantsJSON();
 		if($jsonStrConsts !== false){
 			$this->header_code .= '<script type="text/javascript">var langConsts = ' . $jsonStrConsts . ';' . "\n" . 'var langConstPrefix = "' . $GSPLangPre . '";</script>' . "\n";
 		}

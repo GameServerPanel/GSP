@@ -8,7 +8,7 @@
 function exec_gsp_module()
 {
         global $db, $settings;
-        define('REPONAME', 'OGP-Website');
+        define('REPONAME', 'GSP-Website');
 
         if ($_SESSION['users_group'] != "admin")
         {

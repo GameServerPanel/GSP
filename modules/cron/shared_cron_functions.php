@@ -203,7 +203,7 @@ function updateCronJobsToNewApi()
 	{
 		require_once 'includes/lib_remote.php';
 		
-		$panelURL = getOGPSiteURL();
+		$panelURL = getGSPSiteURL();
 		if($panelURL === false)
 			return false;
 		

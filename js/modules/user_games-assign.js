@@ -30,9 +30,9 @@ function change_access_rights(id_type, assign_id)
 		{
 			return true;
 		}
-		check_access_rights += "<tr><td align='right'><label for='" + value + "'>" + langConsts['OGP_LANG_' + value] + ":</label></td>" +
+		check_access_rights += "<tr><td align='right'><label for='" + value + "'>" + langConsts['GSP_LANG_' + value] + ":</label></td>" +
 							   "<td align='left'><input class='ar_flag' id='" + value + "' type='checkbox' name='" + value + "' value='" + index + "' checked='checked' /></td></tr>" +
-							   "<tr><td colspan='2' class='info'>" + langConsts['OGP_LANG_' + value + '_info'] + "</td></tr>";
+							   "<tr><td colspan='2' class='info'>" + langConsts['GSP_LANG_' + value + '_info'] + "</td></tr>";
 	});
 	
 	check_access_rights += '</table>';

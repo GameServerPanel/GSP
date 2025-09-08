@@ -5,7 +5,7 @@
 
 require_once(MODULES."/litefm/functions.php");
 require_once(MODULES."/litefm/litefm.php");
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	$home_id = $_REQUEST['home_id'];
 

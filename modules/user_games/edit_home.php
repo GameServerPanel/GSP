@@ -5,7 +5,7 @@
 
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db;
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
@@ -413,7 +413,7 @@ function exec_ogp_module()
 			if ( $db->changeUserIdMain($home_id,$user_id_main) == TRUE )
 			{
 				$db->assignHomeTo("user",$user_id_main,$home_id,$old_home['access_rights']);
-                                $query="UPDATE `ogp_billing_orders` SET `user_id`=".$user_id_main." WHERE `home_id` = ".$home_id.";";
+                                $query="UPDATE `gsp_billing_orders` SET `user_id`=".$user_id_main." WHERE `home_id` = ".$home_id.";";
 	                        $db->query($query);
 				echo json_encode(array('result' => 'success', 'info' => get_lang("successfully_changed_game_server")));
 				$db->logger( get_lang("successfully_changed_game_server") ." HOME ID:$home_id - ". get_lang("change_user_id_main") .":$user_id_main");

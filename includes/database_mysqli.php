@@ -938,7 +938,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 		return false;
 	}
 	
-	public function updateOGPGameModsWithNewIDs($oldModStructure){
+	public function updateGSPGameModsWithNewIDs($oldModStructure){
 		$currentStructure = $this->getCurrentHomeConfigMods(false);
 		
 		if(isset($oldModStructure) && is_array($oldModStructure) && isset($currentStructure) && is_array($currentStructure)){
@@ -1217,7 +1217,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 			return false;
 
 		$rhost_name = trim($rhost_name);
-		$query = sprintf("INSERT INTO `%sremote_servers` (`agent_ip`,remote_server_name,ogp_user,agent_port,ftp_ip,ftp_port,`encryption_key`,timeout,use_nat,display_public_ip)
+		$query = sprintf("INSERT INTO `%sremote_servers` (`agent_ip`,remote_server_name,gsp_user,agent_port,ftp_ip,ftp_port,`encryption_key`,timeout,use_nat,display_public_ip)
 			VALUES('%s','%s','%s','%d','%s','%s','%s','%s','%s','%s');",
 				$this->table_prefix,
 				$this->realEscapeSingle($rhost_ip),
@@ -1379,7 +1379,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 		$query = sprintf("UPDATE %sremote_servers SET agent_ip='%s',
 			agent_port='%s', encryption_key='%s',
 			remote_server_name='%s',
-			ogp_user='%s',
+			gsp_user='%s',
 			ftp_ip='%s',
 			ftp_port='%s',
 			timeout='%s',
