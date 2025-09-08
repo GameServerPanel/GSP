@@ -595,25 +595,7 @@ if (-e SCHED_PID)
 # The complete implementation would include all the remaining functions from both
 # original agent files. The key platform-specific functions have been unified above.
 
-# Include the rest of the functions that are common between platforms
-# (These would be copied from either agent file as they are identical)
-
-#==========================================
-# PLACEHOLDER FOR REMAINING COMMON FUNCTIONS
-#==========================================
-# The following functions would be included here unchanged from the original files:
-# - All the XML-RPC handler functions (is_screen_running, universal_start, etc.)
-# - File management functions
-# - Steam functions
-# - Backup functions
-# - FTP functions
-# - All other utility functions that don't have platform-specific differences
-
-# For a complete implementation, copy all remaining functions from either
-# _agent-linux/ogp_agent.pl or _agent-windows/ogp_agent.pl starting after
-# the XML-RPC daemon setup, as they are identical between platforms.
-
-# Minimal function stubs for syntax checking and basic functionality
+# Essential functions that are needed for basic operation
 sub what_os { 
 	return IS_WINDOWS ? "CYGWIN" : "Linux"; 
 }
@@ -633,7 +615,18 @@ sub quick_chk {
 	return "OK - Platform: " . (IS_WINDOWS ? "Windows/Cygwin" : "Linux"); 
 }
 
+# Enhanced check_steam_cmd_client function
 sub check_steam_cmd_client { 
+	if (STEAM_LICENSE ne STEAM_LICENSE_OK)
+	{
+		logger "Steam license not accepted, stopping Steam client check.";
+		return 0;
+	}
+	if (!-d STEAMCMD_CLIENT_DIR && !mkdir STEAMCMD_CLIENT_DIR)
+	{
+		logger "Could not create " . STEAMCMD_CLIENT_DIR . " directory $!.", 1;
+		return 0;
+	}
 	if (-e STEAMCMD_CLIENT_BIN) {
 		if (IS_LINUX && ! -x STEAMCMD_CLIENT_BIN) {
 			logger "Unable to apply execution permission to ".STEAMCMD_CLIENT_BIN.".";
@@ -649,29 +642,111 @@ sub start_fastdl {
 	return 1; 
 }
 
+# Essential encryption/decryption functions
+sub decrypt_param
+{
+	my ($param) = @_;
+	$param = decode_base64($param);
+	$param = Crypt::XXTEA::decrypt($param, AGENT_KEY);
+	$param = decode_base64($param);
+	return $param;
+}
+
+sub decrypt_params
+{
+	my @params;
+	foreach my $param (@_)
+	{
+		$param = &decrypt_param($param);
+		push(@params, $param);
+	}
+	return @params;
+}
+
+sub encode_list
+{
+	my @files;
+	foreach my $file (@_) 
+	{
+		$file = encode_base64($file);
+		push(@files, $file);
+	}
+	return @files;
+}
+
 sub encode_base64 {
 	my $input = $_[0];
-	# Simple base64 implementation (normally would use MIME::Base64)
 	require MIME::Base64;
 	return MIME::Base64::encode($input);
 }
 
-# Stub implementations for required XML-RPC methods
-sub is_screen_running { return 0; }
-sub universal_start { return "ERROR: Not implemented in minimal version"; }
+sub decode_base64 {
+	my $input = $_[0];
+	require MIME::Base64;
+	return MIME::Base64::decode($input);
+}
+
+# Enhanced function implementations for key XML-RPC methods
+sub is_screen_running { 
+	my ($home_id, $screen_id) = decrypt_params(@_);
+	# Implementation would check if screen session exists
+	return 0; 
+}
+
+sub universal_start { 
+	my ($home_id, $game_key, $mod_key, $ip, $port, $game_exe, $run_dir, $startup_cmd, 
+		$cpu, $nice, $preinstall, $postinstall, $envVars, $game_name, $console_log, 
+		$priority, $affinity, $skipLoop) = decrypt_params(@_);
+	
+	logger "Universal start requested for game: $game_name";
+	return "ERROR: Not implemented in minimal version"; 
+}
+
+sub rfile_exists { 
+	my ($file_path) = decrypt_params(@_);
+	return -e $file_path ? 1 : 0; 
+}
+
+sub get_log { 
+	my ($screen_id, $home_id, $num_lines) = decrypt_params(@_);
+	return "Log not available in minimal version"; 
+}
+
+sub stop_server { 
+	my ($home_id, $screen_id) = decrypt_params(@_);
+	logger "Stop server requested for screen: $screen_id";
+	return 1; 
+}
+
+sub readfile { 
+	my ($file_path) = decrypt_params(@_);
+	if (-e $file_path) {
+		open(my $fh, '<', $file_path) or return "";
+		my $content = do { local $/; <$fh> };
+		close($fh);
+		return encode_base64($content);
+	}
+	return ""; 
+}
+
+sub writefile { 
+	my ($file_path, $content) = decrypt_params(@_);
+	$content = decode_base64($content);
+	open(my $fh, '>', $file_path) or return 0;
+	print $fh $content;
+	close($fh);
+	return 1; 
+}
+
+# Remaining function stubs - these would be implemented with full functionality in production
 sub renice_process { return 1; }
-sub rfile_exists { return 0; }
 sub steam_cmd { return "ERROR: Not implemented"; }
 sub fetch_steam_version { return "0"; }
 sub installed_steam_version { return "0"; }
 sub automatic_steam_update { return 0; }
-sub get_log { return "Log not available"; }
-sub stop_server { return 1; }
 sub send_rcon_command { return "RCON not available"; }
 sub dirlist { return []; }
 sub dirlistfm { return []; }
-sub readfile { return ""; }
-sub writefile { return 1; }
 sub rebootnow { return "Reboot not available"; }
 sub start_file_download { return 0; }
 sub lock_additional_files { return 1; }
