@@ -1047,7 +1047,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 				if($mysql_db['remote_server_id'] != "0")
 				{
 					$remote_server = $db->getRemoteServer($mysql_db['remote_server_id']);
-					$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+					$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 					$host_stat = $remote->status_chk();
 					if($host_stat === 1 )
 					{

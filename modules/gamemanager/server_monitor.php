@@ -419,7 +419,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			
 			//End
 
-			$remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
+			$remote = new GSPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 			$host_stat = $remote->status_chk();
 
 			if( $host_stat === 1)
@@ -429,8 +429,8 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$displayIP =  checkDisplayPublicIP($server_home['display_public_ip'], $ip);
 				$address = "";
 
-				$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1;
-				$update_in_progress = $remote->is_screen_running(OGP_SCREEN_TYPE_UPDATE,$server_home['home_id']) === 1;
+				$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1;
+				$update_in_progress = $remote->is_screen_running(GSP_SCREEN_TYPE_UPDATE,$server_home['home_id']) === 1;
 				if($screen_running)
 				{
 					// Check if the screen running the server is running.

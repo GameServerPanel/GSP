@@ -3,7 +3,7 @@
  * Component of the user_games module
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db, $settings;
 
@@ -25,7 +25,7 @@ function exec_ogp_module()
 	echo create_back_button('user_games');
 
 	include_once('includes/lib_remote.php');
-	$remote = new OGPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
+	$remote = new GSPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
 
 	if(isset($_REQUEST['clone_home']))
 	{

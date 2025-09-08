@@ -4,7 +4,7 @@
  */
 
 require_once(MODULES."/litefm/functions.php");
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	require_once('includes/form_table_class.php');
 	global $db;

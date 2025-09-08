@@ -8,7 +8,7 @@
 require_once('includes/lib_remote.php');
 
 
-function exec_ogp_module() 
+function exec_gsp_module() 
 {
 	global $db, $settings, $loggedInUserInfo;
 	
@@ -225,7 +225,7 @@ function exec_ogp_module()
 
 			if( isset($_GET['remote_server_id']) AND $_GET['remote_server_id'] == $server_row['remote_server_id'] )
 			{
-				$remote = new OGPRemoteLibrary( $server_row['agent_ip'], $server_row['agent_port'], 
+				$remote = new GSPRemoteLibrary( $server_row['agent_ip'], $server_row['agent_port'], 
 												$server_row['encryption_key'], $server_row['timeout'] );
 				$host_stat = $remote->status_chk();
 				if( $host_stat === 1 )
@@ -253,7 +253,7 @@ function exec_ogp_module()
 			if($remote_server_id)
 			{
 				$remote_server = $db->getRemoteServer($remote_server_id);
-				$remote = new OGPRemoteLibrary( $remote_server['agent_ip'], $remote_server['agent_port'], 
+				$remote = new GSPRemoteLibrary( $remote_server['agent_ip'], $remote_server['agent_port'], 
 												$remote_server['encryption_key'], $remote_server['timeout'] );
 				$host_stat = $remote->status_chk();
 				if( $host_stat === 1 )

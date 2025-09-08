@@ -23,7 +23,7 @@ require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
 require_once("protocol/lgsl/lgsl_protocol.php");
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
     global $db,$view;
 	$home_id = $_REQUEST['home_id'];
@@ -74,7 +74,7 @@ function exec_ogp_module() {
 			return;
 		}
 		
-		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		
 		$addon_info = $addons_rows[0];
 		$url = $addon_info['url'];

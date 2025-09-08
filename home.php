@@ -26,7 +26,7 @@ $db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name,
 include_once("includes/lang.php");
 
 if (!$db instanceof GSPDatabase) {
-	ogpLang();
+	gspLang();
 	die(get_lang('no_db_connection'));
 }
 
@@ -37,7 +37,7 @@ if(hasValue($_SESSION['user_id'])){
 
 $settings = $db->getSettings();
 @$GLOBALS['panel_language'] = $settings['panel_language'];
-ogpLang();
+gspLang();
 
 require_once("includes/view.php");
 $view = new OGPView();

@@ -118,7 +118,7 @@ function exec_ogp_module()
 				if($success){
 					$home_info = $db->getGameHomeWithoutMods($new_home_id);
 					require_once('includes/lib_remote.php');
-					$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+					$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 					
 					// Create new home directory if it doesn't already exist
 					$remote->exec("mkdir -p " . clean_path($game_path) . (!$skipId ? $new_home_id : ""));
@@ -166,7 +166,7 @@ function exec_ogp_module()
 			$rhost_id = $_POST['rserver_id'];
 		$remote_server = $db->getRemoteServer($rhost_id);
 		require_once('includes/lib_remote.php');
-		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$host_stat = $remote->status_chk();
 		if( $host_stat === 1)
 			$os = $remote->what_os();

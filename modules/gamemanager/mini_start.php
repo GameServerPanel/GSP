@@ -294,7 +294,7 @@ elseif($server_home['home_id'] == $_POST['home_id'])
 		
 	
 	$cli_param_data['HOSTNAME'] = $server_home['home_name'];
-	$cli_param_data['PID_FILE'] = "ogp_game_startup.pid";
+	$cli_param_data['PID_FILE'] = "gsp_game_startup.pid";
 	
 	$os = $remote->what_os();
 	
@@ -337,7 +337,7 @@ elseif($server_home['home_id'] == $_POST['home_id'])
 	
 	// We do this check because sometimes server does not answer to lgsl check
 	// done below and is still running.
-	if ( $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1 )
+	if ( $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1 )
 	{
 		echo "<p>".get_lang_f('server_already_running')."<a href=?m=gamemanager&amp;p=stop&amp;home_id=".$server_home['home_id'].
 			"&amp;ip=".$ip."&amp;port=".

@@ -41,7 +41,7 @@ function assignOrdersToCart($user_id,$tax_amount,$currency,$coupon_id){
 	return $db->resultInsertId( 'billing_carts', $fields );
 }
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	error_reporting(E_ALL);
 	

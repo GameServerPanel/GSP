@@ -35,7 +35,7 @@ if(isset($server_home['control_password']) && $server_home['control_password'] !
 			$cfg["voice"] = $server_home['port'];
 			$cfg["query"] = 10011;
 			require_once('includes/lib_remote.php');
-			$remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
+			$remote = new GSPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 			foreach($db->getHomeIpPorts($server_home['home_id']) as $ts3Port)
 			{
 				if($remote->rfile_exists( "startups/".$ts3Port['ip']."-".$ts3Port['port'] ) === 1)

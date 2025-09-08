@@ -5,7 +5,7 @@
 
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	$home_id = $_GET['home_id'];
 	$mod_id = $_GET['mod_id'];

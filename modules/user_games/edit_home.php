@@ -53,7 +53,7 @@ function exec_ogp_module()
 	
 	$server_xml = read_server_config(SERVER_CONFIG_LOCATION.$home_info['home_cfg_file']);
 	include_once('includes/lib_remote.php');
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$ftp_installed = $db->isModuleInstalled('ftp');
 		
 	if( isset($_REQUEST['change_name']) )
@@ -781,7 +781,7 @@ function exec_ogp_module()
 		if ( is_array($avail_ips) && !empty($avail_ips) )
 		{
 			echo "<h3>". get_lang("ips_and_ports") ."</h3>";
-			$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
+			$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
 			if( ! $screen_running )
 			{
 				if( isset($_REQUEST['set_ip']) )

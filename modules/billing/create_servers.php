@@ -62,7 +62,7 @@ function exec_ogp_module()
 				$home_info = $db->getGameHomeWithoutMods($home_id);
 				
 				//Create the remote connection
-				$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+				$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 				
 				//Reassign the server
 				$db->assignHomeTo( "user", $user_id, $home_id, $access_rights );
@@ -147,7 +147,7 @@ function exec_ogp_module()
 				$home_info = $db->getGameHomeWithoutMods($home_id);
 				
 				//Create the remote connection
-				$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+				$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 								
 				//Get Full home info in 1 array
 				$home_info = $db->getGameHome($home_id);

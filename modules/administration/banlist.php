@@ -4,7 +4,7 @@
  * Component of the administration module
  */
 
-function exec_ogp_module() 
+function exec_gsp_module() 
 {
 	echo "<h2>".get_lang('ban_list')."</h2>";
 	global $db, $settings;

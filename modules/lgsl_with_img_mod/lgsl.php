@@ -22,7 +22,7 @@
  *
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	echo "<h2>LGSL</h2>";
 	global $output, $lgsl_server_id;

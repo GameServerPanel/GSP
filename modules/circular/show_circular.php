@@ -3,7 +3,7 @@
  * Component of the circular module
  */
 include 'modules/circular/functions.php';
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	$circulars = get_circulars();
 	if(isset($_GET['list']))

@@ -3,7 +3,7 @@
  * Component of the server module
  */
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 	
 	global $view;
 	global $db;
@@ -35,7 +35,7 @@ function exec_ogp_module() {
 
 		require_once('includes/lib_remote.php');
 
-		$remote = new OGPRemoteLibrary($rhost_ip,$rhost_port,$encryption_key,$timeout);
+		$remote = new GSPRemoteLibrary($rhost_ip,$rhost_port,$encryption_key,$timeout);
 		$status = $remote->status_chk();
 		if($status === 0)
 		{

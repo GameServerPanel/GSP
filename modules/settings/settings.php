@@ -3,7 +3,7 @@
  * Settings management for the settings module
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	require_once('includes/form_table_class.php');
 	global $db,$view;

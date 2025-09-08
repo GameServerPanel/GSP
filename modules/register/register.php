@@ -9,7 +9,7 @@
 define("RECAPTCHA_API_SERVER", "http://www.google.com/recaptcha/api");
 define("RECAPTCHA_API_SECURE_SERVER", "https://www.google.com/recaptcha/api");
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db,$view,$settings;
 	

@@ -96,7 +96,7 @@ function update_local_copies()
 
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
-function exec_ogp_module() {
+function exec_gsp_module() {
 //update_local_copies(); #Disabled until the rsync_sites.list file from master servers is corrected.
 	global $db,$view,$settings;
 	
@@ -134,7 +134,7 @@ function exec_ogp_module() {
 	
 	$home_id = $home_info['home_id'];
 	
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
 	
 	if( isset($server_xml->lgsl_query_name) )
@@ -172,12 +172,12 @@ function exec_ogp_module() {
 		
 	echo "<h2>Update $home_info[home_name]</h2>";
 	
-	if ( $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_id) == 1 )
+	if ( $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_id) == 1 )
 	{
 		print_failure( get_lang("server_running_cant_update") );
 		return;
 	}
-	$update_active = $remote->get_log(OGP_SCREEN_TYPE_UPDATE,
+	$update_active = $remote->get_log(GSP_SCREEN_TYPE_UPDATE,
 		// Note exec location should not be added here as the log is in root where rsync is executed.
 		$home_id,clean_path($home_info['home_path']),
 		$log_txt,30);

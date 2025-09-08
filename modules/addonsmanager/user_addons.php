@@ -3,7 +3,7 @@
  * Component of the addonsmanager module
  */
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 	global $db;
 	$home_id = $_GET['home_id'];
 	$mod_id = $_GET['mod_id'];

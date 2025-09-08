@@ -176,7 +176,7 @@ $name_type_vertical = false; // false/true // Global default/fallback for printi
 
 require_once "modules/lgsl_with_img_mod/lgsl_files/lgsl_class.php";
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	error_reporting(0);	  
 	//------------------------------------------------------------------------------------------------------------+

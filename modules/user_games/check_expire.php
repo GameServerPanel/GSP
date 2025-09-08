@@ -3,7 +3,7 @@
  * Component of the user_games module
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db;
 	$expired_servers = $db->resultQuery("SELECT home_name, home_id, server_expiration_date FROM GSP_DB_PREFIXserver_homes WHERE server_expiration_date NOT LIKE 'X' AND server_expiration_date <= ".time().";");

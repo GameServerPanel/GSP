@@ -42,20 +42,20 @@ require_once("modules/config_games/server_config_parser.php");
     }
 
     require_once('includes/lib_remote.php');
-    $remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+    $remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 
     $home_log = "";
 	
 	if( isset( $server_xml->console_log ) )
 	{
-		$log_retval = $remote->get_log(OGP_SCREEN_TYPE_HOME,
+		$log_retval = $remote->get_log(GSP_SCREEN_TYPE_HOME,
 			$home_info['home_id'],
 			clean_path($home_info['home_path']),
 			$home_log, 100, (string) $server_xml->console_log);
 	}
 	else
 	{
-		$log_retval = $remote->get_log(OGP_SCREEN_TYPE_HOME,
+		$log_retval = $remote->get_log(GSP_SCREEN_TYPE_HOME,
 			$home_info['home_id'],
 			clean_path($home_info['home_path']."/".$server_xml->exe_location),
 			$home_log);

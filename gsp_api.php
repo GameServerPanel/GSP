@@ -281,7 +281,7 @@ function api_server()
 	{
 		$remote_server_id = $_POST['remote_server_id'];
 		$remote_server = $db->getRemoteServer($remote_server_id);
-		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$status = "200";
 		$message = $remote->status_chk() == 1?'online':'offline';
 	}
@@ -290,7 +290,7 @@ function api_server()
 	{
 		$remote_server_id = $_POST['remote_server_id'];
 		$remote_server = $db->getRemoteServer($remote_server_id);
-		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$remote->agent_restart();
 		$status = "200";
 		$message = "success";
@@ -488,7 +488,7 @@ function api_user_games()
 		if(!isPortValid($port))
 			return array("status" => '309', "message" => "The given port is not a valid port.");
 		
-		$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+		$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");
@@ -581,7 +581,7 @@ function api_user_games()
 			}
 		}
 		
-		$remote = new OGPRemoteLibrary($game_home['agent_ip'],$game_home['agent_port'],$game_home['encryption_key'],$game_home['timeout']);
+		$remote = new GSPRemoteLibrary($game_home['agent_ip'],$game_home['agent_port'],$game_home['encryption_key'],$game_home['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");
@@ -957,7 +957,7 @@ function api_gamemanager()
     if($server_xml === FALSE)
 		return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 	
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$host_stat = $remote->status_chk();
 	if($host_stat !== 1)
 		return array("status" => '310', "message" => "The remote server is offline.");
@@ -1421,7 +1421,7 @@ function api_litefm()
     if($server_xml === FALSE)
 		return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 	
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$host_stat = $remote->status_chk();
 	if($host_stat !== 1)
 		return array("status" => '310', "message" => "The remote server is offline.");
@@ -1514,7 +1514,7 @@ function api_addonsmanager()
 		if($server_xml === FALSE)
 			return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 		
-		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");
@@ -1632,7 +1632,7 @@ function api_steam_workshop()
 		if($server_xml === FALSE)
 			return array("status" => '305', "message" => "No game configuration found for home_cfg_id #" . $home_cfg_id . ".");
 		
-		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		$host_stat = $remote->status_chk();
 		if($host_stat !== 1)
 			return array("status" => '310', "message" => "The remote server is offline.");

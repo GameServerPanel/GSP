@@ -98,7 +98,7 @@ function exec_ogp_module()
 		
 		if($xml !== false)
 		{
-			$remote = new OGPRemoteLibrary($home_cfg['agent_ip'],$home_cfg['agent_port'],$home_cfg['encryption_key'], $home_cfg['timeout']);
+			$remote = new GSPRemoteLibrary($home_cfg['agent_ip'],$home_cfg['agent_port'],$home_cfg['encryption_key'], $home_cfg['timeout']);
 			
 			if($remote->status_chk() !== 1)
 			{
@@ -107,7 +107,7 @@ function exec_ogp_module()
 			
 			if(isset($_GET['show_log']))
 			{
-				$update_active = $remote->get_log(OGP_SCREEN_TYPE_UPDATE,$home_id,clean_path($home_cfg['home_path']),$log_txt);
+				$update_active = $remote->get_log(GSP_SCREEN_TYPE_UPDATE,$home_id,clean_path($home_cfg['home_path']),$log_txt);
 				if ( $update_active == 1 )
 				{
 					if(isset($_POST['sgc']))

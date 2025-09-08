@@ -5,7 +5,7 @@
 
 require_once("server_config_parser.php");
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
     global $db,$view;
     $game_cfgs = $db->getGameCfgs();

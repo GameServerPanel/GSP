@@ -29,7 +29,7 @@ function logHandling($home_id, $action = 'delete', &$remote){
 	}
 }
  
-function exec_ogp_module() {
+function exec_gsp_module() {
 	global $db, $view;
 	require_once('includes/lib_remote.php');
 	$home_id = $_GET['home_id'];
@@ -47,7 +47,7 @@ function exec_ogp_module() {
 		return;
 	}
 	
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
 	$agent_online = $remote->status_chk() === 1;
 	
 	if($y != 'y')

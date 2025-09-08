@@ -3,7 +3,7 @@
  * Administrative interface for the ts3admin module
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	$templates_folder = 'modules/TS3Admin/templates_c';
 	if( is_writable( $templates_folder ) )

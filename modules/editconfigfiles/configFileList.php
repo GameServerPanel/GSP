@@ -25,7 +25,7 @@
 require_once('modules/editconfigfiles/functions.php');
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
     global $db, $view;
     

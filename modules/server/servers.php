@@ -5,7 +5,7 @@
  */
 
 require_once('includes/lib_remote.php');
-function exec_ogp_module() {
+function exec_gsp_module() {
 
 	global $view;
 	global $db;
@@ -48,7 +48,7 @@ function exec_ogp_module() {
 	foreach ( $servers as $server_row )
 	{
 		#check to see if the remote daeomns are up status_chk is found in lib_remote.php
-		$remote = new OGPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
+		$remote = new GSPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
 
 		$host_stat = $remote->status_chk();
 

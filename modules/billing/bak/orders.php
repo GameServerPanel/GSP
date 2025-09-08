@@ -1,5 +1,5 @@
 <?php 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	error_reporting(E_ALL);
 	

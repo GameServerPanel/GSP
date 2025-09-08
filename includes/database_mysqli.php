@@ -3762,7 +3762,7 @@ class GSPDatabaseMySQL extends GSPDatabase
 					case 'server':
 						require_once('includes/lib_remote.php');
 						$home_info = $this->getGameHomeWithoutMods($home_id);
-						$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
+						$remote = new GSPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
 						$agent_online = $remote->status_chk() === 1;
 						if( $agent_online )
 						{

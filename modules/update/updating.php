@@ -16,7 +16,7 @@ function rmdir_recurse($path) {
     rmdir($path);
 }
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	define('REPONAME', 'OGP-Website');
 	if($_SESSION['users_group'] != "admin")
@@ -227,7 +227,7 @@ function exec_ogp_module()
 				// update version info in db
 
 				$version = $db->real_escape_string($_GET['version']);
-				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$version' WHERE setting = 'ogp_version'");
+				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$version' WHERE setting = 'gsp_version'");
 				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$vtype' WHERE setting = 'version_type'");
 
 				// Remove the downloaded package

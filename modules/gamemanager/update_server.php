@@ -6,7 +6,7 @@
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
 	global $db;
 	global $view;
@@ -40,7 +40,7 @@ function exec_ogp_module() {
 		print_failure( get_lang("xml_steam_error") );
 		return;
 	}
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'], $home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'], $home_info['timeout']);
 	$host_stat = $remote->status_chk();
 	if( $host_stat === 0 )
 	{
@@ -50,14 +50,14 @@ function exec_ogp_module() {
 	}
 	else
 	{
-		if ( $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_id) == 1 )
+		if ( $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_id) == 1 )
 		{
 			print_failure( get_lang("server_running_cant_update") );
 			return;
 		}
 
 		$log_txt = '';
-		$update_active = $remote->get_log(OGP_SCREEN_TYPE_UPDATE,
+		$update_active = $remote->get_log(GSP_SCREEN_TYPE_UPDATE,
 			// Note exec location should not be added here as the log is in root where steam is executed.
 			$home_id,clean_path($home_info['home_path']),
 			$log_txt);

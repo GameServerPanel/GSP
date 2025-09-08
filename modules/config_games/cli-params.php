@@ -3,7 +3,7 @@
  * Component of the config_games module
  */
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 	@$arch = $_POST['arch'];
 	@$os = $_POST['os'];
 	@$protocol = $_POST['protocol'];

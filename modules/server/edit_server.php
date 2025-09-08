@@ -3,7 +3,7 @@
  * Component of the server module
  */
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
     global $view;
     global $db;
@@ -148,8 +148,8 @@ function exec_ogp_module() {
 				{
 					foreach ( $servers_match_ip_id as $home_info )
 					{
-						$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
-						$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
+						$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+						$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
 						if( $screen_running )
 						{
 							$servers_running = TRUE;

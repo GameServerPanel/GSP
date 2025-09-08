@@ -931,12 +931,12 @@ $(document).ready(function()
 
 
 		/* *** Footer Mod *** */
-		$('.main-footer .OGPVersionArea').addClass('d-none');
+		$('.main-footer .GSPVersionArea').addClass('d-none');
 		$('.main-footer a').attr('target', '_blank').addClass('text-dark');
 		$('.main-footer .footer').html($('.main-footer .footer').html().replace("Theme - ", "Theme for OGP by <a href='https://www.ondsen.ch' target='_blank' class='text-dark'>oNdsen</a> - "))
 		$('.main-footer .footer.center').removeClass('center');
-		$('.main-footer .OGPVersionArea .version').remove()
-		$('.main-footer .OGPVersionArea').removeClass('inline-block').addClass('d-inline-block');
+		$('.main-footer .GSPVersionArea .version').remove()
+		$('.main-footer .GSPVersionArea').removeClass('inline-block').addClass('d-inline-block');
 		$('.main-footer .footer > br').last().remove()
 	}
 
@@ -1173,17 +1173,17 @@ $(window).load(function()
 
 	$('.main-footer .versionInfo').click(function()
 	{
-		$('.OGPVersionArea, .OGPVersionArea .version, .OGPVersionArea .versionNumber').removeClass('d-none').removeClass('hide');
+		$('.GSPVersionArea, .GSPVersionArea .version, .GSPVersionArea .versionNumber').removeClass('d-none').removeClass('hide');
 
 		// add blink class to versionNumber
-		$('.OGPVersionArea .versionNumber').addClass('shortblink');
+		$('.GSPVersionArea .versionNumber').addClass('shortblink');
 		// remove after 4 seconds
 		setTimeout(function(){
-			$('.OGPVersionArea .versionNumber').removeClass('shortblink');
+			$('.GSPVersionArea .versionNumber').removeClass('shortblink');
 		}, 4000);
 
-		var copy = copyToClipboard($('.OGPVersionArea .versionNumber'));
-		toastr.info('"' + copy + '" ' + $('.OGPVersionArea .copyVersionResult').attr('lang'));
+		var copy = copyToClipboard($('.GSPVersionArea .versionNumber'));
+		toastr.info('"' + copy + '" ' + $('.GSPVersionArea .copyVersionResult').attr('lang'));
 	});
 	// circular notifications
 	if($('body > #notification').length > 0)

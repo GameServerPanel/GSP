@@ -25,7 +25,7 @@
 require_once("modules/config_games/server_config_parser.php");
 require_once('includes/lib_remote.php');
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db;
 
@@ -44,8 +44,8 @@ function exec_ogp_module()
 	foreach ( $server_homes as $server_home )
 	{
 		$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$server_home['home_cfg_file']);
-		$remote = new OGPRemoteLibrary($server_home['agent_ip'],$server_home['agent_port'],$server_home['encryption_key'],$server_home['timeout']);
-		$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1;
+		$remote = new GSPRemoteLibrary($server_home['agent_ip'],$server_home['agent_port'],$server_home['encryption_key'],$server_home['timeout']);
+		$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1;
 		if( ( $server_xml->control_protocol == 'rcon' OR $server_xml->control_protocol == 'rcon2' OR 
 		   @$server_xml->gameq_query_name == "minecraft" OR $server_xml->control_protocol == 'lcon' ) AND $screen_running )
 		{
@@ -88,7 +88,7 @@ function exec_ogp_module()
 			{
 				list($home_id,$mod_id,$ip,$port) = explode("-", $value);
 				$home_info = $db->getGameHome($home_id);
-				$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+				$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 				$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
 				$control_type = isset($server_xml->control_protocol_type) ? $server_xml->control_protocol_type : "";
 				

@@ -115,7 +115,7 @@ else
                 $home_id = $user_home['home_id'];
                 $home_info = $db->getGameHomeWithoutMods($home_id);
                 $server_info = $db->getRemoteServerById($home_info['remote_server_id']);
-                $remote = new OGPRemoteLibrary($server_info['agent_ip'], $server_info['agent_port'], $server_info['encryption_key'],$server_info['timeout']);
+                $remote = new GSPRemoteLibrary($server_info['agent_ip'], $server_info['agent_port'], $server_info['encryption_key'],$server_info['timeout']);
                 $ftp_login = isset($home_info['ftp_login']) ? $home_info['ftp_login'] : $home_id;
                 $remote->ftp_mgr("userdel", $ftp_login);
                 $db->changeFtpStatus('disabled',$home_id);
@@ -169,7 +169,7 @@ else
                 $home_id = $user_home['home_id'];
                 $home_info = $db->getGameHomeWithoutMods($home_id);
                 $server_info = $db->getRemoteServerById($home_info['remote_server_id']);
-                $remote = new OGPRemoteLibrary($server_info['agent_ip'], $server_info['agent_port'], $server_info['encryption_key'],$server_info['timeout']);
+                $remote = new GSPRemoteLibrary($server_info['agent_ip'], $server_info['agent_port'], $server_info['encryption_key'],$server_info['timeout']);
 
                 // Remove the game home from db
                 $db->deleteGameHome($home_id);

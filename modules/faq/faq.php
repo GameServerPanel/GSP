@@ -28,7 +28,7 @@
 <script type="text/javascript" src="modules/faq/faq.js"></script>
 <link type="text/css" rel="stylesheet" href="modules/faq/syntaxhighlighter/styles/shCoreDefault.css"/>
 <?php
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	echo '<h2>F.A.Q.</h2>';
 	echo '<div class="maincategory"><img class="headerimage" src="modules/faq/faq.png">Categories<div style="float:right" >'.

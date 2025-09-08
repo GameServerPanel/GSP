@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 require_once('includes/lib_remote.php');
 require_once('modules/cron/shared_cron_functions.php');
 
-function exec_ogp_module() 
+function exec_gsp_module() 
 {
 	global $db, $view;
 	$isAdmin = $db->isAdmin($_SESSION['user_id']);
@@ -38,7 +38,7 @@ function exec_ogp_module()
 	{
 		if(!checkCronInput($_POST['minute'], $_POST['hour'], $_POST['dayOfTheMonth'], $_POST['month'], $_POST['dayOfTheWeek']))
 		{
-			print_failure(get_lang('OGP_LANG_bad_inputs'));
+			print_failure(get_lang('GSP_LANG_bad_inputs'));
 			$view->refresh('?m=cron&p=user_cron',2);
 			return;
 		}
@@ -81,7 +81,7 @@ function exec_ogp_module()
 				   $_POST['dayOfTheWeek']." ".
 				   $command;
 			
-			$remote = new OGPRemoteLibrary( $game_home['agent_ip'],
+			$remote = new GSPRemoteLibrary( $game_home['agent_ip'],
 											$game_home['agent_port'],
 											$game_home['encryption_key'],
 											$game_home['timeout']);
@@ -95,7 +95,7 @@ function exec_ogp_module()
 	}
 	elseif( isset($_POST['removeJob']) and isset($remote_servers[$_POST['r_server_id']]) and isset($jobsArray[$_POST['r_server_id']][$_POST['job_id']]) )
 	{	
-		$remote = new OGPRemoteLibrary( $remote_servers[$_POST['r_server_id']]['agent_ip'],
+		$remote = new GSPRemoteLibrary( $remote_servers[$_POST['r_server_id']]['agent_ip'],
 										$remote_servers[$_POST['r_server_id']]['agent_port'],
 										$remote_servers[$_POST['r_server_id']]['encryption_key'],
 										$remote_servers[$_POST['r_server_id']]['timeout'] );
