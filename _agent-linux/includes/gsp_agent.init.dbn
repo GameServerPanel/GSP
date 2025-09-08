@@ -13,7 +13,7 @@
 ### END INIT INFO
 #
 
-agent_dir=OGP_AGENT_DIR
+agent_dir=GSP_AGENT_DIR
 agent_user=OGP_USER
 
 #

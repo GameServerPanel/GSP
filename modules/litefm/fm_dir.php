@@ -5,7 +5,7 @@
 
 require_once(MODULES."/litefm/functions.php");
 require_once(MODULES."/litefm/litefm.php");
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	$home_id = $_REQUEST['home_id'];
 
@@ -38,7 +38,7 @@ function exec_ogp_module()
 
 	litefm_check($home_id);
 	
-	$remote = new OGPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
+	$remote = new GSPRemoteLibrary($home_cfg['agent_ip'], $home_cfg['agent_port'], $home_cfg['encryption_key'], $home_cfg['timeout']);
 	
 	$os_string = $remote->what_os();
 	$os = preg_match("/Linux/i", $os_string) ? "linux" : "windows";

@@ -5,7 +5,7 @@ require 'include/functions.php';
 require 'include/TicketSettings.php';
 require 'includes/form_table_class.php';
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
     global $db, $view;
 

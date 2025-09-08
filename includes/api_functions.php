@@ -91,7 +91,7 @@ function get_start_cmd($user_info,$remote,$server_xml,$home_info,$mod_id,$ip,$po
 	$cli_param_data['IP'] = $ip;
 	$cli_param_data['PORT'] = $port;
 	$cli_param_data['HOSTNAME'] = $home_info['home_name'];
-	$cli_param_data['PID_FILE'] = "ogp_game_startup.pid";
+	$cli_param_data['PID_FILE'] = "gsp_game_startup.pid";
 	
 	// Linux
 	if( preg_match("/Linux/", $os) )
@@ -342,7 +342,7 @@ function get_faster_rsync($rsync_sites)
 	}
 	
 	if($faster == "NONE")
-		$faster = "rsync.opengamepanel.org";
+		$faster = "rsync.gameservers-world.com";
 	return $faster;
 }
 

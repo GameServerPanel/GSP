@@ -5,7 +5,7 @@
 
 require_once("server_config_parser.php");
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
     global $db,$view;
     $game_cfgs = $db->getGameCfgs();
@@ -67,7 +67,7 @@ function exec_ogp_module() {
         
         // Update and remove invalid old game mod ids
         if($clear_old){
-			$db->updateOGPGameModsWithNewIDs($oldStructure);
+			$db->updateGSPGameModsWithNewIDs($oldStructure);
 		}
 
         print_success(get_lang('configs_updated_ok'));

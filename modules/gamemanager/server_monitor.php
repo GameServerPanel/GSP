@@ -127,7 +127,7 @@ function get_sync_name($server_xml)
 	return $sync_name;
 }
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 	global $db, $settings, $loggedInUserInfo;
 	echo "<h2 class='gameMonitor " . ($db->isAdmin( $_SESSION['user_id'] ) ? "isAdminUser" : "") . "'>". get_lang("game_monitor") ."</h2>";
 	$refresh = new refreshed();
@@ -322,7 +322,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			//default is it never expires 
 			$expiration_dates = "This Server Will NEVER Expire";
 			//get all orders thare are active or invoiced
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status >= -2" ;
+			$query = "SELECT * FROM gsp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status >= -2" ;
 			$results = $db->resultQuery($query);
 			if(!is_null($results[0]['status'])) 
 			{
@@ -419,7 +419,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			
 			//End
 
-			$remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
+			$remote = new GSPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 			$host_stat = $remote->status_chk();
 
 			if( $host_stat === 1)
@@ -429,8 +429,8 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$displayIP =  checkDisplayPublicIP($server_home['display_public_ip'], $ip);
 				$address = "";
 
-				$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1;
-				$update_in_progress = $remote->is_screen_running(OGP_SCREEN_TYPE_UPDATE,$server_home['home_id']) === 1;
+				$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$server_home['home_id']) === 1;
+				$update_in_progress = $remote->is_screen_running(GSP_SCREEN_TYPE_UPDATE,$server_home['home_id']) === 1;
 				if($screen_running)
 				{
 					// Check if the screen running the server is running.
@@ -513,7 +513,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$address = "<span style='color:darkred;font-weight:bold;'>Agent Offline</span>";
 			}
 			$user = $db->getUserById($server_home['user_id_main']);
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status > 0" ;
+			$query = "SELECT * FROM gsp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status > 0" ;
 //DISABLE SHOWING EXPIRATION DATES
 //$expiration_dates = "";
 

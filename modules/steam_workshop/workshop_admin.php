@@ -4,7 +4,7 @@
  */
 require_once('includes/form_table_class.php');
 require_once("modules/steam_workshop/functions.php");
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	
 	Global $db,$view;

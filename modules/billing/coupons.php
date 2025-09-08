@@ -1,5 +1,5 @@
 <?php
-function exec_ogp_module()
+function exec_gsp_module()
 {		
 	global $db;
 
@@ -14,7 +14,7 @@ function exec_ogp_module()
 		$id = $db->realEscapeSingle($_POST['id']);
 
 		//Create INSERT query
-		$qry_change_url = "UPDATE OGP_DB_PREFIXbilling_coupons
+		$qry_change_url = "UPDATE GSP_DB_PREFIXbilling_coupons
 						   SET code ='".$new_code."', 
 							   name = '".$new_name."',
 							   discount ='".$new_discount."',
@@ -35,14 +35,14 @@ function exec_ogp_module()
 		$expires = $_POST['expires'];
 
 
-		$query = "INSERT INTO OGP_DB_PREFIXbilling_coupons(code, name, discount, count, expires) VALUES('".$code."', '".$name."', '".$discount."', '".$count."', '".$expires."')";
+		$query = "INSERT INTO GSP_DB_PREFIXbilling_coupons(code, name, discount, count, expires) VALUES('".$code."', '".$name."', '".$discount."', '".$count."', '".$expires."')";
 		$db->query($query);	
 	}
 	
 	//Querying REMOVE coupon FROM DB
 	if (isset($_POST['del_coupon']))
 	{
-		$db->query( "DELETE FROM OGP_DB_PREFIXbilling_coupons WHERE id=" . $db->realEscapeSingle($_POST['id']) );
+		$db->query( "DELETE FROM GSP_DB_PREFIXbilling_coupons WHERE id=" . $db->realEscapeSingle($_POST['id']) );
 	}
 	?>
 	
@@ -51,7 +51,7 @@ function exec_ogp_module()
 	</table>
 	<br>
 	<?php  
-	$result = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_coupons");
+	$result = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_coupons");
 	if ($result > 0)
 	{
 		?>

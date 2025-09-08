@@ -3,7 +3,7 @@
  * Component of the settings module
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {	
 	global $db;
 	require_once 'includes/api_functions.php';

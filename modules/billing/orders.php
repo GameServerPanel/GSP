@@ -1,5 +1,5 @@
 <?php
-function exec_ogp_module()
+function exec_gsp_module()
 {
         error_reporting(E_ALL);
 
@@ -7,12 +7,12 @@ function exec_ogp_module()
 
         if(isset($_POST['remove']))
         {
-                $query_delete_order = $db->query("DELETE FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($_POST['cart_id']));
-                $query_delete_order = $db->query("DELETE FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($_POST['cart_id']));
+                $query_delete_order = $db->query("DELETE FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($_POST['cart_id']));
+                $query_delete_order = $db->query("DELETE FROM GSP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($_POST['cart_id']));
         }
         if(isset($_POST['paid']))
         {
-                $query_set_as_paid =  $db->query("UPDATE OGP_DB_PREFIXbilling_carts
+                $query_set_as_paid =  $db->query("UPDATE GSP_DB_PREFIXbilling_carts
                                                                                   SET paid=1
                                                                                   WHERE cart_id=".$db->realEscapeSingle($_POST['cart_id']));
         }
@@ -49,7 +49,7 @@ function exec_ogp_module()
                 echo "<h1>Accounting</h1>";
                 $servercount = 0;
                 $income = 0;
-                $paidOrders = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE status > 0");
+                $paidOrders = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE status > 0");
                 foreach($paidOrders as $inc)
                  {
                          $servercount = $servercount +1;
@@ -65,9 +65,9 @@ function exec_ogp_module()
         if($isAdmin or $status > "not_paid")
         {
          if ($isAdmin){
-        $carts = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE paid =" . $db->realEscapeSingle($paid_value) ." order by cart_id DESC");
+        $carts = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE paid =" . $db->realEscapeSingle($paid_value) ." order by cart_id DESC");
          }else{
-        $carts = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE paid =" . $db->realEscapeSingle($paid_value) ." AND user_id = " . $user_id ." order by cart_id DESC");
+        $carts = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE paid =" . $db->realEscapeSingle($paid_value) ." AND user_id = " . $user_id ." order by cart_id DESC");
          }
                 if( $carts > 0 )
                 {
@@ -103,7 +103,7 @@ function exec_ogp_module()
                                 }?>
                                 </tr>
                                 <?php
-                                $orders = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart['cart_id'])." order by order_id DESC" );
+                                $orders = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart['cart_id'])." order by order_id DESC" );
                                 $subtotal = 0;
                                 foreach($orders as $order)
                                 {
@@ -221,7 +221,7 @@ function exec_ogp_module()
                                         //obter as informações de cupom usadas neste pedido
                                         $coupon_savings = 0;
                                         if($cart['coupon_id']>0) {
-                                                $result = $db->resultquery("SELECT * from OGP_DB_PREFIXbilling_coupons WHERE id = '". $cart['coupon_id'] . "'");
+                                                $result = $db->resultquery("SELECT * from GSP_DB_PREFIXbilling_coupons WHERE id = '". $cart['coupon_id'] . "'");
                                                 foreach($result as $coupon){
                                                         $coupon_savings = $subtotal * ($coupon['discount']/ 100);
                                                         echo "Sub-total c/discount <b>$" .number_format( ($subtotal - $coupon_savings) , 2 ).$cart['currency']."</b></br><td>";

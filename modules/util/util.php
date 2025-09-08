@@ -3,7 +3,7 @@
  * Component of the util module
  */
 echo '<script src="js/modules/util.js"></script>';
-function exec_ogp_module() 
+function exec_gsp_module() 
 {
 	global $db;
 	include 'util_config.php';

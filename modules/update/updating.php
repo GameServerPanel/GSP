@@ -16,9 +16,9 @@ function rmdir_recurse($path) {
     rmdir($path);
 }
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
-	define('REPONAME', 'OGP-Website');
+	define('REPONAME', 'GSP-Website');
 	if($_SESSION['users_group'] != "admin")
 	{
 		print_failure( get_lang("no_access") );
@@ -29,9 +29,9 @@ function exec_ogp_module()
 	global $view;
 	
 	// GitHub URL
-	if(function_exists("getOGPGitHubURL") && function_exists("getOGPGitHubURLUnstrict")){
+	if(function_exists("getGSPGitHubURL") && function_exists("getGSPGitHubURLUnstrict")){
 		$gitHubUsername = $settings["custom_github_update_username"];	
-		$gitHubURL = getOGPGitHubURL($gitHubUsername, REPONAME);
+		$gitHubURL = getGSPGitHubURL($gitHubUsername, REPONAME);
 	}else{
 		$gitHubURL = "https://github.com/OpenGamePanel/";
 	}
@@ -107,14 +107,14 @@ function exec_ogp_module()
 		$new_files = "";
 		
 		$unwanted_path = REPONAME . "-" . $_GET['version'];
-		$extract_path = $temp . DIRECTORY_SEPARATOR . "OGP_update";
+		$extract_path = $temp . DIRECTORY_SEPARATOR . "GSP_update";
 		if( !file_exists($extract_path) )
 			mkdir($extract_path, 0775);
 			
 		$blacklist = array ('/install.php',
 							'/modules/gamemanager/rsync_sites_local.list');
 							
-		$blacklisted_files = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
+		$blacklisted_files = $db->resultQuery('SELECT file_path FROM `GSP_DB_PREFIXupdate_blacklist`;');
 		if($blacklisted_files !== FALSE)
 		{
 			$current_blacklist = array();
@@ -227,8 +227,8 @@ function exec_ogp_module()
 				// update version info in db
 
 				$version = $db->real_escape_string($_GET['version']);
-				$db->query("UPDATE OGP_DB_PREFIXsettings SET value = '$version' WHERE setting = 'ogp_version'");
-				$db->query("UPDATE OGP_DB_PREFIXsettings SET value = '$vtype' WHERE setting = 'version_type'");
+				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$version' WHERE setting = 'gsp_version'");
+				$db->query("UPDATE GSP_DB_PREFIXsettings SET value = '$vtype' WHERE setting = 'version_type'");
 
 				// Remove the downloaded package
 				if( file_exists( $temp_dwl ) )

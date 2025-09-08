@@ -4,7 +4,7 @@
  */
 
 // Globals
-$OGPLangPre = "OGP_LANG_";
+$GSPLangPre = "GSP_LANG_";
 
 // Ignore any request with unwanted values at 'm' or 'p'
 if( isset($_REQUEST['m']) and !preg_match("/^([a-z]|[0-9]|_|-)+$/i", $_REQUEST['m']) )
@@ -33,8 +33,8 @@ function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$
 		if ( function_exists('mysqli_connect') )
 			require_once("includes/database_mysqli.php");
 		else
-			die("<p class='failure'>OGP requires the <a href='http://php.net/manual/en/book.mysqli.php' target='_blank'>mysqli PHP extension</a>. Please install it, and then try again.</p>");
-        $database = new OGPDatabaseMysql();
+			die("<p class='failure'>GSP requires the <a href='http://php.net/manual/en/book.mysqli.php' target='_blank'>mysqli PHP extension</a>. Please install it, and then try again.</p>");
+        $database = new GSPDatabaseMysql();
         $connect_value = $database->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
         
         if ($connect_value === TRUE)
@@ -51,7 +51,7 @@ function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$
 
 function get_db_error_text ($db_retval, &$error_text)
 {
-    if (is_a($db_retval,"OGPDatabase"))
+    if (is_a($db_retval,"GSPDatabase"))
         return FALSE;
 
     switch ($db_retval) {
@@ -229,7 +229,7 @@ function sanitizeInputStr($strToProcess, $removeHTML = true, $trim = true, $remo
 
 function startSession(){
 	if(!isset($_SESSION)){
-		session_name("opengamepanel_web");
+		session_name("gameserver-panel_web");
 		session_start();
 	}
 }
@@ -410,9 +410,9 @@ function runPostUpdateOperations(){
 	}
 }
 
-function getOGPGitHubURL($gitHubUsername, $repo){
-	$OGPGitHub = "https://github.com/OpenGamePanel/";
-	$gitHubURL = $OGPGitHub; 
+function getGSPGitHubURL($gitHubUsername, $repo){
+	$GSPGitHub = "https://github.com/Gameservers-World/";
+	$gitHubURL = $GSPGitHub; 
 	if(isset($gitHubUsername) && !empty($gitHubUsername)){
 		$gitHubURL = "https://github.com/" . $gitHubUsername . "/"; 
 	}
@@ -423,12 +423,12 @@ function getOGPGitHubURL($gitHubUsername, $repo){
 		return $gitHubURL;
 	}
 	
-	return $OGPGitHub;
+	return $GSPGitHub;
 }
 
-function getOGPGitHubURLUnstrict($gitHubUsername){
-	$OGPGitHub = "https://github.com/OpenGamePanel/";
-	$gitHubURL = $OGPGitHub; 
+function getGSPGitHubURLUnstrict($gitHubUsername){
+	$GSPGitHub = "https://github.com/Gameservers-World/";
+	$gitHubURL = $GSPGitHub; 
 	if(isset($gitHubUsername) && !empty($gitHubUsername)){
 		$gitHubURL = "https://github.com/" . $gitHubUsername . "/"; 
 	}
@@ -440,7 +440,7 @@ function getOGPGitHubURLUnstrict($gitHubUsername){
 		return $gitHubURL;
 	}
 	
-	return $OGPGitHub;
+	return $GSPGitHub;
 }
 
 function getGitHubOrganization($gitHubURL){
@@ -456,13 +456,13 @@ function getGitHubOrganization($gitHubURL){
 	return $gitHubOrg;
 }
 
-function getOGPLangConstantsJSON(){
-	global $OGPLangPre;
+function getGSPLangConstantsJSON(){
+	global $GSPLangPre;
 	$finalConsts = array();
 	
 	$consts = get_defined_constants(true);
 	foreach($consts["user"] as $key => $value){
-		if(startsWith($key, $OGPLangPre)){
+		if(startsWith($key, $GSPLangPre)){
 			$finalConsts[$key] = $value;
 		}
 	}

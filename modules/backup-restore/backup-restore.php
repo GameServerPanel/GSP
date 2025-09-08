@@ -2,7 +2,7 @@
 
 include "function.php";
 
-function exec_ogp_module(){
+function exec_gsp_module(){
 
 	if($_SERVER['REQUEST_METHOD'] === 'GET'){
 		$homeid = $_GET['home_id'];

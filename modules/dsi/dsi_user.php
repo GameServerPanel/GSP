@@ -25,7 +25,7 @@ require_once('modules/gamemanager/home_handling_functions.php');
 require_once('modules/config_games/server_config_parser.php');
 require_once('protocol/lgsl/lgsl_protocol.php');
 require_once('protocol/GameQ/GameQ.php');
-function exec_ogp_module(){
+function exec_gsp_module(){
 	global $db;
 	echo "<h2>".get_lang("dsi_long")."</h2>";
 	

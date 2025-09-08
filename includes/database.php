@@ -3,9 +3,9 @@
  * Database connection and query functions
  */
 
-define("OGP_DB_PREFIX", "OGP_DB_PREFIX");
+define("GSP_DB_PREFIX", "GSP_DB_PREFIX");
 
-abstract class OGPDatabase {
+abstract class GSPDatabase {
 
     protected $queries_ = 0;
 
@@ -134,7 +134,7 @@ abstract class OGPDatabase {
 
 	abstract public function getCurrentHomeConfigMods($clear_all);
 	
-	abstract public function updateOGPGameModsWithNewIDs($oldModStructure);
+	abstract public function updateGSPGameModsWithNewIDs($oldModStructure);
 
     abstract public function clearGameCfgs($clear_all);
 

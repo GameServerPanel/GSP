@@ -5,14 +5,14 @@
 require_once('includes/lib_remote.php');
 require_once('modules/cron/shared_cron_functions.php');
 
-function exec_ogp_module() 
+function exec_gsp_module() 
 {
 	global $db, $view;
 	$r_servers = $db->getRemoteServers();
 	$homes = $db->getIpPorts();
 	if(!$homes)
 	{
-		print_failure(get_lang('cron_admin_no_ogp_servers_to_display'));
+		print_failure(get_lang('cron_admin_no_gsp_servers_to_display'));
 		return 0;
 	}
 	
@@ -37,14 +37,14 @@ function exec_ogp_module()
 	{
 		if(!checkCronInput($_POST['minute'], $_POST['hour'], $_POST['dayOfTheMonth'], $_POST['month'], $_POST['dayOfTheWeek']))
 		{
-			print_failure(get_lang('OGP_LANG_bad_inputs'));
+			print_failure(get_lang('GSP_LANG_bad_inputs'));
 			$view->refresh('?m=cron&p=cron',2);
 			return;
 		}
 		
 		if(isset($_POST['homeid_ip_port']) and isset($server_homes[$_POST['homeid_ip_port']]))
 		{
-			$panelURL = getOGPSiteURL();
+			$panelURL = getGSPSiteURL();
 			if($panelURL === false)
 			{
 				print_failure('Failed to retrieve panel URL.');
@@ -60,26 +60,26 @@ function exec_ogp_module()
 				
 			switch ($_POST['action']) {
 				case "stop":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/stop&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+					$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/stop&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
 					break;
 				case "start":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/start&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+					$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/start&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
 					break;
 				case "restart":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/restart&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+					$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/restart&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
 					break;
 				case "steam_auto_update":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/update&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
+					$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/update&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
 					break;
 			}
 			
-			$remote = new OGPRemoteLibrary( $game_home['agent_ip'], $game_home['agent_port'],
+			$remote = new GSPRemoteLibrary( $game_home['agent_ip'], $game_home['agent_port'],
 											$game_home['encryption_key'], $game_home['timeout'] );
 		}
 		else
 		{
 			$r_server_id = $_POST['r_server_id'];
-			$remote = new OGPRemoteLibrary( $remote_servers[$r_server_id]['agent_ip'],
+			$remote = new GSPRemoteLibrary( $remote_servers[$r_server_id]['agent_ip'],
 											$remote_servers[$r_server_id]['agent_port'],
 											$remote_servers[$r_server_id]['encryption_key'],
 											$remote_servers[$r_server_id]['timeout']);
@@ -101,7 +101,7 @@ function exec_ogp_module()
 	}
 	elseif( isset($_POST['removeJob']) and isset($remote_servers[$_POST['r_server_id']]) and isset($jobsArray[$_POST['r_server_id']][$_POST['job_id']]) )
 	{	
-		$remote = new OGPRemoteLibrary( $remote_servers[$_POST['r_server_id']]['agent_ip'],
+		$remote = new GSPRemoteLibrary( $remote_servers[$_POST['r_server_id']]['agent_ip'],
 										$remote_servers[$_POST['r_server_id']]['agent_port'],
 										$remote_servers[$_POST['r_server_id']]['encryption_key'],
 										$remote_servers[$_POST['r_server_id']]['timeout']);

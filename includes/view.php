@@ -5,7 +5,7 @@
 
 define("DEFAULT_REFRESH_TIME","2");
 
-class OGPView {
+class GSPView {
 
     private $meta;
     private $title;
@@ -29,9 +29,9 @@ class OGPView {
 	function menu(){}
 	
     function printView($cleared = false, $dataType = "html") {
-        global $db, $OGPLangPre;
+        global $db, $GSPLangPre;
 
-        if ( is_object($db) && array_key_exists( "OGPDatabase", class_parents($db) ) ) {
+        if ( is_object($db) && array_key_exists( "GSPDatabase", class_parents($db) ) ) {
             $panel_settings = $db->getSettings();
         }
         
@@ -80,9 +80,9 @@ class OGPView {
 		$this->title = $title == "" ? $this->title : $this->title . " [$title]";
 		
 		// Dump defined constants to json (for language javascript)
-		$jsonStrConsts = getOGPLangConstantsJSON();
+		$jsonStrConsts = getGSPLangConstantsJSON();
 		if($jsonStrConsts !== false){
-			$this->header_code .= '<script type="text/javascript">var langConsts = ' . $jsonStrConsts . ';' . "\n" . 'var langConstPrefix = "' . $OGPLangPre . '";</script>' . "\n";
+			$this->header_code .= '<script type="text/javascript">var langConsts = ' . $jsonStrConsts . ';' . "\n" . 'var langConstPrefix = "' . $GSPLangPre . '";</script>' . "\n";
 		}
 				
 		// Include jQuery, jQuery UI, and our global CSS file in the header code
@@ -110,7 +110,7 @@ class OGPView {
 		$javascript .= '</script>' . "\n";
 		
 		// Include global JS for modules
-		if(is_object($db) && array_key_exists("OGPDatabase", class_parents($db))){
+		if(is_object($db) && array_key_exists("GSPDatabase", class_parents($db))){
 			foreach($db->getInstalledModules() as $m)
 			{
 				$global_js_file = 'js/' . MODULES . "{$m['folder']}_global.js";
@@ -194,14 +194,14 @@ class OGPView {
 				
         $footer = "";
 
-        if ( is_object($db) && array_key_exists( "OGPDatabase", class_parents($db) ) ) {
+        if ( is_object($db) && array_key_exists( "GSPDatabase", class_parents($db) ) ) {
             $footer .= "<div class=\"footer center\">";
             $footer .= get_lang_f('cur_theme', !empty($_SESSION['users_theme']) ? $_SESSION['users_theme'] : @$panel_settings['theme']) . " - " . $db->getNbOfQueries()." ".get_lang('queries_executed');
-            $footer .= "<br />".get_lang('copyright')." &copy; <a href=\"http://www.opengamepanel.org\">Open Game Panel</a> " . date("Y") . " - ".get_lang('all_rights_reserved')." - <span class='versionInfo'>".get_lang('show_version')."</span><br /><div class='inline-block OGPVersionArea'><span class='version hide'>" . get_lang('version') . ":</span>&nbsp; <span class='hide versionNumber'>".@$panel_settings['ogp_version']."</span> <span class='copyVersionResult' lang='" . get_lang('copied') . "'></span></div></div>";
+            $footer .= "<br />".get_lang('copyright')." &copy; <a href=\"http://www.gameservers-world.com\">GameServer Panel</a> " . date("Y") . " - ".get_lang('all_rights_reserved')." - <span class='versionInfo'>".get_lang('show_version')."</span><br /><div class='inline-block GSPVersionArea'><span class='version hide'>" . get_lang('version') . ":</span>&nbsp; <span class='hide versionNumber'>".@$panel_settings['gsp_version']."</span> <span class='copyVersionResult' lang='" . get_lang('copied') . "'></span></div></div>";
         }
         else
         {
-            $footer .= "<div class='footer center'>".get_lang('copyright')." &copy; <a href=\"http://www.opengamepanel.org\">Open Game Panel</a> " . date("Y") . " - ".get_lang('all_rights_reserved').".</div>";
+            $footer .= "<div class='footer center'>".get_lang('copyright')." &copy; <a href=\"http://www.gameserver-panel.org\">Open Game Panel</a> " . date("Y") . " - ".get_lang('all_rights_reserved').".</div>";
         }
         
         // Add our magnific popup holder to the page (hidden element):

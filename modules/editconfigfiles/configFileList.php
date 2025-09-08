@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
- * http://www.opengamepanel.org/
+ * http://www.gameserver-panel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
 require_once('modules/editconfigfiles/functions.php');
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
     global $db, $view;
     

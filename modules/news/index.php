@@ -1,5 +1,5 @@
 <?php
-function exec_ogp_module() {
+function exec_gsp_module() {
 	define("IN_SCRIPT","1");
 	error_reporting(0);
 

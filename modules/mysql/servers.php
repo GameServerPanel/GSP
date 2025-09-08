@@ -26,7 +26,7 @@ if ( function_exists('mysqli_connect') )
 else
 	require_once("modules/mysql/mysql_database.php");
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
 	$modDb = new MySQLModuleDatabase();
 	require("includes/config.inc.php");
@@ -156,7 +156,7 @@ function exec_ogp_module() {
 		if($mysql_server['remote_server_id'] != 0)
 		{
 			$remote_server = $db->getRemoteServer($mysql_server['remote_server_id']);
-			$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+			$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 			$host_stat = $remote->status_chk();
 			if($host_stat === 0 )
 			{

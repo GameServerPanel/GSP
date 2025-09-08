@@ -5,7 +5,7 @@ Part of the ZPE-Online Master Control Program (MCP) Project.
 
 ![image](https://user-images.githubusercontent.com/80121347/115991244-90b43d80-a5bf-11eb-8d98-f0236e80d207.png) 
 
-NOTE!!! The Master Control Program (MCP) will be under constant changes as it evolves over time, there will be no "VERSIONS" as there is no "End Goal", So please make sure to regularly update to get latest version until we are able to implement an automatc update feature. Always keep checking this repository. Please make sure to report any problems in this github projects issues. Alternatively you can also join our discord server to talk more about this or for giving us feedback! also you can visit our Master Control Program Theme thread on the following two forums For Open Game Panel Related feedback or issues: https://www.opengamepanel.org/forum/viewthread.php?thread_id=7620 For Non Open Game Panel related feedback or issues: https://www.zpeonline.co.uk/forum
+NOTE!!! The Master Control Program (MCP) will be under constant changes as it evolves over time, there will be no "VERSIONS" as there is no "End Goal", So please make sure to regularly update to get latest version until we are able to implement an automatc update feature. Always keep checking this repository. Please make sure to report any problems in this github projects issues. Alternatively you can also join our discord server to talk more about this or for giving us feedback! also you can visit our Master Control Program Theme thread on the following two forums For GameServer Panel Related feedback or issues: https://www.opengamepanel.org/forum/viewthread.php?thread_id=7620 For Non GameServer Panel related feedback or issues: https://www.zpeonline.co.uk/forum
 
 Enjoy!!.
 
@@ -19,7 +19,7 @@ Currently this theme is and the project is still in early development, so please
 
 ZPE-Online discord server
 github repository issues
-theme thread of the Open Game Panel forum
+theme thread of the GameServer Panel forum
 Master Control Program section of the ZPE-Online Forum
 Your feedback is essential so the MCP theme and other developments we make can further be improved and help this project evolve.
 

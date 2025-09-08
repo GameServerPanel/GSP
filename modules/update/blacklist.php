@@ -40,7 +40,7 @@ function path_check()
 
     return TRUE;
 }
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db, $view;
 	
@@ -49,7 +49,7 @@ function exec_ogp_module()
 						
 	$current_blacklist = array();
 	
-	$blacklisted_files = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
+	$blacklisted_files = $db->resultQuery('SELECT file_path FROM `GSP_DB_PREFIXupdate_blacklist`;');
 	if($blacklisted_files !== FALSE)
 	{
 		$current_blacklist = array();
@@ -64,7 +64,7 @@ function exec_ogp_module()
 		foreach($_POST['blacklist'] as $file)
 		{
 			$file = $db->real_escape_string($file);
-			$db->query("INSERT INTO `OGP_DB_PREFIXupdate_blacklist` SET file_path='$file';");
+			$db->query("INSERT INTO `GSP_DB_PREFIXupdate_blacklist` SET file_path='$file';");
 		}
 		
 		foreach($_POST['folder_files'] as $file)
@@ -74,12 +74,12 @@ function exec_ogp_module()
 				if(!in_array($file,$_POST['blacklist']))
 				{
 					$file = $db->real_escape_string($file);
-					$db->query("DELETE FROM `OGP_DB_PREFIXupdate_blacklist` WHERE file_path='$file';");
+					$db->query("DELETE FROM `GSP_DB_PREFIXupdate_blacklist` WHERE file_path='$file';");
 				}
 			}
 		}
 		
-		$blacklisted_files = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
+		$blacklisted_files = $db->resultQuery('SELECT file_path FROM `GSP_DB_PREFIXupdate_blacklist`;');
 		if($blacklisted_files !== FALSE)
 		{
 			$current_blacklist = array();

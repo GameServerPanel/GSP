@@ -118,7 +118,7 @@ function smart_resize_image($file,
 	return true;
 }
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
 	global $db;
 

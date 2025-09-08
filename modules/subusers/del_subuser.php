@@ -7,7 +7,7 @@
 //  own3mall
 
 
-function exec_ogp_module() {
+function exec_gsp_module() {
     require_once ("includes/functions.php");
     global $db;
     global $view;

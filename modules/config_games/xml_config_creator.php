@@ -3,7 +3,7 @@
  * Component of the config_games module
  */
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 	?>
 	<h2>XML Config Creator</h2>
 	 <table BORDER=1>

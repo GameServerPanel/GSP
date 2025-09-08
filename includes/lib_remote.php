@@ -6,12 +6,12 @@
 require_once("Crypt/XXTEA.php");
 
 // Screen type for servers
-define("OGP_SCREEN_TYPE_HOME","HOME");
-define("OGP_SCREEN_TYPE_UPDATE","UPDATE");
+define("GSP_SCREEN_TYPE_HOME","HOME");
+define("GSP_SCREEN_TYPE_UPDATE","UPDATE");
 
 define("AGENT_ERROR_NOT_EXECUTABLE",-13);
 
-class OGPRemoteLibrary
+class GSPRemoteLibrary
 {
 	private $port;
 	private $host;

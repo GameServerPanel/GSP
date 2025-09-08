@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
- * http://www.opengamepanel.org/
+ * http://www.gameserver-panel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
  *
  */
 
-function exec_ogp_module()
+function exec_gsp_module()
 {	
 	global $db, $view;
 
@@ -33,7 +33,7 @@ function exec_ogp_module()
 		$new_description = str_replace("\\r\\n", "<br>", $_POST['description']);
 		$service = $_POST['service_id'];
 		
-		$change_description = "UPDATE OGP_DB_PREFIXbilling_services
+		$change_description = "UPDATE GSP_DB_PREFIXbilling_services
 						       SET description ='".$db->realEscapeSingle($new_description)."'
 						       WHERE service_id=".$db->realEscapeSingle($service);
 		$save = $db->query($change_description);
@@ -63,7 +63,7 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 
 	// Shop Form
 	if(intval($_REQUEST['service_id']) !==0) $where_service_id = " WHERE enabled = 1 and service_id=".intval($_REQUEST['service_id']); else $where_service_id = " where enabled = 1";
-	$qry_services = "SELECT * FROM OGP_DB_PREFIXbilling_services".$where_service_id;
+	$qry_services = "SELECT * FROM GSP_DB_PREFIXbilling_services".$where_service_id;
 	$services = $db->resultQuery($qry_services);
 	
 	if (isset($_REQUEST['service_id']) && $services === false) {
@@ -208,7 +208,7 @@ if ($row['price_monthly'] == 0.0) {
 			//loop through each of the assigned servers and see if its disabled
 			foreach($rsiArray as $rsi)
 			{
-				$query = "SELECT * FROM OGP_DB_PREFIXremote_servers WHERE remote_server_id = ".$rsi;
+				$query = "SELECT * FROM GSP_DB_PREFIXremote_servers WHERE remote_server_id = ".$rsi;
 				$result = $db->resultQuery($query);
 				foreach($result as $rs)
 				{

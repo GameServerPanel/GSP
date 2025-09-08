@@ -23,7 +23,7 @@ require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
 require_once("protocol/lgsl/lgsl_protocol.php");
 
-function exec_ogp_module() {
+function exec_gsp_module() {
 
     global $db,$view;
 	$home_id = $_REQUEST['home_id'];
@@ -66,7 +66,7 @@ function exec_ogp_module() {
     {
         $addon_id = (int)$_REQUEST['addon_id'];
 		
-		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
+		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM GSP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
 
 		if (!$addons_rows) {
 			print_failure(get_lang('invalid_addon'));
@@ -74,7 +74,7 @@ function exec_ogp_module() {
 			return;
 		}
 		
-		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+		$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		
 		$addon_info = $addons_rows[0];
 		$url = $addon_info['url'];
@@ -241,7 +241,7 @@ function exec_ogp_module() {
             <td align='left'>
 			<select name="addon_id">
 			<?php
-			$addons = $db->resultQuery("SELECT addon_id, name FROM OGP_DB_PREFIXaddons WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . " ORDER BY name ASC");
+			$addons = $db->resultQuery("SELECT addon_id, name FROM GSP_DB_PREFIXaddons WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . " ORDER BY name ASC");
 			foreach($addons as $addon) 
 			{
 			?>

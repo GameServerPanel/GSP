@@ -9,7 +9,7 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 	$jobsArray = array();
 	foreach( $remote_servers as $rhost_id => $remote_server )
 	{
-		$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+		$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 		if($remote->status_chk() != 1)
 		{
 			$remote_servers_offline[$rhost_id] = $remote_server;
@@ -85,7 +85,7 @@ function updateCronJobTokens($old_token, $token){
 	$remote_servers = $db->getRemoteServers();
 	foreach($remote_servers as $remote_server)
 	{
-		$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+		$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 		$jobs = $remote->scheduler_list_tasks();
 		foreach($jobs as $job_id => $job)
 		{
@@ -105,7 +105,7 @@ function deleteJobsByHomeServerID($home_id){
 		$remote_servers = $db->getRemoteServers();
 		foreach($remote_servers as $remote_server)
 		{
-			$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+			$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 			$jobs = $remote->scheduler_list_tasks();
 			foreach($jobs as $job_id => $job)
 			{
@@ -203,7 +203,7 @@ function updateCronJobsToNewApi()
 	{
 		require_once 'includes/lib_remote.php';
 		
-		$panelURL = getOGPSiteURL();
+		$panelURL = getGSPSiteURL();
 		if($panelURL === false)
 			return false;
 		
@@ -214,7 +214,7 @@ function updateCronJobsToNewApi()
 		$mod_key = '';
 		foreach($remote_servers as $remote_server)
 		{
-			$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
+			$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 			$jobs = $remote->scheduler_list_tasks();
 			if(!is_array($jobs))
 				continue;
@@ -231,16 +231,16 @@ function updateCronJobsToNewApi()
 						
 						switch ($action) {
 							case "stopServer":
-								$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/stop&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+								$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/stop&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
 								break;
 							case "startServer":
-								$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/start&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+								$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/start&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
 								break;
 							case "restartServer":
-								$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/restart&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+								$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/restart&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
 								break;
 							case "autoUpdateSteamHome":
-								$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/update&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
+								$command = "wget -qO- \"${panelURL}/gsp_api.php?gamemanager/update&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
 								break;
 						}
 						list($minute,$hour,$dayOfTheMonth,$month,$dayOfTheWeek,$old_command) = explode(" ", $job, 6);

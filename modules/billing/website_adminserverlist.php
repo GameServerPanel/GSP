@@ -52,8 +52,8 @@ function join_base($base, $path){
 }
 
 /* which column holds space-separated locations */
-$locationCol = col_exists($db, 'ogp_billing_services', 'remote_server_id') ? 'remote_server_id' :
-               (col_exists($db, 'ogp_billing_services', 'remote_server') ? 'remote_server' : 'remote_server_id');
+$locationCol = col_exists($db, 'gsp_billing_services', 'remote_server_id') ? 'remote_server_id' :
+               (col_exists($db, 'gsp_billing_services', 'remote_server') ? 'remote_server' : 'remote_server_id');
 
 $flash = [];
 
@@ -61,11 +61,11 @@ $flash = [];
 if (isset($_POST['update_remote_servers'])) {
   $enabledIds = array_map('intval', $_POST['rs'] ?? []);
   $enabledSet = array_flip($enabledIds);
-  $allIds = fetch_all_assoc($db, "SELECT remote_server_id FROM ogp_remote_servers");
+  $allIds = fetch_all_assoc($db, "SELECT remote_server_id FROM gsp_remote_servers");
   foreach ($allIds as $row) {
     $id = (int)$row['remote_server_id'];
     $e  = isset($enabledSet[$id]) ? 1 : 0;
-    $db->query("UPDATE ogp_remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
+    $db->query("UPDATE gsp_remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
   }
   $flash[] = "Server locations updated.";
 }
@@ -93,7 +93,7 @@ function update_service_row(mysqli $db, string $locationCol, int $sid, array $sv
   $locList    = implode(' ', $selected);
   $locListEsc = esc_mysqli($db, $locList);
 
-  $sql = "UPDATE ogp_billing_services
+  $sql = "UPDATE gsp_billing_services
              SET service_name='{$name}',
                  `{$locationCol}`='{$locListEsc}',
                  slot_min_qty={$minSlots},
@@ -125,13 +125,13 @@ if (isset($_POST['bulk_update']) && !empty($_POST['service']) && is_array($_POST
 /* C) Remove a service (separate small form) */
 if (isset($_POST['remove_service'], $_POST['service_id_remove'])) {
   $sid = (int)$_POST['service_id_remove'];
-  $db->query("DELETE FROM ogp_billing_services WHERE service_id={$sid}");
+  $db->query("DELETE FROM gsp_billing_services WHERE service_id={$sid}");
   $flash[] = "Service #{$sid} removed.";
 }
 
 /* fetch data for UI */
-$remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, enabled FROM ogp_remote_servers ORDER BY remote_server_name");
-$services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_monthly, img_url, enabled FROM ogp_billing_services ORDER BY service_name");
+$remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, enabled FROM gsp_remote_servers ORDER BY remote_server_name");
+$services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_monthly, img_url, enabled FROM gsp_billing_services ORDER BY service_name");
 ?>
 
 <?php if ($flash): ?>

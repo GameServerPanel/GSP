@@ -4,17 +4,17 @@
  */
 
 require_once('includes/lib_remote.php');
-function exec_ogp_module() {
+function exec_gsp_module() {
 
     global $view;
     global $db;
 	echo "<h2>". get_lang("view_log") ."</h2>";
 	$rhost_id = @$_REQUEST['rhost_id'];
     $remote_server = $db->getRemoteServer($rhost_id);
-	$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout'] );
+	$remote = new GSPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout'] );
 	if(isset($_POST['save_file']))
 	{
-		$file_info = $remote->remote_writefile('./ogp_agent.log', strip_real_escape_string($_REQUEST['file_content']));
+		$file_info = $remote->remote_writefile('./gsp_agent.log', strip_real_escape_string($_REQUEST['file_content']));
 		if ( $file_info === 1 )
 		{
             print_success( get_lang("wrote_changes") );
@@ -27,7 +27,7 @@ function exec_ogp_module() {
 		}
 	}
     $data = "";
-    $file_info =  $remote->remote_readfile('./ogp_agent.log',$data);
+    $file_info =  $remote->remote_readfile('./gsp_agent.log',$data);
     if ( $file_info === 0 )
     {
         print_failure( get_lang("not_found") );

@@ -62,7 +62,7 @@ use constant AGENT_VERSION  => $Cfg::Config{version};
 use constant SCREEN_LOG_LOCAL  => $Cfg::Preferences{screen_log_local};
 use constant DELETE_LOGS_AFTER  => $Cfg::Preferences{delete_logs_after};
 use constant AGENT_PID_FILE =>
-  Path::Class::File->new(AGENT_RUN_DIR, 'ogp_agent.pid');
+  Path::Class::File->new(AGENT_RUN_DIR, 'gsp_agent.pid');
 use constant AGENT_RSYNC_GENERIC_LOG =>
   Path::Class::File->new(AGENT_RUN_DIR, 'rsync_update_generic.log');
 use constant STEAM_LICENSE_OK => "Accept";
@@ -3367,9 +3367,9 @@ sub agent_restart
 	if ($dec_check eq 'restart')
 	{
 		chdir AGENT_RUN_DIR;
-		if(-e "ogp_agent_run.pid")
+		if(-e "gsp_agent_run.pid")
 		{
-			my $init_pid	= `cat ogp_agent_run.pid`;
+			my $init_pid	= `cat gsp_agent_run.pid`;
 			chomp($init_pid);
 			
 			if(kill 0, $init_pid)
@@ -3378,7 +3378,7 @@ sub agent_restart
 				my $rm_pid_file	= "";
 				my $agent_pid = "";
 				my $restart_scr_log = Path::Class::File->new(SCREEN_LOGS_DIR, 'screenlog.agent_restart');
-				my $agent_scr_log = Path::Class::File->new(SCREEN_LOGS_DIR, 'screenlog.ogp_agent');
+				my $agent_scr_log = Path::Class::File->new(SCREEN_LOGS_DIR, 'screenlog.gsp_agent');
 				
 				if(-e $restart_scr_log)
 				{
@@ -3390,10 +3390,10 @@ sub agent_restart
 					unlink $agent_scr_log;
 				}
 				
-				if(-e "ogp_agent.pid")
+				if(-e "gsp_agent.pid")
 				{
-					$rm_pid_file .= " ogp_agent.pid";
-					$agent_pid = `cat ogp_agent.pid`;
+					$rm_pid_file .= " gsp_agent.pid";
+					$agent_pid = `cat gsp_agent.pid`;
 					chomp($agent_pid);
 					if( kill 0, $agent_pid )
 					{
@@ -3419,8 +3419,8 @@ sub agent_restart
 							  "while [ -e /proc/$init_pid $or_exist ];do echo -n .;sleep 1;done\n".
 							  "rm -f $rm_pid_file\necho \" [OK]\"\n".
 							  "echo -n \"Starting OGP Agent...\"\n".
-							  "screen -d -m -t \"ogp_agent\" -c \"" . SCREENRC_FILE . "\" -S ogp_agent bash ogp_agent -pidfile /OGP/ogp_agent_run.pid\n".
-							  "while [ ! -e 'ogp_agent.pid' ];do echo -n .;sleep 1;done\n".
+							  "screen -d -m -t \"gsp_agent\" -c \"" . SCREENRC_FILE . "\" -S gsp_agent bash gsp_agent -pidfile /OGP/gsp_agent_run.pid\n".
+							  "while [ ! -e 'gsp_agent.pid' ];do echo -n .;sleep 1;done\n".
 							  "echo \" [OK]\"\n".
 							  "rm -f tmp_restart.sh\n".
 							  "exit 0\n";
@@ -4219,7 +4219,7 @@ sub	generate_post_install_scripts
 							 '		fi'."\n".
 							 '	fi'."\n".
 							 '	if [ ! -d "${mods_info_path}" ];then mkdir -p "${mods_info_path}";fi'."\n".
-							 '	echo "${mod_name[$i]}" > "${mods_info_path}${mod_string[$i]}.ogpmod"'."\n".
+							 '	echo "${mod_name[$i]}" > "${mods_info_path}${mod_string[$i]}.gspmod"'."\n".
 							 '	i=$(expr $i + 1)'."\n".
 							 'done'."\n";
 	return "$post_install_scripts";
@@ -4237,7 +4237,7 @@ sub get_workshop_mods_info()
 		my @mods_info;
 		while(my $mod_info_file = readdir(MODS_INFO_DIR))
 		{
-			if($mod_info_file =~ /\.ogpmod$/)
+			if($mod_info_file =~ /\.gspmod$/)
 			{
 				my $mod_info_file_path = Path::Class::File->new($mods_info_dir_path, $mod_info_file);
 				if(open(my $fh, '<:encoding(UTF-8)', $mod_info_file_path))

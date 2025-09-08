@@ -14,7 +14,7 @@ function create_selection($selection,$flag,$access_rights)
 		return $right;
 }
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db;
 	

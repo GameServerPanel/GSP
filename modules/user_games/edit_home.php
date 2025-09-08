@@ -5,7 +5,7 @@
 
 require_once("modules/config_games/server_config_parser.php");
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db;
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
@@ -53,7 +53,7 @@ function exec_ogp_module()
 	
 	$server_xml = read_server_config(SERVER_CONFIG_LOCATION.$home_info['home_cfg_file']);
 	include_once('includes/lib_remote.php');
-	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+	$remote = new GSPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 	$ftp_installed = $db->isModuleInstalled('ftp');
 		
 	if( isset($_REQUEST['change_name']) )
@@ -413,7 +413,7 @@ function exec_ogp_module()
 			if ( $db->changeUserIdMain($home_id,$user_id_main) == TRUE )
 			{
 				$db->assignHomeTo("user",$user_id_main,$home_id,$old_home['access_rights']);
-                                $query="UPDATE `ogp_billing_orders` SET `user_id`=".$user_id_main." WHERE `home_id` = ".$home_id.";";
+                                $query="UPDATE `gsp_billing_orders` SET `user_id`=".$user_id_main." WHERE `home_id` = ".$home_id.";";
 	                        $db->query($query);
 				echo json_encode(array('result' => 'success', 'info' => get_lang("successfully_changed_game_server")));
 				$db->logger( get_lang("successfully_changed_game_server") ." HOME ID:$home_id - ". get_lang("change_user_id_main") .":$user_id_main");
@@ -781,13 +781,13 @@ function exec_ogp_module()
 		if ( is_array($avail_ips) && !empty($avail_ips) )
 		{
 			echo "<h3>". get_lang("ips_and_ports") ."</h3>";
-			$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
+			$screen_running = $remote->is_screen_running(GSP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;
 			if( ! $screen_running )
 			{
 				if( isset($_REQUEST['set_ip']) )
 				{
 					$ip_id = $db->real_escape_string($_POST['ip']);
-					$ip_row = $db->resultQuery( "SELECT ip FROM OGP_DB_PREFIXremote_server_ips WHERE ip_id=".$ip_id );
+					$ip_row = $db->resultQuery( "SELECT ip FROM GSP_DB_PREFIXremote_server_ips WHERE ip_id=".$ip_id );
 					$ip = $ip_row['0']['ip'];
 					$port = $_POST['port'];
 					$port = (int)(trim($port));

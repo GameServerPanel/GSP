@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
- * http://www.opengamepanel.org/
+ * http://www.gameserver-panel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -33,7 +33,7 @@ $module_menus = array( array( 'subpage' => 'lgsl', 'name'=>'LGSL', 'group'=>'use
 
 $install_queries = array();
 $install_queries[0] = array(
-						"CREATE TABLE IF NOT EXISTS ".OGP_DB_PREFIX."lgsl
+						"CREATE TABLE IF NOT EXISTS ".GSP_DB_PREFIX."lgsl
 						 (
 
 						  `id`         INT     (11)  NOT NULL auto_increment,

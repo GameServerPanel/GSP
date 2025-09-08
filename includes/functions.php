@@ -150,7 +150,7 @@ function get_map_path($query_name,$mod,$map) {
 	return get_first_existing_file($map_paths, 'http://gametracker.com', 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0');
 }
 
-// Thanks adjo (http://opengamepanel.org/forum/viewthread.php?thread_id=5209#post_25073)
+// Thanks adjo (http://gameserver-panel.org/forum/viewthread.php?thread_id=5209#post_25073)
 function curlCacheImage($cachePath, $resource){
    if(preg_match('/^(https?:\/\/)/', $resource)){
       $map = explode('/', $resource);
@@ -365,7 +365,7 @@ function mymail($email_address, $subject, $message, $panel_settings, $user_to_pa
 		}
 		
 		if(empty($panel_settings['panel_email_address'])){
-			$panel_email = "noreply@opengamepanel.org";
+			$panel_email = "noreply@gameserver-panel.org";
 		}else{
 			$panel_email = $panel_settings['panel_email_address'];
 		}
@@ -626,7 +626,7 @@ function getClientIPAddress(){
 	return $_SERVER['REMOTE_ADDR'];
 }
 
-function getOGPSiteURL(){
+function getGSPSiteURL(){
 	$url = '';
 	$scheme = ( isset($_SERVER['HTTPS']) and get_true_boolean($_SERVER['HTTPS']) ) ? "https://" : "http://";
 	$url .= $scheme;
@@ -1047,7 +1047,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 				if($mysql_db['remote_server_id'] != "0")
 				{
 					$remote_server = $db->getRemoteServer($mysql_db['remote_server_id']);
-					$remote = new OGPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
+					$remote = new GSPRemoteLibrary($remote_server['agent_ip'],$remote_server['agent_port'],$remote_server['encryption_key'],$remote_server['timeout']);
 					$host_stat = $remote->status_chk();
 					if($host_stat === 1 )
 					{

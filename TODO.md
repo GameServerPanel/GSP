@@ -1,6 +1,6 @@
 # Gameservers World – Development & Operations TODO
 
-This document tracks development tasks, infrastructure setup, and business steps for building our commercial game server community around the **GS Panel** (fork of OGP), aka **GSP**.  
+This document tracks development tasks, infrastructure setup, and business steps for building our commercial game server community around the **GS Panel** (fork of GSP), aka **GSP**.  
 The software is developed and maintained by **World Domination Software (WDS)**. 
 
 ---
@@ -9,7 +9,7 @@ The software is developed and maintained by **World Domination Software (WDS)**.
 - [ ] Repo for GSW website
 - [ ] Repo for WDS website
 - [ ] Create organization for WDS
-- [ ] Create OGP-like section and forum/docs on WDS website
+- [ ] Create GSP-like section and forum/docs on WDS website
 - [ ] Repo for game post-install config scripts and files
 - [ ] Compare agent files — can we use the same files?
 - [ ] Add scripts for setting up servers with required files, DLL, settings
@@ -17,12 +17,12 @@ The software is developed and maintained by **World Domination Software (WDS)**.
 
 ---
 
-## 1. Core Panel (OGP → GS Fork)
+## 1. Core Panel (GSP → GS Fork)
 - [ ] GSW is a host provider. GSP is a product of WDS. Brand as such. The WDS site needs to keep the forum and documentation.
-- [ ] Replace all references from **OGP** → **GS / Gameservers World**
+- [ ] Replace all references from **GSP** → **GS / Gameservers World**
 - [ ] Update UI text, branding, and logos
 - [ ] Create new default theme (dark/light mode support)
-- [ ] Review and clean up legacy OGP code no longer needed
+- [ ] Review and clean up legacy GSP code no longer needed
 - [ ] Update README.md with GS branding + installation instructions
 - [ ] Ensure GPL license text is preserved and updated with attribution
 - [ ] Remove `print` language as there is probably a better option now — which one?
@@ -130,6 +130,6 @@ The software is developed and maintained by **World Domination Software (WDS)**.
 ---
 
 # ✅ Notes
-- **GPL Compliance**: Keep OGP attribution in LICENSE, but rebrand UI and docs to GS.  
+- **GPL Compliance**: Keep GSP attribution in LICENSE, but rebrand UI and docs to GS.  
 - **Secrets**: Never commit live passwords or IPs to public repos — use `.env` or secrets repo.  
 - **Testing**: Always stage DB changes, backup scripts, and automation before production.

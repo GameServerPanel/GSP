@@ -1,10 +1,10 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2017 The OGP Development Team
+ * GSP - GameServer Panel
+ * Copyright (C) 2008 - 2017 The GSP Development Team
  *
- * http://www.opengamepanel.org/
+ * http://www.gameserver-panel.org/
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -82,7 +82,7 @@ function lgsl_lookup_ip($ip, $port)
 	$ip = $db->realEscapeSingle($ip);
 	$port = $db->realEscapeSingle($port);
 	
-	$result = $db->resultQuery("SELECT `id` FROM `OGP_DB_PREFIXlgsl` WHERE `ip`='{$ip}' AND c_port='{$port}' LIMIT 1");
+	$result = $db->resultQuery("SELECT `id` FROM `GSP_DB_PREFIXlgsl` WHERE `ip`='{$ip}' AND c_port='{$port}' LIMIT 1");
 	return $result[0];
 }
   
@@ -149,7 +149,7 @@ function lgsl_cache_info($id)
 {
 	global $db;	
 	$id = $db->realEscapeSingle($id);
-	$result = $db->resultQuery("SELECT `cache_time` FROM `OGP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
+	$result = $db->resultQuery("SELECT `cache_time` FROM `GSP_DB_PREFIXlgsl` WHERE `id`='{$id}' LIMIT 1");
 	return empty($result[0]['cache_time']) ? array(0,0,0) : explode("_", $result[0]['cache_time']);
 }
 
@@ -176,7 +176,7 @@ $name_type_vertical = false; // false/true // Global default/fallback for printi
 
 require_once "modules/lgsl_with_img_mod/lgsl_files/lgsl_class.php";
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	error_reporting(0);	  
 	//------------------------------------------------------------------------------------------------------------+

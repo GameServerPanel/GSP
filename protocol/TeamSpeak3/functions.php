@@ -86,7 +86,7 @@ try
 					if ($sid !== 0) {
 						$ts3_ServerInstance->serverStop($sid);
 						$ts3_ServerInstance->serverDelete($sid);
-						$db->query( "DELETE FROM OGP_DB_PREFIXts3_homes WHERE vserver_id=" . $db->real_escape_string($sid));
+						$db->query( "DELETE FROM GSP_DB_PREFIXts3_homes WHERE vserver_id=" . $db->real_escape_string($sid));
 					}
 
 					/* refresh */
@@ -134,11 +134,11 @@ try
 			if(isset($_POST['assign_to_user']) && (int)$_POST['vserver_id'] == $ts3_ServerInstance->getId() AND $server_home['remote_server_id'] == $_POST['remote_server_id'] )
 			{
 				$query_ip = $server_home['use_nat'] == 1 ? $server_home['agent_ip'] : $server_home['ip'];
-				$db->query("INSERT INTO OGP_DB_PREFIXts3_homes (`rserver_id`, `ip`, `pwd`, `vserver_id`, `user_id`, `port`) VALUES ('".$server_home['remote_server_id']."', '".$query_ip."', '".$cfg["pass"]."', '".(int)$_POST['vserver_id']."', '".$db->real_escape_string($_POST['assign_to_user'])."', '".$cfg['query']."');");
+				$db->query("INSERT INTO GSP_DB_PREFIXts3_homes (`rserver_id`, `ip`, `pwd`, `vserver_id`, `user_id`, `port`) VALUES ('".$server_home['remote_server_id']."', '".$query_ip."', '".$cfg["pass"]."', '".(int)$_POST['vserver_id']."', '".$db->real_escape_string($_POST['assign_to_user'])."', '".$cfg['query']."');");
 			}
 			if(isset($_POST['remove_vuser_id']) && (int)$_POST['vserver_id'] == $ts3_ServerInstance->getId() AND $server_home['remote_server_id'] == (int)$_POST['remote_server_id'] )
 			{
-				$db->query( "DELETE FROM OGP_DB_PREFIXts3_homes WHERE vserver_id='" . (int)$_POST['vserver_id'] . "' AND user_id='".(int)$_POST['remove_vuser_id']."' AND rserver_id='".(int)$_POST['remote_server_id']."';" );
+				$db->query( "DELETE FROM GSP_DB_PREFIXts3_homes WHERE vserver_id='" . (int)$_POST['vserver_id'] . "' AND user_id='".(int)$_POST['remove_vuser_id']."' AND rserver_id='".(int)$_POST['remote_server_id']."';" );
 			}
 			$add_remove_virtual .= "<tr><td>Assign This Virtual<br>Server To User</td><td>
 									<form action='' method='POST'>
@@ -155,7 +155,7 @@ try
 									<input type='hidden' name='vserver_id' value='".$ts3_ServerInstance->getId()."' />
 									</form></td></tr>";
 
-			$ts3vservers = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXts3_homes WHERE vserver_id='".$ts3_ServerInstance->getId()."' AND rserver_id=".$server_home['remote_server_id'] );
+			$ts3vservers = $db->resultQuery("SELECT * FROM GSP_DB_PREFIXts3_homes WHERE vserver_id='".$ts3_ServerInstance->getId()."' AND rserver_id=".$server_home['remote_server_id'] );
 			if($ts3vservers != 0)
 			{
 				$ts3vuserlist = "<b>TeamSpeak 3</b><br>";

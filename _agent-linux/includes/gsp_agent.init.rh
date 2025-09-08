@@ -8,7 +8,7 @@
 #   chkconfig: 2345 88 10
 #   description: Startup/shutdown script for the Game Server Agent
 
-agent_dir=OGP_AGENT_DIR
+agent_dir=GSP_AGENT_DIR
 agent_user=OGP_USER
 service=agent
 

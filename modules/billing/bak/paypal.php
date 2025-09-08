@@ -1,5 +1,5 @@
 <?php
-function exec_ogp_module()
+function exec_gsp_module()
 {
 global $db,$view;
 $settings = $db->getSettings();
@@ -28,15 +28,15 @@ $debug =  $settings['debug'];
 
 if(!empty($cart_id))
 	{		
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id));
+		$orders = $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id));
 		//get couponID then discount for this cart
-		$result= $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id));
+		$result= $db->resultQuery( "SELECT * FROM GSP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id));
 			foreach ($result as $cartDB){
 				$coupon_id = $cartDB['id'];
 			}
 
 		$coupon_discount = 0;
-		$result = $db->resultQuery( "SELECT discount FROM ogp_billing_coupons WHERE id=".$db->realEscapeSingle($cartDB['coupon_id']));
+		$result = $db->resultQuery( "SELECT discount FROM gsp_billing_coupons WHERE id=".$db->realEscapeSingle($cartDB['coupon_id']));
 		foreach ($result as $couponDB){
 			$coupon_discount=$couponDB['discount'];
 		}

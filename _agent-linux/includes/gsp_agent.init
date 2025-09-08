@@ -2,7 +2,7 @@
 
 # Generic Init script if we can't find what kind of Linux we're on
 
-agent_dir=OGP_AGENT_DIR
+agent_dir=GSP_AGENT_DIR
 agent_user=OGP_USER
 
 # Start function.

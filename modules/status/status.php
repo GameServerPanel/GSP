@@ -10,7 +10,7 @@ function numbersFormatting($bytes){
     return sprintf('%1.2f' , $bytes / pow($base,$class)) . ' ' . $si_prefix[$class];
 }
 
-function exec_ogp_module()
+function exec_gsp_module()
 {
 	global $db;
 	include_once ("modules/status/include/status_functions.php");

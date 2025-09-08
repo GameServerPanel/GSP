@@ -17,11 +17,11 @@ function add_lang_module($lang_module)
 {
     global $lang_modules;
     array_push($lang_modules,$lang_module);
-    // Need to reload langs if module is added after the first ogpLang call.
-    ogpLang();
+    // Need to reload langs if module is added after the first gspLang call.
+    gspLang();
 }
 
-function ogpLang()
+function gspLang()
 {
     global $lang_modules;
 	$locale_files = makefilelist("lang/", ".|..|.svn", true, "folders");
@@ -68,15 +68,15 @@ function ogpLang()
 
 function get_lang($lang_index)
 {
-	global $OGPLangPre;
+	global $GSPLangPre;
 	
     if (defined($lang_index))
     {
         return constant($lang_index);
     }
     
-    if(!startsWith($lang_index, $OGPLangPre)){
-		$newLangIndex = $OGPLangPre . $lang_index;
+    if(!startsWith($lang_index, $GSPLangPre)){
+		$newLangIndex = $GSPLangPre . $lang_index;
 		if (defined($newLangIndex))
 		{
 			return constant($newLangIndex);
@@ -89,7 +89,7 @@ function get_lang($lang_index)
 
 function get_lang_f()
 {
-	global $OGPLangPre;
+	global $GSPLangPre;
     $args = func_get_args();
     $lang_index = array_shift($args);
 
@@ -98,8 +98,8 @@ function get_lang_f()
         return vsprintf(constant($lang_index),$args);
     }
     
-    if(!startsWith($lang_index, $OGPLangPre)){
-		$newLangIndex = $OGPLangPre . $lang_index;
+    if(!startsWith($lang_index, $GSPLangPre)){
+		$newLangIndex = $GSPLangPre . $lang_index;
 		if (defined($newLangIndex))
 		{
 			return vsprintf(constant($newLangIndex),$args);

@@ -3,7 +3,7 @@
  * Component of the mysql module
  */
 
-class MySQLModuleDatabase extends OGPDatabaseMySQL
+class MySQLModuleDatabase extends GSPDatabaseMySQL
 {
 	protected $link;
 	protected $table_prefix;

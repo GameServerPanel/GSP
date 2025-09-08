@@ -4,7 +4,7 @@ class Ticket
 {
     private $db;
 
-    public function __construct(OGPDatabase $db)
+    public function __construct(GSPDatabase $db)
     {
         $this->db = $db;
     }
@@ -14,13 +14,13 @@ class Ticket
         $limitStart = ((int)($page - 1) * $limit);
 
         $query = "SELECT a.tid, a.uid, a.user_id, a.parent_id, a.subject, a.created_at, a.last_updated, a.status, a.assigned_to
-                    FROM OGP_DB_PREFIXtickets a ";
+                    FROM GSP_DB_PREFIXtickets a ";
 
         if ($ticketsFor !== null) {
             $query .= "WHERE a.user_id = ".(int)$ticketsFor." OR a.parent_id = ".(int)$ticketsFor." ";
 
             if ($this->db->isSubUser($ticketsFor)) {
-                $result = $this->db->resultQuery("SELECT users_parent FROM OGP_DB_PREFIXusers WHERE user_id = ".(int)$ticketsFor);
+                $result = $this->db->resultQuery("SELECT users_parent FROM GSP_DB_PREFIXusers WHERE user_id = ".(int)$ticketsFor);
                 $query .= "OR a.parent_id = ".(int)$result[0]['users_parent']." ";
             }
         }
@@ -33,13 +33,13 @@ class Ticket
 
     public function count($ticketsFor = null)
     {
-        $query = "SELECT COUNT(1) as ticketCount FROM OGP_DB_PREFIXtickets a ";
+        $query = "SELECT COUNT(1) as ticketCount FROM GSP_DB_PREFIXtickets a ";
 
         if ($ticketsFor !== null) {
             $query .= "WHERE a.user_id = ".(int)$ticketsFor." OR a.parent_id = ".(int)$ticketsFor." ";
             
             if ($this->db->isSubUser($ticketsFor)) {
-                $result = $this->db->resultQuery("SELECT users_parent FROM OGP_DB_PREFIXusers WHERE user_id = ".(int)$ticketsFor);
+                $result = $this->db->resultQuery("SELECT users_parent FROM GSP_DB_PREFIXusers WHERE user_id = ".(int)$ticketsFor);
                 $query .= "OR a.parent_id = ".(int)$result[0]['users_parent']." ";
             }
         }
@@ -50,13 +50,13 @@ class Ticket
 
     public function notificationCount($ticketsFor = null, $status = 0)
     {
-        $query = "SELECT COUNT(1) as ticketCount FROM OGP_DB_PREFIXtickets a WHERE a.status = ".(int)$status." ";
+        $query = "SELECT COUNT(1) as ticketCount FROM GSP_DB_PREFIXtickets a WHERE a.status = ".(int)$status." ";
 
         if ($ticketsFor !== null) {
             $query .= "AND (a.user_id = ".(int)$ticketsFor." OR a.parent_id = ".(int)$ticketsFor." ";
             
             if ($this->db->isSubUser($ticketsFor)) {
-                $result = $this->db->resultQuery("SELECT users_parent FROM OGP_DB_PREFIXusers WHERE user_id = ".(int)$ticketsFor);
+                $result = $this->db->resultQuery("SELECT users_parent FROM GSP_DB_PREFIXusers WHERE user_id = ".(int)$ticketsFor);
                 $query .= "OR a.parent_id = ".(int)$result[0]['users_parent'].")";
             } else {
                 $query .= ")";
@@ -71,8 +71,8 @@ class Ticket
     {
         $query = "SELECT a.tid, a.uid, a.user_id, a.user_ip, a.subject, a.status, a.service_id, a.created_at, a.last_updated,
                             b.users_login, b.users_fname, b.users_lname, b.users_role, b.users_email
-                    FROM OGP_DB_PREFIXtickets a
-                        JOIN OGP_DB_PREFIXusers b
+                    FROM GSP_DB_PREFIXtickets a
+                        JOIN GSP_DB_PREFIXusers b
                             ON (a.user_id = b.user_id)
                     WHERE tid = $tid
                     AND uid = '".$this->db->real_escape_string($uid)."'";
@@ -96,8 +96,8 @@ class Ticket
     {
         $query = "SELECT a.reply_id, a.ticket_id, a.user_id, a.user_ip, a.message, a.date, a.rating, a.is_admin,
                             b.user_id, b.users_login, b.users_role, b.users_fname, b.users_lname, b.users_email, b.users_parent
-                        FROM OGP_DB_PREFIXticket_messages a
-                            JOIN OGP_DB_PREFIXusers b
+                        FROM GSP_DB_PREFIXticket_messages a
+                            JOIN GSP_DB_PREFIXusers b
                                 ON (a.user_id = b.user_id)
                         WHERE a.ticket_id = $tid
                         ORDER BY a.reply_id DESC";
@@ -108,7 +108,7 @@ class Ticket
     private function getAttachments($tid)
     {
         $query = "SELECT attachment_id, reply_id, original_name, unique_name
-                    FROM OGP_DB_PREFIXticket_attachments
+                    FROM GSP_DB_PREFIXticket_attachments
                     WHERE ticket_id = $tid
                     ORDER BY reply_id DESC";
 
@@ -144,7 +144,7 @@ class Ticket
     {
         $parent_id = $user_id;
         if ($this->db->isSubUser($user_id)) {
-            $result = $this->db->resultQuery("SELECT users_parent FROM OGP_DB_PREFIXusers WHERE user_id = ".(int)$user_id);
+            $result = $this->db->resultQuery("SELECT users_parent FROM GSP_DB_PREFIXusers WHERE user_id = ".(int)$user_id);
             $parent_id = (int)$result[0]['users_parent'];
         }
 
@@ -199,17 +199,17 @@ class Ticket
     public function updateStatus($tid, $uid, $status)
     {
         $status = (int)$status;
-        return $this->db->query("UPDATE OGP_DB_PREFIXtickets SET status = $status WHERE tid = $tid AND uid = '$uid'");
+        return $this->db->query("UPDATE GSP_DB_PREFIXtickets SET status = $status WHERE tid = $tid AND uid = '$uid'");
     }
 
     public function updateTimestamp($tid, $uid)
     {
-        return $this->db->query("UPDATE OGP_DB_PREFIXtickets SET last_updated = NOW() WHERE tid = $tid AND uid = '$uid'");
+        return $this->db->query("UPDATE GSP_DB_PREFIXtickets SET last_updated = NOW() WHERE tid = $tid AND uid = '$uid'");
     }
 
     public function exists($tid, $uid)
     {
-        $query = "SELECT COUNT(1) AS ticketCount FROM OGP_DB_PREFIXtickets
+        $query = "SELECT COUNT(1) AS ticketCount FROM GSP_DB_PREFIXtickets
                     WHERE `tid` = $tid AND
                         `uid` = '".$this->db->real_escape_string($uid)."'";
                         
@@ -220,8 +220,8 @@ class Ticket
     public function authorized($user_id, $tid, $uid)
     {
         $query = "SELECT a.user_id as utid, a.parent_id, b.user_id, b.users_parent
-                    FROM OGP_DB_PREFIXtickets a
-                        JOIN OGP_DB_PREFIXusers b
+                    FROM GSP_DB_PREFIXtickets a
+                        JOIN GSP_DB_PREFIXusers b
                         ON (
                             a.user_id = b.user_id
                             OR a.user_id = b.users_parent
@@ -263,7 +263,7 @@ class Ticket
 
     public function setRating($tid, $reply_id, $rating)
     {
-        $query = "UPDATE OGP_DB_PREFIXticket_messages
+        $query = "UPDATE GSP_DB_PREFIXticket_messages
                     SET rating = ".(int)$rating."
                     WHERE ticket_id = ".(int)$tid." AND reply_id = ".(int)$reply_id;
 
@@ -273,7 +273,7 @@ class Ticket
     // Move this to the attachment class...?
     public function getAttachmentById($attachment_id, $tid)
     {
-        $query = "SELECT original_name, unique_name FROM OGP_DB_PREFIXticket_attachments
+        $query = "SELECT original_name, unique_name FROM GSP_DB_PREFIXticket_attachments
                     WHERE attachment_id = ".(int)$attachment_id." AND ticket_id = ".(int)$tid;
 
         $result = $this->db->resultQuery($query);
