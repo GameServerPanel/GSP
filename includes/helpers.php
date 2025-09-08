@@ -33,7 +33,7 @@ function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$
 		if ( function_exists('mysqli_connect') )
 			require_once("includes/database_mysqli.php");
 		else
-			die("<p class='failure'>OGP requires the <a href='http://php.net/manual/en/book.mysqli.php' target='_blank'>mysqli PHP extension</a>. Please install it, and then try again.</p>");
+			die("<p class='failure'>GSP requires the <a href='http://php.net/manual/en/book.mysqli.php' target='_blank'>mysqli PHP extension</a>. Please install it, and then try again.</p>");
         $database = new GSPDatabaseMysql();
         $connect_value = $database->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
         
@@ -229,7 +229,7 @@ function sanitizeInputStr($strToProcess, $removeHTML = true, $trim = true, $remo
 
 function startSession(){
 	if(!isset($_SESSION)){
-		session_name("opengamepanel_web");
+		session_name("gameserver-panel_web");
 		session_start();
 	}
 }
@@ -410,7 +410,7 @@ function runPostUpdateOperations(){
 	}
 }
 
-function getOGPGitHubURL($gitHubUsername, $repo){
+function getGSPGitHubURL($gitHubUsername, $repo){
 	$OGPGitHub = "https://github.com/OpenGamePanel/";
 	$gitHubURL = $OGPGitHub; 
 	if(isset($gitHubUsername) && !empty($gitHubUsername)){
@@ -426,7 +426,7 @@ function getOGPGitHubURL($gitHubUsername, $repo){
 	return $OGPGitHub;
 }
 
-function getOGPGitHubURLUnstrict($gitHubUsername){
+function getGSPGitHubURLUnstrict($gitHubUsername){
 	$OGPGitHub = "https://github.com/OpenGamePanel/";
 	$gitHubURL = $OGPGitHub; 
 	if(isset($gitHubUsername) && !empty($gitHubUsername)){

@@ -35,7 +35,7 @@ function exec_gsp_module()
 		 '<input class=search name=search id=search type=text placeholder="Search"/></div><br></div>';
 
 	require 'modules/faq/rss_php.php';
-	$url = 'https://opengamepanel.org/faq/rss.php';
+	$url = 'https://gameserver-panel.org/faq/rss.php';
 	$local_copy = 'modules/faq/faq.rss'; ## Relative path
 	$save_as = realpath('modules' . DIRECTORY_SEPARATOR . 'faq') . DIRECTORY_SEPARATOR . 'faq.rss'; 
 	## Full path (adding the filename to realpath would fail if the file does not exists yet)

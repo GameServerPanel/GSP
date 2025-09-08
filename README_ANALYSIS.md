@@ -1,20 +1,20 @@
-# Open Game Panel - System Analysis Report
+# GameServer Panel - System Analysis Report
 
 ## Executive Summary
 
-This repository contains a fork of the Open Game Panel (OGP) project, which is a comprehensive game server management system. After thorough analysis, I've documented the complete architecture and provide recommendations for integrating the remote agent code to create a unified development environment.
+This repository contains a fork of the GameServer Panel (GSP) project, which is a comprehensive game server management system. After thorough analysis, I've documented the complete architecture and provide recommendations for integrating the remote agent code to create a unified development environment.
 
 ## Original Project Context
 
-The original Open Game Panel project is maintained by the OpenGamePanel organization on GitHub:
-- **Main Web Panel**: [OpenGamePanel/OGP-Website](https://github.com/OpenGamePanel/OGP-Website)
-- **Linux Agent**: [OpenGamePanel/OGP-Agent-Linux](https://github.com/OpenGamePanel/OGP-Agent-Linux)  
-- **Windows Agent**: [OpenGamePanel/OGP-Agent-Windows](https://github.com/OpenGamePanel/OGP-Agent-Windows)
+The original GameServer Panel project is maintained by the OpenGamePanel organization on GitHub:
+- **Main Web Panel**: [OpenGamePanel/GSP-Website](https://github.com/OpenGamePanel/GSP-Website)
+- **Linux Agent**: [OpenGamePanel/GSP-Agent-Linux](https://github.com/OpenGamePanel/GSP-Agent-Linux)  
+- **Windows Agent**: [OpenGamePanel/GSP-Agent-Windows](https://github.com/OpenGamePanel/GSP-Agent-Windows)
 - **Official Website**: opengamepanel.org (blocked in this environment)
 
 ## Current Repository State
 
-This repository appears to be a customized version of the OGP web panel with:
+This repository appears to be a customized version of the GSP web panel with:
 - AdminLTE theme integration
 - Custom modules and functionality
 - Modified database configurations
@@ -109,4 +109,4 @@ The documentation includes detailed setup instructions for:
 - Testing procedures
 - Debugging techniques
 
-This analysis provides you with a solid foundation for understanding the complex OGP codebase and making informed decisions about improvements and architectural changes.
+This analysis provides you with a solid foundation for understanding the complex GSP codebase and making informed decisions about improvements and architectural changes.

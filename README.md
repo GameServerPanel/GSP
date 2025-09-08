@@ -1,10 +1,10 @@
-# Open Game Panel - Enhanced Fork
+# GameServer Panel - Enhanced Fork
 
-This repository contains an enhanced version of Open Game Panel (OGP) with AdminLTE theme integration and additional features. Open Game Panel is a comprehensive game server management system that allows hosting providers and users to easily manage game servers across multiple platforms.
+This repository contains an enhanced version of GameServer Panel (GSP) with AdminLTE theme integration and additional features. GameServer Panel is a comprehensive game server management system that allows hosting providers and users to easily manage game servers across multiple platforms.
 
-## What is Open Game Panel?
+## What is GameServer Panel?
 
-Open Game Panel is a distributed system consisting of:
+GameServer Panel is a distributed system consisting of:
 - **Web Panel** (this repository) - PHP-based web interface for server management
 - **Remote Agents** - Lightweight applications that run on game servers (Linux/Windows)
 - **Game Server Integration** - Support for 100+ games with automated installation and management
@@ -81,10 +81,10 @@ Open Game Panel is a distributed system consisting of:
 
 ## Related Repositories
 
-This project is based on the original Open Game Panel:
-- [OpenGamePanel/OGP-Website](https://github.com/OpenGamePanel/OGP-Website) - Original web panel
-- [OpenGamePanel/OGP-Agent-Linux](https://github.com/OpenGamePanel/OGP-Agent-Linux) - Linux agent
-- [OpenGamePanel/OGP-Agent-Windows](https://github.com/OpenGamePanel/OGP-Agent-Windows) - Windows agent
+This project is based on the original GameServer Panel:
+- [OpenGamePanel/GSP-Website](https://github.com/OpenGamePanel/GSP-Website) - Original web panel
+- [OpenGamePanel/GSP-Agent-Linux](https://github.com/OpenGamePanel/GSP-Agent-Linux) - Linux agent
+- [OpenGamePanel/GSP-Agent-Windows](https://github.com/OpenGamePanel/GSP-Agent-Windows) - Windows agent
 
 ## Contributing
 
@@ -96,7 +96,7 @@ This project is licensed under the GNU General Public License v2.0 - see the [LI
 
 ## Support
 
-- Original OGP Community: https://opengamepanel.org
+- GameServer Panel Community: https://gameservers-world.com
 - Issues and bug reports: Use GitHub Issues
 - Development discussions: See GitHub Discussions
 

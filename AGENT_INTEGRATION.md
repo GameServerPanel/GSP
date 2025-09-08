@@ -2,7 +2,7 @@
 
 ## Should Remote Agent Code Be Included?
 
-Based on my analysis of the Open Game Panel architecture, **I recommend including both the Linux and Windows agent code in this repository**. Here's why:
+Based on my analysis of the GameServer Panel architecture, **I recommend including both the Linux and Windows agent code in this repository**. Here's why:
 
 ## Benefits of Including Agent Code
 
@@ -83,7 +83,7 @@ panel/
 
 ### Phase 1: Repository Restructuring
 1. **Move Current Files**: Reorganize current web panel code into `/web` directory
-2. **Add Agent Code**: Clone and integrate OGP-Agent-Linux and OGP-Agent-Windows
+2. **Add Agent Code**: Clone and integrate GSP-Agent-Linux and GSP-Agent-Windows
 3. **Create Shared Libraries**: Extract common code into `/shared`
 4. **Update Paths**: Adjust all file references and includes
 

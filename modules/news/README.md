@@ -1,5 +1,5 @@
 # Module-News
-Simple news module for OGP
+Simple news module for GSP
 
 Based on News Lister from www.netartmedia.net/
 

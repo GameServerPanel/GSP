@@ -4,7 +4,7 @@
 // Check http://www.netartmedia.net/newslister for demos and information
 // Released under the MIT license
 
-session_name('opengamepanel_web');
+session_name('gameserver-panel_web');
 session_start();
 
 $output_dir = "uploads/";

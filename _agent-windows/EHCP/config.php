@@ -1,7 +1,7 @@
 <?php
 /*
 This FTP addon works with EHCP (www.ehcp.net)
-It allows OGP - the open game panel - to manage custom FTP user accounts
+It allows GSP - the GameServer Panel - to manage custom FTP user accounts
 
 by own3mall
 */

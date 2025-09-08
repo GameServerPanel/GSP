@@ -150,7 +150,7 @@ function get_map_path($query_name,$mod,$map) {
 	return get_first_existing_file($map_paths, 'http://gametracker.com', 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0');
 }
 
-// Thanks adjo (http://opengamepanel.org/forum/viewthread.php?thread_id=5209#post_25073)
+// Thanks adjo (http://gameserver-panel.org/forum/viewthread.php?thread_id=5209#post_25073)
 function curlCacheImage($cachePath, $resource){
    if(preg_match('/^(https?:\/\/)/', $resource)){
       $map = explode('/', $resource);
@@ -365,7 +365,7 @@ function mymail($email_address, $subject, $message, $panel_settings, $user_to_pa
 		}
 		
 		if(empty($panel_settings['panel_email_address'])){
-			$panel_email = "noreply@opengamepanel.org";
+			$panel_email = "noreply@gameserver-panel.org";
 		}else{
 			$panel_email = $panel_settings['panel_email_address'];
 		}

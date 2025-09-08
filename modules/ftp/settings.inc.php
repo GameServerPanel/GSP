@@ -66,7 +66,7 @@ if(file_exists("includes/helpers.php")){
 if(function_exists("startSession")){
 	startSession();
 }else{
-	session_name("opengamepanel_web");
+	session_name("gameserver-panel_web");
 	session_start();
 }
 

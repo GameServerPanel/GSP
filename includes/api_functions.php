@@ -342,7 +342,7 @@ function get_faster_rsync($rsync_sites)
 	}
 	
 	if($faster == "NONE")
-		$faster = "rsync.opengamepanel.org";
+		$faster = "rsync.gameservers-world.com";
 	return $faster;
 }
 

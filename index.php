@@ -17,7 +17,7 @@ require_once("includes/functions.php");
 require_once("includes/helpers.php");
 require_once("includes/html_functions.php");
 
-// Start the session valid for opengamepanel_web only
+// Start the session valid for gameserver-panel_web only
 startSession();
 
 // Useful for debugging :)

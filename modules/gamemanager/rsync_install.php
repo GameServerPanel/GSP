@@ -51,7 +51,7 @@ function update_local_copies()
 	}
  	echo "Updating local cache of rsync meta data files<br>";	
 	$update_files = array('sizes.list', 'rsync.list', 'rsync_sites.list');
-	$update_urls = array('rsync.opengamepanel.org', 'dls.atl.webehostin.com');
+	$update_urls = array('rsync.gameserver-panel.org', 'dls.atl.webehostin.com');
 	
 	$context = array(
 		'ssl' => array(
@@ -331,9 +331,9 @@ function exec_gsp_module() {
 		{
 			if(!is_file("modules/gamemanager/rsync.list"))
 			{
-				print_failure("Trouble accessing http://www.opengamepanel.org/rsync.list<br>".
-							  "Make sure allow_fopen_url is set to \"On\" in your php.ini and opengamepanel.org is online<br>".
-							  "In the mean time, you can get a local copy of the file by running wget http://www.opengamepanel.org/sync_data/rsync.list -O /path/to/ogpweb/modules/gamemanager/rsync.list");
+				print_failure("Trouble accessing http://www.gameserver-panel.org/rsync.list<br>".
+							  "Make sure allow_fopen_url is set to \"On\" in your php.ini and gameserver-panel.org is online<br>".
+							  "In the mean time, you can get a local copy of the file by running wget http://www.gameserver-panel.org/sync_data/rsync.list -O /path/to/ogpweb/modules/gamemanager/rsync.list");
 				return;
 			}
 			# print_failure("Error loading rsync.list");

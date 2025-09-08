@@ -72,7 +72,7 @@ function exec_gsp_module()
     }
     elseif ($log_retval == 1 || $log_retval == 2)
     {
-		// Force log file contents to be UTF-8 (fixes http://www.opengamepanel.org/forum/viewthread.php?thread_id=5379)
+		// Force log file contents to be UTF-8 (fixes http://www.gameserver-panel.org/forum/viewthread.php?thread_id=5379)
 		if(hasValue($home_log)){
 			$home_log = utf8_encode($home_log);
 		}

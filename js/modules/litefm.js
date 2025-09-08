@@ -1038,7 +1038,7 @@ $(document).ready(function(){
 							 "<label for='subject'>"+subject+"</label><br>\n"+
 							 "<input name='subject' id='subject' type=text value='Files attached' style='width:100%;'><br>\n"+
 							 "<label for='message'>"+message+"</label><br>\n"+
-							 "<textarea name='message' id='message' style='width:100%;'>There are the files you requested from OGP</textarea><br>\n"+
+							 "<textarea name='message' id='message' style='width:100%;'>There are the files you requested from GSP</textarea><br>\n"+
 							 "<label for='dest_email'>"+dest_email+"</label><br>\n"+
 							 "<input name='dest_email' id='dest_email' type=text value='"+user_email+"' style='width:100%;'><br>\n");
 			

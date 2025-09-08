@@ -201,7 +201,7 @@ class OGPView {
         }
         else
         {
-            $footer .= "<div class='footer center'>".get_lang('copyright')." &copy; <a href=\"http://www.opengamepanel.org\">Open Game Panel</a> " . date("Y") . " - ".get_lang('all_rights_reserved').".</div>";
+            $footer .= "<div class='footer center'>".get_lang('copyright')." &copy; <a href=\"http://www.gameserver-panel.org\">Open Game Panel</a> " . date("Y") . " - ".get_lang('all_rights_reserved').".</div>";
         }
         
         // Add our magnific popup holder to the page (hidden element):
