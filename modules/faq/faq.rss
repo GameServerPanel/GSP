@@ -185,6 +185,267 @@ As always, if you need help just ask on Discord.
     </content:encoded>
 </item>
 
+<item>
+    <title>What is the Game Monitor and how do I use it?</title>
+    <category>Game Monitor</category>
+    
+    <content:encoded>
+    The Game Monitor is your main control center for managing your game server. From here you can:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Server Status:&lt;/strong&gt; View real-time information about your server including player count, map, and server status
+    &lt;br&gt;
+    &lt;strong&gt;Start/Stop/Restart:&lt;/strong&gt; Control your server's power state with dedicated buttons
+    &lt;br&gt;
+    &lt;strong&gt;Update Server:&lt;/strong&gt; Keep your game server files up to date with automatic or manual updates
+    &lt;br&gt;
+    &lt;strong&gt;View Logs:&lt;/strong&gt; Monitor server logs to troubleshoot issues or track player activity
+    &lt;br&gt;
+    &lt;strong&gt;RCON Console:&lt;/strong&gt; Send commands directly to your server if supported by the game
+    &lt;br&gt;&lt;br&gt;
+    The monitor refreshes automatically to give you up-to-date information about your server's performance and status.
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I start, stop, or restart my server?</title>
+    <category>Game Monitor</category>
+    
+    <content:encoded>
+    From the Game Monitor page:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Start:&lt;/strong&gt; Click the "Start" button to launch your server. Wait for the status to show as "Online"
+    &lt;br&gt;
+    &lt;strong&gt;Stop:&lt;/strong&gt; Click the "Stop" button to safely shut down your server
+    &lt;br&gt;
+    &lt;strong&gt;Restart:&lt;/strong&gt; Click "Restart" to stop and start your server in one action
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Important:&lt;/strong&gt; Always use these controls rather than killing processes directly. This ensures proper shutdown and prevents data corruption.
+    &lt;br&gt;&lt;br&gt;
+    If your server fails to start, check the server logs for error messages that can help identify configuration issues.
+    </content:encoded>
+</item>
+
+<item>
+    <title>What is the Scheduler and how does it work?</title>
+    <category>Scheduler</category>
+    
+    <content:encoded>
+    The Scheduler is a cron-like system that allows you to automate server tasks at specific times or intervals. 
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;What is Cron?&lt;/strong&gt; Cron is a time-based job scheduler used in Unix-like systems (Linux). The panel's Scheduler brings this functionality to game server management.
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Common uses:&lt;/strong&gt;
+    &lt;br&gt;• Automatic server restarts (daily, weekly, etc.)
+    &lt;br&gt;• Scheduled server updates
+    &lt;br&gt;• Backup creation at regular intervals  
+    &lt;br&gt;• Sending automated messages to players
+    &lt;br&gt;• Running custom scripts or commands
+    &lt;br&gt;&lt;br&gt;
+    Access the Scheduler from the main menu to create, edit, or delete scheduled tasks for your servers.
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I create scheduled tasks (for non-Linux users)?</title>
+    <category>Scheduler</category>
+    
+    <content:encoded>
+    The Scheduler uses cron syntax, which may be unfamiliar to Windows users. Here's a simple guide:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Cron Format:&lt;/strong&gt; * * * * * (5 fields separated by spaces)
+    &lt;br&gt;Position 1: Minute (0-59)
+    &lt;br&gt;Position 2: Hour (0-23, where 0 = midnight)  
+    &lt;br&gt;Position 3: Day of month (1-31)
+    &lt;br&gt;Position 4: Month (1-12)
+    &lt;br&gt;Position 5: Day of week (0-7, where 0 and 7 = Sunday)
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Examples:&lt;/strong&gt;
+    &lt;br&gt;• &lt;code&gt;0 6 * * *&lt;/code&gt; - Every day at 6:00 AM
+    &lt;br&gt;• &lt;code&gt;0 0 * * 0&lt;/code&gt; - Every Sunday at midnight
+    &lt;br&gt;• &lt;code&gt;*/30 * * * *&lt;/code&gt; - Every 30 minutes
+    &lt;br&gt;• &lt;code&gt;0 4 * * 1&lt;/code&gt; - Every Monday at 4:00 AM
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Special characters:&lt;/strong&gt;
+    &lt;br&gt;• &lt;code&gt;*&lt;/code&gt; means "every" (every minute, hour, etc.)
+    &lt;br&gt;• &lt;code&gt;*/X&lt;/code&gt; means "every X units" (*/15 = every 15 minutes)
+    &lt;br&gt;• &lt;code&gt;X,Y&lt;/code&gt; means "at X and Y" (1,15 = 1st and 15th)
+    &lt;br&gt;• &lt;code&gt;X-Y&lt;/code&gt; means "from X to Y" (9-17 = 9 AM to 5 PM)
+    </content:encoded>
+</item>
+
+<item>
+    <title>Common Scheduler examples for game servers</title>
+    <category>Scheduler</category>
+    
+    <content:encoded>
+    Here are practical examples for common server management tasks:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Daily Restart at 6 AM:&lt;/strong&gt;
+    &lt;br&gt;Schedule: &lt;code&gt;0 6 * * *&lt;/code&gt;
+    &lt;br&gt;Action: Restart Server
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Weekly Restart (Sunday 3 AM):&lt;/strong&gt;
+    &lt;br&gt;Schedule: &lt;code&gt;0 3 * * 0&lt;/code&gt;
+    &lt;br&gt;Action: Restart Server
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Hourly Server Update Check:&lt;/strong&gt;
+    &lt;br&gt;Schedule: &lt;code&gt;0 * * * *&lt;/code&gt;
+    &lt;br&gt;Action: Update Server
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Daily Backup at Midnight:&lt;/strong&gt;
+    &lt;br&gt;Schedule: &lt;code&gt;0 0 * * *&lt;/code&gt;
+    &lt;br&gt;Action: Create Backup
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Maintenance Window (2 AM - 4 AM daily):&lt;/strong&gt;
+    &lt;br&gt;Stop: &lt;code&gt;0 2 * * *&lt;/code&gt;
+    &lt;br&gt;Start: &lt;code&gt;0 4 * * *&lt;/code&gt;
+    &lt;br&gt;&lt;br&gt;
+    Remember to consider your server's time zone and peak player hours when scheduling restarts or maintenance.
+    </content:encoded>
+</item>
+
+<item>
+    <title>What is the Dashboard and what can I see there?</title>
+    <category>Dashboard</category>
+    
+    <content:encoded>
+    The Dashboard is your overview page that displays key information about all your servers and account:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Server Status Widgets:&lt;/strong&gt; Quick view of all your servers' online/offline status
+    &lt;br&gt;
+    &lt;strong&gt;Resource Usage:&lt;/strong&gt; CPU, memory, and disk usage for your servers
+    &lt;br&gt;
+    &lt;strong&gt;Player Activity:&lt;/strong&gt; Current player counts across all your game servers  
+    &lt;br&gt;
+    &lt;strong&gt;Recent Events:&lt;/strong&gt; Server starts, stops, updates, and other activities
+    &lt;br&gt;
+    &lt;strong&gt;Quick Actions:&lt;/strong&gt; Fast access to common tasks like starting/stopping servers
+    &lt;br&gt;
+    &lt;strong&gt;System Alerts:&lt;/strong&gt; Important notifications about your servers or account
+    &lt;br&gt;&lt;br&gt;
+    The Dashboard refreshes automatically and serves as your central command center for monitoring multiple game servers at a glance.
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I manage server configuration files?</title>
+    <category>File Management</category>
+    
+    <content:encoded>
+    The panel provides several ways to edit your server configuration files:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Config Files Editor:&lt;/strong&gt; Built-in editor for game-specific configuration files with syntax highlighting
+    &lt;br&gt;
+    &lt;strong&gt;File Manager:&lt;/strong&gt; Browser-based file manager to upload, download, edit, and organize all server files
+    &lt;br&gt;
+    &lt;strong&gt;FTP Access:&lt;/strong&gt; Use your favorite FTP client to manage files directly
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Important Tips:&lt;/strong&gt;
+    &lt;br&gt;• Always backup configuration files before making changes
+    &lt;br&gt;• Stop your server before editing critical config files
+    &lt;br&gt;• Some files are protected and cannot be modified for security reasons
+    &lt;br&gt;• Test configuration changes carefully - invalid configs can prevent server startup
+    &lt;br&gt;• Use the built-in editor when possible as it provides validation and syntax checking
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I use the File Manager?</title>
+    <category>File Management</category>
+    
+    <content:encoded>
+    The File Manager is a web-based interface for managing your server files:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Navigation:&lt;/strong&gt; Click folders to browse your server directory structure
+    &lt;br&gt;
+    &lt;strong&gt;Upload Files:&lt;/strong&gt; Drag and drop files or use the upload button to add files to your server
+    &lt;br&gt;
+    &lt;strong&gt;Edit Files:&lt;/strong&gt; Click on text files to open the built-in editor
+    &lt;br&gt;
+    &lt;strong&gt;Download Files:&lt;/strong&gt; Right-click files to download them to your computer
+    &lt;br&gt;
+    &lt;strong&gt;Create Folders:&lt;/strong&gt; Use the "New Folder" button to organize your files
+    &lt;br&gt;
+    &lt;strong&gt;Delete Files:&lt;/strong&gt; Select files and click delete (be careful - this is permanent!)
+    &lt;br&gt;
+    &lt;strong&gt;Permissions:&lt;/strong&gt; View and modify file permissions if your game requires specific settings
+    &lt;br&gt;&lt;br&gt;
+    The File Manager supports most common file operations and is perfect for quick changes without needing a separate FTP client.
+    </content:encoded>
+</item>
+
+<item>
+    <title>What backup and restore options are available?</title>
+    <category>Backup &amp; Restore</category>
+    
+    <content:encoded>
+    The panel provides comprehensive backup and restore functionality:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Automatic Backups:&lt;/strong&gt; Schedule regular backups of your server files and data
+    &lt;br&gt;
+    &lt;strong&gt;Manual Backups:&lt;/strong&gt; Create instant backups before making major changes
+    &lt;br&gt;
+    &lt;strong&gt;Database Backups:&lt;/strong&gt; Export MySQL databases associated with your game servers
+    &lt;br&gt;
+    &lt;strong&gt;Selective Restore:&lt;/strong&gt; Restore specific files or folders rather than entire server
+    &lt;br&gt;
+    &lt;strong&gt;Download Backups:&lt;/strong&gt; Download backup files to your local computer for safekeeping
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Best Practices:&lt;/strong&gt;
+    &lt;br&gt;• Always backup before major updates or configuration changes
+    &lt;br&gt;• Keep multiple backup versions (daily, weekly, monthly)
+    &lt;br&gt;• Test restore procedures periodically to ensure backups work
+    &lt;br&gt;• Store important backups offline for maximum protection
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I manage server updates?</title>
+    <category>Server Management</category>
+    
+    <content:encoded>
+    The panel provides multiple update options for keeping your servers current:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Automatic Updates:&lt;/strong&gt; Enable automatic Steam updates when new game versions are released
+    &lt;br&gt;
+    &lt;strong&gt;Manual Updates:&lt;/strong&gt; Check for and apply updates on-demand from the Game Monitor
+    &lt;br&gt;
+    &lt;strong&gt;Scheduled Updates:&lt;/strong&gt; Use the Scheduler to update servers during low-traffic periods
+    &lt;br&gt;
+    &lt;strong&gt;Validation:&lt;/strong&gt; Verify and repair corrupted game files using Steam's validation system
+    &lt;br&gt;
+    &lt;strong&gt;Rollback:&lt;/strong&gt; Restore previous game versions if needed (when backups are available)
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Update Tips:&lt;/strong&gt;
+    &lt;br&gt;• Monitor update logs for any errors during the process
+    &lt;br&gt;• Consider backing up before major game updates
+    &lt;br&gt;• Some updates may require server restart or configuration changes
+    &lt;br&gt;• Test servers after updates to ensure mods and plugins still work
+    </content:encoded>
+</item>
+
+<item>
+    <title>How do I use RCON to manage my server?</title>
+    <category>Server Management</category>
+    
+    <content:encoded>
+    RCON (Remote Console) allows you to send commands directly to your game server:
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Accessing RCON:&lt;/strong&gt; Click the "Console" or "RCON" button in your Game Monitor
+    &lt;br&gt;
+    &lt;strong&gt;Authentication:&lt;/strong&gt; RCON may require a password set in your server configuration
+    &lt;br&gt;
+    &lt;strong&gt;Common Commands:&lt;/strong&gt;
+    &lt;br&gt;• &lt;code&gt;say [message]&lt;/code&gt; - Send message to all players
+    &lt;br&gt;• &lt;code&gt;kick [player]&lt;/code&gt; - Remove a player from the server  
+    &lt;br&gt;• &lt;code&gt;ban [player]&lt;/code&gt; - Permanently ban a player
+    &lt;br&gt;• &lt;code&gt;status&lt;/code&gt; - Show server status and player list
+    &lt;br&gt;• &lt;code&gt;changelevel [map]&lt;/code&gt; - Change to a different map
+    &lt;br&gt;&lt;br&gt;
+    &lt;strong&gt;Note:&lt;/strong&gt; Available commands vary by game. Not all games support RCON functionality. Check your specific game's documentation for supported commands.
+    </content:encoded>
+</item>
+
 </channel>
 </rss>
 
