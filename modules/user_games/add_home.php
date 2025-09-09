@@ -142,6 +142,61 @@ function exec_ogp_module()
 					// Create new home directory if it doesn't already exist
 					$remote->exec("mkdir -p " . clean_path($game_path) . (!$skipId ? $new_home_id : ""));
 					
+					// Automatically assign an available IP to this server
+					$remote_server_ips = $db->getRemoteServerIPs($rserver_id);
+					if(!empty($remote_server_ips))
+					{
+						// Use the first available IP for this server
+						$ip_id = $remote_server_ips[0]['ip_id'];
+						$available_port = $db->getNextAvailablePort($ip_id, $home_cfg_id);
+						if($available_port)
+						{
+							$db->addGameIpPort($new_home_id, $ip_id, $available_port);
+						}
+					}
+					
+					// Assign a default mod to the game home
+					$available_mods = $db->getCfgMods($home_cfg_id);
+					if(!empty($available_mods))
+					{
+						$default_mod = $available_mods[0]; // Use first available mod as default
+						$mod_cfg_id = $default_mod['mod_cfg_id'];
+						$mod_id = $db->addModToGameHome($new_home_id, $mod_cfg_id);
+						
+						// Set default parameters for the mod
+						$max_players = 32; // Default max players
+						$extra_params = ""; // No extra params
+						$cpu_affinity = "NA"; // No CPU affinity
+						$nice = "0"; // Default priority
+						$db->updateGameModParams($max_players, $extra_params, $cpu_affinity, $nice, $new_home_id, $mod_cfg_id);
+					}
+					
+					// Create billing order entry with 30-day expiration
+					$finish_date = strtotime('+30 day'); // 30 days from now
+					$current_time = time();
+					$order_query = "INSERT INTO OGP_DB_PREFIXbilling_orders 
+						(user_id, service_id, home_name, ip, qty, invoice_duration, max_players, price, 
+						remote_control_password, ftp_password, cart_id, home_id, status, finish_date, extended, coupon_id) 
+						VALUES (
+							'".$db->realEscapeSingle($web_user_id)."',
+							'0',
+							'".$db->realEscapeSingle($server_name)."',
+							'".$db->realEscapeSingle($rserver_id)."',
+							'30',
+							'day',
+							'32',
+							'0.00',
+							'".$db->realEscapeSingle($control_password)."',
+							'".$db->realEscapeSingle($ftppassword)."',
+							'0',
+							'".$db->realEscapeSingle($new_home_id)."',
+							'1',
+							'".$db->realEscapeSingle($finish_date)."',
+							'0',
+							'0'
+						)";
+					$db->query($order_query);
+					
 					if($ftp)
 					{
 						$host_stat = $remote->status_chk();
@@ -150,7 +205,7 @@ function exec_ogp_module()
 						$db->changeFtpStatus('enabled',$new_home_id);
 					}
 					print_success(get_lang('game_home_added'));
-					$db->logger(get_lang('game_home_added')." ($server_name)");
+					$db->logger(get_lang('game_home_added')." ($server_name) - Billing order created with 30-day expiration");
 					$view->refresh("?m=user_games&amp;p=edit&amp;home_id=$new_home_id", 0);
 				}else{
 					print_failure(get_lang_f("failed_to_assign_home_to_user", $new_home_id, $web_user . " " . $db->getError()));
