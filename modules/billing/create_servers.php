@@ -2,6 +2,129 @@
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
 
+function createMysqlDatabase($home_id, $settings, $db) {
+	// Generate database name and user based on server ID
+	$dbID = "server_" . $home_id;
+	$dbPass = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"), 0, 12);
+	
+	// Check if MySQL auto-creation is enabled
+	if (!isset($settings['mysql_auto_create']) || $settings['mysql_auto_create'] != '1') {
+		return false;
+	}
+	
+	// Check if we have the required MySQL settings
+	if (empty($settings['mysql_root_user']) || empty($settings['mysql_root_password']) || empty($settings['mysql_host'])) {
+		return false;
+	}
+	
+	$mysql_host = $settings['mysql_host'];
+	$mysql_user = $settings['mysql_root_user'];
+	$mysql_pass = $settings['mysql_root_password'];
+	$mysql_port = isset($settings['mysql_port']) ? $settings['mysql_port'] : '3306';
+	
+	try {
+		// Create MySQL connection
+		if (function_exists('mysqli_connect')) {
+			$link = mysqli_connect($mysql_host, $mysql_user, $mysql_pass, "", $mysql_port);
+			if (!$link) {
+				$db->logger("MYSQL DB CREATION FAILED - Could not connect to MySQL server for server " . $home_id);
+				return false;
+			}
+			
+			// Create database
+			$query = "CREATE DATABASE IF NOT EXISTS `" . mysqli_real_escape_string($link, $dbID) . "`";
+			mysqli_query($link, $query);
+			
+			// Grant privileges to database user locally
+			$query = "GRANT ALL ON `" . mysqli_real_escape_string($link, $dbID) . "`.* TO '" . mysqli_real_escape_string($link, $dbID) . "'@'localhost' IDENTIFIED BY '" . mysqli_real_escape_string($link, $dbPass) . "'";
+			mysqli_query($link, $query);
+			
+			// Grant privileges to database user remotely
+			$query = "GRANT ALL ON `" . mysqli_real_escape_string($link, $dbID) . "`.* TO '" . mysqli_real_escape_string($link, $dbID) . "'@'%' IDENTIFIED BY '" . mysqli_real_escape_string($link, $dbPass) . "'";
+			mysqli_query($link, $query);
+			
+			// If there's a special user defined, grant it access too (like dayzhivemind in the original script)
+			if (!empty($settings['mysql_special_user']) && !empty($settings['mysql_special_password'])) {
+				$query = "GRANT ALL ON `" . mysqli_real_escape_string($link, $dbID) . "`.* TO '" . mysqli_real_escape_string($link, $settings['mysql_special_user']) . "'@'%' IDENTIFIED BY '" . mysqli_real_escape_string($link, $settings['mysql_special_password']) . "'";
+				mysqli_query($link, $query);
+			}
+			
+			// Flush privileges
+			mysqli_query($link, "FLUSH PRIVILEGES");
+			
+			// Import SQL file if specified
+			if (!empty($settings['mysql_init_sql_file'])) {
+				$sql_file = $settings['mysql_init_sql_file'];
+				if (file_exists($sql_file)) {
+					$sql_content = file_get_contents($sql_file);
+					mysqli_select_db($link, $dbID);
+					mysqli_multi_query($link, $sql_content);
+				}
+			}
+			
+			mysqli_close($link);
+		} else {
+			// Fallback to old mysql functions
+			$link = mysql_connect($mysql_host . ':' . $mysql_port, $mysql_user, $mysql_pass);
+			if (!$link) {
+				$db->logger("MYSQL DB CREATION FAILED - Could not connect to MySQL server for server " . $home_id);
+				return false;
+			}
+			
+			// Create database
+			$query = "CREATE DATABASE IF NOT EXISTS `" . mysql_real_escape_string($dbID, $link) . "`";
+			mysql_query($query, $link);
+			
+			// Grant privileges
+			$query = "GRANT ALL ON `" . mysql_real_escape_string($dbID, $link) . "`.* TO '" . mysql_real_escape_string($dbID, $link) . "'@'localhost' IDENTIFIED BY '" . mysql_real_escape_string($dbPass, $link) . "'";
+			mysql_query($query, $link);
+			
+			$query = "GRANT ALL ON `" . mysql_real_escape_string($dbID, $link) . "`.* TO '" . mysql_real_escape_string($dbID, $link) . "'@'%' IDENTIFIED BY '" . mysql_real_escape_string($dbPass, $link) . "'";
+			mysql_query($query, $link);
+			
+			if (!empty($settings['mysql_special_user']) && !empty($settings['mysql_special_password'])) {
+				$query = "GRANT ALL ON `" . mysql_real_escape_string($dbID, $link) . "`.* TO '" . mysql_real_escape_string($settings['mysql_special_user'], $link) . "'@'%' IDENTIFIED BY '" . mysql_real_escape_string($settings['mysql_special_password'], $link) . "'";
+				mysql_query($query, $link);
+			}
+			
+			mysql_query("FLUSH PRIVILEGES", $link);
+			
+			if (!empty($settings['mysql_init_sql_file'])) {
+				$sql_file = $settings['mysql_init_sql_file'];
+				if (file_exists($sql_file)) {
+					$sql_content = file_get_contents($sql_file);
+					mysql_select_db($dbID, $link);
+					mysql_query($sql_content, $link);
+				}
+			}
+			
+			mysql_close($link);
+		}
+		
+		// Add database to OGP tracking if mysql_server_id is configured
+		if (!empty($settings['mysql_default_server_id'])) {
+			// Try to add to the mysql_databases table directly using the main db connection
+			$db->query("DELETE FROM OGP_DB_PREFIXmysql_databases WHERE db_user = '" . $db->realEscapeSingle($dbID) . "'");
+			
+			// Insert new database record directly
+			$query = "INSERT INTO OGP_DB_PREFIXmysql_databases (mysql_server_id, home_id, db_user, db_passwd, db_name, enabled) VALUES (" .
+					 $db->realEscapeSingle($settings['mysql_default_server_id']) . ", " .
+					 $db->realEscapeSingle($home_id) . ", '" .
+					 $db->realEscapeSingle($dbID) . "', '" .
+					 $db->realEscapeSingle($dbPass) . "', '" .
+					 $db->realEscapeSingle($dbID) . "', 1)";
+			$db->query($query);
+		}
+		
+		$db->logger("MYSQL DB CREATED - Database " . $dbID . " created for server " . $home_id);
+		return true;
+		
+	} catch (Exception $e) {
+		$db->logger("MYSQL DB CREATION FAILED - Error creating database for server " . $home_id . ": " . $e->getMessage());
+		return false;
+	}
+}
+
 function exec_ogp_module()
 {
 	global $db,$view,$settings;
@@ -241,6 +364,13 @@ function exec_ogp_module()
 				echo "<h4><br><p>".get_lang('starting_installations')."</p></h4><br>";
 				//PANEL LOG 
                                 $db->logger( "CREATED NEW SERVER " . $home_id);
+				
+				// CREATE MYSQL DATABASE FOR NEW SERVERS
+				if($order['finish_date'] == 0){
+					$settings = $db->getSettings();
+					createMysqlDatabase($home_id, $settings, $db);
+				}
+				
 				// SEND EMAIL to new server only
 				if($order['finish_date'] == 0){
 					$settings = $db->getSettings();
