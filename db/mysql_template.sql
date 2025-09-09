@@ -1418,6 +1418,28 @@ ALTER TABLE `ogp_widgets`
 --
 ALTER TABLE `ogp_ticket_messages`
   ADD CONSTRAINT `ogp_ticket_messages_fk0` FOREIGN KEY (`ticket_id`) REFERENCES `ogp_tickets` (`tid`);
+
+--
+-- Dumping data for consolidated modules
+--
+
+-- Dashboard widgets
+INSERT INTO `ogp_widgets` (`id`, `column_id`, `sort_no`, `collapsed`, `title`) VALUES 
+(1, 1, 1, 0, 'Game Monitor'),  
+(2, 2, 0, 0, 'Online Server'),  
+(3, 2, 1, 0, 'Currently Online'),  
+(4, 3, 0, 0, 'FTP'),
+(5, 3, 1, 0, 'Support');
+
+-- Ticket system default settings
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('ratings_enabled', 'true') ON DUPLICATE KEY UPDATE `setting_name` = 'ratings_enabled', `setting_value` = 'true';
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('attachments_enabled', 'true') ON DUPLICATE KEY UPDATE `setting_name` = 'attachments_enabled', `setting_value` = 'true';
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('attachment_max_size', '52428800') ON DUPLICATE KEY UPDATE `setting_name` = 'attachment_max_size', `setting_value` = '52428800';
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('attachment_limit', '5') ON DUPLICATE KEY UPDATE `setting_name` = 'attachment_limit', `setting_value` = '5';
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('attachment_save_dir', 'modules/tickets/uploads') ON DUPLICATE KEY UPDATE `setting_name` = 'attachment_save_dir', `setting_value` = 'modules/tickets/uploads';
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('attachment_extensions', 'jpg, gif, jpeg, jpg, png, pdf, txt, sql, zip') ON DUPLICATE KEY UPDATE `setting_name` = 'attachment_extensions', `setting_value` = 'jpg, gif, jpeg, jpg, png, pdf, txt, sql, zip';
+INSERT INTO `ogp_ticket_settings` (setting_name, setting_value) VALUES ('notifications_enabled', 'true') ON DUPLICATE KEY UPDATE `setting_name` = 'notifications_enabled', `setting_value` = 'true';
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
