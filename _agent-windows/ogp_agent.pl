@@ -2461,6 +2461,34 @@ sub restart_server_without_decrypt
 									$server_port, $control_protocol,
 									$control_password, $control_type, $home_path) == 0)
 	{
+		# Wait for screen session to be completely terminated and verify it has stopped
+		logger "Waiting for server screen session to terminate completely...";
+		my $max_wait_attempts = 30; # 30 seconds max to wait for screen to die
+		my $wait_count = 0;
+		
+		while ($wait_count < $max_wait_attempts)
+		{
+			if (is_screen_running_without_decrypt(SCREEN_TYPE_HOME, $home_id) == 0)
+			{
+				logger "Server screen session has been terminated successfully.";
+				last;
+			}
+			
+			$wait_count++;
+			logger "Waiting for screen session to terminate... (attempt $wait_count/$max_wait_attempts)";
+			sleep 1;
+		}
+		
+		# Final check - if screen still exists, log warning but continue
+		if (is_screen_running_without_decrypt(SCREEN_TYPE_HOME, $home_id) == 1)
+		{
+			logger "Warning: Server screen session may still be running, but proceeding with restart.";
+		}
+		
+		# Wait 60 seconds between stop and start operations as requested
+		logger "Waiting 60 seconds before starting server as requested for reliable scheduler functionality...";
+		sleep 60;
+		
 		if (universal_start_without_decrypt($home_id, $home_path, $server_exe, $run_dir,
 											$cmd, $server_port, $server_ip, $cpu, $nice, $preStart, $envVars, $game_key, $console_log) == 1)
 		{

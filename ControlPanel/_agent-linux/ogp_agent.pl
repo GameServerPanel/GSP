@@ -2826,6 +2826,36 @@ sub restart_server_without_decrypt
 									$server_port, $control_protocol,
 									$control_password, $control_type, $home_path) == 0)
 	{
+		# Wait for processes to be completely terminated and verify they are killed
+		logger "Waiting for server processes to terminate completely...";
+		my $max_wait_attempts = 30; # 30 seconds max to wait for processes to die
+		my $wait_count = 0;
+		
+		while ($wait_count < $max_wait_attempts)
+		{
+			my @remaining_pids = get_home_pids($home_id);
+			if (@remaining_pids == 0)
+			{
+				logger "All server processes have been terminated successfully.";
+				last;
+			}
+			
+			$wait_count++;
+			logger "Waiting for processes to terminate... (attempt $wait_count/$max_wait_attempts, PIDs: @remaining_pids)";
+			sleep 1;
+		}
+		
+		# Final check - if processes still exist, log warning but continue
+		my @final_check_pids = get_home_pids($home_id);
+		if (@final_check_pids > 0)
+		{
+			logger "Warning: Some processes may still be running (PIDs: @final_check_pids), but proceeding with restart.";
+		}
+		
+		# Wait 60 seconds between stop and start operations as requested
+		logger "Waiting 60 seconds before starting server as requested for reliable scheduler functionality...";
+		sleep 60;
+		
 		if (universal_start_without_decrypt($home_id, $home_path, $server_exe, $run_dir,
 											$cmd, $server_port, $server_ip, $cpu, $nice, $preStart, $envVars, $game_key, $console_log) == 1)
 		{
