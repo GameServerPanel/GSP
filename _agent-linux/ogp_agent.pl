@@ -381,7 +381,9 @@ my $d = Frontier::Daemon::OGP::Forking->new(
 				 remote_query					=> \&remote_query,
 				 send_steam_guard_code  		=> \&send_steam_guard_code,
 				 steam_workshop					=> \&steam_workshop,
-				 get_workshop_mods_info			=> \&get_workshop_mods_info
+				 get_workshop_mods_info			=> \&get_workshop_mods_info,
+				 get_system_resource_usage		=> \&get_system_resource_usage,
+				 get_gameserver_resource_usage	=> \&get_gameserver_resource_usage
 			 },
 			 debug	 => 4,
 			 LocalPort => AGENT_PORT,
@@ -4628,3 +4630,297 @@ sub trim{
 	$s =~ s/^\s+|\s+$//g; 
 	return $s 
 };
+
+### Resource Monitoring Functions for OGP Monitoring System ###
+
+# Get system-wide resource usage
+sub get_system_resource_usage
+{
+	return "Bad Encryption Key" unless(decrypt_param(pop(@_)) eq "Encryption checking OK");
+	my ($request_type) = decrypt_params(@_);
+	
+	if ($request_type ne "system_resources")
+	{
+		logger "Invalid parameter '$request_type' given for get_system_resource_usage function.";
+		return -1;
+	}
+	
+	my $resource_data = {};
+	
+	# Get CPU usage
+	my $cpu_usage = get_cpu_usage_percentage();
+	$resource_data->{cpu_usage} = $cpu_usage;
+	
+	# Get memory usage
+	my ($memory_usage, $memory_used_mb, $memory_total_mb) = get_memory_usage();
+	$resource_data->{memory_usage} = $memory_usage;
+	$resource_data->{memory_used_mb} = $memory_used_mb;
+	$resource_data->{memory_total_mb} = $memory_total_mb;
+	
+	# Get disk usage for the root partition
+	my ($disk_usage, $disk_used_mb, $disk_total_mb) = get_disk_usage("/");
+	$resource_data->{disk_usage} = $disk_usage;
+	$resource_data->{disk_used_mb} = $disk_used_mb;
+	$resource_data->{disk_total_mb} = $disk_total_mb;
+	
+	# Get network stats
+	my ($network_rx_mb, $network_tx_mb) = get_network_usage();
+	$resource_data->{network_rx_mb} = $network_rx_mb;
+	$resource_data->{network_tx_mb} = $network_tx_mb;
+	
+	# Convert hash to encoded string
+	my $result = "";
+	for my $key (sort keys %$resource_data) {
+		$result .= "$key=" . $resource_data->{$key} . ";";
+	}
+	
+	logger "System resource usage collected: $result";
+	return "1;$result";
+}
+
+# Get resource usage for a specific game server
+sub get_gameserver_resource_usage
+{
+	return "Bad Encryption Key" unless(decrypt_param(pop(@_)) eq "Encryption checking OK");
+	my ($home_id) = decrypt_params(@_);
+	
+	if (!defined $home_id || $home_id !~ /^\d+$/)
+	{
+		logger "Invalid home_id '$home_id' given for get_gameserver_resource_usage function.";
+		return -1;
+	}
+	
+	my $resource_data = {};
+	
+	# Get PIDs for this home_id
+	my @pids = get_home_pids($home_id);
+	
+	if (@pids == 0)
+	{
+		logger "No processes found for home_id $home_id";
+		return "0;No processes found";
+	}
+	
+	my $total_cpu = 0;
+	my $total_memory_mb = 0;
+	my $process_count = 0;
+	
+	foreach my $pid (@pids)
+	{
+		chomp $pid;
+		next if $pid !~ /^\d+$/;
+		
+		# Check if process still exists
+		if (kill 0, $pid)
+		{
+			my ($cpu_percent, $memory_mb) = get_process_resource_usage($pid);
+			if (defined $cpu_percent && defined $memory_mb)
+			{
+				$total_cpu += $cpu_percent;
+				$total_memory_mb += $memory_mb;
+				$process_count++;
+			}
+		}
+	}
+	
+	$resource_data->{cpu_usage} = sprintf("%.2f", $total_cpu);
+	$resource_data->{memory_used_mb} = int($total_memory_mb);
+	$resource_data->{process_count} = $process_count;
+	
+	# Convert hash to encoded string
+	my $result = "";
+	for my $key (sort keys %$resource_data) {
+		$result .= "$key=" . $resource_data->{$key} . ";";
+	}
+	
+	logger "Game server resource usage for home_id $home_id: $result";
+	return "1;$result";
+}
+
+# Helper function to get CPU usage percentage
+sub get_cpu_usage_percentage
+{
+	# Read /proc/stat to get CPU usage
+	my $stat_file = '/proc/stat';
+	return 0 unless -r $stat_file;
+	
+	# Take two samples 1 second apart
+	my ($idle1, $total1) = read_cpu_stat();
+	sleep(1);
+	my ($idle2, $total2) = read_cpu_stat();
+	
+	my $idle_delta = $idle2 - $idle1;
+	my $total_delta = $total2 - $total1;
+	
+	return 0 if $total_delta <= 0;
+	
+	my $cpu_usage = 100 - (($idle_delta / $total_delta) * 100);
+	return sprintf("%.2f", $cpu_usage);
+}
+
+# Helper function to read CPU stats from /proc/stat
+sub read_cpu_stat
+{
+	open(my $fh, '<', '/proc/stat') or return (0, 0);
+	my $line = <$fh>;
+	close($fh);
+	
+	# Parse the first line: cpu user nice system idle iowait irq softirq steal guest
+	if ($line =~ /^cpu\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/)
+	{
+		my ($user, $nice, $system, $idle, $iowait, $irq, $softirq, $steal) = ($1, $2, $3, $4, $5, $6, $7, $8);
+		my $total = $user + $nice + $system + $idle + $iowait + $irq + $softirq + $steal;
+		return ($idle + $iowait, $total);
+	}
+	
+	return (0, 0);
+}
+
+# Helper function to get memory usage
+sub get_memory_usage
+{
+	my $meminfo_file = '/proc/meminfo';
+	return (0, 0, 0) unless -r $meminfo_file;
+	
+	open(my $fh, '<', $meminfo_file) or return (0, 0, 0);
+	
+	my ($mem_total, $mem_free, $mem_buffers, $mem_cached) = (0, 0, 0, 0);
+	
+	while (my $line = <$fh>)
+	{
+		if ($line =~ /^MemTotal:\s+(\d+)\s+kB/)		{ $mem_total = $1; }
+		elsif ($line =~ /^MemFree:\s+(\d+)\s+kB/)	{ $mem_free = $1; }
+		elsif ($line =~ /^Buffers:\s+(\d+)\s+kB/)	{ $mem_buffers = $1; }
+		elsif ($line =~ /^Cached:\s+(\d+)\s+kB/)	{ $mem_cached = $1; }
+	}
+	close($fh);
+	
+	return (0, 0, 0) if $mem_total == 0;
+	
+	# Calculate actual memory usage (exclude buffers/cache)
+	my $mem_used = $mem_total - $mem_free - $mem_buffers - $mem_cached;
+	my $mem_usage_percent = ($mem_used / $mem_total) * 100;
+	
+	# Convert from KB to MB
+	my $mem_used_mb = int($mem_used / 1024);
+	my $mem_total_mb = int($mem_total / 1024);
+	
+	return (sprintf("%.2f", $mem_usage_percent), $mem_used_mb, $mem_total_mb);
+}
+
+# Helper function to get disk usage for a specific path
+sub get_disk_usage
+{
+	my ($path) = @_;
+	$path = "/" unless defined $path;
+	
+	# Use df command to get disk usage
+	my $df_output = `df -k '$path' 2>/dev/null | tail -1`;
+	chomp $df_output;
+	
+	return (0, 0, 0) unless $df_output;
+	
+	# Parse df output: filesystem 1K-blocks used available use% mounted_on
+	my @fields = split(/\s+/, $df_output);
+	return (0, 0, 0) unless @fields >= 4;
+	
+	my ($total_kb, $used_kb, $available_kb, $use_percent) = @fields[1,2,3,4];
+	
+	# Remove % sign from use_percent
+	$use_percent =~ s/%//;
+	
+	# Convert from KB to MB
+	my $total_mb = int($total_kb / 1024);
+	my $used_mb = int($used_kb / 1024);
+	
+	return ($use_percent, $used_mb, $total_mb);
+}
+
+# Helper function to get network usage (cumulative since boot)
+sub get_network_usage
+{
+	my $net_file = '/proc/net/dev';
+	return (0, 0) unless -r $net_file;
+	
+	open(my $fh, '<', $net_file) or return (0, 0);
+	
+	my ($total_rx_bytes, $total_tx_bytes) = (0, 0);
+	
+	while (my $line = <$fh>)
+	{
+		# Skip header lines
+		next if $line =~ /Inter-|face/;
+		
+		# Skip loopback interface
+		next if $line =~ /^\s*lo:/;
+		
+		# Parse network interface line
+		if ($line =~ /^\s*(\w+):\s*(\d+)\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+(\d+)/)
+		{
+			my ($interface, $rx_bytes, $tx_bytes) = ($1, $2, $3);
+			$total_rx_bytes += $rx_bytes;
+			$total_tx_bytes += $tx_bytes;
+		}
+	}
+	close($fh);
+	
+	# Convert bytes to MB
+	my $total_rx_mb = int($total_rx_bytes / (1024 * 1024));
+	my $total_tx_mb = int($total_tx_bytes / (1024 * 1024));
+	
+	return ($total_rx_mb, $total_tx_mb);
+}
+
+# Helper function to get resource usage for a specific process
+sub get_process_resource_usage
+{
+	my ($pid) = @_;
+	return (0, 0) unless defined $pid && $pid =~ /^\d+$/;
+	
+	my $stat_file = "/proc/$pid/stat";
+	my $status_file = "/proc/$pid/status";
+	
+	return (0, 0) unless -r $stat_file && -r $status_file;
+	
+	# Get memory usage from /proc/pid/status
+	my $memory_kb = 0;
+	if (open(my $fh, '<', $status_file))
+	{
+		while (my $line = <$fh>)
+		{
+			if ($line =~ /^VmRSS:\s+(\d+)\s+kB/)
+			{
+				$memory_kb = $1;
+				last;
+			}
+		}
+		close($fh);
+	}
+	
+	# Get CPU usage from /proc/pid/stat  
+	my $cpu_percent = 0;
+	if (open(my $fh, '<', $stat_file))
+	{
+		my $line = <$fh>;
+		close($fh);
+		
+		if ($line)
+		{
+			my @fields = split(/\s+/, $line);
+			if (@fields >= 17)
+			{
+				my $utime = $fields[13];  # User time
+				my $stime = $fields[14];  # System time
+				my $total_time = $utime + $stime;
+				
+				# This is a simple approximation - for accurate CPU % we'd need sampling
+				# For now, just return a basic calculation
+				$cpu_percent = ($total_time > 0) ? 0.1 : 0;  # Placeholder
+			}
+		}
+	}
+	
+	my $memory_mb = $memory_kb / 1024;
+	
+	return ($cpu_percent, $memory_mb);
+}

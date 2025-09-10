@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigation>
+    <item>
+        <text>Resource Monitor</text>
+        <link>?m=resource_monitor&amp;type=dashboard</link>
+        <target>main</target>
+        <icon>images/icons/statistics.png</icon>
+    </item>
+    <item>
+        <text>Resource History</text>
+        <link>?m=resource_monitor&amp;type=history</link>
+        <target>main</target>
+        <icon>images/icons/statistics.png</icon>
+    </item>
+    <item>
+        <text>Alert Configuration</text>
+        <link>?m=resource_monitor&amp;type=alerts</link>
+        <target>main</target>
+        <icon>images/icons/settings.png</icon>
+    </item>
+</navigation>
