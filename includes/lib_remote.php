@@ -1198,5 +1198,27 @@ class OGPRemoteLibrary
 		//Unknown response
 		return -4;
 	}
+
+	/// Get system-wide resource usage from agent
+	public function get_system_resource_usage()
+	{
+		$args = $this->encrypt_params("system_resources");
+		$this->add_enc_chk($args);
+		$request = xmlrpc_encode_request("get_system_resource_usage", $args);
+		$response = $this->sendRequest($request);
+		
+		return $response;
+	}
+
+	/// Get resource usage for a specific game server from agent  
+	public function get_gameserver_resource_usage($home_id)
+	{
+		$args = $this->encrypt_params($home_id);
+		$this->add_enc_chk($args);
+		$request = xmlrpc_encode_request("get_gameserver_resource_usage", $args);
+		$response = $this->sendRequest($request);
+		
+		return $response;
+	}
 }
 ?>

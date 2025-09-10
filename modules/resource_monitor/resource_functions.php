@@ -86,26 +86,39 @@ function store_resource_data($remote_server_id, $home_id, $data)
 {
     global $db;
     
+    // Sanitize values
+    $cpu_usage = isset($data['cpu_usage']) ? floatval($data['cpu_usage']) : 'NULL';
+    $memory_usage = isset($data['memory_usage']) ? floatval($data['memory_usage']) : 'NULL';
+    $memory_used_mb = isset($data['memory_used_mb']) ? intval($data['memory_used_mb']) : 'NULL';
+    $memory_total_mb = isset($data['memory_total_mb']) ? intval($data['memory_total_mb']) : 'NULL';
+    $disk_usage = isset($data['disk_usage']) ? floatval($data['disk_usage']) : 'NULL';
+    $disk_used_mb = isset($data['disk_used_mb']) ? intval($data['disk_used_mb']) : 'NULL';
+    $disk_total_mb = isset($data['disk_total_mb']) ? intval($data['disk_total_mb']) : 'NULL';
+    $process_count = isset($data['process_count']) ? intval($data['process_count']) : 'NULL';
+    $network_rx_mb = isset($data['network_rx_mb']) ? intval($data['network_rx_mb']) : 'NULL';
+    $network_tx_mb = isset($data['network_tx_mb']) ? intval($data['network_tx_mb']) : 'NULL';
+    
+    $home_id_val = $home_id ? intval($home_id) : 'NULL';
+    
     $query = "INSERT INTO ogp_resource_monitoring 
               (remote_server_id, home_id, cpu_usage, memory_usage, memory_used_mb, memory_total_mb, 
                disk_usage, disk_used_mb, disk_total_mb, process_count, network_rx_mb, network_tx_mb) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+              VALUES (
+                " . intval($remote_server_id) . ",
+                $home_id_val,
+                $cpu_usage,
+                $memory_usage,
+                $memory_used_mb,
+                $memory_total_mb,
+                $disk_usage,
+                $disk_used_mb,
+                $disk_total_mb,
+                $process_count,
+                $network_rx_mb,
+                $network_tx_mb
+              )";
     
-    $stmt = $db->prepare($query);
-    $stmt->execute([
-        $remote_server_id,
-        $home_id,
-        isset($data['cpu_usage']) ? floatval($data['cpu_usage']) : null,
-        isset($data['memory_usage']) ? floatval($data['memory_usage']) : null,
-        isset($data['memory_used_mb']) ? intval($data['memory_used_mb']) : null,
-        isset($data['memory_total_mb']) ? intval($data['memory_total_mb']) : null,
-        isset($data['disk_usage']) ? floatval($data['disk_usage']) : null,
-        isset($data['disk_used_mb']) ? intval($data['disk_used_mb']) : null,
-        isset($data['disk_total_mb']) ? intval($data['disk_total_mb']) : null,
-        isset($data['process_count']) ? intval($data['process_count']) : null,
-        isset($data['network_rx_mb']) ? intval($data['network_rx_mb']) : null,
-        isset($data['network_tx_mb']) ? intval($data['network_tx_mb']) : null
-    ]);
+    return $db->query($query);
 }
 
 /**
@@ -117,10 +130,9 @@ function check_system_alerts($server, $data)
     
     // Get active alerts for this server (system-wide)
     $query = "SELECT * FROM ogp_resource_alerts 
-              WHERE remote_server_id = ? AND home_id IS NULL AND is_active = 1";
-    $stmt = $db->prepare($query);
-    $stmt->execute([$server['remote_server_id']]);
-    $alerts = $stmt->fetchAll();
+              WHERE remote_server_id = " . intval($server['remote_server_id']) . " 
+              AND home_id IS NULL AND is_active = 1";
+    $alerts = $db->resultQuery($query);
     
     foreach ($alerts as $alert) {
         $resource_value = null;
@@ -407,17 +419,16 @@ function show_dashboard()
     echo "<h2>Resource Monitoring Dashboard</h2>";
     
     // Get recent resource data for all servers
-    $query = "SELECT r.*, s.agent_name, s.agent_ip 
+    $query = "SELECT r.*, s.remote_server_name, s.agent_ip 
               FROM ogp_resource_monitoring r 
               LEFT JOIN ogp_remote_servers s ON r.remote_server_id = s.remote_server_id 
               WHERE r.timestamp >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
                 AND r.home_id IS NULL
               ORDER BY r.timestamp DESC";
     
-    $result = $db->query($query);
-    $servers_data = $result->fetchAll();
+    $servers_data = $db->resultQuery($query);
     
-    if (empty($servers_data)) {
+    if (!$servers_data || empty($servers_data)) {
         echo "<p>No recent resource data available. Make sure the monitoring system is configured and running.</p>";
         echo "<a href='?m=resource_monitor&type=configure' class='btn btn-primary'>Configure Monitoring</a>";
         return;
@@ -442,7 +453,7 @@ function show_dashboard()
     
     foreach ($servers as $server_id => $server) {
         $data = $server['latest'];
-        $server_name = $data['agent_name'] ?: $data['agent_ip'];
+        $server_name = $data['remote_server_name'] ?: $data['agent_ip'];
         
         echo "<div class='col-md-4'>";
         echo "<div class='card'>";
@@ -498,10 +509,10 @@ function show_configuration()
     
     // Check if we have recent data
     global $db;
-    $recent_data = $db->query("SELECT COUNT(*) as count FROM ogp_resource_monitoring WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)")->fetch();
+    $recent_data = $db->resultQuery("SELECT COUNT(*) as count FROM ogp_resource_monitoring WHERE timestamp >= DATE_SUB(NOW(), INTERVAL 10 MINUTE)");
     
-    if ($recent_data['count'] > 0) {
-        echo "<div class='alert alert-success'>✅ Monitoring is active - " . $recent_data['count'] . " records in the last 10 minutes</div>";
+    if ($recent_data && isset($recent_data[0]['count']) && $recent_data[0]['count'] > 0) {
+        echo "<div class='alert alert-success'>✅ Monitoring is active - " . $recent_data[0]['count'] . " records in the last 10 minutes</div>";
     } else {
         echo "<div class='alert alert-warning'>⚠️ No recent monitoring data found. Please set up the cron job.</div>";
     }
@@ -517,7 +528,7 @@ function show_history()
     echo "<h2>Resource History</h2>";
     
     // Simple table view for now - could be enhanced with charts later
-    $query = "SELECT r.*, s.agent_name, s.agent_ip, h.home_name
+    $query = "SELECT r.*, s.remote_server_name, s.agent_ip, h.home_name
               FROM ogp_resource_monitoring r 
               LEFT JOIN ogp_remote_servers s ON r.remote_server_id = s.remote_server_id 
               LEFT JOIN ogp_server_homes h ON r.home_id = h.home_id
@@ -525,15 +536,18 @@ function show_history()
               ORDER BY r.timestamp DESC
               LIMIT 100";
     
-    $result = $db->query($query);
-    $history_data = $result->fetchAll();
+    $history_data = $db->resultQuery($query);
+    
+    if (!$history_data) {
+        $history_data = [];
+    }
     
     echo "<table class='table table-striped'>";
     echo "<thead><tr><th>Time</th><th>Server</th><th>Target</th><th>CPU %</th><th>Memory %</th><th>Disk %</th></tr></thead>";
     echo "<tbody>";
     
     foreach ($history_data as $data) {
-        $server_name = $data['agent_name'] ?: $data['agent_ip'];
+        $server_name = $data['remote_server_name'] ?: $data['agent_ip'];
         $target = $data['home_id'] ? "Game Server ({$data['home_name']})" : "System";
         
         echo "<tr>";
@@ -589,9 +603,9 @@ function manage_alerts()
     
     // Show existing alerts
     echo "<h4>Current Alerts</h4>";
-    $alerts = $db->query("SELECT a.*, s.agent_name, s.agent_ip FROM ogp_resource_alerts a LEFT JOIN ogp_remote_servers s ON a.remote_server_id = s.remote_server_id ORDER BY a.created_at DESC")->fetchAll();
+    $alerts = $db->resultQuery("SELECT a.*, s.remote_server_name, s.agent_ip FROM ogp_resource_alerts a LEFT JOIN ogp_remote_servers s ON a.remote_server_id = s.remote_server_id ORDER BY a.created_at DESC");
     
-    if (empty($alerts)) {
+    if (!$alerts || empty($alerts)) {
         echo "<p>No alerts configured yet.</p>";
     } else {
         echo "<table class='table'>";
@@ -599,7 +613,7 @@ function manage_alerts()
         echo "<tbody>";
         
         foreach ($alerts as $alert) {
-            $server_name = $alert['agent_name'] ?: $alert['agent_ip'];
+            $server_name = $alert['remote_server_name'] ?: $alert['agent_ip'];
             $target = $alert['home_id'] ? "Game Server (ID: {$alert['home_id']})" : "System";
             
             echo "<tr>";
@@ -625,10 +639,12 @@ function manage_alerts()
     echo "<div class='col-md-4'>";
     echo "<label>Server:</label>";
     echo "<select name='remote_server_id' class='form-control' required>";
-    $servers = $db->query("SELECT remote_server_id, agent_name, agent_ip FROM ogp_remote_servers ORDER BY agent_name, agent_ip")->fetchAll();
-    foreach ($servers as $server) {
-        $name = $server['agent_name'] ?: $server['agent_ip'];
-        echo "<option value='{$server['remote_server_id']}'>{$name}</option>";
+    $servers = $db->resultQuery("SELECT remote_server_id, remote_server_name, agent_ip FROM ogp_remote_servers ORDER BY remote_server_name, agent_ip");
+    if ($servers) {
+        foreach ($servers as $server) {
+            $name = $server['remote_server_name'] ?: $server['agent_ip'];
+            echo "<option value='{$server['remote_server_id']}'>{$name}</option>";
+        }
     }
     echo "</select>";
     echo "</div>";
@@ -672,10 +688,12 @@ function get_discord_settings()
     global $db;
     
     $settings = [];
-    $result = $db->query("SELECT setting_name, setting_value FROM ogp_discord_settings");
+    $result = $db->resultQuery("SELECT setting_name, setting_value FROM ogp_discord_settings");
     
-    while ($row = $result->fetch()) {
-        $settings[$row['setting_name']] = $row['setting_value'];
+    if ($result) {
+        foreach ($result as $row) {
+            $settings[$row['setting_name']] = $row['setting_value'];
+        }
     }
     
     return $settings;
@@ -691,8 +709,9 @@ function update_discord_settings()
     ];
     
     foreach ($settings as $name => $value) {
-        $stmt = $db->prepare("UPDATE ogp_discord_settings SET setting_value = ? WHERE setting_name = ?");
-        $stmt->execute([$value, $name]);
+        $escaped_value = $db->realEscapeSingle($value);
+        $escaped_name = $db->realEscapeSingle($name);
+        $db->query("UPDATE ogp_discord_settings SET setting_value = '$escaped_value' WHERE setting_name = '$escaped_name'");
     }
     
     echo "<div class='alert alert-success'>Discord settings updated successfully!</div>";
@@ -702,19 +721,22 @@ function add_alert()
 {
     global $db;
     
-    $stmt = $db->prepare("INSERT INTO ogp_resource_alerts (remote_server_id, alert_type, threshold_percentage, duration_minutes, discord_webhook_url) VALUES (?, ?, ?, ?, ?)");
+    $remote_server_id = intval($_POST['remote_server_id']);
+    $alert_type = $db->realEscapeSingle($_POST['alert_type']);
+    $threshold = floatval($_POST['threshold']);
+    $duration = intval($_POST['duration']);
+    $webhook_url = !empty($_POST['webhook_url']) ? $db->realEscapeSingle($_POST['webhook_url']) : 'NULL';
     
-    $webhook_url = !empty($_POST['webhook_url']) ? $_POST['webhook_url'] : null;
+    $webhook_value = ($webhook_url === 'NULL') ? 'NULL' : "'$webhook_url'";
     
-    $stmt->execute([
-        $_POST['remote_server_id'],
-        $_POST['alert_type'],
-        $_POST['threshold'],
-        $_POST['duration'],
-        $webhook_url
-    ]);
+    $query = "INSERT INTO ogp_resource_alerts (remote_server_id, alert_type, threshold_percentage, duration_minutes, discord_webhook_url) 
+              VALUES ($remote_server_id, '$alert_type', $threshold, $duration, $webhook_value)";
     
-    echo "<div class='alert alert-success'>Alert added successfully!</div>";
+    if ($db->query($query)) {
+        echo "<div class='alert alert-success'>Alert added successfully!</div>";
+    } else {
+        echo "<div class='alert alert-danger'>Error adding alert!</div>";
+    }
 }
 
 ?>

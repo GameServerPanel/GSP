@@ -12,6 +12,7 @@
 chdir(dirname(__DIR__));
 require_once('includes/config.inc.php');
 require_once('includes/functions.php');
+require_once('includes/helpers.php');
 require_once('includes/database.php');
 
 // Connect to database
