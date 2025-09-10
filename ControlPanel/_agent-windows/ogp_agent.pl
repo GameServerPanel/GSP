@@ -1167,11 +1167,11 @@ sub stop_server_without_decrypt
 		logger("Invalid IP:Port given $server_ip:$server_port.");
 		return 1;
 	}
- #removed stopping with rcon. just kill PID
+ #Skip RCON - always kill processes directly for reliable server stops
 	
 	if (is_screen_running_without_decrypt(SCREEN_TYPE_HOME, $home_id) == 1)
 	{
-		logger "Control protocol not responding. Using kill signal.";
+		logger "Stopping server with kill command (RCON disabled for reliability).";
 		system("cmd /C taskkill /f /fi 'PID eq $windows_pid' /T");
 		system('screen -wipe > /dev/null 2>&1');
 		logger "Server ID $home_id:Stopped server running on $server_ip:$server_port.";
