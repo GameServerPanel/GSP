@@ -1,23 +1,17 @@
--- Database: gs_metrics  (create and grant user as needed)
-CREATE DATABASE IF NOT EXISTS gs_metrics CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Run these while connected to your current PANEL database (no CREATE DATABASE here)
 
--- Example user:
--- CREATE USER 'gs_metrics'@'%' IDENTIFIED BY 'REPLACE_ME';
--- GRANT ALL PRIVILEGES ON gs_metrics.* TO 'gs_metrics'@'%';
--- FLUSH PRIVILEGES;
-
-USE gs_metrics;
-
-CREATE TABLE IF NOT EXISTS machines (
+-- Machines catalog
+CREATE TABLE IF NOT EXISTS gsp_machines (
   id INT AUTO_INCREMENT PRIMARY KEY,
   machine_id VARCHAR(64) NOT NULL,
   hostname   VARCHAR(255) NOT NULL,
   ip         VARCHAR(45) DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uniq_machine (machine_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS machine_samples (
+-- Host-level samples
+CREATE TABLE IF NOT EXISTS gsp_machine_samples (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   machine_id VARCHAR(64) NOT NULL,
   ts DATETIME NOT NULL,
@@ -40,9 +34,10 @@ CREATE TABLE IF NOT EXISTS machine_samples (
   iface_speed_mbps INT NULL,
   KEY idx_machine_ts (machine_id, ts),
   KEY idx_ts (ts)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS process_samples (
+-- Per-process/per-server samples
+CREATE TABLE IF NOT EXISTS gsp_process_samples (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   machine_id VARCHAR(64) NOT NULL,
   ts DATETIME NOT NULL,
@@ -63,4 +58,4 @@ CREATE TABLE IF NOT EXISTS process_samples (
   KEY idx_proc_server (machine_id, server_name, ts),
   KEY idx_proc_pid (machine_id, pid, ts),
   KEY idx_ts (ts)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
