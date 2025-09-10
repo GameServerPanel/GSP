@@ -1287,8 +1287,6 @@ sub stop_server_without_decrypt
 	my ($home_id, $server_ip, $server_port, $control_protocol,
 		$control_password, $control_type, $home_path) = @_;
 		
-	my $usedProtocolToStop = 0;
-		
 	my $startup_file = Path::Class::File->new(GAME_STARTUP_DIR, "$server_ip-$server_port");
 	
 	if (-e $startup_file)
@@ -1323,197 +1321,40 @@ sub stop_server_without_decrypt
 	my $screen_id = create_screen_id(SCREEN_TYPE_HOME, $home_id);
 	my $as_user = find_user_by_screen_id($screen_id);
 
-	if ($control_password !~ /^\s*$/ and $control_protocol ne "")
+	# Skip RCON - always kill processes directly for reliable server stops
+	logger "Stopping server with kill command (RCON disabled for reliability).";
+	
+	my @server_pids = get_home_pids($home_id);
+	
+	my $cnt;
+	my $out;
+	foreach my $pid (@server_pids)
 	{
-		if ($control_protocol eq "rcon")
+		chomp($pid);
+		$cnt = sudo_exec_without_decrypt("kill 15 $pid", $as_user);
+		($cnt, $out) = split(/;/, $cnt, 2);
+		if ($cnt == -1)
 		{
-			use KKrcon::KKrcon;
-			my $rcon = new KKrcon(
-								  Password => $control_password,
-								  Host	 => $server_ip,
-								  Port	 => $server_port,
-								  Type	 => $control_type
-								 );
-
-			my $rconCommand = "quit";
-			$rcon->execute($rconCommand);
-			$usedProtocolToStop = 1;
-		}
-		elsif ($control_protocol eq "rcon2")
-		{
-			use KKrcon::HL2;
-			my $rcon2 = new HL2(
-								  hostname => $server_ip,
-								  port	 => $server_port,
-								  password => $control_password,
-								  timeout  => 2
-								 );
-
-			my $rconCommand = "quit";
-			$rcon2->run($rconCommand);
-			$usedProtocolToStop = 1;
-		}
-		elsif ($control_protocol eq "armabe")
-		{
-			use ArmaBE::ArmaBE;
-			my $armabe = new ArmaBE(
-								  hostname => $server_ip,
-								  port	 => $server_port, # Uses server port for now (Arma 2), Arma 3 BE uses a different, user definable port
-								  password => $control_password,
-								  timeout  => 2
-								 );
-
-			my $rconCommand = "#shutdown";
-			my $armabe_result = $armabe->run($rconCommand);
-			if ($armabe_result) {
-				logger "ArmaBE Shutdown command sent successfully";		
-				$usedProtocolToStop = 1;
+			$cnt = sudo_exec_without_decrypt("kill 9 $pid", $as_user);
+			($cnt, $out) = split(/;/, $cnt, 2);
+			if ($cnt == -1)
+			{
+				logger "Process $pid can not be stopped.";
 			}
-		}
-		elsif ($control_protocol eq "minecraft")
-		{
-			use Minecraft::RCON;
-			my $strip_color = 1;
-			
-			my $rconPort = get_minecraft_rcon_port($home_path);
-			
-			logger "Minecraft rcon port detected as $rconPort with path of $home_path";
-			
-			if ($rconPort != -1){
-				my $minecraft;
-				my $response;
-				
-				eval {
-					$minecraft = Minecraft::RCON->new(
-						{
-							address     => $server_ip,
-							port        => $rconPort,
-							password    => $control_password,
-							color_mode  => $strip_color ? 'strip' : 'convert',
-						}
-					);
-				};
-				
-				if (defined $minecraft)
-				{
-					eval { $minecraft->connect };
-					logger "Minecraft rcon module connection failed: $@" if $@;
-					 
-					
-					my $rconCommand = "/stop";
-					eval { $response = $minecraft->command($rconCommand) };
-					logger $@ ? "Minecraft rcon error: $@" : "Minecraft rcon module response: $response";
-	 
-					eval { $minecraft->disconnect; };
-					
-					if (defined $response) {
-						logger "Minecraft Shutdown command sent successfully";
-						$usedProtocolToStop = 1;
-					}
-				}
+			else
+			{
+				logger "Stopped process with pid $pid successfully using kill 9.";
 			}
-		}
-		
-		my @server_pids;
-		
-		# Gives the server time to shutdown with rcon in case it takes a while for the server to shutdown (arma for example) before we forcefully kill it
-		if ($usedProtocolToStop == 1 && is_screen_running_without_decrypt(SCREEN_TYPE_HOME, $home_id) == 1){
-			@server_pids = get_home_pids($home_id);
-			my $timeWaited = 0;
-			my $pidSize = @server_pids;
-			my $maxWaitTime = 5;
-			
-			# Maximum time to wait can now be configured as a preference
-			if(defined($Cfg::Preferences{protocol_shutdown_waittime}) && $Cfg::Preferences{protocol_shutdown_waittime} =~ /^\d+?$/){
-				$maxWaitTime = $Cfg::Preferences{protocol_shutdown_waittime};
-			}
-			
-			while ($pidSize > 0 && $timeWaited < $maxWaitTime && is_screen_running_without_decrypt(SCREEN_TYPE_HOME, $home_id) == 1) {
-				select(undef, undef, undef, 0.25); # Sleeps for 250ms
-				
-				# Add to time waited
-				$timeWaited += 0.25;
-				
-				# Recheck server home PIDs
-				@server_pids = get_home_pids($home_id);
-				$pidSize = @server_pids;
-			}
-		}
-		
-		if (is_screen_running_without_decrypt(SCREEN_TYPE_HOME, $home_id) == 0)
-		{
-			logger "Stopped server $server_ip:$server_port with rcon quit.";
-			return 0;
 		}
 		else
 		{
-			logger "Failed to send rcon quit. Stopping server with kill command.";
+			logger "Stopped process with pid $pid successfully using kill 15.";
 		}
-		
-		@server_pids = get_home_pids($home_id);
-		
-		my $cnt;
-		my $out;
-		foreach my $pid (@server_pids)
-		{
-			chomp($pid);
-			$cnt = sudo_exec_without_decrypt("kill 15 $pid", $as_user);
-			($cnt, $out) = split(/;/, $cnt, 2);
-			if ($cnt == -1)
-			{
-				$cnt = sudo_exec_without_decrypt("kill 9 $pid", $as_user);
-				($cnt, $out) = split(/;/, $cnt, 2);
-				if ($cnt == -1)
-				{
-					logger "Process $pid can not be stopped.";
-				}
-				else
-				{
-					logger "Stopped process with pid $pid successfully using kill 9.";
-				}
-			}
-			else
-			{
-				logger "Stopped process with pid $pid successfully using kill 15.";
-			}
-		}
-		sudo_exec_without_decrypt('screen -wipe > /dev/null 2>&1', $as_user);
-		return 0;
 	}
-	else
-	{
-		logger "Remote control protocol not available or PASSWORD NOT SET. Using kill signal instead.";
-		my @server_pids = get_home_pids($home_id);
-		
-		my $cnt;
-		my $out;
-		foreach my $pid (@server_pids)
-		{
-			chomp($pid);
-			$cnt = sudo_exec_without_decrypt("kill 15 $pid", $as_user);
-			($cnt, $out) = split(/;/, $cnt, 2);
-			if ($cnt == -1)
-			{
-				$cnt = sudo_exec_without_decrypt("kill 9 $pid", $as_user);
-				($cnt, $out) = split(/;/, $cnt, 2);
-				if ($cnt == -1)
-				{
-					logger "Process $pid can not be stopped.";
-				}
-				else
-				{
-					logger "Stopped process with pid $pid successfully using kill 9.";
-				}
-			}
-			else
-			{
-				logger "Stopped process with pid $pid successfully using kill 15.";
-			}
-		}
-		sudo_exec_without_decrypt('screen -wipe > /dev/null 2>&1', $as_user);
-		return 0;
-	}
+	sudo_exec_without_decrypt('screen -wipe > /dev/null 2>&1', $as_user);
+	return 0;
 }
+
 
 ##### Send RCON command 
 ### Return 0 when error occurred on decryption.
@@ -2985,6 +2826,36 @@ sub restart_server_without_decrypt
 									$server_port, $control_protocol,
 									$control_password, $control_type, $home_path) == 0)
 	{
+		# Wait for processes to be completely terminated and verify they are killed
+		logger "Waiting for server processes to terminate completely...";
+		my $max_wait_attempts = 30; # 30 seconds max to wait for processes to die
+		my $wait_count = 0;
+		
+		while ($wait_count < $max_wait_attempts)
+		{
+			my @remaining_pids = get_home_pids($home_id);
+			if (@remaining_pids == 0)
+			{
+				logger "All server processes have been terminated successfully.";
+				last;
+			}
+			
+			$wait_count++;
+			logger "Waiting for processes to terminate... (attempt $wait_count/$max_wait_attempts, PIDs: @remaining_pids)";
+			sleep 1;
+		}
+		
+		# Final check - if processes still exist, log warning but continue
+		my @final_check_pids = get_home_pids($home_id);
+		if (@final_check_pids > 0)
+		{
+			logger "Warning: Some processes may still be running (PIDs: @final_check_pids), but proceeding with restart.";
+		}
+		
+		# Wait 60 seconds between stop and start operations as requested
+		logger "Waiting 60 seconds before starting server as requested for reliable scheduler functionality...";
+		sleep 60;
+		
 		if (universal_start_without_decrypt($home_id, $home_path, $server_exe, $run_dir,
 											$cmd, $server_port, $server_ip, $cpu, $nice, $preStart, $envVars, $game_key, $console_log) == 1)
 		{
