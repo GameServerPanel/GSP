@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # collector.py  (place in gameserver root; run via cron)
+# On each machine: pip install psutil mysql-connector-python
 
 import os, socket, time, subprocess
 from datetime import datetime, timezone
