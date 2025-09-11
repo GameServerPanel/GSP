@@ -1,0 +1,29 @@
+.admin-buttons {
+	width: 150px;
+	height: 110px;
+	margin: 0px 5px 5px 0px !important;
+}
+.admin-buttons > span {
+	font-size: 0.9rem;
+	display: block;
+}
+.admin-buttons:before {
+	font-size: 40px;
+	line-height: 40px;
+	display: block;
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+	margin-bottom: 5px;
+}
+.admin-buttons > img,
+.admin-buttons > br {
+	display: none;
+}
+
+.table tr:first-of-type td {
+    border-top: none;
+}
+
+.main > h2 {
+	margin-top: 2rem;
+}

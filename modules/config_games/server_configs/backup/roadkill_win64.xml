@@ -1,0 +1,25 @@
+<game_config>
+  <game_key>roadkill_win64</game_key>
+  <installer>steamcmd</installer>
+  <game_name>Roadkill</game_name>
+  <server_exec_name>Roadkill.exe</server_exec_name>
+  <cli_template>-batchmode</cli_template>
+  <max_user_amount>32</max_user_amount>
+  <mods>
+    <mod>
+      <name>none</name>
+	</mod> 
+ </mods>
+<post_install>
+</post_install> 
+
+<pre_start>
+</pre_start>
+
+<lock_files>
+</lock_files>
+
+<configuration_files> 
+<file description="server.cfg">GameSettings.txt</file> 
+</configuration_files> 
+</game_config> 

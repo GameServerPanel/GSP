@@ -1,0 +1,16 @@
+*.log
+*.tmp
+cache/
+tmp/
+sessions/
+*.tar
+*.tar.gz
+*.zip
+*.bak
+node_modules/
+vendor/*/cache/
+.env
+.env.*
+config.local.php
+!_agent-linux/**
+!_agent-windows/**

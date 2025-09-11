@@ -1,0 +1,37 @@
+	<game_config>
+	<game_key>spunkybot_linux64</game_key>
+	<installer>steamcmd</installer>
+	<game_name>SpunkyBot</game_name>
+	<server_exec_name>spunky.py</server_exec_name>
+        <console_log>devel.log</console_log>
+
+	<mods>
+	 <mod key='spunkybot'>
+	  <name>none</name>
+	  <installer_name>spunkybot</installer_name>
+	 </mod>
+	</mods>
+
+<replace_texts>
+ <text key="control_password">
+    <default>rcon_password =.*</default>
+    <var>rcon_password = %key% ;</var>
+    <filepath>conf/settings.conf</filepath>
+    <options>key-regex</options>
+   </text>
+</replace_texts>
+
+<post_install>
+wget http://files.iaregamer.com/installers/spunkybot_linux64/spunkybot.tar.gz
+tar -zxvf spunkybot.tar.gz
+rm spunkybot.tar.gz
+</post_install>
+
+<pre_start>
+</pre_start>
+
+<configuration_files>
+<file description="Rules">conf/rules.conf</file>
+<file description="Settings">conf/settings.conf</file>
+</configuration_files>
+	</game_config>

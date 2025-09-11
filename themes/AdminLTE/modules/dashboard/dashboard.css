@@ -1,0 +1,95 @@
+[id^=refreshed] br {
+    display: none;
+}
+
+.vertical-progress {
+	transform: rotate(-90deg);
+	max-width: 100px;
+}
+
+.online_servers {
+	width: 100%;
+}
+.online_servers .name img {
+	margin-right: 4px;
+}
+.online_servers td {
+	padding: 3px 10px !important;
+}
+.online_servers a
+{
+	color: #fff;
+}
+.online_servers a:hover
+{
+	color: rgba(255, 255, 255, 0.6);
+}
+.online_servers [id^=refreshed]
+{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.online_servers [id^=refreshed] div
+{
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.online_servers .name,
+.online_servers #gamelink {
+	display: inline-block;
+}
+
+@media (max-width: 500px) {
+	.serverstatus .info-box-icon,
+	.serverstatus .playerChart	{
+		display: none !important;
+	}
+}
+
+.serverstatus .server-infos > div {
+	line-height: 1.2rem;
+}
+
+.serverstatus .server-name {
+    font-weight: bold;
+	margin-bottom: 0.3rem;
+	max-width: 260px;
+}
+
+.serverstatus[data-status="online"] {
+    border-left: 4px solid;
+    border-color: var(--success);
+}
+
+.serverstatus[data-status="unknown"] {
+    border-left: 4px solid;
+    border-color: var(--warning);
+}
+
+.serverstatus:last-of-type {
+	margin-bottom: 0px !important;
+}
+
+.serverstatus .playerChart {
+	position: relative;
+}
+
+.serverstatus .chart-container {
+	margin-left: auto;
+	margin-right: 0;
+	max-width: 320px;
+}
+
+#chartjs-tooltip {
+	background-color: rgb(18 19 20 / 80%);
+	border-radius: 4px;
+	color: #fff;
+	padding: 2px 10px;
+	font-size: 0.7rem;
+}
+
+#chartjs-tooltip {
+	transition: opacity 200ms linear;
+}

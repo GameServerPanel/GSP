@@ -1,0 +1,134 @@
+<?php
+
+function getHomeID() {
+	$homeid = $_GET['home_id'];
+	return $homeID;
+}
+function postHomeID(){
+	$homeid = $_POST(['home_id']);
+	$action = $_POST['dothis'];
+}
+function getLatestBackup($path) {
+	$latest = readlink($path);
+	$base = basename($latest);
+	return $base;
+}
+
+function getAvailableBackups($homeid) {
+	$dir = "/sdb1/backup/gameserver";
+	$servers = glob("$dir/*/$homeid", GLOB_ONLYDIR);	//put all homeID backup paths into array
+	$length = count($servers);
+	for ($i = 0; $i < $length; $i++) {
+		$path = explode("/",$servers[$i]);
+		$path1 = explode("-",$path[4]);
+		if ("$path1[1]" === "latest"){
+			$latest = getLatestBackup(dirname($servers[$i]));   // latest is softlinked to the last backup preformed
+			$latest1 = explode("-",$latest);
+			$skip = $latest1[1];    // get the day name to add to top row buttons
+			topRowButtons($skip);   // go make buttons for the top row
+			$unset1=$i;             // get the index of latest backups
+		}elseif("$path1[1]" === "$skip"){
+			$unset2=$i;             // get index of day name of latest backup
+		}
+	}
+	unset($servers[$unset1], $servers[$unset2]); // remove the indexes from the $servers array
+	echo '<div>';
+	bottomRowButtons($servers);
+	echo '</div>';
+}
+
+function topRowButtons($latest){       // now create the top row buttons
+    echo '<div>';
+    echo '<button type="submit" name="dothis" value="go_back"><<&emsp;Go Back</button>';
+    echo '&emsp;&emsp;&emsp;';
+    echo '<button type="submit" name="dothis" value="latest">'.$latest.' (Latest Backup)</button>';
+    echo '&emsp;&emsp;&emsp;';
+    echo '<button type="submit" name="dothis" value="backup_now">Create Backup Now</button>';
+    echo '</div>';
+}
+
+function bottomRowButtons($bottomRow){      // create the bottom row buttons for older possiable backups
+	$newArray=array_values($bottomRow);     // rebuild array to get rid of removed indexes
+    $length = count($newArray);
+    for ($i = 0; $i < $length; $i++) {
+        $path = explode("/",$newArray[$i]);
+        $path1 = explode("-",$path[4]);
+		echo '<button type="submit" name="dothis" value="'.$path1[1].'">'.$path1[1].'</button>&emsp;';	}
+}
+
+function doButtons($action, $homeid){
+echo "<br>66: $action, $homeid";
+	switch ($action) {
+		case go_back:
+			echo "<br>63: Case go_back $action, $homeid";
+			goBack($action, $homeid);
+			break;
+		case backup_now:
+			echo "<br>67: backup_now $action, $homeid";
+			backupNow($action, $homeid);
+			break;
+		default:
+			echo "<br>71: default $action, $homeid";
+			restore($action, $homeid);
+			break;
+	}
+}
+
+function buildBackupCmd($action, $homeid){
+	$xmlFile = "/sdb1/backup/servers.xml";
+	$xmlData = simplexml_load_file($xmlFile);
+	$serverINFO = findServer($serverID, $xmlData);
+
+}
+
+function backupNow($action, $homeid){
+	echo "<br>98: backup: $action, $homeid";
+}
+
+function restore($action, $homeid){
+	$backup = backupServer($action, $homeid);
+	echo "<h3>You have chosen to Restore Server from backup <br>".$backup."</h3>";
+}
+
+function backupServer($action, $homeid){
+	$dir = "/sdb1/backup/gameserver";
+	$servers = glob("$dir/*/$homeid", GLOB_ONLYDIR);	//put all homeID backup paths into array
+	$key = customSearch($action, $servers);
+	$backupServer = $servers[$key];
+	return $backupServer;
+}
+
+
+
+
+//=====  DONE   =============================
+
+function goBack($action, $homeid){
+	$baseURL = "https://panel.iaregamer.com/home.php?m=gamemanager&p=game_monitor&home_id=$homeid";
+	header('Location: '.$baseURL);
+	exit();
+}
+function findServer($serverid, $xmldata) {
+	foreach ($xml->server as $server) {
+		if ( $server->servername == $serverid ) {
+			$serverINFO[servername] = "$server->servername";
+			$serverINFO[serverlogin] = "$server->login";
+			$serverINFO[serverpass] = "$server->pass";
+			$serverINFO[homedir] = "$server->files";
+			$serverINFO[backupdir] = "$server->backupdir";
+			return $serverINFO;
+		}
+	}
+}
+function customSearch($keyword, $arrayToSearch){
+    foreach($arrayToSearch as $key => $arrayItem){
+        if( stristr( $arrayItem, $keyword ) ){
+            return $key;
+        }
+    }
+}
+function printArray($array){        // quick way to print the array, I got tired of typing this in the code during testing
+	echo "<br>PrintArray<pre>";
+		print_r($array);
+	echo "</pre><br>";
+}

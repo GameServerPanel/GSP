@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<rss version="2.0" 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:admin="http://webns.net/mvcb/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+   xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+   xmlns:content="http://purl.org/rss/1.0/modules/content/"
+   >
+<channel>
+    
+    <title>IAREGAMER FAQ</title>
+    <link>https://iaregamer.com</link>
+    <description></description>
+    <dc:language>en</dc:language>
+    <generator>Serendipity 2.0.4 - http://www.s9y.org/</generator>
+    <pubDate>Wed, 17 Jun 2020 20:10:54 GMT</pubDate>
+
+    <image>
+    <url></url>
+    <title>RSS: IAREGAMER FAQ - </title>
+    <link>https://iaregamer.com</link>
+    <width>100</width>
+    <height>21</height>
+</image>
+
+<item>
+    <title>What if I need help with my server?</title>
+    <category>General</category>
+    
+    <content:encoded>
+    (1) if your server is not responding, submit a ticket or contact us on Discord 
+    (2) if you need help with scripting, contact us on Discord and let us know what you need 
+    (3) confused? contact us on Discord
+
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is the Query Port (or other port) for my server</title>
+   <category>General</category>
+    
+    <content:encoded>
+    Each game has its own category with specific information about that game including the query (and other) ports. 
+	Look in the FAQ category for your game.
+	If your game is not listed, or the query port is not specified then its probably the SAME as your SERVER PORT. If it still doesnt work, submit a ticket and we will find out ASAP for you (and update the FAQ)
+	
+ 
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What are subusers and groups? How do I add them?</title>
+   <category>Panel</category>
+    
+    <content:encoded>
+    &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/g45JbifloFQ&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+ 
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>My server won't start. Error: &quot;Failed to start the remote server. Error code: -1&quot; or &quot;Failed with server query&quot;</title>
+   <category>Error Messages</category>
+    
+    <content:encoded>
+Often the message (Failed with Server Query) means its just taking a long time for the server to start, give it some time and see what happens. 
+Check your logs for error messages.
+Your server MAY have been misconfigured and is not starting correctly.
+BUT have you recently changed any files?
+The most common reason is the server is crashing or fails to start because of invalid, missing files
+or something is misconfigured.  
+Restore the BACKUP you made before editing your server. (You DID backup, right?)
+If you have NOT made any changes, contact support and we will investigate. 
+    </content:encoded>
+    
+</item>
+ <item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Ark</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +2 
+	
+    </content:encoded>
+ </item>
+  <item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Arma</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +1 
+	
+    </content:encoded>
+ </item>
+ 
+<item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Conan Exiles</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +2 
+	Rcon port is your SERVER port + 3
+    </content:encoded>
+ </item>
+ 
+<item>
+    <title>What is my Query port?</title>
+   <category>Dayz</category>
+    
+    <content:encoded>
+    Dayz MOD query port is your SERVER port +1 
+	Dayz STANDALONE query port is your SERVER port +3 
+    </content:encoded>
+    
+</item>
+   <item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Killing Floor</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +1 
+	
+    </content:encoded>
+ </item>
+
+<item>
+    <title>I get an ERROR when trying to connect to the FTP using my client</title>
+   <category>Panel</category>
+
+    <content:encoded>
+    Does the error mention TLS or secure connection?  Try different encryption settings. Our FTP servers do not have TLS enabled.
+    </content:encoded>
+
+</item>
+<item>
+    <title>How can I backup and restore my Gameserver database?</title>
+            <category>Panel</category>
+    
+    <content:encoded>
+In your Game Monitor, click on the MYSQL button and then login to PHPMYADMIN.  
+Select EXPORT and save the file on your local PC.  
+To RESTORE, delete ALL TABLES, FUNCTIONS and DATA from your DB then IMPORT your file 
+    </content:encoded>
+   
+</item>
+
+<item>
+    <title>Why can't I delete some files in my game server folder?</title>
+           <category>Panel</category>
+    
+    <content:encoded>
+    We protect the &lt;strong&gt;server executable&lt;/strong&gt; and the &lt;strong&gt;startup script&lt;/strong&gt; to disallow modifications by the user.
+If you need to change this file, contact support.
+
+ 
+    </content:encoded>
+
+    
+</item>
+<item>
+    <title>How do I  validate my files  with Steam?</title>
+     <category>Panel</category>
+    
+    <content:encoded>
+ If you click on the INSTALL/UPDATE button it will validate all your Steam files.  If you want to WIPE your server and reinstall fresh, 'check' the checkbox on the upper left of the 
+FILE MANAGER and REMOVE all files.  Then press INSTALL/UPDATE and Steam will replace all the missing files. 
+    </content:encoded>
+</item>
+
+
+<item>
+    <title>How do I restart my server?</title>
+     <category>Dayz</category>
+
+    <content:encoded>
+BEC is preinstalled with your server. You can set the scheduler.xml to restart at intervals.
+There is a scheduler_faq.xml file inside your bec/config folder that will explain in detail 
+how to configure the scheduler.
+As always, if you need help just ask on Discord.
+    </content:encoded>
+</item>
+
+</channel>
+</rss>
+

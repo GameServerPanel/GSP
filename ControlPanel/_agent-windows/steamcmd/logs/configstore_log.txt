@@ -1,0 +1,1387 @@
+
+
+[2025-03-02 13:26:04] Client version: 1738027521
+[2025-03-02 13:26:04] Failed to read store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf.tmp'
+[2025-03-02 13:26:04] Failed to read store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf.tmp'
+[2025-03-02 13:26:04] Failed to read store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf.tmp'
+[2025-03-02 13:26:05] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-02 13:26:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-02 13:26:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-06 11:12:27] Client version: 1738027521
+[2025-03-06 11:12:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:12:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:12:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:12:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:12:31] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-06 11:17:59] Client version: 1738027521
+[2025-03-06 11:17:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:17:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:17:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:17:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:18:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-06 11:36:24] Client version: 1738027521
+[2025-03-06 11:36:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:36:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:36:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:36:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 11:36:28] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-06 17:22:47] Client version: 1738027521
+[2025-03-06 17:22:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 17:22:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 17:22:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 17:22:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 17:22:48] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-06 17:22:49] Failed to read store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf.tmp'
+[2025-03-06 17:22:49] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-06 17:22:50] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf'
+[2025-03-06 17:23:13] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf'
+[2025-03-06 17:23:13] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-06 17:23:13] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-06 17:23:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-07 16:30:53] Client version: 1738027521
+[2025-03-07 16:30:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-07 16:30:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-07 16:30:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-07 16:30:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-07 16:30:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-07 16:30:56] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf' successfully
+[2025-03-07 16:30:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:30:57] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf'
+[2025-03-07 16:31:18] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf'
+[2025-03-07 16:31:19] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:31:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:32:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:32:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:33:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:33:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:34:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:34:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:35:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:35:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:36:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:36:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:37:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:37:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:38:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:38:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:39:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:39:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:40:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:40:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:41:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:41:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:42:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:42:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:43:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:43:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:44:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:44:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:45:17] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\anonymous\config\localconfig.vdf'
+[2025-03-07 16:45:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:45:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:46:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:46:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:47:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-07 16:47:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-15 06:51:37] Client version: 1741737873
+[2025-03-15 06:51:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 06:51:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 06:51:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 06:51:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 06:51:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-15 08:33:38] Client version: 1741737873
+[2025-03-15 08:33:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:33:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:33:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:33:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:33:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-15 08:36:14] Client version: 1741737873
+[2025-03-15 08:36:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:36:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:36:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:36:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:36:16] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-15 08:37:44] Client version: 1741737873
+[2025-03-15 08:37:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:37:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:37:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:37:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 08:37:46] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-15 11:53:35] Client version: 1741737873
+[2025-03-15 11:53:35] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 11:53:35] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 11:53:35] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 11:53:35] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-15 11:53:37] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-19 11:47:17] Client version: 1741737873
+[2025-03-19 11:47:17] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 11:47:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 11:47:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 11:47:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 11:47:20] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-19 12:29:47] Client version: 1741737873
+[2025-03-19 12:29:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:29:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:29:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:30:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:30:02] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:31:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:31:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:31:40] Failed to read store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf.tmp'
+[2025-03-19 12:31:41] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:31:41] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:31:42] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:31:42] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:31:44] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:31:46] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-19 12:32:12] Client version: 1741737873
+[2025-03-19 12:32:12] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:32:12] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:32:12] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:32:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:32:25] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-19 12:32:25] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 12:32:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:32:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:32:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:32:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:32:27] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 12:32:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:32:28] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-19 12:37:53] Client version: 1741737873
+[2025-03-19 12:37:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:37:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:37:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:37:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:37:53] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-19 12:37:53] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 12:37:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:37:54] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:37:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:37:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 12:37:56] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 12:37:57] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:37:57] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:38:02] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:38:18] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 12:38:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:38:50] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:39:20] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:39:50] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 12:40:50] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-19 13:16:08] Client version: 1741737873
+[2025-03-19 13:16:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:16:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:16:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:16:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:16:08] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-19 13:16:08] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 13:16:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:16:08] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:16:10] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:16:10] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:16:10] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 13:16:11] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:16:11] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 13:16:12] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 13:16:32] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 13:16:33] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:16:33] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:16:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:17:03] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:17:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-19 13:18:53] Client version: 1741737873
+[2025-03-19 13:18:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:18:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:18:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:18:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:18:53] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-19 13:18:53] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 13:18:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:18:53] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:18:55] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:18:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-19 13:18:55] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-19 13:18:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:18:56] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 13:19:17] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-19 13:19:48] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:20:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:20:48] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-19 13:21:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-22 14:03:00] Client version: 1742420332
+[2025-03-22 14:03:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-22 14:03:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-22 14:03:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-22 14:03:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-22 14:03:00] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-22 14:03:00] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-22 14:03:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-22 14:03:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-22 14:03:02] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-22 14:03:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-22 14:03:02] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-22 14:03:03] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-22 14:03:03] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-22 14:03:03] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-22 14:03:08] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-22 14:03:24] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-22 14:03:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-22 14:04:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-22 14:04:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-22 14:05:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-24 09:44:57] Client version: 1742420332
+[2025-03-24 09:44:57] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 09:44:57] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 09:44:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 09:44:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 09:44:58] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-24 09:44:58] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-24 09:44:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 09:44:58] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 09:45:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 09:45:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 09:45:00] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-24 09:45:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 09:45:01] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-24 09:45:02] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-24 11:22:02] Client version: 1742420332
+[2025-03-24 11:22:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 11:22:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 11:22:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 11:22:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 11:22:02] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-24 11:22:02] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-24 11:22:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 11:22:03] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:22:04] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:22:04] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-24 11:22:04] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-24 11:22:05] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:22:05] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-24 11:22:06] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-24 11:22:26] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-24 11:22:57] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:23:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:23:57] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:24:28] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-24 11:24:58] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-03-31 18:07:55] Client version: 1742420332
+[2025-03-31 18:07:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:07:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:07:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:07:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:07:55] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-31 18:07:55] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:07:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:07:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:07:57] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:07:57] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:07:57] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:07:58] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:07:58] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-31 18:07:59] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-03-31 18:08:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:08:03] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-31 18:10:41] Client version: 1742420332
+[2025-03-31 18:10:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:10:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:10:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:10:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:10:41] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-31 18:10:41] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:10:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:10:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:10:43] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:10:43] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:10:43] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:10:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:10:44] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-31 18:11:38] Client version: 1742420332
+[2025-03-31 18:11:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:11:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:11:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:11:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:11:38] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-31 18:11:38] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:11:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:11:39] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:11:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:11:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:11:40] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:11:41] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:11:41] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-31 18:12:17] Client version: 1742420332
+[2025-03-31 18:12:17] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:12:17] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:12:17] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:12:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:12:18] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-31 18:12:18] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:12:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:12:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:12:19] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:12:19] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:12:19] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:12:20] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:12:20] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-31 18:22:07] Client version: 1742420332
+[2025-03-31 18:22:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:07] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-31 18:22:07] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:22:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:08] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:22:09] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:22:09] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:09] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:22:09] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:22:10] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-03-31 18:22:51] Client version: 1742420332
+[2025-03-31 18:22:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:51] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-03-31 18:22:51] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:22:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:22:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:22:53] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:23:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-03-31 18:23:08] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-03-31 18:23:08] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-03-31 18:23:09] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-03 19:11:19] Client version: 1743712175
+[2025-04-03 19:11:19] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-03 19:11:19] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-03 19:11:19] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-03 19:11:19] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-03 19:11:19] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-03 19:11:19] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-03 19:11:19] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-03 19:11:19] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-03 19:11:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-03 19:11:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-03 19:11:21] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-03 19:11:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-03 19:11:22] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-03 19:11:23] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-04 20:21:29] Client version: 1743712175
+[2025-04-04 20:21:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-04 20:21:30] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-04 20:21:30] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-04 20:21:30] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-04 20:21:30] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-04 20:21:30] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-04 20:21:30] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-04 20:21:30] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-04 20:21:32] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-04 20:21:32] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-04 20:21:32] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-04 20:21:32] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-04 20:21:33] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-04 20:21:34] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-04 20:22:05] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-04 20:22:35] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-04 20:23:05] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-04 20:23:35] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-04-06 06:13:43] Client version: 1743712175
+[2025-04-06 06:13:43] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-06 06:13:43] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-06 06:13:43] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-06 06:13:43] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-06 06:13:43] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-06 06:13:43] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-06 06:13:43] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-06 06:13:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-06 06:13:45] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-06 06:13:45] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-06 06:13:45] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-06 06:13:46] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-06 06:13:46] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-06 06:13:47] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-08 05:17:18] Client version: 1743712175
+[2025-04-08 05:17:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:17:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:17:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:17:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:17:18] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-08 05:17:18] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:17:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:17:19] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:17:20] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:17:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:17:21] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:17:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:17:22] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-08 05:17:22] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-08 05:17:23] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:17:23] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-08 05:17:54] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:18:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-04-08 05:23:37] Client version: 1743712175
+[2025-04-08 05:23:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:23:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:23:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:23:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:23:37] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-08 05:23:37] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:23:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:23:38] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:23:39] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:23:39] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:23:39] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:23:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:23:40] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-08 05:26:29] Client version: 1743712175
+[2025-04-08 05:26:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:26:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:26:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:26:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:26:29] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-08 05:26:29] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:26:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:26:30] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:26:31] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:26:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:26:46] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:26:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:26:47] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-08 05:27:29] Client version: 1743712175
+[2025-04-08 05:27:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:27:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:27:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:27:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:27:29] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-08 05:27:29] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:27:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:27:30] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:27:31] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:27:31] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-08 05:27:31] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-08 05:27:32] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-08 05:27:32] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:24:41] Client version: 1745270234
+[2025-04-25 06:24:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:24:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:24:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:24:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:24:41] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:24:41] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:24:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:24:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:24:43] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:24:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:24:44] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:24:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:24:45] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-25 06:24:46] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-25 06:24:47] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-25 06:24:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:24:49] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:25:52] Client version: 1745270234
+[2025-04-25 06:25:52] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:25:52] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:25:52] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:25:52] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:25:52] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:25:52] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:25:52] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:25:53] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:25:54] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:25:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:25:54] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:25:55] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:25:55] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:26:20] Client version: 1745270234
+[2025-04-25 06:26:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:20] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:26:20] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:26:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:26:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:26:22] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:22] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:26:23] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:26:23] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:26:58] Client version: 1745270234
+[2025-04-25 06:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:58] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:26:58] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:26:59] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:27:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:27:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:27:00] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:27:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:27:01] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:28:21] Client version: 1745270234
+[2025-04-25 06:28:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:28:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:28:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:28:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:28:21] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:28:21] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:28:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:28:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:28:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:28:22] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:28:22] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:28:23] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:28:23] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-25 06:28:55] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-04-25 06:34:21] Client version: 1745270234
+[2025-04-25 06:34:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:34:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:34:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:34:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:34:21] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:34:21] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:34:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:34:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:34:23] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:34:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:34:23] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:34:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:34:24] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:35:14] Client version: 1745270234
+[2025-04-25 06:35:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:14] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:35:14] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:35:14] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:15] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:35:16] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:35:16] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:16] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:35:17] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:35:17] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:35:54] Client version: 1745270234
+[2025-04-25 06:35:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:54] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:35:54] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:35:54] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:54] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:35:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:35:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:35:56] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:35:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:35:57] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:36:56] Client version: 1745270234
+[2025-04-25 06:36:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:36:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:36:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:36:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:36:56] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:36:56] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:36:56] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:36:57] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:36:58] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:36:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:36:59] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:36:59] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:36:59] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:38:20] Client version: 1745270234
+[2025-04-25 06:38:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:38:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:38:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:38:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:38:20] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:38:20] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:38:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:38:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:38:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:38:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:38:23] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:38:23] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:38:24] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-25 06:39:23] Client version: 1745270234
+[2025-04-25 06:39:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:39:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:39:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:39:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:39:23] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-25 06:39:23] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:39:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:39:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:39:25] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:39:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-25 06:39:25] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-25 06:39:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-25 06:39:26] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-04-28 16:24:25] Client version: 1745270234
+[2025-04-28 16:24:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-28 16:24:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-28 16:24:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-28 16:24:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-28 16:24:25] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-04-28 16:24:25] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-28 16:24:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-28 16:24:25] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-28 16:24:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-28 16:24:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-04-28 16:24:27] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-04-28 16:24:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-28 16:24:28] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-28 16:24:28] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-04-28 16:25:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-04-28 16:25:30] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-05-08 14:24:23] Client version: 1745888136
+[2025-05-08 14:24:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-08 14:24:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-08 14:24:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-08 14:24:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-08 14:24:24] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-08 14:24:24] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-08 14:24:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-08 14:24:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-08 14:24:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-08 14:24:26] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-08 14:24:26] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-08 14:24:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-08 14:24:27] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-08 14:24:28] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-08 14:24:32] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-09 11:19:27] Client version: 1745888136
+[2025-05-09 11:19:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:19:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:19:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:19:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:19:27] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-09 11:19:27] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-09 11:19:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:19:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:19:29] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:19:29] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:19:29] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-09 11:19:29] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:19:30] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-09 11:19:30] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-09 11:22:21] Client version: 1745888136
+[2025-05-09 11:22:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:22:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:22:21] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:22:22] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:22:22] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-09 11:22:22] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-09 11:22:22] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:22:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:22:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:22:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:22:24] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-09 11:22:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:22:25] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-09 11:22:25] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-09 11:24:44] Client version: 1745888136
+[2025-05-09 11:24:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:24:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:24:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:24:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:24:44] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-09 11:24:44] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-09 11:24:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:24:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:24:46] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:24:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-09 11:24:46] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-09 11:24:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-09 11:24:47] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-14 11:11:06] Client version: 1745888136
+[2025-05-14 11:11:06] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-14 11:11:06] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-14 11:11:06] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-14 11:11:06] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-14 11:11:06] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-14 11:11:06] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-14 11:11:06] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-14 11:11:06] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-14 11:11:08] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-14 11:11:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-14 11:11:08] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-14 11:11:08] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-14 11:11:09] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-14 11:11:10] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-28 12:25:45] Client version: 1747702063
+[2025-05-28 12:25:45] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-28 12:25:45] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-28 12:25:45] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-28 12:25:45] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-28 12:25:45] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-28 12:25:45] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-28 12:25:45] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-28 12:25:45] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-28 12:25:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-28 12:25:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-28 12:25:47] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-28 12:25:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-28 12:25:48] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-28 12:25:48] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-28 12:25:53] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-28 12:26:20] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-05-31 13:15:59] Client version: 1747702063
+[2025-05-31 13:15:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:15:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:15:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:15:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:15:59] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-31 13:15:59] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:15:59] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:16:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:16:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:16:01] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:16:01] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:16:02] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:16:02] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-31 13:16:03] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-31 13:16:07] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-31 13:19:26] Client version: 1747702063
+[2025-05-31 13:19:26] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:19:26] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:19:26] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:19:26] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:19:26] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-31 13:19:26] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:19:26] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:19:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:19:28] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:19:28] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:19:28] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:19:28] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:19:29] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-31 13:20:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:20:31] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:21:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:21:31] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:22:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:22:31] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:23:01] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-05-31 13:26:58] Client version: 1747702063
+[2025-05-31 13:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:26:58] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-31 13:26:58] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:26:58] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:26:58] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:27:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:27:00] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:00] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:27:00] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:27:01] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-05-31 13:27:01] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-31 13:27:44] Client version: 1747702063
+[2025-05-31 13:27:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:44] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-31 13:27:44] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:27:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:27:46] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:27:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:27:46] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:27:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:27:47] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-05-31 13:31:53] Client version: 1747702063
+[2025-05-31 13:31:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:31:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:31:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:31:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:31:53] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-05-31 13:31:53] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:31:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:31:54] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:31:55] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:31:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-05-31 13:31:55] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-05-31 13:31:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-05-31 13:31:56] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-06-03 11:23:51] Client version: 1747702063
+[2025-06-03 11:23:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 11:23:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 11:23:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 11:23:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 11:23:51] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-06-03 11:23:51] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-03 11:23:51] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 11:23:52] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-03 11:23:53] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-03 11:23:53] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 11:23:53] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-03 11:23:53] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-03 11:23:54] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-06-03 11:23:54] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-06-03 11:23:59] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-06-03 11:24:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-06-03 12:44:36] Client version: 1747702063
+[2025-06-03 12:44:36] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 12:44:36] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 12:44:36] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 12:44:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 12:44:37] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-06-03 12:44:37] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-03 12:44:37] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 12:44:37] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-03 12:44:38] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-03 12:44:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-03 12:44:38] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-03 12:44:39] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-03 12:44:39] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-06-03 12:44:40] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-06-18 17:09:40] Client version: 1747702063
+[2025-06-18 17:09:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:09:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:09:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:09:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:09:40] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-06-18 17:09:40] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-18 17:09:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:09:41] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-18 17:09:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-18 17:09:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:09:42] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-18 17:09:43] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-18 17:09:43] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-06-18 17:09:44] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-06-18 17:09:48] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-06-18 17:25:23] Client version: 1747702063
+[2025-06-18 17:25:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:25:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:25:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:25:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:25:23] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-06-18 17:25:23] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-18 17:25:23] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:25:24] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-18 17:25:25] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-18 17:25:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-06-18 17:25:25] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-06-18 17:25:26] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-06-18 17:25:26] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-07-14 17:26:42] Client version: 1751406682
+[2025-07-14 17:26:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:26:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:26:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:26:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:26:42] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 17:26:42] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:26:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:26:43] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:26:45] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:26:45] Failed to read store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:26:45] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:26:45] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:26:46] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-07-14 17:26:47] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-07-14 17:26:48] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-07-14 17:26:51] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-07-14 17:27:19] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-07-14 17:54:07] Client version: 1751406682
+[2025-07-14 17:54:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:54:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:54:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:54:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:54:07] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 17:54:07] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:54:07] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:54:07] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:54:09] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:54:09] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:54:09] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:54:09] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:54:10] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-07-14 17:55:20] Client version: 1751406682
+[2025-07-14 17:55:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:55:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:55:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:55:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:55:20] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 17:55:20] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:55:20] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:55:21] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:55:22] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:55:22] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:55:22] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:55:23] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:55:24] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-07-14 17:56:38] Client version: 1751406682
+[2025-07-14 17:56:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:56:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:56:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:56:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:56:38] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 17:56:38] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:56:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:56:39] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:56:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:56:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:56:40] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:56:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:56:41] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-07-14 17:57:34] Client version: 1751406682
+[2025-07-14 17:57:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:57:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:57:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:57:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:57:34] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 17:57:34] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:57:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:57:35] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:57:36] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:57:36] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 17:57:36] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 17:57:37] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 17:57:37] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-07-14 18:05:40] Client version: 1751406682
+[2025-07-14 18:05:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:05:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:05:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:05:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:05:40] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 18:05:40] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 18:05:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:05:41] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 18:05:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 18:05:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:05:42] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 18:05:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 18:05:43] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-07-14 18:06:02] Client version: 1751406682
+[2025-07-14 18:06:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:06:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:06:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:06:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:06:02] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-07-14 18:06:02] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 18:06:02] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:06:03] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 18:06:04] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 18:06:04] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-07-14 18:06:04] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-07-14 18:06:05] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-07-14 18:06:05] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-04 08:02:32] Client version: 1751406682
+[2025-08-04 08:02:32] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-04 08:02:32] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-04 08:02:32] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-04 08:02:32] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-04 08:02:32] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-04 08:02:32] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-04 08:02:32] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-04 08:02:32] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-04 08:02:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-04 08:02:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-04 08:02:34] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-04 08:02:35] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-04 08:02:35] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-04 08:02:36] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-04 08:02:40] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-07 13:12:24] Client version: 1751406682
+[2025-08-07 13:12:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:12:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:12:24] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:12:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:12:25] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-07 13:12:25] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 13:12:25] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:12:25] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:12:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:12:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:12:27] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 13:12:27] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:12:28] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-07 13:12:29] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-07 13:26:08] Client version: 1751406682
+[2025-08-07 13:26:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:26:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:26:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:26:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:26:08] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-07 13:26:08] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 13:26:08] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:26:09] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:26:11] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:26:11] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 13:26:11] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 13:26:12] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:26:12] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-07 13:26:13] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-07 13:26:13] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-07 13:26:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:27:14] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 13:27:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-08-07 14:50:42] Client version: 1751406682
+[2025-08-07 14:50:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 14:50:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 14:50:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 14:50:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 14:50:42] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-07 14:50:42] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 14:50:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 14:50:43] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 14:50:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 14:50:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 14:50:44] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 14:50:45] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 14:50:45] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-07 14:50:46] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-07 18:38:46] Client version: 1751406682
+[2025-08-07 18:38:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 18:38:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 18:38:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 18:38:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 18:38:46] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-07 18:38:46] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 18:38:46] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 18:38:47] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 18:38:49] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 18:38:49] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-07 18:38:49] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-07 18:38:49] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-07 18:38:50] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-07 18:38:51] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-14 20:16:31] Client version: 1751406682
+[2025-08-14 20:16:31] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:16:31] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:16:31] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:16:31] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:16:31] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-14 20:16:31] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-14 20:16:31] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:16:32] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-14 20:16:33] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-14 20:16:34] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:16:34] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-14 20:16:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-14 20:16:35] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-14 20:16:36] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-14 20:29:55] Client version: 1751406682
+[2025-08-14 20:29:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:29:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:29:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:29:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:29:55] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-14 20:29:55] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-14 20:29:55] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:29:56] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-14 20:29:57] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-14 20:29:57] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-14 20:29:57] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-14 20:29:58] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-14 20:29:58] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-15 12:05:47] Client version: 1751406682
+[2025-08-15 12:05:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:05:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:05:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:05:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:05:47] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-15 12:05:47] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:05:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:05:48] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:05:50] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:05:50] Failed to read store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:05:50] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:05:50] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:05:51] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 12:05:52] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-15 12:08:03] Client version: 1751406682
+[2025-08-15 12:08:03] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:08:03] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:08:03] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:08:03] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:08:03] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-15 12:08:03] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:08:03] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:08:03] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:08:05] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:08:05] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:08:05] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:08:06] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:08:06] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-15 12:29:38] Client version: 1751406682
+[2025-08-15 12:29:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:29:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:29:38] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:29:39] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:29:39] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-15 12:29:39] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:29:39] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:29:39] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:29:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:29:42] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:29:42] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:29:42] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:29:43] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-15 12:41:40] Client version: 1751406682
+[2025-08-15 12:41:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:41:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:41:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:41:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:41:41] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-15 12:41:41] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:41:41] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:41:41] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:41:43] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:41:44] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:41:44] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:41:44] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:41:45] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 12:41:45] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 12:42:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:42:48] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:43:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+
+
+[2025-08-15 12:50:16] Client version: 1751406682
+[2025-08-15 12:50:16] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:50:16] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:50:16] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:50:16] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:50:16] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-15 12:50:16] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:50:16] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:50:17] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:50:18] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:50:18] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 12:50:18] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 12:50:19] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 12:50:19] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-15 18:13:09] Client version: 1751406682
+[2025-08-15 18:13:09] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:13:09] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:13:09] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:13:22] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:13:25] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:15:09] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 18:15:09] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:15:10] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:15:10] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:15:11] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:15:39] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:15:39] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-15 18:15:39] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 18:15:39] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:15:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:15:40] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-15 18:15:40] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-15 18:15:40] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:15:41] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:16:03] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:16:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:17:04] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:17:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:17:34] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-15 18:21:22] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:24:03] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:31:42] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 18:46:17] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 19:02:21] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 19:18:35] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 19:32:23] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-15 19:48:50] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-28 12:51:27] Client version: 1751406682
+[2025-08-28 12:51:27] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 12:51:28] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 12:51:28] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 12:51:28] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 12:51:28] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-28 12:51:28] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-28 12:51:28] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 12:51:28] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-28 12:51:30] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-28 12:51:30] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 12:51:30] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-28 12:51:30] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-28 12:51:31] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-28 12:51:31] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-28 12:51:32] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+
+
+[2025-08-28 18:54:47] Client version: 1751406682
+[2025-08-28 18:54:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 18:54:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 18:54:47] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 18:54:48] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 18:54:48] Failed to read store 'machineuser' from 'C:\Users\cyg_server\AppData\Local\Steam\local.vdf.tmp'
+[2025-08-28 18:54:48] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-28 18:54:48] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 18:54:48] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-28 18:54:50] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-28 18:54:50] Loaded store 'install' from 'C:\OGP64\OGP\steamcmd\config\config.vdf' successfully
+[2025-08-28 18:54:50] Loaded store 'userlocal' from 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf' successfully
+[2025-08-28 18:54:51] Flushed store 'install' to 'C:\OGP64\OGP\steamcmd\config\config.vdf'
+[2025-08-28 18:54:51] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'
+[2025-08-28 18:54:51] Flushed store 'userlocal' to 'C:\OGP64\OGP\steamcmd\userdata\120543934\config\localconfig.vdf'

@@ -1,0 +1,88 @@
+
+
+[2025-07-14 17:26:42] Client version: 1751406682
+[2025-07-14 17:26:42] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-07-14 17:54:07] Client version: 1751406682
+[2025-07-14 17:54:07] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-07-14 17:55:20] Client version: 1751406682
+[2025-07-14 17:55:20] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-07-14 17:56:38] Client version: 1751406682
+[2025-07-14 17:56:38] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-07-14 17:57:34] Client version: 1751406682
+[2025-07-14 17:57:34] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-07-14 18:05:40] Client version: 1751406682
+[2025-07-14 18:05:40] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-07-14 18:06:02] Client version: 1751406682
+[2025-07-14 18:06:02] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-04 08:02:32] Client version: 1751406682
+[2025-08-04 08:02:32] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-07 13:12:24] Client version: 1751406682
+[2025-08-07 13:12:24] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-07 13:26:08] Client version: 1751406682
+[2025-08-07 13:26:08] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-07 14:50:42] Client version: 1751406682
+[2025-08-07 14:50:42] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-07 18:38:46] Client version: 1751406682
+[2025-08-07 18:38:46] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-14 20:16:31] Client version: 1751406682
+[2025-08-14 20:16:31] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-14 20:29:55] Client version: 1751406682
+[2025-08-14 20:29:55] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-15 12:05:47] Client version: 1751406682
+[2025-08-15 12:05:47] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-15 12:08:03] Client version: 1751406682
+[2025-08-15 12:08:03] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-15 12:29:38] Client version: 1751406682
+[2025-08-15 12:29:38] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-15 12:41:40] Client version: 1751406682
+[2025-08-15 12:41:40] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-15 12:50:16] Client version: 1751406682
+[2025-08-15 12:50:16] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-15 18:13:09] Client version: 1751406682
+[2025-08-15 18:13:09] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-28 12:51:28] Client version: 1751406682
+[2025-08-28 12:51:28] Mapping AppID 0 to tool "proton_experimental" with priority 75
+
+
+[2025-08-28 18:54:47] Client version: 1751406682
+[2025-08-28 18:54:47] Mapping AppID 0 to tool "proton_experimental" with priority 75

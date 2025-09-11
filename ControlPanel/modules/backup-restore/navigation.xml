@@ -1,0 +1,3 @@
+<navigation>
+  <page key="default" file="backup-restore.php" access="user,admin" />
+</navigation>

@@ -1,0 +1,44 @@
+<game_config>
+  <game_key>conanexiles_win64</game_key>
+  <installer>steamcmd</installer>
+  <game_name>Conan Exiles</game_name>
+  <server_exec_name>ConanSandboxServer.exe</server_exec_name>
+  <cli_template>%PORT% %QUERY_PORT% %PLAYERS% -log</cli_template>
+  <cli_params>
+    <cli_param id="IP" cli_string="-MULTIHOME=" />
+    <cli_param id="PORT" cli_string="-Port=" />
+    <cli_param id="PLAYERS" cli_string="-MaxPlayers=" />
+  </cli_params>
+  <reserve_ports>
+    <port type="add" id="QUERY_PORT" cli_string="-QueryPort=">1</port>
+  </reserve_ports>
+  <console_log>ConanSandbox/Saved/Logs/ConanSandbox.log</console_log>
+  <max_user_amount>70</max_user_amount>
+  <mods>
+    <mod key="default">
+      <name>None</name>
+      <installer_name>443030</installer_name>
+      <installer_login>anonymous</installer_login>
+    </mod>
+  </mods>
+  <replace_texts>
+    <text key="home_name">
+      <default>ServerName=.*</default>
+      <var>ServerName=</var>
+      <filepath>ConanSandbox/Config/DefaultEngine.ini</filepath>
+    </text>
+    <text key="control_password">
+      <default>AdminPassword=.*</default>
+      <var>AdminPassword=</var>
+      <filepath>ConanSandbox/Config/DefaultServerSettings.ini</filepath>
+    </text>
+  </replace_texts>
+
+<configuration_files>
+    <file description="Engine.ini ">ConanSandbox\Config\DefaultEngine.ini</file>
+    <file description="Game.ini ">ConanSandbox\Config\DefaultGame.ini</file>
+    <file description="ServerSettings.ini">ConanSandbox\Config\DefaultServerSettings.ini</file>
+
+</configuration_files>
+
+</game_config>

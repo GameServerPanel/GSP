@@ -1,0 +1,44 @@
+.pull-right {
+	float: right;
+}
+.pull-left {
+	float: left;
+}
+
+.fixed-height {
+    display: inline-block;
+    width: 100%;
+}
+
+.news-row {
+    margin-bottom: 0.1rem;
+    display: inline-block;
+    width: 100%;
+}
+
+.eight-tenth {
+    width: 83%;
+}
+.one-quarter {
+    width: 25%;
+    margin-left:10px;
+}
+.one-sixth {
+    width: 16%;
+}
+.news-form-control-mce {
+    min-height: 250px;
+}
+
+input[type="file"]:hover {
+	cursor: pointer;
+}
+
+.admin-preview-thumbnail {
+	max-width: 50px;
+	max-height: 50px;
+}
+
+.mce-content-body {
+	overflow: scroll;
+}

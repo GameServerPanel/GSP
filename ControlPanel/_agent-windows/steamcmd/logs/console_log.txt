@@ -1,0 +1,1700 @@
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-03 19:11:19] @ShutdownOnFailedCommand 1
+[2025-04-03 19:11:19] "@ShutdownOnFailedCommand" = "1"
+[2025-04-03 19:11:19] @NoPromptForPassword 1
+[2025-04-03 19:11:19] "@NoPromptForPassword" = "1"
+[2025-04-03 19:11:19] set_steam_guard_code C3QCP
+[2025-04-03 19:11:19] Logging in using username/password.
+[2025-04-03 19:11:19] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-03 19:11:21] OK
+[2025-04-03 19:11:21] Waiting for client config...
+[2025-04-03 19:11:22] OK
+[2025-04-03 19:11:22] Waiting for user info...
+[2025-04-03 19:11:22] OK
+[2025-04-03 19:11:22] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-04-03 19:11:22] Please use force_install_dir before logon!
+[2025-04-03 19:11:22] app_update 223350
+[2025-04-03 19:11:25]  Update state (0x3) reconfiguring, progress: 0.00 (0 / 0)
+[2025-04-03 19:11:27]  Update state (0x61) downloading, progress: 9.38 (77957688 / 831198327)
+[2025-04-03 19:11:29]  Update state (0x41) staging, progress: 24.82 (206320319 / 831198327)
+[2025-04-03 19:11:31]  Update state (0x41) staging, progress: 39.35 (327078038 / 831198327)
+[2025-04-03 19:11:33]  Update state (0x41) staging, progress: 49.99 (415544314 / 831198327)
+[2025-04-03 19:11:35]  Update state (0x41) staging, progress: 99.11 (823778116 / 831198327)
+[2025-04-03 19:11:37]  Update state (0x81) verifying update, progress: 29.16 (242414438 / 831198327)
+[2025-04-03 19:11:39]  Update state (0x81) verifying update, progress: 60.09 (499445510 / 831198327)
+[2025-04-03 19:11:41]  Update state (0x81) verifying update, progress: 92.05 (765097834 / 831198327)
+[2025-04-03 19:11:42] Success! App '223350' fully installed.
+[2025-04-03 19:11:42] exit
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-04 20:21:30] @ShutdownOnFailedCommand 1
+[2025-04-04 20:21:30] "@ShutdownOnFailedCommand" = "1"
+[2025-04-04 20:21:30] @NoPromptForPassword 1
+[2025-04-04 20:21:30] "@NoPromptForPassword" = "1"
+[2025-04-04 20:21:30] set_steam_guard_code C3QCP
+[2025-04-04 20:21:30] Logging in using username/password.
+[2025-04-04 20:21:30] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-04 20:21:32] OK
+[2025-04-04 20:21:32] Waiting for client config...
+[2025-04-04 20:21:33] OK
+[2025-04-04 20:21:33] Waiting for user info...
+[2025-04-04 20:21:33] OK
+[2025-04-04 20:21:33] force_install_dir "C:\OGP64\home\gameserver\1483"
+[2025-04-04 20:21:33] Please use force_install_dir before logon!
+[2025-04-04 20:21:33] app_update 33930
+[2025-04-04 20:21:35]  Update state (0x61) downloading, progress: 0.08 (6571197 / 8714127071)
+[2025-04-04 20:21:37]  Update state (0x61) downloading, progress: 1.91 (166408153 / 8714127071)
+[2025-04-04 20:21:39]  Update state (0x61) downloading, progress: 3.59 (312510323 / 8714127071)
+[2025-04-04 20:21:41]  Update state (0x61) downloading, progress: 5.13 (447270898 / 8714127071)
+[2025-04-04 20:21:43]  Update state (0x61) downloading, progress: 6.40 (557462261 / 8714127071)
+[2025-04-04 20:21:46]  Update state (0x61) downloading, progress: 7.67 (668681168 / 8714127071)
+[2025-04-04 20:21:48]  Update state (0x61) downloading, progress: 10.93 (952031356 / 8714127071)
+[2025-04-04 20:21:50]  Update state (0x61) downloading, progress: 12.38 (1078473249 / 8714127071)
+[2025-04-04 20:21:52]  Update state (0x61) downloading, progress: 13.87 (1208576048 / 8714127071)
+[2025-04-04 20:21:54]  Update state (0x61) downloading, progress: 15.62 (1361267920 / 8714127071)
+[2025-04-04 20:21:56]  Update state (0x61) downloading, progress: 17.61 (1534191940 / 8714127071)
+[2025-04-04 20:21:58]  Update state (0x61) downloading, progress: 18.63 (1623729000 / 8714127071)
+[2025-04-04 20:22:00]  Update state (0x61) downloading, progress: 19.46 (1696147484 / 8714127071)
+[2025-04-04 20:22:02]  Update state (0x61) downloading, progress: 21.64 (1885453232 / 8714127071)
+[2025-04-04 20:22:04]  Update state (0x61) downloading, progress: 23.80 (2073656016 / 8714127071)
+[2025-04-04 20:22:06]  Update state (0x61) downloading, progress: 25.64 (2234265578 / 8714127071)
+[2025-04-04 20:22:08]  Update state (0x61) downloading, progress: 27.09 (2360285714 / 8714127071)
+[2025-04-04 20:22:10]  Update state (0x61) downloading, progress: 29.75 (2592232232 / 8714127071)
+[2025-04-04 20:22:12]  Update state (0x61) downloading, progress: 31.41 (2737262440 / 8714127071)
+[2025-04-04 20:22:14]  Update state (0x61) downloading, progress: 33.29 (2900667364 / 8714127071)
+[2025-04-04 20:22:16]  Update state (0x61) downloading, progress: 34.62 (3016971519 / 8714127071)
+[2025-04-04 20:22:18]  Update state (0x61) downloading, progress: 36.05 (3141752619 / 8714127071)
+[2025-04-04 20:22:20]  Update state (0x61) downloading, progress: 39.04 (3402202856 / 8714127071)
+[2025-04-04 20:22:22]  Update state (0x61) downloading, progress: 41.26 (3595656459 / 8714127071)
+[2025-04-04 20:22:24]  Update state (0x61) downloading, progress: 43.65 (3803339920 / 8714127071)
+[2025-04-04 20:22:26]  Update state (0x61) downloading, progress: 46.00 (4008443979 / 8714127071)
+[2025-04-04 20:22:28]  Update state (0x61) downloading, progress: 47.47 (4136861339 / 8714127071)
+[2025-04-04 20:22:30]  Update state (0x61) downloading, progress: 49.86 (4345016304 / 8714127071)
+[2025-04-04 20:22:32]  Update state (0x61) downloading, progress: 51.44 (4482381983 / 8714127071)
+[2025-04-04 20:22:34]  Update state (0x61) downloading, progress: 53.12 (4629184288 / 8714127071)
+[2025-04-04 20:22:36]  Update state (0x61) downloading, progress: 54.98 (4791210769 / 8714127071)
+[2025-04-04 20:22:38]  Update state (0x61) downloading, progress: 56.89 (4957437432 / 8714127071)
+[2025-04-04 20:22:40]  Update state (0x61) downloading, progress: 58.84 (5127558154 / 8714127071)
+[2025-04-04 20:22:42]  Update state (0x61) downloading, progress: 60.70 (5289810089 / 8714127071)
+[2025-04-04 20:22:44]  Update state (0x61) downloading, progress: 63.88 (5566523216 / 8714127071)
+[2025-04-04 20:22:46]  Update state (0x61) downloading, progress: 66.44 (5789303900 / 8714127071)
+[2025-04-04 20:22:48]  Update state (0x61) downloading, progress: 69.37 (6044648075 / 8714127071)
+[2025-04-04 20:22:50]  Update state (0x61) downloading, progress: 72.27 (6297299941 / 8714127071)
+[2025-04-04 20:22:52]  Update state (0x61) downloading, progress: 74.56 (6496849138 / 8714127071)
+[2025-04-04 20:22:54]  Update state (0x61) downloading, progress: 76.77 (6689411981 / 8714127071)
+[2025-04-04 20:22:56]  Update state (0x61) downloading, progress: 78.96 (6880899338 / 8714127071)
+[2025-04-04 20:22:58]  Update state (0x61) downloading, progress: 81.12 (7068967468 / 8714127071)
+[2025-04-04 20:23:00]  Update state (0x61) downloading, progress: 83.11 (7242363938 / 8714127071)
+[2025-04-04 20:23:02]  Update state (0x61) downloading, progress: 85.05 (7411084839 / 8714127071)
+[2025-04-04 20:23:04]  Update state (0x61) downloading, progress: 87.10 (7589944647 / 8714127071)
+[2025-04-04 20:23:06]  Update state (0x61) downloading, progress: 88.83 (7740581112 / 8714127071)
+[2025-04-04 20:23:08]  Update state (0x61) downloading, progress: 90.62 (7896389578 / 8714127071)
+[2025-04-04 20:23:10]  Update state (0x61) downloading, progress: 92.31 (8044357801 / 8714127071)
+[2025-04-04 20:23:12]  Update state (0x61) downloading, progress: 93.89 (8181384482 / 8714127071)
+[2025-04-04 20:23:14]  Update state (0x61) downloading, progress: 94.97 (8275717865 / 8714127071)
+[2025-04-04 20:23:16]  Update state (0x61) downloading, progress: 96.65 (8422006549 / 8714127071)
+[2025-04-04 20:23:18]  Update state (0x61) downloading, progress: 98.52 (8585428006 / 8714127071)
+[2025-04-04 20:23:20]  Update state (0x61) downloading, progress: 99.83 (8699447007 / 8714127071)
+[2025-04-04 20:23:22]  Update state (0x81) verifying update, progress: 0.83 (72163191 / 8714127071)
+[2025-04-04 20:23:24]  Update state (0x81) verifying update, progress: 3.35 (292077532 / 8714127071)
+[2025-04-04 20:23:26]  Update state (0x81) verifying update, progress: 5.96 (519618524 / 8714127071)
+[2025-04-04 20:23:28]  Update state (0x81) verifying update, progress: 8.53 (742965212 / 8714127071)
+[2025-04-04 20:23:30]  Update state (0x81) verifying update, progress: 11.20 (975844900 / 8714127071)
+[2025-04-04 20:23:32]  Update state (0x81) verifying update, progress: 13.74 (1196912081 / 8714127071)
+[2025-04-04 20:23:34]  Update state (0x81) verifying update, progress: 16.05 (1398313766 / 8714127071)
+[2025-04-04 20:23:36]  Update state (0x81) verifying update, progress: 18.60 (1621043423 / 8714127071)
+[2025-04-04 20:23:38]  Update state (0x81) verifying update, progress: 21.13 (1841334407 / 8714127071)
+[2025-04-04 20:23:40]  Update state (0x81) verifying update, progress: 23.66 (2061979573 / 8714127071)
+[2025-04-04 20:23:42] Success! App '33930' fully installed.
+[2025-04-04 20:23:42] exit
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-06 06:13:43] @ShutdownOnFailedCommand 1
+[2025-04-06 06:13:43] "@ShutdownOnFailedCommand" = "1"
+[2025-04-06 06:13:43] @NoPromptForPassword 1
+[2025-04-06 06:13:43] "@NoPromptForPassword" = "1"
+[2025-04-06 06:13:43] Logging in using username/password.
+[2025-04-06 06:13:43] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-06 06:13:45] OK
+[2025-04-06 06:13:45] Waiting for client config...
+[2025-04-06 06:13:46] OK
+[2025-04-06 06:13:46] Waiting for user info...
+[2025-04-06 06:13:46] OK
+[2025-04-06 06:13:46] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-04-06 06:13:46] Please use force_install_dir before logon!
+[2025-04-06 06:13:46] workshop_download_item 221100 3371742728
+[2025-04-06 06:13:47] Downloading item 3371742728 ...
+[2025-04-06 06:14:01] 
+[2025-04-06 06:14:01] Success. Downloaded item 3371742728 to "c:\ogp64\home\gameserver\1479\steamapps\workshop\content\221100\3371742728" (1668203026 bytes) 
+[2025-04-06 06:14:02] exit
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-08 05:17:18] @ShutdownOnFailedCommand 1
+[2025-04-08 05:17:18] "@ShutdownOnFailedCommand" = "1"
+[2025-04-08 05:17:18] @NoPromptForPassword 1
+[2025-04-08 05:17:18] "@NoPromptForPassword" = "1"
+[2025-04-08 05:17:18] set_steam_guard_code C3QCP
+[2025-04-08 05:17:18] Logging in using username/password.
+[2025-04-08 05:17:18] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-08 05:17:21] OK
+[2025-04-08 05:17:21] Waiting for client config...
+[2025-04-08 05:17:22] OK
+[2025-04-08 05:17:22] Waiting for user info...
+[2025-04-08 05:17:22] OK
+[2025-04-08 05:17:22] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-08 05:17:22] Please use force_install_dir before logon!
+[2025-04-08 05:17:22] app_update 233780
+[2025-04-08 05:17:24]  Update state (0x61) downloading, progress: 0.02 (1100195 / 5390606534)
+[2025-04-08 05:17:26]  Update state (0x61) downloading, progress: 2.29 (123517473 / 5390606534)
+[2025-04-08 05:17:28]  Update state (0x61) downloading, progress: 4.91 (264740065 / 5390606534)
+[2025-04-08 05:17:30]  Update state (0x61) downloading, progress: 8.63 (465266956 / 5390606534)
+[2025-04-08 05:17:32]  Update state (0x61) downloading, progress: 13.21 (711868863 / 5390606534)
+[2025-04-08 05:17:34]  Update state (0x61) downloading, progress: 17.88 (963653330 / 5390606534)
+[2025-04-08 05:17:36]  Update state (0x61) downloading, progress: 22.72 (1224949803 / 5390606534)
+[2025-04-08 05:17:38]  Update state (0x61) downloading, progress: 26.10 (1406924322 / 5390606534)
+[2025-04-08 05:17:40]  Update state (0x61) downloading, progress: 30.40 (1638913308 / 5390606534)
+[2025-04-08 05:17:42]  Update state (0x61) downloading, progress: 37.19 (2005036070 / 5390606534)
+[2025-04-08 05:17:44]  Update state (0x61) downloading, progress: 40.50 (2182946564 / 5390606534)
+[2025-04-08 05:17:46]  Update state (0x61) downloading, progress: 46.54 (2508810702 / 5390606534)
+[2025-04-08 05:17:48]  Update state (0x61) downloading, progress: 50.45 (2719628370 / 5390606534)
+[2025-04-08 05:17:50]  Update state (0x61) downloading, progress: 56.36 (3038098834 / 5390606534)
+[2025-04-08 05:17:52]  Update state (0x61) downloading, progress: 59.62 (3213816153 / 5390606534)
+[2025-04-08 05:17:54]  Update state (0x61) downloading, progress: 61.85 (3333878641 / 5390606534)
+[2025-04-08 05:17:56]  Update state (0x61) downloading, progress: 66.09 (3562507859 / 5390606534)
+[2025-04-08 05:17:58]  Update state (0x61) downloading, progress: 72.37 (3901230494 / 5390606534)
+[2025-04-08 05:18:01]  Update state (0x61) downloading, progress: 78.92 (4254530733 / 5390606534)
+[2025-04-08 05:18:03]  Update state (0x61) downloading, progress: 87.68 (4726440445 / 5390606534)
+[2025-04-08 05:18:05]  Update state (0x61) downloading, progress: 96.03 (5176624895 / 5390606534)
+[2025-04-08 05:18:07]  Update state (0x61) downloading, progress: 100.00 (5390606534 / 5390606534)
+[2025-04-08 05:18:09]  Update state (0x81) verifying update, progress: 4.70 (253582869 / 5390606534)
+[2025-04-08 05:18:11]  Update state (0x81) verifying update, progress: 9.43 (508241354 / 5390606534)
+[2025-04-08 05:18:13]  Update state (0x81) verifying update, progress: 14.14 (762034933 / 5390606534)
+[2025-04-08 05:18:15]  Update state (0x81) verifying update, progress: 18.58 (1001752942 / 5390606534)
+[2025-04-08 05:18:17]  Update state (0x81) verifying update, progress: 23.40 (1261414804 / 5390606534)
+[2025-04-08 05:18:19]  Update state (0x81) verifying update, progress: 28.17 (1518363577 / 5390606534)
+[2025-04-08 05:18:21]  Update state (0x81) verifying update, progress: 32.61 (1757610075 / 5390606534)
+[2025-04-08 05:18:23]  Update state (0x81) verifying update, progress: 37.40 (2015891077 / 5390606534)
+[2025-04-08 05:18:24] Success! App '233780' fully installed.
+[2025-04-08 05:18:24] exit
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-08 05:23:37] @ShutdownOnFailedCommand 1
+[2025-04-08 05:23:37] "@ShutdownOnFailedCommand" = "1"
+[2025-04-08 05:23:37] @NoPromptForPassword 1
+[2025-04-08 05:23:37] "@NoPromptForPassword" = "1"
+[2025-04-08 05:23:37] set_steam_guard_code C3QCP
+[2025-04-08 05:23:37] Logging in using username/password.
+[2025-04-08 05:23:37] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-08 05:23:39] OK
+[2025-04-08 05:23:39] Waiting for client config...
+[2025-04-08 05:23:40] OK
+[2025-04-08 05:23:40] Waiting for user info...
+[2025-04-08 05:23:40] OK
+[2025-04-08 05:23:40] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-04-08 05:23:40] Please use force_install_dir before logon!
+[2025-04-08 05:23:40] app_update 223350
+[2025-04-08 05:23:40] Success! App '223350' already up to date.
+[2025-04-08 05:23:40] exit
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-08 05:26:29] @ShutdownOnFailedCommand 1
+[2025-04-08 05:26:29] "@ShutdownOnFailedCommand" = "1"
+[2025-04-08 05:26:29] @NoPromptForPassword 1
+[2025-04-08 05:26:29] "@NoPromptForPassword" = "1"
+[2025-04-08 05:26:29] set_steam_guard_code C3QCP
+[2025-04-08 05:26:29] Logging in using username/password.
+[2025-04-08 05:26:29] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-08 05:26:47] OK
+[2025-04-08 05:26:47] Waiting for client config...
+[2025-04-08 05:26:47] OK
+[2025-04-08 05:26:47] Waiting for user info...
+[2025-04-08 05:26:47] OK
+[2025-04-08 05:26:47] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-04-08 05:26:47] Please use force_install_dir before logon!
+[2025-04-08 05:26:47] app_update 223350
+[2025-04-08 05:26:47] Success! App '223350' already up to date.
+[2025-04-08 05:26:47] exit
+
+
+[1969-12-31 18:00:00] OK
+[2025-04-08 05:27:29] @ShutdownOnFailedCommand 1
+[2025-04-08 05:27:29] "@ShutdownOnFailedCommand" = "1"
+[2025-04-08 05:27:29] @NoPromptForPassword 1
+[2025-04-08 05:27:29] "@NoPromptForPassword" = "1"
+[2025-04-08 05:27:29] set_steam_guard_code C3QCP
+[2025-04-08 05:27:29] Logging in using username/password.
+[2025-04-08 05:27:29] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-08 05:27:32] OK
+[2025-04-08 05:27:32] Waiting for client config...
+[2025-04-08 05:27:32] OK
+[2025-04-08 05:27:32] Waiting for user info...
+[2025-04-08 05:27:32] OK
+[2025-04-08 05:27:32] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-04-08 05:27:32] Please use force_install_dir before logon!
+[2025-04-08 05:27:32] app_update 223350
+[2025-04-08 05:27:33] Success! App '223350' already up to date.
+[2025-04-08 05:27:33] exit
+
+
+[2025-04-25 06:24:41] Client version: 1745270234
+[2025-04-25 06:24:41] Loading Steam API...
+[2025-04-25 06:24:41] OK
+[2025-04-25 06:24:41] @ShutdownOnFailedCommand 1
+[2025-04-25 06:24:41] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:24:41] @NoPromptForPassword 1
+[2025-04-25 06:24:41] "@NoPromptForPassword" = "1"
+[2025-04-25 06:24:41] Logging in using username/password.
+[2025-04-25 06:24:41] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:24:44] OK
+[2025-04-25 06:24:44] Waiting for client config...
+[2025-04-25 06:24:45] OK
+[2025-04-25 06:24:45] Waiting for user info...
+[2025-04-25 06:24:46] OK
+[2025-04-25 06:24:46] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:24:46] Please use force_install_dir before logon!
+[2025-04-25 06:24:46] workshop_download_item 107410 450814997
+[2025-04-25 06:24:47] Downloading item 450814997 ...
+[2025-04-25 06:24:49] 
+[2025-04-25 06:24:49] Success. Downloaded item 450814997 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\450814997" (4552523 bytes) 
+[2025-04-25 06:24:49] exit
+[2025-04-25 06:24:49] Unloading Steam API...
+[2025-04-25 06:24:49] OK
+
+
+[2025-04-25 06:25:52] Client version: 1745270234
+[2025-04-25 06:25:52] Loading Steam API...
+[2025-04-25 06:25:52] OK
+[2025-04-25 06:25:52] @ShutdownOnFailedCommand 1
+[2025-04-25 06:25:52] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:25:52] @NoPromptForPassword 1
+[2025-04-25 06:25:52] "@NoPromptForPassword" = "1"
+[2025-04-25 06:25:52] Logging in using username/password.
+[2025-04-25 06:25:52] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:25:55] OK
+[2025-04-25 06:25:55] Waiting for client config...
+[2025-04-25 06:25:55] OK
+[2025-04-25 06:25:55] Waiting for user info...
+[2025-04-25 06:25:55] OK
+[2025-04-25 06:25:55] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:25:55] Please use force_install_dir before logon!
+[2025-04-25 06:25:55] workshop_download_item 107410 1334412770
+[2025-04-25 06:25:55] Downloading item 1334412770 ...
+[2025-04-25 06:25:57] 
+[2025-04-25 06:25:57] Success. Downloaded item 1334412770 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\1334412770" (3607680 bytes) 
+[2025-04-25 06:25:58] exit
+[2025-04-25 06:25:58] Unloading Steam API...
+[2025-04-25 06:25:58] OK
+
+
+[2025-04-25 06:26:20] Client version: 1745270234
+[2025-04-25 06:26:20] Loading Steam API...
+[2025-04-25 06:26:20] OK
+[2025-04-25 06:26:20] @ShutdownOnFailedCommand 1
+[2025-04-25 06:26:20] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:26:20] @NoPromptForPassword 1
+[2025-04-25 06:26:20] "@NoPromptForPassword" = "1"
+[2025-04-25 06:26:20] Logging in using username/password.
+[2025-04-25 06:26:20] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:26:23] OK
+[2025-04-25 06:26:23] Waiting for client config...
+[2025-04-25 06:26:23] OK
+[2025-04-25 06:26:23] Waiting for user info...
+[2025-04-25 06:26:23] OK
+[2025-04-25 06:26:23] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:26:23] Please use force_install_dir before logon!
+[2025-04-25 06:26:23] workshop_download_item 107410 2791403093
+[2025-04-25 06:26:24] Downloading item 2791403093 ...
+[2025-04-25 06:26:26] 
+[2025-04-25 06:26:26] Success. Downloaded item 2791403093 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\2791403093" (106238 bytes) 
+[2025-04-25 06:26:26] exit
+[2025-04-25 06:26:26] Unloading Steam API...
+[2025-04-25 06:26:26] OK
+
+
+[2025-04-25 06:26:58] Client version: 1745270234
+[2025-04-25 06:26:58] Loading Steam API...
+[2025-04-25 06:26:58] OK
+[2025-04-25 06:26:58] @ShutdownOnFailedCommand 1
+[2025-04-25 06:26:58] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:26:58] @NoPromptForPassword 1
+[2025-04-25 06:26:58] "@NoPromptForPassword" = "1"
+[2025-04-25 06:26:58] Logging in using username/password.
+[2025-04-25 06:26:58] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:27:00] OK
+[2025-04-25 06:27:00] Waiting for client config...
+[2025-04-25 06:27:01] OK
+[2025-04-25 06:27:01] Waiting for user info...
+[2025-04-25 06:27:01] OK
+[2025-04-25 06:27:01] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:27:01] Please use force_install_dir before logon!
+[2025-04-25 06:27:01] workshop_download_item 107410 861133494
+[2025-04-25 06:27:01] Downloading item 861133494 ...
+[2025-04-25 06:27:16] 
+[2025-04-25 06:27:16] Success. Downloaded item 861133494 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\861133494" (1480207899 bytes) 
+[2025-04-25 06:27:16] exit
+[2025-04-25 06:27:16] Unloading Steam API...
+[2025-04-25 06:27:16] OK
+
+
+[2025-04-25 06:28:20] Client version: 1745270234
+[2025-04-25 06:28:20] Loading Steam API...
+[2025-04-25 06:28:20] OK
+[2025-04-25 06:28:21] @ShutdownOnFailedCommand 1
+[2025-04-25 06:28:21] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:28:21] @NoPromptForPassword 1
+[2025-04-25 06:28:21] "@NoPromptForPassword" = "1"
+[2025-04-25 06:28:21] Logging in using username/password.
+[2025-04-25 06:28:21] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:28:23] OK
+[2025-04-25 06:28:23] Waiting for client config...
+[2025-04-25 06:28:23] OK
+[2025-04-25 06:28:23] Waiting for user info...
+[2025-04-25 06:28:23] OK
+[2025-04-25 06:28:23] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:28:23] Please use force_install_dir before logon!
+[2025-04-25 06:28:23] workshop_download_item 107410 497661914
+[2025-04-25 06:28:24] Downloading item 497661914 ...
+[2025-04-25 06:29:23] 
+[2025-04-25 06:29:23] Success. Downloaded item 497661914 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\497661914" (6637545467 bytes) 
+[2025-04-25 06:29:23] exit
+[2025-04-25 06:29:23] Unloading Steam API...
+[2025-04-25 06:29:23] OK
+
+
+[2025-04-25 06:34:21] Client version: 1745270234
+[2025-04-25 06:34:21] Loading Steam API...
+[2025-04-25 06:34:21] OK
+[2025-04-25 06:34:21] @ShutdownOnFailedCommand 1
+[2025-04-25 06:34:21] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:34:21] @NoPromptForPassword 1
+[2025-04-25 06:34:21] "@NoPromptForPassword" = "1"
+[2025-04-25 06:34:21] Logging in using username/password.
+[2025-04-25 06:34:21] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:34:23] OK
+[2025-04-25 06:34:23] Waiting for client config...
+[2025-04-25 06:34:24] OK
+[2025-04-25 06:34:24] Waiting for user info...
+[2025-04-25 06:34:24] OK
+[2025-04-25 06:34:24] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:34:24] Please use force_install_dir before logon!
+[2025-04-25 06:34:24] workshop_download_item 107410 541888371
+[2025-04-25 06:34:24] Downloading item 541888371 ...
+[2025-04-25 06:34:26] 
+[2025-04-25 06:34:26] ERROR! Download item 541888371 failed (Failure).
+[2025-04-25 06:34:26] exit
+[2025-04-25 06:34:26] Unloading Steam API...
+[2025-04-25 06:34:26] OK
+
+
+[2025-04-25 06:35:14] Client version: 1745270234
+[2025-04-25 06:35:14] Loading Steam API...
+[2025-04-25 06:35:14] OK
+[2025-04-25 06:35:14] @ShutdownOnFailedCommand 1
+[2025-04-25 06:35:14] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:35:14] @NoPromptForPassword 1
+[2025-04-25 06:35:14] "@NoPromptForPassword" = "1"
+[2025-04-25 06:35:15] Logging in using username/password.
+[2025-04-25 06:35:15] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:35:17] OK
+[2025-04-25 06:35:17] Waiting for client config...
+[2025-04-25 06:35:17] OK
+[2025-04-25 06:35:17] Waiting for user info...
+[2025-04-25 06:35:17] OK
+[2025-04-25 06:35:17] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:35:17] Please use force_install_dir before logon!
+[2025-04-25 06:35:17] workshop_download_item 107410 647753401
+[2025-04-25 06:35:17] Downloading item 647753401 ...
+[2025-04-25 06:35:24] 
+[2025-04-25 06:35:24] Success. Downloaded item 647753401 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\647753401" (314365523 bytes) 
+[2025-04-25 06:35:24] exit
+[2025-04-25 06:35:24] Unloading Steam API...
+[2025-04-25 06:35:24] OK
+
+
+[2025-04-25 06:35:53] Client version: 1745270234
+[2025-04-25 06:35:53] Loading Steam API...
+[2025-04-25 06:35:53] OK
+[2025-04-25 06:35:54] @ShutdownOnFailedCommand 1
+[2025-04-25 06:35:54] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:35:54] @NoPromptForPassword 1
+[2025-04-25 06:35:54] "@NoPromptForPassword" = "1"
+[2025-04-25 06:35:54] Logging in using username/password.
+[2025-04-25 06:35:54] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:35:56] OK
+[2025-04-25 06:35:56] Waiting for client config...
+[2025-04-25 06:35:56] OK
+[2025-04-25 06:35:56] Waiting for user info...
+[2025-04-25 06:35:56] OK
+[2025-04-25 06:35:56] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:35:56] Please use force_install_dir before logon!
+[2025-04-25 06:35:57] workshop_download_item 107410 1487484880
+[2025-04-25 06:35:57] Downloading item 1487484880 ...
+[2025-04-25 06:36:11] 
+[2025-04-25 06:36:11] Success. Downloaded item 1487484880 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\1487484880" (1492724396 bytes) 
+[2025-04-25 06:36:11] exit
+[2025-04-25 06:36:11] Unloading Steam API...
+[2025-04-25 06:36:11] OK
+
+
+[2025-04-25 06:36:56] Client version: 1745270234
+[2025-04-25 06:36:56] Loading Steam API...
+[2025-04-25 06:36:56] OK
+[2025-04-25 06:36:56] @ShutdownOnFailedCommand 1
+[2025-04-25 06:36:56] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:36:56] @NoPromptForPassword 1
+[2025-04-25 06:36:56] "@NoPromptForPassword" = "1"
+[2025-04-25 06:36:56] Logging in using username/password.
+[2025-04-25 06:36:56] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:36:59] OK
+[2025-04-25 06:36:59] Waiting for client config...
+[2025-04-25 06:36:59] OK
+[2025-04-25 06:36:59] Waiting for user info...
+[2025-04-25 06:36:59] OK
+[2025-04-25 06:36:59] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:36:59] Please use force_install_dir before logon!
+[2025-04-25 06:37:00] workshop_download_item 107410 541888371
+[2025-04-25 06:37:00] Downloading item 541888371 ...
+[2025-04-25 06:37:01] 
+[2025-04-25 06:37:01] ERROR! Download item 541888371 failed (Failure).
+[2025-04-25 06:37:01] exit
+[2025-04-25 06:37:01] Unloading Steam API...
+[2025-04-25 06:37:01] CWorkThreadPool::~CWorkThreadPool: work complete queue not empty, 1 items discarded.
+[2025-04-25 06:37:01] CWorkThreadPool::~CWorkThreadPool: work processing queue not empty: 2 items discarded.
+[2025-04-25 06:37:01] OK
+
+
+[2025-04-25 06:38:20] Client version: 1745270234
+[2025-04-25 06:38:20] Loading Steam API...
+[2025-04-25 06:38:20] OK
+[2025-04-25 06:38:20] @ShutdownOnFailedCommand 1
+[2025-04-25 06:38:20] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:38:20] @NoPromptForPassword 1
+[2025-04-25 06:38:20] "@NoPromptForPassword" = "1"
+[2025-04-25 06:38:20] Logging in using username/password.
+[2025-04-25 06:38:20] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:38:23] OK
+[2025-04-25 06:38:23] Waiting for client config...
+[2025-04-25 06:38:24] OK
+[2025-04-25 06:38:24] Waiting for user info...
+[2025-04-25 06:38:24] OK
+[2025-04-25 06:38:24] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:38:24] Please use force_install_dir before logon!
+[2025-04-25 06:38:24] workshop_download_item 107410 497660133
+[2025-04-25 06:38:24] Downloading item 497660133 ...
+[2025-04-25 06:38:26] 
+[2025-04-25 06:38:26] ERROR! Download item 497660133 failed (Failure).
+[2025-04-25 06:38:26] exit
+[2025-04-25 06:38:26] Unloading Steam API...
+[2025-04-25 06:38:26] OK
+
+
+[2025-04-25 06:39:23] Client version: 1745270234
+[2025-04-25 06:39:23] Loading Steam API...
+[2025-04-25 06:39:23] OK
+[2025-04-25 06:39:23] @ShutdownOnFailedCommand 1
+[2025-04-25 06:39:23] "@ShutdownOnFailedCommand" = "1"
+[2025-04-25 06:39:23] @NoPromptForPassword 1
+[2025-04-25 06:39:23] "@NoPromptForPassword" = "1"
+[2025-04-25 06:39:23] Logging in using username/password.
+[2025-04-25 06:39:23] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-25 06:39:26] OK
+[2025-04-25 06:39:26] Waiting for client config...
+[2025-04-25 06:39:26] OK
+[2025-04-25 06:39:26] Waiting for user info...
+[2025-04-25 06:39:26] OK
+[2025-04-25 06:39:26] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-25 06:39:26] Please use force_install_dir before logon!
+[2025-04-25 06:39:26] workshop_download_item 107410 541888371
+[2025-04-25 06:39:26] Downloading item 541888371 ...
+[2025-04-25 06:39:27] 
+[2025-04-25 06:39:27] ERROR! Download item 541888371 failed (Failure).
+[2025-04-25 06:39:27] exit
+[2025-04-25 06:39:27] Unloading Steam API...
+[2025-04-25 06:39:27] OK
+
+
+[2025-04-28 16:24:25] Client version: 1745270234
+[2025-04-28 16:24:25] Loading Steam API...
+[2025-04-28 16:24:25] OK
+[2025-04-28 16:24:25] @ShutdownOnFailedCommand 1
+[2025-04-28 16:24:25] "@ShutdownOnFailedCommand" = "1"
+[2025-04-28 16:24:25] @NoPromptForPassword 1
+[2025-04-28 16:24:25] "@NoPromptForPassword" = "1"
+[2025-04-28 16:24:25] Logging in using username/password.
+[2025-04-28 16:24:25] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-04-28 16:24:27] OK
+[2025-04-28 16:24:27] Waiting for client config...
+[2025-04-28 16:24:28] OK
+[2025-04-28 16:24:28] Waiting for user info...
+[2025-04-28 16:24:28] OK
+[2025-04-28 16:24:28] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-04-28 16:24:28] Please use force_install_dir before logon!
+[2025-04-28 16:24:28] workshop_download_item 107410 485417177
+[2025-04-28 16:24:28] Downloading item 485417177 ...
+[2025-04-28 16:25:30] 
+[2025-04-28 16:25:30] Success. Downloaded item 485417177 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\485417177" (6581753711 bytes) 
+[2025-04-28 16:25:30] exit
+[2025-04-28 16:25:30] Unloading Steam API...
+[2025-04-28 16:25:30] OK
+
+
+[2025-05-08 14:24:23] Client version: 1745888136
+[2025-05-08 14:24:23] Loading Steam API...
+[2025-05-08 14:24:23] OK
+[2025-05-08 14:24:23] @ShutdownOnFailedCommand 1
+[2025-05-08 14:24:23] "@ShutdownOnFailedCommand" = "1"
+[2025-05-08 14:24:23] @NoPromptForPassword 1
+[2025-05-08 14:24:23] "@NoPromptForPassword" = "1"
+[2025-05-08 14:24:24] Logging in using username/password.
+[2025-05-08 14:24:24] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-08 14:24:26] OK
+[2025-05-08 14:24:26] Waiting for client config...
+[2025-05-08 14:24:28] OK
+[2025-05-08 14:24:28] Waiting for user info...
+[2025-05-08 14:24:28] OK
+[2025-05-08 14:24:28] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-05-08 14:24:28] Please use force_install_dir before logon!
+[2025-05-08 14:24:28] workshop_download_item 107410 1361461340
+[2025-05-08 14:24:29] Downloading item 1361461340 ...
+[2025-05-08 14:24:32] 
+[2025-05-08 14:24:32] Success. Downloaded item 1361461340 to "c:\ogp64\home\gameserver\1485\steamapps\workshop\content\107410\1361461340" (61392985 bytes) 
+[2025-05-08 14:24:32] exit
+[2025-05-08 14:24:32] Unloading Steam API...
+[2025-05-08 14:24:32] OK
+
+
+[2025-05-09 11:19:26] Client version: 1745888136
+[2025-05-09 11:19:26] Loading Steam API...
+[2025-05-09 11:19:26] OK
+[2025-05-09 11:19:27] @ShutdownOnFailedCommand 1
+[2025-05-09 11:19:27] "@ShutdownOnFailedCommand" = "1"
+[2025-05-09 11:19:27] @NoPromptForPassword 1
+[2025-05-09 11:19:27] "@NoPromptForPassword" = "1"
+[2025-05-09 11:19:27] Logging in using username/password.
+[2025-05-09 11:19:27] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-09 11:19:29] OK
+[2025-05-09 11:19:29] Waiting for client config...
+[2025-05-09 11:19:30] OK
+[2025-05-09 11:19:30] Waiting for user info...
+[2025-05-09 11:19:30] OK
+[2025-05-09 11:19:30] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-05-09 11:19:30] Please use force_install_dir before logon!
+[2025-05-09 11:19:30] workshop_download_item 107410 843425103
+[2025-05-09 11:19:30] Downloading item 843425103 ...
+[2025-05-09 11:19:32] 
+[2025-05-09 11:19:32] ERROR! Download item 843425103 failed (Failure).
+[2025-05-09 11:19:32] exit
+[2025-05-09 11:19:32] Unloading Steam API...
+[2025-05-09 11:19:32] CWorkThreadPool::~CWorkThreadPool: work complete queue not empty, 2 items discarded.
+[2025-05-09 11:19:32] OK
+
+
+[2025-05-09 11:22:21] Client version: 1745888136
+[2025-05-09 11:22:21] Loading Steam API...
+[2025-05-09 11:22:21] OK
+[2025-05-09 11:22:22] @ShutdownOnFailedCommand 1
+[2025-05-09 11:22:22] "@ShutdownOnFailedCommand" = "1"
+[2025-05-09 11:22:22] @NoPromptForPassword 1
+[2025-05-09 11:22:22] "@NoPromptForPassword" = "1"
+[2025-05-09 11:22:22] Logging in using username/password.
+[2025-05-09 11:22:22] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-09 11:22:24] OK
+[2025-05-09 11:22:24] Waiting for client config...
+[2025-05-09 11:22:25] OK
+[2025-05-09 11:22:25] Waiting for user info...
+[2025-05-09 11:22:25] OK
+[2025-05-09 11:22:25] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-05-09 11:22:25] Please use force_install_dir before logon!
+[2025-05-09 11:22:25] workshop_download_item 107410 843425103
+[2025-05-09 11:22:25] Downloading item 843425103 ...
+[2025-05-09 11:22:26] 
+[2025-05-09 11:22:26] ERROR! Download item 843425103 failed (Failure).
+[2025-05-09 11:22:26] exit
+[2025-05-09 11:22:26] Unloading Steam API...
+[2025-05-09 11:22:26] OK
+
+
+[2025-05-09 11:24:44] Client version: 1745888136
+[2025-05-09 11:24:44] Loading Steam API...
+[2025-05-09 11:24:44] OK
+[2025-05-09 11:24:44] @ShutdownOnFailedCommand 1
+[2025-05-09 11:24:44] "@ShutdownOnFailedCommand" = "1"
+[2025-05-09 11:24:44] @NoPromptForPassword 1
+[2025-05-09 11:24:44] "@NoPromptForPassword" = "1"
+[2025-05-09 11:24:44] Logging in using username/password.
+[2025-05-09 11:24:44] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-09 11:24:47] OK
+[2025-05-09 11:24:47] Waiting for client config...
+[2025-05-09 11:24:47] OK
+[2025-05-09 11:24:47] Waiting for user info...
+[2025-05-09 11:24:47] OK
+[2025-05-09 11:24:47] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-05-09 11:24:47] Please use force_install_dir before logon!
+[2025-05-09 11:24:47] workshop_download_item 107410 843425103
+[2025-05-09 11:24:48] Downloading item 843425103 ...
+[2025-05-09 11:24:48] 
+[2025-05-09 11:24:48] ERROR! Download item 843425103 failed (Failure).
+[2025-05-09 11:24:48] exit
+[2025-05-09 11:24:48] Unloading Steam API...
+[2025-05-09 11:24:48] CWorkThreadPool::~CWorkThreadPool: work complete queue not empty, 3 items discarded.
+[2025-05-09 11:24:48] OK
+
+
+[2025-05-14 11:11:05] Client version: 1745888136
+[2025-05-14 11:11:05] Loading Steam API...
+[2025-05-14 11:11:05] OK
+[2025-05-14 11:11:06] @ShutdownOnFailedCommand 1
+[2025-05-14 11:11:06] "@ShutdownOnFailedCommand" = "1"
+[2025-05-14 11:11:06] @NoPromptForPassword 1
+[2025-05-14 11:11:06] "@NoPromptForPassword" = "1"
+[2025-05-14 11:11:06] Logging in using username/password.
+[2025-05-14 11:11:06] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-14 11:11:08] OK
+[2025-05-14 11:11:08] Waiting for client config...
+[2025-05-14 11:11:10] OK
+[2025-05-14 11:11:10] Waiting for user info...
+[2025-05-14 11:11:10] OK
+[2025-05-14 11:11:10] force_install_dir "C:\OGP64\home\gameserver\1460"
+[2025-05-14 11:11:10] Please use force_install_dir before logon!
+[2025-05-14 11:11:10] workshop_download_item 107410 1361461340
+[2025-05-14 11:11:10] Downloading item 1361461340 ...
+[2025-05-14 11:11:13] 
+[2025-05-14 11:11:13] Success. Downloaded item 1361461340 to "c:\ogp64\home\gameserver\1460\steamapps\workshop\content\107410\1361461340" (61392985 bytes) 
+[2025-05-14 11:11:13] exit
+[2025-05-14 11:11:13] Unloading Steam API...
+[2025-05-14 11:11:13] CWorkThreadPool::~CWorkThreadPool: work processing queue not empty: 1 items discarded.
+[2025-05-14 11:11:13] OK
+
+
+[2025-05-28 12:25:44] Client version: 1747702063
+[2025-05-28 12:25:44] Loading Steam API...
+[2025-05-28 12:25:44] OK
+[2025-05-28 12:25:45] @ShutdownOnFailedCommand 1
+[2025-05-28 12:25:45] "@ShutdownOnFailedCommand" = "1"
+[2025-05-28 12:25:45] @NoPromptForPassword 1
+[2025-05-28 12:25:45] "@NoPromptForPassword" = "1"
+[2025-05-28 12:25:45] Logging in using username/password.
+[2025-05-28 12:25:45] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-28 12:25:47] OK
+[2025-05-28 12:25:47] Waiting for client config...
+[2025-05-28 12:25:48] OK
+[2025-05-28 12:25:48] Waiting for user info...
+[2025-05-28 12:25:48] OK
+[2025-05-28 12:25:48] force_install_dir "C:\OGP64\home\gameserver\1460"
+[2025-05-28 12:25:48] Please use force_install_dir before logon!
+[2025-05-28 12:25:48] workshop_download_item 107410 1128256978
+[2025-05-28 12:25:49] Downloading item 1128256978 ...
+[2025-05-28 12:26:40] 
+[2025-05-28 12:26:40] Success. Downloaded item 1128256978 to "c:\ogp64\home\gameserver\1460\steamapps\workshop\content\107410\1128256978" (3842471156 bytes) 
+[2025-05-28 12:26:40] exit
+[2025-05-28 12:26:40] Unloading Steam API...
+[2025-05-28 12:26:40] OK
+
+
+[2025-05-31 13:15:59] Client version: 1747702063
+[2025-05-31 13:15:59] Loading Steam API...
+[2025-05-31 13:15:59] OK
+[2025-05-31 13:15:59] @ShutdownOnFailedCommand 1
+[2025-05-31 13:15:59] "@ShutdownOnFailedCommand" = "1"
+[2025-05-31 13:15:59] @NoPromptForPassword 1
+[2025-05-31 13:15:59] "@NoPromptForPassword" = "1"
+[2025-05-31 13:15:59] Logging in using username/password.
+[2025-05-31 13:15:59] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-31 13:16:01] OK
+[2025-05-31 13:16:01] Waiting for client config...
+[2025-05-31 13:16:02] OK
+[2025-05-31 13:16:02] Waiting for user info...
+[2025-05-31 13:16:02] OK
+[2025-05-31 13:16:02] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-05-31 13:16:02] Please use force_install_dir before logon!
+[2025-05-31 13:16:02] workshop_download_item 221100 3483534745
+[2025-05-31 13:16:03] Downloading item 3483534745 ...
+[2025-05-31 13:16:31] 
+[2025-05-31 13:16:31] Success. Downloaded item 3483534745 to "c:\ogp64\home\gameserver\1479\steamapps\workshop\content\221100\3483534745" (1257540659 bytes) 
+[2025-05-31 13:16:31] exit
+[2025-05-31 13:16:31] Unloading Steam API...
+[2025-05-31 13:16:31] OK
+
+
+[2025-05-31 13:19:26] Client version: 1747702063
+[2025-05-31 13:19:26] Loading Steam API...
+[2025-05-31 13:19:26] OK
+[2025-05-31 13:19:26] @ShutdownOnFailedCommand 1
+[2025-05-31 13:19:26] "@ShutdownOnFailedCommand" = "1"
+[2025-05-31 13:19:26] @NoPromptForPassword 1
+[2025-05-31 13:19:26] "@NoPromptForPassword" = "1"
+[2025-05-31 13:19:26] Logging in using username/password.
+[2025-05-31 13:19:26] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-31 13:19:28] OK
+[2025-05-31 13:19:28] Waiting for client config...
+[2025-05-31 13:19:28] OK
+[2025-05-31 13:19:28] Waiting for user info...
+[2025-05-31 13:19:28] OK
+[2025-05-31 13:19:28] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-05-31 13:19:28] Please use force_install_dir before logon!
+[2025-05-31 13:19:29] workshop_download_item 221100 2966495799
+[2025-05-31 13:19:29] Downloading item 2966495799 ...
+[2025-05-31 13:23:23] 
+[2025-05-31 13:23:23] Success. Downloaded item 2966495799 to "c:\ogp64\home\gameserver\1479\steamapps\workshop\content\221100\2966495799" (11788821548 bytes) 
+[2025-05-31 13:23:23] exit
+[2025-05-31 13:23:23] Unloading Steam API...
+[2025-05-31 13:23:23] OK
+
+
+[2025-05-31 13:26:57] Client version: 1747702063
+[2025-05-31 13:26:57] Loading Steam API...
+[2025-05-31 13:26:57] OK
+[2025-05-31 13:26:58] @ShutdownOnFailedCommand 1
+[2025-05-31 13:26:58] "@ShutdownOnFailedCommand" = "1"
+[2025-05-31 13:26:58] @NoPromptForPassword 1
+[2025-05-31 13:26:58] "@NoPromptForPassword" = "1"
+[2025-05-31 13:26:58] Logging in using username/password.
+[2025-05-31 13:26:58] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-31 13:27:00] OK
+[2025-05-31 13:27:00] Waiting for client config...
+[2025-05-31 13:27:01] OK
+[2025-05-31 13:27:01] Waiting for user info...
+[2025-05-31 13:27:01] OK
+[2025-05-31 13:27:01] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-05-31 13:27:01] Please use force_install_dir before logon!
+[2025-05-31 13:27:01] workshop_download_item 221100 1559212036
+[2025-05-31 13:27:01] Downloading item 1559212036 ...
+[2025-05-31 13:27:04] 
+[2025-05-31 13:27:04] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1479\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-05-31 13:27:04] exit
+[2025-05-31 13:27:04] Unloading Steam API...
+[2025-05-31 13:27:04] OK
+
+
+[2025-05-31 13:27:44] Client version: 1747702063
+[2025-05-31 13:27:44] Loading Steam API...
+[2025-05-31 13:27:44] OK
+[2025-05-31 13:27:44] @ShutdownOnFailedCommand 1
+[2025-05-31 13:27:44] "@ShutdownOnFailedCommand" = "1"
+[2025-05-31 13:27:44] @NoPromptForPassword 1
+[2025-05-31 13:27:44] "@NoPromptForPassword" = "1"
+[2025-05-31 13:27:44] Logging in using username/password.
+[2025-05-31 13:27:44] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-31 13:27:46] OK
+[2025-05-31 13:27:46] Waiting for client config...
+[2025-05-31 13:27:47] OK
+[2025-05-31 13:27:47] Waiting for user info...
+[2025-05-31 13:27:47] OK
+[2025-05-31 13:27:47] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-05-31 13:27:47] Please use force_install_dir before logon!
+[2025-05-31 13:27:47] workshop_download_item 221100 1828439124
+[2025-05-31 13:27:47] Downloading item 1828439124 ...
+[2025-05-31 13:27:50] 
+[2025-05-31 13:27:50] Success. Downloaded item 1828439124 to "c:\ogp64\home\gameserver\1479\steamapps\workshop\content\221100\1828439124" (2265358 bytes) 
+[2025-05-31 13:27:50] exit
+[2025-05-31 13:27:50] Unloading Steam API...
+[2025-05-31 13:27:50] OK
+
+
+[2025-05-31 13:31:53] Client version: 1747702063
+[2025-05-31 13:31:53] Loading Steam API...
+[2025-05-31 13:31:53] OK
+[2025-05-31 13:31:53] @ShutdownOnFailedCommand 1
+[2025-05-31 13:31:53] "@ShutdownOnFailedCommand" = "1"
+[2025-05-31 13:31:53] @NoPromptForPassword 1
+[2025-05-31 13:31:53] "@NoPromptForPassword" = "1"
+[2025-05-31 13:31:53] Logging in using username/password.
+[2025-05-31 13:31:53] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-05-31 13:31:56] OK
+[2025-05-31 13:31:56] Waiting for client config...
+[2025-05-31 13:31:56] OK
+[2025-05-31 13:31:56] Waiting for user info...
+[2025-05-31 13:31:56] OK
+[2025-05-31 13:31:56] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-05-31 13:31:56] Please use force_install_dir before logon!
+[2025-05-31 13:31:56] workshop_download_item 221100 1828439124
+[2025-05-31 13:31:57] Downloading item 1828439124 ...
+[2025-05-31 13:31:57] 
+[2025-05-31 13:31:57] Success. Downloaded item 1828439124 to "c:\ogp64\home\gameserver\1479\steamapps\workshop\content\221100\1828439124" (2265358 bytes) 
+[2025-05-31 13:31:57] exit
+[2025-05-31 13:31:57] Unloading Steam API...
+[2025-05-31 13:31:57] OK
+
+
+[2025-06-03 11:23:51] Client version: 1747702063
+[2025-06-03 11:23:51] Loading Steam API...
+[2025-06-03 11:23:51] OK
+[2025-06-03 11:23:51] @ShutdownOnFailedCommand 1
+[2025-06-03 11:23:51] "@ShutdownOnFailedCommand" = "1"
+[2025-06-03 11:23:51] @NoPromptForPassword 1
+[2025-06-03 11:23:51] "@NoPromptForPassword" = "1"
+[2025-06-03 11:23:51] set_steam_guard_code C3QCP
+[2025-06-03 11:23:51] Logging in using username/password.
+[2025-06-03 11:23:51] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-06-03 11:23:53] OK
+[2025-06-03 11:23:53] Waiting for client config...
+[2025-06-03 11:23:54] OK
+[2025-06-03 11:23:54] Waiting for user info...
+[2025-06-03 11:23:54] OK
+[2025-06-03 11:23:54] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-06-03 11:23:54] Please use force_install_dir before logon!
+[2025-06-03 11:23:54] app_update 223350
+[2025-06-03 11:23:56]  Update state (0x3) reconfiguring, progress: 0.00 (0 / 0)
+[2025-06-03 11:23:58]  Update state (0x61) downloading, progress: 0.36 (13024814 / 3638587922)
+[2025-06-03 11:24:00]  Update state (0x61) downloading, progress: 5.07 (184351623 / 3638587922)
+[2025-06-03 11:24:02]  Update state (0x61) downloading, progress: 16.47 (599345388 / 3638587922)
+[2025-06-03 11:24:04]  Update state (0x61) downloading, progress: 24.40 (887874942 / 3638587922)
+[2025-06-03 11:24:06]  Update state (0x61) downloading, progress: 33.00 (1200735897 / 3638587922)
+[2025-06-03 11:24:08]  Update state (0x61) downloading, progress: 38.13 (1387382425 / 3638587922)
+[2025-06-03 11:24:10]  Update state (0x41) staging, progress: 49.26 (1792536793 / 3638587922)
+[2025-06-03 11:24:12]  Update state (0x41) staging, progress: 52.03 (1893192583 / 3638587922)
+[2025-06-03 11:24:14]  Update state (0x41) staging, progress: 55.68 (2026055455 / 3638587922)
+[2025-06-03 11:24:16]  Update state (0x41) staging, progress: 59.47 (2163945757 / 3638587922)
+[2025-06-03 11:24:18]  Update state (0x41) staging, progress: 63.18 (2298909500 / 3638587922)
+[2025-06-03 11:24:20]  Update state (0x41) staging, progress: 68.22 (2482098323 / 3638587922)
+[2025-06-03 11:24:22]  Update state (0x41) staging, progress: 73.52 (2675131700 / 3638587922)
+[2025-06-03 11:24:24]  Update state (0x41) staging, progress: 78.30 (2848872791 / 3638587922)
+[2025-06-03 11:24:26]  Update state (0x41) staging, progress: 84.15 (3061735771 / 3638587922)
+[2025-06-03 11:24:28]  Update state (0x41) staging, progress: 88.01 (3202484543 / 3638587922)
+[2025-06-03 11:24:30]  Update state (0x41) staging, progress: 92.54 (3367014359 / 3638587922)
+[2025-06-03 11:24:32]  Update state (0x81) verifying update, progress: 0.58 (20972634 / 3638587922)
+[2025-06-03 11:24:34]  Update state (0x81) verifying update, progress: 7.85 (285598024 / 3638587922)
+[2025-06-03 11:24:36]  Update state (0x81) verifying update, progress: 15.49 (563470664 / 3638587922)
+[2025-06-03 11:24:38]  Update state (0x81) verifying update, progress: 22.99 (836614388 / 3638587922)
+[2025-06-03 11:24:40]  Update state (0x81) verifying update, progress: 29.88 (1087043709 / 3638587922)
+[2025-06-03 11:24:42]  Update state (0x81) verifying update, progress: 36.73 (1336461567 / 3638587922)
+[2025-06-03 11:24:44]  Update state (0x81) verifying update, progress: 44.07 (1603427231 / 3638587922)
+[2025-06-03 11:24:46]  Update state (0x81) verifying update, progress: 50.85 (1850223782 / 3638587922)
+[2025-06-03 11:24:48]  Update state (0x81) verifying update, progress: 58.08 (2113313721 / 3638587922)
+[2025-06-03 11:24:50] Success! App '223350' fully installed.
+[2025-06-03 11:24:50] exit
+[2025-06-03 11:24:50] Unloading Steam API...
+[2025-06-03 11:24:50] OK
+
+
+[2025-06-03 12:44:36] Client version: 1747702063
+[2025-06-03 12:44:36] Loading Steam API...
+[2025-06-03 12:44:36] OK
+[2025-06-03 12:44:37] @ShutdownOnFailedCommand 1
+[2025-06-03 12:44:37] "@ShutdownOnFailedCommand" = "1"
+[2025-06-03 12:44:37] @NoPromptForPassword 1
+[2025-06-03 12:44:37] "@NoPromptForPassword" = "1"
+[2025-06-03 12:44:37] set_steam_guard_code C3QCP
+[2025-06-03 12:44:37] Logging in using username/password.
+[2025-06-03 12:44:37] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-06-03 12:44:39] OK
+[2025-06-03 12:44:39] Waiting for client config...
+[2025-06-03 12:44:39] OK
+[2025-06-03 12:44:39] Waiting for user info...
+[2025-06-03 12:44:39] OK
+[2025-06-03 12:44:39] force_install_dir "C:\OGP64\home\gameserver\1479"
+[2025-06-03 12:44:39] Please use force_install_dir before logon!
+[2025-06-03 12:44:39] app_update 223350
+[2025-06-03 12:44:40] Success! App '223350' already up to date.
+[2025-06-03 12:44:40] exit
+[2025-06-03 12:44:40] Unloading Steam API...
+[2025-06-03 12:44:40] OK
+
+
+[2025-06-18 17:09:40] Client version: 1747702063
+[2025-06-18 17:09:40] Loading Steam API...
+[2025-06-18 17:09:40] OK
+[2025-06-18 17:09:40] @ShutdownOnFailedCommand 1
+[2025-06-18 17:09:40] "@ShutdownOnFailedCommand" = "1"
+[2025-06-18 17:09:40] @NoPromptForPassword 1
+[2025-06-18 17:09:40] "@NoPromptForPassword" = "1"
+[2025-06-18 17:09:40] set_steam_guard_code C3QCP
+[2025-06-18 17:09:40] Logging in using username/password.
+[2025-06-18 17:09:40] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-06-18 17:09:43] OK
+[2025-06-18 17:09:43] Waiting for client config...
+[2025-06-18 17:09:44] OK
+[2025-06-18 17:09:44] Waiting for user info...
+[2025-06-18 17:09:45] OK
+[2025-06-18 17:09:45] force_install_dir "C:\OGP64\home\gameserver\1440"
+[2025-06-18 17:09:45] Please use force_install_dir before logon!
+[2025-06-18 17:09:45] app_update 233780
+[2025-06-18 17:09:47]  Update state (0x3) reconfiguring, progress: 0.00 (0 / 0)
+[2025-06-18 17:09:49]  Update state (0x61) downloading, progress: 8.02 (40863346 / 509581291)
+[2025-06-18 17:09:51]  Update state (0x61) downloading, progress: 55.15 (281018565 / 509581291)
+[2025-06-18 17:09:53]  Update state (0x41) staging, progress: 62.76 (319825597 / 509581291)
+[2025-06-18 17:09:55]  Update state (0x41) staging, progress: 91.80 (467788727 / 509581291)
+[2025-06-18 17:09:57]  Update state (0x81) verifying update, progress: 39.08 (199169085 / 509581291)
+[2025-06-18 17:09:59]  Update state (0x81) verifying update, progress: 79.56 (405438317 / 509581291)
+[2025-06-18 17:10:01] Success! App '233780' fully installed.
+[2025-06-18 17:10:01] exit
+[2025-06-18 17:10:01] Unloading Steam API...
+[2025-06-18 17:10:01] OK
+
+
+[2025-06-18 17:25:23] Client version: 1747702063
+[2025-06-18 17:25:23] Loading Steam API...
+[2025-06-18 17:25:23] OK
+[2025-06-18 17:25:23] @ShutdownOnFailedCommand 1
+[2025-06-18 17:25:23] "@ShutdownOnFailedCommand" = "1"
+[2025-06-18 17:25:23] @NoPromptForPassword 1
+[2025-06-18 17:25:23] "@NoPromptForPassword" = "1"
+[2025-06-18 17:25:23] set_steam_guard_code C3QCP
+[2025-06-18 17:25:23] Logging in using username/password.
+[2025-06-18 17:25:23] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-06-18 17:25:25] OK
+[2025-06-18 17:25:25] Waiting for client config...
+[2025-06-18 17:25:26] OK
+[2025-06-18 17:25:26] Waiting for user info...
+[2025-06-18 17:25:26] OK
+[2025-06-18 17:25:26] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-06-18 17:25:26] Please use force_install_dir before logon!
+[2025-06-18 17:25:26] app_update 233780
+[2025-06-18 17:25:28]  Update state (0x61) downloading, progress: 3.67 (18690051 / 509581291)
+[2025-06-18 17:25:30]  Update state (0x61) downloading, progress: 31.72 (161651804 / 509581291)
+[2025-06-18 17:25:32]  Update state (0x41) staging, progress: 55.34 (282006616 / 509581291)
+[2025-06-18 17:25:34]  Update state (0x41) staging, progress: 84.10 (428576895 / 509581291)
+[2025-06-18 17:25:36]  Update state (0x81) verifying update, progress: 30.38 (154791964 / 509581291)
+[2025-06-18 17:25:38]  Update state (0x81) verifying update, progress: 69.58 (354559201 / 509581291)
+[2025-06-18 17:25:40] Success! App '233780' fully installed.
+[2025-06-18 17:25:40] exit
+[2025-06-18 17:25:40] Unloading Steam API...
+[2025-06-18 17:25:40] OK
+
+
+[2025-07-14 17:26:42] Client version: 1751406682
+[2025-07-14 17:26:42] Loading Steam API...
+[2025-07-14 17:26:42] OK
+[2025-07-14 17:26:42] @ShutdownOnFailedCommand 1
+[2025-07-14 17:26:42] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 17:26:42] @NoPromptForPassword 1
+[2025-07-14 17:26:42] "@NoPromptForPassword" = "1"
+[2025-07-14 17:26:42] set_steam_guard_code C3QCP
+[2025-07-14 17:26:42] Logging in using username/password.
+[2025-07-14 17:26:42] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 17:26:45] OK
+[2025-07-14 17:26:45] Waiting for client config...
+[2025-07-14 17:26:46] OK
+[2025-07-14 17:26:46] Waiting for user info...
+[2025-07-14 17:26:47] OK
+[2025-07-14 17:26:47] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 17:26:47] Please use force_install_dir before logon!
+[2025-07-14 17:26:47] app_update 223350
+[2025-07-14 17:26:50]  Update state (0x61) downloading, progress: 0.03 (1054344 / 4077454718)
+[2025-07-14 17:26:52]  Update state (0x61) downloading, progress: 1.05 (42911410 / 4077454718)
+[2025-07-14 17:26:54]  Update state (0x61) downloading, progress: 2.82 (115143431 / 4077454718)
+[2025-07-14 17:26:56]  Update state (0x61) downloading, progress: 4.99 (203589544 / 4077454718)
+[2025-07-14 17:26:58]  Update state (0x61) downloading, progress: 10.27 (418879831 / 4077454718)
+[2025-07-14 17:27:00]  Update state (0x61) downloading, progress: 13.25 (540325166 / 4077454718)
+[2025-07-14 17:27:02]  Update state (0x61) downloading, progress: 21.50 (876660008 / 4077454718)
+[2025-07-14 17:27:04]  Update state (0x61) downloading, progress: 28.39 (1157675490 / 4077454718)
+[2025-07-14 17:27:06]  Update state (0x61) downloading, progress: 35.11 (1431412251 / 4077454718)
+[2025-07-14 17:27:08]  Update state (0x61) downloading, progress: 39.80 (1622663124 / 4077454718)
+[2025-07-14 17:27:10]  Update state (0x61) downloading, progress: 43.85 (1788065158 / 4077454718)
+[2025-07-14 17:27:12]  Update state (0x61) downloading, progress: 51.90 (2116250344 / 4077454718)
+[2025-07-14 17:27:14]  Update state (0x61) downloading, progress: 59.98 (2445792211 / 4077454718)
+[2025-07-14 17:27:16]  Update state (0x61) downloading, progress: 64.66 (2636518398 / 4077454718)
+[2025-07-14 17:27:18]  Update state (0x61) downloading, progress: 73.53 (2998252196 / 4077454718)
+[2025-07-14 17:27:20]  Update state (0x61) downloading, progress: 86.06 (3509197944 / 4077454718)
+[2025-07-14 17:27:22]  Update state (0x61) downloading, progress: 92.58 (3774725061 / 4077454718)
+[2025-07-14 17:27:24]  Update state (0x61) downloading, progress: 98.84 (4030127842 / 4077454718)
+[2025-07-14 17:27:26]  Update state (0x81) verifying update, progress: 5.08 (207284929 / 4077454718)
+[2025-07-14 17:27:28]  Update state (0x81) verifying update, progress: 11.52 (469923842 / 4077454718)
+[2025-07-14 17:27:30]  Update state (0x81) verifying update, progress: 18.22 (742859041 / 4077454718)
+[2025-07-14 17:27:32]  Update state (0x81) verifying update, progress: 24.82 (1012178408 / 4077454718)
+[2025-07-14 17:27:34]  Update state (0x81) verifying update, progress: 31.09 (1267853940 / 4077454718)
+[2025-07-14 17:27:36]  Update state (0x81) verifying update, progress: 36.99 (1508312091 / 4077454718)
+[2025-07-14 17:27:38]  Update state (0x81) verifying update, progress: 43.73 (1783039003 / 4077454718)
+[2025-07-14 17:27:40]  Update state (0x81) verifying update, progress: 50.22 (2047687311 / 4077454718)
+[2025-07-14 17:27:41] Success! App '223350' fully installed.
+[2025-07-14 17:27:41] exit
+[2025-07-14 17:27:41] Unloading Steam API...
+[2025-07-14 17:27:41] OK
+
+
+[2025-07-14 17:54:06] Client version: 1751406682
+[2025-07-14 17:54:06] Loading Steam API...
+[2025-07-14 17:54:06] OK
+[2025-07-14 17:54:07] @ShutdownOnFailedCommand 1
+[2025-07-14 17:54:07] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 17:54:07] @NoPromptForPassword 1
+[2025-07-14 17:54:07] "@NoPromptForPassword" = "1"
+[2025-07-14 17:54:07] Logging in using username/password.
+[2025-07-14 17:54:07] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 17:54:09] OK
+[2025-07-14 17:54:09] Waiting for client config...
+[2025-07-14 17:54:09] OK
+[2025-07-14 17:54:09] Waiting for user info...
+[2025-07-14 17:54:09] OK
+[2025-07-14 17:54:09] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 17:54:09] Please use force_install_dir before logon!
+[2025-07-14 17:54:10] workshop_download_item 221100 1559212036
+[2025-07-14 17:54:10] Downloading item 1559212036 ...
+[2025-07-14 17:54:11] 
+[2025-07-14 17:54:11] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1488\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-07-14 17:54:11] exit
+[2025-07-14 17:54:11] Unloading Steam API...
+[2025-07-14 17:54:11] OK
+
+
+[2025-07-14 17:55:20] Client version: 1751406682
+[2025-07-14 17:55:20] Loading Steam API...
+[2025-07-14 17:55:20] OK
+[2025-07-14 17:55:20] @ShutdownOnFailedCommand 1
+[2025-07-14 17:55:20] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 17:55:20] @NoPromptForPassword 1
+[2025-07-14 17:55:20] "@NoPromptForPassword" = "1"
+[2025-07-14 17:55:20] Logging in using username/password.
+[2025-07-14 17:55:20] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 17:55:23] OK
+[2025-07-14 17:55:23] Waiting for client config...
+[2025-07-14 17:55:23] OK
+[2025-07-14 17:55:23] Waiting for user info...
+[2025-07-14 17:55:23] OK
+[2025-07-14 17:55:23] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 17:55:23] Please use force_install_dir before logon!
+[2025-07-14 17:55:24] workshop_download_item 221100 1559212036
+[2025-07-14 17:55:24] Downloading item 1559212036 ...
+[2025-07-14 17:55:24] 
+[2025-07-14 17:55:24] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1488\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-07-14 17:55:24] exit
+[2025-07-14 17:55:24] Unloading Steam API...
+[2025-07-14 17:55:24] OK
+
+
+[2025-07-14 17:56:38] Client version: 1751406682
+[2025-07-14 17:56:38] Loading Steam API...
+[2025-07-14 17:56:38] OK
+[2025-07-14 17:56:38] @ShutdownOnFailedCommand 1
+[2025-07-14 17:56:38] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 17:56:38] @NoPromptForPassword 1
+[2025-07-14 17:56:38] "@NoPromptForPassword" = "1"
+[2025-07-14 17:56:38] Logging in using username/password.
+[2025-07-14 17:56:38] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 17:56:40] OK
+[2025-07-14 17:56:40] Waiting for client config...
+[2025-07-14 17:56:41] OK
+[2025-07-14 17:56:41] Waiting for user info...
+[2025-07-14 17:56:41] OK
+[2025-07-14 17:56:41] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 17:56:41] Please use force_install_dir before logon!
+[2025-07-14 17:56:41] workshop_download_item 221100 1559212036
+[2025-07-14 17:56:41] Downloading item 1559212036 ...
+[2025-07-14 17:56:41] 
+[2025-07-14 17:56:41] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1488\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-07-14 17:56:41] exit
+[2025-07-14 17:56:41] Unloading Steam API...
+[2025-07-14 17:56:41] OK
+
+
+[2025-07-14 17:57:34] Client version: 1751406682
+[2025-07-14 17:57:34] Loading Steam API...
+[2025-07-14 17:57:34] OK
+[2025-07-14 17:57:34] @ShutdownOnFailedCommand 1
+[2025-07-14 17:57:34] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 17:57:34] @NoPromptForPassword 1
+[2025-07-14 17:57:34] "@NoPromptForPassword" = "1"
+[2025-07-14 17:57:34] Logging in using username/password.
+[2025-07-14 17:57:34] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 17:57:37] OK
+[2025-07-14 17:57:37] Waiting for client config...
+[2025-07-14 17:57:37] OK
+[2025-07-14 17:57:37] Waiting for user info...
+[2025-07-14 17:57:37] OK
+[2025-07-14 17:57:37] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 17:57:37] Please use force_install_dir before logon!
+[2025-07-14 17:57:37] workshop_download_item 221100 1559212036
+[2025-07-14 17:57:38] Downloading item 1559212036 ...
+[2025-07-14 17:57:38] 
+[2025-07-14 17:57:38] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1488\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-07-14 17:57:38] exit
+[2025-07-14 17:57:38] Unloading Steam API...
+[2025-07-14 17:57:38] OK
+
+
+[2025-07-14 18:05:40] Client version: 1751406682
+[2025-07-14 18:05:40] Loading Steam API...
+[2025-07-14 18:05:40] OK
+[2025-07-14 18:05:40] @ShutdownOnFailedCommand 1
+[2025-07-14 18:05:40] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 18:05:40] @NoPromptForPassword 1
+[2025-07-14 18:05:40] "@NoPromptForPassword" = "1"
+[2025-07-14 18:05:40] Logging in using username/password.
+[2025-07-14 18:05:40] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 18:05:42] OK
+[2025-07-14 18:05:42] Waiting for client config...
+[2025-07-14 18:05:43] OK
+[2025-07-14 18:05:43] Waiting for user info...
+[2025-07-14 18:05:43] OK
+[2025-07-14 18:05:43] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 18:05:43] Please use force_install_dir before logon!
+[2025-07-14 18:05:43] workshop_download_item 221100 1559212036
+[2025-07-14 18:05:43] Downloading item 1559212036 ...
+[2025-07-14 18:05:43] 
+[2025-07-14 18:05:43] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1488\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-07-14 18:05:43] exit
+[2025-07-14 18:05:43] Unloading Steam API...
+[2025-07-14 18:05:43] OK
+
+
+[2025-07-14 18:06:02] Client version: 1751406682
+[2025-07-14 18:06:02] Loading Steam API...
+[2025-07-14 18:06:02] OK
+[2025-07-14 18:06:02] @ShutdownOnFailedCommand 1
+[2025-07-14 18:06:02] "@ShutdownOnFailedCommand" = "1"
+[2025-07-14 18:06:02] @NoPromptForPassword 1
+[2025-07-14 18:06:02] "@NoPromptForPassword" = "1"
+[2025-07-14 18:06:02] Logging in using username/password.
+[2025-07-14 18:06:02] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-07-14 18:06:04] OK
+[2025-07-14 18:06:04] Waiting for client config...
+[2025-07-14 18:06:05] OK
+[2025-07-14 18:06:05] Waiting for user info...
+[2025-07-14 18:06:05] OK
+[2025-07-14 18:06:05] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-07-14 18:06:05] Please use force_install_dir before logon!
+[2025-07-14 18:06:05] workshop_download_item 221100 1559212036
+[2025-07-14 18:06:05] Downloading item 1559212036 ...
+[2025-07-14 18:06:06] 
+[2025-07-14 18:06:06] Success. Downloaded item 1559212036 to "c:\ogp64\home\gameserver\1488\steamapps\workshop\content\221100\1559212036" (525685 bytes) 
+[2025-07-14 18:06:06] exit
+[2025-07-14 18:06:06] Unloading Steam API...
+[2025-07-14 18:06:06] OK
+
+
+[2025-08-04 08:02:32] Client version: 1751406682
+[2025-08-04 08:02:32] Loading Steam API...
+[2025-08-04 08:02:32] OK
+[2025-08-04 08:02:32] @ShutdownOnFailedCommand 1
+[2025-08-04 08:02:32] "@ShutdownOnFailedCommand" = "1"
+[2025-08-04 08:02:32] @NoPromptForPassword 1
+[2025-08-04 08:02:32] "@NoPromptForPassword" = "1"
+[2025-08-04 08:02:32] set_steam_guard_code C3QCP
+[2025-08-04 08:02:32] Logging in using username/password.
+[2025-08-04 08:02:32] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-04 08:02:34] OK
+[2025-08-04 08:02:34] Waiting for client config...
+[2025-08-04 08:02:36] OK
+[2025-08-04 08:02:36] Waiting for user info...
+[2025-08-04 08:02:36] OK
+[2025-08-04 08:02:36] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-08-04 08:02:36] Please use force_install_dir before logon!
+[2025-08-04 08:02:36] app_update 223350
+[2025-08-04 08:02:38]  Update state (0x61) downloading, progress: 0.00 (1956 / 300086199)
+[2025-08-04 08:02:40]  Update state (0x61) downloading, progress: 48.23 (144738583 / 300086199)
+[2025-08-04 08:02:42]  Update state (0x41) staging, progress: 64.48 (193498475 / 300086199)
+[2025-08-04 08:02:44]  Update state (0x81) verifying update, progress: 72.94 (218882583 / 300086199)
+[2025-08-04 08:02:45] Success! App '223350' fully installed.
+[2025-08-04 08:02:45] exit
+[2025-08-04 08:02:45] Unloading Steam API...
+[2025-08-04 08:02:45] OK
+
+
+[2025-08-07 13:12:24] Client version: 1751406682
+[2025-08-07 13:12:24] Loading Steam API...
+[2025-08-07 13:12:24] OK
+[2025-08-07 13:12:25] @ShutdownOnFailedCommand 1
+[2025-08-07 13:12:25] "@ShutdownOnFailedCommand" = "1"
+[2025-08-07 13:12:25] @NoPromptForPassword 1
+[2025-08-07 13:12:25] "@NoPromptForPassword" = "1"
+[2025-08-07 13:12:25] set_steam_guard_code C3QCP
+[2025-08-07 13:12:25] Logging in using username/password.
+[2025-08-07 13:12:25] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-07 13:12:27] OK
+[2025-08-07 13:12:27] Waiting for client config...
+[2025-08-07 13:12:28] OK
+[2025-08-07 13:12:28] Waiting for user info...
+[2025-08-07 13:12:28] OK
+[2025-08-07 13:12:28] force_install_dir "C:\OGP64\home\gameserver\1488"
+[2025-08-07 13:12:28] Please use force_install_dir before logon!
+[2025-08-07 13:12:28] app_update 223350
+[2025-08-07 13:12:31]  Update state (0x61) downloading, progress: 4.71 (14133221 / 300065100)
+[2025-08-07 13:12:33]  Update state (0x61) downloading, progress: 48.24 (144738051 / 300065100)
+[2025-08-07 13:12:35]  Update state (0x41) staging, progress: 67.28 (201883891 / 300065100)
+[2025-08-07 13:12:37]  Update state (0x81) verifying update, progress: 57.22 (171695403 / 300065100)
+[2025-08-07 13:12:39] Success! App '223350' fully installed.
+[2025-08-07 13:12:39] exit
+[2025-08-07 13:12:39] Unloading Steam API...
+[2025-08-07 13:12:39] OK
+
+
+[2025-08-07 13:26:08] Client version: 1751406682
+[2025-08-07 13:26:08] Loading Steam API...
+[2025-08-07 13:26:08] OK
+[2025-08-07 13:26:08] @ShutdownOnFailedCommand 1
+[2025-08-07 13:26:08] "@ShutdownOnFailedCommand" = "1"
+[2025-08-07 13:26:08] @NoPromptForPassword 1
+[2025-08-07 13:26:08] "@NoPromptForPassword" = "1"
+[2025-08-07 13:26:08] set_steam_guard_code C3QCP
+[2025-08-07 13:26:09] Logging in using username/password.
+[2025-08-07 13:26:09] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-07 13:26:11] OK
+[2025-08-07 13:26:11] Waiting for client config...
+[2025-08-07 13:26:12] OK
+[2025-08-07 13:26:12] Waiting for user info...
+[2025-08-07 13:26:12] OK
+[2025-08-07 13:26:12] force_install_dir "C:\OGP64\home\gameserver\1480"
+[2025-08-07 13:26:12] Please use force_install_dir before logon!
+[2025-08-07 13:26:12] app_update 33930
+[2025-08-07 13:26:15]  Update state (0x61) downloading, progress: 0.14 (12490326 / 8714127071)
+[2025-08-07 13:26:17]  Update state (0x61) downloading, progress: 2.80 (243753713 / 8714127071)
+[2025-08-07 13:26:19]  Update state (0x61) downloading, progress: 4.95 (431264796 / 8714127071)
+[2025-08-07 13:26:21]  Update state (0x61) downloading, progress: 7.78 (677680711 / 8714127071)
+[2025-08-07 13:26:23]  Update state (0x61) downloading, progress: 11.02 (960730317 / 8714127071)
+[2025-08-07 13:26:25]  Update state (0x61) downloading, progress: 13.63 (1188131416 / 8714127071)
+[2025-08-07 13:26:27]  Update state (0x61) downloading, progress: 15.28 (1331787439 / 8714127071)
+[2025-08-07 13:26:29]  Update state (0x61) downloading, progress: 18.51 (1613015536 / 8714127071)
+[2025-08-07 13:26:31]  Update state (0x61) downloading, progress: 20.83 (1815356189 / 8714127071)
+[2025-08-07 13:26:33]  Update state (0x61) downloading, progress: 23.90 (2082857581 / 8714127071)
+[2025-08-07 13:26:35]  Update state (0x61) downloading, progress: 26.75 (2331265358 / 8714127071)
+[2025-08-07 13:26:37]  Update state (0x61) downloading, progress: 29.08 (2533826682 / 8714127071)
+[2025-08-07 13:26:39]  Update state (0x61) downloading, progress: 31.83 (2774036431 / 8714127071)
+[2025-08-07 13:26:41]  Update state (0x61) downloading, progress: 34.96 (3046416874 / 8714127071)
+[2025-08-07 13:26:43]  Update state (0x61) downloading, progress: 38.30 (3337823148 / 8714127071)
+[2025-08-07 13:26:45]  Update state (0x61) downloading, progress: 39.98 (3483704811 / 8714127071)
+[2025-08-07 13:26:47]  Update state (0x61) downloading, progress: 42.29 (3685623333 / 8714127071)
+[2025-08-07 13:26:49]  Update state (0x61) downloading, progress: 44.48 (3876187376 / 8714127071)
+[2025-08-07 13:26:51]  Update state (0x61) downloading, progress: 46.71 (4070530483 / 8714127071)
+[2025-08-07 13:26:53]  Update state (0x61) downloading, progress: 48.91 (4262509876 / 8714127071)
+[2025-08-07 13:26:55]  Update state (0x61) downloading, progress: 51.84 (4517219679 / 8714127071)
+[2025-08-07 13:26:57]  Update state (0x61) downloading, progress: 54.20 (4722943450 / 8714127071)
+[2025-08-07 13:26:59]  Update state (0x61) downloading, progress: 57.11 (4977020761 / 8714127071)
+[2025-08-07 13:27:01]  Update state (0x61) downloading, progress: 60.49 (5271143104 / 8714127071)
+[2025-08-07 13:27:03]  Update state (0x61) downloading, progress: 63.07 (5495681351 / 8714127071)
+[2025-08-07 13:27:05]  Update state (0x61) downloading, progress: 64.82 (5648134724 / 8714127071)
+[2025-08-07 13:27:07]  Update state (0x61) downloading, progress: 67.82 (5910168802 / 8714127071)
+[2025-08-07 13:27:09]  Update state (0x61) downloading, progress: 70.33 (6128316664 / 8714127071)
+[2025-08-07 13:27:11]  Update state (0x61) downloading, progress: 71.54 (6234222239 / 8714127071)
+[2025-08-07 13:27:13]  Update state (0x61) downloading, progress: 73.03 (6364246219 / 8714127071)
+[2025-08-07 13:27:15]  Update state (0x61) downloading, progress: 75.76 (6602004804 / 8714127071)
+[2025-08-07 13:27:17]  Update state (0x61) downloading, progress: 78.29 (6822052914 / 8714127071)
+[2025-08-07 13:27:19]  Update state (0x61) downloading, progress: 82.76 (7212020307 / 8714127071)
+[2025-08-07 13:27:21]  Update state (0x61) downloading, progress: 85.84 (7480326968 / 8714127071)
+[2025-08-07 13:27:23]  Update state (0x61) downloading, progress: 88.69 (7728351773 / 8714127071)
+[2025-08-07 13:27:25]  Update state (0x61) downloading, progress: 90.96 (7926488361 / 8714127071)
+[2025-08-07 13:27:27]  Update state (0x61) downloading, progress: 94.15 (8204408491 / 8714127071)
+[2025-08-07 13:27:29]  Update state (0x61) downloading, progress: 96.61 (8418884384 / 8714127071)
+[2025-08-07 13:27:31]  Update state (0x61) downloading, progress: 99.54 (8673621833 / 8714127071)
+[2025-08-07 13:27:33]  Update state (0x81) verifying update, progress: 1.90 (165845574 / 8714127071)
+[2025-08-07 13:27:35]  Update state (0x81) verifying update, progress: 4.23 (368704769 / 8714127071)
+[2025-08-07 13:27:37]  Update state (0x81) verifying update, progress: 6.91 (602537217 / 8714127071)
+[2025-08-07 13:27:39]  Update state (0x81) verifying update, progress: 9.47 (824947289 / 8714127071)
+[2025-08-07 13:27:41]  Update state (0x81) verifying update, progress: 11.82 (1030330873 / 8714127071)
+[2025-08-07 13:27:43]  Update state (0x81) verifying update, progress: 14.25 (1241642853 / 8714127071)
+[2025-08-07 13:27:45]  Update state (0x81) verifying update, progress: 16.64 (1449693990 / 8714127071)
+[2025-08-07 13:27:47]  Update state (0x81) verifying update, progress: 19.05 (1659840735 / 8714127071)
+[2025-08-07 13:27:49]  Update state (0x81) verifying update, progress: 21.34 (1859710867 / 8714127071)
+[2025-08-07 13:27:51]  Update state (0x81) verifying update, progress: 23.78 (2072465333 / 8714127071)
+[2025-08-07 13:27:53] Success! App '33930' fully installed.
+[2025-08-07 13:27:53] exit
+[2025-08-07 13:27:53] Unloading Steam API...
+[2025-08-07 13:27:53] OK
+
+
+[2025-08-07 14:50:42] Client version: 1751406682
+[2025-08-07 14:50:42] Loading Steam API...
+[2025-08-07 14:50:42] OK
+[2025-08-07 14:50:42] @ShutdownOnFailedCommand 1
+[2025-08-07 14:50:42] "@ShutdownOnFailedCommand" = "1"
+[2025-08-07 14:50:42] @NoPromptForPassword 1
+[2025-08-07 14:50:42] "@NoPromptForPassword" = "1"
+[2025-08-07 14:50:42] set_steam_guard_code C3QCP
+[2025-08-07 14:50:42] Logging in using username/password.
+[2025-08-07 14:50:42] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-07 14:50:45] OK
+[2025-08-07 14:50:45] Waiting for client config...
+[2025-08-07 14:50:46] OK
+[2025-08-07 14:50:46] Waiting for user info...
+[2025-08-07 14:50:46] OK
+[2025-08-07 14:50:46] force_install_dir "C:\OGP64\home\gameserver\1500"
+[2025-08-07 14:50:46] Please use force_install_dir before logon!
+[2025-08-07 14:50:46] app_update 33910
+[2025-08-07 14:50:46] ERROR! Failed to install app '33910' (No subscription)
+[2025-08-07 14:50:46] exit
+[2025-08-07 14:50:46] Unloading Steam API...
+[2025-08-07 14:50:46] OK
+
+
+[2025-08-07 18:38:46] Client version: 1751406682
+[2025-08-07 18:38:46] Loading Steam API...
+[2025-08-07 18:38:46] OK
+[2025-08-07 18:38:46] @ShutdownOnFailedCommand 1
+[2025-08-07 18:38:46] "@ShutdownOnFailedCommand" = "1"
+[2025-08-07 18:38:46] @NoPromptForPassword 1
+[2025-08-07 18:38:46] "@NoPromptForPassword" = "1"
+[2025-08-07 18:38:46] set_steam_guard_code C3QCP
+[2025-08-07 18:38:47] Logging in using username/password.
+[2025-08-07 18:38:47] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-07 18:38:49] OK
+[2025-08-07 18:38:49] Waiting for client config...
+[2025-08-07 18:38:50] OK
+[2025-08-07 18:38:50] Waiting for user info...
+[2025-08-07 18:38:50] OK
+[2025-08-07 18:38:50] force_install_dir "C:\OGP64\home\gameserver\1480"
+[2025-08-07 18:38:50] Please use force_install_dir before logon!
+[2025-08-07 18:38:50] app_update 33930
+[2025-08-07 18:38:50] Success! App '33930' already up to date.
+[2025-08-07 18:38:50] exit
+[2025-08-07 18:38:51] Unloading Steam API...
+[2025-08-07 18:38:51] OK
+
+
+[2025-08-14 20:16:31] Client version: 1751406682
+[2025-08-14 20:16:31] Loading Steam API...
+[2025-08-14 20:16:31] OK
+[2025-08-14 20:16:31] @ShutdownOnFailedCommand 1
+[2025-08-14 20:16:31] "@ShutdownOnFailedCommand" = "1"
+[2025-08-14 20:16:31] @NoPromptForPassword 1
+[2025-08-14 20:16:31] "@NoPromptForPassword" = "1"
+[2025-08-14 20:16:31] set_steam_guard_code C3QCP
+[2025-08-14 20:16:31] Logging in using username/password.
+[2025-08-14 20:16:31] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-14 20:16:34] OK
+[2025-08-14 20:16:34] Waiting for client config...
+[2025-08-14 20:16:35] OK
+[2025-08-14 20:16:35] Waiting for user info...
+[2025-08-14 20:16:35] OK
+[2025-08-14 20:16:35] force_install_dir "C:\OGP64\home\gameserver\1485"
+[2025-08-14 20:16:35] Please use force_install_dir before logon!
+[2025-08-14 20:16:35] app_update 233780
+[2025-08-14 20:16:38]  Update state (0x3) reconfiguring, progress: 0.00 (0 / 0)
+[2025-08-14 20:16:40]  Update state (0x61) downloading, progress: 84.73 (128016583 / 151085255)
+[2025-08-14 20:16:42]  Update state (0x81) verifying update, progress: 77.05 (116413399 / 151085255)
+[2025-08-14 20:16:42] Success! App '233780' fully installed.
+[2025-08-14 20:16:42] exit
+[2025-08-14 20:16:42] Unloading Steam API...
+[2025-08-14 20:16:42] OK
+
+
+[2025-08-14 20:29:55] Client version: 1751406682
+[2025-08-14 20:29:55] Loading Steam API...
+[2025-08-14 20:29:55] OK
+[2025-08-14 20:29:55] @ShutdownOnFailedCommand 1
+[2025-08-14 20:29:55] "@ShutdownOnFailedCommand" = "1"
+[2025-08-14 20:29:55] @NoPromptForPassword 1
+[2025-08-14 20:29:55] "@NoPromptForPassword" = "1"
+[2025-08-14 20:29:55] set_steam_guard_code C3QCP
+[2025-08-14 20:29:55] Logging in using username/password.
+[2025-08-14 20:29:55] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-14 20:29:58] OK
+[2025-08-14 20:29:58] Waiting for client config...
+[2025-08-14 20:29:58] OK
+[2025-08-14 20:29:58] Waiting for user info...
+[2025-08-14 20:29:58] OK
+[2025-08-14 20:29:58] force_install_dir "C:\OGP64\home\gameserver\1440"
+[2025-08-14 20:29:58] Please use force_install_dir before logon!
+[2025-08-14 20:29:58] app_update 233780
+[2025-08-14 20:30:01]  Update state (0x61) downloading, progress: 11.49 (17353531 / 151085255)
+[2025-08-14 20:30:03]  Update state (0x81) verifying update, progress: 53.75 (81210183 / 151085255)
+[2025-08-14 20:30:05]  Update state (0x81) verifying update, progress: 98.91 (149440135 / 151085255)
+[2025-08-14 20:30:05] Success! App '233780' fully installed.
+[2025-08-14 20:30:05] exit
+[2025-08-14 20:30:05] Unloading Steam API...
+[2025-08-14 20:30:05] OK
+
+
+[2025-08-15 12:05:47] Client version: 1751406682
+[2025-08-15 12:05:47] Loading Steam API...
+[2025-08-15 12:05:47] OK
+[2025-08-15 12:05:47] @ShutdownOnFailedCommand 1
+[2025-08-15 12:05:47] "@ShutdownOnFailedCommand" = "1"
+[2025-08-15 12:05:47] @NoPromptForPassword 1
+[2025-08-15 12:05:47] "@NoPromptForPassword" = "1"
+[2025-08-15 12:05:47] set_steam_guard_code C3QCP
+[2025-08-15 12:05:47] Logging in using username/password.
+[2025-08-15 12:05:47] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 12:05:50] OK
+[2025-08-15 12:05:50] Waiting for client config...
+[2025-08-15 12:05:51] OK
+[2025-08-15 12:05:51] Waiting for user info...
+[2025-08-15 12:05:51] OK
+[2025-08-15 12:05:51] force_install_dir "C:\OGP64\home\gameserver\1506"
+[2025-08-15 12:05:51] Please use force_install_dir before logon!
+[2025-08-15 12:05:51] app_update 33910
+[2025-08-15 12:05:52] ERROR! Failed to install app '33910' (No subscription)
+[2025-08-15 12:05:52] exit
+[2025-08-15 12:05:52] Unloading Steam API...
+[2025-08-15 12:05:52] OK
+
+
+[2025-08-15 12:08:03] Client version: 1751406682
+[2025-08-15 12:08:03] Loading Steam API...
+[2025-08-15 12:08:03] OK
+[2025-08-15 12:08:03] @ShutdownOnFailedCommand 1
+[2025-08-15 12:08:03] "@ShutdownOnFailedCommand" = "1"
+[2025-08-15 12:08:03] @NoPromptForPassword 1
+[2025-08-15 12:08:03] "@NoPromptForPassword" = "1"
+[2025-08-15 12:08:03] set_steam_guard_code C3QCP
+[2025-08-15 12:08:03] Logging in using username/password.
+[2025-08-15 12:08:03] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 12:08:06] OK
+[2025-08-15 12:08:06] Waiting for client config...
+[2025-08-15 12:08:06] OK
+[2025-08-15 12:08:06] Waiting for user info...
+[2025-08-15 12:08:06] OK
+[2025-08-15 12:08:06] force_install_dir "C:\OGP64\home\gameserver\1506"
+[2025-08-15 12:08:06] Please use force_install_dir before logon!
+[2025-08-15 12:08:06] app_update 33910
+[2025-08-15 12:08:07] ERROR! Failed to install app '33910' (No subscription)
+[2025-08-15 12:08:07] exit
+[2025-08-15 12:08:07] Unloading Steam API...
+[2025-08-15 12:08:07] OK
+
+
+[2025-08-15 12:29:37] Client version: 1751406682
+[2025-08-15 12:29:37] Loading Steam API...
+[2025-08-15 12:29:37] OK
+[2025-08-15 12:29:38] @ShutdownOnFailedCommand 1
+[2025-08-15 12:29:38] "@ShutdownOnFailedCommand" = "1"
+[2025-08-15 12:29:39] @NoPromptForPassword 1
+[2025-08-15 12:29:39] "@NoPromptForPassword" = "1"
+[2025-08-15 12:29:39] set_steam_guard_code C3QCP
+[2025-08-15 12:29:39] Logging in using username/password.
+[2025-08-15 12:29:39] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 12:29:42] OK
+[2025-08-15 12:29:42] Waiting for client config...
+[2025-08-15 12:29:42] OK
+[2025-08-15 12:29:42] Waiting for user info...
+[2025-08-15 12:29:42] OK
+[2025-08-15 12:29:42] force_install_dir "C:\OGP64\home\gameserver\1509"
+[2025-08-15 12:29:42] Please use force_install_dir before logon!
+[2025-08-15 12:29:43] app_update 33930
+[2025-08-15 12:29:43] Success! App '33930' already up to date.
+[2025-08-15 12:29:43] exit
+[2025-08-15 12:29:43] Unloading Steam API...
+[2025-08-15 12:29:43] OK
+
+
+[2025-08-15 12:41:40] Client version: 1751406682
+[2025-08-15 12:41:40] Loading Steam API...
+[2025-08-15 12:41:40] OK
+[2025-08-15 12:41:40] @ShutdownOnFailedCommand 1
+[2025-08-15 12:41:40] "@ShutdownOnFailedCommand" = "1"
+[2025-08-15 12:41:41] @NoPromptForPassword 1
+[2025-08-15 12:41:41] "@NoPromptForPassword" = "1"
+[2025-08-15 12:41:41] set_steam_guard_code C3QCP
+[2025-08-15 12:41:41] Logging in using username/password.
+[2025-08-15 12:41:41] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 12:41:44] OK
+[2025-08-15 12:41:44] Waiting for client config...
+[2025-08-15 12:41:44] OK
+[2025-08-15 12:41:44] Waiting for user info...
+[2025-08-15 12:41:44] OK
+[2025-08-15 12:41:45] force_install_dir "C:\OGP64\home\gameserver\1510"
+[2025-08-15 12:41:45] Please use force_install_dir before logon!
+[2025-08-15 12:41:45] app_update 33930
+[2025-08-15 12:41:47]  Update state (0x61) downloading, progress: 0.00 (0 / 8714127071)
+[2025-08-15 12:41:49]  Update state (0x61) downloading, progress: 1.41 (122558082 / 8714127071)
+[2025-08-15 12:41:51]  Update state (0x61) downloading, progress: 3.65 (317938800 / 8714127071)
+[2025-08-15 12:41:53]  Update state (0x61) downloading, progress: 5.60 (487888455 / 8714127071)
+[2025-08-15 12:41:55]  Update state (0x61) downloading, progress: 8.75 (762225569 / 8714127071)
+[2025-08-15 12:41:57]  Update state (0x61) downloading, progress: 10.35 (901680944 / 8714127071)
+[2025-08-15 12:41:59]  Update state (0x61) downloading, progress: 12.56 (1094296935 / 8714127071)
+[2025-08-15 12:42:01]  Update state (0x61) downloading, progress: 14.45 (1259440392 / 8714127071)
+[2025-08-15 12:42:03]  Update state (0x61) downloading, progress: 16.43 (1431429774 / 8714127071)
+[2025-08-15 12:42:05]  Update state (0x61) downloading, progress: 20.45 (1781960705 / 8714127071)
+[2025-08-15 12:42:07]  Update state (0x61) downloading, progress: 24.55 (2139318067 / 8714127071)
+[2025-08-15 12:42:09]  Update state (0x61) downloading, progress: 27.88 (2429072112 / 8714127071)
+[2025-08-15 12:42:11]  Update state (0x61) downloading, progress: 30.18 (2629520840 / 8714127071)
+[2025-08-15 12:42:13]  Update state (0x61) downloading, progress: 33.76 (2941986867 / 8714127071)
+[2025-08-15 12:42:15]  Update state (0x61) downloading, progress: 35.63 (3104617887 / 8714127071)
+[2025-08-15 12:42:17]  Update state (0x61) downloading, progress: 39.59 (3450125339 / 8714127071)
+[2025-08-15 12:42:19]  Update state (0x61) downloading, progress: 41.98 (3658578639 / 8714127071)
+[2025-08-15 12:42:21]  Update state (0x61) downloading, progress: 43.79 (3815726080 / 8714127071)
+[2025-08-15 12:42:23]  Update state (0x61) downloading, progress: 47.31 (4122659767 / 8714127071)
+[2025-08-15 12:42:25]  Update state (0x61) downloading, progress: 48.78 (4250889551 / 8714127071)
+[2025-08-15 12:42:27]  Update state (0x61) downloading, progress: 50.33 (4385618999 / 8714127071)
+[2025-08-15 12:42:29]  Update state (0x61) downloading, progress: 52.14 (4543424135 / 8714127071)
+[2025-08-15 12:42:31]  Update state (0x61) downloading, progress: 53.91 (4697660350 / 8714127071)
+[2025-08-15 12:42:33]  Update state (0x61) downloading, progress: 55.63 (4847248680 / 8714127071)
+[2025-08-15 12:42:35]  Update state (0x61) downloading, progress: 56.59 (4931694277 / 8714127071)
+[2025-08-15 12:42:37]  Update state (0x61) downloading, progress: 58.02 (5056164641 / 8714127071)
+[2025-08-15 12:42:39]  Update state (0x61) downloading, progress: 59.26 (5163628716 / 8714127071)
+[2025-08-15 12:42:41]  Update state (0x61) downloading, progress: 60.80 (5297847000 / 8714127071)
+[2025-08-15 12:42:43]  Update state (0x61) downloading, progress: 64.19 (5593810733 / 8714127071)
+[2025-08-15 12:42:45]  Update state (0x61) downloading, progress: 68.56 (5974636297 / 8714127071)
+[2025-08-15 12:42:47]  Update state (0x61) downloading, progress: 71.32 (6214593044 / 8714127071)
+[2025-08-15 12:42:49]  Update state (0x61) downloading, progress: 74.82 (6519580137 / 8714127071)
+[2025-08-15 12:42:51]  Update state (0x61) downloading, progress: 77.80 (6779405844 / 8714127071)
+[2025-08-15 12:42:53]  Update state (0x61) downloading, progress: 81.08 (7065032356 / 8714127071)
+[2025-08-15 12:42:55]  Update state (0x61) downloading, progress: 83.12 (7242969416 / 8714127071)
+[2025-08-15 12:42:57]  Update state (0x61) downloading, progress: 87.45 (7620390618 / 8714127071)
+[2025-08-15 12:42:59]  Update state (0x61) downloading, progress: 90.76 (7908944591 / 8714127071)
+[2025-08-15 12:43:01]  Update state (0x61) downloading, progress: 93.72 (8166720334 / 8714127071)
+[2025-08-15 12:43:03]  Update state (0x61) downloading, progress: 96.41 (8401003139 / 8714127071)
+[2025-08-15 12:43:05]  Update state (0x61) downloading, progress: 99.96 (8710981343 / 8714127071)
+[2025-08-15 12:43:07]  Update state (0x81) verifying update, progress: 2.57 (223568644 / 8714127071)
+[2025-08-15 12:43:09]  Update state (0x81) verifying update, progress: 5.18 (451539412 / 8714127071)
+[2025-08-15 12:43:11]  Update state (0x81) verifying update, progress: 8.14 (709489108 / 8714127071)
+[2025-08-15 12:43:13]  Update state (0x81) verifying update, progress: 11.05 (963340316 / 8714127071)
+[2025-08-15 12:43:15]  Update state (0x81) verifying update, progress: 13.83 (1204939832 / 8714127071)
+[2025-08-15 12:43:17]  Update state (0x81) verifying update, progress: 16.48 (1436062502 / 8714127071)
+[2025-08-15 12:43:19]  Update state (0x81) verifying update, progress: 19.37 (1688152287 / 8714127071)
+[2025-08-15 12:43:21]  Update state (0x81) verifying update, progress: 22.08 (1924022558 / 8714127071)
+[2025-08-15 12:43:23]  Update state (0x101) committing, progress: 26.13 (2277282061 / 8714127071)
+[2025-08-15 12:43:24] Success! App '33930' fully installed.
+[2025-08-15 12:43:24] exit
+[2025-08-15 12:43:24] Unloading Steam API...
+[2025-08-15 12:43:24] OK
+
+
+[2025-08-15 12:50:16] Client version: 1751406682
+[2025-08-15 12:50:16] Loading Steam API...
+[2025-08-15 12:50:16] OK
+[2025-08-15 12:50:16] @ShutdownOnFailedCommand 1
+[2025-08-15 12:50:16] "@ShutdownOnFailedCommand" = "1"
+[2025-08-15 12:50:16] @NoPromptForPassword 1
+[2025-08-15 12:50:16] "@NoPromptForPassword" = "1"
+[2025-08-15 12:50:16] set_steam_guard_code C3QCP
+[2025-08-15 12:50:16] Logging in using username/password.
+[2025-08-15 12:50:16] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 12:50:19] OK
+[2025-08-15 12:50:19] Waiting for client config...
+[2025-08-15 12:50:19] OK
+[2025-08-15 12:50:19] Waiting for user info...
+[2025-08-15 12:50:19] OK
+[2025-08-15 12:50:19] force_install_dir "C:\OGP64\home\gameserver\1511"
+[2025-08-15 12:50:19] Please use force_install_dir before logon!
+[2025-08-15 12:50:19] app_update 33910
+[2025-08-15 12:50:20] ERROR! Failed to install app '33910' (No subscription)
+[2025-08-15 12:50:20] exit
+[2025-08-15 12:50:20] Unloading Steam API...
+[2025-08-15 12:50:20] OK
+
+
+[2025-08-15 18:13:09] Client version: 1751406682
+[2025-08-15 18:13:09] Loading Steam API...
+[2025-08-15 18:13:09] OK
+[2025-08-15 18:13:09] 
+Steam>
+[2025-08-15 18:13:22] Logging in using username/password.
+[2025-08-15 18:13:22] Logging in user 'sh000tingblanks' [U:1:0] to Steam Public...
+[2025-08-15 18:13:25] ERROR (Invalid Password)
+[2025-08-15 18:13:25] 
+Steam>
+[2025-08-15 18:13:35] ERROR! Failed to request app info update, not online or not logged in to Steam.
+[2025-08-15 18:13:35] 
+Steam>
+[2025-08-15 18:14:54] ERROR! Failed to request app info update, not online or not logged in to Steam.
+[2025-08-15 18:14:54] 
+Steam>
+[2025-08-15 18:15:09] Logging in using cached credentials.
+[2025-08-15 18:15:09] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 18:15:10] OK
+[2025-08-15 18:15:10] Waiting for client config...
+[2025-08-15 18:15:11] OK
+[2025-08-15 18:15:11] Waiting for user info...
+[2025-08-15 18:15:11] OK
+[2025-08-15 18:15:11] 
+Steam>
+[2025-08-15 18:15:23] ERROR! Failed to install app '33910' (No subscription)
+[2025-08-15 18:15:23] 
+Steam>
+[2025-08-15 18:15:38] Logging off current session...
+[2025-08-15 18:15:39] 
+steamcmd has been disconnected from steam with result 1 (OK)
+[2025-08-15 18:15:39] OK
+[2025-08-15 18:15:39] Logging in using username/password.
+[2025-08-15 18:15:39] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-15 18:15:40] OK
+[2025-08-15 18:15:40] Waiting for client config...
+[2025-08-15 18:15:40] OK
+[2025-08-15 18:15:40] Waiting for user info...
+[2025-08-15 18:15:41] OK
+[2025-08-15 18:15:41] 
+Steam>
+[2025-08-15 18:15:49] ERROR! Failed to install app '33910' (No subscription)
+[2025-08-15 18:15:49] 
+Steam>
+[2025-08-15 18:16:05]  Update state (0x61) downloading, progress: 0.40 (35010633 / 8714127071)
+[2025-08-15 18:16:07]  Update state (0x61) downloading, progress: 3.63 (316582437 / 8714127071)
+[2025-08-15 18:16:09]  Update state (0x61) downloading, progress: 5.62 (489985607 / 8714127071)
+[2025-08-15 18:16:11]  Update state (0x61) downloading, progress: 8.81 (767401177 / 8714127071)
+[2025-08-15 18:16:13]  Update state (0x61) downloading, progress: 10.46 (911182390 / 8714127071)
+[2025-08-15 18:16:15]  Update state (0x61) downloading, progress: 12.38 (1079100457 / 8714127071)
+[2025-08-15 18:16:17]  Update state (0x61) downloading, progress: 14.32 (1247881692 / 8714127071)
+[2025-08-15 18:16:19]  Update state (0x61) downloading, progress: 16.12 (1405094074 / 8714127071)
+[2025-08-15 18:16:21]  Update state (0x61) downloading, progress: 17.92 (1561329982 / 8714127071)
+[2025-08-15 18:16:23]  Update state (0x61) downloading, progress: 21.50 (1873598414 / 8714127071)
+[2025-08-15 18:16:25]  Update state (0x61) downloading, progress: 24.52 (2136643137 / 8714127071)
+[2025-08-15 18:16:27]  Update state (0x61) downloading, progress: 28.33 (2468309605 / 8714127071)
+[2025-08-15 18:16:29]  Update state (0x61) downloading, progress: 32.02 (2790299355 / 8714127071)
+[2025-08-15 18:16:31]  Update state (0x61) downloading, progress: 33.59 (2926715078 / 8714127071)
+[2025-08-15 18:16:33]  Update state (0x61) downloading, progress: 36.68 (3196564116 / 8714127071)
+[2025-08-15 18:16:35]  Update state (0x61) downloading, progress: 38.89 (3389013091 / 8714127071)
+[2025-08-15 18:16:37]  Update state (0x61) downloading, progress: 41.10 (3581237682 / 8714127071)
+[2025-08-15 18:16:39]  Update state (0x61) downloading, progress: 43.44 (3785802888 / 8714127071)
+[2025-08-15 18:16:41]  Update state (0x61) downloading, progress: 46.19 (4025041309 / 8714127071)
+[2025-08-15 18:16:43]  Update state (0x61) downloading, progress: 49.16 (4284294844 / 8714127071)
+[2025-08-15 18:16:45]  Update state (0x61) downloading, progress: 51.71 (4506308075 / 8714127071)
+[2025-08-15 18:16:47]  Update state (0x61) downloading, progress: 54.44 (4743604714 / 8714127071)
+[2025-08-15 18:16:49]  Update state (0x61) downloading, progress: 57.13 (4978646608 / 8714127071)
+[2025-08-15 18:16:51]  Update state (0x61) downloading, progress: 60.51 (5272864812 / 8714127071)
+[2025-08-15 18:16:53]  Update state (0x61) downloading, progress: 62.91 (5482124023 / 8714127071)
+[2025-08-15 18:16:55]  Update state (0x61) downloading, progress: 65.47 (5705170011 / 8714127071)
+[2025-08-15 18:16:57]  Update state (0x61) downloading, progress: 67.86 (5913837190 / 8714127071)
+[2025-08-15 18:16:59]  Update state (0x61) downloading, progress: 71.22 (6205766992 / 8714127071)
+[2025-08-15 18:17:01]  Update state (0x61) downloading, progress: 76.23 (6642939456 / 8714127071)
+[2025-08-15 18:17:03]  Update state (0x61) downloading, progress: 79.24 (6904968029 / 8714127071)
+[2025-08-15 18:17:05]  Update state (0x61) downloading, progress: 82.80 (7215263149 / 8714127071)
+[2025-08-15 18:17:07]  Update state (0x61) downloading, progress: 85.81 (7477810373 / 8714127071)
+[2025-08-15 18:17:09]  Update state (0x61) downloading, progress: 89.31 (7782894708 / 8714127071)
+[2025-08-15 18:17:11]  Update state (0x61) downloading, progress: 92.41 (8052877336 / 8714127071)
+[2025-08-15 18:17:13]  Update state (0x61) downloading, progress: 95.56 (8327565665 / 8714127071)
+[2025-08-15 18:17:15]  Update state (0x61) downloading, progress: 98.68 (8598724907 / 8714127071)
+[2025-08-15 18:17:17]  Update state (0x81) verifying update, progress: 1.38 (120560682 / 8714127071)
+[2025-08-15 18:17:19]  Update state (0x81) verifying update, progress: 4.25 (370001742 / 8714127071)
+[2025-08-15 18:17:21]  Update state (0x81) verifying update, progress: 7.14 (622087018 / 8714127071)
+[2025-08-15 18:17:23]  Update state (0x81) verifying update, progress: 10.30 (897862506 / 8714127071)
+[2025-08-15 18:17:25]  Update state (0x81) verifying update, progress: 13.49 (1175350861 / 8714127071)
+[2025-08-15 18:17:27]  Update state (0x81) verifying update, progress: 16.48 (1436062502 / 8714127071)
+[2025-08-15 18:17:29]  Update state (0x81) verifying update, progress: 19.58 (1705978079 / 8714127071)
+[2025-08-15 18:17:31]  Update state (0x81) verifying update, progress: 22.38 (1950529142 / 8714127071)
+[2025-08-15 18:17:33]  Update state (0x101) committing, progress: 100.00 (8714127071 / 8714127071)
+[2025-08-15 18:17:33] Success! App '33930' fully installed.
+[2025-08-15 18:17:33] 
+Steam>
+
+
+[2025-08-28 12:51:27] Client version: 1751406682
+[2025-08-28 12:51:27] Loading Steam API...
+[2025-08-28 12:51:27] OK
+[2025-08-28 12:51:28] @ShutdownOnFailedCommand 1
+[2025-08-28 12:51:28] "@ShutdownOnFailedCommand" = "1"
+[2025-08-28 12:51:28] @NoPromptForPassword 1
+[2025-08-28 12:51:28] "@NoPromptForPassword" = "1"
+[2025-08-28 12:51:28] set_steam_guard_code C3QCP
+[2025-08-28 12:51:28] Logging in using username/password.
+[2025-08-28 12:51:28] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-28 12:51:30] OK
+[2025-08-28 12:51:30] Waiting for client config...
+[2025-08-28 12:51:31] OK
+[2025-08-28 12:51:31] Waiting for user info...
+[2025-08-28 12:51:31] OK
+[2025-08-28 12:51:31] force_install_dir "C:\OGP64\home\gameserver\1513"
+[2025-08-28 12:51:31] Please use force_install_dir before logon!
+[2025-08-28 12:51:32] app_update bec
+[2025-08-28 12:51:32] exit
+[2025-08-28 12:51:32] Unloading Steam API...
+[2025-08-28 12:51:32] OK
+
+
+[2025-08-28 18:54:47] Client version: 1751406682
+[2025-08-28 18:54:47] Loading Steam API...
+[2025-08-28 18:54:47] OK
+[2025-08-28 18:54:47] @ShutdownOnFailedCommand 1
+[2025-08-28 18:54:47] "@ShutdownOnFailedCommand" = "1"
+[2025-08-28 18:54:48] @NoPromptForPassword 1
+[2025-08-28 18:54:48] "@NoPromptForPassword" = "1"
+[2025-08-28 18:54:48] set_steam_guard_code C3QCP
+[2025-08-28 18:54:48] Logging in using username/password.
+[2025-08-28 18:54:48] Logging in user 'shoootingblanks' [U:1:120543934] to Steam Public...
+[2025-08-28 18:54:50] OK
+[2025-08-28 18:54:50] Waiting for client config...
+[2025-08-28 18:54:51] OK
+[2025-08-28 18:54:51] Waiting for user info...
+[2025-08-28 18:54:51] OK
+[2025-08-28 18:54:51] force_install_dir "C:\OGP64\home\gameserver\1514"
+[2025-08-28 18:54:51] Please use force_install_dir before logon!
+[2025-08-28 18:54:51] app_update 33930
+[2025-08-28 18:54:51] Success! App '33930' already up to date.
+[2025-08-28 18:54:51] exit
+[2025-08-28 18:54:52] Unloading Steam API...
+[2025-08-28 18:54:52] OK

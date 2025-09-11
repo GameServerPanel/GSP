@@ -1,0 +1,92 @@
+<game_config>
+ <game_key>factorio_linux</game_key>
+ <installer>steamcmd</installer>
+ <game_name>factorio</game_name>
+ <server_exec_name>./bin/x64/factorio</server_exec_name>
+<cli_template>%SAVES% --server-settings ./data/server-settings.json %WL% %PORT%</cli_template>
+ <cli_params>
+  <cli_param id="PORT" cli_string="--port "/>
+  <cli_param id="HOSTNAME" cli_string="" options="q" />
+ </cli_params>
+<console_log>factorio-current.log</console_log>
+<max_user_amount>100</max_user_amount>
+ <mods>
+ <mod>
+   <name>none</name>
+   <installer_name>none</installer_name>
+  </mod>
+ </mods>
+ <server_params>
+  <param key="--start-server " type="text" id="SAVES">
+      <default>saves/save.zip</default>
+      <options>ns</options>
+      <desc>Path and name of file to load</desc>
+    </param>
+	<param key="--use-server-whitelist true " type="checkbox_key_value" id="WL">
+<caption> Enable Whitelist</caption>      
+<desc></desc>
+    </param>
+
+
+</server_params>
+<custom_fields>
+    <field key="Username" type="text">
+      <default>"username":.*</default>
+      <default_value></default_value>
+      <var>"username":</var>
+      <filepath>data/server-settings.json</filepath>
+      <options>sqc</options>
+      <desc>Username from Factorio.com</desc>
+    </field>
+	    <field key="Password" type="text">
+      <default>"password":.*</default>
+      <default_value></default_value>
+      <var>"password":</var>
+      <filepath>data/server-settings.json</filepath>
+      <options>sqc</options>
+      <desc>Password from Factorio.com</desc>
+    </field>
+	    <field key="Game Name" type="text">
+      <default>"name":.*</default>
+      <default_value>I Are Gamer</default_value>
+      <var>"name":</var>
+      <filepath>data/server-settings.json</filepath>
+      <options>sqc</options>
+      <desc>Name of server as shown in server browser</desc>
+    </field>
+	   <field key="Game Description" type="text">
+      <default>"description":.*</default>
+      <default_value>Bestest Server Ever</default_value>
+      <var>"description":</var>
+      <filepath>data/server-settings.json</filepath>
+      <options>sqc</options>
+      <desc>DESCRIPTION of server as shown in server browser</desc>
+    </field>
+	<field key="Game Password" type="text">
+      <default>"game_password":.*</default>
+      <default_value></default_value>
+      <var>"game_password":</var>
+      <filepath>data/server-settings.json</filepath>
+      <options>sqc</options>
+      <desc>Player must enter this password to join the server</desc>
+    </field>
+	 
+  </custom_fields>
+<post_install>
+wget -r -np -nH --cut-dirs=2  -R "index.html*" http://files.iaregamer.com/installers/factorio/
+wget -o factorio.xz https://factorio.com/get-download/stable/headless/linux64
+tar -xf factorio.xz
+cp -r factorio/* .
+rm -r factorio
+rm factorio.xz
+</post_install>
+
+<configuration_files>
+ <file description="Server settings (use SERVER SETTINGS to edit this file">data/server-settings.json</file>
+ <file description="Whitelist File">data/server-whitelist.json</file>
+ <file description="Adminlist File">data/server-adminlist.json</file>
+ <file description="Banlist File">data/server-banlist.json</file>
+</configuration_files>
+
+</game_config>
+

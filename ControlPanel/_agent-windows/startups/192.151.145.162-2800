@@ -1,0 +1,1 @@
+1125,/home/gameserver/1125,arma2oaserver.exe,,-cfg=cfg\basic.cfg -config=cfg\server.cfg -name=dayz -profiles=cfg -ip=192.151.145.162 -port=2800 -mod=@dayz;@hive;,2800,192.151.145.162,NA,0,cd bec{OGPNEWLINE}start "BEC" bec.exe --dsc --dec -f config.cfg,,dayzmod_win32,cfg/arma2oaserver.RPT

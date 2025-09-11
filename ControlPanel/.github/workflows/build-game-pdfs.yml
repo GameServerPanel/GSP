@@ -1,0 +1,123 @@
+name: Build Game PDFs
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_pdfs:
+        description: 'Commit PDFs back to repository'
+        required: false
+        default: 'true'
+        type: boolean
+  push:
+    branches: [main]
+    paths:
+      - 'all_hostable_games_union.csv'
+      - 'scripts/build_pdfs.py'
+      - 'scripts/clean.py'
+      - 'scripts/quality_control.py'
+      - 'templates/game_guide.md'
+      - '.github/workflows/build-game-pdfs.yml'
+
+jobs:
+  build-pdfs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pandoc wkhtmltopdf
+        
+    - name: Install Python dependencies
+      run: |
+        pip install pandas PyYAML
+        
+    - name: Clean previous output
+      run: |
+        python3 scripts/clean.py
+        
+    - name: Generate all game guides and PDFs
+      run: |
+        python3 scripts/build_pdfs.py
+        
+    - name: Run quality control validation
+      run: |
+        python3 scripts/quality_control.py
+        
+    - name: Generate statistics
+      run: |
+        echo "## Build Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "- **Markdown files:** $(find out/md -name '*.md' | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- **PDF files:** $(find out/pdfs -name '*.pdf' | wc -l)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total PDF size:** $(du -sh out/pdfs/ | cut -f1)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Generated:** $(date)" >> $GITHUB_STEP_SUMMARY
+        
+        # Check for quality issues
+        if [ -f out/pdfs/quality_report.json ]; then
+          ERRORS=$(jq -r '.total_errors' out/pdfs/quality_report.json)
+          WARNINGS=$(jq -r '.total_warnings' out/pdfs/quality_report.json)
+          echo "- **Quality:** $ERRORS errors, $WARNINGS warnings" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$ERRORS" -gt "0" ]; then
+            echo "❌ Quality validation failed with $ERRORS errors" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ Quality validation passed" >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+        
+    - name: Upload PDF artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-server-guides-pdfs
+        path: out/pdfs/
+        retention-days: 30
+        
+    - name: Upload Markdown artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-server-guides-markdown
+        path: out/md/
+        retention-days: 30
+        
+    - name: Commit PDFs to repository
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.commit_pdfs == 'true' || github.event_name == 'push'
+      run: |
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        # Create docs/pdfs directory if it doesn't exist
+        mkdir -p docs/pdfs
+        
+        # Copy PDFs to docs directory
+        cp out/pdfs/*.pdf docs/pdfs/ 2>/dev/null || true
+        cp out/pdfs/manifest.json docs/pdfs/ 2>/dev/null || true
+        cp out/pdfs/quality_report.json docs/pdfs/ 2>/dev/null || true
+        
+        # Add and commit changes
+        git add docs/pdfs/
+        
+        # Check if there are changes to commit
+        if ! git diff --staged --quiet; then
+          GAME_COUNT=$(find out/pdfs -name '*.pdf' | wc -l)
+          git commit -m "docs: regenerate exhaustive self-hosting PDFs for $GAME_COUNT games
+          
+          - Generated $(date)
+          - Total PDFs: $GAME_COUNT
+          - Quality validated: $(jq -r '.total_errors' out/pdfs/quality_report.json 2>/dev/null || echo '0') errors
+          - All guides are hosting-agnostic and self-hosting focused"
+          
+          git push
+          echo "✅ PDFs committed to repository" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "ℹ️ No changes to commit" >> $GITHUB_STEP_SUMMARY
+        fi
