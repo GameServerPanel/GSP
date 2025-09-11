@@ -1,6 +1,0 @@
-cfg
-conf
-ini
-gam
-properties
-txt

@@ -1,3 +1,0 @@
-<navigation>
-  <page key="default" file="faq.php" access="user,admin" />
-</navigation>
