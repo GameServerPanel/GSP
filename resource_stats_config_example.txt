@@ -1,0 +1,26 @@
+# Example OGP Agent Configuration for Resource Stats
+# Add these lines to your Cfg/Config.pm files
+
+# Database connection settings
+stats_db_host => 'localhost',              # Your MySQL server
+stats_db_user => 'ogp_panel_user',        # Database username  
+stats_db_pass => 'your_secure_password',   # Database password
+stats_db_name => 'ogp_panel_db',          # Your panel database name
+stats_table_prefix => 'gsp_',             # Table prefix (keep as 'gsp_')
+stats_frequency_minutes => '5',           # Collect stats every 5 minutes
+
+# Example configurations for different scenarios:
+
+# High-frequency monitoring (every minute) - use with caution
+# stats_frequency_minutes => '1',
+
+# Low-frequency monitoring (every 15 minutes) - for less critical systems  
+# stats_frequency_minutes => '15',
+
+# Remote database server example
+# stats_db_host => '192.168.1.100',
+
+# Note: Make sure the database user has INSERT privileges on:
+# - gsp_machines table
+# - gsp_machine_samples table  
+# - gsp_process_samples table
