@@ -50,6 +50,10 @@ use Compress::Zlib; # Used to compress file download buffers to zlib.
 use Archive::Tar; # Used to create tar, tgz or tbz archives.
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS ); # Used to create zip archives.
 
+# Database modules for resource stats
+use DBI;  # Database interface
+eval "use DBD::mysql"; # MySQL driver (optional, will skip stats if not available)
+
 # Current location of the agent.
 use constant AGENT_RUN_DIR => getcwd();
 
@@ -89,6 +93,14 @@ use constant SCHED_PID => Path::Class::File->new(AGENT_RUN_DIR, 'scheduler.pid')
 use constant SCHED_TASKS => Path::Class::File->new(AGENT_RUN_DIR, 'scheduler.tasks');
 use constant SCHED_LOG_FILE => Path::Class::File->new(AGENT_RUN_DIR, 'scheduler.log');
 use constant USER_RUNNING_SCRIPT => getlogin || getpwuid($<) || "cyg_server";
+
+# Resource stats database constants
+use constant STATS_DB_HOST => $Cfg::Config{stats_db_host};
+use constant STATS_DB_USER => $Cfg::Config{stats_db_user};
+use constant STATS_DB_PASS => $Cfg::Config{stats_db_pass};
+use constant STATS_DB_NAME => $Cfg::Config{stats_db_name};
+use constant STATS_TABLE_PREFIX => $Cfg::Config{stats_table_prefix};
+use constant STATS_FREQUENCY_MINUTES => $Cfg::Config{stats_frequency_minutes};
 
 my $no_startups	= 0;
 my $clear_startups = 0;
@@ -278,6 +290,12 @@ my $cron = new Schedule::Cron( \&scheduler_dispatcher, {
                                        } );
 
 $cron->add_entry( "* * * * * *", \&scheduler_read_tasks );
+
+# Add resource stats collection task
+my $stats_frequency = STATS_FREQUENCY_MINUTES || 5;
+my $stats_cron_pattern = "*/$stats_frequency * * * *";  # Every N minutes
+$cron->add_entry( $stats_cron_pattern, \&collect_resource_stats );
+
 # Run scheduler
 $cron->run( {detach=>1, pid_file=>SCHED_PID} );
 
@@ -4286,4 +4304,364 @@ sub get_workshop_mods_info()
 	}
 	
 	return -1;
+}
+
+##################################################################
+# Resource Stats Collection System (Windows)
+##################################################################
+
+# Get current timestamp in MySQL format
+sub get_utc_timestamp {
+	my ($sec, $min, $hour, $mday, $mon, $year) = gmtime();
+	return sprintf("%04d-%02d-%02d %02d:%02d:%02d", 
+		$year + 1900, $mon + 1, $mday, $hour, $min, $sec);
+}
+
+# Connect to stats database
+sub connect_stats_db {
+	# Check if DBD::mysql is available
+	eval { require DBD::mysql; };
+	if ($@) {
+		logger "DBD::mysql not available - resource stats collection disabled";
+		return undef;
+	}
+	
+	my $dsn = "DBI:mysql:database=" . STATS_DB_NAME . ";host=" . STATS_DB_HOST;
+	my $dbh = eval { DBI->connect($dsn, STATS_DB_USER, STATS_DB_PASS, 
+		{ RaiseError => 1, AutoCommit => 1, mysql_enable_utf8 => 1 }) };
+	
+	if ($@) {
+		logger "Failed to connect to stats database: $@";
+		return undef;
+	}
+	
+	return $dbh;
+}
+
+# Ensure machine exists in gsp_machines table
+sub ensure_machine_exists {
+	my ($dbh, $machine_id, $hostname) = @_;
+	
+	my $table = STATS_TABLE_PREFIX . "machines";
+	my $sql = "INSERT IGNORE INTO $table (machine_id, hostname) VALUES (?, ?)";
+	
+	eval {
+		my $sth = $dbh->prepare($sql);
+		$sth->execute($machine_id, $hostname);
+		$sth->finish();
+	};
+	
+	if ($@) {
+		logger "Failed to ensure machine exists: $@";
+		return 0;
+	}
+	
+	return 1;
+}
+
+# Get machine-wide system stats using Windows tools
+sub collect_machine_stats {
+	my $stats = {};
+	
+	# Windows doesn't have load averages, set to 0
+	$stats->{load1} = 0;
+	$stats->{load5} = 0;
+	$stats->{load15} = 0;
+	
+	# Get CPU usage using wmic
+	my $cpu_output = `wmic cpu get loadpercentage /value 2>nul`;
+	if ($cpu_output =~ /LoadPercentage=(\d+)/) {
+		$stats->{cpu_pct} = $1;
+	} else {
+		$stats->{cpu_pct} = 0;
+	}
+	
+	# Get memory info using wmic
+	my $mem_total = 0;
+	my $mem_free = 0;
+	
+	my $mem_output = `wmic OS get TotalVisibleMemorySize,FreePhysicalMemory /value 2>nul`;
+	if ($mem_output =~ /TotalVisibleMemorySize=(\d+)/) {
+		$mem_total = $1 * 1024;  # Convert from KB to bytes
+	}
+	if ($mem_output =~ /FreePhysicalMemory=(\d+)/) {
+		$mem_free = $1 * 1024;   # Convert from KB to bytes
+	}
+	
+	my $mem_used = $mem_total - $mem_free;
+	$stats->{mem_used_bytes} = $mem_used;
+	$stats->{mem_total_bytes} = $mem_total;
+	$stats->{mem_used_pct} = $mem_total > 0 ? sprintf("%.2f", ($mem_used * 100) / $mem_total) : 0;
+	
+	# Get swap/pagefile info
+	my $swap_output = `wmic pagefile get AllocatedBaseSize,CurrentUsage /value 2>nul`;
+	my ($swap_total, $swap_used) = (0, 0);
+	if ($swap_output =~ /AllocatedBaseSize=(\d+)/) {
+		$swap_total = $1 * 1024 * 1024;  # Convert from MB to bytes
+	}
+	if ($swap_output =~ /CurrentUsage=(\d+)/) {
+		$swap_used = $1 * 1024 * 1024;   # Convert from MB to bytes
+	}
+	
+	$stats->{swap_used_bytes} = $swap_used;
+	$stats->{swap_total_bytes} = $swap_total;
+	
+	# Get disk usage for agent directory
+	my $disk_path = AGENT_RUN_DIR;
+	$disk_path =~ s/\//\\/g;  # Convert forward slashes to backslashes for Windows
+	
+	# Extract drive letter
+	my $drive_letter = substr($disk_path, 0, 2);
+	
+	my $disk_output = `wmic logicaldisk where "DeviceID='$drive_letter'" get Size,FreeSpace /value 2>nul`;
+	if ($disk_output =~ /FreeSpace=(\d+).*Size=(\d+)/s) {
+		my ($free, $total) = ($1, $2);
+		my $used = $total - $free;
+		$stats->{disk_path} = $disk_path;
+		$stats->{disk_total_bytes} = $total;
+		$stats->{disk_used_bytes} = $used;
+		$stats->{disk_used_pct} = $total > 0 ? sprintf("%.2f", ($used * 100) / $total) : 0;
+	}
+	
+	# Get network interface info (basic implementation)
+	$stats->{net_iface} = "unknown";
+	$stats->{rx_bytes} = 0;
+	$stats->{tx_bytes} = 0;
+	$stats->{iface_speed_mbps} = undef;
+	
+	# Try to get network stats using netstat (basic implementation)
+	my $netstat_output = `netstat -e 2>nul`;
+	if ($netstat_output =~ /(\d+)\s+(\d+)/) {
+		$stats->{rx_bytes} = $1;
+		$stats->{tx_bytes} = $2;
+	}
+	
+	return $stats;
+}
+
+# Get folder size using Windows dir command
+sub get_folder_size_bytes {
+	my ($folder_path) = @_;
+	return 0 unless -d $folder_path;
+	
+	# Convert path for Windows
+	$folder_path =~ s/\//\\/g;
+	
+	my $dir_output = `dir "$folder_path" /s /-c 2>nul | findstr "bytes"`;
+	if ($dir_output =~ /(\d+) bytes/) {
+		return $1;
+	}
+	
+	return 0;
+}
+
+# Find server processes on Windows
+sub find_server_processes {
+	my @server_dirs = ();
+	
+	# Find server directories
+	if (opendir(my $dh, AGENT_RUN_DIR)) {
+		while (my $entry = readdir($dh)) {
+			next if $entry =~ /^\./;  # Skip hidden directories
+			my $path = Path::Class::Dir->new(AGENT_RUN_DIR, $entry);
+			push @server_dirs, $path if -d $path;
+		}
+		closedir($dh);
+	}
+	
+	my %server_procs = ();
+	
+	# Get all running processes using wmic
+	my @processes = get_all_processes_windows();
+	
+	# Associate processes with server directories
+	for my $server_dir (@server_dirs) {
+		my $server_path = "$server_dir";
+		$server_path =~ s/\//\\/g;  # Convert to Windows path
+		$server_procs{$server_path} = [];
+		
+		for my $proc (@processes) {
+			my $exe_path = $proc->{exe} || '';
+			my $cmd = $proc->{cmd} || '';
+			
+			# Check if process is associated with this server directory
+			if (index($exe_path, $server_path) >= 0 || 
+				index($cmd, $server_path) >= 0) {
+				push @{$server_procs{$server_path}}, $proc;
+			}
+		}
+	}
+	
+	return %server_procs;
+}
+
+# Get all running processes on Windows
+sub get_all_processes_windows {
+	my @processes = ();
+	
+	# Use wmic to get process information
+	my $wmic_output = `wmic process get ProcessId,Name,ExecutablePath,CommandLine,WorkingSetSize,VirtualSize /format:csv 2>nul`;
+	
+	my @lines = split /\n/, $wmic_output;
+	shift @lines;  # Remove header
+	
+	for my $line (@lines) {
+		next unless $line =~ /\S/;  # Skip empty lines
+		chomp $line;
+		
+		my @fields = split /,/, $line;
+		next unless @fields >= 6;
+		
+		my $proc = {
+			pid => $fields[4] || 0,
+			name => $fields[2] || '',
+			cmd => $fields[1] || '',
+			exe => $fields[3] || '',
+			rss_bytes => $fields[5] || 0,
+			vms_bytes => $fields[6] || 0,
+			cpu_pct => 0,  # Not easily available on Windows
+			io_read_bytes => 0,
+			io_write_bytes => 0,
+			open_fds => 0,
+		};
+		
+		push @processes, $proc if $proc->{pid} > 0;
+	}
+	
+	return @processes;
+}
+
+# Get listening ports for a process (Windows implementation)
+sub get_process_listening_ports {
+	my ($pid) = @_;
+	my @ports = ();
+	
+	# Use netstat to find listening ports for this PID
+	my $netstat_output = `netstat -ano | findstr ":.*LISTENING.*$pid" 2>nul`;
+	
+	for my $line (split /\n/, $netstat_output) {
+		if ($line =~ /:(\d+)\s+.*LISTENING\s+$pid/) {
+			push @ports, $1;
+		}
+	}
+	
+	return join(',', sort { $a <=> $b } @ports);
+}
+
+# Insert machine sample into database
+sub insert_machine_sample {
+	my ($dbh, $timestamp, $machine_id, $stats) = @_;
+	
+	my $table = STATS_TABLE_PREFIX . "machine_samples";
+	my $sql = qq{
+		INSERT INTO $table 
+		(machine_id, ts, load1, load5, load15, cpu_pct,
+		 mem_used_bytes, mem_total_bytes, mem_used_pct,
+		 swap_used_bytes, swap_total_bytes,
+		 disk_path, disk_total_bytes, disk_used_bytes, disk_used_pct,
+		 net_iface, rx_bytes, tx_bytes, iface_speed_mbps)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	};
+	
+	eval {
+		my $sth = $dbh->prepare($sql);
+		$sth->execute(
+			$machine_id, $timestamp,
+			$stats->{load1}, $stats->{load5}, $stats->{load15}, $stats->{cpu_pct},
+			$stats->{mem_used_bytes}, $stats->{mem_total_bytes}, $stats->{mem_used_pct},
+			$stats->{swap_used_bytes}, $stats->{swap_total_bytes},
+			$stats->{disk_path}, $stats->{disk_total_bytes}, $stats->{disk_used_bytes}, $stats->{disk_used_pct},
+			$stats->{net_iface}, $stats->{rx_bytes}, $stats->{tx_bytes}, $stats->{iface_speed_mbps}
+		);
+		$sth->finish();
+	};
+	
+	if ($@) {
+		logger "Failed to insert machine sample: $@";
+		return 0;
+	}
+	
+	return 1;
+}
+
+# Insert process sample into database
+sub insert_process_sample {
+	my ($dbh, $timestamp, $machine_id, $server_name, $server_path, $proc, $folder_size) = @_;
+	
+	my $table = STATS_TABLE_PREFIX . "process_samples";
+	my $sql = qq{
+		INSERT INTO $table
+		(machine_id, ts, server_name, server_path,
+		 pid, proc_name, cmd, cpu_pct,
+		 rss_bytes, vms_bytes, mem_pct,
+		 io_read_bytes, io_write_bytes, open_fds,
+		 listening_ports, folder_size_bytes)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	};
+	
+	# Get listening ports for this process
+	my $ports = get_process_listening_ports($proc->{pid});
+	
+	eval {
+		my $sth = $dbh->prepare($sql);
+		$sth->execute(
+			$machine_id, $timestamp, $server_name, $server_path,
+			$proc->{pid}, $proc->{name}, $proc->{cmd}, $proc->{cpu_pct},
+			$proc->{rss_bytes}, $proc->{vms_bytes}, 0,  # mem_pct placeholder
+			$proc->{io_read_bytes}, $proc->{io_write_bytes}, $proc->{open_fds},
+			$ports, $folder_size
+		);
+		$sth->finish();
+	};
+	
+	if ($@) {
+		logger "Failed to insert process sample: $@";
+		return 0;
+	}
+	
+	return 1;
+}
+
+# Main resource stats collection function
+sub collect_resource_stats {
+	logger "Starting resource stats collection (Windows)";
+	
+	# Connect to database
+	my $dbh = connect_stats_db();
+	return unless $dbh;
+	
+	my $timestamp = get_utc_timestamp();
+	my $machine_id = $ENV{COMPUTERNAME} || $ENV{GS_MACHINE_ID} || `hostname`;
+	chomp $machine_id;
+	my $hostname = $ENV{COMPUTERNAME} || `hostname`;
+	chomp $hostname;
+	
+	# Ensure machine exists in database
+	unless (ensure_machine_exists($dbh, $machine_id, $hostname)) {
+		$dbh->disconnect();
+		return;
+	}
+	
+	# Collect machine-wide stats
+	my $machine_stats = collect_machine_stats();
+	unless (insert_machine_sample($dbh, $timestamp, $machine_id, $machine_stats)) {
+		$dbh->disconnect();
+		return;
+	}
+	
+	# Collect per-server process stats
+	my %server_procs = find_server_processes();
+	
+	for my $server_path (keys %server_procs) {
+		my $server_name = (split /[\\\/]/, $server_path)[-1];
+		my $folder_size = get_folder_size_bytes($server_path);
+		
+		for my $proc (@{$server_procs{$server_path}}) {
+			insert_process_sample($dbh, $timestamp, $machine_id, 
+				$server_name, $server_path, $proc, $folder_size);
+		}
+	}
+	
+	$dbh->disconnect();
+	logger "Resource stats collection completed (Windows)";
 }

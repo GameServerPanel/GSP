@@ -50,6 +50,10 @@ use Compress::Zlib; # Used to compress file download buffers to zlib.
 use Archive::Tar; # Used to create tar, tgz or tbz archives.
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS ); # Used to create zip archives.
 
+# Database modules for resource stats
+use DBI;  # Database interface
+eval "use DBD::mysql"; # MySQL driver (optional, will skip stats if not available)
+
 # Current location of the agent.
 use constant AGENT_RUN_DIR => getcwd();
 
@@ -95,6 +99,14 @@ use constant FD_PID_FILE => Path::Class::File->new(FD_DIR, 'fd.pid');
 use constant SCHED_PID => Path::Class::File->new(AGENT_RUN_DIR, 'scheduler.pid');
 use constant SCHED_TASKS => Path::Class::File->new(AGENT_RUN_DIR, 'scheduler.tasks');
 use constant SCHED_LOG_FILE => Path::Class::File->new(AGENT_RUN_DIR, 'scheduler.log');
+
+# Resource stats database constants
+use constant STATS_DB_HOST => $Cfg::Config{stats_db_host};
+use constant STATS_DB_USER => $Cfg::Config{stats_db_user};
+use constant STATS_DB_PASS => $Cfg::Config{stats_db_pass};
+use constant STATS_DB_NAME => $Cfg::Config{stats_db_name};
+use constant STATS_TABLE_PREFIX => $Cfg::Config{stats_table_prefix};
+use constant STATS_FREQUENCY_MINUTES => $Cfg::Config{stats_frequency_minutes};
 
 $Cfg::Config{sudo_password} =~ s/('+)/'\"$1\"'/g;
 our $SUDOPASSWD = $Cfg::Config{sudo_password};
@@ -311,6 +323,12 @@ my $cron = new Schedule::Cron( \&scheduler_dispatcher, {
                                        } );
 
 $cron->add_entry( "* * * * * *", \&scheduler_read_tasks );
+
+# Add resource stats collection task
+my $stats_frequency = STATS_FREQUENCY_MINUTES || 5;
+my $stats_cron_pattern = "*/$stats_frequency * * * *";  # Every N minutes
+$cron->add_entry( $stats_cron_pattern, \&collect_resource_stats );
+
 # Run scheduler
 $cron->run( {detach=>1, pid_file=>SCHED_PID} );
 
@@ -4628,3 +4646,536 @@ sub trim{
 	$s =~ s/^\s+|\s+$//g; 
 	return $s 
 };
+
+##################################################################
+# Resource Stats Collection System
+##################################################################
+
+# Get current timestamp in MySQL format
+sub get_utc_timestamp {
+	my ($sec, $min, $hour, $mday, $mon, $year) = gmtime();
+	return sprintf("%04d-%02d-%02d %02d:%02d:%02d", 
+		$year + 1900, $mon + 1, $mday, $hour, $min, $sec);
+}
+
+# Connect to stats database
+sub connect_stats_db {
+	# Check if DBD::mysql is available
+	eval { require DBD::mysql; };
+	if ($@) {
+		logger "DBD::mysql not available - resource stats collection disabled";
+		return undef;
+	}
+	
+	my $dsn = "DBI:mysql:database=" . STATS_DB_NAME . ";host=" . STATS_DB_HOST;
+	my $dbh = eval { DBI->connect($dsn, STATS_DB_USER, STATS_DB_PASS, 
+		{ RaiseError => 1, AutoCommit => 1, mysql_enable_utf8 => 1 }) };
+	
+	if ($@) {
+		logger "Failed to connect to stats database: $@";
+		return undef;
+	}
+	
+	return $dbh;
+}
+
+# Ensure machine exists in gsp_machines table
+sub ensure_machine_exists {
+	my ($dbh, $machine_id, $hostname) = @_;
+	
+	my $table = STATS_TABLE_PREFIX . "machines";
+	my $sql = "INSERT IGNORE INTO $table (machine_id, hostname) VALUES (?, ?)";
+	
+	eval {
+		my $sth = $dbh->prepare($sql);
+		$sth->execute($machine_id, $hostname);
+		$sth->finish();
+	};
+	
+	if ($@) {
+		logger "Failed to ensure machine exists: $@";
+		return 0;
+	}
+	
+	return 1;
+}
+
+# Get machine-wide system stats using native tools
+sub collect_machine_stats {
+	my $stats = {};
+	
+	# Get load averages
+	if (open(my $fh, '<', '/proc/loadavg')) {
+		my $line = <$fh>;
+		close($fh);
+		if ($line =~ /^(\S+)\s+(\S+)\s+(\S+)/) {
+			$stats->{load1} = $1;
+			$stats->{load5} = $2;
+			$stats->{load15} = $3;
+		}
+	}
+	
+	# Get CPU usage (using existing function logic)
+	my %prev_idle;
+	my %prev_total;
+	if (open(my $fh, '<', '/proc/stat')) {
+		while (<$fh>) {
+			next unless /^cpu\s+/;
+			my @stat = split /\s+/, $_;
+			# cpu user nice system idle iowait irq softirq steal guest guest_nice
+			my $idle = $stat[4];
+			my $total = $stat[1] + $stat[2] + $stat[3] + $stat[4] + ($stat[5] || 0) + ($stat[6] || 0) + ($stat[7] || 0);
+			$prev_idle{all} = $idle;
+			$prev_total{all} = $total;
+			last;
+		}
+		close($fh);
+	}
+	
+	sleep(1);  # Wait for CPU measurement
+	
+	my %idle;
+	my %total;
+	if (open(my $fh, '<', '/proc/stat')) {
+		while (<$fh>) {
+			next unless /^cpu\s+/;
+			my @stat = split /\s+/, $_;
+			my $idle = $stat[4];
+			my $total = $stat[1] + $stat[2] + $stat[3] + $stat[4] + ($stat[5] || 0) + ($stat[6] || 0) + ($stat[7] || 0);
+			$idle{all} = $idle;
+			$total{all} = $total;
+			last;
+		}
+		close($fh);
+	}
+	
+	if (exists $prev_total{all} && $prev_total{all} > 0) {
+		my $diff_idle = $idle{all} - $prev_idle{all};
+		my $diff_total = $total{all} - $prev_total{all};
+		if ($diff_total > 0) {
+			$stats->{cpu_pct} = sprintf("%.2f", (100 * ($diff_total - $diff_idle)) / $diff_total);
+		}
+	}
+	
+	# Get memory info
+	my ($mem_total, $mem_free, $mem_buffers, $mem_cached) = (0, 0, 0, 0);
+	my ($swap_total, $swap_free) = (0, 0);
+	
+	if (open(my $fh, '<', '/proc/meminfo')) {
+		while (<$fh>) {
+			$mem_total = $1 * 1024 if /MemTotal:\s+(\d+) kB/;
+			$mem_free = $1 * 1024 if /MemFree:\s+(\d+) kB/;
+			$mem_buffers = $1 * 1024 if /Buffers:\s+(\d+) kB/;
+			$mem_cached = $1 * 1024 if /Cached:\s+(\d+) kB/;
+			$swap_total = $1 * 1024 if /SwapTotal:\s+(\d+) kB/;
+			$swap_free = $1 * 1024 if /SwapFree:\s+(\d+) kB/;
+		}
+		close($fh);
+	}
+	
+	my $mem_used = $mem_total - $mem_free - $mem_buffers - $mem_cached;
+	$stats->{mem_used_bytes} = $mem_used;
+	$stats->{mem_total_bytes} = $mem_total;
+	$stats->{mem_used_pct} = $mem_total > 0 ? sprintf("%.2f", ($mem_used * 100) / $mem_total) : 0;
+	
+	my $swap_used = $swap_total - $swap_free;
+	$stats->{swap_used_bytes} = $swap_used;
+	$stats->{swap_total_bytes} = $swap_total;
+	
+	# Get disk usage for agent directory
+	my $disk_path = AGENT_RUN_DIR;
+	my $df_output = `df -P '$disk_path' 2>/dev/null | tail -1`;
+	if ($df_output =~ /\S+\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)%/) {
+		$stats->{disk_path} = $disk_path;
+		$stats->{disk_total_bytes} = $1 * 1024;
+		$stats->{disk_used_bytes} = $2 * 1024;
+		$stats->{disk_used_pct} = $4;
+	}
+	
+	# Get default network interface and stats
+	my $default_iface = get_default_network_interface();
+	$stats->{net_iface} = $default_iface;
+	
+	if ($default_iface) {
+		my ($rx_bytes, $tx_bytes) = get_network_stats($default_iface);
+		$stats->{rx_bytes} = $rx_bytes;
+		$stats->{tx_bytes} = $tx_bytes;
+		
+		# Get interface speed (try ethtool, fallback to /sys)
+		my $speed_mbps = get_interface_speed($default_iface);
+		$stats->{iface_speed_mbps} = $speed_mbps;
+	}
+	
+	return $stats;
+}
+
+# Get default network interface
+sub get_default_network_interface {
+	# Try to find default route interface
+	if (open(my $fh, '<', '/proc/net/route')) {
+		while (<$fh>) {
+			my @parts = split /\s+/, $_;
+			if (@parts >= 11 && $parts[1] eq '00000000' && hex($parts[3]) & 2) {
+				close($fh);
+				return $parts[0];
+			}
+		}
+		close($fh);
+	}
+	
+	# Fallback: find first up interface
+	my @interfaces = glob('/sys/class/net/*');
+	for my $iface_path (@interfaces) {
+		my $iface = (split '/', $iface_path)[-1];
+		next if $iface eq 'lo';  # Skip loopback
+		
+		if (open(my $fh, '<', "$iface_path/operstate")) {
+			my $state = <$fh>;
+			close($fh);
+			chomp $state;
+			return $iface if $state eq 'up';
+		}
+	}
+	
+	return undef;
+}
+
+# Get network interface statistics
+sub get_network_stats {
+	my ($interface) = @_;
+	my ($rx_bytes, $tx_bytes) = (0, 0);
+	
+	if (open(my $fh, '<', "/sys/class/net/$interface/statistics/rx_bytes")) {
+		$rx_bytes = <$fh>;
+		chomp $rx_bytes;
+		close($fh);
+	}
+	
+	if (open(my $fh, '<', "/sys/class/net/$interface/statistics/tx_bytes")) {
+		$tx_bytes = <$fh>;
+		chomp $tx_bytes;
+		close($fh);
+	}
+	
+	return ($rx_bytes, $tx_bytes);
+}
+
+# Get network interface speed
+sub get_interface_speed {
+	my ($interface) = @_;
+	
+	# Try /sys/class/net first
+	if (open(my $fh, '<', "/sys/class/net/$interface/speed")) {
+		my $speed = <$fh>;
+		close($fh);
+		chomp $speed;
+		return $speed if $speed && $speed =~ /^\d+$/;
+	}
+	
+	# Try ethtool as fallback
+	my $ethtool_output = `ethtool '$interface' 2>/dev/null | grep Speed`;
+	if ($ethtool_output =~ /Speed:\s*(\d+)Mb\/s/) {
+		return $1;
+	}
+	
+	return undef;
+}
+
+# Get folder size using du command
+sub get_folder_size_bytes {
+	my ($folder_path) = @_;
+	return 0 unless -d $folder_path;
+	
+	my $du_output = `du -sb '$folder_path' 2>/dev/null`;
+	if ($du_output =~ /^(\d+)/) {
+		return $1;
+	}
+	
+	return 0;
+}
+
+# Find server processes based on directory association
+sub find_server_processes {
+	my @server_dirs = ();
+	
+	# Find server directories (similar to Python collector)
+	if (opendir(my $dh, AGENT_RUN_DIR)) {
+		while (my $entry = readdir($dh)) {
+			next if $entry =~ /^\./;  # Skip hidden directories
+			my $path = Path::Class::Dir->new(AGENT_RUN_DIR, $entry);
+			push @server_dirs, $path if -d $path;
+		}
+		closedir($dh);
+	}
+	
+	my %server_procs = ();
+	
+	# Get all running processes
+	my @processes = get_all_processes();
+	
+	# Associate processes with server directories
+	for my $server_dir (@server_dirs) {
+		my $server_path = "$server_dir";
+		$server_procs{$server_path} = [];
+		
+		for my $proc (@processes) {
+			my $pid = $proc->{pid};
+			my $cwd = $proc->{cwd} || '';
+			my $exe = $proc->{exe} || '';
+			my $cmd = $proc->{cmd} || '';
+			
+			# Check if process is associated with this server directory
+			if ($cwd =~ /^\Q$server_path\E/ || 
+				$exe =~ /^\Q$server_path\E/ || 
+				index($cmd, $server_path) >= 0) {
+				push @{$server_procs{$server_path}}, $proc;
+			}
+		}
+	}
+	
+	return %server_procs;
+}
+
+# Get all running processes with details
+sub get_all_processes {
+	my @processes = ();
+	
+	# Read process list from /proc
+	if (opendir(my $dh, '/proc')) {
+		while (my $entry = readdir($dh)) {
+			next unless $entry =~ /^\d+$/;  # Only numeric PIDs
+			
+			my $proc_info = get_process_info($entry);
+			push @processes, $proc_info if $proc_info;
+		}
+		closedir($dh);
+	}
+	
+	return @processes;
+}
+
+# Get detailed information about a specific process
+sub get_process_info {
+	my ($pid) = @_;
+	my $proc = { pid => $pid };
+	
+	# Get process name
+	if (open(my $fh, '<', "/proc/$pid/comm")) {
+		$proc->{name} = <$fh>;
+		chomp $proc->{name};
+		close($fh);
+	}
+	
+	# Get command line
+	if (open(my $fh, '<', "/proc/$pid/cmdline")) {
+		my $cmdline = <$fh>;
+		close($fh);
+		if ($cmdline) {
+			$cmdline =~ s/\0/ /g;  # Replace null separators with spaces
+			$proc->{cmd} = $cmdline;
+		}
+	}
+	
+	# Get current working directory
+	my $cwd = readlink("/proc/$pid/cwd");
+	$proc->{cwd} = $cwd if $cwd;
+	
+	# Get executable path
+	my $exe = readlink("/proc/$pid/exe");
+	$proc->{exe} = $exe if $exe;
+	
+	# Get memory info
+	if (open(my $fh, '<', "/proc/$pid/status")) {
+		while (<$fh>) {
+			if (/VmRSS:\s+(\d+) kB/) {
+				$proc->{rss_bytes} = $1 * 1024;
+			} elsif (/VmSize:\s+(\d+) kB/) {
+				$proc->{vms_bytes} = $1 * 1024;
+			}
+		}
+		close($fh);
+	}
+	
+	# Get I/O stats
+	if (open(my $fh, '<', "/proc/$pid/io")) {
+		while (<$fh>) {
+			if (/read_bytes:\s+(\d+)/) {
+				$proc->{io_read_bytes} = $1;
+			} elsif (/write_bytes:\s+(\d+)/) {
+				$proc->{io_write_bytes} = $1;
+			}
+		}
+		close($fh);
+	}
+	
+	# Get file descriptor count
+	if (opendir(my $dh, "/proc/$pid/fd")) {
+		my @fds = readdir($dh);
+		$proc->{open_fds} = @fds - 2;  # Subtract . and ..
+		closedir($dh);
+	}
+	
+	# Get CPU percentage (placeholder - would need sampling period)
+	$proc->{cpu_pct} = 0;  # Will be calculated during collection
+	
+	return $proc;
+}
+
+# Get listening ports for a process
+sub get_process_listening_ports {
+	my ($pid) = @_;
+	my @ports = ();
+	
+	# Check /proc/net/tcp and /proc/net/udp
+	for my $proto (qw(tcp udp)) {
+		if (open(my $fh, '<', "/proc/net/$proto")) {
+			while (<$fh>) {
+				chomp;
+				my @fields = split /\s+/, $_;
+				next unless @fields >= 10;
+				
+				# Check if this socket belongs to our process
+				my $inode = $fields[9];
+				next unless $inode;
+				
+				if (opendir(my $dh, "/proc/$pid/fd")) {
+					while (my $fd = readdir($dh)) {
+						next if $fd =~ /^\./;
+						my $link = readlink("/proc/$pid/fd/$fd");
+						if ($link && $link =~ /socket:\[$inode\]/) {
+							# Parse local address and port
+							my $local = $fields[1];
+							if ($local =~ /:([0-9A-F]+)$/) {
+								my $port = hex($1);
+								push @ports, $port;
+							}
+							last;
+						}
+					}
+					closedir($dh);
+				}
+			}
+			close($fh);
+		}
+	}
+	
+	return join(',', sort { $a <=> $b } @ports);
+}
+
+# Insert machine sample into database
+sub insert_machine_sample {
+	my ($dbh, $timestamp, $machine_id, $stats) = @_;
+	
+	my $table = STATS_TABLE_PREFIX . "machine_samples";
+	my $sql = qq{
+		INSERT INTO $table 
+		(machine_id, ts, load1, load5, load15, cpu_pct,
+		 mem_used_bytes, mem_total_bytes, mem_used_pct,
+		 swap_used_bytes, swap_total_bytes,
+		 disk_path, disk_total_bytes, disk_used_bytes, disk_used_pct,
+		 net_iface, rx_bytes, tx_bytes, iface_speed_mbps)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	};
+	
+	eval {
+		my $sth = $dbh->prepare($sql);
+		$sth->execute(
+			$machine_id, $timestamp,
+			$stats->{load1}, $stats->{load5}, $stats->{load15}, $stats->{cpu_pct},
+			$stats->{mem_used_bytes}, $stats->{mem_total_bytes}, $stats->{mem_used_pct},
+			$stats->{swap_used_bytes}, $stats->{swap_total_bytes},
+			$stats->{disk_path}, $stats->{disk_total_bytes}, $stats->{disk_used_bytes}, $stats->{disk_used_pct},
+			$stats->{net_iface}, $stats->{rx_bytes}, $stats->{tx_bytes}, $stats->{iface_speed_mbps}
+		);
+		$sth->finish();
+	};
+	
+	if ($@) {
+		logger "Failed to insert machine sample: $@";
+		return 0;
+	}
+	
+	return 1;
+}
+
+# Insert process sample into database
+sub insert_process_sample {
+	my ($dbh, $timestamp, $machine_id, $server_name, $server_path, $proc, $folder_size) = @_;
+	
+	my $table = STATS_TABLE_PREFIX . "process_samples";
+	my $sql = qq{
+		INSERT INTO $table
+		(machine_id, ts, server_name, server_path,
+		 pid, proc_name, cmd, cpu_pct,
+		 rss_bytes, vms_bytes, mem_pct,
+		 io_read_bytes, io_write_bytes, open_fds,
+		 listening_ports, folder_size_bytes)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	};
+	
+	# Get listening ports for this process
+	my $ports = get_process_listening_ports($proc->{pid});
+	
+	eval {
+		my $sth = $dbh->prepare($sql);
+		$sth->execute(
+			$machine_id, $timestamp, $server_name, $server_path,
+			$proc->{pid}, $proc->{name}, $proc->{cmd}, $proc->{cpu_pct},
+			$proc->{rss_bytes}, $proc->{vms_bytes}, 0,  # mem_pct placeholder
+			$proc->{io_read_bytes}, $proc->{io_write_bytes}, $proc->{open_fds},
+			$ports, $folder_size
+		);
+		$sth->finish();
+	};
+	
+	if ($@) {
+		logger "Failed to insert process sample: $@";
+		return 0;
+	}
+	
+	return 1;
+}
+
+# Main resource stats collection function
+sub collect_resource_stats {
+	logger "Starting resource stats collection";
+	
+	# Connect to database
+	my $dbh = connect_stats_db();
+	return unless $dbh;
+	
+	my $timestamp = get_utc_timestamp();
+	my $machine_id = $ENV{GS_MACHINE_ID} || `hostname`;
+	chomp $machine_id;
+	my $hostname = `hostname`;
+	chomp $hostname;
+	
+	# Ensure machine exists in database
+	unless (ensure_machine_exists($dbh, $machine_id, $hostname)) {
+		$dbh->disconnect();
+		return;
+	}
+	
+	# Collect machine-wide stats
+	my $machine_stats = collect_machine_stats();
+	unless (insert_machine_sample($dbh, $timestamp, $machine_id, $machine_stats)) {
+		$dbh->disconnect();
+		return;
+	}
+	
+	# Collect per-server process stats
+	my %server_procs = find_server_processes();
+	
+	for my $server_path (keys %server_procs) {
+		my $server_name = (split '/', $server_path)[-1];
+		my $folder_size = get_folder_size_bytes($server_path);
+		
+		for my $proc (@{$server_procs{$server_path}}) {
+			insert_process_sample($dbh, $timestamp, $machine_id, 
+				$server_name, $server_path, $proc, $folder_size);
+		}
+	}
+	
+	$dbh->disconnect();
+	logger "Resource stats collection completed";
+}
