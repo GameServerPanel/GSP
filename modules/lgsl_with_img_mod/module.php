@@ -24,14 +24,19 @@
 
 // Module general information
 $module_title = "LGSL";
-$module_version = "1.0";
+$module_version = "0.2";
 $db_version = 0;
 $module_required = FALSE;
 $module_menus = array( array( 'subpage' => 'lgsl', 'name'=>'LGSL', 'group'=>'user' ),
 					   array( 'subpage' => 'lgsl', 'name'=>'LGSL', 'group'=>'guest' ),
 					   array( 'subpage' => 'lgsl_admin', 'name'=>'LGSL Admin', 'group'=>'admin' ));
 
-  NOT NULL auto_increment,
+$install_queries = array();
+$install_queries[0] = array(
+						"CREATE TABLE IF NOT EXISTS ".OGP_DB_PREFIX."lgsl
+						 (
+
+						  `id`         INT     (11)  NOT NULL auto_increment,
 						  `type`       VARCHAR (50)  NOT NULL DEFAULT '',
 						  `ip`         VARCHAR (255) NOT NULL DEFAULT '',
 						  `c_port`     VARCHAR (5)   NOT NULL DEFAULT '0',

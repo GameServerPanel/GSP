@@ -23,7 +23,7 @@
  */
 
 $module_title = "Circular";
-$module_version = "1.0";
+$module_version = "0.1";
 $db_version = 0;
 $module_required = false;
 $module_menus = array(
@@ -33,7 +33,15 @@ $module_menus = array(
 						'group'		=>	'admin',
 					)
 				);
-
+				
+$install_queries[0] = array(
+	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."circular`",
+	"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."circular` (
+		`circular_id` int NOT NULL AUTO_INCREMENT,
+		`subject` TEXT NOT NULL,
+		`message` TEXT NOT NULL,
+		`timestamp` TIMESTAMP,
+		PRIMARY KEY (`circular_id`)
 	);",
 	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."circular_recipients`",
 	"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."circular_recipients` (

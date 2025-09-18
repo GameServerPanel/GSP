@@ -1,0 +1,31 @@
+.main .btn:not([name="update"]),
+.main .loading {
+	float: right;
+}
+
+.main .btn,
+.main .badge {
+	margin: 0px 5px !important;
+	text-wrap: nowrap !important;
+}
+
+.main .uninstall,
+.main .install,
+.main .remove,
+.main .badge {
+	min-width: 75px;
+}
+
+.main .badge {
+	font-weight: normal !important;
+}
+
+.main .card.extra .table {
+	min-width: 500px;
+}
+
+.main .card.extra label {
+	font-size: 0.8rem;
+	line-height: 1.4rem;
+	font-weight: 400;
+}

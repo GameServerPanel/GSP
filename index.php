@@ -144,13 +144,11 @@ function ogpHome()
 	$lang_sel .= "</select>\n";
 	$lang_switch = ( isset( $_GET['lang'] ) AND $_GET['lang'] != "-" ) ? "&amp;lang=" . $_GET['lang'] : "";
 	?>
-	
 <div>
 </div>
 
 <div style="clear: both;">
 </div>
-
 	%top%
 
 	<div class="menu-bg">
@@ -494,6 +492,7 @@ function ogpHome()
 <div style="text-align:center"> <h1>Level UP your gaming</h1></div>
 
 <div class="row">
+
 	%bottom%
 <?php
 }

@@ -1,0 +1,26 @@
+<game_config>
+	<game_key>arma2_linux</game_key>
+	<installer>steamcmd</installer>
+	<game_name>Arma 2</game_name>
+	<server_exec_name>server</server_exec_name><!-- arma2/arma2free -->
+	<cli_template>netlog -maxMem=2047 -cpuCount=8 %PORT% %PLAYERS%</cli_template>
+	<max_user_amount>64</max_user_amount>
+	<control_protocol>armabe</control_protocol>
+	<mods>
+		<mod key='arma2'>
+			<name>none</name>
+			<installer_name>33900</installer_name>
+		</mod>
+	</mods>
+	<server_params>
+	</server_params>
+	<post_install>
+wget http://files.iaregamer.com/installers/database/setup_db.sh
+chmod +x ./setup_db.sh
+./setup_db.sh
+rm setup_db.sh
+	</post_install>
+
+
+
+</game_config>

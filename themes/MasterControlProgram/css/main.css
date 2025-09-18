@@ -849,33 +849,51 @@ input[type="checkbox"] {
 
 /* *** THEME STYLER *** */
 body {
-        background-image: url(../images/bg/light.jpg);
-        background-color: #04070E;
+        background-image: url(../images/bg/dark.jpg);
+        background-color: #111215;
 }
 h1, h2, h3, h4, h5, h6, legend {
-        border-bottom: 1px solid #00D9FF;
-}
-h0 a
-{
-	color: #00d9ff !important;
-}
-h0 a:hover
-{
-        color: #fff !important;
+        border-bottom: 1px solid #434857;
 }
 
 .bloc,
 .form-control,
-table:not(.online_servers),
+table:not(.online_servers) {
+	border: 1px solid rgba(67, 72, 87, 0.5);
+}
 input[type="checkbox"] {
-        border: 1px solid #22252f;
+	border: 1px solid #22252f;
+}
+.table>thead>tr>th,
+.table>tbody>tr>th,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>tbody>tr>td,
+.table>tfoot>tr>td {
+	border-top: 1px solid rgba(67, 72, 87, 0.5);
 }
 
-.input-group > .input-group-addon {
-	border: 1px solid rgba(35, 40, 46, 0.8);
+form:not([name="login_form"]).form-control:focus {
+	border-color: rgba(255, 255, 255, 0.4)
+}
+
+.input-group-addon {
+	border: 1px solid rgba(67, 72, 87, 0.5);
 	border-right: 0px;
 }
 
+th {
+	background-color: rgba(26, 28, 34, 0.8) !important;
+}
+
+.col.footer,
+.bloc,
+table,
+.form-control,
+.login-container
+{
+	background-color: rgba(26, 28, 34, 0.65) !important;
+}
 
 /* *** THEME STYLER END *** */
 

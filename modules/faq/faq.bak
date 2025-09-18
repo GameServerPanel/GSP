@@ -1,0 +1,1740 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<rss version="2.0" 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:admin="http://webns.net/mvcb/"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+   xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+   xmlns:content="http://purl.org/rss/1.0/modules/content/"
+   >
+<channel>
+    
+    <title>IAREGAMER FAQ</title>
+    <link>https://iaregamer.com</link>
+    <description></description>
+    <dc:language>en</dc:language>
+    <generator>Serendipity 2.0.4 - http://www.s9y.org/</generator>
+    <pubDate>Wed, 17 Jun 2020 20:10:54 GMT</pubDate>
+
+    <image>
+    <url></url>
+    <title>RSS: IAREGAMER FAQ - </title>
+    <link>https://iaregamer.com</link>
+    <width>100</width>
+    <height>21</height>
+</image>
+
+<item>
+    <title>What if I need help with my server?</title>
+    <category>General</category>
+    
+    <content:encoded>
+    (1) if your server is not responding, submit a ticket or contact us on Discord 
+    (2) if you need help with scripting, contact us on Discord and let us know what you need 
+    (3) confused? contact us on Discord
+
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is the Query Port (or other port) for my server</title>
+   <category>General</category>
+    
+    <content:encoded>
+    Each game has its own category with specific information about that game including the query (and other) ports. 
+	Look in the FAQ category for your game.
+	If your game is not listed, or the query port is not specified then its probably the SAME as your SERVER PORT. If it still doesnt work, submit a ticket and we will find out ASAP for you (and update the FAQ)
+	
+ 
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What are subusers and groups? How do I add them?</title>
+   <category>Panel</category>
+    
+    <content:encoded>
+    &lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;https://www.youtube.com/embed/g45JbifloFQ&quot; frameborder=&quot;0&quot; allowfullscreen&gt;&lt;/iframe&gt;
+ 
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>My server won't start. Error: &quot;Failed to start the remote server. Error code: -1&quot; or &quot;Failed with server query&quot;</title>
+   <category>Error Messages</category>
+    
+    <content:encoded>
+Often the message (Failed with Server Query) means its just taking a long time for the server to start, give it some time and see what happens. 
+Check your logs for error messages.
+Your server MAY have been misconfigured and is not starting correctly.
+BUT have you recently changed any files?
+The most common reason is the server is crashing or fails to start because of invalid, missing files
+or something is misconfigured.  
+Restore the BACKUP you made before editing your server. (You DID backup, right?)
+If you have NOT made any changes, contact support and we will investigate. 
+    </content:encoded>
+    
+</item>
+ <item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Ark</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +2 
+	
+    </content:encoded>
+ </item>
+  <item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Arma</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +1 
+	
+    </content:encoded>
+ </item>
+ 
+<item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Conan Exiles</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +2 
+	Rcon port is your SERVER port + 3
+    </content:encoded>
+ </item>
+ 
+<item>
+    <title>What is my Query port?</title>
+   <category>Dayz</category>
+    
+    <content:encoded>
+    Dayz MOD query port is your SERVER port +1 
+	Dayz STANDALONE query port is your SERVER port +3 
+    </content:encoded>
+    
+</item>
+   <item>
+    <title>What is my Query or Rcon port?</title>
+   <category>Killing Floor</category>
+    
+    <content:encoded>
+    Query port is your SERVER port +1 
+	
+    </content:encoded>
+ </item>
+
+<item>
+    <title>I get an ERROR when trying to connect to the FTP using my client</title>
+   <category>Panel</category>
+
+    <content:encoded>
+    Does the error mention TLS or secure connection?  Try different encryption settings. Our FTP servers do not have TLS enabled.
+    </content:encoded>
+
+</item>
+<item>
+    <title>How can I backup and restore my Gameserver database?</title>
+            <category>Panel</category>
+    
+    <content:encoded>
+In your Game Monitor, click on the MYSQL button and then login to PHPMYADMIN.  
+Select EXPORT and save the file on your local PC.  
+To RESTORE, delete ALL TABLES, FUNCTIONS and DATA from your DB then IMPORT your file 
+    </content:encoded>
+   
+</item>
+
+<item>
+    <title>Why can't I delete some files in my game server folder?</title>
+           <category>Panel</category>
+    
+    <content:encoded>
+    We protect the &lt;strong&gt;server executable&lt;/strong&gt; and the &lt;strong&gt;startup script&lt;/strong&gt; to disallow modifications by the user.
+If you need to change this file, contact support.
+
+ 
+    </content:encoded>
+
+    
+</item>
+<item>
+    <title>How do I  validate my files  with Steam?</title>
+     <category>Panel</category>
+    
+    <content:encoded>
+ If you click on the INSTALL/UPDATE button it will validate all your Steam files.  If you want to WIPE your server and reinstall fresh, 'check' the checkbox on the upper left of the 
+FILE MANAGER and REMOVE all files.  Then press INSTALL/UPDATE and Steam will replace all the missing files. 
+    </content:encoded>
+</item>
+
+
+<item>
+    <title>How do I restart my server?</title>
+     <category>Dayz</category>
+
+    <content:encoded>
+BEC is preinstalled with your server. You can set the scheduler.xml to restart at intervals.
+There is a scheduler_faq.xml file inside your bec/config folder that will explain in detail 
+how to configure the scheduler.
+As always, if you need help just ask on Discord.
+    </content:encoded>
+</item>
+
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>7 Days to Die</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for 7 Days to Die.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Smashball</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Smashball.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Synergy</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Synergy.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Aliens vs Predator</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Aliens vs Predator.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Age of Chivalry</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Age of Chivalry.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>ARK: Survival Evolved</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for ARK: Survival Evolved.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Arma Reforger</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Arma Reforger.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Arma2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Arma2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Arma2 CO</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Arma2 CO.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Arma2 Operation Arrowhead</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Arma2 Operation Arrowhead.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Arma 3</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Arma 3.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Assetto Corsa</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Assetto Corsa.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Assetto Corsa</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Assetto Corsa.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Atlas</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Atlas.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Avorion</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Avorion.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>BEC</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for BEC.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Battlefield 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Battlefield 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Battlefield Bad Company 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Battlefield Bad Company 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Big Brother Bot</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Big Brother Bot.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Blood Frontier</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Blood Frontier.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>BrainBread 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for BrainBread 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty 4: Modern Warfare</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty 4: Modern Warfare.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty: Modern Warfare 2 (IW4x)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty: Modern Warfare 2 (IW4x).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty: Modern Warfare 3</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty: Modern Warfare 3.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty: United Offensive</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty: United Offensive.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Call of Duty: World at War</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Call of Duty: World at War.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Citadel: Forged with Fire</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Citadel: Forged with Fire.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>CoD: Black Ops</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for CoD: Black Ops.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Colony Survival</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Colony Survival.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Counter Strike Source</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Counter Strike Source.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>CS2D</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for CS2D.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Counter Strike Global Offensive 128tick</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Counter Strike Global Offensive 128tick.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Counter Strike Global Offensive</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Counter Strike Global Offensive.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>CSPromod</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for CSPromod.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Counter-Strike</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Counter-Strike.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Counter-Strike Condition Zero</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Counter-Strike Condition Zero.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>DayZ Mod</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for DayZ Mod.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>DayZ Mod (OA)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for DayZ Mod (OA).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>DayZ Epoch Mod</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for DayZ Epoch Mod.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Dimrod Epoch Mod</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Dimrod Epoch Mod.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Death Match Classic</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Death Match Classic.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Day of Defeat</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Day of Defeat.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Day of Defeat Source</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Day of Defeat Source.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Day of Infamy</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Day of Infamy.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Dont Starve Together</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Dont Starve Together.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Dystopia</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Dystopia.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Eco</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Eco.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Empyrion</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Empyrion.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>DayZ Epoch Mod</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for DayZ Epoch Mod.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Eternal-Silence</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Eternal-Silence.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Euro Truck Simulator 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Euro Truck Simulator 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>factorio</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for factorio.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Feed The Beast Server</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Feed The Beast Server.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>FlightGear Multiplayer Server</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for FlightGear Multiplayer Server.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Fistful of Frags</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Fistful of Frags.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>FiveM</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for FiveM.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>FreeCol</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for FreeCol.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Garrys Mod</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Garrys Mod.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Gearbox</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Gearbox.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Halo CE</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Halo CE.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Operation Harsh Doorstop</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Operation Harsh Doorstop.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Operation Harsh Doorstop</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Operation Harsh Doorstop.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Hidden: Source</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Hidden: Source.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Half-Life 2: Deathmatch</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Half-Life 2: Deathmatch.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Half Life: Death Match</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Half Life: Death Match.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>HLTV</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for HLTV.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Homefront</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Homefront.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Hurtworld</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Hurtworld.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>IL-2 Sturmovik</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for IL-2 Sturmovik.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Insurgency</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Insurgency.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Insurgency: Modern Infantry Combat</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Insurgency: Modern Infantry Combat.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Insurgency: Sandstorm</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Insurgency: Sandstorm.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>IV Multiplayer</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for IV Multiplayer.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Just Cause 2 Multiplayer (Windows)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Just Cause 2 Multiplayer (Windows).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Jedi Knight 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Jedi Knight 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Jedi Knight: Jedi Academy</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Jedi Knight: Jedi Academy.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Killing Floor 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Killing Floor 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Left 4 Dead 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Left 4 Dead 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Left 4 Dead</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Left 4 Dead.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Left 4 Dead 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Left 4 Dead 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Left 4 Dead</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Left 4 Dead.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Life is Feudal</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Life is Feudal.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Mafia 2 Online</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Mafia 2 Online.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Minecraft</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Minecraft.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Miscreated</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Miscreated.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Medal Of Honor: Allied Assault (Windows)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Medal Of Honor: Allied Assault (Windows).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Medal Of Honor: Breakthrough (Windows)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Medal Of Honor: Breakthrough (Windows).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Medal Of Honor: Spearhead (Windows)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Medal Of Honor: Spearhead (Windows).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Medal Of Honor: Spearhead Demo Server (Windows)</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Medal Of Honor: Spearhead Demo Server (Windows).
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Mordhau</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Mordhau.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Mount and Blade Warband</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Mount and Blade Warband.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Multi Theft Auto</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Multi Theft Auto.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Murmur [Mumble server]</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Murmur [Mumble server].
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Natural Selection 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Natural Selection 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Nexuiz</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Nexuiz.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Nexuiz</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Nexuiz.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Nexuiz</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Nexuiz.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>No More Room In Hell</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for No More Room In Hell.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Nuclear Dawn</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Nuclear Dawn.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Outlaws of the Old West</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Outlaws of the Old West.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>OpenTTD</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for OpenTTD.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>PixARK</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for PixARK.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Pirates, Vikings and Knights II</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Pirates, Vikings and Knights II.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Quake 3</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Quake 3.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Quake 4</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Quake 4.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Red Orchestra 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Red Orchestra 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Reign of Kings</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Reign of Kings.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Ricochet</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Ricochet.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Rising Storm 2: Vietnam</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Rising Storm 2: Vietnam.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Roadkill</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Roadkill.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Rigs of Rods</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Rigs of Rods.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Rust</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Rust.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>San Andreas Multiplayer</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for San Andreas Multiplayer.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Serious Sam HD The First Encounter</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Serious Sam HD The First Encounter.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Serious Sam HD The Second Encounter</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Serious Sam HD The Second Encounter.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>ShootMania Storm</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for ShootMania Storm.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Shoutcast server</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Shoutcast server.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Shoutcast server Bot</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Shoutcast server Bot.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>SinusBot for TS 3 and Discord</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for SinusBot for TS 3 and Discord.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Smokin Guns</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Smokin Guns.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Sniper Elite V2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Sniper Elite V2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Soldat</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Soldat.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Space Engineers</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Space Engineers.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Spigot Server</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Spigot Server.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>SpunkyBot</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for SpunkyBot.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Squad</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Squad.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Starbound</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Starbound.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Stationeers</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Stationeers.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>TeamSpeak 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for TeamSpeak 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>TeamSpeak 3</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for TeamSpeak 3.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Terraria</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Terraria.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Team Fortress 2</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Team Fortress 2.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Team Fortress Classic</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Team Fortress Classic.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>The Forest</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for The Forest.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>TrackMania Nations</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for TrackMania Nations.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>TrackMania Nations Forever</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for TrackMania Nations Forever.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Unreal Tournament</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Unreal Tournament.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Unturned</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Unturned.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Urban Terror 4</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Urban Terror 4.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Unreal Tournament 2004</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Unreal Tournament 2004.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Unreal Tournament 3</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Unreal Tournament 3.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Valheim</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Valheim.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Valheim</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Valheim.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>VirtualBox</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for VirtualBox.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Ventrilo</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Ventrilo.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Vice City Multiplayer</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Vice City Multiplayer.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Warsow</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Warsow.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Wolfenstein: Enemy Territory</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Wolfenstein: Enemy Territory.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Wolfenstein: Return To Castle Wolfenstein 1.4</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Wolfenstein: Return To Castle Wolfenstein 1.4.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Wreckfest</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Wreckfest.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Wurm Unlimited</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Wurm Unlimited.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Xonotic</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Xonotic.
+    </content:encoded>
+    
+</item>
+
+<item>
+    <title>What is my Query or RCON port?</title>
+    <category>Zombie Panic! Source</category>
+    
+    <content:encoded>
+    Please check your game server configuration or contact support for specific port information for Zombie Panic! Source.
+    </content:encoded>
+    
+</item>
+
+</channel>
+</rss>

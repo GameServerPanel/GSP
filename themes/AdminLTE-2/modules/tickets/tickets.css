@@ -1,0 +1,8 @@
+.ticketOptionLinks {
+	border-bottom: none;
+	margin-bottom: 0.5rem;
+}
+
+.ticketRow a {
+	color: inherit;
+}
