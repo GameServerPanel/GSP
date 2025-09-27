@@ -17,6 +17,9 @@
 		  $counter++;
 		}
     }
+
+
+	
     ?>
 	<h1> Array to Biedi Converter</h1>
 <form action="" method="post" enctype="multipart/form-data">
