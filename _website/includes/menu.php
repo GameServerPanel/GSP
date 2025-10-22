@@ -51,6 +51,9 @@ if ($is_logged_in) {
   <nav class="gsw-header-nav">
     <a href="index.php" class="gsw-nav-link">Home</a>
     <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
+    <?php if ($is_logged_in): ?>
+    <a href="my_servers.php" class="gsw-nav-link">My Servers</a>
+    <?php endif; ?>
     <li>
       <a href="cart.php">Cart
         <?php

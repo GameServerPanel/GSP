@@ -338,7 +338,8 @@ mysqli_close($db);
             <button type="submit" name="login" class="btn-login">Sign In</button>
         </form>
     <div class="center mt-12">
-            <a href="register.php">Register</a>
+            <a href="register.php">Register</a> | 
+            <a href="forgot_password.php">Forgot Password?</a>
         </div>
         
         <div class="divider">or</div>
