@@ -3,6 +3,11 @@
 **Repo of truth:** `GameServerPanel/GSP`, branch `Panel-unstable`.  
 **Prime directive:** Read this document first. Propose changes that align with our repo and specs. Only search for external info if something contradicts this file.
 
+## Standalone website mode
+- When working on website features, treat the `_website/` folder as a standalone website root. All website-focused changes (pages, runtime, data persistence, webhooks, and admin UI for the storefront) should live inside `_website/` and be referenced relative to that folder.
+- Do NOT modify files outside `_website/` (the panel codebase) unless a maintainer explicitly asks for cross-repo or panel-side changes. If a change necessarily touches panel files, call it out clearly in the plan and get maintainer approval first.
+- All redirects, data directories, and public-facing endpoints implemented for the storefront must be scoped under `_website/` (absolute or root-relative to the `_website` site root), not the panel root or external panel dashboard pages.
+
 ## 1) What to read first (paths & context)
 - `_website/` — canonical website storefront and Checkout/Webhooks flow.
 - `modules/config_games/server_configs/` — authoritative game catalog XMLs (all supported games live here).
