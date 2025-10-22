@@ -1,10 +1,14 @@
 
 text/x-generic _db.php ( PHP script, ASCII text, with CRLF line terminators )
 <?php
-$servername = "panel.iaregamer.com";
-$username = "remoteuser";
-$password = "Pkloyn7yvpht!";
-$dbname = "panel";
+// Include the centralized database configuration
+require_once(__DIR__ . '/includes/config.inc.php');
+
+// Use the configuration variables from config.inc.php
+$servername = $db_host;
+$username = $db_user;
+$password = $db_pass;
+$dbname = $db_name;
 
 // Create connection
 $db = mysqli_connect($servername, $username, $password, $dbname);
