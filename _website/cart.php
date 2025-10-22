@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 global $db, $view, $settings;
 
-include "panel/_db.php";
+include "db.php";
 
 
 $user_id=$_SESSION['user_id'] ?? 0;
