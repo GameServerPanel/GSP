@@ -1,6 +1,0 @@
-Webhook https://panel.iaregamer.com/paypal/webhook.php
-Webhook ID 6N620673281740730
-App Gameservers World
-Client ID AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c
-Secret Key EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0
-

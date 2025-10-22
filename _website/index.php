@@ -35,7 +35,13 @@
 </head>
 <body>
 
+<?php include(__DIR__ . '/includes/top.php'); ?>
 <?php include(__DIR__ . '/includes/menu.php'); ?>
+
+<!-- Page banner -->
+<div class="center mb-18">
+  <img src="images/banner.png" alt="Banner" class="gsw-banner">
+</div>
 
 <div class="gsw-outer-full">
   <div class="gsw-page-center">
@@ -44,7 +50,7 @@
         <h1>Virtual Private Gameservers</h1>
         <p>Just like running on your own dedicated box — <strong>full configurability</strong> with <strong>help when you need it</strong>.</p>
         <span class="gsw-badge" aria-label="Never oversold">Never Oversold Capacity</span>
-        <p style="margin-top:6px;">We also specialize in classics — <strong>50+ older/community-favorite games</strong> hosted right.</p>
+  <p class="muted mt-6">We also specialize in classics — <strong>50+ older/community-favorite games</strong> hosted right.</p>
       </header>
 
       <div class="gsw-callout" role="note">
@@ -76,9 +82,9 @@
         </article>
       </section>
 
-      <nav class="gsw-cta" aria-label="Primary actions">
-        <a class="gsw-btn" href="/server-list/">Browse Game Servers</a>
-        <a class="gsw-btn" href="/contact/">Talk to Support</a>
+  <nav class="gsw-cta" aria-label="Primary actions">
+  <a class="gsw-btn" href="serverlist.php">Browse Game Servers</a>
+  <a class="gsw-btn" href="contact/">Talk to Support</a>
       </nav>
 
       <p class="gsw-fine">Looking for a specific title or region? Tell us what you need — we add games and locations regularly.</p>
@@ -87,4 +93,5 @@
 </div>
 
 </body>
+<?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>

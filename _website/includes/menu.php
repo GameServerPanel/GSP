@@ -13,43 +13,84 @@ if (session_status() === PHP_SESSION_NONE) {
 // Check login status
 $is_logged_in = isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id']);
 $username = $is_logged_in ? htmlspecialchars($_SESSION['website_username']) : '';
-?>
-<style>
-  .gsw-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:rgba(102, 126, 234, 0.95);backdrop-filter:blur(10px);margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-  .gsw-header-left{font-weight:700;font-size:1.2rem;color:#fff;}
-  .gsw-header-left a{color:#fff;text-decoration:none;}
-  .gsw-header-nav{display:flex;gap:20px;align-items:center;}
-  .gsw-nav-link{color:#fff;text-decoration:none;font-size:0.95rem;transition:opacity 0.2s;}
-  .gsw-nav-link:hover{opacity:0.8;text-decoration:underline;}
-  .gsw-header-right{display:flex;gap:12px;align-items:center;}
-  .gsw-user-info{color:#fff;font-size:0.95rem;}
-  .gsw-header-btn{padding:8px 16px;background:#fff;color:#667eea;border-radius:6px;text-decoration:none;font-weight:600;transition:transform 0.2s;}
-  .gsw-header-btn:hover{transform:translateY(-2px);}
-  @media(max-width:768px){
-    .gsw-header{flex-direction:column;gap:12px;}
-    .gsw-header-nav{flex-wrap:wrap;justify-content:center;}
+
+// Determine if the logged-in user is an admin by checking the panel DB
+$is_admin = false;
+if ($is_logged_in) {
+  // load DB credentials
+  require_once(__DIR__ . '/config.inc.php');
+  // Prefer reusing an existing $db if present, otherwise open a local connection
+  $menu_db = null;
+  $menu_db_opened = false;
+  if (isset($db) && $db instanceof mysqli) {
+    $menu_db = $db;
+  } else {
+    $menu_db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+    $menu_db_opened = true;
   }
-</style>
+
+  if ($menu_db) {
+    $uid = intval($_SESSION['website_user_id']);
+    $res = mysqli_query($menu_db, "SELECT users_role FROM ogp_users WHERE user_id = $uid LIMIT 1");
+    if ($res && mysqli_num_rows($res) === 1) {
+      $row = mysqli_fetch_assoc($res);
+      if (strtolower((string)($row['users_role'] ?? '')) === 'admin') $is_admin = true;
+    }
+    if ($menu_db_opened) {
+      mysqli_close($menu_db);
+    }
+  }
+}
+?>
+<link rel="stylesheet" href="css/header.css">
 
 <div class="gsw-header">
   <div class="gsw-header-left">
-    <a href="/">GameServers.World</a>
+    <a href="index.php">GameServers.World</a>
   </div>
   <nav class="gsw-header-nav">
-    <a href="/" class="gsw-nav-link">Home</a>
-    <a href="/serverlist.php" class="gsw-nav-link">Game Servers</a>
-    <a href="/cart.php" class="gsw-nav-link">Cart</a>
-    <?php if ($is_logged_in): ?>
-      <a href="/adminserverlist.php" class="gsw-nav-link">Admin</a>
+    <a href="index.php" class="gsw-nav-link">Home</a>
+    <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
+    <li>
+      <a href="cart.php">Cart
+        <?php
+        // show cart badge if helper available
+        $cart_count = 0;
+        if (file_exists(__DIR__ . '/cart_helper.php')) {
+          include_once __DIR__ . '/cart_helper.php';
+          if (function_exists('get_cart_count')) {
+            $cart_count = (int) get_cart_count();
+          }
+        }
+        if ($cart_count > 0) {
+          echo ' <span class="cart-badge">' . intval($cart_count) . '</span>';
+        }
+        ?>
+      </a>
+    </li>
+    <?php if (basename($_SERVER['PHP_SELF']) === 'login.php'): ?>
+      <a href="register.php" class="gsw-nav-link">Register</a>
+    <?php endif; ?>
+    <?php if ($is_logged_in && $is_admin): ?>
+  <a href="admin.php" class="gsw-nav-link">Admin</a>
     <?php endif; ?>
     <a href="http://panel.iaregamer.com" class="gsw-nav-link" target="_blank">Panel Login</a>
   </nav>
   <div class="gsw-header-right">
     <?php if ($is_logged_in): ?>
       <span class="gsw-user-info">Welcome, <?php echo $username; ?>!</span>
-      <a href="/logout.php" class="gsw-header-btn">Logout</a>
+  <?php
+    // Build a safe absolute return_to under this site so logout redirects stay in _website
+    $script = $_SERVER['SCRIPT_NAME'] ?? '';
+    $pos = strpos($script, '/_website');
+    $siteRoot = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rtrim(dirname($script), '/\\');
+    $current = $_SERVER['REQUEST_URI'] ?? $siteRoot . '/index.php';
+    // Ensure current is absolute and under site root; urlencode only when embedding in URL
+    $return_to_param = $current;
+  ?>
+  <a href="logout.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Logout</a>
     <?php else: ?>
-      <a href="/login.php" class="gsw-header-btn">Login</a>
+  <a href="login.php" class="gsw-header-btn">Login</a>
     <?php endif; ?>
   </div>
 </div>

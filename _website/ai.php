@@ -233,23 +233,28 @@ try {
     $error = $e->getMessage();
 }
 ?>
+<?php
+// Include top and menu for website UI (session already started above)
+include(__DIR__ . '/includes/top.php');
+include(__DIR__ . '/includes/menu.php');
+?>
 <!-- UI -->
-<div style="max-width:760px; margin:20px auto; font-family:Arial, sans-serif;">
+<div class="ai-container">
   <h3>Site Assistant</h3>
   <p>Type a question below. Press <b>Enter</b> to send, <b>Shift+Enter</b> for a new line.</p>
 
   <?php if ($error): ?>
-    <div style="margin:10px 0; padding:8px; border:1px solid #c00; border-radius:6px;">
+  <div class="ai-alert" style="border:1px solid #c00;">
       <strong>Error:</strong> <?php echo h($error); ?>
     </div>
   <?php endif; ?>
 
   <?php if (!empty($_SESSION['thread_id'])): ?>
-    <div style="margin:4px 0; font-size:12px;">Thread: <?php echo h($_SESSION['thread_id']); ?></div>
+  <div class="ai-msg-meta">Thread: <?php echo h($_SESSION['thread_id']); ?></div>
   <?php endif; ?>
 
   <form id="chat-form" method="post" style="margin:12px 0;">
-    <textarea id="chat-input" name="user_input" rows="3" style="width:100%; padding:6px;" placeholder="Ask your question..."></textarea>
+    <textarea id="chat-input" name="user_input" rows="3" class="ai-textarea" placeholder="Ask your question..."></textarea>
     <div style="margin-top:8px; display:flex; gap:8px;">
       <button type="submit">Send</button>
       <button type="submit" name="reset_thread" value="1">Reset Conversation</button>

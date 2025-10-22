@@ -59,7 +59,7 @@ function filterList(q) {
 <header class="wrap">
   <h1>Game Server Guides</h1>
   <input class="search" placeholder="Search games…" oninput="filterList(this.value)">
-  <p style="color:#9ca3af;margin:8px 2px 0">Click a game to open its guide in a new tab; each page has a “Print / Save PDF” button.</p>
+  <p class="muted">Click a game to open its guide in a new tab; each page has a “Print / Save PDF” button.</p>
 </header>
 <div class="wrap">
   <div class="grid">

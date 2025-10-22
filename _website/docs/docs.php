@@ -77,7 +77,7 @@ $docs = [
 
   <div class="embed-snippet">
     <strong>Generic embed snippet (replace <code>doc=</code> value):</strong>
-    <pre><code>&lt;iframe src="/serve.php?doc=sales" width="100%" height="720" style="border:1px solid #ddd;border-radius:12px"&gt;&lt;/iframe&gt;</code></pre>
+  <pre><code>&lt;iframe src="/serve.php?doc=sales" width="100%" height="720" class="doc-iframe"&gt;&lt;/iframe&gt;</code></pre>
   </div>
 
   <p class="footer">Tip: You can place <code>serve.php</code> and <code>docs.php</code> anywhere; just keep the whitelist in <code>serve.php</code> updated to match your files.</p>

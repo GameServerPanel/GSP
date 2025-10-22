@@ -20,6 +20,9 @@ There are other methods that might be better to get the info.  But all we need i
 This method means we can use one code block in every game page and fill in the data dynamically.   
 */
 
+// Require login for ordering
+require_once(__DIR__ . '/includes/login_required.php');
+
 // Include database configuration
 require_once(__DIR__ . '/includes/config.inc.php');
 
@@ -29,7 +32,8 @@ if (!$db) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Include menu
+// Include top bar and menu
+include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
 	
@@ -65,10 +69,10 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 	}
 	
 	foreach ($services as $key => $row) {
-		$service_id[$key] = $row['service_id'];
+		$service_ids[$key] = $row['service_id'];
 		$home_cfg_id[$key] = $row['home_cfg_id'];
 		$mod_cfg_id[$key] = $row['mod_cfg_id'];
-		$service_name[$key] = $row['service_name'];
+	$service_name[$key] = $row['service_name'];
 		$remote_server_id[$key] = $row['remote_server_id'];
 		$slot_max_qty[$key] = $row['slot_max_qty'];
 		$slot_min_qty[$key] = $row['slot_min_qty'];
@@ -80,23 +84,18 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 		$ftp[$key] = $row['ftp'];
 		$install_method[$key] = $row['install_method'];
 		$manual_url[$key] = $row['manual_url'];
-		$access_rights[$key] = $row['access_rights'];
+	$access_rights_list[$key] = $row['access_rights'];
 	}
 	
 ?>	
-<div style="border-left:10px solid transparent;"> 
+<div class="clearfix">
 	<?php
 	foreach($services as $row)
 	{ 
 	if(!isset($_REQUEST['service_id']))
 		{
 	?>
-	<div style="
-	float:left; 	
-	padding-top: 30px;
-  padding-right: 20px;
-  padding-bottom: 30px;
-  padding-left: 20px;">
+		<div class="float-left p-30-20">
   
   
   
@@ -135,7 +134,7 @@ if ($row['price_monthly'] == 0.0) {
 			//THIS IS THE SERVER WE WANT TO ORDER
 		{	
 			?>
-			<div style="float:left; border: 4px solid transparent;border-bottom: 25px solid transparent;">
+			<div class="float-left decorative-bottom">
 			
 			<img src="<?php echo $row['img_url'];?>" width=230 height=112 border=0 ">
 			<center><b>	<?php echo $row['service_name'];?></b></center>
@@ -169,7 +168,7 @@ if ($row['price_monthly'] == 0.0) {
 				echo "<p style='color:gray;width:280px;' >$row[description]<p>";
 			?>
 			</div>
-			<table style="float:left;">
+			<table class="float-left">
 			<form method="post" action="panel/_add_to_cart.php">
     		<input type="hidden" name="service_id" size="15" value="<?php if(isset($_POST['service_id'])) echo $_POST['service_id'];?>">
 			<input type="hidden" name="remote_control_password" size="15" value="ChangeMe">
@@ -295,7 +294,7 @@ if ($row['price_monthly'] == 0.0) {
 			</tr>
 			<tr>
 			<td align="left" colspan="2">
-			<form action ="https://gameservers.world/server-list/" method="POST">
+			<form action ="serverlist.php" method="POST">
 			  <button >Back to List</button>
 			</form>
 			</td>
@@ -311,4 +310,5 @@ if ($row['price_monthly'] == 0.0) {
 mysqli_close($db);
 ?>
 </body>
+<?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>

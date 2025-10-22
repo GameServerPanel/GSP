@@ -9,19 +9,22 @@
 <?php
 // gameservers.world admin — mysqli only, bulk + per-row update, image base URL + small button
 
-/* === Configure your site base URL for image previews (MUST end with or without slash; we'll normalize) === */
-$SITE_BASE_URL = 'http://gameservers.world/';
+/* === SITE_BASE_URL is loaded from includes/config.inc.php; leave empty to use relative paths === */
 
 // Include database configuration
 require_once(__DIR__ . '/includes/config.inc.php');
 
-// Create database connection
+// Protect this page: require admin
+require_once(__DIR__ . '/includes/admin_auth.php');
+
+// Create database connection (admin_auth already validated DB but we need connection for UI ops)
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 if (!$db) {
-    die("Connection failed: " . mysqli_connect_error());
+  die("Connection failed: " . mysqli_connect_error());
 }
 
-// Include menu
+// Include top bar and menu
+include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
 /* show errors during setup */
@@ -138,7 +141,8 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
 ?>
 
 <?php if ($flash): ?>
-  <div style="padding:8px;border:1px solid #ccc;margin:10px 0;"><?php foreach($flash as $m) echo "<div>".h($m)."</div>"; ?></div>
+  <div class="panel" style="margin-bottom:12px"><?php foreach($flash as $m) echo "<div>".h($m)."</div>"; ?></div>
+    <div class="panel mb-12"><?php foreach($flash as $m) echo "<div>".h($m)."</div>"; ?></div>
 <?php endif; ?>
 
 <h2>Enable/Disable Server Locations (Global)</h2>
@@ -146,17 +150,18 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
   <input type="hidden" name="update_remote_servers" value="1">
   <div style="display:flex;flex-wrap:wrap;gap:10px;">
     <?php foreach ($remoteServers as $rs): ?>
-      <label style="border:1px solid #ddd;border-radius:6px;padding:6px 10px;min-width:240px;">
+  <label class="loc-label min-w-240">
         <input type="checkbox" name="rs[]" value="<?php echo (int)$rs['remote_server_id']; ?>" <?php echo ((int)$rs['enabled']===1?'checked':''); ?>>
         <b><?php echo h($rs['remote_server_name']); ?></b>
-        <small style="color:#666;">(ID: <?php echo (int)$rs['remote_server_id']; ?>)</small>
+  <small class="muted">(ID: <?php echo (int)$rs['remote_server_id']; ?>)</small>
       </label>
     <?php endforeach; ?>
   </div>
   <div style="margin-top:10px;"><button type="submit">Update Enabled Servers</button></div>
+    <div class="mt-10"><button type="submit">Update Enabled Servers</button></div>
 </form>
 
-<hr style="margin:20px 0;">
+<hr>
 
 <h2>Current Services</h2>
 <?php if (!$services): ?>
@@ -169,14 +174,14 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
   <table class="center" style="text-align:center;width:100%;border-collapse:collapse;">
     <thead>
       <tr>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Enabled</th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Service Name <small style="color:#777;">(ID below)</small></th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Min Slots</th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Max Slots</th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Price (Monthly)</th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Thumbnail URL</th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Preview</th>
-        <th style="border-bottom:1px solid #ddd;padding:6px;">Update Row</th>
+  <th>Enabled</th>
+  <th>Service Name <small class="muted">(ID below)</small></th>
+  <th>Min Slots</th>
+  <th>Max Slots</th>
+  <th>Price (Monthly)</th>
+  <th>Thumbnail URL</th>
+  <th>Preview</th>
+  <th>Update Row</th>
       </tr>
     </thead>
     <tbody>
@@ -189,57 +194,61 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
         $imgUrl   = trim((string)$row['img_url']);
         $displayUrl = '';
         if ($imgUrl !== '') {
-          $displayUrl = is_abs_url($imgUrl) ? $imgUrl : join_base($SITE_BASE_URL, $imgUrl);
+          if (is_abs_url($imgUrl)) {
+            $displayUrl = $imgUrl;
+          } elseif ($SITE_BASE_URL !== '') {
+            $displayUrl = join_base($SITE_BASE_URL, $imgUrl);
+          } else {
+            // Use relative path (local folder)
+            $displayUrl = $imgUrl;
+          }
         }
       ?>
 
       <!-- MAIN ROW (no bottom border) -->
       <tr>
         <!-- Enabled first -->
-        <td style="padding:6px;">
+        <td>
           <input type="hidden" name="service[<?php echo $sid; ?>][enabled]" value="0">
           <input type="checkbox" name="service[<?php echo $sid; ?>][enabled]" value="1" <?php echo ((int)$row['enabled']===1?'checked':''); ?>>
         </td>
 
         <!-- Service name (with tiny ID under it) -->
-        <td style="padding:6px; text-align:left;">
-          <input type="text" name="service[<?php echo $sid; ?>][service_name]" value="<?php echo h($row['service_name']); ?>" style="min-width:260px;">
-          <div style="color:#777; font-size:12px; margin-top:2px;">ID: <?php echo $sid; ?></div>
+        <td>
+          <input type="text" name="service[<?php echo $sid; ?>][service_name]" value="<?php echo h($row['service_name']); ?>" class="min-w-260">
+          <div class="small-muted">ID: <?php echo $sid; ?></div>
         </td>
 
-        <td style="padding:6px;">
-          <input type="number" name="service[<?php echo $sid; ?>][slot_min_qty]" value="<?php echo (int)$row['slot_min_qty']; ?>" min="1" step="1" style="width:90px;">
+        <td>
+          <input type="number" name="service[<?php echo $sid; ?>][slot_min_qty]" value="<?php echo (int)$row['slot_min_qty']; ?>" min="1" step="1" class="w-90">
         </td>
 
-        <td style="padding:6px;">
-          <input type="number" name="service[<?php echo $sid; ?>][slot_max_qty]" value="<?php echo (int)$row['slot_max_qty']; ?>" min="1" step="1" style="width:90px;">
+        <td>
+          <input type="number" name="service[<?php echo $sid; ?>][slot_max_qty]" value="<?php echo (int)$row['slot_max_qty']; ?>" min="1" step="1" class="w-90">
         </td>
 
-        <td style="padding:6px;">
+        <td>
           <input type="text" name="service[<?php echo $sid; ?>][price_monthly]" value="<?php echo h($row['price_monthly']); ?>" size="8">
         </td>
 
         <!-- Thumbnail URL input -->
-        <td style="padding:6px; vertical-align:top;">
-          <input type="text" name="service[<?php echo $sid; ?>][img_url]" value="<?php echo h($row['img_url']); ?>" style="min-width:240px;">
+        <td>
+          <input type="text" name="service[<?php echo $sid; ?>][img_url]" value="<?php echo h($row['img_url']); ?>" class="min-w-240">
         </td>
 
         <!-- Preview (uses BASE + relative path) -->
-        <td style="padding:6px; vertical-align:top;">
+        <td>
           <?php if ($displayUrl !== ''): ?>
-            <img src="<?php echo h($displayUrl); ?>" alt="preview" loading="lazy"
-                 style="max-height:48px; max-width:120px; border:1px solid #eee; display:block;"
-                 onerror="this.style.display='none'">
+      <img src="<?php echo h($displayUrl); ?>" alt="preview" loading="lazy" class="img-preview" onerror="this.style.display='none'">
           <?php else: ?>
-            <span style="color:#aaa;">(no image)</span>
+            <span class="muted">(no image)</span>
           <?php endif; ?>
         </td>
 
         <!-- Per-row Update (smaller) -->
-        <td style="padding:6px;">
-          <button type="submit" name="update_single" value="<?php echo $sid; ?>"
-                  style="padding:3px 8px; font-size:12px;">Update Row</button>
-        </td>
+  <td>
+     <button type="submit" name="update_single" value="<?php echo $sid; ?>" class="btn-small">Update Row</button>
+  </td>
       </tr>
 
       <!-- LOCATIONS ROW (single bottom divider) -->
@@ -252,10 +261,10 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
                 $isChecked = isset($selSet[$rid]);
                 $isPrimary = ($primary === $rid);
               ?>
-              <label style="border:1px solid #eee;border-radius:6px;padding:6px 8px; display:inline-flex; align-items:center;">
+              <label class="loc-label">
                 <input type="checkbox" class="locchk" data-sid="<?php echo $sid; ?>"
                        name="service[<?php echo $sid; ?>][locations][]" value="<?php echo $rid; ?>"
-                       <?php echo $isChecked ? 'checked' : ''; ?> style="margin-right:6px;">
+                       <?php echo $isChecked ? 'checked' : ''; ?> class="mr-6">
                 <?php echo h($rs['remote_server_name']); ?> (<?php echo $rid; ?>)
                 <span style="margin-left:10px;">
                   <input type="radio" class="locprim" data-sid="<?php echo $sid; ?>"
@@ -264,7 +273,7 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
                   <small>Primary</small>
                 </span>
                 <?php if ((int)$rs['enabled'] === 0): ?>
-                  <small style="color:#a00; margin-left:8px;">[Globally disabled]</small>
+                  <small class="text-danger ml-8">[Globally disabled]</small>
                 <?php endif; ?>
               </label>
             <?php endforeach; ?>

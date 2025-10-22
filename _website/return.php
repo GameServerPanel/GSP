@@ -1,7 +1,7 @@
 <?php
-// Reads data/<invoice>.json written by webhook.php and shows a receipt with items
+require_once(__DIR__ . '/includes/config.inc.php');
 
-$dataDir = __DIR__ . '/data';
+$dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';
 $invoice = $_GET['invoice'] ?? '';
 $cancel  = isset($_GET['cancel']);
 
@@ -9,8 +9,8 @@ $status   = 'PENDING';
 $details  = null;
 $items    = [];
 
-if ($invoice && is_file("$dataDir/$invoice.json")) {
-  $details = json_decode(file_get_contents("$dataDir/$invoice.json"), true);
+if ($invoice && is_file($dataDir . DIRECTORY_SEPARATOR . $invoice . '.json')) {
+  $details = json_decode(file_get_contents($dataDir . DIRECTORY_SEPARATOR . $invoice . '.json'), true);
   if (!empty($details['status'])) {
     $status = $details['status'];
   }
@@ -19,7 +19,6 @@ if ($invoice && is_file("$dataDir/$invoice.json")) {
   }
 }
 
-// Helpers
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 function money_fmt($value, $currency) {
   if ($value === null || $value === '') return '';
@@ -32,16 +31,11 @@ function money_fmt($value, $currency) {
   <meta charset="utf-8">
   <title>Payment Status</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{font-family:system-ui,Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 16px;line-height:1.45}
-    .muted{color:#555}
-    table{width:100%;border-collapse:collapse;margin-top:12px}
-    th,td{border:1px solid #ddd;padding:8px;text-align:left}
-    th{background:#f6f6f6}
-    code{background:#f4f4f4;padding:2px 4px;border-radius:4px}
-  </style>
+  <link rel="stylesheet" href="css/header.css">
 </head>
 <body>
+<?php include(__DIR__ . '/includes/top.php'); include(__DIR__ . '/includes/menu.php'); ?>
+<div class="site-panel">
 <?php if ($cancel): ?>
   <h1>Payment canceled</h1>
   <p>Invoice: <?= h($invoice) ?></p>
@@ -67,7 +61,7 @@ function money_fmt($value, $currency) {
 
     <h3>Items</h3>
     <?php if ($items): ?>
-      <table>
+      <table class="cart-table">
         <thead>
           <tr>
             <th>Server ID</th>
@@ -83,7 +77,7 @@ function money_fmt($value, $currency) {
           $grand  = 0.00;
           foreach ($items as $it) {
             $name = $it['name'] ?? '';
-            $sku  = $it['sku'] ?? ''; // we sent serverID here
+            $sku  = $it['sku'] ?? '';
             $qty  = isset($it['quantity']) ? (int)$it['quantity'] : 1;
             $unit = isset($it['unit_amount']['value']) ? (float)$it['unit_amount']['value'] : 0.00;
             $line = $qty * $unit;
@@ -98,7 +92,7 @@ function money_fmt($value, $currency) {
           }
         ?>
           <tr>
-            <td colspan="4" style="text-align:right;"><strong>Total</strong></td>
+            <td colspan="4" class="text-right"><strong>Total</strong></td>
             <td><strong><?= money_fmt($grand, $currency) ?></strong></td>
           </tr>
         </tbody>
@@ -114,6 +108,7 @@ function money_fmt($value, $currency) {
     <p class="muted">We’re waiting for PayPal to confirm your payment. This page will show the receipt once we receive the webhook. Try refreshing in a few seconds.</p>
   <?php endif; ?>
 <?php endif; ?>
+</div>
+<?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
-

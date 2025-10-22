@@ -1,0 +1,115 @@
+.gsw-top{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#fff;border-bottom:1px solid rgba(0,0,0,0.05);}
+.gsw-top img{height:40px;width:auto;display:block}
+.gsw-top .gsw-site-name{font-weight:700;font-size:1.1rem;color:#333}
+@media(max-width:480px){.gsw-top{padding:10px}.gsw-top img{height:32px}.gsw-top .gsw-site-name{font-size:1rem}}
+
+.gsw-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:rgba(102, 126, 234, 0.95);backdrop-filter:blur(10px);margin-bottom:20px;box-shadow:0 2px 4px rgba(0,0,0,0.1);} 
+.gsw-header-left{font-weight:700;font-size:1.2rem;color:#fff;} 
+.gsw-header-left a{color:#fff;text-decoration:none;} 
+.gsw-header-nav{display:flex;gap:20px;align-items:center;} 
+.gsw-nav-link{color:#fff;text-decoration:none;font-size:0.95rem;transition:opacity 0.2s;} 
+.gsw-nav-link:hover{opacity:0.8;text-decoration:underline;} 
+.gsw-header-right{display:flex;gap:12px;align-items:center;} 
+.gsw-user-info{color:#fff;font-size:0.95rem;} 
+.gsw-header-btn{padding:8px 16px;background:#fff;color:#667eea;border-radius:6px;text-decoration:none;font-weight:600;transition:transform 0.2s;} 
+.gsw-header-btn:hover{transform:translateY(-2px);} 
+@media(max-width:768px){
+  .gsw-header{flex-direction:column;gap:12px;}
+  .gsw-header-nav{flex-wrap:wrap;justify-content:center;}
+}
+
+/* Banner styling (index only) */
+.gsw-banner{width:100%;text-align:center;margin-bottom:18px}
+.gsw-banner img{max-width:100%;height:auto;display:inline-block}
+
+/* Footer styles */
+footer.gsw-footer{background:#000;color:#fff;padding:18px 12px;text-align:center;margin-top:28px}
+footer.gsw-footer a{color:#4aa3ff;text-decoration:none}
+footer.gsw-footer a:hover{text-decoration:underline}
+
+/* Page color scheme: prefer dark text on light backgrounds by default */
+/* Dark site theme: dark background with light text */
+body { color: #fff; background: #0b1020; }
+
+/* Make links readable on dark background */
+a { color: #7fb3ff; }
+
+/* Form inputs: light text on darker inputs by default */
+input, textarea, select, button { color: #fff; background: #11141f; border: 1px solid rgba(255,255,255,0.06); }
+
+.cart-badge{display:inline-block;background:#ff3b30;color:#fff;font-size:0.8rem;padding:2px 6px;border-radius:12px;margin-left:6px;vertical-align:middle}
+.site-panel{width:100%; max-width:1000px; margin:auto; padding:1rem; background:rgba(0,0,0,0.25); border-radius:0.75rem;}
+.site-panel-title{font-size:1.5rem; font-weight:bold; color:#fff; margin-bottom:1.5rem; text-align:center}
+.cart-table{border-collapse:separate; border-spacing:0; width:100%; color:#fff}
+.cart-table thead{background:rgba(255,255,255,0.03)}
+.cart-table th, .cart-table td{padding:1rem 1.5rem; text-align:left; border-bottom:1px solid rgba(255,255,255,0.03)}
+.cart-total-row{background:transparent; font-weight:bold}
+.cart-total-label{padding:1rem 1.5rem; text-align:right; border-top:2px solid rgba(255,255,255,0.06); font-weight:600; color:#fff}
+.cart-total-value{padding:1rem 1.5rem; text-align:left; border-top:2px solid rgba(255,255,255,0.06); font-weight:600; color:#fff; font-size:1.1rem}
+
+/* Utility classes */
+.container-wide{width:100%; max-width:1000px; margin:28px auto;}
+.panel{background:rgba(0,0,0,0.25); padding:16px; border-radius:8px}
+.muted{color:rgba(255,255,255,0.6)}
+.center{text-align:center}
+.pad-40{padding:40px}
+.btn-danger{background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:6px}
+.btn-primary{background:#06b6d4;color:#fff;border:none;padding:6px 10px;border-radius:6px}
+.float-left{float:left}
+.clearfix::after{content:"";display:table;clear:both}
+.table-compact th,.table-compact td{padding:0.5rem}
+
+/* Small spacing utilities used by a few pages */
+.mb-18{margin-bottom:18px}
+.mt-6{margin-top:6px}
+.mt-12{margin-top:12px}
+
+/* Padding helper used where a wider card/panel is desired */
+.p-30-20{padding:30px 20px}
+
+/* Decorative container used in a few places */
+.decorative-bottom{border:4px solid transparent;border-bottom:25px solid transparent}
+
+/* Inline form helper (used for small inline forms inside table cells) */
+.inline-form{margin:0;display:inline}
+
+/* Small square button (used for delete icons) */
+.btn-square{width:2rem;height:2rem;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;border-radius:0.25rem;border:none}
+
+.text-right{text-align:right}
+.text-danger{color:#ef4444}
+.text-center{text-align:center}
+
+/* small helpers for admin server list inputs */
+.min-w-260{min-width:260px}
+.min-w-240{min-width:240px}
+.w-90{width:90px}
+.img-preview{max-height:48px; max-width:120px; border:1px solid #eee; display:block}
+.loc-label{border:1px solid #eee;border-radius:6px;padding:6px 8px; display:inline-flex; align-items:center}
+.small-muted{color:#777;font-size:12px;margin-top:2px}
+
+/* PayPal status */
+.pp-status{margin-top:12px;font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
+
+/* AI UI helpers */
+.ai-container{max-width:760px; margin:20px auto; font-family:Arial, sans-serif}
+.ai-panel{margin:10px 0; padding:8px; border-radius:6px}
+.ai-alert{margin:10px 0; padding:8px; border-radius:6px; border:1px solid #c00}
+.ai-textarea{width:100%; padding:6px}
+.ai-message{margin-top:16px; padding:10px; border:1px solid #ccc; border-radius:8px}
+.ai-msg-title{font-weight:bold}
+.ai-msg-meta{margin-top:6px; font-size:12px}
+.flex-gap-wrap{display:flex;flex-wrap:wrap;gap:10px}
+.table-center{text-align:center;width:100%;border-collapse:collapse}
+.tb-row-bottom{border-bottom:1px solid #f0f0f0;padding:8px 6px;text-align:left}
+.locs-box{display:flex;flex-wrap:wrap;gap:8px}
+.mb-12{margin-bottom:12px}
+.mt-10{margin-top:10px}
+.mt-14{margin-top:14px}
+.mt-20{margin-top:20px}
+.mt-8{margin-top:8px}
+.btn-small{padding:3px 8px;font-size:12px}
+.mr-6{margin-right:6px}
+.ml-8{margin-left:8px}
+.flex-row-gap{display:flex;gap:8px;align-items:center}
+

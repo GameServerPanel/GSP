@@ -3,8 +3,39 @@
 session_name("gameservers_website");
 session_start();
 
+// We'll compute a site root below (up to /_website) and define a strict sanitizer after config is loaded
+
 // Include database configuration
 require_once(__DIR__ . '/includes/config.inc.php');
+
+// Determine site root up to /_website so we can enforce absolute redirects within this site
+$script = $_SERVER['SCRIPT_NAME'] ?? '';
+$pos = strpos($script, '/_website');
+$SITE_ROOT_PATH = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rtrim(dirname($script), '/\\');
+
+// Strict sanitizer that returns an absolute path under $SITE_ROOT_PATH or empty string on invalid
+$sanitize_return_path = function($p) use ($SITE_ROOT_PATH) {
+    $p = trim((string)$p);
+    if ($p === '') return '';
+    // disallow absolute URLs or protocol-relative paths
+    if (preg_match('#^(https?:)?//#i', $p)) return '';
+    if (strpos($p, "\n") !== false || strpos($p, "\r") !== false) return '';
+    // Reject path traversal
+    if (strpos($p, '..') !== false) return '';
+    // Normalize: if it starts with '/', treat as absolute path and ensure it's under SITE_ROOT_PATH
+    if (substr($p,0,1) === '/') {
+        // simple character whitelist
+        if (!preg_match('#^/[A-Za-z0-9_./?&=%:\-]+$#', $p)) return '';
+        // Disallow entry to 'dashboard' (panel area) explicitly
+        if (stripos($p, '/dashboard') !== false) return '';
+        return $p;
+    }
+    // Relative path: restrict characters and build absolute under site root
+    if (!preg_match('#^[A-Za-z0-9_./?&=%:\-]+$#', $p)) return '';
+    // Disallow references to panel dashboard
+    if (stripos($p, 'dashboard') !== false) return '';
+    return $SITE_ROOT_PATH . '/' . ltrim($p, '/');
+};
 
 // Create database connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
@@ -19,8 +50,14 @@ function logger($logtext){
 
 // Check if user is already logged in
 if (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) {
+    // Determine return path and sanitize it strictly to stay under _website
+    // Request values may be url-encoded (from previous urlencode calls); decode first
+    $return_to_raw = isset($_REQUEST['return_to']) ? urldecode($_REQUEST['return_to']) : '';
+    $sanitized_return = $sanitize_return_path($return_to_raw);
+    if ($sanitized_return === '') $sanitized_return = $SITE_ROOT_PATH . '/index.php';
+
     // Already logged in, redirect to appropriate page
-    header('Location: /');
+    header('Location: ' . $sanitized_return);
     exit();
 }
 
@@ -39,15 +76,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         // Sanitize username to prevent SQL injection
         $username = mysqli_real_escape_string($db, $username);
         
-        // Query the panel database for the user
-        $query = "SELECT user_id, users_login, users_passwd, users_role, users_email FROM ogp_users WHERE users_login = '$username'";
-        $result = mysqli_query($db, $query);
-        
-        if ($result && mysqli_num_rows($result) === 1) {
-            $user = mysqli_fetch_assoc($result);
+    // Detect if shadow column for modern hash exists, and build a safe SELECT
+    $has_shadow = false;
+    $res_cols = mysqli_query($db, "SHOW COLUMNS FROM ogp_users LIKE 'users_pass_hash'");
+    if ($res_cols && mysqli_num_rows($res_cols) > 0) {
+        $has_shadow = true;
+    }
+
+    $select_fields = 'user_id, users_login, users_passwd, users_role, users_email';
+    if ($has_shadow) $select_fields .= ', users_pass_hash';
+
+    // Query the panel database for the user
+    $query = "SELECT $select_fields FROM ogp_users WHERE users_login = '$username'";
+    $result = mysqli_query($db, $query);
+
+    if ($result && mysqli_num_rows($result) === 1) {
+        $user = mysqli_fetch_assoc($result);
             
-            // Verify password (panel uses MD5)
-            if (md5($password) === $user['users_passwd']) {
+            // Prefer modern password hash if present (shadow column), otherwise fall back to MD5 and migrate
+            $verified = false;
+            if (!empty($user['users_pass_hash'])) {
+                // verify against modern hash
+                if (password_verify($password, $user['users_pass_hash'])) {
+                    $verified = true;
+                }
+            } else {
+                // legacy MD5
+                if (md5($password) === $user['users_passwd']) {
+                    $verified = true;
+                    // attempt to migrate: store modern hash if column exists
+                    $res = mysqli_query($db, "SHOW COLUMNS FROM ogp_users LIKE 'users_pass_hash'");
+                    if ($res && mysqli_num_rows($res) > 0) {
+                        $newhash = password_hash($password, PASSWORD_DEFAULT);
+                        $safe_user_id = (int)$user['user_id'];
+                        $stmt_m = $db->prepare("UPDATE ogp_users SET users_pass_hash = ? WHERE user_id = ?");
+                        if ($stmt_m) {
+                            $stmt_m->bind_param('si', $newhash, $safe_user_id);
+                            $stmt_m->execute();
+                            $stmt_m->close();
+                        }
+                    }
+                }
+            }
+
+            if ($verified) {
                 // Login successful - create website session
                 $_SESSION['website_user_id'] = $user['user_id'];
                 $_SESSION['website_username'] = $user['users_login'];
@@ -60,8 +132,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 // Log the login
                 logger("Website login successful: " . $user['users_login']);
                 
-                // Redirect after 2 seconds
-                header('Refresh: 2; URL=/');
+                // Redirect after 2 seconds to the requested return path or index.php, using strict sanitizer
+                // POST may contain a raw (not URL-encoded) return_to from the hidden form; decode defensively
+                $post_return = isset($_POST['return_to']) ? urldecode($_POST['return_to']) : '';
+                $return_candidate = $post_return !== '' ? $post_return : ($return_to_raw ?? '');
+                $sanitized_after = $sanitize_return_path($return_candidate ?? '');
+                if ($sanitized_after === '') $sanitized_after = $SITE_ROOT_PATH . '/index.php';
+                // Use immediate server-side redirect to avoid client-side relative resolution or delays
+                header('Location: ' . $sanitized_after);
+                exit();
             } else {
                 $error_message = 'Invalid username or password.';
                 logger("Website login failed - wrong password: $username");
@@ -93,10 +172,17 @@ mysqli_close($db);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: block;
+            padding: 0; /* we'll handle padding in content wrapper */
+        }
+
+        /* content area below the top/menu; aligns the login box to the right */
+        .content{
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            min-height: calc(100vh - 140px); /* leave room for header/menu */
+            padding:20px;
         }
         
         .login-container {
@@ -215,7 +301,9 @@ mysqli_close($db);
     </style>
 </head>
 <body>
+    <?php include(__DIR__ . '/includes/top.php'); ?>
     <?php include(__DIR__ . '/includes/menu.php'); ?>
+    <div class="content">
     <div class="login-container">
         <div class="login-header">
             <h1>Welcome Back</h1>
@@ -230,7 +318,13 @@ mysqli_close($db);
             <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
         <?php endif; ?>
         
+        <?php
+        // Capture a return_to GET parameter so we can send users back after login
+        $return_to_raw = $_GET['return_to'] ?? '';
+        // ensure we don't break if not set; the sanitizer is defined above
+        ?>
         <form method="POST" action="login.php">
+            <input type="hidden" name="return_to" value="<?php echo htmlspecialchars($return_to_raw); ?>">
             <div class="form-group">
                 <label for="ulogin">Username</label>
                 <input type="text" id="ulogin" name="ulogin" required autofocus>
@@ -243,13 +337,18 @@ mysqli_close($db);
             
             <button type="submit" name="login" class="btn-login">Sign In</button>
         </form>
+    <div class="center mt-12">
+            <a href="register.php">Register</a>
+        </div>
         
         <div class="divider">or</div>
         
         <div class="footer-links">
-            <a href="/">Back to Home</a> | 
+            <a href="index.php">Back to Home</a> | 
             <a href="../index.php">Panel Login</a>
         </div>
     </div>
+    </div>
 </body>
+<?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>

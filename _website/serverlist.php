@@ -42,15 +42,16 @@ if (!$services) {
     return;
 }
 
-// Include menu
+// Include top bar and menu
+include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 ?>
 
-<div style="border-left:10px solid transparent;">
+<div>
 <?php foreach ($services as $row): ?>
     <?php if (!isset($_REQUEST['service_id'])): ?>
         <!-- Service listing (all) -->
-        <div style="float:left; padding:30px 20px;">
+    <div class="float-left p-30-20">
             <img src="../<?php echo $row['img_url']; ?>" width="460" height="225"><br>
             <strong><?php echo $row['service_name']; ?></strong><br>
             <?php
@@ -58,14 +59,11 @@ include(__DIR__ . '/includes/menu.php');
             ?>
             <br>
                         
-            <form action="https://gameservers.world/order-server" method="POST">
-                <input type="hidden" name="service_id" value="<?php echo $row['service_id']; ?>">
-                <input type="submit" name="order" value="Order Server" >
-            </form>
+            <a href="order.php?service_id=<?php echo urlencode($row['service_id']); ?>" class="gsw-btn">Order Server</a>
         </div>
     <?php else: ?>
         <!-- Single service detail view -->
-        <div style="float:left; border: 4px solid transparent; border-bottom: 25px solid transparent;">
+    <div class="float-left decorative-bottom">
             <img src="<?php echo $row['img_url']; ?>" width="230" height="112"><br>
             <center><b><?php echo $row['service_name']; ?></b></center>
 
@@ -97,7 +95,7 @@ include(__DIR__ . '/includes/menu.php');
             <input type="hidden" name="service_id" value="<?php echo $row['service_id']; ?>">
             <input type="hidden" name="remote_control_password" value="ChangeMe">
             <input type="hidden" name="ftp_password" value="ChangeMe">
-            <table style="float:left;">
+            <table class="float-left">
                 <tr>
                     <td align="right"><b>Game Server Name</b></td>
                     <td><input type="text" name="home_name" size="40" value="<?php echo $row['service_name']; ?>"></td>
@@ -117,4 +115,5 @@ include(__DIR__ . '/includes/menu.php');
 mysqli_close($db);
 ?>
 </body>
+<?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>

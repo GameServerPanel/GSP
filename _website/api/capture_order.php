@@ -1,5 +1,5 @@
 <?php
-// === CONFIG (Sandbox) ===
+require_once(__DIR__ . '/../includes/config.inc.php');
 $sandbox       = true; // flip to false for Live
 $client_id     = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
 $client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0';
@@ -11,7 +11,6 @@ if (!$order_id) { http_response_code(400); echo json_encode(['error'=>'missing o
 
 $api = $sandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
 
-// 1) OAuth2
 $ch = curl_init("$api/v1/oauth2/token");
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
@@ -26,15 +25,11 @@ curl_close($ch);
 if ($http !== 200) { http_response_code(500); echo json_encode(['error'=>'oauth_fail']); exit; }
 $access = json_decode($tok, true)['access_token'] ?? null;
 
-// 2) Capture
 $ch = curl_init("$api/v2/checkout/orders/$order_id/capture");
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_POST => true,
-  CURLOPT_HTTPHEADER => [
-    'Content-Type: application/json',
-    'Authorization: Bearer ' . $access
-  ],
+  CURLOPT_HTTPHEADER => [ 'Content-Type: application/json', 'Authorization: Bearer ' . $access ],
 ]);
 $res  = curl_exec($ch);
 $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -48,3 +43,4 @@ $txnId   = $payload['purchase_units'][0]['payments']['captures'][0]['id'] ?? nul
 
 echo json_encode(['status'=>$status, 'txn_id'=>$txnId]);
 
+?>
