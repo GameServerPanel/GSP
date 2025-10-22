@@ -1,11 +1,24 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server List - GameServers.World</title>
+</head>
+<body>
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-include "db.php";
+// Include database configuration
+require_once(__DIR__ . '/includes/config.inc.php');
 
+// Create database connection
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
 // Save new description if admin
 if (isset($_POST['save']) && !empty($_POST['description'])) {
@@ -25,8 +38,12 @@ $services = $db->query($qry_services);
 
 if (!$services) {
     echo "<meta http-equiv='refresh' content='1'>";
+    mysqli_close($db);
     return;
 }
+
+// Include menu
+include(__DIR__ . '/includes/menu.php');
 ?>
 
 <div style="border-left:10px solid transparent;">
@@ -95,5 +112,9 @@ if (!$services) {
 <?php endforeach; ?>
 </div>
 
-
-
+<?php
+// Close database connection
+mysqli_close($db);
+?>
+</body>
+</html>

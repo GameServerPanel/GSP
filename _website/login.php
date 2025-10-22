@@ -3,8 +3,19 @@
 session_name("gameservers_website");
 session_start();
 
-// Include database connection
-require_once('db.php');
+// Include database configuration
+require_once(__DIR__ . '/includes/config.inc.php');
+
+// Create database connection
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Logger function
+function logger($logtext){
+    file_put_contents(__DIR__ . "/logfile.txt", $logtext . PHP_EOL, FILE_APPEND);
+}
 
 // Check if user is already logged in
 if (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) {
@@ -61,6 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
     }
 }
+
+// Close database connection
+mysqli_close($db);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - GameServers.World</title>
-    <style>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -201,6 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     </style>
 </head>
 <body>
+    <?php include(__DIR__ . '/includes/menu.php'); ?>
     <div class="login-container">
         <div class="login-header">
             <h1>Welcome Back</h1>

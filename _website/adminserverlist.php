@@ -1,29 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Server List - GameServers.World</title>
+</head>
+<body>
 <?php
 // gameservers.world admin — mysqli only, bulk + per-row update, image base URL + small button
-
-global $db;
 
 /* === Configure your site base URL for image previews (MUST end with or without slash; we'll normalize) === */
 $SITE_BASE_URL = 'http://gameservers.world/';
 
-/* include DB (must provide $db as mysqli) */
-$try = [
-  __DIR__ . "db.php",
-  (defined('ABSPATH') ? ABSPATH : $_SERVER['DOCUMENT_ROOT']) . "db.php",
-  "db.php"
-];
-foreach ($try as $p) { if (empty($db) && is_readable($p)) include_once $p; }
+// Include database configuration
+require_once(__DIR__ . '/includes/config.inc.php');
 
-/* show errors to WP admins during setup */
-if (function_exists('current_user_can') && current_user_can('manage_options')) { @ini_set('display_errors','1'); error_reporting(E_ALL); }
-
-/* guards & helpers */
-if (!($db instanceof mysqli)) {
-  echo '<div style="border:1px solid #c00;padding:10px;margin:10px 0;">
-        <b>Admin panel error:</b> <code>$db</code> must be a <code>mysqli</code> connection (check panel/_db.php).
-        </div>';
-  return;
+// Create database connection
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
 }
+
+// Include menu
+include(__DIR__ . '/includes/menu.php');
+
+/* show errors during setup */
+@ini_set('display_errors','1'); 
+error_reporting(E_ALL);
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 function esc_mysqli($db, $v){ return $db->real_escape_string($v); }
 function fetch_all_assoc($db, $sql){
@@ -318,3 +321,9 @@ document.querySelectorAll('.locs-box').forEach(function(box){
 });
 </script>
 
+<?php
+// Close database connection
+mysqli_close($db);
+?>
+</body>
+</html>
