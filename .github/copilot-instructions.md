@@ -1,123 +1,151 @@
-# Open Game Panel (OGP) ControlPanel
-Open Game Panel is a PHP-based web application for managing game servers with Linux/Windows agents and Python documentation tools.
+Repo of truth: GameServerPanel/GSP, branch Panel-unstable.
+Prime directive: Read this document first. Propose changes that align with our repo and specs. Only search for external info if something contradicts this file.
 
-Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
+1) What to read first (paths & context)
 
-## Working Effectively
-- Bootstrap and test the repository:
-  - `sudo apt-get update && sudo apt-get install -y php mysql-server libxml-parser-perl libpath-class-perl libarchive-extract-perl libdbi-perl libdbd-mysql-perl libxml-simpleobject-perl libproc-daemon-perl liblinux-inotify2-perl libarchive-zip-perl pandoc texlive-xetex python3 python3-yaml`
-  - `sudo service mysql start`
-  - `sudo mysql --defaults-file=/etc/mysql/debian.cnf -e "CREATE DATABASE IF NOT EXISTS panel; CREATE USER IF NOT EXISTS 'localuser'@'localhost' IDENTIFIED BY 'testpass'; GRANT ALL PRIVILEGES ON panel.* TO 'localuser'@'localhost'; FLUSH PRIVILEGES;"`
-  - Edit `/home/runner/work/ControlPanel/ControlPanel/includes/config.inc.php` to set database password to `testpass`
-- Test Python guide generation tools:
-  - `cd /home/runner/work/ControlPanel/ControlPanel && ./tools/generate_all_guides.sh` -- takes 3-10 seconds. NEVER CANCEL. Set timeout to 30+ seconds.
-  - `python3 tools/validate_guides.py` -- takes under 1 second
-- Test PHP web application:
-  - `cd /home/runner/work/ControlPanel/ControlPanel && php -S localhost:8080 &` 
-  - `curl -I http://localhost:8080` (will show 500 error due to missing database schema - this is expected)
-  - `pkill -f "php -S"` to stop server
-- Test Perl agent syntax:
-  - `cd /home/runner/work/ControlPanel/ControlPanel/_agent-linux && perl -c ogp_agent.pl` -- should show "syntax OK"
+_website/ — canonical website storefront and Checkout/Webhooks flow.
 
-## Validation
-- Always test the Python guide generation workflow when making changes to tools/ directory
-- ALWAYS run `./tools/generate_all_guides.sh` to validate guide generation changes  
-- Test PHP syntax with `php -l <file.php>` for any PHP file changes
-- Test Perl agent syntax with `perl -c ogp_agent.pl` when modifying agent files
-- The web application requires a complete database schema to run properly, but basic connectivity can be tested
+modules/config_games/server_configs/ — authoritative game catalog XMLs (all supported games live here).
 
-## CRITICAL Build & Test Timing
-- **Guide generation: 3-10 seconds** - NEVER CANCEL. Set timeout to 30+ seconds minimum
-- **Guide validation: Under 1 second** - Set timeout to 15+ seconds  
-- **Package installation: 5-15 minutes** - NEVER CANCEL. Set timeout to 20+ minutes
-- **PDF generation (with LaTeX): 2-5 seconds per document** - NEVER CANCEL
-- **Database setup: Under 10 seconds** - Set timeout to 30+ seconds
+modules/ — panel modules (legacy billing/ exists; its schema is authoritative for multi-remote, but the pages are deprecated).
 
-## Common Tasks
-The following are outputs from frequently run commands. Reference them instead of viewing, searching, or running bash commands to save time.
+includes/ — panel configuration and DB connectors.
 
-### Repository Structure
-```
-/home/runner/work/ControlPanel/ControlPanel/
-├── index.php                    # Main web application entry point
-├── includes/                    # PHP includes and configuration
-│   ├── config.inc.php          # Database configuration  
-│   ├── database_mysqli.php     # Database abstraction layer
-│   └── helpers.php             # Utility functions
-├── modules/                     # Web application modules
-├── themes/                      # UI themes
-├── tools/                       # Python guide generation tools
-│   ├── generate_all_guides.sh  # Main guide generation script
-│   ├── generate_server_guides.py # Python guide generator
-│   └── validate_guides.py      # Guide validation script
-├── _agent-linux/               # Linux agent (Perl)
-│   ├── ogp_agent.pl           # Main agent script
-│   └── ogp_agent_run          # Agent wrapper script
-├── _agent-windows/             # Windows agent
-├── data/games/                  # YAML game definitions for guides
-└── dist/pdfs/                  # Generated PDF guides
-```
+ogp_api.php — internal API entry point for panel-side actions.
 
-### Dependencies Status  
-- **PHP 8.3.6**: Available, with MySQLi extension
-- **MySQL 8.0**: Available, can be started with `sudo service mysql start`
-- **Perl 5.38**: Available, with all required OGP modules installed
-- **Python 3.12**: Available, with PyYAML installed  
-- **Pandoc + XeLaTeX**: Available, for PDF generation
+paypal/ — PayPal code if present in this branch.
 
-### Guide Generation Workflow
-```bash
-# Complete workflow (3-10 seconds total)
-cd /home/runner/work/ControlPanel/ControlPanel
-./tools/generate_all_guides.sh
+2) No-Code Planning Mode (default)
 
-# Individual steps
-python3 tools/generate_server_guides.py  # Generate markdown + PDFs
-python3 tools/validate_guides.py         # Validate output
+Do not emit PHP, SQL, XML, or shell commands unless a maintainer explicitly asks: “Generate code now.”
 
-# Expected output structure:
-# docs/games/<game-slug>/index.md         # Markdown guides
-# dist/pdfs/<game-slug>__Server_Admin_Guide_v1.pdf # PDF guides  
-# docs/games/_index.md                    # Index page
-# dist/pdfs/manifest.json                 # Metadata manifest
-```
+While in planning mode, produce only:
 
-### Agent Testing
-```bash
-# Test Perl agent syntax (agent requires special permissions to run)
-cd /home/runner/work/ControlPanel/ControlPanel/_agent-linux
-perl -c ogp_agent.pl
-# Expected: "ogp_agent.pl syntax OK"
-```
+Impacted paths and files,
 
-### Database Setup for Testing
-```bash
-# Basic database setup (already configured)
-sudo service mysql start
-mysql -u localuser -ptestpass -e "SHOW DATABASES;"
-# Should show: information_schema, panel, performance_schema
-```
+Step-by-step plans with acceptance criteria,
 
-### Web Application Testing
-```bash
-# Start development server (will show 500 errors without complete DB schema)
-cd /home/runner/work/ControlPanel/ControlPanel  
-php -S localhost:8080 &
-curl -I http://localhost:8080  # Test connectivity
-pkill -f "php -S"              # Stop server
-```
+Risks, rollbacks, and test/validation checklists,
 
-## Key Projects in Codebase
-1. **Web Panel** (`index.php`, `modules/`, `themes/`): PHP web application for game server management
-2. **Linux Agent** (`_agent-linux/`): Perl-based agent for Linux game server management  
-3. **Windows Agent** (`_agent-windows/`): Windows version of server agent
-4. **Guide Tools** (`tools/`): Python scripts for generating comprehensive server admin documentation
-5. **Game Definitions** (`data/games/`): YAML files defining game server configurations for guide generation
+Data mappings that reference existing tables/fields.
 
-## Important Notes
-- The web application requires complete database schema initialization to run fully (beyond basic connectivity testing)
-- Agents require special system permissions and users to run properly in production
-- Guide generation tools work independently and can be tested without the web application
-- PDF generation requires both pandoc and XeLaTeX (texlive-xetex package)
-- All basic syntax checking and connectivity testing works in this environment
-- Focus testing on the components that can be fully validated: guide tools, PHP syntax, Perl syntax, and basic connectivity
+3) Scope & principles
+
+Website ↔ Panel on the same host. Website uses the panel DB for authentication and the panel’s internal APIs for provisioning. Sessions remain separate (website session ≠ panel session).
+
+Catalog = XML. Enable every game present under modules/config_games/server_configs/. The website reads those XMLs for ports, params, install/update metadata. New XMLs should become available without code changes.
+
+Regions/Nodes = panel DB. Regions and nodes are configured in the panel and must be queried live from the panel DB. Never hardcode or mirror region lists on the website.
+
+Slotless model. Pricing/UX must not enforce slot caps. If an engine requires a player count parameter, set a safe high default and surface engine limits transparently if they exist.
+
+Auth compatibility. Panel users use legacy MD5 in ogp_users. The website should prefer a modern hashing shadow and upgrade transparently on successful login, without breaking panel login.
+
+Checkout/Webhooks. Follow the working PayPal Checkout flow in _website/. Use REST Webhooks only. Mark orders paid only after webhook verification.
+
+Legacy billing module. Treat modules/billing/ pages as deprecated. Reuse the existing tables/fields introduced there for multi-remote support. Do not invent parallel schema.
+
+4) Functional requirements (design-level only)
+4.1 Catalog (from XML)
+
+Parse all XMLs under modules/config_games/server_configs/.
+
+Normalize game key, display name, required ports, startup parameters, install/update routines, and any engine constraints.
+
+Support hot-add: new XMLs become available to the storefront after a repo update.
+
+4.2 Authentication & sessions
+
+Website registration creates a panel user (legacy-compatible) and stores a modern hash shadow linked 1:1 to that user.
+
+Login prefers the modern hash; on MD5 success, upgrade silently to the modern hash.
+
+Maintain separate sessions for website and panel.
+
+4.3 Checkout → Webhooks → Provisioning
+
+Mirror _website/ structure and flows for Checkout.
+
+On verified webhook events: transition order state to paid, create service records, and provision a panel Home using internal panel APIs.
+
+Derive ports and startup parameters from the XML metadata.
+
+4.4 Regions/Nodes (multi-remote)
+
+At checkout or during provisioning, present or auto-select regions/nodes by reading the panel DB.
+
+If a node is hidden/disabled in the panel, it must not appear in the website UI.
+
+4.5 Billing automation (website-side)
+
+Reconcile renewals and invoke panel APIs to suspend/reactivate/terminate services.
+
+Operations must be idempotent and observable (logs/metrics defined at design time).
+
+5) Data model alignment (no DDL)
+
+Use the panel DB as the source of truth.
+
+Multi-remote tables and fields already exist (introduced by the legacy billing work). Reuse them.
+
+Only propose new fields/tables if strictly necessary; when doing so, reference existing naming conventions and provide a migration plan (still no SQL while in planning mode).
+
+6) Coding standards & security (what to enforce when code is requested)
+
+Repository-first: Before proposing file names, endpoints, or structures, search Panel-unstable to reuse existing helpers, patterns, and locations.
+
+Strictness: Prefer strict comparisons; parameterized DB access; centralized input validation and output escaping.
+
+Session & CSRF: Harden website sessions and require CSRF tokens on state-changing requests.
+
+Webhooks: Verify signatures and event types server-side; never trust client redirects for payment state.
+
+XML: Harden parsing (no external entities; size/complexity limits). Treat XML as untrusted input even though it’s in-repo.
+
+Observability: Define success/failure metrics, audit logs for state changes, and trace IDs for provisioning flows.
+
+Licensing: Preserve upstream notices and ensure our additions stay license-compatible.
+
+7) Validation checklist (pre-PR / pre-merge)
+
+Read _website/, modules/config_games/server_configs/, modules/, includes/, paypal/ (if present), and ogp_api.php to anchor proposals to actual code.
+
+Catalog uses only the XML metadata; no hardcoded ports/params.
+
+Regions/nodes are read live from the panel DB; no duplicates on the website.
+
+Auth plan preserves panel compatibility and modernizes website hashing; sessions remain separate.
+
+Checkout mirrors _website/; uses REST Webhooks; paid state changes occur only after verification.
+
+Provisioning calls panel internals (e.g., ogp_api.php), respects selected/auto node, and records mappings consistently.
+
+Legacy billing module pages are not extended; its schema is reused for multi-remote.
+
+Security items from §6 are addressed in the plan: CSRF, webhook verification, strict comparisons, hardened XML.
+
+8) Deliverables for Copilot (when planning)
+
+A concise change plan that lists:
+
+Files to create/modify/remove and their locations,
+
+Data sources and mappings to existing tables/fields,
+
+UX notes (e.g., region selector vs auto-placement),
+
+Risks, rollback approach, and test coverage,
+
+Acceptance criteria aligned to these instructions.
+
+Update CHANGELOG.md with a brief, high-signal entry (date, scope, rationale).
+
+Append a single line item to docs/COPILOT_TODO.md for any UI follow-ups or next steps.
+
+9) Prohibited while in planning
+
+No PHP/SQL/XML.
+
+No shell commands or system setup steps.
+
+No scaffolding diffs or auto-generated file dumps.
