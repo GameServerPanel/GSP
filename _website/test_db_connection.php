@@ -10,8 +10,14 @@
  * accessible in production.
  */
 
-// Include database connection
-require_once('db.php');
+// Include database configuration
+require_once(__DIR__ . '/includes/config.inc.php');
+
+// Create database connection
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
 echo "<!DOCTYPE html>
 <html>

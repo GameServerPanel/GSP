@@ -3,8 +3,10 @@
 session_name("gameservers_website");
 session_start();
 
-// Include database connection for logging
-require_once('db.php');
+// Logger function
+function logger($logtext){
+    file_put_contents(__DIR__ . "/logfile.txt", $logtext . PHP_EOL, FILE_APPEND);
+}
 
 // Log the logout
 if (isset($_SESSION['website_username'])) {
