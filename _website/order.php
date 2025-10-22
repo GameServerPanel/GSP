@@ -11,7 +11,7 @@ In our website, we are setting "post" pages with a "Tag". The first tag in our p
 There are other methods that might be better to get the info.  But all we need is the "service_ID" in the "ogp_billing_services" table
 This method means we can use one code block in every game page and fill in the data dynamically.   
 */
-include "panel/_db.php";
+include "db.php";
 
 	
 	if (isset($_POST['save']) AND !empty($_POST['description']))
