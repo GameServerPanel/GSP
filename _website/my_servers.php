@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Servers - GameServers.World</title>
+</head>
+<body>
+<?php
+// Require login for this page
+require_once(__DIR__ . '/includes/login_required.php');
+
+// Include database configuration
+require_once(__DIR__ . '/includes/config.inc.php');
+
+// Create database connection
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$db) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Include top bar and menu
+include(__DIR__ . '/includes/top.php');
+include(__DIR__ . '/includes/menu.php');
+
+// Get user ID from session
+$user_id = intval($_SESSION['website_user_id']);
+
+// Fetch user's active servers
+// We'll look for homes assigned to this user
+// The relationship is: ogp_billing_orders -> user_id and contains home_id references
+// We need to join with ogp_home to get server details
+
+$query = "SELECT 
+            h.home_id,
+            h.home_name,
+            h.enabled,
+            rs.remote_server_name,
+            gc.game_name,
+            o.order_id,
+            o.status,
+            o.created_at,
+            o.invoice_duration,
+            DATE_ADD(o.created_at, INTERVAL 
+                CASE 
+                    WHEN o.invoice_duration = 'month' THEN 30 
+                    WHEN o.invoice_duration = 'year' THEN 365 
+                    ELSE 30 
+                END DAY
+            ) as expiration_date,
+            bs.service_name,
+            bs.price_monthly
+          FROM ogp_home h
+          LEFT JOIN ogp_remote_servers rs ON h.remote_server_id = rs.remote_server_id
+          LEFT JOIN ogp_game_configs gc ON h.home_cfg_id = gc.home_cfg_id
+          LEFT JOIN ogp_billing_orders o ON h.user_id = o.user_id
+          LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
+          WHERE h.user_id = $user_id
+          ORDER BY h.home_id DESC";
+
+$result = mysqli_query($db, $query);
+
+?>
+
+<div class="site-panel">
+    <div class="site-panel-title">My Game Servers</div>
+    
+    <?php if ($result && mysqli_num_rows($result) > 0): ?>
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Server Name</th>
+                    <th>Game</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Expiration Date</th>
+                    <th>Monthly Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($server = mysqli_fetch_assoc($result)): ?>
+                    <?php
+                    $is_active = $server['enabled'] == 1;
+                    $is_expired = strtotime($server['expiration_date']) < time();
+                    $status_class = $is_active ? 'text-success' : 'text-danger';
+                    $status_text = $is_active ? 'Active' : 'Inactive';
+                    
+                    if ($is_expired) {
+                        $status_text = 'Expired';
+                        $status_class = 'text-danger';
+                    }
+                    ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($server['home_name'] ?? 'Unknown'); ?></td>
+                        <td><?php echo htmlspecialchars($server['game_name'] ?? $server['service_name'] ?? 'Unknown'); ?></td>
+                        <td><?php echo htmlspecialchars($server['remote_server_name'] ?? 'Unknown'); ?></td>
+                        <td class="<?php echo $status_class; ?>"><?php echo $status_text; ?></td>
+                        <td><?php echo $server['expiration_date'] ? date('M d, Y', strtotime($server['expiration_date'])) : 'N/A'; ?></td>
+                        <td><?php echo $server['price_monthly'] ? '$' . number_format($server['price_monthly'], 2) : 'N/A'; ?></td>
+                        <td>
+                            <?php if ($server['order_id']): ?>
+                                <a href="renew_server.php?order_id=<?php echo urlencode($server['order_id']); ?>" class="btn-primary" style="padding:8px 16px;text-decoration:none;display:inline-block;border-radius:6px;">Renew</a>
+                            <?php else: ?>
+                                <span class="muted">N/A</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <div class="panel" style="text-align:center;padding:40px;">
+            <p style="font-size:1.2rem;margin-bottom:20px;">You don't have any game servers yet.</p>
+            <a href="serverlist.php" class="btn-primary" style="padding:12px 24px;text-decoration:none;display:inline-block;border-radius:8px;">Browse Game Servers</a>
+        </div>
+    <?php endif; ?>
+</div>
+
+<?php
+// Close database connection
+mysqli_close($db);
+?>
+
+<style>
+.text-success {
+    color: #10b981;
+    font-weight: 600;
+}
+.text-danger {
+    color: #ef4444;
+    font-weight: 600;
+}
+</style>
+
+</body>
+<?php include(__DIR__ . '/includes/footer.php'); ?>
+</html>

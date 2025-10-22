@@ -59,7 +59,7 @@ include(__DIR__ . '/includes/menu.php');
             ?>
             <br>
                         
-            <a href="order.php?service_id=<?php echo urlencode($row['service_id']); ?>" class="gsw-btn">Order Server</a>
+            <a href="order.php?service_id=<?php echo urlencode($row['service_id']); ?>" class="gsw-btn" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;text-decoration:none;border-radius:8px;font-weight:600;transition:transform 0.2s;">Order Now</a>
         </div>
     <?php else: ?>
         <!-- Single service detail view -->
