@@ -1,5 +1,18 @@
 <?php
-echo <<<'HTML'
+// Start the website session to check if user is logged in
+session_name("gameservers_website");
+session_start();
+
+// Check login status
+$is_logged_in = isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id']);
+$username = $is_logged_in ? htmlspecialchars($_SESSION['website_username']) : '';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameServers.World - Virtual Private Gameservers</title>
 <style>
   .gsw-outer-full{box-sizing:border-box;width:100vw!important;margin-left:calc(50% - 50vw)!important;margin-right:calc(50% - 50vw)!important}
   .gsw-page-center{display:flex;justify-content:center;padding:24px 12px}
@@ -27,7 +40,28 @@ echo <<<'HTML'
   .gsw-btn{border:1px solid;border-radius:8px;padding:10px 14px;text-decoration:none;display:inline-block;font-weight:600}
 
   .gsw-fine{font-size:.92rem;opacity:.9;text-align:center;margin-top:10px}
+  
+  .gsw-header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);margin-bottom:20px}
+  .gsw-header-left{font-weight:700;font-size:1.2rem;color:#fff}
+  .gsw-header-right{display:flex;gap:12px;align-items:center}
+  .gsw-user-info{color:#fff;font-size:0.95rem}
+  .gsw-header-btn{padding:8px 16px;background:#fff;color:#667eea;border-radius:6px;text-decoration:none;font-weight:600;transition:transform 0.2s}
+  .gsw-header-btn:hover{transform:translateY(-2px)}
 </style>
+</head>
+<body>
+
+<div class="gsw-header">
+  <div class="gsw-header-left">GameServers.World</div>
+  <div class="gsw-header-right">
+    <?php if ($is_logged_in): ?>
+      <span class="gsw-user-info">Welcome, <?php echo $username; ?>!</span>
+      <a href="logout.php" class="gsw-header-btn">Logout</a>
+    <?php else: ?>
+      <a href="login.php" class="gsw-header-btn">Login</a>
+    <?php endif; ?>
+  </div>
+</div>
 
 <div class="gsw-outer-full">
   <div class="gsw-page-center">
@@ -77,6 +111,6 @@ echo <<<'HTML'
     </section>
   </div>
 </div>
-HTML;
-?>
 
+</body>
+</html>
