@@ -54,11 +54,11 @@ $db->logger("AUTO-CLEAN: Server Cleanup running at ".$rundate);
 
 
 //THESE SERVERS HAVE REACHED THE DATE FOR INVOICE, FINISH_DATE - 7 (OR WHAT IS IN SETTINGS)
-//SET STATUS -1 MEANING INVOICED
-//LOOP THROUGH ALL SERVERS WITH STATUS = 'paid' (ACTIVE) -----------------------------------------------------------
+//SET STATUS 'invoiced' MEANING INVOICE SHOULD BE CREATED
+//LOOP THROUGH ALL SERVERS WITH STATUS = 'paid' OR 'installed' (ACTIVE) -----------------------------------------------------------
 $user_homes = $db->resultQuery( "SELECT *
                                                                  FROM " . $table_prefix .  "billing_orders
-                                                                 WHERE status = 'paid' AND finish_date <" . $invoice_date); 
+                                                                 WHERE status IN ('paid', 'installed') AND finish_date <" . $invoice_date); 
 
 if (!is_array($user_homes))
 {
@@ -188,7 +188,7 @@ else
 				// Set order as not installed
                 $db->query( "UPDATE " . $table_prefix . "billing_orders
                                          SET home_id=0
-                                         WHERE cart_id=".$db->realEscapeSingle($user_home['cart_id']));
+                                         WHERE order_id=".$db->realEscapeSingle($user_home['order_id']));
 			    
 				// remove userid and table from database
 				$db->query( "DROP USER 'server_" .$home_id ."'@'%'");

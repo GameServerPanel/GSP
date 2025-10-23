@@ -60,7 +60,7 @@ function exec_ogp_module()
 
             <strong>GOOD NEWS!</strong> You have a new server! <br>
                         <form method="post" action="home.php?m=billing&p=create_servers">
-            <input type="hidden" name="cart_id" value="'. $res['cart_id'].'">
+            <input type="hidden" name="order_id" value="'. $res['order_id'].'">
                         <button type="submit" name="submit_param" value="submit_value" class="link-button">
                         Create Server
                         </button>
@@ -80,7 +80,7 @@ function exec_ogp_module()
             <a href="#" class="close" data-dismiss="alert" aria-label="close"></a>
             You have an Invoice Due <br>
                         <form method="post" action="home.php?m=billing&p=create_servers">
-            <input type="hidden" name="cart_id" value="'. $res['cart_id'].'">
+            <input type="hidden" name="order_id" value="'. $res['order_id'].'">
                         <button type="submit" name="submit_param" value="submit_value" class="link-button">
                         View Invoice
                         </button>
@@ -99,7 +99,7 @@ function exec_ogp_module()
             <a href="#" class="close" data-dismiss="alert" aria-label="close"></a>
             <strong>Warning!</strong> You have an OVERDUE invoice<br>
                         <form method="post" action="home.php?m=billing&p=create_servers">
-            <input type="hidden" name="cart_id" value="'. $res['cart_id'].'">
+            <input type="hidden" name="order_id" value="'. $res['order_id'].'">
                         <button type="submit" name="submit_param" value="submit_value" class="link-button">
                         View Overdue Invoice
                         </button>
