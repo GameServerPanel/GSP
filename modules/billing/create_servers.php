@@ -6,20 +6,19 @@ function exec_ogp_module()
 {
 	global $db,$view,$settings;
 	$user_id = $_SESSION['user_id'];
-	if (isset($_POST['cart_id'])) {
-		$cart_id = $_POST['cart_id'];
+	if (isset($_POST['order_id'])) {
+		$order_id = $_POST['order_id'];
 	}
-	if(isset($_GET['cart_id'])){
-		$cart_id = $_GET['cart_id'];
+	if(isset($_GET['order_id'])){
+		$order_id = $_GET['order_id'];
 	}
-	$cart_paid = $db->resultQuery( "SELECT paid FROM OGP_DB_PREFIXbilling_carts WHERE cart_id=".$db->realEscapeSingle($cart_id) );
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
 	if ( $isAdmin ){
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id) );
+		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND status='paid'" );
 	} else {
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE cart_id=".$db->realEscapeSingle($cart_id)." AND user_id=".$db->realEscapeSingle($user_id) );
+		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND user_id=".$db->realEscapeSingle($user_id)." AND status='paid'" );
 	}
-	if( !empty($orders) and !empty($cart_paid) )
+	if( !empty($orders) )
 	{
 		
 		foreach($orders as $order)
@@ -287,8 +286,12 @@ function exec_ogp_module()
 				
 			}
 			// Set expiration date in ogp database
-			//status is -3 -2 -1 0 and 1 
-			// deleted, suspended, invoiced, inactive, active
+			//status is: in-cart, paid, installed, invoiced, suspended, deleted
+			// 'paid' - order has been paid but server not yet created
+			// 'installed' - server created and active
+			// 'invoiced' - invoice created for renewal
+			// 'suspended' - server suspended for non-payment
+			// 'deleted' - server deleted after extended suspension
 			//finish_date the server will be suspended 
 			//in cron_shop the finish_date is used to delete the server
 			//several days after being suspended
@@ -297,12 +300,10 @@ function exec_ogp_module()
 				
 				if($order['finish_date'] == 0){
 				$finish_date = strtotime('+'.$order['qty'].' day'); 
-			    $status = 'paid';
 				}
 			else{
 			//this is a renewel, start from end of previous order
-				$finish_date = strtotime('+'.$order['qty'].' day',$order['finish_date']); 
-			    $status = 'paid';			
+				$finish_date = strtotime('+'.$order['qty'].' day',$order['finish_date']); 		
 				}	
 				
 			}
@@ -311,13 +312,11 @@ function exec_ogp_module()
 			// this is a new order
 			if($order['finish_date'] == 0){
 				$finish_date = strtotime('+'.$order['qty'].' month'); 
-			    $status = 'paid';
 
 				}
 			else{
 			//this is a renewel, start from end of previous order
                 $finish_date = strtotime('+'.$order['qty'].' month',$order['finish_date']); 
-				$status = 'paid';
 				}	
 			}
 			elseif ($order['invoice_duration'] == "year")
@@ -325,19 +324,17 @@ function exec_ogp_module()
 				// this is a new order
 			if($order['finish_date'] == 0){
 				$finish_date = strtotime('+'.$order['qty'].' year'); 
-				$status = 'paid';
 				}
 			else{
 			//this is a renewel, start from end of previous order
                 $finish_date = strtotime('+'.$order['qty'].' year',$order['finish_date']); 
-				$status = 'paid';
 				
 				}	
 				
 			}
-			// set order status
+			// set order status to 'installed' to indicate server has been provisioned
 			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
-						SET status='" . $db->realEscapeSingle($status) . "' 
+						SET status='installed' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 	
 			// set the order expiration
@@ -350,17 +347,6 @@ function exec_ogp_module()
 						SET home_id='" . $db->realEscapeSingle($home_id) . "' WHERE order_id=".$db->realEscapeSingle($order_id));
 						
 		}
-
-		//Update Cart Payment Status as 3(paid and installed)
-		$db->query("UPDATE OGP_DB_PREFIXbilling_carts
-					SET paid=3
-					WHERE cart_id=".$db->realEscapeSingle($cart_id));
-
-		// Set payment/creation date
-		$date = date('d M Y');
-		$db->query("UPDATE OGP_DB_PREFIXbilling_carts 
-					SET date='" . $db->realEscapeSingle($date) . "' 
-					WHERE cart_id=".$db->realEscapeSingle($cart_id));
 					
         $db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
