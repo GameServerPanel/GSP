@@ -57,6 +57,9 @@ if ($is_logged_in) {
 ?>
 <link rel="stylesheet" href="css/header.css">
 
+<!-- site wrapper for scoping styles -->
+<div id="gsw-site">
+
 <div class="gsw-header">
   <div class="gsw-header-top">
     <div class="gsw-header-left">

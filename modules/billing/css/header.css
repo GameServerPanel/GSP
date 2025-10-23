@@ -3,20 +3,35 @@
 .gsw-top .gsw-site-name{font-weight:700;font-size:1.1rem;color:#333}
 @media(max-width:480px){.gsw-top{padding:10px}.gsw-top img{height:32px}.gsw-top .gsw-site-name{font-size:1rem}}
 
-.gsw-header{display:flex;flex-direction:column;align-items:stretch;padding:0;background:transparent;margin-bottom:18px;} 
-.gsw-header-top{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#0b3b6f;backdrop-filter:blur(6px);box-shadow:0 2px 6px rgba(0,0,0,0.18);}
-.gsw-header-left{display:flex;align-items:center;font-weight:700;font-size:1.4rem;color:#fff;padding-left:8px;} 
+/* Header: two-row layout with left/right divs on top row */
+.gsw-header{display:flex;flex-direction:column;align-items:stretch;padding:0;background:transparent;margin-bottom:18px;}
+
+/* Top row: contains left (logo/title) and right (login) divs as separate blocks */
+#gsw-site .gsw-header-top{display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:12px 20px;background:#0b3b6f !important;backdrop-filter:blur(6px);box-shadow:0 2px 6px rgba(0,0,0,0.18);width:100%;}
+
+/* Left div: logo + title, takes up available space */
+#gsw-site .gsw-header-left{flex:1 1 auto;display:flex;align-items:center;font-weight:700;font-size:1.4rem;color:#fff;padding-left:8px;}
+
+/* Right div: login/logout button area, shrinks to content */
+#gsw-site .gsw-header-right{flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:12px;padding-right:8px;}
+
 .gsw-logo{height:48px;width:auto;margin-right:12px;display:block}
 .gsw-logo-link{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
-.gsw-header-left a{color:#fff;text-decoration:none;} 
-.gsw-header-bottom{display:flex;justify-content:center;padding:10px 20px;background:#0b3b6f;}
-.gsw-header-nav{display:flex;gap:22px;align-items:center;} 
-.gsw-nav-link{color:#fff;text-decoration:none;font-size:0.98rem;transition:opacity 0.2s;padding:6px 8px;border-radius:6px;} 
-.gsw-nav-link:hover{opacity:0.9;text-decoration:underline;background:rgba(255,255,255,0.03);} 
-.gsw-header-right{display:flex;gap:12px;align-items:center;padding-right:8px;} 
-.gsw-user-info{color:#fff;font-size:0.95rem;margin-right:8px;} 
-.gsw-header-btn{padding:10px 18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:8px;text-decoration:none;font-weight:700;transition:transform 0.2s;border:none;display:inline-block;} 
-.gsw-header-btn:hover{transform:translateY(-2px);}
+.gsw-header-left a{color:#fff;text-decoration:none;}
+
+/* Bottom row: centered navigation menu */
+#gsw-site .gsw-header-bottom{display:flex;justify-content:center;padding:10px 20px;background:#0b3b6f !important;width:100%;}
+.gsw-header-nav{display:flex;gap:22px;align-items:center;}
+.gsw-nav-link{color:#fff;text-decoration:none;font-size:0.98rem;transition:opacity 0.2s;padding:6px 8px;border-radius:6px;}
+.gsw-nav-link:hover{opacity:0.9;text-decoration:underline;background:rgba(255,255,255,0.03);}
+
+.gsw-user-info{color:#fff;font-size:0.95rem;margin-right:8px;}
+
+/* Login/Logout button with gradient */
+#gsw-site .gsw-header-btn,
+#gsw-site a.gsw-header-btn{padding:10px 18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%) !important;color:#fff !important;border-radius:8px;text-decoration:none;font-weight:700;transition:transform 0.2s;border:none;display:inline-block;cursor:pointer;}
+#gsw-site .gsw-header-btn:hover,
+#gsw-site a.gsw-header-btn:hover{transform:translateY(-2px);text-decoration:none;color:#fff !important;}
 @media(max-width:768px){
   .gsw-header{flex-direction:column;gap:12px;}
   .gsw-header-nav{flex-wrap:wrap;justify-content:center;}
@@ -26,10 +41,10 @@
 .gsw-banner{width:100%;text-align:center;margin-bottom:18px}
 .gsw-banner img{max-width:100%;height:auto;display:inline-block}
 
-/* Footer styles */
-footer.gsw-footer{background:#0b3b6f;color:#fff;padding:18px 12px;text-align:center;margin-top:28px}
-footer.gsw-footer a{color:#cfe6ff;text-decoration:none}
-footer.gsw-footer a:hover{text-decoration:underline}
+/* Footer styles: ultra-specific to override any theme CSS */
+html body #gsw-site footer.gsw-footer{background:#0b3b6f !important;color:#fff;padding:18px 12px;text-align:center;margin-top:28px;}
+#gsw-site footer.gsw-footer a{color:#cfe6ff;text-decoration:none;}
+#gsw-site footer.gsw-footer a:hover{text-decoration:underline;}
 
 /* Page color scheme: prefer dark text on light backgrounds by default */
 /* Dark site theme: dark background with light text */
@@ -37,6 +52,11 @@ body { color: #fff; background: #0b1020; }
 
 /* Make links readable on dark background */
 a { color: #7fb3ff; }
+/* But override for styled buttons/links inside our site wrapper */
+#gsw-site a.gsw-btn,
+#gsw-site a.gsw-btn-secondary,
+#gsw-site a.gsw-header-btn,
+#gsw-site .gsw-nav-link{color:#fff !important;}
 
 /* Form inputs: light text on darker inputs by default */
 input, textarea, select, button { color: #fff; background: #11141f; border: 1px solid rgba(255,255,255,0.06); }
@@ -59,9 +79,19 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 .pad-40{padding:40px}
 .btn-danger{background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:6px}
 .btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:700}
-.gsw-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;text-decoration:none;border-radius:8px;font-weight:600;transition:transform 0.2s;}
-.gsw-btn:hover{transform:translateY(-2px)}
-.gsw-btn-secondary{display:inline-block;padding:10px 16px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;border-radius:8px;border:1px solid rgba(255,255,255,0.06);}
+
+/* Primary gradient button for links and buttons */
+#gsw-site .gsw-btn,
+#gsw-site a.gsw-btn,
+#gsw-site button.gsw-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%) !important;color:#fff !important;text-decoration:none;border-radius:8px;font-weight:600;transition:transform 0.2s;border:none;cursor:pointer;}
+#gsw-site .gsw-btn:hover,
+#gsw-site a.gsw-btn:hover,
+#gsw-site button.gsw-btn:hover{transform:translateY(-2px);color:#fff !important;text-decoration:none;}
+
+#gsw-site .gsw-btn-secondary,
+#gsw-site a.gsw-btn-secondary{display:inline-block;padding:10px 16px;background:rgba(255,255,255,0.06);color:#fff !important;text-decoration:none;border-radius:8px;border:1px solid rgba(255,255,255,0.06);cursor:pointer;}
+#gsw-site .gsw-btn-secondary:hover,
+#gsw-site a.gsw-btn-secondary:hover{color:#fff !important;text-decoration:none;}
 .float-left{float:left}
 .clearfix::after{content:"";display:table;clear:both}
 .table-compact th,.table-compact td{padding:0.5rem}

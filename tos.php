@@ -1,59 +1,54 @@
+<?php include(__DIR__ . '/modules/billing/includes/top.php'); include(__DIR__ . '/modules/billing/includes/menu.php'); ?>
 
-<h1 style="text-align:center">Terms of Service</h1>
+<main class="container-wide pad-40">
+	<h1 class="center">Terms of Service</h1>
 
-<ol>
-<li>
-<h3>
-Your Responsibility
-</h3>
-You as the customer are responsible for not doing anything that may harm or be detrimental to our
-service, network,  or any other customers.  You are renting a "game server" and are expected to only
-run any scripts or files that are required or needed by that gameserver. <br>
-If you do anything to disrupt, degrade or otherwise harm our services or customers, your account
-will be terminated immediately without refund.
-</li>
+	<ol>
+		<li>
+			<h3>Your Responsibility</h3>
+			<p>
+				As the customer you are responsible for not doing anything that may harm or be detrimental to our
+				service, network, or other customers. You are renting a "game server" and should only run scripts
+				or files required by that game server. If you disrupt, degrade, or otherwise harm our services or
+				customers, your account may be terminated immediately without refund.
+			</p>
+		</li>
 
-<li>
-<h3>
-Our Responsibility
-</h3>
-We are providing you with a game server and the bandwidth to run your gameserver. Many things are
-beyond our control but we accept responsibility for everthing that is within or outside our control.
-We will provide you with a responsive server and support for that server. If you think we are meeting
-your expectations you are welcome to cancel your server for a full refund within the first 30 days
-and for any used pro-rated service time thereafter.
-</li>
+		<li>
+			<h3>Our Responsibility</h3>
+			<p>
+				We provide a game server and the bandwidth to run it. Some factors are beyond our control, but we
+				accept responsibility for what we can control. If you are not satisfied within the first 30 days
+				you may request a full refund. After the first month refunds are prorated for unused service time.
+			</p>
+		</li>
 
-<li>
-<h3>
-Support
-</h3>
-Changes to your Service, Player Counts, Location, or Cancellations:<br>
-Please submit a Ticket from the Game Panel so we can track the status of your issue<br>
-Service Related Issues:<br>
-Our support consists of 'Tickets' created on the game panel which will be responded to ASAP. For
-fastest (not always immediate) answers you should use our Discord for support.<br> We can GUARANTEE that you
-will have a response to any support request within 12 hours.  In reality, the response time is usually
-less than 30 minutes during normal business hours which are 7am-8pm EST daily. Outside of those hours
-it might take up to the 12 hours. <br>
-<br>
-YOUR Gameserver Issues:<br>
-Help with customizing and coding your server. This is HELP, not doing it FOR you. We may if time
-is available do some work for you at no charge.  What we mean by HELP is telling you what is wrong,
-pointing you in the right direction, looking at your code or configuration for errors.<br>
-If we can, we will perform fixes for you .. but more than likely you will have to do the coding
-and we are just instructing.
-</li>
-<li>
-<h3>
-Refunds
-</h3>
-You can cancel your server at <i><b>any time</b></i> and will be credited for your unused services.  If in
-the first month of your service you are not satisfied with your gameserver, our support, services,
-network or anything at all .. you can ask for a <b>full refund</b> which will be granted without question.
+		<li>
+			<h3>Support</h3>
+			<p>
+				For changes to your service, player counts, location changes, or cancellations please submit a ticket
+				via the Game Panel so we can track and resolve the issue. Our primary support channel is tickets;
+				for faster responses you can use Discord. We aim to reply within 12 hours; during business hours
+				replies are often much faster.
+			</p>
+			<p>
+				Help with customizing and coding your server is provided as guidance (not as full development work).
+				We will point out errors, provide direction, and may perform small fixes if time allows.
+			</p>
+		</li>
+
+		<li>
+			<h3>Refunds</h3>
+			<p>
+				You can cancel at any time and will be credited for unused services. If you are not satisfied within
+				the first month, you may request a full refund. After the first month refunds are limited to unused
+				prorated time only.
+			</p>
+		</li>
+	</ol>
+
+</main>
+
+<?php include(__DIR__ . '/modules/billing/includes/footer.php'); ?>
 After the first month, you can receive a refund for unused cancelled services only.
-</li>
-
-
-</ol>
 
