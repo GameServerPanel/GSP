@@ -341,31 +341,31 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			//default is it never expires 
 			$expiration_dates = "This Server Will NEVER Expire";
 			//get all orders thare are active or invoiced
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status >= -2" ;
+			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status IN ('paid', 'invoiced', 'suspended', 'in-cart', 'unknown')" ;
 			$results = $db->resultQuery($query);
 			if(!is_null($results[0]['status'])) 
 			{
 			//there is an end date
-			if($results[0]['status'] > 0)
+			if($results[0]['status'] == 'paid')
 			{ 
 			$expire_date = $results[0]['finish_date'];
                         $expiration_dates = "<font color='green'>" . read_expire($expire_date) . "</font>";
 			}
-				// 0 its expire, invoice printed
-			if($results[0]['status'] == 0)
+				// in-cart its expire, invoice printed
+			if($results[0]['status'] == 'in-cart' || $results[0]['status'] == 'unknown')
                         {
                         $expire_date = $results[0]['finish_date'];
 			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
                         }
 
-			// -1 its expire, invoice printed
-			if($results[0]['status'] == -1)
+			// invoiced its expire, invoice printed
+			if($results[0]['status'] == 'invoiced')
                         {
                         $expire_date = $results[0]['finish_date'];
 			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
                         }
-			// -2 its suspended, invoice still available
-			if($results[0]['status'] == -2)
+			// suspended its suspended, invoice still available
+			if($results[0]['status'] == 'suspended')
                         {
                         $expire_date = $results[0]['finish_date'];
 			$expiration_dates = "<font color='red'> SUSPENDED </font><a href='home.php?m=billing&p=cart'> Invoice</a>";
@@ -532,7 +532,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$address = "<span style='color:darkred;font-weight:bold;'>Agent Offline</span>";
 			}
 			$user = $db->getUserById($server_home['user_id_main']);
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status > 0" ;
+			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status = 'paid'" ;
 //DISABLE SHOWING EXPIRATION DATES
 //$expiration_dates = "";
 

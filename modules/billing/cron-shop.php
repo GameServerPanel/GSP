@@ -55,10 +55,10 @@ $db->logger("AUTO-CLEAN: Server Cleanup running at ".$rundate);
 
 //THESE SERVERS HAVE REACHED THE DATE FOR INVOICE, FINISH_DATE - 7 (OR WHAT IS IN SETTINGS)
 //SET STATUS -1 MEANING INVOICED
-//LOOP THROUGH ALL SERVERS WITH STATUS = 1 (ACTIVE) -----------------------------------------------------------
+//LOOP THROUGH ALL SERVERS WITH STATUS = 'paid' (ACTIVE) -----------------------------------------------------------
 $user_homes = $db->resultQuery( "SELECT *
                                                                  FROM " . $table_prefix .  "billing_orders
-                                                                 WHERE status > 0 AND finish_date <" . $invoice_date); 
+                                                                 WHERE status = 'paid' AND finish_date <" . $invoice_date); 
 
 if (!is_array($user_homes))
 {
@@ -72,9 +72,9 @@ else
                 $home_id = $user_home['home_id'];
 				
                
-                // Reset the STATUS -1 so cart.php will create an invoice
+                // Reset the STATUS 'invoiced' so cart.php will create an invoice
 				$db->query( "UPDATE " . $table_prefix . "billing_orders
-                                         SET status=-1
+                                         SET status='invoiced'
                                          WHERE order_id=".$db->realEscapeSingle($user_home['order_id']));
 
 				// SEND EMAIL
@@ -99,10 +99,10 @@ else
 
 //THESE ARE THE SERVERS THAT HAVE NOT BEEN PAID AND THE FINISH_DATE IS TODAY
 //THESE SERVERS GET SUSPENDED
-//LOOP THROUGH ALL ORDERS WITH STATUS 0 OR -1 (INACTIVE OR INVOICED)
+//LOOP THROUGH ALL ORDERS WITH STATUS 'invoiced' OR 'in-cart' OR 'unknown' (INACTIVE OR INVOICED)
 $user_homes = $db->resultQuery( "SELECT *
                                                                  FROM " . $table_prefix .  "billing_orders
-                                                                 WHERE (status = -1 OR status = 0) AND finish_date < ".$today);
+                                                                 WHERE status IN ('invoiced', 'in-cart', 'unknown') AND finish_date < ".$today);
 
 if (!is_array($user_homes))
 {
@@ -128,10 +128,10 @@ else
                 }
                 $db->unassignHomeFrom("user", $user_id, $home_id);
 
-                // Reset the invoice end date to -2
+                // Reset the invoice end date to 'suspended'
 				// User can still RENEW server
                 $db->query( "UPDATE " . $table_prefix . "billing_orders
-                                         SET status=-2
+                                         SET status='suspended'
                                          WHERE order_id=".$db->realEscapeSingle($user_home['order_id']));
 
 			//logger
@@ -152,11 +152,11 @@ else
         }
 }
 
-// end date = -2 (suspended) and its been suspended for $removal_date days
-//set removed servers as -99
+// end date = 'suspended' (suspended) and its been suspended for $removal_date days
+//set removed servers as 'deleted'
 $user_homes = $db->resultQuery( "SELECT *
                                                                  FROM " . $table_prefix .  "billing_orders
-                                                                 WHERE status = -2 AND finish_date < ".$removal_date );
+                                                                 WHERE status = 'suspended' AND finish_date < ".$removal_date );
 
 if (!is_array($user_homes))
 {
@@ -181,7 +181,7 @@ else
 
                 // Reset the invoice end date
                 $db->query( "UPDATE " . $table_prefix . "billing_orders
-                                         SET status=-3
+                                         SET status='deleted'
                                          WHERE order_id=".$db->realEscapeSingle($user_home['order_id']));
 
                 						

@@ -327,7 +327,7 @@ function ogpHome()
 				$db->logger( get_lang("logging_in") ."...");
 				$db->query("DELETE FROM `OGP_DB_PREFIXban_list` WHERE client_ip='$client_ip';");
 				//find number of servers user has. if zero, then redirect to the shop page.
-				$result = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status < 1 ");
+				$result = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status IN ('in-cart', 'unknown') ");
 				$servercount = 0;
 				foreach($result as $servers)
 						{

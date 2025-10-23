@@ -114,7 +114,7 @@ $install_queries[2] = array(
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `home_path`;",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `paid`;",
     "ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `home_id` varchar(255) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `status` varchar(16) NOT NULL DEFAULT '0';",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `status` varchar(16) NOT NULL DEFAULT 'unknown';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `date` varchar(16) NOT NULL DEFAULT '0';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `tax_amount` varchar(16) NOT NULL DEFAULT '0';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `currency` varchar(3) NOT NULL DEFAULT '0';"
@@ -126,8 +126,8 @@ $install_queries[3] = array(
 
 $install_queries[4] = array(
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `extended` tinyint(1) NOT NULL;",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_services` ADD `enabled` int(11) NOT NULL;"
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_services` ADD `enabled` int(11) NOT NULL;",
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
 
 );
