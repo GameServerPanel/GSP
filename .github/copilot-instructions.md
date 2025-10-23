@@ -14,7 +14,7 @@
 - `modules/` — panel modules (legacy `billing/` exists; its **schema** is authoritative for multi-remote, but the **pages** are deprecated).
 - `includes/` — panel configuration and DB connectors.
 - `ogp_api.php` — internal API entry point for panel-side actions.
-- `paypal/` — PayPal code if present in this branch.
+- `api/` — Payment-related API code if present in this branch (previously under `paypal/` or `payments/`).
 
 ## 2) No-Code Planning Mode (default)
 - Do **not** emit PHP, SQL, XML, or shell commands unless a maintainer explicitly asks: **“Generate code now.”**
@@ -72,7 +72,7 @@
 - **Licensing:** Preserve upstream notices and ensure our additions stay license-compatible.
 
 ## 7) Validation checklist (pre-PR / pre-merge)
-- Read `_website/`, `modules/config_games/server_configs/`, `modules/`, `includes/`, `paypal/` (if present), and `ogp_api.php` to anchor proposals to actual code.
+- Read `_website/`, `modules/config_games/server_configs/`, `modules/`, `includes/`, `api/` (if present), and `ogp_api.php` to anchor proposals to actual code.
 - Catalog uses only the XML metadata; no hardcoded ports/params.
 - Regions/nodes are read live from the panel DB; no duplicates on the website.
 - Auth plan preserves panel compatibility and modernizes website hashing; **sessions remain separate**.

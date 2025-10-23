@@ -1,0 +1,21 @@
+2025-10-23T20:49:51+02:00 - add_to_cart invoked by user_id=186 service_id=3
+2025-10-23T20:49:51+02:00 - SQL: INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, created_ts) VALUES (186, 3, 'Arma 2', 38, 16, 1, 'month', 0.20, 'ChangeMe', 'ChangeMe', 'in-cart', '2025-10-23 20:49:51')
+2025-10-23T20:49:51+02:00 - mysqli_query failed: Unknown column 'created_ts' in 'field list'
+2025-10-23T20:52:18+02:00 - add_to_cart invoked by user_id=186 service_id=9
+2025-10-23T20:52:18+02:00 - SQL: INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, created_ts) VALUES (186, 9, 'BrainBread 2', 33, 16, 1, 'month', 0.10, 'ChangeMe', 'ChangeMe', 'in-cart', '2025-10-23 20:52:18')
+2025-10-23T20:52:18+02:00 - mysqli_query failed: Unknown column 'created_ts' in 'field list'
+2025-10-23T20:53:54+02:00 - add_to_cart invoked by user_id=186 service_id=16
+2025-10-23T20:53:54+02:00 - SQL: INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, created_ts) VALUES (186, 16, 'DayZ Mod', 38, 16, 1, 'month', 0.40, 'ChangeMe', 'ChangeMe', 'in-cart', '2025-10-23 20:53:54')
+2025-10-23T20:53:54+02:00 - mysqli_query failed: Unknown column 'created_ts' in 'field list'
+2025-10-23T21:00:05+02:00 - DB connected host=localhost user=localuser pass=*** db=panel
+2025-10-23T21:00:07+02:00 - DB connected host=localhost user=localuser pass=*** db=panel
+2025-10-23T21:00:07+02:00 - add_to_cart invoked by user_id=186 service_id=9
+2025-10-23T21:00:07+02:00 - SQL: INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, created_at) VALUES (186, 9, 'BrainBread 2', 16, 16, 1, 'month', 0.10, 'ChangeMe', 'ChangeMe', 'in-cart', '2025-10-23 21:00:07')
+2025-10-23T21:00:07+02:00 - mysqli_query failed (errno=1054): Unknown column 'created_at' in 'field list'
+2025-10-23T21:00:07+02:00 - table ogp_billing_orders exists? yes
+2025-10-23T21:05:04+02:00 - DB connected host=localhost user=localuser pass=*** db=panel
+2025-10-23T21:05:06+02:00 - DB connected host=localhost user=localuser pass=*** db=panel
+2025-10-23T21:05:06+02:00 - add_to_cart invoked by user_id=186 service_id=9
+2025-10-23T21:05:06+02:00 - finish_date included: 2025-10-26 21:05:06
+2025-10-23T21:05:06+02:00 - SQL: INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, finish_date) VALUES (186, 9, 'BrainBread 2', 16, 16, 1, 'month', 0.10, 'ChangeMe', 'ChangeMe', 'in-cart', '2025-10-26 21:05:06')
+2025-10-23T21:05:06+02:00 - insert ok, id=549 affected_rows=1

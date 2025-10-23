@@ -1,0 +1,12 @@
+{
+    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+    "status": "PAID",
+    "amount": 0,
+    "currency": "USD",
+    "payer": "iaretechnician@gmail.com",
+    "invoice": "FREE-549-1761246925",
+    "custom": "admin_free_create_order_549",
+    "resource_id": "FREE-439c594e1e65",
+    "items": [],
+    "ts": "2025-10-23T00:12:58+02:00"
+}

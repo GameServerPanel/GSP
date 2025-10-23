@@ -1,0 +1,11 @@
+{
+    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+    "status": "PAID",
+    "amount": "19.99",
+    "currency": "USD",
+    "payer": null,
+    "invoice": "INV-20250825-174311-0a7993",
+    "custom": "user_1234_order_5678",
+    "resource_id": "2V315801FX904340P",
+    "ts": "2025-08-25T17:05:27-04:00"
+}

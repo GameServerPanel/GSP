@@ -1,0 +1,10 @@
+{
+  "event_type": "PAYMENT.CAPTURE.COMPLETED",
+  "status": "PAID",
+  "amount": "9.99",
+  "currency": "USD",
+  "invoice": "INV-20251022-101500-TEST",
+  "resource_id": "SIMULATED12345",
+  "ts": "2025-10-22T10:15:00-04:00",
+  "note": "Simulated webhook write for testing"
+}
