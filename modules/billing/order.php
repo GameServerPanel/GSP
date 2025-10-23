@@ -278,19 +278,25 @@ if ($row['price_monthly'] == 0.0) {
 			  </td>
 			</tr>
 			
-			<tr>
-			  <td align="left" colspan="2">
-			  	<input name="service_id" type="hidden" value="<?php echo $row['service_id'];?>"/>
-								<?php if ($available_server): ?>
-									<button type="submit" name="add_to_cart" class="btn-primary">Add to Cart</button>
+						<tr>
+							<td align="left" colspan="2">
+								<input name="service_id" type="hidden" value="<?php echo $row['service_id'];?>"/>
+								<?php
+									// Only show Add to Cart when logged in
+									$is_logged_in = (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) || (isset($_SESSION['website_username']) && !empty($_SESSION['website_username']));
+								?>
+								<?php if ($available_server && $is_logged_in): ?>
+									<button type="submit" name="add_to_cart" class="gsw-btn">Add to Cart</button>
+								<?php elseif ($available_server && !$is_logged_in): ?>
+									<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;color:#fff;">Please <a href="login.php" style="color:#cfe6ff;text-decoration:underline;">login</a> to order</div>
 								<?php endif; ?>
-			  </form>
-			  </td>
-			</tr>
+							</form>
+							</td>
+						</tr>
 			<tr>
 			<td align="left" colspan="2">
 						<form action ="serverlist.php" method="POST">
-							<button class="btn-secondary">Back to List</button>
+							<button class="gsw-btn-secondary">Back to List</button>
 						</form>
 			</td>
 			</tr>

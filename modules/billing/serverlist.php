@@ -59,7 +59,7 @@ include(__DIR__ . '/includes/menu.php');
             ?>
             <br>
                         
-            <a href="order.php?service_id=<?php echo urlencode($row['service_id']); ?>" class="gsw-btn" style="display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;text-decoration:none;border-radius:8px;font-weight:600;transition:transform 0.2s;">Order Now</a>
+            <a href="order.php?service_id=<?php echo urlencode($row['service_id']); ?>" class="gsw-btn">Order Now</a>
         </div>
     <?php else: ?>
         <!-- Single service detail view -->
@@ -102,7 +102,17 @@ include(__DIR__ . '/includes/menu.php');
                 </tr>
                 <!-- Add other form fields as needed -->
                 <tr>
-                    <td colspan="2"><input type="submit" value="Add to Cart"></td>
+                    <td colspan="2">
+                        <?php
+                        // Only show Add to Cart when the user is logged in
+                        $is_logged_in = (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) || (isset($_SESSION['website_username']) && !empty($_SESSION['website_username']));
+                        if ($is_logged_in):
+                        ?>
+                            <button type="submit" class="gsw-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;color:#fff;">Please <a href="login.php" style="color:#cfe6ff;text-decoration:underline;">login</a> to order</div>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             </table>
         </form>

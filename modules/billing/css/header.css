@@ -3,18 +3,20 @@
 .gsw-top .gsw-site-name{font-weight:700;font-size:1.1rem;color:#333}
 @media(max-width:480px){.gsw-top{padding:10px}.gsw-top img{height:32px}.gsw-top .gsw-site-name{font-size:1rem}}
 
-.gsw-header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#0b3b6f;backdrop-filter:blur(6px);margin-bottom:18px;box-shadow:0 2px 6px rgba(0,0,0,0.18);} 
-.gsw-header-left{display:flex;align-items:center;font-weight:700;font-size:1.1rem;color:#fff;} 
-.gsw-logo{height:36px;width:auto;margin-right:10px;display:block}
-.gsw-logo-link{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none}
+.gsw-header{display:flex;flex-direction:column;align-items:stretch;padding:0;background:transparent;margin-bottom:18px;} 
+.gsw-header-top{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:#0b3b6f;backdrop-filter:blur(6px);box-shadow:0 2px 6px rgba(0,0,0,0.18);}
+.gsw-header-left{display:flex;align-items:center;font-weight:700;font-size:1.4rem;color:#fff;padding-left:8px;} 
+.gsw-logo{height:48px;width:auto;margin-right:12px;display:block}
+.gsw-logo-link{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none}
 .gsw-header-left a{color:#fff;text-decoration:none;} 
-.gsw-header-nav{display:flex;gap:18px;align-items:center;} 
-.gsw-nav-link{color:#fff;text-decoration:none;font-size:0.95rem;transition:opacity 0.2s;} 
-.gsw-nav-link:hover{opacity:0.85;text-decoration:underline;} 
-.gsw-header-right{display:flex;gap:12px;align-items:center;} 
-.gsw-user-info{color:#fff;font-size:0.95rem;} 
-.gsw-header-btn{padding:8px 16px;background:#fff;color:#0b3b6f;border-radius:6px;text-decoration:none;font-weight:600;transition:transform 0.2s;} 
-.gsw-header-btn:hover{transform:translateY(-2px);} 
+.gsw-header-bottom{display:flex;justify-content:center;padding:10px 20px;background:#0b3b6f;}
+.gsw-header-nav{display:flex;gap:22px;align-items:center;} 
+.gsw-nav-link{color:#fff;text-decoration:none;font-size:0.98rem;transition:opacity 0.2s;padding:6px 8px;border-radius:6px;} 
+.gsw-nav-link:hover{opacity:0.9;text-decoration:underline;background:rgba(255,255,255,0.03);} 
+.gsw-header-right{display:flex;gap:12px;align-items:center;padding-right:8px;} 
+.gsw-user-info{color:#fff;font-size:0.95rem;margin-right:8px;} 
+.gsw-header-btn{padding:10px 18px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border-radius:8px;text-decoration:none;font-weight:700;transition:transform 0.2s;border:none;display:inline-block;} 
+.gsw-header-btn:hover{transform:translateY(-2px);}
 @media(max-width:768px){
   .gsw-header{flex-direction:column;gap:12px;}
   .gsw-header-nav{flex-wrap:wrap;justify-content:center;}
@@ -25,8 +27,8 @@
 .gsw-banner img{max-width:100%;height:auto;display:inline-block}
 
 /* Footer styles */
-footer.gsw-footer{background:#000;color:#fff;padding:18px 12px;text-align:center;margin-top:28px}
-footer.gsw-footer a{color:#4aa3ff;text-decoration:none}
+footer.gsw-footer{background:#0b3b6f;color:#fff;padding:18px 12px;text-align:center;margin-top:28px}
+footer.gsw-footer a{color:#cfe6ff;text-decoration:none}
 footer.gsw-footer a:hover{text-decoration:underline}
 
 /* Page color scheme: prefer dark text on light backgrounds by default */
@@ -56,7 +58,10 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 .center{text-align:center}
 .pad-40{padding:40px}
 .btn-danger{background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:6px}
-.btn-primary{background:#06b6d4;color:#fff;border:none;padding:6px 10px;border-radius:6px}
+.btn-primary{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-weight:700}
+.gsw-btn{display:inline-block;padding:12px 24px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;text-decoration:none;border-radius:8px;font-weight:600;transition:transform 0.2s;}
+.gsw-btn:hover{transform:translateY(-2px)}
+.gsw-btn-secondary{display:inline-block;padding:10px 16px;background:rgba(255,255,255,0.06);color:#fff;text-decoration:none;border-radius:8px;border:1px solid rgba(255,255,255,0.06);}
 .float-left{float:left}
 .clearfix::after{content:"";display:table;clear:both}
 .table-compact th,.table-compact td{padding:0.5rem}

@@ -322,11 +322,11 @@ if ($db){
               // Use the previously resolved $is_admin (computed once above)
               $is_free = ((float)$row['price'] == 0.0);
             ?>
-            <?php if ($is_admin || $is_free): ?>
+                <?php if ($is_admin || $is_free): ?>
               <td>
                 <form method="post" action="" class="inline-form">
                   <input type="hidden" name="create_free_for" value="<?php echo (int)$row['order_id']; ?>">
-                  <button type="submit" class="btn-primary"><?php echo $is_admin ? 'Create (Free)' : 'Claim (Free)'; ?></button>
+                      <button type="submit" class="gsw-btn"><?php echo $is_admin ? 'Create (Free)' : 'Claim (Free)'; ?></button>
                 </form>
                 <?php if ($is_admin): ?>
                   <div style="font-size:11px;color:#666;margin-top:4px;">Admin: force-create a paid record for testing.</div>

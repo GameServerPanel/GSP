@@ -58,58 +58,54 @@ if ($is_logged_in) {
 <link rel="stylesheet" href="css/header.css">
 
 <div class="gsw-header">
-  <div class="gsw-header-left">
-    <a href="index.php" class="gsw-logo-link">
-      <img src="images/logo-sm.png" alt="GameServers.World" class="gsw-logo">
-      <span class="gsw-site-name">GameServers.World</span>
-    </a>
+  <div class="gsw-header-top">
+    <div class="gsw-header-left">
+      <a href="index.php" class="gsw-logo-link">
+        <img src="images/logo-sm.png" alt="GameServers.World" class="gsw-logo">
+        <span class="gsw-site-name">GameServers.World</span>
+      </a>
+    </div>
+    <div class="gsw-header-right">
+      <?php if ($is_logged_in): ?>
+        <span class="gsw-user-info">Welcome, <?php echo $username; ?>!</span>
+      <?php endif; ?>
+      <?php
+        // Build a safe absolute return_to under this site so logout redirects stay within this module
+        $current = $_SERVER['REQUEST_URI'] ?? '/';
+        $return_to_param = $current;
+      ?>
+      <?php if ($is_logged_in): ?>
+        <a href="logout.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Logout</a>
+      <?php else: ?>
+        <a href="login.php" class="gsw-header-btn">Login</a>
+      <?php endif; ?>
+    </div>
   </div>
-  <nav class="gsw-header-nav">
-    <a href="index.php" class="gsw-nav-link">Home</a>
-    <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
-    <?php if ($is_logged_in): ?>
-    <a href="my_servers.php" class="gsw-nav-link">My Servers</a>
-    <?php endif; ?>
-    <?php if ($is_logged_in): ?>
-    <a href="cart.php" class="gsw-nav-link">Cart
-        <?php
-        // show cart badge if helper available
-        $cart_count = 0;
-        if (file_exists(__DIR__ . '/cart_helper.php')) {
-          include_once __DIR__ . '/cart_helper.php';
-          if (function_exists('get_cart_count')) {
-            $cart_count = (int) get_cart_count();
-          }
-        }
-        if ($cart_count > 0) {
-          echo ' <span class="cart-badge">' . intval($cart_count) . '</span>';
-        }
-        ?>
-    </a>
-    <?php endif; ?>
-    <?php if (basename($_SERVER['PHP_SELF']) === 'login.php'): ?>
-      <a href="register.php" class="gsw-nav-link">Register</a>
-    <?php endif; ?>
-    <?php if ($is_logged_in && $is_admin): ?>
-  <a href="admin.php" class="gsw-nav-link">Admin</a>
-    <?php endif; ?>
-    <a href="http://panel.iaregamer.com" class="gsw-nav-link" target="_blank">Panel Login</a>
-  </nav>
-  <div class="gsw-header-right">
-    <?php if ($is_logged_in): ?>
-      <span class="gsw-user-info">Welcome, <?php echo $username; ?>!</span>
-  <?php
-    // Build a safe absolute return_to under this site so logout redirects stay in _website
-    $script = $_SERVER['SCRIPT_NAME'] ?? '';
-    $pos = strpos($script, '/_website');
-    $siteRoot = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rtrim(dirname($script), '/\\');
-    $current = $_SERVER['REQUEST_URI'] ?? $siteRoot . '/index.php';
-    // Ensure current is absolute and under site root; urlencode only when embedding in URL
-    $return_to_param = $current;
-  ?>
-  <a href="logout.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Logout</a>
-    <?php else: ?>
-  <a href="login.php" class="gsw-header-btn">Login</a>
-    <?php endif; ?>
+
+  <div class="gsw-header-bottom">
+    <nav class="gsw-header-nav">
+      <a href="index.php" class="gsw-nav-link">Home</a>
+      <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
+      <?php if ($is_logged_in): ?>
+        <a href="my_servers.php" class="gsw-nav-link">My Servers</a>
+        <a href="cart.php" class="gsw-nav-link">Cart
+          <?php
+            $cart_count = 0;
+            if (file_exists(__DIR__ . '/cart_helper.php')) {
+              include_once __DIR__ . '/cart_helper.php';
+              if (function_exists('get_cart_count')) $cart_count = (int) get_cart_count();
+            }
+            if ($cart_count > 0) echo ' <span class="cart-badge">' . intval($cart_count) . '</span>';
+          ?>
+        </a>
+      <?php endif; ?>
+      <?php if (basename($_SERVER['PHP_SELF']) === 'login.php'): ?>
+        <a href="register.php" class="gsw-nav-link">Register</a>
+      <?php endif; ?>
+      <?php if ($is_logged_in && $is_admin): ?>
+        <a href="admin.php" class="gsw-nav-link">Admin</a>
+      <?php endif; ?>
+      <a href="http://panel.iaregamer.com" class="gsw-nav-link" target="_blank">Panel Login</a>
+    </nav>
   </div>
 </div>
