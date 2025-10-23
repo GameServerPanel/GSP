@@ -24,15 +24,11 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "1";
-$db_version = 4;
+$module_version = "2.0";
+$db_version = 5;
 $module_required = FALSE;
-$module_menus = array(
-    array( 'subpage' => 'orders', 'name'=>'Orders', 'group'=>'user,admin' ),
-    array( 'subpage' => 'services', 'name'=>'Services', 'group'=>'admin' ),
-    array( 'subpage' => 'shop_settings', 'name'=>'Shop Settings', 'group'=>'admin' ),
-    array( 'subpage' => 'coupons', 'name'=>'Coupons', 'group'=>'admin' )
-);
+// Navigation disabled - this is now a purely external module
+$module_menus = array();
 
 $install_queries = array();
 $install_queries[0] = array(
@@ -43,6 +39,7 @@ $install_queries[0] = array(
 	`mod_cfg_id` int(11) NOT NULL,
 	`service_name` varchar(255) NOT NULL,
 	`remote_server_id` varchar(255) NOT NULL,
+	`out_of_stock` varchar(255) NOT NULL,
 	`slot_max_qty` int(11) NOT NULL,
 	`slot_min_qty` int(11) NOT NULL,
 	`price_daily` float(15,4) NOT NULL,
@@ -53,7 +50,8 @@ $install_queries[0] = array(
 	`ftp` varchar(255) NOT NULL,
 	`install_method` varchar(255) NOT NULL,
 	`manual_url` varchar(255) NOT NULL, 
-	`access_rights` varchar(255) NOT NULL, 
+	`access_rights` varchar(255) NOT NULL,
+	`enabled` int(11) NOT NULL,
 	PRIMARY KEY  (`service_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=UTF8;",
 	
@@ -62,19 +60,20 @@ $install_queries[0] = array(
 	`order_id` int(11) NOT NULL auto_increment,	
 	`user_id` int(11) NOT NULL,
 	`service_id` int(11) NOT NULL,
-	`home_path` varchar(255) NOT NULL,
 	`home_name` varchar(255) NOT NULL,
 	`ip` varchar(255) NOT NULL,
-	`port` varchar(5) NOT NULL,
 	`qty` int(11) NOT NULL,
 	`invoice_duration` varchar(16) NOT NULL,
 	`max_players` int(11) NOT NULL,
+	`price` float(15,2) NOT NULL,
 	`remote_control_password` varchar(10) NULL,
 	`ftp_password` varchar(10) NULL,
-	`subtotal` float(15,2) NOT NULL,
-	`rate` int(11) NOT NULL,
-	`total` float(15,2) NOT NULL,
-	`date` varchar(10) NULL,
+	`cart_id` int(11) NOT NULL,
+	`home_id` varchar(255) NOT NULL DEFAULT '0',
+	`status` varchar(16) NOT NULL DEFAULT '0',
+	`finish_date` varchar(16) NOT NULL DEFAULT '0',
+	`extended` tinyint(1) NOT NULL,
+	`coupon_id` int(11) NOT NULL DEFAULT 0,
 	PRIMARY KEY  (`order_id`)
 	) ENGINE=MyISAM;"
 );
@@ -86,50 +85,25 @@ $install_queries[1] = array(
 	`user_id` int(11) NOT NULL,
 	`paid` int(11) NULL,
 	PRIMARY KEY  (`cart_id`)
-    ) ENGINE=MyISAM DEFAULT CHARSET=UTF8;",
-	
-	"DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_orders`;",
-    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_orders` (
-	`order_id` int(11) NOT NULL auto_increment,
-	`user_id` int(11) NOT NULL,
-	`service_id` int(11) NOT NULL,
-	`home_path` varchar(255) NOT NULL,
-	`home_name` varchar(255) NOT NULL,
-	`ip` varchar(255) NOT NULL,
-	`qty` int(11) NOT NULL,
-	`invoice_duration` varchar(16) NOT NULL,
-	`max_players` int(11) NOT NULL,
-	`price` float(15,2) NOT NULL,
-	`remote_control_password` varchar(10) NULL,
-	`ftp_password` varchar(10) NULL,
-	`paid` varchar(1) NULL,
-	`date` varchar(10) NULL,
-	`cart_id` int(11) NOT NULL,
-	PRIMARY KEY  (`order_id`)
-	) ENGINE=MyISAM;"
+    ) ENGINE=MyISAM DEFAULT CHARSET=UTF8;"
 );
 
 $install_queries[2] = array(
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `date`;",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `home_path`;",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` DROP `paid`;",
-    "ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `home_id` varchar(255) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `status` varchar(16) NOT NULL DEFAULT 'unknown';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `date` varchar(16) NOT NULL DEFAULT '0';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `tax_amount` varchar(16) NOT NULL DEFAULT '0';",
 	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `currency` varchar(3) NOT NULL DEFAULT '0';"
 );
 
 $install_queries[3] = array(
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `finish_date` varchar(16) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `coupon_id` int(11) NOT NULL DEFAULT 0;"
 );
 
 $install_queries[4] = array(
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `extended` tinyint(1) NOT NULL;",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_services` ADD `enabled` int(11) NOT NULL;",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_carts` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';",
-	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` ADD `coupon_id` varchar(3) NOT NULL DEFAULT '0';"
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_orders` MODIFY `coupon_id` int(11) NOT NULL DEFAULT 0;"
+);
 
+$install_queries[5] = array(
+	"ALTER TABLE `".OGP_DB_PREFIX."billing_services` ADD `out_of_stock` varchar(255) NOT NULL AFTER `remote_server_id`;"
 );
 
 
