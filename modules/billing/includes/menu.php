@@ -90,6 +90,7 @@ if ($is_logged_in) {
       <a href="index.php" class="gsw-nav-link">Home</a>
       <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
       <?php if ($is_logged_in): ?>
+        <a href="my_account.php" class="gsw-nav-link gsw-nav-link-myaccount">My Account</a>
         <a href="my_servers.php" class="gsw-nav-link">My Servers</a>
         <a href="cart.php" class="gsw-nav-link">Cart
           <?php
@@ -101,6 +102,8 @@ if ($is_logged_in) {
             if ($cart_count > 0) echo ' <span class="cart-badge">' . intval($cart_count) . '</span>';
           ?>
         </a>
+      <?php else: ?>
+        <a href="login.php" class="gsw-nav-link gsw-nav-link-myaccount">Login</a>
       <?php endif; ?>
       <?php if (basename($_SERVER['PHP_SELF']) === 'login.php'): ?>
         <a href="register.php" class="gsw-nav-link">Register</a>
