@@ -287,8 +287,8 @@ if ($row['price_monthly'] == 0.0) {
 								?>
 								<?php if ($available_server && $is_logged_in): ?>
 									<button type="submit" name="add_to_cart" class="gsw-btn">Add to Cart</button>
-								<?php elseif ($available_server && !$is_logged_in): ?>
-									<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;color:#fff;">Please <a href="login.php" style="color:#cfe6ff;text-decoration:underline;">login</a> to order</div>
+								<?php else: ?>
+									<div class="login-placeholder">Please <a href="login.php">login</a> to order</div>
 								<?php endif; ?>
 							</form>
 							</td>

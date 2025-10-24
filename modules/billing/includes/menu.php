@@ -71,16 +71,12 @@ if ($is_logged_in) {
     <div class="gsw-header-right">
       <?php if ($is_logged_in): ?>
         <span class="gsw-user-info">Welcome, <?php echo $username; ?>!</span>
-      <?php endif; ?>
-      <?php
-        // Build a safe absolute return_to under this site so logout redirects stay within this module
-        $current = $_SERVER['REQUEST_URI'] ?? '/';
-        $return_to_param = $current;
-      ?>
-      <?php if ($is_logged_in): ?>
+        <?php
+          // Build a safe absolute return_to under this site so logout redirects stay within this module
+          $current = $_SERVER['REQUEST_URI'] ?? '/';
+          $return_to_param = $current;
+        ?>
         <a href="logout.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Logout</a>
-      <?php else: ?>
-        <a href="login.php" class="gsw-header-btn">Login</a>
       <?php endif; ?>
     </div>
   </div>
@@ -90,8 +86,8 @@ if ($is_logged_in) {
       <a href="index.php" class="gsw-nav-link">Home</a>
       <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
       <?php if ($is_logged_in): ?>
-        <a href="my_account.php" class="gsw-nav-link gsw-nav-link-myaccount">My Account</a>
-        <a href="my_servers.php" class="gsw-nav-link">My Servers</a>
+        <!-- Make My Account a prominent header button and remove My Servers link per UX request -->
+        <a href="my_account.php" class="gsw-header-btn gsw-nav-link-myaccount">My Account</a>
         <a href="cart.php" class="gsw-nav-link">Cart
           <?php
             $cart_count = 0;
@@ -102,11 +98,6 @@ if ($is_logged_in) {
             if ($cart_count > 0) echo ' <span class="cart-badge">' . intval($cart_count) . '</span>';
           ?>
         </a>
-      <?php else: ?>
-        <a href="login.php" class="gsw-nav-link gsw-nav-link-myaccount">Login</a>
-      <?php endif; ?>
-      <?php if (basename($_SERVER['PHP_SELF']) === 'login.php'): ?>
-        <a href="register.php" class="gsw-nav-link">Register</a>
       <?php endif; ?>
       <?php if ($is_logged_in && $is_admin): ?>
         <a href="admin.php" class="gsw-nav-link">Admin</a>

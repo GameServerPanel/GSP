@@ -4,186 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account - GameServers.World</title>
-    <style>
-        .account-container {
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        
-        .account-section {
-            background: rgba(0,0,0,0.25);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .account-section h2 {
-            margin: 0 0 15px 0;
-            font-size: 1.3rem;
-            color: #fff;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
-            padding-bottom: 10px;
-        }
-        
-        .account-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .account-info-item {
-            padding: 10px;
-            background: rgba(255,255,255,0.03);
-            border-radius: 6px;
-        }
-        
-        .account-info-label {
-            font-weight: 600;
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-        
-        .account-info-value {
-            color: #fff;
-            font-size: 1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #fff;
-            font-weight: 500;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            background: rgba(0,0,0,0.3);
-            color: #fff;
-        }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
-        }
-        
-        .alert-error {
-            background-color: rgba(255,0,0,0.2);
-            border: 1px solid rgba(255,0,0,0.3);
-            color: #ffcccc;
-        }
-        
-        .alert-success {
-            background-color: rgba(0,255,0,0.2);
-            border: 1px solid rgba(0,255,0,0.3);
-            color: #ccffcc;
-        }
-        
-        .server-item {
-            background: rgba(255,255,255,0.03);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            border-left: 3px solid #667eea;
-        }
-        
-        .server-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 8px;
-        }
-        
-        .server-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .server-detail {
-            font-size: 0.9rem;
-        }
-        
-        .server-detail-label {
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .server-detail-value {
-            color: #fff;
-            font-weight: 500;
-        }
-        
-        .invoice-item {
-            background: rgba(255,255,255,0.03);
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .invoice-id {
-            font-weight: 600;
-            color: #fff;
-        }
-        
-        .invoice-amount {
-            color: #10b981;
-            font-weight: 600;
-        }
-        
-        .invoice-status {
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        
-        .invoice-status-paid {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-        }
-        
-        .invoice-status-pending {
-            background: rgba(245, 158, 11, 0.2);
-            color: #f59e0b;
-        }
-        
-        .invoice-date {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 30px;
-            color: rgba(255,255,255,0.6);
-        }
-        
-        @media (max-width: 768px) {
-            .account-info-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
 <?php
-// Require login for this page
-require_once(__DIR__ . '/includes/login_required.php');
+// Start session to check login status
+if (session_status() === PHP_SESSION_NONE) {
+    session_name("gameservers_website");
+    session_start();
+}
+
+// Enable error display during debugging so runtime errors show in the page
+@ini_set('display_errors', 1);
+@ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Check if user is logged in
+$is_logged_in = (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) || (isset($_SESSION['website_username']) && !empty($_SESSION['website_username']));
+
+// If not logged in, show login page instead
+if (!$is_logged_in) {
+    include(__DIR__ . '/login.php');
+    exit;
+}
 
 // Include database configuration
 require_once(__DIR__ . '/includes/config.inc.php');
@@ -197,6 +39,8 @@ if (!$db) {
 // Include top bar and menu
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
+
+// (debug markers removed)
 
 // Initialize messages
 $error_message = '';
@@ -272,22 +116,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_info'])) {
     }
 }
 
-// Fetch user's game servers from billing_orders
-$servers_query = "SELECT 
-                    o.order_id,
-                    o.home_name,
-                    o.status,
-                    o.price,
-                    o.invoice_duration,
-                    o.created_at,
-                    bs.service_name,
-                    rs.remote_server_name
-                  FROM ogp_billing_orders o
-                  LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
-                  LEFT JOIN ogp_remote_servers rs ON o.remote_server_id = rs.remote_server_id
-                  WHERE o.user_id = $user_id
-                  ORDER BY o.created_at DESC";
+// Fetch user's orders from billing_orders. Keep this simple: select orders for the user and join service name.
+// Avoid joins to remote server fields that do not exist on the orders table.
+$servers_query = "SELECT
+                                        o.order_id,
+                                        o.home_name,
+                                        o.status,
+                                        o.price,
+                                        o.invoice_duration,
+                                        o.home_id,
+                                        o.finish_date,
+                                        bs.service_name
+                                    FROM ogp_billing_orders o
+                                    LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
+                                    WHERE o.user_id = $user_id
+                                    ORDER BY o.order_id DESC";
 $servers_result = mysqli_query($db, $servers_query);
+
+// Debug: Log query execution and errors
+if (!$servers_result) {
+        error_log("My Account Error - User ID: $user_id, Query failed: " . mysqli_error($db));
+} else {
+        error_log("My Account Debug - User ID: $user_id, Servers Found: " . mysqli_num_rows($servers_result));
+}
 
 // Fetch invoices (from data directory JSON files)
 $dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';
@@ -310,8 +161,29 @@ if (is_dir($dataDir)) {
     }
 }
 
-// Sort invoices by date (newest first)
+// Sort invoices by invoice/order id (newest order id first) when available,
+// otherwise fall back to timestamp (newest first).
 usort($invoices, function($a, $b) {
+    $getOrderId = function($inv) {
+        if (!empty($inv['invoice']) && is_numeric($inv['invoice'])) return intval($inv['invoice']);
+        if (!empty($inv['custom']) && is_numeric($inv['custom'])) return intval($inv['custom']);
+        return null;
+    };
+
+    $aId = $getOrderId($a);
+    $bId = $getOrderId($b);
+
+    if ($aId !== null || $bId !== null) {
+        // If either has a numeric order id, prefer numeric comparison (desc)
+        if ($aId === $bId) {
+            return strtotime($b['ts'] ?? 0) - strtotime($a['ts'] ?? 0);
+        }
+        if ($aId === null) return 1; // b has id -> b before a
+        if ($bId === null) return -1; // a has id -> a before b
+        return $bId - $aId; // numeric desc
+    }
+
+    // Fallback: newest timestamp first
     return strtotime($b['ts'] ?? 0) - strtotime($a['ts'] ?? 0);
 });
 
@@ -325,7 +197,15 @@ $previous_invoices = array_filter($invoices, function($inv) {
 
 ?>
 
-<div class="account-container">
+<!-- Debug marker: Page rendering started -->
+<div class="site-panel">
+    <div class="site-panel-title">
+        My Account
+        <a href="logout.php" class="gsw-btn" style="float:right;">Logout</a>
+    </div>
+    
+    <!-- Debug: User ID = <?php echo $user_id; ?>, User Info: <?php echo $user_info ? 'Loaded' : 'NULL'; ?> -->
+    
     <?php if (!empty($error_message)): ?>
         <div class="alert alert-error"><?php echo htmlspecialchars($error_message); ?></div>
     <?php endif; ?>
@@ -359,8 +239,8 @@ $previous_invoices = array_filter($invoices, function($inv) {
             
             <!-- Edit Account Information Form -->
             <details>
-                <summary style="cursor: pointer; color: #667eea; font-weight: 600; margin-top: 10px;">Edit Account Information</summary>
-                <form method="POST" style="margin-top: 15px;">
+                <summary class="account-edit-summary">Edit Account Information</summary>
+                <form method="POST" class="mt-12">
                     <div class="form-group">
                         <label for="fname">First Name</label>
                         <input type="text" id="fname" name="fname" value="<?php echo htmlspecialchars($user_info['users_fname'] ?? ''); ?>">
@@ -404,6 +284,7 @@ $previous_invoices = array_filter($invoices, function($inv) {
     <!-- My Game Servers Section -->
     <div class="account-section">
         <h2>My Game Servers</h2>
+        
         <?php if ($servers_result && mysqli_num_rows($servers_result) > 0): ?>
             <?php while ($server = mysqli_fetch_assoc($servers_result)): ?>
                 <div class="server-item">
@@ -414,8 +295,8 @@ $previous_invoices = array_filter($invoices, function($inv) {
                             <span class="server-detail-value"><?php echo htmlspecialchars($server['service_name'] ?? 'N/A'); ?></span>
                         </div>
                         <div class="server-detail">
-                            <span class="server-detail-label">Location:</span>
-                            <span class="server-detail-value"><?php echo htmlspecialchars($server['remote_server_name'] ?? 'N/A'); ?></span>
+                            <span class="server-detail-label">Location / Home ID:</span>
+                            <span class="server-detail-value"><?php echo htmlspecialchars($server['remote_server_name'] ?? $server['home_id'] ?? 'N/A'); ?></span>
                         </div>
                         <div class="server-detail">
                             <span class="server-detail-label">Status:</span>
@@ -426,16 +307,28 @@ $previous_invoices = array_filter($invoices, function($inv) {
                             <span class="server-detail-value">$<?php echo number_format($server['price'] ?? 0, 2); ?>/<?php echo htmlspecialchars($server['invoice_duration'] ?? 'month'); ?></span>
                         </div>
                         <div class="server-detail">
-                            <span class="server-detail-label">Created:</span>
-                            <span class="server-detail-value"><?php echo $server['created_at'] ? date('M d, Y', strtotime($server['created_at'])) : 'N/A'; ?></span>
+                            <span class="server-detail-label">Order ID:</span>
+                            <span class="server-detail-value">#<?php echo htmlspecialchars($server['order_id'] ?? 'N/A'); ?></span>
                         </div>
+                        <div class="server-detail">
+                            <span class="server-detail-label">Expires:</span>
+                            <span class="server-detail-value"><?php echo !empty($server['finish_date']) && $server['finish_date'] != '0' ? date('M d, Y', strtotime($server['finish_date'])) : 'N/A'; ?></span>
+                        </div>
+                    </div>
+                    <div class="server-actions">
+                        <?php
+                        // Show Renew action for servers that can be renewed
+                        $renewable_statuses = array('paid','installed','invoiced','suspended');
+                        if (!empty($server['status']) && in_array(strtolower($server['status']), $renewable_statuses)): ?>
+                            <a href="renew_server.php?order_id=<?php echo intval($server['order_id']); ?>" class="gsw-btn renew-btn">Renew</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endwhile; ?>
         <?php else: ?>
             <div class="no-data">
                 <p>You don't have any game servers yet.</p>
-                <a href="serverlist.php" class="btn-primary" style="display: inline-block; margin-top: 10px;">Browse Game Servers</a>
+                <a href="serverlist.php" class="gsw-btn mt-10">Browse Game Servers</a>
             </div>
         <?php endif; ?>
     </div>

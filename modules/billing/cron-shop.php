@@ -20,6 +20,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
+ * 
+ * 
+ 
+Complete Status Flow:
+in-cart - User added to cart, not yet paid
+renew - Renewal order in cart
+paid - Payment received, awaiting server creation
+installed - ✅ Active/Running (server provisioned and operational)
+invoiced - Invoice generated, payment due (7 days before expiration)
+suspended - Server stopped, payment overdue
+deleted - Server permanently removed (7 days after suspension)
+expired - Order has expired
+unknown - Error/undefined state
  */
 
 chdir(realpath(dirname(__FILE__))); /* Change to the current file path */
@@ -68,7 +81,16 @@ else
         foreach($user_homes as $user_home)
         {
 
-				$user_id = $user_home['user_id'];
+                // Developer note:
+                // In future we may want to change the renewal/invoice strategy so that a
+                // new order record is created for the renewal (leaving the original order
+                // intact) instead of mutating the existing order's status/finish_date.
+                // Creating a separate renewal order gives a clearer, immutable purchase
+                // history and simplifies auditing. For now this cron job continues to
+                // update the existing order (change status/finish_date) as implemented
+                // below.
+
+                $user_id = $user_home['user_id'];
                 $home_id = $user_home['home_id'];
 				
                

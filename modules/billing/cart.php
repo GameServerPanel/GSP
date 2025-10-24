@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
   $orderId = (int)$_POST['create_free_for'];
   if ($orderId > 0) {
     // load order to verify ownership/price
-  $stmt = $db->prepare("SELECT user_id, price, status, qty, invoice_duration FROM ogp_billing_orders WHERE order_id = ? LIMIT 1");
+  $stmt = $db->prepare("SELECT user_id, price, status, qty, invoice_duration FROM " . $table_prefix . "billing_orders WHERE order_id = ? LIMIT 1");
     if ($stmt) {
       $stmt->bind_param('i', $orderId);
       $stmt->execute();
@@ -106,15 +106,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
           $finish_date = date('Y-m-d H:i:s');
         }
 
-        // Check if finish_date column exists
-        $finish_col_exists = false;
-        $col_check = mysqli_query($db, "SHOW COLUMNS FROM ogp_billing_orders LIKE 'finish_date'");
-        if ($col_check && mysqli_num_rows($col_check) > 0) $finish_col_exists = true;
+  // Check if finish_date column exists (use table prefix)
+  $finish_col_exists = false;
+  $col_check = mysqli_query($db, "SHOW COLUMNS FROM " . $table_prefix . "billing_orders LIKE 'finish_date'");
+  if ($col_check && mysqli_num_rows($col_check) > 0) $finish_col_exists = true;
 
         // Perform update and log results. Use prepared statements when available and fallback to direct query on error.
         $updated_rows = 0;
         if ($finish_col_exists) {
-          $upd = $db->prepare("UPDATE ogp_billing_orders SET status = 'paid', finish_date = ? WHERE order_id = ? LIMIT 1");
+          $upd = $db->prepare("UPDATE " . $table_prefix . "billing_orders SET status = 'paid', finish_date = ? WHERE order_id = ? LIMIT 1");
           if ($upd) {
             $upd->bind_param('si', $finish_date, $orderId);
             $ok = $upd->execute();
@@ -124,13 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
           } else {
             // fallback
             $safe_fd = mysqli_real_escape_string($db, $finish_date);
-            $q = "UPDATE ogp_billing_orders SET status = 'paid', finish_date = '$safe_fd' WHERE order_id = " . intval($orderId) . " LIMIT 1";
+            $q = "UPDATE " . $table_prefix . "billing_orders SET status = 'paid', finish_date = '$safe_fd' WHERE order_id = " . intval($orderId) . " LIMIT 1";
             $resq = mysqli_query($db, $q);
             if (!$resq) site_log_warn('free_create_update_failed_query', ['error'=>mysqli_error($db), 'sql'=>$q]);
             else $updated_rows = mysqli_affected_rows($db);
           }
         } else {
-          $upd = $db->prepare("UPDATE ogp_billing_orders SET status = 'paid' WHERE order_id = ? LIMIT 1");
+          $upd = $db->prepare("UPDATE " . $table_prefix . "billing_orders SET status = 'paid' WHERE order_id = ? LIMIT 1");
           if ($upd) {
             $upd->bind_param('i', $orderId);
             $ok = $upd->execute();
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
             $updated_rows = $upd->affected_rows;
             $upd->close();
           } else {
-            $q = "UPDATE ogp_billing_orders SET status = 'paid' WHERE order_id = " . intval($orderId) . " LIMIT 1";
+            $q = "UPDATE " . $table_prefix . "billing_orders SET status = 'paid' WHERE order_id = " . intval($orderId) . " LIMIT 1";
             $resq = mysqli_query($db, $q);
             if (!$resq) site_log_warn('free_create_update_failed_query', ['error'=>mysqli_error($db), 'sql'=>$q]);
             else $updated_rows = mysqli_affected_rows($db);
@@ -248,20 +248,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
         $stmt->bind_param("ii", $order_id, $user_id);
         $stmt->execute();
         $stmt->bind_result($status);
-        if ($stmt->fetch() && strtolower($status) === 'renew') {
-            $stmt->close();
-            // Set status to 'expired' if currently 'renew'
-            $update = $db->prepare("UPDATE ogp_billing_orders SET status = 'expired' WHERE order_id = ? AND user_id = ?");
-            $update->bind_param("ii", $order_id, $user_id);
-            $update->execute();
-            $update->close();
+    if ($stmt->fetch() && strtolower($status) === 'renew') {
+      $stmt->close();
+      // If user removes a renewal from their cart, revert the order back to 'installed'
+      $update = $db->prepare("UPDATE ogp_billing_orders SET status = 'installed' WHERE order_id = ? AND user_id = ?");
+      $update->bind_param("ii", $order_id, $user_id);
+    $update->execute();
+    // Log revert action to panel logger
+    if (isset($db) && method_exists($db, 'logger')) {
+      $db->logger("USER-CART: User " . intval($user_id) . " reverted renew for order " . intval($order_id));
+    }
+    $update->close();
         } else {
             $stmt->close();
             // Otherwise, delete the order
             $delete = $db->prepare("DELETE FROM ogp_billing_orders WHERE order_id = ? AND user_id = ?");
             $delete->bind_param("ii", $order_id, $user_id);
-            $delete->execute();
-            $delete->close();
+      $delete->execute();
+      // Log deletion to panel logger
+      if (isset($db) && method_exists($db, 'logger')) {
+        $db->logger("USER-CART: User " . intval($user_id) . " deleted order " . intval($order_id));
+      }
+      $delete->close();
         }
     }
 }
@@ -319,6 +327,15 @@ if ($db){
             <td><?php echo htmlspecialchars($row['qty']); ?></td>
             <?php $rowtotal = $row['price'] * $row['qty'] * $row['max_players'];?>
             <?php
+              // Build invoice and line item structures used later when creating PayPal order
+              if (!isset($invoice) || !is_array($invoice)) $invoice = [];
+              $invoice[] = [
+                'serverID' => isset($row['home_id']) ? (string)$row['home_id'] : ('order'.$row['order_id']),
+                'amount'   => number_format($rowtotal, 2, '.', ''),
+                'order_id' => intval($row['order_id'])
+              ];
+            ?>
+            <?php
               // Use the previously resolved $is_admin (computed once above)
               $is_free = ((float)$row['price'] == 0.0);
             ?>
@@ -329,7 +346,7 @@ if ($db){
                       <button type="submit" class="gsw-btn"><?php echo $is_admin ? 'Create (Free)' : 'Claim (Free)'; ?></button>
                 </form>
                 <?php if ($is_admin): ?>
-                  <div style="font-size:11px;color:#666;margin-top:4px;">Admin: force-create a paid record for testing.</div>
+                  <div class="admin-note">Admin: force-create a paid record for testing.</div>
                 <?php endif; ?>
               </td>
             <?php else: ?>
@@ -401,6 +418,11 @@ $invoiceId   = 'INV-' . date('Ymd-His') . '-' . bin2hex(random_bytes(3));
 // A short custom reference derived from your line items (<= 127 chars for PayPal)
 $customHash  = substr(strtoupper(sha1(json_encode($invoice))), 0, 16);
 $customId    = "INVREF-$customHash";
+// If the cart contains a single order, set custom_id to the numeric order id so webhooks
+// can match the order directly (payment_success matches numeric custom -> order_id).
+if (is_array($invoice) && count($invoice) === 1 && !empty($invoice[0]['order_id'])) {
+  $customId = (string) intval($invoice[0]['order_id']);
+}
 
 // Text on the PayPal side
 $description = 'Game server order (' . count($lineItems) . ' item' . (count($lineItems)===1?'': 's') . ')';

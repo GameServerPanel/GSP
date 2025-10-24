@@ -21,7 +21,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   <h1>Admin Dashboard</h1>
   <p>Welcome to the admin area. From here you can manage servers, payments, and site settings.</p>
 
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;">
+  <div class="admin-flex-wrap">
   <a class="gsw-btn" href="adminserverlist.php">Manage Servers & Services</a>
   <a class="gsw-btn" href="./invoices.php">Invoice History</a>
   <a class="gsw-btn" href="admin_config.php">Edit Site Config</a>

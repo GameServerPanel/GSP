@@ -39,15 +39,9 @@ $query = "SELECT
             gc.game_name,
             o.order_id,
             o.status,
-            o.created_at,
             o.invoice_duration,
-            DATE_ADD(o.created_at, INTERVAL 
-                CASE 
-                    WHEN o.invoice_duration = 'month' THEN 30 
-                    WHEN o.invoice_duration = 'year' THEN 365 
-                    ELSE 30 
-                END DAY
-            ) as expiration_date,
+            -- use finish_date as the expiration marker (set when order is paid/created)
+            o.finish_date AS expiration_date,
             bs.service_name,
             bs.price_monthly
           FROM ogp_home h
@@ -100,7 +94,7 @@ $result = mysqli_query($db, $query);
                         <td><?php echo $server['price_monthly'] ? '$' . number_format($server['price_monthly'], 2) : 'N/A'; ?></td>
                         <td>
                             <?php if ($server['order_id']): ?>
-                                <a href="renew_server.php?order_id=<?php echo urlencode($server['order_id']); ?>" class="btn-primary" style="padding:8px 16px;text-decoration:none;display:inline-block;border-radius:6px;">Renew</a>
+                                <a href="renew_server.php?order_id=<?php echo urlencode($server['order_id']); ?>" class="gsw-btn">Renew</a>
                             <?php else: ?>
                                 <span class="muted">N/A</span>
                             <?php endif; ?>
@@ -110,9 +104,9 @@ $result = mysqli_query($db, $query);
             </tbody>
         </table>
     <?php else: ?>
-        <div class="panel" style="text-align:center;padding:40px;">
+        <div class="panel no-data">
             <p style="font-size:1.2rem;margin-bottom:20px;">You don't have any game servers yet.</p>
-            <a href="serverlist.php" class="btn-primary" style="padding:12px 24px;text-decoration:none;display:inline-block;border-radius:8px;">Browse Game Servers</a>
+            <a href="serverlist.php" class="gsw-btn">Browse Game Servers</a>
         </div>
     <?php endif; ?>
 </div>
@@ -121,17 +115,6 @@ $result = mysqli_query($db, $query);
 // Close database connection
 mysqli_close($db);
 ?>
-
-<style>
-.text-success {
-    color: #10b981;
-    font-weight: 600;
-}
-.text-danger {
-    color: #ef4444;
-    font-weight: 600;
-}
-</style>
 
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>

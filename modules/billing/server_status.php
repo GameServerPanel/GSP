@@ -66,8 +66,8 @@ $result = mysqli_query($db, $query);
 <div class="site-panel">
     <div class="site-panel-title">Server Status</div>
     
-    <div style="margin-bottom:20px;text-align:center;">
-        <p style="color:rgba(255,255,255,0.7);">Real-time status of our game server infrastructure</p>
+    <div class="text-center mb-20">
+        <p class="text-muted">Real-time status of our game server infrastructure</p>
     </div>
     
     <?php if ($result && mysqli_num_rows($result) > 0): ?>
@@ -143,7 +143,7 @@ $result = mysqli_query($db, $query);
                     </tr>
                     <?php if (!empty($server['notes'])): ?>
                     <tr>
-                        <td colspan="8" style="padding-left:40px;font-size:0.9rem;color:rgba(255,255,255,0.7);">
+                        <td colspan="8" class="server-notes">
                             <em><?php echo htmlspecialchars($server['notes']); ?></em>
                         </td>
                     </tr>
@@ -152,12 +152,12 @@ $result = mysqli_query($db, $query);
             </tbody>
         </table>
     <?php else: ?>
-        <div class="panel" style="text-align:center;padding:40px;">
+        <div class="panel no-data">
             <p style="font-size:1.2rem;">No server status information available.</p>
         </div>
     <?php endif; ?>
     
-    <div style="margin-top:30px;text-align:center;color:rgba(255,255,255,0.6);font-size:0.9rem;">
+    <div class="text-center text-muted" style="margin-top:30px;font-size:0.9rem;">
         <p>Server status is updated automatically every 5 minutes.</p>
         <p style="margin-top:10px;">If you experience any issues, please contact support.</p>
     </div>
@@ -167,37 +167,6 @@ $result = mysqli_query($db, $query);
 // Close database connection
 mysqli_close($db);
 ?>
-
-<style>
-.status-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.status-online {
-    background-color: #10b981;
-    color: white;
-}
-
-.status-offline {
-    background-color: #ef4444;
-    color: white;
-}
-
-.status-maintenance {
-    background-color: #f59e0b;
-    color: white;
-}
-
-.status-unknown {
-    background-color: #6b7280;
-    color: white;
-}
-</style>
 
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>

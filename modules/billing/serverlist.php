@@ -111,7 +111,7 @@ include(__DIR__ . '/includes/menu.php');
                         ?>
                             <button type="submit" class="gsw-btn">Add to Cart</button>
                         <?php else: ?>
-                            <div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;color:#fff;">Please <a href="login.php" style="color:#cfe6ff;text-decoration:underline;">login</a> to order</div>
+                            <div class="login-placeholder">Please <a href="login.php">login</a> to order</div>
                         <?php endif; ?>
                     </td>
                 </tr>
