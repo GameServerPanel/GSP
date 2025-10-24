@@ -47,7 +47,8 @@ include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 ?>
 
-<div>
+<!-- Services container: clearfix to contain floated service cards so footer clears correctly -->
+<div class="clearfix container-wide">
 <?php foreach ($services as $row): ?>
     <?php if (!isset($_REQUEST['service_id'])): ?>
         <!-- Service listing (all) -->
@@ -124,6 +125,7 @@ include(__DIR__ . '/includes/menu.php');
 // Close database connection
 mysqli_close($db);
 ?>
-</body>
+
 <?php include(__DIR__ . '/includes/footer.php'); ?>
+</body>
 </html>
