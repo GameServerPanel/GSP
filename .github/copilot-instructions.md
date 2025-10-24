@@ -12,6 +12,7 @@
 - `_website/` — canonical website storefront and Checkout/Webhooks flow.
 - `modules/config_games/server_configs/` — authoritative game catalog XMLs (all supported games live here).
 - `modules/` — panel modules (legacy `billing/` exists; its **schema** is authoritative for multi-remote, but the **pages** are deprecated).
+- `modules/billing/` — frontend website for selling gameservers to customers. Can interface with panel from same machine or external web host via MySQL tables. Uses `gameservers_website` session namespace (separate from panel sessions).
 - `includes/` — panel configuration and DB connectors.
 - `ogp_api.php` — internal API entry point for panel-side actions.
 - `api/` — Payment-related API code if present in this branch (previously under `paypal/` or `payments/`).
@@ -26,6 +27,8 @@
 
 ## 3) Scope & principles
 - **Website ↔ Panel on the same host.** Website uses the **panel DB for authentication** and the **panel’s internal APIs** for provisioning. **Sessions remain separate** (website session ≠ panel session).
+- **Billing module flexibility.** The `modules/billing/` frontend can run on the **same machine as the panel** or on an **external web host**, interfacing primarily via MySQL table edits. All interaction with panel DB happens through direct MySQL queries using credentials in `modules/billing/includes/config.inc.php`.
+- **Billing module flexibility.** The `modules/billing/` frontend can run on the **same machine as the panel** or on an **external web host**, interfacing primarily via MySQL table edits. All interaction with panel DB happens through direct MySQL queries using credentials in `modules/billing/includes/config.inc.php`.
 - **Catalog = XML.** Enable **every game** present under `modules/config_games/server_configs/`. The website reads those XMLs for ports, params, install/update metadata. New XMLs should become available without code changes.
 - **Regions/Nodes = panel DB.** Regions and nodes are configured in the panel and must be **queried live** from the panel DB. Never hardcode or mirror region lists on the website.
 - **Slotless model.** Pricing/UX must not enforce slot caps. If an engine requires a player count parameter, set a safe high default and surface engine limits transparently if they exist.

@@ -24,6 +24,8 @@
 .gsw-header-nav{display:flex;gap:22px;align-items:center;}
 .gsw-nav-link{color:#fff;text-decoration:none;font-size:0.98rem;transition:opacity 0.2s;padding:6px 8px;border-radius:6px;}
 .gsw-nav-link:hover{opacity:0.9;text-decoration:underline;background:rgba(255,255,255,0.03);}
+/* My Account link styling - larger font in middle of menu */
+.gsw-nav-link-myaccount{font-size:1.15rem;font-weight:600;padding:6px 12px;}
 
 .gsw-user-info{color:#fff;font-size:0.95rem;margin-right:8px;}
 
