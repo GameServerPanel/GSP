@@ -428,12 +428,13 @@ if (is_array($invoice) && count($invoice) === 1 && !empty($invoice[0]['order_id'
 $description = 'Game server order (' . count($lineItems) . ' item' . (count($lineItems)===1?'': 's') . ')';
 
 // URLs
-$siteBase   = 'https://panel.iaregamer.com';
-$returnUrl  = $siteBase . '/_website/return.php?invoice=' . urlencode($invoiceId);
-$cancelUrl  = $siteBase . '/_website/return.php?invoice=' . urlencode($invoiceId) . '&cancel=1';
+// URLs - since the billing "website" root is the files in modules/billing,
+// return.php lives alongside cart.php so use relative paths.
+$returnUrl  = 'return.php?invoice=' . urlencode($invoiceId);
+$cancelUrl  = 'return.php?invoice=' . urlencode($invoiceId) . '&cancel=1';
 
-// API base (relative)
-$apiBase = '/_website/api';
+// API base (relative) - point to billing module API endpoints
+$apiBase = 'api';
 ?>
 <!-- PayPal JS SDK (Sandbox). Use LIVE client-id when going live. -->
 <script src="https://www.paypal.com/sdk/js?client-id=AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c&currency=USD&intent=capture"></script>

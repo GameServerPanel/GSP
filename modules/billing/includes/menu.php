@@ -69,14 +69,17 @@ if ($is_logged_in) {
       </a>
     </div>
     <div class="gsw-header-right">
+      <!-- Always show the user-info area (may be empty for guests) and an auth button -->
+      <?php
+        // Build a safe absolute return_to under this site so auth redirects stay within this module
+        $current = $_SERVER['REQUEST_URI'] ?? '/';
+        $return_to_param = $current;
+      ?>
       <?php if ($is_logged_in): ?>
-        <span class="gsw-user-info">Welcome, <?php echo $username; ?>!</span>
-        <?php
-          // Build a safe absolute return_to under this site so logout redirects stay within this module
-          $current = $_SERVER['REQUEST_URI'] ?? '/';
-          $return_to_param = $current;
-        ?>
+        <a href="my_account.php" class="gsw-user-info">Welcome, <?php echo $username; ?></a>
         <a href="logout.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Logout</a>
+      <?php else: ?>
+        <a href="login.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Login</a>
       <?php endif; ?>
     </div>
   </div>

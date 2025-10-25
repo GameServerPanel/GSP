@@ -224,6 +224,61 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
   .account-info-grid{grid-template-columns:1fr}
 }
 
+/* Responsive improvements for mobile devices */
+@media (max-width: 600px) {
+    /* Stack header top and make logo smaller */
+    #gsw-site .gsw-header-top{flex-direction:column;align-items:flex-start;padding:10px 12px}
+    #gsw-site .gsw-header-left{width:100%;justify-content:flex-start;padding-left:4px}
+    .gsw-logo{height:40px}
+    .gsw-site-name{font-size:1rem}
+
+    /* Make header right area flow beneath the logo */
+    #gsw-site .gsw-header-right{width:100%;margin-top:8px;justify-content:flex-start;padding-right:4px;gap:8px}
+
+    /* Navigation: wrap and stack for easier tapping */
+    #gsw-site .gsw-header-bottom{padding:8px 12px}
+    .gsw-header-nav{flex-direction:column;align-items:stretch;gap:10px;width:100%}
+    .gsw-nav-link{display:block;padding:12px 10px;border-radius:8px}
+    .gsw-nav-link-myaccount{font-size:1rem}
+
+    /* Make main panel use full width with reduced padding */
+    .site-panel{padding:0.75rem;margin:8px;border-radius:0.5rem}
+
+    /* Tables and cart spacing adjustments */
+    .cart-table th, .cart-table td{padding:0.6rem 0.8rem}
+
+    /* Buttons become full-width for easier tapping on small screens */
+    #gsw-site .gsw-btn, #gsw-site a.gsw-btn, #gsw-site button.gsw-btn, #gsw-site .gsw-header-btn{
+        width:100%;display:block;text-align:center;padding:12px;border-radius:10px
+    }
+
+    /* Server cards: stack details and move actions below */
+    .server-details{grid-template-columns:1fr}
+    .server-actions{margin-top:12px;display:block}
+    .server-item{padding:12px}
+
+    /* Forms: make inputs and action buttons full width */
+    .form-group input, .form-group textarea, .form-group select{width:100%;box-sizing:border-box}
+
+    /* Invoice items: stack label and amount for readability */
+    .invoice-item{flex-direction:column;align-items:flex-start;gap:8px}
+    .invoice-amount{font-size:1rem}
+}
+
+@media (max-width:420px){
+    /* Extra small devices: tighten spacing, smaller fonts */
+    .gsw-logo{height:34px}
+    .gsw-site-name{font-size:0.95rem}
+    .site-panel-title{font-size:1.25rem}
+    .server-name{font-size:1rem}
+    .account-section h2{font-size:1.1rem}
+
+    /* Reduce large paddings that consume screen real estate */
+    .panel{padding:10px}
+    .form-group{margin-bottom:12px}
+    .btn-primary, .btn-small{padding:10px}
+}
+
 /* Server status and utility classes */
 #gsw-site .text-success {
     color: #10b981 !important;
@@ -298,4 +353,29 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 #gsw-site .form-group label:hover {
     background: rgba(255,255,255,0.1);
 }
+
+/* Ensure header-right sits flush to the far right */
+#gsw-site .gsw-header-top .gsw-header-right{margin-left:auto}
+
+/* User dropdown menu (small, CSS-only). Uses :focus-within and :hover for accessibility */
+.gsw-user-menu{position:relative;display:inline-block}
+.gsw-user-link{color:#fff;text-decoration:none;font-weight:600;padding:8px 12px;display:inline-block}
+.gsw-user-caret{margin-left:6px;font-size:0.85rem;opacity:0.85}
+.gsw-user-dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);background:rgba(255,255,255,0.06);backdrop-filter:blur(6px);border-radius:8px;padding:8px;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.35);z-index:60}
+.gsw-user-dropdown-item{display:block;color:#fff;text-decoration:none;padding:8px 10px;border-radius:6px;margin:2px 0}
+.gsw-user-dropdown-item:hover{background:rgba(255,255,255,0.03)}
+.gsw-user-menu:hover .gsw-user-dropdown, .gsw-user-menu:focus-within .gsw-user-dropdown{display:block}
+
+/* Mobile: make dropdown inline under header and full-width */
+@media (max-width:600px){
+    .gsw-user-dropdown{position:static;top:auto;right:auto;margin-top:8px;background:rgba(255,255,255,0.03);width:100%;box-shadow:none;padding:6px}
+    .gsw-user-menu{width:100%}
+    .gsw-user-link{width:100%;display:flex;justify-content:space-between;padding:12px}
+}
+
+/* Prevent serverlist images from overflowing on small screens */
+#gsw-site .server-item img,
+#gsw-site .game-thumb,
+#gsw-site .server-card img,
+.server-list img{max-width:100%;height:auto;display:block;object-fit:cover}
 
