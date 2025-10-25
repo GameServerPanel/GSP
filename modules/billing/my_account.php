@@ -187,13 +187,26 @@ usort($invoices, function($a, $b) {
     return strtotime($b['ts'] ?? 0) - strtotime($a['ts'] ?? 0);
 });
 
-// Separate current (pending) and previous (paid) invoices
-$current_invoices = array_filter($invoices, function($inv) {
-    return strtolower($inv['status'] ?? '') === 'pending' || empty($inv['status']);
-});
-$previous_invoices = array_filter($invoices, function($inv) {
-    return strtolower($inv['status'] ?? '') === 'paid' || strtolower($inv['status'] ?? '') === 'completed';
-});
+// Organize invoices by status
+$invoices_by_status = [];
+foreach ($invoices as $inv) {
+    $status = strtolower($inv['status'] ?? 'pending');
+    if (!isset($invoices_by_status[$status])) {
+        $invoices_by_status[$status] = [];
+    }
+    $invoices_by_status[$status][] = $inv;
+}
+
+// Define status display order and labels
+$status_config = [
+    'pending' => ['label' => 'Pending Invoices', 'class' => 'pending'],
+    'paid' => ['label' => 'Paid Invoices', 'class' => 'paid'],
+    'completed' => ['label' => 'Completed Invoices', 'class' => 'paid'],
+    'in-cart' => ['label' => 'In Cart', 'class' => 'pending'],
+    'installed' => ['label' => 'Installed/Active', 'class' => 'paid'],
+    'expired' => ['label' => 'Expired Invoices', 'class' => 'expired'],
+    'cancelled' => ['label' => 'Cancelled Invoices', 'class' => 'expired'],
+];
 
 ?>
 
@@ -333,45 +346,35 @@ $previous_invoices = array_filter($invoices, function($inv) {
         <?php endif; ?>
     </div>
     
-    <!-- Current Invoices Due Section -->
-    <?php if (!empty($current_invoices)): ?>
-    <div class="account-section">
-        <h2>Current Invoices Due</h2>
-        <?php foreach ($current_invoices as $invoice): ?>
-            <div class="invoice-item">
-                <div>
-                    <div class="invoice-id">Invoice #<?php echo htmlspecialchars($invoice['invoice'] ?? $invoice['custom'] ?? 'N/A'); ?></div>
-                    <div class="invoice-date"><?php echo htmlspecialchars($invoice['ts'] ?? 'N/A'); ?></div>
+    <!-- Invoices Section - Organized by Status -->
+    <?php if (!empty($invoices_by_status)): ?>
+        <?php foreach ($status_config as $status_key => $status_info): ?>
+            <?php if (isset($invoices_by_status[$status_key]) && !empty($invoices_by_status[$status_key])): ?>
+                <div class="account-section">
+                    <h2><?php echo htmlspecialchars($status_info['label']); ?></h2>
+                    <?php foreach ($invoices_by_status[$status_key] as $invoice): ?>
+                        <div class="invoice-item">
+                            <div>
+                                <div class="invoice-id">Invoice #<?php echo htmlspecialchars($invoice['invoice'] ?? $invoice['custom'] ?? 'N/A'); ?></div>
+                                <div class="invoice-date"><?php echo htmlspecialchars($invoice['ts'] ?? 'N/A'); ?></div>
+                            </div>
+                            <div>
+                                <span class="invoice-amount"><?php echo htmlspecialchars(($invoice['currency'] ?? 'USD') . ' ' . number_format((float)($invoice['amount'] ?? 0), 2)); ?></span>
+                                <span class="invoice-status invoice-status-<?php echo htmlspecialchars($status_info['class']); ?>">
+                                    <?php echo htmlspecialchars(ucfirst($status_key)); ?>
+                                </span>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <div>
-                    <span class="invoice-amount"><?php echo htmlspecialchars(($invoice['currency'] ?? 'USD') . ' ' . number_format((float)($invoice['amount'] ?? 0), 2)); ?></span>
-                    <span class="invoice-status invoice-status-pending">Pending</span>
-                </div>
-            </div>
+            <?php endif; ?>
         <?php endforeach; ?>
-    </div>
+    <?php else: ?>
+        <div class="account-section">
+            <h2>Invoices</h2>
+            <div class="no-data">No invoices found.</div>
+        </div>
     <?php endif; ?>
-    
-    <!-- Previous Invoices Section -->
-    <div class="account-section">
-        <h2>Previous Invoices</h2>
-        <?php if (!empty($previous_invoices)): ?>
-            <?php foreach ($previous_invoices as $invoice): ?>
-                <div class="invoice-item">
-                    <div>
-                        <div class="invoice-id">Invoice #<?php echo htmlspecialchars($invoice['invoice'] ?? $invoice['custom'] ?? 'N/A'); ?></div>
-                        <div class="invoice-date"><?php echo htmlspecialchars($invoice['ts'] ?? 'N/A'); ?></div>
-                    </div>
-                    <div>
-                        <span class="invoice-amount"><?php echo htmlspecialchars(($invoice['currency'] ?? 'USD') . ' ' . number_format((float)($invoice['amount'] ?? 0), 2)); ?></span>
-                        <span class="invoice-status invoice-status-paid">Paid</span>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="no-data">No previous invoices found.</div>
-        <?php endif; ?>
-    </div>
 </div>
 
 <?php

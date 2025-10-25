@@ -428,16 +428,31 @@ if (is_array($invoice) && count($invoice) === 1 && !empty($invoice[0]['order_id'
 $description = 'Game server order (' . count($lineItems) . ' item' . (count($lineItems)===1?'': 's') . ')';
 
 // URLs
-// URLs - since the billing "website" root is the files in modules/billing,
-// return.php lives alongside cart.php so use relative paths.
-$returnUrl  = 'return.php?invoice=' . urlencode($invoiceId);
-$cancelUrl  = 'return.php?invoice=' . urlencode($invoiceId) . '&cancel=1';
+// Define the site base URL
+$siteBaseUrl = 'http://gameservers.world/modules/billing';
+
+// Generate absolute URLs for return and cancel
+$returnUrl  = $siteBaseUrl . '/return.php?invoice=' . urlencode($invoiceId);
+$cancelUrl  = $siteBaseUrl . '/return.php?invoice=' . urlencode($invoiceId) . '&cancel=1';
 
 // API base (relative) - point to billing module API endpoints
 $apiBase = 'api';
 ?>
 <!-- PayPal JS SDK (Sandbox). Use LIVE client-id when going live. -->
 <script src="https://www.paypal.com/sdk/js?client-id=AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c&currency=USD&intent=capture"></script>
+
+<!-- Debug: Cart values -->
+<?php if (isset($_GET['debug'])): ?>
+<div style="background:#f0f0f0; padding:10px; margin:10px 0; font:12px monospace;">
+  <strong>Debug Info:</strong><br>
+  Grand Total: $<?php echo htmlspecialchars($grandTotal); ?><br>
+  Invoice Items: <?php echo count($invoice); ?><br>
+  Line Items: <?php echo count($lineItems); ?><br>
+  Amount: <?php echo htmlspecialchars($amount); ?><br>
+  Invoice ID: <?php echo htmlspecialchars($invoiceId); ?><br>
+  Custom ID: <?php echo htmlspecialchars($customId); ?><br>
+</div>
+<?php endif; ?>
 
 <div id="paypal-button-container"></div>
 <div id="pp-status" class="mt-12" style="font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;"></div>
@@ -446,14 +461,14 @@ $apiBase = 'api';
 (function(){
   const statusEl    = document.getElementById('pp-status');
 
-  // Values from PHP
-  const amount      = "<?= $amount ?>";
-  const currency    = "<?= $currency ?>";
-  const invoice_id  = "<?= $invoiceId ?>";
-  const custom_id   = "<?= $customId ?>";
-  const description = "<?= htmlspecialchars($description, ENT_QUOTES) ?>";
-  const return_url  = "<?= $returnUrl ?>";
-  const cancel_url  = "<?= $cancelUrl ?>";
+  // Values from PHP - use json_encode for proper JavaScript escaping
+  const amount      = <?php echo json_encode($amount); ?>;
+  const currency    = <?php echo json_encode($currency); ?>;
+  const invoice_id  = <?php echo json_encode($invoiceId); ?>;
+  const custom_id   = <?php echo json_encode($customId); ?>;
+  const description = <?php echo json_encode($description); ?>;
+  const return_url  = <?php echo json_encode($returnUrl); ?>;
+  const cancel_url  = <?php echo json_encode($cancelUrl); ?>;
 
   // Line items (serverID + per-item amount) for your records and webhook correlation
   const line_invoices = <?php echo json_encode($invoice, JSON_UNESCAPED_SLASHES); ?>;
@@ -461,7 +476,16 @@ $apiBase = 'api';
   // PayPal "items" for purchase_units (shows on PayPal + returns in webhook under purchase_units)
   const items = <?php echo json_encode($lineItems, JSON_UNESCAPED_SLASHES); ?>;
 
+  // Debug logging
+  console.log('PayPal cart debug:', {
+    amount, currency, invoice_id, custom_id, description,
+    line_invoices_count: line_invoices.length,
+    items_count: items.length,
+    return_url, cancel_url
+  });
+
   function setStatus(msg){ if(statusEl) statusEl.textContent = msg; }
+
 
   paypal.Buttons({
     createOrder: function() {
@@ -477,11 +501,24 @@ $apiBase = 'api';
           line_invoices      // your raw cart detail, persisted in your DB if you choose
         })
       })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          return res.text().then(errText => {
+            throw new Error('API error ' + res.status + ': ' + errText.substring(0, 200));
+          });
+        }
+        return res.json();
+      })
       .then(data => {
-        if (!data.id) { throw new Error(data.error || 'No order id'); }
+        if (!data.id) { 
+          throw new Error(JSON.stringify(data).substring(0, 200) || 'No order id'); 
+        }
         setStatus('Order created.');
         return data.id;
+      })
+      .catch(err => {
+        setStatus('PayPal error: ' + err.message);
+        throw err;
       });
     },
 

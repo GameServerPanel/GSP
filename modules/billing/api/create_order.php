@@ -47,6 +47,17 @@ if ($http !== 200) { http_response_code(500); echo json_encode(['error'=>'oauth_
 $access = json_decode($tok, true)['access_token'] ?? null;
 if (!$access) { http_response_code(500); echo json_encode(['error'=>'oauth_no_token']); exit; }
 
+// Update site base URL to exclude 'modules/billing'
+$siteBaseUrl = 'http://gameservers.world';
+
+// Ensure return_url and cancel_url are absolute URLs (relative to site root)
+if (strpos($return_url, 'http') !== 0) {
+    $return_url = $siteBaseUrl . '/' . ltrim($return_url, '/');
+}
+if (strpos($cancel_url, 'http') !== 0) {
+    $cancel_url = $siteBaseUrl . '/' . ltrim($cancel_url, '/');
+}
+
 $purchaseUnit = [
   'amount' => [ 'currency_code' => $currency, 'value' => $amount_value ],
   'description' => $description,
@@ -64,6 +75,18 @@ $body = [
   'application_context' => [ 'return_url'=>$return_url, 'cancel_url'=>$cancel_url, 'user_action'=>'PAY_NOW' ]
 ];
 
+// Log the payload for debugging
+$logDir = __DIR__ . '/../data';
+@mkdir($logDir, 0775, true);
+$logFile = $logDir . '/create_order_payload.log';
+$logEntry = date('Y-m-d H:i:s') . "\n" . json_encode($body, JSON_PRETTY_PRINT) . "\n\n";
+@file_put_contents($logFile, $logEntry, FILE_APPEND);
+
+// Log corrected URLs for debugging
+$logFile = $logDir . '/corrected_urls.log';
+$logEntry = date('Y-m-d H:i:s') . "\nReturn URL: $return_url\nCancel URL: $cancel_url\n\n";
+@file_put_contents($logFile, $logEntry, FILE_APPEND);
+
 $ch = curl_init("$api/v2/checkout/orders");
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
@@ -75,7 +98,18 @@ $res  = curl_exec($ch);
 $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-if ($http !== 201) { http_response_code($http); echo $res; exit; }
+if ($http !== 201) { 
+  // Log error for debugging
+  $logDir = __DIR__ . '/../data';
+  @mkdir($logDir, 0775, true);
+  $logFile = $logDir . '/create_order_errors.log';
+  $logEntry = date('Y-m-d H:i:s') . " HTTP $http: " . substr($res, 0, 500) . "\n";
+  @file_put_contents($logFile, $logEntry, FILE_APPEND);
+  
+  http_response_code($http); 
+  echo $res; 
+  exit; 
+}
 echo $res;
 
 ?>

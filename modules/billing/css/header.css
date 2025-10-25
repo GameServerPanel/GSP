@@ -202,6 +202,7 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 .invoice-status{padding:4px 10px;border-radius:4px;font-size:0.85rem;font-weight:600}
 .invoice-status-paid{background:rgba(16,185,129,0.2);color:#10b981}
 .invoice-status-pending{background:rgba(245,158,11,0.2);color:#f59e0b}
+.invoice-status-expired{background:rgba(239,68,68,0.2);color:#ef4444}
 .invoice-date{color:rgba(255,255,255,0.6);font-size:0.9rem}
 
 /* Login placeholder for non-logged-in users */

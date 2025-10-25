@@ -37,10 +37,49 @@ curl_close($ch);
 
 if ($http !== 201 && $http !== 200) { http_response_code($http); echo $res; exit; }
 
-$payload = json_decode($res, true);
-$status  = $payload['status'] ?? 'UNKNOWN';
-$txnId   = $payload['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
+// Parse the capture response
+$captureData = json_decode($res, true);
+$captureStatus = $captureData['status'] ?? '';
 
-echo json_encode(['status'=>$status, 'txn_id'=>$txnId]);
+// If capture was successful, immediately update the order status to 'paid'
+if ($captureStatus === 'COMPLETED') {
+    // Extract custom_id which contains the order_id
+    $customId = $captureData['purchase_units'][0]['payments']['captures'][0]['custom_id'] ?? null;
+    $txnId = $captureData['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
+    
+    if ($customId && is_numeric($customId)) {
+        // Connect to DB and update order status
+        $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+        if ($db) {
+            $orderId = intval($customId);
+            
+            // Calculate finish_date based on qty and invoice_duration
+            $qtyRes = mysqli_query($db, "SELECT qty, invoice_duration FROM ogp_billing_orders WHERE order_id = $orderId LIMIT 1");
+            $finish_date = null;
+            if ($qtyRes && $row = mysqli_fetch_assoc($qtyRes)) {
+                $qty = intval($row['qty'] ?? 1);
+                $duration = strtolower(trim($row['invoice_duration'] ?? 'month'));
+                $months = (strpos($duration, 'year') !== false) ? ($qty * 12) : $qty;
+                if ($months > 0) {
+                    $dt = new DateTime('now');
+                    $dt->modify('+' . $months . ' months');
+                    $finish_date = $dt->format('Y-m-d H:i:s');
+                }
+            }
+            
+            // Update order status to 'paid'
+            $sql = "UPDATE ogp_billing_orders SET status = 'paid', payment_txid = '" . mysqli_real_escape_string($db, $txnId) . "', paid_ts = NOW()";
+            if ($finish_date) {
+                $sql .= ", finish_date = '" . mysqli_real_escape_string($db, $finish_date) . "'";
+            }
+            $sql .= " WHERE order_id = $orderId AND status = 'in-cart' LIMIT 1";
+            mysqli_query($db, $sql);
+            mysqli_close($db);
+        }
+    }
+}
+
+// Return the full PayPal response for proper processing
+echo $res;
 
 ?>
