@@ -125,7 +125,7 @@ $servers_query = "SELECT
                                         o.price,
                                         o.invoice_duration,
                                         o.home_id,
-                                        o.finish_date,
+                                        o.end_date,
                                         bs.service_name
                                     FROM ogp_billing_orders o
                                     LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
@@ -325,7 +325,7 @@ $status_config = [
                         </div>
                         <div class="server-detail">
                             <span class="server-detail-label">Expires:</span>
-                            <span class="server-detail-value"><?php echo !empty($server['finish_date']) && $server['finish_date'] != '0' ? date('M d, Y', strtotime($server['finish_date'])) : 'N/A'; ?></span>
+                            <span class="server-detail-value"><?php echo !empty($server['end_date']) && $server['end_date'] != '0' ? date('M d, Y', strtotime($server['end_date'])) : 'N/A'; ?></span>
                         </div>
                     </div>
                     <div class="server-actions">

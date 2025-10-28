@@ -8,6 +8,46 @@
 - Do NOT modify files outside `_website/` (the panel codebase) unless a maintainer explicitly asks for cross-repo or panel-side changes. If a change necessarily touches panel files, call it out clearly in the plan and get maintainer approval first.
 - All redirects, data directories, and public-facing endpoints implemented for the storefront must be scoped under `_website/` (absolute or root-relative to the `_website` site root), not the panel root or external panel dashboard pages.
 
+## CRITICAL: Website file paths and URLs (modules/billing)
+- **The billing website files in `modules/billing/` will be deployed at the WEBSITE ROOT when live.**
+- **NEVER EVER use `/modules/billing/` in any URL, link, redirect, or file path within the billing website code.**
+- **All URLs must be root-relative (starting with `/` but NOT including `/modules/billing/`):**
+  - ✅ CORRECT: `/payment_success.php`, `/cart.php`, `/order.php`
+  - ❌ WRONG: `/modules/billing/payment_success.php`, `modules/billing/cart.php`
+- **This is a CRITICAL requirement that has been violated multiple times. Read this section carefully before making ANY changes to billing website files.**
+
+### Examples of CORRECT usage:
+```php
+// PayPal return URLs
+$returnUrl = $siteBase . '/payment_success.php';
+$cancelUrl = $siteBase . '/payment_cancel.php';
+
+// Header redirects
+header('Location: /cart.php');
+header('Location: /order.php');
+
+// Links
+<a href="/my_account.php">My Account</a>
+<a href="/serverlist.php">Browse Servers</a>
+
+// Form actions
+<form action="/add_to_cart.php" method="POST">
+```
+
+### Examples of WRONG usage (NEVER DO THIS):
+```php
+// ❌ WRONG - includes modules/billing path
+$returnUrl = $siteBase . '/modules/billing/payment_success.php';
+header('Location: /modules/billing/cart.php');
+<a href="/modules/billing/my_account.php">My Account</a>
+```
+
+### Exception - Backend includes only:
+- Backend PHP includes CAN use `__DIR__` or relative paths for file inclusion:
+  - ✅ `require_once(__DIR__ . '/includes/config.inc.php')`
+  - ✅ `require_once(__DIR__ . '/../../includes/database_mysqli.php')`
+- But these are for SERVER-SIDE file inclusion, NOT for user-facing URLs/redirects/links.
+
 ## 1) What to read first (paths & context)
 - `_website/` — canonical website storefront and Checkout/Webhooks flow.
 - `modules/config_games/server_configs/` — authoritative game catalog XMLs (all supported games live here).

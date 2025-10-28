@@ -96,7 +96,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
             </span>
           </td>
           <td><?php echo h($row['order_date']); ?></td>
-          <td><?php echo h($row['finish_date'] ?? 'N/A'); ?></td>
+          <td><?php echo h($row['end_date'] ?? 'N/A'); ?></td>
           <td>
             <button onclick="editRow(<?php echo $row['order_id']; ?>)" class="gsw-btn" style="padding: 4px 10px; font-size: 12px;">Edit</button>
           </td>

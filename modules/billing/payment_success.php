@@ -1,54 +1,94 @@
 <?php
-// Helper to process a persisted payment record and mark orders paid in panel DB.
-// Usage: require_once(__DIR__ . '/payment_success.php'); process_payment_record($record);
+/**
+ * Payment Success Page
+ * User lands here after successful PayPal payment
+ */
 
-function process_payment_record(array $record) {
-    // Minimal validation
-    $invoice = $record['invoice'] ?? '';
-    $custom  = $record['custom'] ?? '';
-    $txid    = $record['resource_id'] ?? '';
-    $ts      = $record['ts'] ?? date('c');
+session_start();
+require_once(__DIR__ . '/includes/header.php');
+require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/../../includes/database_mysqli.php');
 
-    // Attempt DB update using site DB config
-    // This file lives in _website/, config is in includes/config.inc.php
-    $cfg = __DIR__ . '/includes/config.inc.php';
-    if (!is_file($cfg)) {
-        error_log('[payment_success] missing config: ' . $cfg);
-        return false;
-    }
-    require_once($cfg);
-    // include site logging helper if available
-    if (is_file(__DIR__ . '/includes/log.php')) require_once(__DIR__ . '/includes/log.php');
+$invoice_ref = isset($_GET['invoice']) ? $_GET['invoice'] : '';
+$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-    // Use variables from config.inc.php: $db_host, $db_user, $db_pass, $db_name
-    $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-    if (!$db) {
-        if (function_exists('site_log_error')) site_log_error('payment_success_db_connect_failed', ['error'=>mysqli_connect_error()]);
-        else error_log('[payment_success] DB connect failed: ' . mysqli_connect_error());
-        return false;
-    }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Game Server Panel</title>
+    <link rel="stylesheet" href="includes/style.css">
+</head>
+<body>
 
-    // Helper to run a prepared update
-    $update_paid = function($where_sql, $bind_types, $bind_vals) use ($db, $txid, $ts) {
-        // Ensure we only set paid when not already paid
-        $sql = "UPDATE ogp_billing_orders SET status = 'paid'";
-        // Optionally set txid/paid_ts if columns exist; also attempt finish_date
-        $cols = [];
-        $res = mysqli_query($db, "SHOW COLUMNS FROM ogp_billing_orders LIKE 'payment_txid'");
-        if ($res && mysqli_num_rows($res) > 0) $cols[] = 'payment_txid';
-        $res2 = mysqli_query($db, "SHOW COLUMNS FROM ogp_billing_orders LIKE 'paid_ts'");
-        if ($res2 && mysqli_num_rows($res2) > 0) $cols[] = 'paid_ts';
-        $res3 = mysqli_query($db, "SHOW COLUMNS FROM ogp_billing_orders LIKE 'finish_date'");
-        $has_finish = ($res3 && mysqli_num_rows($res3) > 0);
-        // We'll compute finish_date when possible by selecting qty/invoice_duration for the matched row later
-        if ($cols) {
-            $sql .= ', ' . implode(' = ?, ', $cols) . ' = ?';
+<div class="container" style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    <div class="success-box" style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+        <h1 style="margin-top: 0;">✓ Payment Successful!</h1>
+        <p>Thank you for your purchase. Your payment has been received and is being processed.</p>
+        <?php if ($invoice_ref): ?>
+        <p><strong>Invoice Reference:</strong> <?php echo htmlspecialchars($invoice_ref); ?></p>
+        <?php endif; ?>
+    </div>
+
+    <div class="info-box" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
+        <h2>What happens next?</h2>
+        <ol>
+            <li><strong>Payment Confirmation:</strong> Your payment has been captured by PayPal</li>
+            <li><strong>Order Creation:</strong> Your game server order has been created</li>
+            <li><strong>Server Provisioning:</strong> Your server will be provisioned automatically (this may take a few minutes)</li>
+            <li><strong>Email Notification:</strong> You'll receive an email with your server details and login credentials</li>
+        </ol>
+    </div>
+
+    <?php
+    // Show user's recent orders
+    if ($user_id > 0) {
+        $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
+        if ($db) {
+            $result = mysqli_query($db, "SELECT * FROM ogp_billing_orders WHERE user_id=$user_id ORDER BY order_date DESC LIMIT 5");
+            if ($result && mysqli_num_rows($result) > 0) {
+                echo '<div class="orders-box" style="background: #fff; border: 1px solid #dee2e6; padding: 20px; border-radius: 5px;">';
+                echo '<h2>Your Recent Orders</h2>';
+                echo '<table style="width: 100%; border-collapse: collapse;">';
+                echo '<thead><tr style="background: #f8f9fa;">';
+                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Order ID</th>';
+                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Server</th>';
+                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Status</th>';
+                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Date</th>';
+                echo '<th style="padding: 10px; text-align: right; border-bottom: 2px solid #dee2e6;">Price</th>';
+                echo '</tr></thead><tbody>';
+                
+                while ($order = mysqli_fetch_assoc($result)) {
+                    $statusColor = $order['status'] === 'paid' ? '#28a745' : '#6c757d';
+                    echo '<tr style="border-bottom: 1px solid #dee2e6;">';
+                    echo '<td style="padding: 10px;">#' . htmlspecialchars($order['order_id']) . '</td>';
+                    echo '<td style="padding: 10px;">' . htmlspecialchars($order['home_name']) . '</td>';
+                    echo '<td style="padding: 10px;"><span style="color: ' . $statusColor . '; font-weight: bold;">' . htmlspecialchars(ucfirst($order['status'])) . '</span></td>';
+                    echo '<td style="padding: 10px;">' . htmlspecialchars($order['order_date']) . '</td>';
+                    echo '<td style="padding: 10px; text-align: right;">$' . htmlspecialchars(number_format($order['price'], 2)) . '</td>';
+                    echo '</tr>';
+                }
+                
+                echo '</tbody></table>';
+                echo '</div>';
+            }
+            mysqli_close($db);
         }
-        // placeholder for finish_date; we'll append it if we can compute it
-        $sql .= ' WHERE ' . $where_sql . ' AND status <> "paid" LIMIT 1';
+    }
+    ?>
 
-        // If we need finish_date, attempt to compute it by selecting the row first
-        $finish_date_val = null;
+    <div class="actions" style="margin-top: 30px; text-align: center;">
+        <a href="my_account.php" style="display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">View My Servers</a>
+        <a href="order.php" style="display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 5px;">Order Another Server</a>
+    </div>
+</div>
+
+<?php include(__DIR__ . '/includes/footer.php'); ?>
+</body>
+</html>
+        $end_date_val = null;
         if ($has_finish) {
             // Attempt to find the target order's qty/invoice_duration using the same where clause but without LIMIT
             $sel_sql = "SELECT qty, invoice_duration FROM ogp_billing_orders WHERE " . str_replace(' AND status <> \"paid\" LIMIT 1', '', $where_sql) . " LIMIT 1";
@@ -77,17 +117,17 @@ function process_payment_record(array $record) {
                     if ($months <= 0) $months = 0;
                     $dt = new DateTime('now');
                     if ($months > 0) $dt->modify('+' . intval($months) . ' months');
-                    $finish_date_val = $dt->format('Y-m-d H:i:s');
+                    $end_date_val = $dt->format('Y-m-d H:i:s');
                 }
                 $sel_stmt->close();
             }
-            if ($finish_date_val !== null) {
-                $sql = str_replace(' WHERE ', ', finish_date = ? WHERE ', $sql);
+            if ($end_date_val !== null) {
+                $sql = str_replace(' WHERE ', ', end_date = ? WHERE ', $sql);
             }
         }
 
         if ($stmt = $db->prepare($sql)) {
-            // Build params: first any where params, then txid/ts values if present, then finish_date if present
+            // Build params: first any where params, then txid/ts values if present, then end_date if present
             $types = $bind_types;
             $vals = $bind_vals;
             if ($cols) {
@@ -97,9 +137,9 @@ function process_payment_record(array $record) {
                     else $vals[] = $ts;
                 }
             }
-            if ($finish_date_val !== null) {
+            if ($end_date_val !== null) {
                 $types .= 's';
-                $vals[] = $finish_date_val;
+                $vals[] = $end_date_val;
             }
             // bind dynamically
             if ($types) {

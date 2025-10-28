@@ -241,7 +241,7 @@ function exec_ogp_module()
 				//PANEL LOG 
                                 $db->logger( "CREATED NEW SERVER " . $home_id);
 				// SEND EMAIL to new server only
-				if($order['finish_date'] == 0){
+				if($order['end_date'] == 0){
 					$settings = $db->getSettings();
 					 $subject = "New Gameserver installed at " . $settings['panel_name'];
 					  $email = $db->resultQuery("   SELECT DISTINCT users_email
@@ -292,42 +292,42 @@ function exec_ogp_module()
 			// 'invoiced' - invoice created for renewal
 			// 'suspended' - server suspended for non-payment
 			// 'deleted' - server deleted after extended suspension
-			//finish_date the server will be suspended 
-			//in cron_shop the finish_date is used to delete the server
+			//end_date the server will be suspended 
+			//in cron_shop the end_date is used to delete the server
 			//several days after being suspended
 			if ($order['invoice_duration'] == "day")
 			{
 				
-				if($order['finish_date'] == 0){
-				$finish_date = strtotime('+'.$order['qty'].' day'); 
+				if($order['end_date'] == 0){
+				$end_date = strtotime('+'.$order['qty'].' day'); 
 				}
 			else{
 			//this is a renewel, start from end of previous order
-				$finish_date = strtotime('+'.$order['qty'].' day',$order['finish_date']); 		
+				$end_date = strtotime('+'.$order['qty'].' day',$order['end_date']); 		
 				}	
 				
 			}
 			elseif ($order['invoice_duration'] == "month")
 			{
 			// this is a new order
-			if($order['finish_date'] == 0){
-				$finish_date = strtotime('+'.$order['qty'].' month'); 
+			if($order['end_date'] == 0){
+				$end_date = strtotime('+'.$order['qty'].' month'); 
 
 				}
 			else{
 			//this is a renewel, start from end of previous order
-                $finish_date = strtotime('+'.$order['qty'].' month',$order['finish_date']); 
+                $end_date = strtotime('+'.$order['qty'].' month',$order['end_date']); 
 				}	
 			}
 			elseif ($order['invoice_duration'] == "year")
 			{
 				// this is a new order
-			if($order['finish_date'] == 0){
-				$finish_date = strtotime('+'.$order['qty'].' year'); 
+			if($order['end_date'] == 0){
+				$end_date = strtotime('+'.$order['qty'].' year'); 
 				}
 			else{
 			//this is a renewel, start from end of previous order
-                $finish_date = strtotime('+'.$order['qty'].' year',$order['finish_date']); 
+                $end_date = strtotime('+'.$order['qty'].' year',$order['end_date']); 
 				
 				}	
 				
@@ -339,7 +339,7 @@ function exec_ogp_module()
 	
 			// set the order expiration
 			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
-						SET finish_date='" . $db->realEscapeSingle($finish_date) . "' 
+						SET end_date='" . $db->realEscapeSingle($end_date) . "' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 						
 			// Save home id created by this order

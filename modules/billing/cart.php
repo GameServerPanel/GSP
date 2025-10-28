@@ -57,12 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
   }
   $orderId = (int)$_POST['create_free_for'];
   if ($orderId > 0) {
-    // load order to verify ownership/price
-  $stmt = $db->prepare("SELECT user_id, price, status, qty, invoice_duration FROM " . $table_prefix . "billing_orders WHERE order_id = ? LIMIT 1");
+    // load invoice to verify ownership/price (invoice-first flow)
+  $stmt = $db->prepare("SELECT user_id, amount, status, qty, invoice_duration, service_id, home_name, ip, max_players, remote_control_password, ftp_password FROM " . $table_prefix . "billing_invoices WHERE invoice_id = ? LIMIT 1");
     if ($stmt) {
       $stmt->bind_param('i', $orderId);
       $stmt->execute();
-  $stmt->bind_result($owner_id, $order_price, $prev_status, $order_qty, $order_invoice_duration);
+  $stmt->bind_result($owner_id, $order_price, $prev_status, $order_qty, $order_invoice_duration, $service_id, $home_name, $ip, $max_players, $remote_control_password, $ftp_password);
       $found = $stmt->fetch();
       $stmt->close();
     } else {
@@ -86,7 +86,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
       }
 
       if ($allowed) {
-        // Compute finish_date: months based on invoice_duration and qty
+        // Mark invoice as paid
+        $upd_inv = $db->prepare("UPDATE " . $table_prefix . "billing_invoices SET status = 'paid', paid_date = NOW() WHERE invoice_id = ? LIMIT 1");
+        if ($upd_inv) {
+          $upd_inv->bind_param('i', $orderId);
+          $upd_inv->execute();
+          $upd_inv->close();
+        }
+        
+        // Now create the order record (invoice -> order after payment)
+        // Compute end_date: months based on invoice_duration and qty
         $months = 0;
         $q = intval($order_qty ?? 0);
         $invdur = strtolower(trim($order_invoice_duration ?? ''));
@@ -96,57 +105,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
           // default to months for anything else (month, monthly, etc.)
           $months = $q;
         }
-        $finish_date = null;
+        $end_date = null;
         if ($months > 0) {
           $dt = new DateTime('now');
           $dt->modify('+' . intval($months) . ' months');
-          $finish_date = $dt->format('Y-m-d H:i:s');
+          $end_date = $dt->format('Y-m-d H:i:s');
         } else {
           // if no months specified, set to now
-          $finish_date = date('Y-m-d H:i:s');
+          $end_date = date('Y-m-d H:i:s');
         }
 
-  // Check if finish_date column exists (use table prefix)
-  $finish_col_exists = false;
-  $col_check = mysqli_query($db, "SHOW COLUMNS FROM " . $table_prefix . "billing_orders LIKE 'finish_date'");
-  if ($col_check && mysqli_num_rows($col_check) > 0) $finish_col_exists = true;
-
-        // Perform update and log results. Use prepared statements when available and fallback to direct query on error.
-        $updated_rows = 0;
-        if ($finish_col_exists) {
-          $upd = $db->prepare("UPDATE " . $table_prefix . "billing_orders SET status = 'paid', finish_date = ? WHERE order_id = ? LIMIT 1");
-          if ($upd) {
-            $upd->bind_param('si', $finish_date, $orderId);
-            $ok = $upd->execute();
-            if (!$ok) site_log_warn('free_create_update_failed_prepare', ['error'=>$db->error, 'sql'=>'UPDATE with finish_date', 'order'=>$orderId]);
-            $updated_rows = $upd->affected_rows;
-            $upd->close();
-          } else {
-            // fallback
-            $safe_fd = mysqli_real_escape_string($db, $finish_date);
-            $q = "UPDATE " . $table_prefix . "billing_orders SET status = 'paid', finish_date = '$safe_fd' WHERE order_id = " . intval($orderId) . " LIMIT 1";
-            $resq = mysqli_query($db, $q);
-            if (!$resq) site_log_warn('free_create_update_failed_query', ['error'=>mysqli_error($db), 'sql'=>$q]);
-            else $updated_rows = mysqli_affected_rows($db);
-          }
-        } else {
-          $upd = $db->prepare("UPDATE " . $table_prefix . "billing_orders SET status = 'paid' WHERE order_id = ? LIMIT 1");
-          if ($upd) {
-            $upd->bind_param('i', $orderId);
-            $ok = $upd->execute();
-            if (!$ok) site_log_warn('free_create_update_failed_prepare', ['error'=>$db->error, 'sql'=>'UPDATE status only', 'order'=>$orderId]);
-            $updated_rows = $upd->affected_rows;
-            $upd->close();
-          } else {
-            $q = "UPDATE " . $table_prefix . "billing_orders SET status = 'paid' WHERE order_id = " . intval($orderId) . " LIMIT 1";
-            $resq = mysqli_query($db, $q);
-            if (!$resq) site_log_warn('free_create_update_failed_query', ['error'=>mysqli_error($db), 'sql'=>$q]);
-            else $updated_rows = mysqli_affected_rows($db);
+        // INSERT new order record (invoice->order after payment)
+        $esc_service_id = intval($service_id);
+        $esc_home_name = mysqli_real_escape_string($db, $home_name);
+        $esc_ip = intval($ip);
+        $esc_max_players = intval($max_players);
+        $esc_qty = intval($order_qty);
+        $esc_inv_dur = mysqli_real_escape_string($db, $order_invoice_duration);
+        $esc_price = floatval($order_price);
+        $esc_rc_pass = mysqli_real_escape_string($db, $remote_control_password);
+        $esc_ftp_pass = mysqli_real_escape_string($db, $ftp_password);
+        $esc_user_id = intval($owner_id);
+        $esc_end_date = mysqli_real_escape_string($db, $end_date);
+        
+        $insert_sql = "INSERT INTO " . $table_prefix . "billing_orders 
+          (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, end_date, payment_txid, paid_ts) 
+          VALUES 
+          ({$esc_user_id}, {$esc_service_id}, '{$esc_home_name}', {$esc_ip}, {$esc_max_players}, {$esc_qty}, '{$esc_inv_dur}', {$esc_price}, '{$esc_rc_pass}', '{$esc_ftp_pass}', 'paid', '{$esc_end_date}', 'FREE-{$orderId}', NOW())";
+        
+        $insert_res = mysqli_query($db, $insert_sql);
+        $new_order_id = 0;
+        if ($insert_res) {
+          $new_order_id = mysqli_insert_id($db);
+          // Update invoice with the new order_id
+          $upd_inv_order = $db->prepare("UPDATE " . $table_prefix . "billing_invoices SET order_id = ? WHERE invoice_id = ? LIMIT 1");
+          if ($upd_inv_order) {
+            $upd_inv_order->bind_param('ii', $new_order_id, $orderId);
+            $upd_inv_order->execute();
+            $upd_inv_order->close();
           }
         }
 
-  // write audit log (include finish_date if set)
-  site_log_info('free_create', ['actor'=>$actor_id, 'role'=>$actor_role, 'action'=>$reason, 'order'=>$orderId, 'owner'=>$owner_id, 'price'=>$order_price, 'prev_status'=>$prev_status, 'finish_date'=>$finish_date ?? '', 'updated_rows'=>$updated_rows]);
+  // write audit log (include end_date if set)
+  site_log_info('free_create', ['actor'=>$actor_id, 'role'=>$actor_role, 'action'=>$reason, 'invoice'=>$orderId, 'new_order'=>$new_order_id, 'owner'=>$owner_id, 'price'=>$order_price, 'prev_status'=>$prev_status, 'end_date'=>$end_date ?? '']);
 
         // write a simulated webhook file (same behavior as previous admin flow)
         $dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';
@@ -241,33 +242,32 @@ if (isset($_SESSION['website_user_role']) && !empty($_SESSION['website_user_role
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
-    $order_id = intval($_POST['delete_single']);
-    if ($order_id > 0) {
-        // First, check if the status is 'renew'
-        $stmt = $db->prepare("SELECT status FROM ogp_billing_orders WHERE order_id = ? AND user_id = ?");
-        $stmt->bind_param("ii", $order_id, $user_id);
+    $invoice_id = intval($_POST['delete_single']);
+    if ($invoice_id > 0) {
+        // Check if this invoice is linked to an order (renewal case)
+        $stmt = $db->prepare("SELECT order_id FROM ogp_billing_invoices WHERE invoice_id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $invoice_id, $user_id);
         $stmt->execute();
-        $stmt->bind_result($status);
-    if ($stmt->fetch() && strtolower($status) === 'renew') {
-      $stmt->close();
-      // If user removes a renewal from their cart, revert the order back to 'installed'
-      $update = $db->prepare("UPDATE ogp_billing_orders SET status = 'installed' WHERE order_id = ? AND user_id = ?");
-      $update->bind_param("ii", $order_id, $user_id);
-    $update->execute();
-    // Log revert action to panel logger
-    if (isset($db) && method_exists($db, 'logger')) {
-      $db->logger("USER-CART: User " . intval($user_id) . " reverted renew for order " . intval($order_id));
-    }
-    $update->close();
-        } else {
-            $stmt->close();
-            // Otherwise, delete the order
-            $delete = $db->prepare("DELETE FROM ogp_billing_orders WHERE order_id = ? AND user_id = ?");
-            $delete->bind_param("ii", $order_id, $user_id);
+        $stmt->bind_result($linked_order_id);
+        $found = $stmt->fetch();
+        $stmt->close();
+        
+    if ($found && $linked_order_id > 0) {
+      // This is a renewal invoice - just delete the invoice, keep the order
+      $delete = $db->prepare("DELETE FROM ogp_billing_invoices WHERE invoice_id = ? AND user_id = ?");
+      $delete->bind_param("ii", $invoice_id, $user_id);
       $delete->execute();
-      // Log deletion to panel logger
       if (isset($db) && method_exists($db, 'logger')) {
-        $db->logger("USER-CART: User " . intval($user_id) . " deleted order " . intval($order_id));
+        $db->logger("USER-CART: User " . intval($user_id) . " deleted renewal invoice " . intval($invoice_id));
+      }
+      $delete->close();
+        } else {
+            // New order invoice - delete it
+            $delete = $db->prepare("DELETE FROM ogp_billing_invoices WHERE invoice_id = ? AND user_id = ?");
+            $delete->bind_param("ii", $invoice_id, $user_id);
+      $delete->execute();
+      if (isset($db) && method_exists($db, 'logger')) {
+        $db->logger("USER-CART: User " . intval($user_id) . " deleted invoice " . intval($invoice_id));
       }
       $delete->close();
         }
@@ -275,11 +275,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
 }
 
 if ($db){
-        $carts = $db->query("SELECT * FROM ogp_billing_orders AS cart
-            WHERE (status = 'in-cart' OR status = 'renew') AND user_id = " . $user_id . " ORDER BY order_id ASC");
-	
-
-
+        $carts = $db->query("SELECT * FROM ogp_billing_invoices AS cart
+            WHERE status = 'due' AND user_id = " . $user_id . " ORDER BY invoice_id ASC");
 }
 
 ?> 
@@ -311,38 +308,38 @@ if ($db){
             if (isset($carts) && $carts instanceof mysqli_result && $carts->num_rows > 0) {
                 while ($row = $carts->fetch_assoc()) {
                     ?>
-          <tr data-cart-id="<?php echo htmlspecialchars($row['order_id']); ?>">
+          <tr data-cart-id="<?php echo htmlspecialchars($row['invoice_id']); ?>">
             <td>
               <form method="post" action="" class="inline-form">
-                <button type="submit" name="delete_single" value="<?php echo htmlspecialchars($row['order_id']); ?>" class="btn-square text-danger">
+                <button type="submit" name="delete_single" value="<?php echo htmlspecialchars($row['invoice_id']); ?>" class="btn-square text-danger">
                   
                 </button>
               </form>
             </td>
-            <td><?php echo htmlspecialchars($row['home_id']); ?></td>
+            <td><?php echo htmlspecialchars($row['invoice_id']); ?></td>
             <td><?php echo htmlspecialchars($row['home_name']); ?></td>
             <td><?php echo htmlspecialchars($row['ip']); ?></td>
             <td><?php echo htmlspecialchars($row['max_players']); ?></td>
-            <td>$<?php echo number_format($row['price'], 2); ?></td>
+            <td>$<?php echo number_format($row['amount'], 2); ?></td>
             <td><?php echo htmlspecialchars($row['qty']); ?></td>
-            <?php $rowtotal = $row['price'] * $row['qty'] * $row['max_players'];?>
+            <?php $rowtotal = $row['amount'] * $row['qty'] * $row['max_players'];?>
             <?php
               // Build invoice and line item structures used later when creating PayPal order
               if (!isset($invoice) || !is_array($invoice)) $invoice = [];
               $invoice[] = [
-                'serverID' => isset($row['home_id']) ? (string)$row['home_id'] : ('order'.$row['order_id']),
+                'serverID' => 'invoice-' . $row['invoice_id'],
                 'amount'   => number_format($rowtotal, 2, '.', ''),
-                'order_id' => intval($row['order_id'])
+                'invoice_id' => intval($row['invoice_id'])
               ];
             ?>
             <?php
               // Use the previously resolved $is_admin (computed once above)
-              $is_free = ((float)$row['price'] == 0.0);
+              $is_free = ((float)$row['amount'] == 0.0);
             ?>
                 <?php if ($is_admin || $is_free): ?>
               <td>
                 <form method="post" action="" class="inline-form">
-                  <input type="hidden" name="create_free_for" value="<?php echo (int)$row['order_id']; ?>">
+                  <input type="hidden" name="create_free_for" value="<?php echo (int)$row['invoice_id']; ?>">
                       <button type="submit" class="gsw-btn"><?php echo $is_admin ? 'Create (Free)' : 'Claim (Free)'; ?></button>
                 </form>
                 <?php if ($is_admin): ?>
@@ -428,12 +425,14 @@ if (is_array($invoice) && count($invoice) === 1 && !empty($invoice[0]['order_id'
 $description = 'Game server order (' . count($lineItems) . ' item' . (count($lineItems)===1?'': 's') . ')';
 
 // URLs
-// Define the site base URL
-$siteBaseUrl = 'http://gameservers.world/modules/billing';
+// Define the site base URL - detect protocol and host dynamically
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$siteBase = $protocol . $host;
 
-// Generate absolute URLs for return and cancel
-$returnUrl  = $siteBaseUrl . '/return.php?invoice=' . urlencode($invoiceId);
-$cancelUrl  = $siteBaseUrl . '/return.php?invoice=' . urlencode($invoiceId) . '&cancel=1';
+// Return URLs are root-relative (website will be deployed at root, not modules/billing)
+$returnUrl  = $siteBase . '/payment_success.php?invoice=' . urlencode($invoiceId);
+$cancelUrl  = $siteBase . '/payment_cancel.php?invoice=' . urlencode($invoiceId);
 
 // API base (relative) - point to billing module API endpoints
 $apiBase = 'api';

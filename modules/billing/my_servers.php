@@ -40,8 +40,8 @@ $query = "SELECT
             o.order_id,
             o.status,
             o.invoice_duration,
-            -- use finish_date as the expiration marker (set when order is paid/created)
-            o.finish_date AS expiration_date,
+            -- use end_date as the expiration marker (set when order is paid/created)
+            o.end_date AS expiration_date,
             bs.service_name,
             bs.price_monthly
           FROM ogp_home h

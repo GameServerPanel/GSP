@@ -104,9 +104,9 @@ if ($service_id > 0) {
     }
 }
 
-// Insert into ogp_billing_orders
+// Insert into ogp_billing_invoices (NOT orders - invoice created first)
 $now = date('Y-m-d H:i:s');
-$status = 'in-cart';
+$status = 'due'; // Invoice status: due (unpaid), paid
 
 // Normal flow: process POST immediately. If debug=1 is passed, we'll still log SQL and show results in logs.
 $debug = (isset($_GET['debug']) && $_GET['debug'] == '1') || (isset($_POST['debug']) && $_POST['debug'] == '1');
@@ -115,6 +115,21 @@ $debug = (isset($_GET['debug']) && $_GET['debug'] == '1') || (isset($_POST['debu
 @mkdir(__DIR__ . '/logs', 0775, true);
 $logfile = __DIR__ . '/logs/add_to_cart.log';
 site_log_info('add_to_cart_invoked', ['user_id'=>$user_id, 'service_id'=>$service_id]);
+
+// Get customer name and email from ogp_users
+$customer_name = '';
+$customer_email = '';
+$user_q = mysqli_query($db, "SELECT users_fname, users_lname, users_email FROM ogp_users WHERE user_id = " . intval($user_id) . " LIMIT 1");
+if ($user_q && mysqli_num_rows($user_q) === 1) {
+    $user_row = mysqli_fetch_assoc($user_q);
+    $customer_name = trim(($user_row['users_fname'] ?? '') . ' ' . ($user_row['users_lname'] ?? ''));
+    $customer_email = $user_row['users_email'] ?? '';
+}
+
+// Compute due_date = now + 3 days
+$due_dt = new DateTime('now');
+$due_dt->modify('+3 days');
+$due_date = $due_dt->format('Y-m-d H:i:s');
 
 // Escape values
 $esc_user_id = intval($user_id);
@@ -128,44 +143,47 @@ $esc_price = number_format((float)$price, 2, '.', '');
 $esc_remote_control_password = mysqli_real_escape_string($db, $remote_control_password);
 $esc_ftp_password = mysqli_real_escape_string($db, $ftp_password);
 $esc_status = mysqli_real_escape_string($db, $status);
+$esc_customer_name = mysqli_real_escape_string($db, $customer_name);
+$esc_customer_email = mysqli_real_escape_string($db, $customer_email);
+$esc_due_date = mysqli_real_escape_string($db, $due_date);
+$esc_description = mysqli_real_escape_string($db, "New server: {$home_name}");
 
-$sql = "INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status) VALUES ({$esc_user_id}, {$esc_service_id}, '{$esc_home_name}', {$esc_ip_id}, {$esc_max_players}, {$esc_qty}, '{$esc_invoice_duration}', {$esc_price}, '{$esc_remote_control_password}', '{$esc_ftp_password}', '{$esc_status}')";
-
-// Compute finish_date = now + 3 days
-$finish_dt = new DateTime('now');
-$finish_dt->modify('+3 days');
-$finish_date = $finish_dt->format('Y-m-d H:i:s');
-
-// Check if the ogp_billing_orders table has a finish_date column; if so include it in the INSERT
-$has_finish = false;
-$col_check_q = mysqli_query($db, "SHOW COLUMNS FROM ogp_billing_orders LIKE 'finish_date'");
-if ($col_check_q && mysqli_num_rows($col_check_q) > 0) {
-    $has_finish = true;
-}
-
-if ($has_finish) {
-    $esc_finish_date = mysqli_real_escape_string($db, $finish_date);
-    $sql = "INSERT INTO ogp_billing_orders (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, finish_date) VALUES ({$esc_user_id}, {$esc_service_id}, '{$esc_home_name}', {$esc_ip_id}, {$esc_max_players}, {$esc_qty}, '{$esc_invoice_duration}', {$esc_price}, '{$esc_remote_control_password}', '{$esc_ftp_password}', '{$esc_status}', '{$esc_finish_date}')";
-    file_put_contents($logfile, date('c') . " - finish_date included: {$esc_finish_date}\n", FILE_APPEND);
-} else {
-    file_put_contents($logfile, date('c') . " - finish_date column not present, skipping finish_date. computed_finish_date={$finish_date}\n", FILE_APPEND);
-}
+$sql = "INSERT INTO ogp_billing_invoices (
+    user_id, service_id, home_name, ip, max_players, qty, invoice_duration, 
+    amount, remote_control_password, ftp_password, status, customer_name, 
+    customer_email, due_date, description, currency, order_id
+) VALUES (
+    {$esc_user_id}, {$esc_service_id}, '{$esc_home_name}', {$esc_ip_id}, 
+    {$esc_max_players}, {$esc_qty}, '{$esc_invoice_duration}', {$esc_price}, 
+    '{$esc_remote_control_password}', '{$esc_ftp_password}', '{$esc_status}', 
+    '{$esc_customer_name}', '{$esc_customer_email}', '{$esc_due_date}', 
+    '{$esc_description}', 'USD', 0
+)";
 
 site_log_info('add_to_cart_sql', ['sql'=>$sql]);
+file_put_contents($logfile, date('c') . " - Creating invoice (not order): status=due\n", FILE_APPEND);
+file_put_contents($logfile, date('c') . " - SQL: " . $sql . "\n", FILE_APPEND);
 
-$res = mysqli_query($db, $sql);
-if (!$res) {
-    $err_no = mysqli_errno($db);
-    $err = mysqli_error($db);
+$res = @mysqli_query($db, $sql);
+$err_no = mysqli_errno($db);
+$err = mysqli_error($db);
+
+if (!$res || $err_no > 0) {
     site_log_error('mysqli_query_failed', ['errno'=>$err_no, 'error'=>$err, 'sql'=>$sql]);
+    file_put_contents($logfile, date('c') . " - ERROR: " . $err . " (errno: {$err_no})\n", FILE_APPEND);
     // Log table existence check
-    $tbl_check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_billing_orders'");
+    $tbl_check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_billing_invoices'");
     $tbl_exists = ($tbl_check && mysqli_num_rows($tbl_check) > 0) ? 'yes' : 'no';
-    site_log_warn('ogp_billing_orders_exists', ['exists'=>$tbl_exists]);
+    site_log_warn('ogp_billing_invoices_exists', ['exists'=>$tbl_exists]);
+    file_put_contents($logfile, date('c') . " - Table exists check: {$tbl_exists}\n", FILE_APPEND);
+    
+    // Show user-friendly error
+    die("Error adding to cart: " . htmlspecialchars($err) . ". Please contact support.");
 } else {
     $insert_id = mysqli_insert_id($db);
     $affected = mysqli_affected_rows($db);
-    site_log_info('add_to_cart_insert', ['insert_id'=>$insert_id, 'affected_rows'=>$affected]);
+    site_log_info('add_to_cart_insert', ['invoice_id'=>$insert_id, 'affected_rows'=>$affected]);
+    file_put_contents($logfile, date('c') . " - Invoice created: invoice_id={$insert_id}\n", FILE_APPEND);
 }
 
 // Redirect to cart page

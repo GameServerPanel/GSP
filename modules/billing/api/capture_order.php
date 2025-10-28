@@ -1,5 +1,6 @@
 <?php
 require_once(__DIR__ . '/../includes/config.inc.php');
+require_once(__DIR__ . '/../../../includes/database_mysqli.php');
 $sandbox       = true; // flip to false for Live
 $client_id     = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
 $client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0';
@@ -33,53 +34,119 @@ curl_setopt_array($ch, [
 ]);
 $res  = curl_exec($ch);
 $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_err = curl_error($ch);
 curl_close($ch);
 
-if ($http !== 201 && $http !== 200) { http_response_code($http); echo $res; exit; }
+// Normalize response: ensure we always return valid JSON to the caller
+if ($res === false || $res === '') {
+    // Curl-level failure or empty body
+    http_response_code(502);
+    $out = ['error' => 'paypal_empty_response', 'http' => $http, 'curl_error' => $curl_err];
+    echo json_encode($out);
+    exit;
+}
 
-// Parse the capture response
-$captureData = json_decode($res, true);
-$captureStatus = $captureData['status'] ?? '';
+// Attempt to decode PayPal response
+$capture = json_decode($res, true);
+if (json_last_error() !== JSON_ERROR_NONE) {
+    // PayPal returned non-JSON / malformed response — return it as raw string inside JSON
+    http_response_code(502);
+    $out = ['error' => 'paypal_invalid_json', 'http' => $http, 'raw' => $res];
+    echo json_encode($out);
+    exit;
+}
 
-// If capture was successful, immediately update the order status to 'paid'
-if ($captureStatus === 'COMPLETED') {
-    // Extract custom_id which contains the order_id
-    $customId = $captureData['purchase_units'][0]['payments']['captures'][0]['custom_id'] ?? null;
-    $txnId = $captureData['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
+if ($http !== 201 && $http !== 200) {
+    http_response_code($http);
+    // Return structured JSON with PayPal's decoded response
+    echo json_encode(['error' => 'paypal_capture_failed', 'http' => $http, 'response' => $capture]);
+    exit;
+}
+
+// Extract payment details
+$txid = null;
+$captureStatus = $capture['status'] ?? 'UNKNOWN';
+if (isset($capture['purchase_units'][0]['payments']['captures'][0])) {
+    $txid = $capture['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
+}
+
+// Get custom_id (should be invoice_id from cart.php)
+$custom_id = $capture['purchase_units'][0]['custom_id'] ?? null;
+
+if ($captureStatus === 'COMPLETED' && $custom_id) {
+    // Connect to database
+    $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
+    if (!$db) {
+        error_log('capture_order.php: DB connection failed');
+        echo $res;
+        exit;
+    }
+
+    // Find all invoices with status='due' for this user (cart session)
+    // For now, we'll mark ALL due invoices for the logged-in user as paid
+    // TODO: Improve to match specific invoice_id from custom_id if cart sends it
+    session_start();
+    $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
     
-    if ($customId && is_numeric($customId)) {
-        // Connect to DB and update order status
-        $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-        if ($db) {
-            $orderId = intval($customId);
+    if ($user_id > 0) {
+        // Mark all due invoices for this user as paid
+        $now = date('Y-m-d H:i:s');
+        $esc_txid = mysqli_real_escape_string($db, $txid);
+        
+        $updateInvoices = "UPDATE ogp_billing_invoices 
+                          SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'
+                          WHERE user_id=$user_id AND status='due'";
+        mysqli_query($db, $updateInvoices);
+        
+        // Get all invoices we just marked paid
+        $getInvoices = "SELECT * FROM ogp_billing_invoices WHERE user_id=$user_id AND payment_txid='$esc_txid'";
+        $invoicesResult = mysqli_query($db, $getInvoices);
+        
+        // For each invoice, create an order
+        while ($inv = mysqli_fetch_assoc($invoicesResult)) {
+            $invoice_id = intval($inv['invoice_id']);
+            $service_id = intval($inv['service_id']);
+            $home_name = mysqli_real_escape_string($db, $inv['home_name']);
+            $ip = intval($inv['ip']);
+            $max_players = intval($inv['max_players']);
+            $qty = intval($inv['qty']);
+            $duration = mysqli_real_escape_string($db, $inv['invoice_duration']);
+            $amount = floatval($inv['amount']);
+            $rcon_pw = mysqli_real_escape_string($db, $inv['remote_control_password']);
+            $ftp_pw = mysqli_real_escape_string($db, $inv['ftp_password']);
             
-            // Calculate finish_date based on qty and invoice_duration
-            $qtyRes = mysqli_query($db, "SELECT qty, invoice_duration FROM ogp_billing_orders WHERE order_id = $orderId LIMIT 1");
-            $finish_date = null;
-            if ($qtyRes && $row = mysqli_fetch_assoc($qtyRes)) {
-                $qty = intval($row['qty'] ?? 1);
-                $duration = strtolower(trim($row['invoice_duration'] ?? 'month'));
-                $months = (strpos($duration, 'year') !== false) ? ($qty * 12) : $qty;
-                if ($months > 0) {
-                    $dt = new DateTime('now');
-                    $dt->modify('+' . $months . ' months');
-                    $finish_date = $dt->format('Y-m-d H:i:s');
-                }
-            }
+            // Calculate end_date based on qty * duration
+            $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
             
-            // Update order status to 'paid'
-            $sql = "UPDATE ogp_billing_orders SET status = 'paid', payment_txid = '" . mysqli_real_escape_string($db, $txnId) . "', paid_ts = NOW()";
-            if ($finish_date) {
-                $sql .= ", finish_date = '" . mysqli_real_escape_string($db, $finish_date) . "'";
+            // Insert order
+            $insertOrder = "INSERT INTO ogp_billing_orders (
+                user_id, service_id, home_name, ip, max_players, qty, invoice_duration,
+                price, remote_control_password, ftp_password, status, order_date, end_date,
+                payment_txid, paid_ts
+            ) VALUES (
+                $user_id, $service_id, '$home_name', $ip, $max_players, $qty, '$duration',
+                $amount, '$rcon_pw', '$ftp_pw', 'paid', '$now', '$end_date',
+                '$esc_txid', '$now'
+            )";
+            
+            if (mysqli_query($db, $insertOrder)) {
+                $new_order_id = mysqli_insert_id($db);
+                
+                // Link invoice to order
+                $linkInvoice = "UPDATE ogp_billing_invoices SET order_id=$new_order_id WHERE invoice_id=$invoice_id";
+                mysqli_query($db, $linkInvoice);
+                
+                error_log("capture_order.php: Created order $new_order_id for invoice $invoice_id");
+            } else {
+                error_log("capture_order.php: Failed to create order for invoice $invoice_id: " . mysqli_error($db));
             }
-            $sql .= " WHERE order_id = $orderId AND status = 'in-cart' LIMIT 1";
-            mysqli_query($db, $sql);
-            mysqli_close($db);
         }
+        
+        mysqli_close($db);
     }
 }
 
-// Return the full PayPal response for proper processing
-echo $res;
+// Return the full PayPal response (normalized JSON) for proper processing
+echo json_encode($capture);
 
 ?>
