@@ -128,11 +128,11 @@ if ($service_stmt) {
 // Create invoice for renewal
 $qty = 1;
 $price_formatted = number_format($price_val, 2, '.', '');
-$home_name = mysqli_real_escape_string($db, $order['home_name'] ?? 'Server Renewal');
+$home_name = $order['home_name'] ?? 'Server Renewal';
 $ip = intval($order['ip'] ?? 0);
 $max_players = intval($order['max_players'] ?? 0);
-$rcon_pw = mysqli_real_escape_string($db, $order['remote_control_password'] ?? '');
-$ftp_pw = mysqli_real_escape_string($db, $order['ftp_password'] ?? '');
+$rcon_pw = $order['remote_control_password'] ?? '';
+$ftp_pw = $order['ftp_password'] ?? '';
 $description = "Renewal: " . $service_name . " - " . $home_name . " (" . $duration . ")";
 $now = date('Y-m-d H:i:s');
 $due_date = date('Y-m-d H:i:s', strtotime('+7 days')); // Due in 7 days

@@ -303,7 +303,11 @@ function exec_ogp_module()
 				}
 			else{
 			//this is a renewel, start from end of previous order
-				$end_date = strtotime('+'.$order['qty'].' day',strtotime($order['end_date'])); 		
+				$current_end = strtotime($order['end_date']);
+				if ($current_end === false) {
+					$current_end = time(); // fallback to now if date is invalid
+				}
+				$end_date = strtotime('+'.$order['qty'].' day', $current_end); 		
 				}	
 				
 			}
@@ -316,7 +320,11 @@ function exec_ogp_module()
 				}
 			else{
 			//this is a renewel, start from end of previous order
-                $end_date = strtotime('+'.$order['qty'].' month',strtotime($order['end_date'])); 
+				$current_end = strtotime($order['end_date']);
+				if ($current_end === false) {
+					$current_end = time(); // fallback to now if date is invalid
+				}
+                $end_date = strtotime('+'.$order['qty'].' month', $current_end); 
 				}	
 			}
 			elseif ($order['invoice_duration'] == "year")
@@ -327,7 +335,11 @@ function exec_ogp_module()
 				}
 			else{
 			//this is a renewel, start from end of previous order
-                $end_date = strtotime('+'.$order['qty'].' year',strtotime($order['end_date'])); 
+				$current_end = strtotime($order['end_date']);
+				if ($current_end === false) {
+					$current_end = time(); // fallback to now if date is invalid
+				}
+                $end_date = strtotime('+'.$order['qty'].' year', $current_end); 
 				
 				}	
 				
