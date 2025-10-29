@@ -22,7 +22,12 @@ if (!function_exists('process_payment_record')) {
         $amount = $record['amount'] ?? 0;
         
         // Require database connection
-        require_once(__DIR__ . '/../../../includes/database_mysqli.php');
+        // When deployed at website root: includes/payment_processor.php -> ../../includes/database_mysqli.php
+        // When in repo: modules/billing/includes/payment_processor.php -> ../../../includes/database_mysqli.php
+        $db_mysqli_path = file_exists(__DIR__ . '/../../includes/database_mysqli.php') 
+            ? __DIR__ . '/../../includes/database_mysqli.php'  // Deployed at website root
+            : __DIR__ . '/../../../includes/database_mysqli.php'; // In repo structure
+        require_once($db_mysqli_path);
         $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
         if (!$db) {
             if (function_exists('site_log_error')) site_log_error('process_payment_db_fail', ['invoice'=>$invoice]);
