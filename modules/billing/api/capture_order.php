@@ -5,6 +5,10 @@ $sandbox       = true; // flip to false for Live
 $client_id     = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
 $client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0';
 
+// Ensure all errors are logged, not output (to prevent JSON corruption)
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
+
 header('Content-Type: application/json');
 $in = json_decode(file_get_contents('php://input'), true) ?: [];
 $order_id = $in['order_id'] ?? null;
@@ -95,13 +99,13 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
         $now = date('Y-m-d H:i:s');
         $esc_txid = mysqli_real_escape_string($db, $txid);
         
-        $updateInvoices = "UPDATE ogp_billing_invoices 
+        $updateInvoices = "UPDATE {$table_prefix}billing_invoices 
                           SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'
                           WHERE user_id=$user_id AND status='due'";
         mysqli_query($db, $updateInvoices);
         
         // Get all invoices we just marked paid
-        $getInvoices = "SELECT * FROM ogp_billing_invoices WHERE user_id=$user_id AND payment_txid='$esc_txid'";
+        $getInvoices = "SELECT * FROM {$table_prefix}billing_invoices WHERE user_id=$user_id AND payment_txid='$esc_txid'";
         $invoicesResult = mysqli_query($db, $getInvoices);
         
         // For each invoice, either create a new order or extend existing one (renewal)
@@ -133,7 +137,7 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
                 }
                 
                 // Get current end_date and extend it
-                $getEndDate = "SELECT end_date FROM ogp_billing_orders WHERE order_id=$existing_order_id LIMIT 1";
+                $getEndDate = "SELECT end_date FROM {$table_prefix}billing_orders WHERE order_id=$existing_order_id LIMIT 1";
                 $endDateResult = mysqli_query($db, $getEndDate);
                 if ($endDateResult && mysqli_num_rows($endDateResult) === 1) {
                     $endRow = mysqli_fetch_assoc($endDateResult);
@@ -148,7 +152,7 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
                     $new_end_date = $dt->format('Y-m-d H:i:s');
                     
                     // Update order with new end_date and mark as paid/active
-                    $updateOrder = "UPDATE ogp_billing_orders 
+                    $updateOrder = "UPDATE {$table_prefix}billing_orders 
                                    SET end_date='$new_end_date', status='paid', payment_txid='$esc_txid', paid_ts='$now'
                                    WHERE order_id=$existing_order_id";
                     if (mysqli_query($db, $updateOrder)) {
@@ -163,7 +167,7 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
                 $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
                 
                 // Insert order
-                $insertOrder = "INSERT INTO ogp_billing_orders (
+                $insertOrder = "INSERT INTO {$table_prefix}billing_orders (
                     user_id, service_id, home_name, ip, max_players, qty, invoice_duration,
                     price, remote_control_password, ftp_password, status, order_date, end_date,
                     payment_txid, paid_ts
@@ -177,7 +181,7 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
                     $new_order_id = mysqli_insert_id($db);
                     
                     // Link invoice to order
-                    $linkInvoice = "UPDATE ogp_billing_invoices SET order_id=$new_order_id WHERE invoice_id=$invoice_id";
+                    $linkInvoice = "UPDATE {$table_prefix}billing_invoices SET order_id=$new_order_id WHERE invoice_id=$invoice_id";
                     mysqli_query($db, $linkInvoice);
                     
                     error_log("capture_order.php: Created order $new_order_id for invoice $invoice_id");
