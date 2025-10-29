@@ -10,6 +10,25 @@ $client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-
 ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
+// Setup comprehensive logging
+$logDir = __DIR__ . '/../logs';
+@mkdir($logDir, 0755, true);
+$logFile = $logDir . '/paypal_capture_order.log';
+$requestId = uniqid('req_', true); // Unique request identifier for tracking
+
+function capture_log($label, $data) {
+    global $logFile, $requestId;
+    $timestamp = date('Y-m-d H:i:s');
+    $entry = "[$timestamp] [$requestId] $label\n";
+    if (is_array($data) || is_object($data)) {
+        $entry .= print_r($data, true);
+    } else {
+        $entry .= (string)$data;
+    }
+    $entry .= "\n" . str_repeat('-', 80) . "\n";
+    @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
+}
+
 header('Content-Type: application/json');
 
 // Read and parse input
