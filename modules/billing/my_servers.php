@@ -43,12 +43,18 @@ $query = "SELECT
             -- use end_date as the expiration marker (set when order is paid/created)
             o.end_date AS expiration_date,
             bs.service_name,
-            bs.price_monthly
+            bs.price_monthly,
+            o.price,
+            o.discount_amount,
+            o.coupon_id,
+            bc.code AS coupon_code,
+            bc.discount_percent AS coupon_discount_percent
           FROM ogp_home h
           LEFT JOIN ogp_remote_servers rs ON h.remote_server_id = rs.remote_server_id
           LEFT JOIN ogp_game_configs gc ON h.home_cfg_id = gc.home_cfg_id
           LEFT JOIN ogp_billing_orders o ON h.user_id = o.user_id
           LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
+          LEFT JOIN ogp_billing_coupons bc ON o.coupon_id = bc.coupon_id
           WHERE h.user_id = $user_id
           ORDER BY h.home_id DESC";
 
@@ -91,7 +97,24 @@ $result = mysqli_query($db, $query);
                         <td><?php echo htmlspecialchars($server['remote_server_name'] ?? 'Unknown'); ?></td>
                         <td class="<?php echo $status_class; ?>"><?php echo $status_text; ?></td>
                         <td><?php echo $server['expiration_date'] ? date('M d, Y', strtotime($server['expiration_date'])) : 'N/A'; ?></td>
-                        <td><?php echo $server['price_monthly'] ? '$' . number_format($server['price_monthly'], 2) : 'N/A'; ?></td>
+                        <td>
+                            <?php 
+                            $price = $server['price'] ?? $server['price_monthly'];
+                            $discount = floatval($server['discount_amount'] ?? 0);
+                            
+                            if ($price) {
+                                if ($discount > 0 && $server['coupon_code']) {
+                                    echo '<span style="text-decoration: line-through; color: #999;">$' . number_format($price + $discount, 2) . '</span><br>';
+                                    echo '<strong>$' . number_format($price, 2) . '</strong>';
+                                    echo '<br><small style="color: #28a745;">(' . htmlspecialchars($server['coupon_code']) . ' -' . number_format($server['coupon_discount_percent'], 0) . '%)</small>';
+                                } else {
+                                    echo '$' . number_format($price, 2);
+                                }
+                            } else {
+                                echo 'N/A';
+                            }
+                            ?>
+                        </td>
                         <td>
                             <?php if ($server['order_id']): ?>
                                 <a href="renew_server.php?order_id=<?php echo urlencode($server['order_id']); ?>" class="gsw-btn">Renew</a>
