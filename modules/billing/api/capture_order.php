@@ -41,11 +41,28 @@ $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curl_err = curl_error($ch);
 curl_close($ch);
 
+// Ensure logs folder exists and provide a helper to write debug info
+$logDir = __DIR__ . '/../logs';
+if (!is_dir($logDir)) @mkdir($logDir, 0755, true);
+$logFile = $logDir . '/paypal_capture.log';
+function capture_log($label, $data) {
+    global $logFile;
+    $entry = '[' . date('Y-m-d H:i:s') . '] ' . $label . "\n";
+    if (is_array($data) || is_object($data)) $entry .= print_r($data, true);
+    else $entry .= (string)$data;
+    $entry .= "\n---\n";
+    @file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
+}
+
+// Log the raw curl response for debugging
+capture_log('paypal_curl_response_http_' . $http, $res === false ? "(curl failed) " . $curl_err : $res);
+
 // Normalize response: ensure we always return valid JSON to the caller
 if ($res === false || $res === '') {
     // Curl-level failure or empty body
     http_response_code(502);
     $out = ['error' => 'paypal_empty_response', 'http' => $http, 'curl_error' => $curl_err];
+    capture_log('paypal_empty_response', $out);
     echo json_encode($out);
     exit;
 }
@@ -56,6 +73,7 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     // PayPal returned non-JSON / malformed response — return it as raw string inside JSON
     http_response_code(502);
     $out = ['error' => 'paypal_invalid_json', 'http' => $http, 'raw' => $res];
+    capture_log('paypal_invalid_json', $out);
     echo json_encode($out);
     exit;
 }
@@ -63,13 +81,16 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 if ($http !== 201 && $http !== 200) {
     http_response_code($http);
     // Return structured JSON with PayPal's decoded response
-    echo json_encode(['error' => 'paypal_capture_failed', 'http' => $http, 'response' => $capture]);
+    $out = ['error' => 'paypal_capture_failed', 'http' => $http, 'response' => $capture];
+    capture_log('paypal_capture_failed', $out);
+    echo json_encode($out);
     exit;
 }
 
 // Extract payment details
 $txid = null;
-$captureStatus = $capture['status'] ?? 'UNKNOWN';
+capture_log('paypal_capture_success', $capture);
+echo json_encode($capture);
 if (isset($capture['purchase_units'][0]['payments']['captures'][0])) {
     $txid = $capture['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
 }
