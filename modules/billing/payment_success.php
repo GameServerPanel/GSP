@@ -8,6 +8,8 @@ session_start();
 require_once(__DIR__ . '/includes/header.php');
 require_once(__DIR__ . '/includes/config.inc.php');
 require_once(__DIR__ . '/../../includes/database_mysqli.php');
+require_once(__DIR__ . '/includes/log.php');
+require_once(__DIR__ . '/includes/payment_processor.php');
 
 $invoice_ref = isset($_GET['invoice']) ? $_GET['invoice'] : '';
 $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
@@ -88,104 +90,3 @@ $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 <?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
-        $end_date_val = null;
-        if ($has_finish) {
-            // Attempt to find the target order's qty/invoice_duration using the same where clause but without LIMIT
-            $sel_sql = "SELECT qty, invoice_duration FROM ogp_billing_orders WHERE " . str_replace(' AND status <> \"paid\" LIMIT 1', '', $where_sql) . " LIMIT 1";
-            // Note: this simple substitution assumes the where_sql is of the form 'col = ?' used earlier
-            if ($sel_stmt = $db->prepare($sel_sql)) {
-                // bind where params
-                if ($bind_types) {
-                    $refs = [];
-                    $vals = $bind_vals;
-                    foreach ($vals as $k => $v) $refs[$k] = &$vals[$k];
-                    array_unshift($refs, $bind_types);
-                    call_user_func_array([$sel_stmt, 'bind_param'], $refs);
-                }
-                $sel_stmt->execute();
-                $sel_stmt->bind_result($sel_qty, $sel_invdur);
-                if ($sel_stmt->fetch()) {
-                    // compute months
-                    $months = 0;
-                    $q = intval($sel_qty ?? 0);
-                    $invdur = strtolower(trim($sel_invdur ?? ''));
-                    if (strpos($invdur, 'year') !== false) {
-                        $months = $q * 12;
-                    } else {
-                        $months = $q;
-                    }
-                    if ($months <= 0) $months = 0;
-                    $dt = new DateTime('now');
-                    if ($months > 0) $dt->modify('+' . intval($months) . ' months');
-                    $end_date_val = $dt->format('Y-m-d H:i:s');
-                }
-                $sel_stmt->close();
-            }
-            if ($end_date_val !== null) {
-                $sql = str_replace(' WHERE ', ', end_date = ? WHERE ', $sql);
-            }
-        }
-
-        if ($stmt = $db->prepare($sql)) {
-            // Build params: first any where params, then txid/ts values if present, then end_date if present
-            $types = $bind_types;
-            $vals = $bind_vals;
-            if ($cols) {
-                foreach ($cols as $c) {
-                    $types .= 's';
-                    if ($c === 'payment_txid') $vals[] = $txid;
-                    else $vals[] = $ts;
-                }
-            }
-            if ($end_date_val !== null) {
-                $types .= 's';
-                $vals[] = $end_date_val;
-            }
-            // bind dynamically
-            if ($types) {
-                $refs = [];
-                foreach ($vals as $k => $v) $refs[$k] = &$vals[$k];
-                array_unshift($refs, $types);
-                call_user_func_array([$stmt, 'bind_param'], $refs);
-            }
-            $stmt->execute();
-            $affected = $stmt->affected_rows;
-            $stmt->close();
-            return $affected;
-        }
-        return 0;
-    };
-
-    $affected = 0;
-    // Try match by invoice column (if present)
-    if ($invoice) {
-        // some invoices may include paths or file names; use exact match
-        $affected = $update_paid('invoice = ?', 's', [$invoice]);
-    }
-
-    // If not matched, try numeric custom (order_id)
-    if (!$affected && $custom) {
-        if (ctype_digit((string)$custom)) {
-            $affected = $update_paid('order_id = ?', 'i', [(int)$custom]);
-        }
-    }
-
-    // If still not matched, try matching the custom text field
-    if (!$affected && $custom) {
-        $affected = $update_paid('custom = ?', 's', [$custom]);
-    }
-
-    mysqli_close($db);
-
-    if ($affected) {
-        if (function_exists('site_log_info')) site_log_info('payment_success_marked_paid', ['affected'=>intval($affected),'invoice'=>$invoice,'custom'=>$custom]);
-        else error_log('[payment_success] Marked order paid (affected=' . intval($affected) . ') invoice=' . $invoice . ' custom=' . $custom);
-        return true;
-    } else {
-        if (function_exists('site_log_warn')) site_log_warn('payment_success_no_match', ['invoice'=>$invoice,'custom'=>$custom]);
-        else error_log('[payment_success] No matching order found for invoice=' . $invoice . ' custom=' . $custom);
-        return false;
-    }
-}
-
-?>

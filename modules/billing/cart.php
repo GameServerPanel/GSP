@@ -169,16 +169,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) 
         file_put_contents($fname, json_encode($rec, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 
         // If available, process the payment record immediately so webhooks logic runs during creation
-        $ps = __DIR__ . '/payment_success.php';
-        if (is_file($ps)) {
-          try {
-            require_once($ps);
+        require_once(__DIR__ . '/includes/payment_processor.php');
+        try {
             if (function_exists('process_payment_record')) {
               process_payment_record($rec);
             }
-          } catch (Exception $e) {
+        } catch (Exception $e) {
             error_log('[cart create_free] process_payment_record failed: ' . $e->getMessage());
-          }
         }
 
         header('Location: return.php?invoice=' . urlencode($rec['invoice']));
