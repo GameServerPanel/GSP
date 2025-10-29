@@ -148,10 +148,12 @@ if (in_array($type, ['PAYMENT.CAPTURE.COMPLETED','PAYMENT.SALE.COMPLETED'], true
   $status = 'WROTE_FILE';
 
   // Attempt to mark order paid in DB
-  $ps = __DIR__ . '/payment_success.php';
-  if (is_file($ps)) {
-      require_once($ps);
-  try { process_payment_record($record); } catch (Exception $e) { if (function_exists('site_log_error')) site_log_error('process_payment_fail',['err'=>$e->getMessage()]); else log_line('PROC_FAIL '.$e->getMessage()); }
+  require_once(__DIR__ . '/includes/payment_processor.php');
+  try { 
+      process_payment_record($record); 
+  } catch (Exception $e) { 
+      if (function_exists('site_log_error')) site_log_error('process_payment_fail',['err'=>$e->getMessage()]); 
+      else log_line('PROC_FAIL '.$e->getMessage()); 
   }
 }
 
