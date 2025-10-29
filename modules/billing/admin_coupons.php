@@ -3,16 +3,40 @@
 require_once(__DIR__ . '/includes/admin_auth.php');
 require_once(__DIR__ . '/includes/config.inc.php');
 
-session_start();
-if (empty($_SESSION['admin_csrf'])) $_SESSION['admin_csrf'] = bin2hex(random_bytes(16));
+// Start session if not already started by admin_auth
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (empty($_SESSION['admin_csrf'])) {
+  // generate a CSRF token with a safe fallback for older PHP builds
+  try {
+    $token = function_exists('random_bytes') ? bin2hex(random_bytes(16)) : null;
+  } catch (Exception $e) {
+    $token = null;
+  }
+  if (empty($token)) {
+    if (function_exists('openssl_random_pseudo_bytes')) {
+      $token = bin2hex(openssl_random_pseudo_bytes(16));
+    } else {
+      $token = bin2hex(bin2hex(substr(sha1(uniqid((string)microtime(true), true)), 0, 16)));
+    }
+  }
+  $_SESSION['admin_csrf'] = $token;
+}
 $csrf = $_SESSION['admin_csrf'];
 
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-// Connect to database
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+// Connect to database (graceful failure)
+$db = false;
+try {
+  // suppress direct output; we'll log errors and show a friendly message
+  $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+} catch (Throwable $e) {
+  error_log('[admin_coupons] mysqli_connect exception: ' . $e->getMessage());
+  $db = false;
+}
 if (!$db) {
-    die("Connection failed: " . mysqli_connect_error());
+  $error = 'Database connection failed. Please check your configuration.';
+  error_log('[admin_coupons] DB connect failed for host=' . ($db_host ?? 'unknown') . ' user=' . ($db_user ?? 'unknown') . ' db=' . ($db_name ?? 'unknown') . ' - ' . mysqli_connect_error());
 }
 
 $status = '';
@@ -411,5 +435,5 @@ include(__DIR__ . '/includes/menu.php');
 </html>
 
 <?php
-mysqli_close($db);
+if ($db) mysqli_close($db);
 ?>
