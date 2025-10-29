@@ -2,8 +2,6 @@
 // Admin coupon management page - standalone billing module
 require_once(__DIR__ . '/includes/admin_auth.php');
 require_once(__DIR__ . '/includes/config.inc.php');
-include(__DIR__ . '/includes/top.php');
-include(__DIR__ . '/includes/menu.php');
 
 session_start();
 if (empty($_SESSION['admin_csrf'])) $_SESSION['admin_csrf'] = bin2hex(random_bytes(16));
@@ -123,7 +121,6 @@ if (is_dir($games_dir)) {
 // Get all coupons
 $coupons_result = mysqli_query($db, "SELECT * FROM {$table_prefix}billing_coupons ORDER BY created_date DESC");
 ?>
-
 <!doctype html>
 <html>
 <head>
@@ -178,6 +175,10 @@ $coupons_result = mysqli_query($db, "SELECT * FROM {$table_prefix}billing_coupon
   </script>
 </head>
 <body>
+<?php
+include(__DIR__ . '/includes/top.php');
+include(__DIR__ . '/includes/menu.php');
+?>
 <div class="container-wide panel">
   <h1>Coupon Management</h1>
   
