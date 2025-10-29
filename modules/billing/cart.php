@@ -597,12 +597,37 @@ $apiBase = 'api';
     return_url, cancel_url
   });
 
-  function setStatus(msg){ if(statusEl) statusEl.textContent = msg; }
+  function setStatus(msg, isError = false){ 
+    if(statusEl) {
+      statusEl.textContent = msg; 
+      statusEl.style.color = isError ? '#dc3545' : '#000';
+      statusEl.style.fontWeight = isError ? 'bold' : 'normal';
+    }
+  }
+  
+  function logError(context, error) {
+    const errorData = {
+      timestamp: new Date().toISOString(),
+      context: context,
+      error: error,
+      invoice_id: invoice_id,
+      amount: amount
+    };
+    console.error('PayPal Error:', errorData);
+    // Try to send error to server for logging
+    fetch("<?= $apiBase ?>/log_error.php", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(errorData)
+    }).catch(e => console.error('Failed to log error to server:', e));
+  }
 
 
   paypal.Buttons({
     createOrder: function() {
       setStatus('Creating order…');
+      console.log('createOrder: Starting request to create_order.php');
+      
       return fetch("<?= $apiBase ?>/create_order.php", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
@@ -615,51 +640,114 @@ $apiBase = 'api';
         })
       })
       .then(res => {
+        console.log('createOrder: Response received', { status: res.status, ok: res.ok });
         if (!res.ok) {
           return res.text().then(errText => {
-            throw new Error('API error ' + res.status + ': ' + errText.substring(0, 200));
+            console.error('createOrder: Error response text:', errText);
+            logError('create_order_http_error', { status: res.status, response: errText });
+            
+            // Try to parse as JSON for better error display
+            let errorMsg = 'API error ' + res.status;
+            try {
+              const errJson = JSON.parse(errText);
+              if (errJson.error) errorMsg += ': ' + errJson.error;
+              if (errJson.request_id) errorMsg += ' (Ref: ' + errJson.request_id + ')';
+            } catch (e) {
+              errorMsg += ': ' + errText.substring(0, 100);
+            }
+            throw new Error(errorMsg);
           });
         }
         return res.json();
       })
       .then(data => {
-        if (!data.id) { 
-          throw new Error(JSON.stringify(data).substring(0, 200) || 'No order id'); 
+        console.log('createOrder: Parsed response', data);
+        if (!data.id) {
+          const errMsg = 'No order ID in response';
+          console.error('createOrder:', errMsg, data);
+          logError('create_order_no_id', { response: data });
+          throw new Error(errMsg + (data.request_id ? ' (Ref: ' + data.request_id + ')' : '')); 
         }
         setStatus('Order created.');
+        console.log('createOrder: Success, order ID:', data.id);
         return data.id;
       })
       .catch(err => {
-        setStatus('PayPal error: ' + err.message);
+        console.error('createOrder: Caught error', err);
+        const errorMsg = 'Failed to create order: ' + err.message;
+        setStatus(errorMsg, true);
+        logError('create_order_exception', { message: err.message, stack: err.stack });
         throw err;
       });
     },
 
     onApprove: function(data) {
       setStatus('Capturing payment…');
+      console.log('onApprove: Starting capture for order', data.orderID);
+      
       return fetch("<?= $apiBase ?>/capture_order.php", {
         method: "POST",
         headers: {"Content-Type":"application/json"},
         body: JSON.stringify({ order_id: data.orderID })
       })
-      .then(res => res.json())
+      .then(res => {
+        console.log('onApprove: Capture response received', { status: res.status, ok: res.ok });
+        if (!res.ok) {
+          return res.text().then(errText => {
+            console.error('onApprove: Error response text:', errText);
+            logError('capture_order_http_error', { status: res.status, response: errText });
+            
+            let errorMsg = 'Capture failed (HTTP ' + res.status + ')';
+            try {
+              const errJson = JSON.parse(errText);
+              if (errJson.error) errorMsg += ': ' + errJson.error;
+              if (errJson.request_id) errorMsg += ' (Ref: ' + errJson.request_id + ')';
+            } catch (e) {
+              errorMsg += ': ' + errText.substring(0, 100);
+            }
+            throw new Error(errorMsg);
+          });
+        }
+        return res.json();
+      })
       .then(capture => {
+        console.log('onApprove: Parsed capture response', capture);
         if (capture.status === 'COMPLETED') {
+          console.log('onApprove: Payment completed, redirecting to success page');
+          setStatus('Payment completed! Redirecting...');
           // go to your return page; webhook will fill data/<invoice_id>.json
           window.location.href = return_url;
+        } else if (capture.error) {
+          const errorMsg = 'Capture error: ' + capture.error + (capture.request_id ? ' (Ref: ' + capture.request_id + ')' : '');
+          console.error('onApprove:', errorMsg);
+          logError('capture_order_error_response', capture);
+          setStatus(errorMsg, true);
         } else {
-          setStatus('Capture status: ' + capture.status);
+          const statusMsg = 'Unexpected capture status: ' + (capture.status || 'UNKNOWN');
+          console.warn('onApprove:', statusMsg, capture);
+          logError('capture_order_unexpected_status', capture);
+          setStatus(statusMsg, true);
         }
       })
-      .catch(err => setStatus('Error: ' + err.message));
+      .catch(err => {
+        console.error('onApprove: Caught error', err);
+        const errorMsg = 'Payment capture failed: ' + err.message;
+        setStatus(errorMsg, true);
+        logError('capture_order_exception', { message: err.message, stack: err.stack });
+      });
     },
 
     onCancel: function() {
+      console.log('onCancel: User cancelled payment');
+      logError('payment_cancelled', { invoice_id: invoice_id });
       window.location.href = cancel_url;
     },
 
     onError: function(err){
-      setStatus('PayPal error: ' + (err && err.message ? err.message : err));
+      console.error('onError: PayPal SDK error', err);
+      const errorMsg = 'PayPal error: ' + (err && err.message ? err.message : JSON.stringify(err));
+      setStatus(errorMsg, true);
+      logError('paypal_sdk_error', { error: err });
     }
   }).render('#paypal-button-container');
 })();
