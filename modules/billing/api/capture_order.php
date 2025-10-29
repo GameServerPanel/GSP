@@ -109,6 +109,10 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
         exit;
     }
 
+    // Get coupon information from session if available
+    $applied_coupon = isset($_SESSION['applied_coupon']) ? $_SESSION['applied_coupon'] : null;
+    $coupon_id = $applied_coupon ? intval($applied_coupon['coupon_id']) : null;
+    
     // Find all invoices with status='due' for this user (cart session)
     // For now, we'll mark ALL due invoices for the logged-in user as paid
     // TODO: Improve to match specific invoice_id from custom_id if cart sends it
@@ -118,14 +122,30 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
                (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
     
     if ($user_id > 0) {
-        // Mark all due invoices for this user as paid
+        // Mark all due invoices for this user as paid, including coupon_id if applicable
         $now = date('Y-m-d H:i:s');
         $esc_txid = mysqli_real_escape_string($db, $txid);
         
         $updateInvoices = "UPDATE {$table_prefix}billing_invoices 
-                          SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'
-                          WHERE user_id=$user_id AND status='due'";
+                          SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'";
+        if ($coupon_id) {
+            $updateInvoices .= ", coupon_id=$coupon_id";
+        }
+        $updateInvoices .= " WHERE user_id=$user_id AND status='due'";
         mysqli_query($db, $updateInvoices);
+        
+        // Update coupon usage count if a coupon was applied
+        if ($coupon_id) {
+            $updateCoupon = "UPDATE {$table_prefix}billing_coupons 
+                            SET current_uses = current_uses + 1 
+                            WHERE coupon_id = $coupon_id";
+            mysqli_query($db, $updateCoupon);
+            
+            // Clear coupon from session after use (for one-time coupons)
+            if ($applied_coupon && $applied_coupon['usage_type'] === 'one_time') {
+                unset($_SESSION['applied_coupon']);
+            }
+        }
         
         // Get all invoices we just marked paid
         $getInvoices = "SELECT * FROM {$table_prefix}billing_invoices WHERE user_id=$user_id AND payment_txid='$esc_txid'";
@@ -142,8 +162,10 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
             $qty = intval($inv['qty']);
             $duration = mysqli_real_escape_string($db, $inv['invoice_duration']);
             $amount = floatval($inv['amount']);
+            $discount_amount = floatval($inv['discount_amount'] ?? 0);
             $rcon_pw = mysqli_real_escape_string($db, $inv['remote_control_password']);
             $ftp_pw = mysqli_real_escape_string($db, $inv['ftp_password']);
+            $inv_coupon_id = intval($inv['coupon_id'] ?? 0);
             
             // Check if this is a renewal (existing order_id > 0) or new order (order_id = 0)
             if ($existing_order_id > 0) {
@@ -189,15 +211,15 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
                 // Calculate end_date based on qty * duration
                 $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
                 
-                // Insert order
+                // Insert order with coupon_id and discount_amount
                 $insertOrder = "INSERT INTO {$table_prefix}billing_orders (
                     user_id, service_id, home_name, ip, max_players, qty, invoice_duration,
-                    price, remote_control_password, ftp_password, status, order_date, end_date,
-                    payment_txid, paid_ts
+                    price, discount_amount, remote_control_password, ftp_password, status, order_date, end_date,
+                    payment_txid, paid_ts" . ($inv_coupon_id ? ", coupon_id" : "") . "
                 ) VALUES (
                     $user_id, $service_id, '$home_name', $ip, $max_players, $qty, '$duration',
-                    $amount, '$rcon_pw', '$ftp_pw', 'paid', '$now', '$end_date',
-                    '$esc_txid', '$now'
+                    $amount, $discount_amount, '$rcon_pw', '$ftp_pw', 'paid', '$now', '$end_date',
+                    '$esc_txid', '$now'" . ($inv_coupon_id ? ", $inv_coupon_id" : "") . "
                 )";
                 
                 if (mysqli_query($db, $insertOrder)) {
