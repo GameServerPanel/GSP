@@ -174,6 +174,8 @@ mysqli_close($db);
             border-radius: 8px;
             font-size: 1rem;
             transition: border-color 0.3s;
+            color: #333;
+            background-color: #fff;
         }
         
         .form-group input:focus {

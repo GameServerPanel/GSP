@@ -46,8 +46,8 @@ if ($order_id <= 0 || $user_id <= 0) {
     exit;
 }
 
-// Fetch order and verify ownership
-$stmt = $db->prepare('SELECT order_id, user_id, service_id, qty, invoice_duration, price, home_id FROM ogp_billing_orders WHERE order_id = ? LIMIT 1');
+// Fetch order and verify ownership (get all needed fields for invoice creation)
+$stmt = $db->prepare('SELECT order_id, user_id, service_id, qty, invoice_duration, price, home_id, home_name, ip, max_players, remote_control_password, ftp_password FROM ogp_billing_orders WHERE order_id = ? LIMIT 1');
 if (!$stmt) {
     header('Location: ' . $redirect_to);
     exit;
@@ -90,25 +90,78 @@ if ($service_id > 0) {
     }
 }
 
-// Update order: set status='renew', invoice_duration, qty, price
-$new_status = 'renew';
+// Get user email for invoice
+$user_email = '';
+$user_name = '';
+$user_stmt = $db->prepare('SELECT users_email, users_login, users_fname, users_lname FROM ogp_users WHERE user_id = ? LIMIT 1');
+if ($user_stmt) {
+    $user_stmt->bind_param('i', $user_id);
+    $user_stmt->execute();
+    $user_res = $user_stmt->get_result();
+    if ($user_res && $user_res->num_rows > 0) {
+        $user_row = $user_res->fetch_assoc();
+        $user_email = $user_row['users_email'] ?? '';
+        $fname = $user_row['users_fname'] ?? '';
+        $lname = $user_row['users_lname'] ?? '';
+        $user_name = trim($fname . ' ' . $lname);
+        if (empty($user_name)) {
+            $user_name = $user_row['users_login'] ?? '';
+        }
+    }
+    $user_stmt->close();
+}
+
+// Get service name for invoice description
+$service_name = '';
+$service_stmt = $db->prepare('SELECT service_name FROM ' . $table_prefix . 'billing_services WHERE service_id = ? LIMIT 1');
+if ($service_stmt) {
+    $service_stmt->bind_param('i', $service_id);
+    $service_stmt->execute();
+    $service_res = $service_stmt->get_result();
+    if ($service_res && $service_res->num_rows > 0) {
+        $service_row = $service_res->fetch_assoc();
+        $service_name = $service_row['service_name'] ?? 'Game Server';
+    }
+    $service_stmt->close();
+}
+
+// Create invoice for renewal
 $qty = 1;
 $price_formatted = number_format($price_val, 2, '.', '');
- $upd = $db->prepare('UPDATE ogp_billing_orders SET status = ?, invoice_duration = ?, qty = ?, price = ? WHERE order_id = ? AND user_id = ? LIMIT 1');
-if ($upd) {
-    // types: status (s), invoice_duration (s), qty (i), price (d), order_id (i), user_id (i)
-    $upd->bind_param('ssiddi', $new_status, $duration, $qty, $price_formatted, $order_id, $user_id);
-    $ok = $upd->execute();
-    $affected = $upd->affected_rows;
-    $upd->close();
-    if ($ok && $affected > 0) {
-        // Insert a row into ogp_logger if table exists (best-effort)
+$home_name = mysqli_real_escape_string($db, $order['home_name'] ?? 'Server Renewal');
+$ip = intval($order['ip'] ?? 0);
+$max_players = intval($order['max_players'] ?? 0);
+$rcon_pw = mysqli_real_escape_string($db, $order['remote_control_password'] ?? '');
+$ftp_pw = mysqli_real_escape_string($db, $order['ftp_password'] ?? '');
+$description = "Renewal: " . $service_name . " - " . $home_name . " (" . $duration . ")";
+$now = date('Y-m-d H:i:s');
+$due_date = date('Y-m-d H:i:s', strtotime('+7 days')); // Due in 7 days
+
+$inv_insert = $db->prepare('INSERT INTO ' . $table_prefix . 'billing_invoices 
+    (order_id, user_id, service_id, home_name, ip, max_players, remote_control_password, ftp_password,
+     customer_name, customer_email, amount, currency, status, invoice_date, due_date, description, 
+     invoice_duration, qty) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    
+if ($inv_insert) {
+    $currency = 'USD';
+    $status = 'due';
+    $inv_insert->bind_param('iiisiissssdssssssi', 
+        $order_id, $user_id, $service_id, $home_name, $ip, $max_players, 
+        $rcon_pw, $ftp_pw, $user_name, $user_email, $price_formatted, 
+        $currency, $status, $now, $due_date, $description, $duration, $qty);
+    $ok = $inv_insert->execute();
+    $inv_insert->close();
+    
+    if ($ok) {
+        $new_invoice_id = mysqli_insert_id($db);
+        // Log the renewal invoice creation
         $client_ip = $_SERVER['REMOTE_ADDR'] ?? '';
-        $msg = "USER-RENEW: User {$user_id} marked order {$order_id} as renew";
-        // Try insert into ogp_logger table
+        $msg = "USER-RENEW: User {$user_id} created renewal invoice {$new_invoice_id} for order {$order_id}";
         $escaped_msg = mysqli_real_escape_string($db, $msg);
         $escaped_ip = mysqli_real_escape_string($db, $client_ip);
-        // Determine logger table name (best-effort). Try standard name then any table that ends with 'logger'.
+        
+        // Try to log to panel logger
         $logger_table = null;
         $check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_logger'");
         if ($check && mysqli_num_rows($check) > 0) {

@@ -298,36 +298,36 @@ function exec_ogp_module()
 			if ($order['invoice_duration'] == "day")
 			{
 				
-				if($order['end_date'] == 0){
+				if(empty($order['end_date']) || $order['end_date'] === NULL){
 				$end_date = strtotime('+'.$order['qty'].' day'); 
 				}
 			else{
 			//this is a renewel, start from end of previous order
-				$end_date = strtotime('+'.$order['qty'].' day',$order['end_date']); 		
+				$end_date = strtotime('+'.$order['qty'].' day',strtotime($order['end_date'])); 		
 				}	
 				
 			}
 			elseif ($order['invoice_duration'] == "month")
 			{
 			// this is a new order
-			if($order['end_date'] == 0){
+			if(empty($order['end_date']) || $order['end_date'] === NULL){
 				$end_date = strtotime('+'.$order['qty'].' month'); 
 
 				}
 			else{
 			//this is a renewel, start from end of previous order
-                $end_date = strtotime('+'.$order['qty'].' month',$order['end_date']); 
+                $end_date = strtotime('+'.$order['qty'].' month',strtotime($order['end_date'])); 
 				}	
 			}
 			elseif ($order['invoice_duration'] == "year")
 			{
 				// this is a new order
-			if($order['end_date'] == 0){
+			if(empty($order['end_date']) || $order['end_date'] === NULL){
 				$end_date = strtotime('+'.$order['qty'].' year'); 
 				}
 			else{
 			//this is a renewel, start from end of previous order
-                $end_date = strtotime('+'.$order['qty'].' year',$order['end_date']); 
+                $end_date = strtotime('+'.$order['qty'].' year',strtotime($order['end_date'])); 
 				
 				}	
 				
