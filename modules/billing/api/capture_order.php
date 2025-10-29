@@ -1,6 +1,7 @@
 <?php
 require_once(__DIR__ . '/../includes/config.inc.php');
-require_once(__DIR__ . '/../../../includes/database_mysqli.php');
+// Standalone billing module - do NOT include panel files
+// Connect directly to MySQL using mysqli
 $sandbox       = true; // flip to false for Live
 $client_id     = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
 $client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0';
@@ -97,12 +98,13 @@ if (isset($capture['purchase_units'][0]['payments']['captures'][0])) {
 
 // Get custom_id (should be invoice_id from cart.php)
 $custom_id = $capture['purchase_units'][0]['custom_id'] ?? null;
+$captureStatus = $capture['status'] ?? null;
 
 if ($captureStatus === 'COMPLETED' && $custom_id) {
-    // Connect to database
-    $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
+    // Connect to database using mysqli (standalone - no panel dependencies)
+    $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
     if (!$db) {
-        error_log('capture_order.php: DB connection failed');
+        error_log('capture_order.php: DB connection failed - ' . mysqli_connect_error());
         echo json_encode(['error' => 'db_connection_failed', 'status' => $captureStatus]);
         exit;
     }
