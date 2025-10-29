@@ -131,56 +131,59 @@ mysqli_close($db);
         }
         
         .login-container {
-            background: white;
+            background: #ffffff; /* explicit white */
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
             width: 100%;
             max-width: 420px;
             padding: 40px;
+            border: 1px solid rgba(0,0,0,0.06);
         }
-        
+
         .login-header {
             text-align: center;
             margin-bottom: 30px;
         }
-        
+
         .login-header h1 {
             font-size: 1.8rem;
-            color: #333;
+            color: #111111; /* high contrast */
             margin-bottom: 8px;
         }
-        
+
         .login-header p {
-            color: #666;
+            color: #4b5563; /* neutral dark gray */
             font-size: 0.95rem;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
+            color: #111111 !important; /* ensure labels are dark and readable (override external styles) */
+            font-weight: 600;
             font-size: 0.95rem;
         }
-        
+
         .form-group input {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid #e1e8ed;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s;
-            color: #333;
-            background-color: #fff;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            color: #111111;
+            background-color: #ffffff;
+            -webkit-appearance: none;
         }
-        
+
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #4f46e5;
+            box-shadow: 0 6px 20px rgba(79,70,229,0.12);
         }
         
         .btn-login {
@@ -273,12 +276,12 @@ mysqli_close($db);
         <form method="POST" action="login.php">
             <input type="hidden" name="return_to" value="<?php echo htmlspecialchars($return_to_raw); ?>">
             <div class="form-group">
-                <label for="ulogin">Username</label>
+                <label>Username</label>
                 <input type="text" id="ulogin" name="ulogin" required autofocus>
             </div>
             
             <div class="form-group">
-                <label for="upassword">Password</label>
+                <label>Password</label>
                 <input type="password" id="upassword" name="upassword" required>
             </div>
             
