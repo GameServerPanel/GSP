@@ -78,7 +78,7 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
     $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
     if (!$db) {
         error_log('capture_order.php: DB connection failed');
-        echo $res;
+        echo json_encode(['error' => 'db_connection_failed', 'status' => $captureStatus]);
         exit;
     }
 
@@ -86,7 +86,9 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
     // For now, we'll mark ALL due invoices for the logged-in user as paid
     // TODO: Improve to match specific invoice_id from custom_id if cart sends it
     session_start();
-    $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+    // Check both website_user_id and user_id for compatibility
+    $user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
+               (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
     
     if ($user_id > 0) {
         // Mark all due invoices for this user as paid
@@ -102,9 +104,10 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
         $getInvoices = "SELECT * FROM ogp_billing_invoices WHERE user_id=$user_id AND payment_txid='$esc_txid'";
         $invoicesResult = mysqli_query($db, $getInvoices);
         
-        // For each invoice, create an order
+        // For each invoice, either create a new order or extend existing one (renewal)
         while ($inv = mysqli_fetch_assoc($invoicesResult)) {
             $invoice_id = intval($inv['invoice_id']);
+            $existing_order_id = intval($inv['order_id'] ?? 0);
             $service_id = intval($inv['service_id']);
             $home_name = mysqli_real_escape_string($db, $inv['home_name']);
             $ip = intval($inv['ip']);
@@ -115,30 +118,72 @@ if ($captureStatus === 'COMPLETED' && $custom_id) {
             $rcon_pw = mysqli_real_escape_string($db, $inv['remote_control_password']);
             $ftp_pw = mysqli_real_escape_string($db, $inv['ftp_password']);
             
-            // Calculate end_date based on qty * duration
-            $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
-            
-            // Insert order
-            $insertOrder = "INSERT INTO ogp_billing_orders (
-                user_id, service_id, home_name, ip, max_players, qty, invoice_duration,
-                price, remote_control_password, ftp_password, status, order_date, end_date,
-                payment_txid, paid_ts
-            ) VALUES (
-                $user_id, $service_id, '$home_name', $ip, $max_players, $qty, '$duration',
-                $amount, '$rcon_pw', '$ftp_pw', 'paid', '$now', '$end_date',
-                '$esc_txid', '$now'
-            )";
-            
-            if (mysqli_query($db, $insertOrder)) {
-                $new_order_id = mysqli_insert_id($db);
+            // Check if this is a renewal (existing order_id > 0) or new order (order_id = 0)
+            if ($existing_order_id > 0) {
+                // RENEWAL: Extend the existing order's end_date
+                // Calculate months to add based on qty and duration
+                $months = 0;
+                $q = intval($qty);
+                $invdur = strtolower(trim($duration));
+                if (strpos($invdur, 'year') !== false) {
+                    $months = $q * 12;
+                } else {
+                    // default to months for anything else (month, monthly, etc.)
+                    $months = $q;
+                }
                 
-                // Link invoice to order
-                $linkInvoice = "UPDATE ogp_billing_invoices SET order_id=$new_order_id WHERE invoice_id=$invoice_id";
-                mysqli_query($db, $linkInvoice);
-                
-                error_log("capture_order.php: Created order $new_order_id for invoice $invoice_id");
+                // Get current end_date and extend it
+                $getEndDate = "SELECT end_date FROM ogp_billing_orders WHERE order_id=$existing_order_id LIMIT 1";
+                $endDateResult = mysqli_query($db, $getEndDate);
+                if ($endDateResult && mysqli_num_rows($endDateResult) === 1) {
+                    $endRow = mysqli_fetch_assoc($endDateResult);
+                    $current_end = $endRow['end_date'] ?? date('Y-m-d H:i:s');
+                    
+                    // Extend from current end_date or now (whichever is later)
+                    $extend_from = (strtotime($current_end) > time()) ? $current_end : date('Y-m-d H:i:s');
+                    $dt = new DateTime($extend_from);
+                    if ($months > 0) {
+                        $dt->modify('+' . intval($months) . ' months');
+                    }
+                    $new_end_date = $dt->format('Y-m-d H:i:s');
+                    
+                    // Update order with new end_date and mark as paid/active
+                    $updateOrder = "UPDATE ogp_billing_orders 
+                                   SET end_date='$new_end_date', status='paid', payment_txid='$esc_txid', paid_ts='$now'
+                                   WHERE order_id=$existing_order_id";
+                    if (mysqli_query($db, $updateOrder)) {
+                        error_log("capture_order.php: Extended order $existing_order_id end_date to $new_end_date for invoice $invoice_id");
+                    } else {
+                        error_log("capture_order.php: Failed to extend order $existing_order_id: " . mysqli_error($db));
+                    }
+                }
             } else {
-                error_log("capture_order.php: Failed to create order for invoice $invoice_id: " . mysqli_error($db));
+                // NEW ORDER: Create a new order record
+                // Calculate end_date based on qty * duration
+                $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
+                
+                // Insert order
+                $insertOrder = "INSERT INTO ogp_billing_orders (
+                    user_id, service_id, home_name, ip, max_players, qty, invoice_duration,
+                    price, remote_control_password, ftp_password, status, order_date, end_date,
+                    payment_txid, paid_ts
+                ) VALUES (
+                    $user_id, $service_id, '$home_name', $ip, $max_players, $qty, '$duration',
+                    $amount, '$rcon_pw', '$ftp_pw', 'paid', '$now', '$end_date',
+                    '$esc_txid', '$now'
+                )";
+                
+                if (mysqli_query($db, $insertOrder)) {
+                    $new_order_id = mysqli_insert_id($db);
+                    
+                    // Link invoice to order
+                    $linkInvoice = "UPDATE ogp_billing_invoices SET order_id=$new_order_id WHERE invoice_id=$invoice_id";
+                    mysqli_query($db, $linkInvoice);
+                    
+                    error_log("capture_order.php: Created order $new_order_id for invoice $invoice_id");
+                } else {
+                    error_log("capture_order.php: Failed to create order for invoice $invoice_id: " . mysqli_error($db));
+                }
             }
         }
         
