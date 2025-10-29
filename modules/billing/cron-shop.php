@@ -114,6 +114,11 @@ if (is_array($upcoming_expirations)) {
                 " . intval($order['qty']) . "
             )");
         
+        // Mark order status as 'renew' to indicate renewal invoice was created
+        $db->query("UPDATE " . $table_prefix . "billing_orders 
+                    SET status='renew' 
+                    WHERE order_id={$order_id}");
+        
         // Send renewal notice email
         $settings = $db->getSettings();
         $subject = "Renewal Invoice for " . $order['home_name'] . " - " . $panel_settings['panel_name'];
@@ -138,7 +143,7 @@ if (is_array($upcoming_expirations)) {
 // STEP 2: SUSPEND SERVERS THAT ARE EXPIRED AND HAVE UNPAID INVOICES
 // ==================================================================================
 // Find servers that:
-// - Are currently installed (active)
+// - Are currently installed or renew (active)
 // - Have passed their end_date
 // - Have at least one unpaid invoice
 $servers_to_suspend = $db->resultQuery("
@@ -146,7 +151,7 @@ $servers_to_suspend = $db->resultQuery("
     FROM " . $table_prefix . "billing_orders o
     LEFT JOIN " . $table_prefix . "users u ON o.user_id = u.user_id
     INNER JOIN " . $table_prefix . "billing_invoices i ON o.order_id = i.order_id
-    WHERE o.status = 'installed'
+    WHERE o.status IN ('installed', 'renew')
         AND o.end_date IS NOT NULL
         AND UNIX_TIMESTAMP(o.end_date) < {$suspend_date}
         AND i.status = 'unpaid'
@@ -247,9 +252,12 @@ if (is_array($servers_to_delete)) {
             // Remove the game home files from remote server
             $remote->remove_home($home_info['home_path']);
             
-            // Drop database and user if they exist
+            // Drop database and user if they exist (both user_#### and server_#### formats)
+            @$db->query("DROP USER 'user_" . $home_id . "'@'%'");
+            @$db->query("DROP USER 'user_" . $home_id . "'@'localhost'");
             @$db->query("DROP USER 'server_" . $home_id . "'@'%'");
             @$db->query("DROP USER 'server_" . $home_id . "'@'localhost'");
+            @$db->query("DROP DATABASE IF EXISTS user_" . $home_id);
             @$db->query("DROP DATABASE IF EXISTS server_" . $home_id);
         }
         
@@ -257,6 +265,11 @@ if (is_array($servers_to_delete)) {
         $db->query("UPDATE " . $table_prefix . "billing_orders 
                     SET status='deleted', home_id='0' 
                     WHERE order_id={$order_id}");
+        
+        // Mark all unpaid invoices for this order as deleted
+        $db->query("UPDATE " . $table_prefix . "billing_invoices 
+                    SET status='deleted' 
+                    WHERE order_id={$order_id} AND status='unpaid'");
         
         $db->logger("BILLING-CRON: DELETED server {$home_id} for order {$order_id} after 7 days suspended");
         
@@ -420,16 +433,24 @@ else
                                          SET status='deleted'
                                          WHERE order_id=".$db->realEscapeSingle($user_home['order_id']));
 
-                						
+                
 				// Set order as not installed
                 $db->query( "UPDATE " . $table_prefix . "billing_orders
                                          SET home_id=0
                                          WHERE order_id=".$db->realEscapeSingle($user_home['order_id']));
 			    
-				// remove userid and table from database
-				$db->query( "DROP USER 'server_" .$home_id ."'@'%'");
-				$db->query( "DROP USER 'server_" .$home_id ."'@'localhost'");
-				$db->query( "DROP DATABASE server_" .$home_id); 
+				// Mark all unpaid invoices for this order as deleted
+				$db->query("UPDATE " . $table_prefix . "billing_invoices 
+							SET status='deleted' 
+							WHERE order_id=".$db->realEscapeSingle($user_home['order_id'])." AND status='unpaid'");
+			    
+				// remove userid and table from database (both user_#### and server_#### formats)
+				@$db->query( "DROP USER 'user_" .$home_id ."'@'%'");
+				@$db->query( "DROP USER 'user_" .$home_id ."'@'localhost'");
+				@$db->query( "DROP USER 'server_" .$home_id ."'@'%'");
+				@$db->query( "DROP USER 'server_" .$home_id ."'@'localhost'");
+				@$db->query( "DROP DATABASE IF EXISTS user_" .$home_id); 
+				@$db->query( "DROP DATABASE IF EXISTS server_" .$home_id); 
 										 
 				//logger
 				$db->logger( "AUTO-CLEAN: DELETED server " . $home_id);
