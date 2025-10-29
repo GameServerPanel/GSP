@@ -24,6 +24,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   <div class="admin-flex-wrap">
   <a class="gsw-btn" href="adminserverlist.php">Manage Servers & Services</a>
   <a class="gsw-btn" href="./invoices.php">Invoice History</a>
+  <a class="gsw-btn" href="admin_coupons.php">Manage Coupons</a>
   <a class="gsw-btn" href="admin_config.php">Edit Site Config</a>
   </div>
 

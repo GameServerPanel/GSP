@@ -271,6 +271,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
     }
 }
 
+// Handle coupon application
+$coupon_message = '';
+$coupon_error = '';
+$applied_coupon = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
+    $coupon_code = trim($_POST['coupon_code']);
+    
+    if (!empty($coupon_code)) {
+        // Validate and fetch coupon
+        $safe_code = mysqli_real_escape_string($db, $coupon_code);
+        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
+                         WHERE code = '$safe_code' 
+                         AND is_active = 1 
+                         AND (expires IS NULL OR expires > NOW())
+                         LIMIT 1";
+        $coupon_result = mysqli_query($db, $coupon_query);
+        
+        if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
+            $coupon = mysqli_fetch_assoc($coupon_result);
+            
+            // Check usage limits
+            if ($coupon['max_uses'] !== null && intval($coupon['current_uses']) >= intval($coupon['max_uses'])) {
+                $coupon_error = "This coupon has reached its usage limit.";
+            } else {
+                // Store coupon in session for later use
+                $_SESSION['applied_coupon'] = $coupon;
+                $applied_coupon = $coupon;
+                $coupon_message = "Coupon '{$coupon['code']}' applied successfully! " . 
+                                  number_format($coupon['discount_percent'], 2) . "% discount " .
+                                  ($coupon['usage_type'] === 'permanent' ? '(permanent - applies to all renewals)' : '(one-time only)');
+            }
+        } else {
+            $coupon_error = "Invalid or expired coupon code.";
+        }
+    }
+}
+
+// Handle coupon removal
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
+    unset($_SESSION['applied_coupon']);
+    $coupon_message = "Coupon removed.";
+}
+
+// Check if there's a coupon in session
+if (isset($_SESSION['applied_coupon']) && !$applied_coupon) {
+    $applied_coupon = $_SESSION['applied_coupon'];
+}
+
 if ($db){
         $carts = $db->query("SELECT * FROM ogp_billing_invoices AS cart
             WHERE status = 'due' AND user_id = " . $user_id . " ORDER BY invoice_id ASC");
@@ -301,6 +350,28 @@ if ($db){
   <tbody>
             <?php
             $grandTotal = 0; // Initialize grand total variable
+            $totalDiscount = 0; // Track total discount amount
+            
+            // Helper function to check if coupon applies to a game
+            function couponAppliesTo($coupon, $game_name) {
+                if (!$coupon || $coupon['game_filter_type'] === 'all_games') {
+                    return true;
+                }
+                
+                if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
+                    $allowed_games = json_decode($coupon['game_filter_list'], true);
+                    if (is_array($allowed_games)) {
+                        // Check if the game_name matches any of the allowed games
+                        foreach ($allowed_games as $allowed_game) {
+                            if (stripos($game_name, $allowed_game) !== false || stripos($allowed_game, $game_name) !== false) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                
+                return false;
+            }
             
             if (isset($carts) && $carts instanceof mysqli_result && $carts->num_rows > 0) {
                 while ($row = $carts->fetch_assoc()) {
@@ -319,14 +390,28 @@ if ($db){
             <td><?php echo htmlspecialchars($row['max_players']); ?></td>
             <td>$<?php echo number_format($row['amount'], 2); ?></td>
             <td><?php echo htmlspecialchars($row['qty']); ?></td>
-            <?php $rowtotal = $row['amount'] * $row['qty'] * $row['max_players'];?>
+            <?php 
+              $rowtotal = $row['amount'] * $row['qty'] * $row['max_players'];
+              $itemDiscount = 0;
+              
+              // Apply coupon if applicable
+              if ($applied_coupon && couponAppliesTo($applied_coupon, $row['home_name'])) {
+                  $discountPercent = floatval($applied_coupon['discount_percent']);
+                  $itemDiscount = ($rowtotal * $discountPercent) / 100;
+                  $totalDiscount += $itemDiscount;
+                  $rowtotal = $rowtotal - $itemDiscount;
+              }
+            ?>
             <?php
               // Build invoice and line item structures used later when creating PayPal order
               if (!isset($invoice) || !is_array($invoice)) $invoice = [];
               $invoice[] = [
                 'serverID' => 'invoice-' . $row['invoice_id'],
                 'amount'   => number_format($rowtotal, 2, '.', ''),
-                'invoice_id' => intval($row['invoice_id'])
+                'invoice_id' => intval($row['invoice_id']),
+                'discount' => number_format($itemDiscount, 2, '.', ''),
+                'original_amount' => number_format($row['amount'] * $row['qty'] * $row['max_players'], 2, '.', ''),
+                'coupon_id' => $applied_coupon ? intval($applied_coupon['coupon_id']) : null
               ];
             ?>
             <?php
@@ -376,6 +461,38 @@ if ($db){
             ?>
         </tbody>
     </table>
+
+    <!-- Coupon Application Section -->
+    <div class="coupon-section" style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+        <?php if ($coupon_message): ?>
+            <div style="padding: 10px; margin-bottom: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 3px;">
+                <?php echo htmlspecialchars($coupon_message); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($coupon_error): ?>
+            <div style="padding: 10px; margin-bottom: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 3px;">
+                <?php echo htmlspecialchars($coupon_error); ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if ($applied_coupon): ?>
+            <div style="padding: 10px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; margin-bottom: 10px;">
+                <strong>Active Coupon:</strong> <?php echo htmlspecialchars($applied_coupon['code']); ?> 
+                (<?php echo number_format($applied_coupon['discount_percent'], 2); ?>% off)
+                <form method="POST" style="display: inline; margin-left: 10px;">
+                    <button type="submit" name="remove_coupon" class="btn-square text-danger" style="padding: 5px 10px;">Remove</button>
+                </form>
+            </div>
+        <?php else: ?>
+            <form method="POST" style="display: flex; gap: 10px; align-items: center;">
+                <label for="coupon_code" style="font-weight: bold;">Have a coupon code?</label>
+                <input type="text" id="coupon_code" name="coupon_code" placeholder="Enter code" 
+                       style="padding: 8px; border: 1px solid #ddd; border-radius: 3px; flex: 1; max-width: 200px;">
+                <button type="submit" name="apply_coupon" class="gsw-btn">Apply Coupon</button>
+            </form>
+        <?php endif; ?>
+    </div>
 
 
 <?php

@@ -21,10 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all orders
-$orders = mysqli_query($db, "SELECT o.*, u.user_name 
+// Fetch all orders with coupon information
+$orders = mysqli_query($db, "SELECT o.*, u.user_name, c.code AS coupon_code, c.discount_percent AS coupon_discount 
     FROM ogp_billing_orders o 
     LEFT JOIN ogp_users u ON o.user_id = u.user_id 
+    LEFT JOIN ogp_billing_coupons c ON o.coupon_id = c.coupon_id
     ORDER BY o.order_id DESC");
 
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
@@ -88,7 +89,20 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
           <td><?php echo h($row['home_id'] ?? 'N/A'); ?></td>
           <td><?php echo h($row['home_name']); ?></td>
           <td><?php echo h($row['ip']); ?></td>
-          <td>$<?php echo number_format($row['price'], 2); ?></td>
+          <td>
+            <?php 
+            $price = floatval($row['price']);
+            $discount = floatval($row['discount_amount'] ?? 0);
+            
+            if ($discount > 0 && !empty($row['coupon_code'])) {
+                echo '<span style="text-decoration: line-through; color: #999;">$' . number_format($price + $discount, 2) . '</span><br>';
+                echo '<strong>$' . number_format($price, 2) . '</strong>';
+                echo '<br><small style="color: #28a745;">(' . h($row['coupon_code']) . ' -' . number_format($row['coupon_discount'], 0) . '%)</small>';
+            } else {
+                echo '$' . number_format($price, 2);
+            }
+            ?>
+          </td>
           <td><?php echo h($row['invoice_duration']); ?></td>
           <td>
             <span class="status-badge status-<?php echo h($row['status']); ?>">

@@ -1,0 +1,29 @@
+# Ignore database configuration files with sensitive credentials
+modules/billing/includes/config.inc.php
+
+# Ignore logs
+modules/billing/logs/*.log
+modules/billing/logs/*.txt
+
+# Ignore data directory (payment JSONs)
+modules/billing/data/*.json
+!modules/billing/data/.gitkeep
+
+# Ignore backup files
+*.backup
+*.bak
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore temporary files
+/tmp/
+*.tmp
