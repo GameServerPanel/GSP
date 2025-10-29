@@ -91,7 +91,6 @@ if ($http !== 201 && $http !== 200) {
 // Extract payment details
 $txid = null;
 capture_log('paypal_capture_success', $capture);
-echo json_encode($capture);
 if (isset($capture['purchase_units'][0]['payments']['captures'][0])) {
     $txid = $capture['purchase_units'][0]['payments']['captures'][0]['id'] ?? null;
 }
