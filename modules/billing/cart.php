@@ -1,765 +1,338 @@
+<?php
+/**
+ * Shopping Cart - Display unpaid invoices and PayPal checkout
+ * Standalone billing module - uses only standard PHP mysqli
+ */
+session_start();
+require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/login_required.php');
+
+// Get user ID from session (website_user_id preferred)
+$user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
+           (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
+
+if ($user_id <= 0) {
+    header('Location: /login.php?return_to=' . urlencode($_SERVER['REQUEST_URI']));
+    exit;
+}
+
+// Connect to database using mysqli
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$db) {
+    die('Database connection failed: ' . mysqli_connect_error());
+}
+
+// Fetch all unpaid invoices for this user
+$invoices = [];
+$total_amount = 0.00;
+$query = "SELECT i.*, s.game_key, s.game_name 
+          FROM {$table_prefix}billing_invoices i
+          LEFT JOIN {$table_prefix}billing_services s ON i.service_id = s.service_id
+          WHERE i.user_id = " . intval($user_id) . " AND i.status = 'due'
+          ORDER BY i.invoice_date ASC";
+
+$result = mysqli_query($db, $query);
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $invoices[] = $row;
+        $total_amount += floatval($row['amount']);
+    }
+}
+
+// If cart is empty, show message
+$cart_empty = count($invoices) === 0;
+
+// PayPal configuration
+$sandbox = true; // Set to false for live PayPal
+$client_id = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
+
+// Prepare PayPal items array
+$paypal_items = [];
+foreach ($invoices as $inv) {
+    $game_display = !empty($inv['game_name']) ? $inv['game_name'] : 'Game Server';
+    $paypal_items[] = [
+        'name' => $inv['home_name'] . ' (' . $game_display . ')',
+        'description' => $inv['description'],
+        'quantity' => intval($inv['qty']),
+        'unit_amount' => [
+            'currency_code' => 'USD',
+            'value' => number_format(floatval($inv['amount']) / intval($inv['qty']), 2, '.', '')
+        ]
+    ];
+}
+
+// Get site base URL dynamically
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$siteBase = $protocol . $host;
+
+mysqli_close($db);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - GameServers.World</title>
+    <title>Shopping Cart - Game Server Panel</title>
+    <link rel="stylesheet" href="/includes/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .cart-empty {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .cart-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .cart-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+        .cart-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .cart-table tr:hover {
+            background: #f8f9fa;
+        }
+        .game-name {
+            font-weight: 600;
+            color: #007bff;
+        }
+        .server-name {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .price {
+            font-weight: 600;
+            color: #28a745;
+        }
+        .cart-total {
+            text-align: right;
+            padding: 20px 0;
+            border-top: 2px solid #dee2e6;
+            margin-bottom: 30px;
+        }
+        .cart-total .total-label {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-right: 20px;
+        }
+        .cart-total .total-amount {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #28a745;
+        }
+        .checkout-section {
+            padding: 20px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .status-due {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        #paypal-button-container {
+            max-width: 400px;
+            margin: 20px 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+    <?php if (!$cart_empty): ?>
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=USD&intent=capture"></script>
+    <?php endif; ?>
 </head>
 <body>
-<?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Require login
-require_once(__DIR__ . '/includes/login_required.php');
-
-// Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
-require_once(__DIR__ . '/includes/log.php');
-
-// Create database connection
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-if (!$db) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// Handler: allow admin quick-create OR user claim for free items
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['create_free_for'])) {
-  if (session_status() === PHP_SESSION_NONE) session_start();
-  $actor_id = intval($_SESSION['website_user_id'] ?? $_SESSION['user_id'] ?? 0);
-  $actor_role = strtolower($_SESSION['website_user_role'] ?? '');
-  $is_admin = ($actor_role === 'admin');
-
-  // Fallback: if session role not present, try to resolve from DB using actor_id or website_username
-  if (!$is_admin) {
-    if ($actor_id > 0) {
-      $ar = mysqli_query($db, "SELECT users_role FROM ogp_users WHERE user_id = " . intval($actor_id) . " LIMIT 1");
-      if ($ar && mysqli_num_rows($ar) === 1) {
-        $arr = mysqli_fetch_assoc($ar);
-        if (strtolower((string)($arr['users_role'] ?? '')) === 'admin') {
-          $is_admin = true;
-          $_SESSION['website_user_role'] = 'admin';
-        }
-      }
-    } elseif (isset($_SESSION['website_username']) && !empty($_SESSION['website_username'])) {
-      $safe_un = mysqli_real_escape_string($db, $_SESSION['website_username']);
-      $ar = mysqli_query($db, "SELECT user_id, users_role FROM ogp_users WHERE users_login = '$safe_un' LIMIT 1");
-      if ($ar && mysqli_num_rows($ar) === 1) {
-        $arr = mysqli_fetch_assoc($ar);
-        if (strtolower((string)($arr['users_role'] ?? '')) === 'admin') {
-          $is_admin = true;
-          $_SESSION['website_user_role'] = 'admin';
-          $_SESSION['website_user_id'] = intval($arr['user_id'] ?? 0);
-        }
-      }
-    }
-  }
-  $orderId = (int)$_POST['create_free_for'];
-  if ($orderId > 0) {
-    // load invoice to verify ownership/price (invoice-first flow)
-  $stmt = $db->prepare("SELECT user_id, amount, status, qty, invoice_duration, service_id, home_name, ip, max_players, remote_control_password, ftp_password FROM " . $table_prefix . "billing_invoices WHERE invoice_id = ? LIMIT 1");
-    if ($stmt) {
-      $stmt->bind_param('i', $orderId);
-      $stmt->execute();
-  $stmt->bind_result($owner_id, $order_price, $prev_status, $order_qty, $order_invoice_duration, $service_id, $home_name, $ip, $max_players, $remote_control_password, $ftp_password);
-      $found = $stmt->fetch();
-      $stmt->close();
-    } else {
-      $found = false;
-    }
-
-    $audit_file = __DIR__ . '/logs/free_create_audit.log';
-
-    if ($found) {
-      $allowed = false;
-      $reason = '';
-      // Admin may force-create paid records for testing
-      if ($is_admin) {
-        $allowed = true;
-        $reason = 'admin_create';
-      }
-      // Owner may claim a free order if the price is zero
-      elseif ($actor_id > 0 && $actor_id === intval($owner_id) && floatval($order_price) == 0.0) {
-        $allowed = true;
-        $reason = 'user_claim_free';
-      }
-
-      if ($allowed) {
-        // Mark invoice as paid
-        $upd_inv = $db->prepare("UPDATE " . $table_prefix . "billing_invoices SET status = 'paid', paid_date = NOW() WHERE invoice_id = ? LIMIT 1");
-        if ($upd_inv) {
-          $upd_inv->bind_param('i', $orderId);
-          $upd_inv->execute();
-          $upd_inv->close();
-        }
+    <div class="container">
+        <h1>🛒 Shopping Cart</h1>
         
-        // Now create the order record (invoice -> order after payment)
-        // Compute end_date: months based on invoice_duration and qty
-        $months = 0;
-        $q = intval($order_qty ?? 0);
-        $invdur = strtolower(trim($order_invoice_duration ?? ''));
-        if (strpos($invdur, 'year') !== false) {
-          $months = $q * 12;
-        } else {
-          // default to months for anything else (month, monthly, etc.)
-          $months = $q;
-        }
-        $end_date = null;
-        if ($months > 0) {
-          $dt = new DateTime('now');
-          $dt->modify('+' . intval($months) . ' months');
-          $end_date = $dt->format('Y-m-d H:i:s');
-        } else {
-          // if no months specified, set to now
-          $end_date = date('Y-m-d H:i:s');
-        }
-
-        // INSERT new order record (invoice->order after payment)
-        $esc_service_id = intval($service_id);
-        $esc_home_name = mysqli_real_escape_string($db, $home_name);
-        $esc_ip = intval($ip);
-        $esc_max_players = intval($max_players);
-        $esc_qty = intval($order_qty);
-        $esc_inv_dur = mysqli_real_escape_string($db, $order_invoice_duration);
-        $esc_price = floatval($order_price);
-        $esc_rc_pass = mysqli_real_escape_string($db, $remote_control_password);
-        $esc_ftp_pass = mysqli_real_escape_string($db, $ftp_password);
-        $esc_user_id = intval($owner_id);
-        $esc_end_date = mysqli_real_escape_string($db, $end_date);
-        
-        $insert_sql = "INSERT INTO " . $table_prefix . "billing_orders 
-          (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, end_date, payment_txid, paid_ts) 
-          VALUES 
-          ({$esc_user_id}, {$esc_service_id}, '{$esc_home_name}', {$esc_ip}, {$esc_max_players}, {$esc_qty}, '{$esc_inv_dur}', {$esc_price}, '{$esc_rc_pass}', '{$esc_ftp_pass}', 'paid', '{$esc_end_date}', 'FREE-{$orderId}', NOW())";
-        
-        $insert_res = mysqli_query($db, $insert_sql);
-        $new_order_id = 0;
-        if ($insert_res) {
-          $new_order_id = mysqli_insert_id($db);
-          // Update invoice with the new order_id
-          $upd_inv_order = $db->prepare("UPDATE " . $table_prefix . "billing_invoices SET order_id = ? WHERE invoice_id = ? LIMIT 1");
-          if ($upd_inv_order) {
-            $upd_inv_order->bind_param('ii', $new_order_id, $orderId);
-            $upd_inv_order->execute();
-            $upd_inv_order->close();
-          }
-        }
-
-  // write audit log (include end_date if set)
-  site_log_info('free_create', ['actor'=>$actor_id, 'role'=>$actor_role, 'action'=>$reason, 'invoice'=>$orderId, 'new_order'=>$new_order_id, 'owner'=>$owner_id, 'price'=>$order_price, 'prev_status'=>$prev_status, 'end_date'=>$end_date ?? '']);
-
-        // write a simulated webhook file (same behavior as previous admin flow)
-        $dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';
-        @mkdir($dataDir, 0775, true);
-        $rec = [
-          'event_type' => 'PAYMENT.CAPTURE.COMPLETED',
-          'status' => 'PAID',
-          'amount' => floatval($order_price),
-          'currency' => 'USD',
-          'payer' => $_SESSION['website_user_email'] ?? ($_SESSION['website_username'] ?? ''),
-          'invoice' => 'FREE-' . $orderId . '-' . time(),
-          // process_payment_record matches numeric custom values to order_id; use numeric order id here to ensure matching
-          'custom' => (string)$orderId,
-          'resource_id' => 'FREE-' . bin2hex(random_bytes(6)),
-          'items' => [],
-          'ts' => date('c'),
-        ];
-        $fname = $dataDir . DIRECTORY_SEPARATOR . $rec['invoice'] . '.json';
-        file_put_contents($fname, json_encode($rec, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
-
-        // If available, process the payment record immediately so webhooks logic runs during creation
-        require_once(__DIR__ . '/includes/payment_processor.php');
-        try {
-            if (function_exists('process_payment_record')) {
-              process_payment_record($rec);
-            }
-        } catch (Exception $e) {
-            error_log('[cart create_free] process_payment_record failed: ' . $e->getMessage());
-        }
-
-        header('Location: return.php?invoice=' . urlencode($rec['invoice']));
-        exit;
-      } else {
-  // unauthorized attempt - log and continue
-  site_log_warn('unauthorized_free_create', ['actor'=>$actor_id, 'role'=>$actor_role, 'order'=>$orderId, 'owner'=>$owner_id, 'price'=>$order_price]);
-      }
-    }
-  }
-}
-
-// Include top bar and menu
-include(__DIR__ . '/includes/top.php');
-include(__DIR__ . '/includes/menu.php');
-
-// Use session user_id where available
-// Use session user_id where available; if not present but website_username exists, try to resolve it from DB
-$user_id = intval($_SESSION['website_user_id'] ?? $_SESSION['user_id'] ?? 0);
-if ($user_id <= 0 && isset($_SESSION['website_username']) && !empty($_SESSION['website_username'])) {
-  // try to resolve username to user_id in DB and persist into session
-  $safe_uname = mysqli_real_escape_string($db, $_SESSION['website_username']);
-  $qr = mysqli_query($db, "SELECT user_id FROM ogp_users WHERE users_login = '$safe_uname' LIMIT 1");
-  if ($qr && mysqli_num_rows($qr) === 1) {
-    $rr = mysqli_fetch_assoc($qr);
-    $user_id = intval($rr['user_id'] ?? 0);
-    if ($user_id > 0) {
-      $_SESSION['website_user_id'] = $user_id;
-      site_log_info('cart_resolved_user_id', ['username'=>$_SESSION['website_username'],'user_id'=>$user_id]);
-      // Resolve and persist the user's role to avoid extra DB lookups later
-      $role_q = mysqli_query($db, "SELECT users_role FROM ogp_users WHERE user_id = " . intval($user_id) . " LIMIT 1");
-      if ($role_q && mysqli_num_rows($role_q) === 1) {
-        $role_r = mysqli_fetch_assoc($role_q);
-        $_SESSION['website_user_role'] = $role_r['users_role'] ?? '';
-      }
-    }
-  } else {
-    site_log_warn('cart_resolve_user_failed', ['username'=>$_SESSION['website_username']]);
-  }
-}
-
-if ($user_id <= 0) {
-    echo "<center><h4>Please login to view your cart</h4></center>";
-    mysqli_close($db);
-    echo "</body></html>";
-    return;
-}
-
-// Determine admin status for UI: prefer session role, otherwise check DB
-$is_admin = false;
-if (isset($_SESSION['website_user_role']) && !empty($_SESSION['website_user_role'])) {
-  $is_admin = (strtolower($_SESSION['website_user_role']) === 'admin');
-} elseif ($user_id > 0) {
-  $rr = mysqli_query($db, "SELECT users_role FROM ogp_users WHERE user_id = " . intval($user_id) . " LIMIT 1");
-  if ($rr && mysqli_num_rows($rr) === 1) {
-    $rrow = mysqli_fetch_assoc($rr);
-    $is_admin = (strtolower((string)($rrow['users_role'] ?? '')) === 'admin');
-  }
-}
-
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_single'])) {
-    $invoice_id = intval($_POST['delete_single']);
-    if ($invoice_id > 0) {
-        // Check if this invoice is linked to an order (renewal case)
-        $stmt = $db->prepare("SELECT order_id FROM ogp_billing_invoices WHERE invoice_id = ? AND user_id = ?");
-        $stmt->bind_param("ii", $invoice_id, $user_id);
-        $stmt->execute();
-        $stmt->bind_result($linked_order_id);
-        $found = $stmt->fetch();
-        $stmt->close();
-        
-    if ($found && $linked_order_id > 0) {
-      // This is a renewal invoice - just delete the invoice, keep the order
-      $delete = $db->prepare("DELETE FROM ogp_billing_invoices WHERE invoice_id = ? AND user_id = ?");
-      $delete->bind_param("ii", $invoice_id, $user_id);
-      $delete->execute();
-      if (isset($db) && method_exists($db, 'logger')) {
-        $db->logger("USER-CART: User " . intval($user_id) . " deleted renewal invoice " . intval($invoice_id));
-      }
-      $delete->close();
-        } else {
-            // New order invoice - delete it
-            $delete = $db->prepare("DELETE FROM ogp_billing_invoices WHERE invoice_id = ? AND user_id = ?");
-            $delete->bind_param("ii", $invoice_id, $user_id);
-      $delete->execute();
-      if (isset($db) && method_exists($db, 'logger')) {
-        $db->logger("USER-CART: User " . intval($user_id) . " deleted invoice " . intval($invoice_id));
-      }
-      $delete->close();
-        }
-    }
-}
-
-// Handle coupon application
-$coupon_message = '';
-$coupon_error = '';
-$applied_coupon = null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
-    $coupon_code = trim($_POST['coupon_code']);
-    
-    if (!empty($coupon_code)) {
-        // Validate and fetch coupon
-        $safe_code = mysqli_real_escape_string($db, $coupon_code);
-        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
-                         WHERE code = '$safe_code' 
-                         AND is_active = 1 
-                         AND (expires IS NULL OR expires > NOW())
-                         LIMIT 1";
-        $coupon_result = mysqli_query($db, $coupon_query);
-        
-        if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
-            $coupon = mysqli_fetch_assoc($coupon_result);
-            
-            // Check usage limits
-            if ($coupon['max_uses'] !== null && intval($coupon['current_uses']) >= intval($coupon['max_uses'])) {
-                $coupon_error = "This coupon has reached its usage limit.";
-            } else {
-                // Store coupon in session for later use
-                $_SESSION['applied_coupon'] = $coupon;
-                $applied_coupon = $coupon;
-                $coupon_message = "Coupon '{$coupon['code']}' applied successfully! " . 
-                                  number_format($coupon['discount_percent'], 2) . "% discount " .
-                                  ($coupon['usage_type'] === 'permanent' ? '(permanent - applies to all renewals)' : '(one-time only)');
-            }
-        } else {
-            $coupon_error = "Invalid or expired coupon code.";
-        }
-    }
-}
-
-// Handle coupon removal
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
-    unset($_SESSION['applied_coupon']);
-    $coupon_message = "Coupon removed.";
-}
-
-// Check if there's a coupon in session
-if (isset($_SESSION['applied_coupon']) && !$applied_coupon) {
-    $applied_coupon = $_SESSION['applied_coupon'];
-}
-
-if ($db){
-        $carts = $db->query("SELECT * FROM ogp_billing_invoices AS cart
-            WHERE status = 'due' AND user_id = " . $user_id . " ORDER BY invoice_id ASC");
-}
-
-?> 
-
-<div class="site-panel">
-  <h2 class="site-panel-title">Your Cart</h2>
-
-   <!-- 
-   This is our cart form just for display and deletion.  There is a different form below that has the paypal button and fills in all the hidden fields
-   -->
-
-  <table class="cart-table">
-    <thead>
-      <tr>
-        <th class="table-compact text-center"></th>
-        <th>Server ID</th>
-        <th>Game Name</th>
-        <th>Location</th>
-        <th>Max Players</th>
-        <th>Price per Player</th>
-        <th>Months</th>
-        <th>Total</th>
-      </tr>
-    </thead>
-  <tbody>
-            <?php
-            $grandTotal = 0; // Initialize grand total variable
-            $totalDiscount = 0; // Track total discount amount
-            
-            // Helper function to check if coupon applies to a game
-            function couponAppliesTo($coupon, $game_name) {
-                if (!$coupon || $coupon['game_filter_type'] === 'all_games') {
-                    return true;
-                }
-                
-                if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
-                    $allowed_games = json_decode($coupon['game_filter_list'], true);
-                    if (is_array($allowed_games)) {
-                        // Check if the game_name matches any of the allowed games
-                        foreach ($allowed_games as $allowed_game) {
-                            if (stripos($game_name, $allowed_game) !== false || stripos($allowed_game, $game_name) !== false) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                
-                return false;
-            }
-            
-            if (isset($carts) && $carts instanceof mysqli_result && $carts->num_rows > 0) {
-                while ($row = $carts->fetch_assoc()) {
-                    ?>
-          <tr data-cart-id="<?php echo htmlspecialchars($row['invoice_id']); ?>">
-            <td>
-              <form method="post" action="" class="inline-form">
-                <button type="submit" name="delete_single" value="<?php echo htmlspecialchars($row['invoice_id']); ?>" class="btn-square text-danger">
-                  
-                </button>
-              </form>
-            </td>
-            <td><?php echo htmlspecialchars($row['invoice_id']); ?></td>
-            <td><?php echo htmlspecialchars($row['home_name']); ?></td>
-            <td><?php echo htmlspecialchars($row['ip']); ?></td>
-            <td><?php echo htmlspecialchars($row['max_players']); ?></td>
-            <td>$<?php echo number_format($row['amount'], 2); ?></td>
-            <td><?php echo htmlspecialchars($row['qty']); ?></td>
-            <?php 
-              $rowtotal = $row['amount'] * $row['qty'] * $row['max_players'];
-              $itemDiscount = 0;
-              
-              // Apply coupon if applicable
-              if ($applied_coupon && couponAppliesTo($applied_coupon, $row['home_name'])) {
-                  $discountPercent = floatval($applied_coupon['discount_percent']);
-                  $itemDiscount = ($rowtotal * $discountPercent) / 100;
-                  $totalDiscount += $itemDiscount;
-                  $rowtotal = $rowtotal - $itemDiscount;
-              }
-            ?>
-            <?php
-              // Build invoice and line item structures used later when creating PayPal order
-              if (!isset($invoice) || !is_array($invoice)) $invoice = [];
-              $invoice[] = [
-                'serverID' => 'invoice-' . $row['invoice_id'],
-                'amount'   => number_format($rowtotal, 2, '.', ''),
-                'invoice_id' => intval($row['invoice_id']),
-                'discount' => number_format($itemDiscount, 2, '.', ''),
-                'original_amount' => number_format($row['amount'] * $row['qty'] * $row['max_players'], 2, '.', ''),
-                'coupon_id' => $applied_coupon ? intval($applied_coupon['coupon_id']) : null
-              ];
-            ?>
-            <?php
-              // Use the previously resolved $is_admin (computed once above)
-              $is_free = ((float)$row['amount'] == 0.0);
-            ?>
-                <?php if ($is_admin || $is_free): ?>
-              <td>
-                <form method="post" action="" class="inline-form">
-                  <input type="hidden" name="create_free_for" value="<?php echo (int)$row['invoice_id']; ?>">
-                      <button type="submit" class="gsw-btn"><?php echo $is_admin ? 'Create (Free)' : 'Claim (Free)'; ?></button>
-                </form>
-                <?php if ($is_admin): ?>
-                  <div class="admin-note">Admin: force-create a paid record for testing.</div>
-                <?php endif; ?>
-              </td>
-            <?php else: ?>
-              <td>&nbsp;</td>
-            <?php endif; ?>
-                        <?php $grandTotal += $rowtotal; // Add to grand total ?>
-                        <td>$<?php echo number_format($rowtotal, 2); ?></td>
-                        
-                        
-                    </tr>
-                    <?php
-                }
-                
-                // Add total row
-                ?>
-        <tr class="cart-total-row">
-          <td colspan="7" class="cart-total-label">
-                        Cart Total:
-                    </td>
-          <td class="cart-total-value">
-            $<?php echo number_format($grandTotal, 2); ?>
-          </td>
-                </tr>
-                <?php
-            } else {
-                // Display a message if no cart items are found
-                ?>
-                <tr>
-                    <td colspan="7" class="text-center muted">No items in your cart.</td>
-                </tr>
-                <?php
-            }
-            ?>
-        </tbody>
-    </table>
-
-    <!-- Coupon Application Section -->
-    <div class="coupon-section" style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 5px;">
-        <?php if ($coupon_message): ?>
-            <div style="padding: 10px; margin-bottom: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 3px;">
-                <?php echo htmlspecialchars($coupon_message); ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if ($coupon_error): ?>
-            <div style="padding: 10px; margin-bottom: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 3px;">
-                <?php echo htmlspecialchars($coupon_error); ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if ($applied_coupon): ?>
-            <div style="padding: 10px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 3px; margin-bottom: 10px;">
-                <strong>Active Coupon:</strong> <?php echo htmlspecialchars($applied_coupon['code']); ?> 
-                (<?php echo number_format($applied_coupon['discount_percent'], 2); ?>% off)
-                <form method="POST" style="display: inline; margin-left: 10px;">
-                    <button type="submit" name="remove_coupon" class="btn-square text-danger" style="padding: 5px 10px;">Remove</button>
-                </form>
+        <?php if ($cart_empty): ?>
+            <div class="cart-empty">
+                <h2>Your cart is empty</h2>
+                <p>Browse our game servers and add them to your cart to get started!</p>
+                <a href="/order.php" class="btn">Browse Servers</a>
             </div>
         <?php else: ?>
-            <form method="POST" style="display: flex; gap: 10px; align-items: center;">
-                <label for="coupon_code" style="font-weight: bold;">Have a coupon code?</label>
-                <input type="text" id="coupon_code" name="coupon_code" placeholder="Enter code" 
-                       style="padding: 8px; border: 1px solid #ddd; border-radius: 3px; flex: 1; max-width: 200px;">
-                <button type="submit" name="apply_coupon" class="gsw-btn">Apply Coupon</button>
-            </form>
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Game Server</th>
+                        <th>Duration</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($invoices as $inv): ?>
+                    <tr>
+                        <td>
+                            <div class="game-name"><?php echo htmlspecialchars($inv['game_name'] ?? 'Game Server'); ?></div>
+                            <div class="server-name"><?php echo htmlspecialchars($inv['home_name']); ?></div>
+                            <?php if (!empty($inv['description'])): ?>
+                            <div style="font-size: 0.85em; color: #999; margin-top: 4px;">
+                                <?php echo htmlspecialchars($inv['description']); ?>
+                            </div>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($inv['invoice_duration']); ?></td>
+                        <td><?php echo htmlspecialchars($inv['qty']); ?>x</td>
+                        <td>
+                            <span class="status-badge status-due">
+                                <?php echo htmlspecialchars(strtoupper($inv['status'])); ?>
+                            </span>
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="price">$<?php echo number_format(floatval($inv['amount']), 2); ?></span>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <div class="cart-total">
+                <span class="total-label">Total:</span>
+                <span class="total-amount">$<?php echo number_format($total_amount, 2); ?></span>
+            </div>
+
+            <div class="checkout-section">
+                <h3>Checkout with PayPal</h3>
+                <p>Click the button below to complete your purchase securely through PayPal.</p>
+                
+                <div id="paypal-button-container"></div>
+                <div id="status-message" class="loading" style="display:none;"></div>
+                
+                <div style="margin-top: 30px;">
+                    <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
+                    <a href="/my_account.php" class="btn btn-secondary">My Account</a>
+                </div>
+            </div>
+
+            <script>
+                function setStatus(msg) {
+                    const statusDiv = document.getElementById('status-message');
+                    statusDiv.textContent = msg;
+                    statusDiv.style.display = 'block';
+                }
+
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        setStatus('Creating order...');
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    currency_code: 'USD',
+                                    value: '<?php echo number_format($total_amount, 2, '.', ''); ?>',
+                                    breakdown: {
+                                        item_total: {
+                                            currency_code: 'USD',
+                                            value: '<?php echo number_format($total_amount, 2, '.', ''); ?>'
+                                        }
+                                    }
+                                },
+                                items: <?php echo json_encode($paypal_items); ?>
+                            }]
+                        });
+                    },
+                    
+                    onApprove: function(data, actions) {
+                        setStatus('Processing payment...');
+                        
+                        // Capture the order via our backend
+                        return fetch('/api/capture_order.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ order_id: data.orderID })
+                        })
+                        .then(function(res) {
+                            if (!res.ok) {
+                                return res.text().then(function(text) {
+                                    throw new Error('Payment capture failed: ' + text);
+                                });
+                            }
+                            return res.json();
+                        })
+                        .then(function(orderData) {
+                            console.log('Capture result:', orderData);
+                            if (orderData.status === 'COMPLETED') {
+                                setStatus('Payment successful! Redirecting...');
+                                // Redirect to success page
+                                window.location.href = '/payment_success.php?order_id=' + data.orderID;
+                            } else {
+                                throw new Error('Unexpected payment status: ' + orderData.status);
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('Payment error:', err);
+                            setStatus('Error: ' + err.message);
+                            alert('Payment processing failed. Please try again or contact support.');
+                        });
+                    },
+                    
+                    onError: function(err) {
+                        console.error('PayPal error:', err);
+                        setStatus('Payment error occurred');
+                        alert('An error occurred during payment. Please try again.');
+                    },
+                    
+                    onCancel: function(data) {
+                        setStatus('Payment cancelled');
+                        window.location.href = '/payment_cancel.php';
+                    }
+                }).render('#paypal-button-container');
+            </script>
         <?php endif; ?>
     </div>
-
-
-<?php
-// These must already exist earlier in your cart page:
-// $grandTotal  (number)  e.g., 24.49
-// $invoice     (array)   e.g., [['serverID'=>'srv123','amount'=>9.99], ['serverID'=>'srv999','amount'=>14.50]]
-
-// --- Sanity + normalization ---
-if (!isset($grandTotal) || !is_numeric($grandTotal)) {
-  $grandTotal = 0.00;
-}
-if (!isset($invoice) || !is_array($invoice)) {
-  $invoice = [];
-}
-$currency    = 'USD';
-$amount      = number_format((float)$grandTotal, 2, '.', '');
-$lineItems   = [];
-
-// Build PayPal-friendly items array (name, unit_amount, quantity, sku)
-foreach ($invoice as $i) {
-  $sid = isset($i['serverID']) ? (string)$i['serverID'] : 'unknown';
-  $amt = isset($i['amount']) && is_numeric($i['amount']) ? number_format((float)$i['amount'], 2, '.', '') : '0.00';
-  $lineItems[] = [
-    'name'        => "Server $sid",
-    'quantity'    => '1',
-    'unit_amount' => ['currency_code' => $currency, 'value' => $amt],
-    'sku'         => $sid
-  ];
-}
-
-// Single overall invoice id for the order
-$invoiceId   = 'INV-' . date('Ymd-His') . '-' . bin2hex(random_bytes(3));
-
-// A short custom reference derived from your line items (<= 127 chars for PayPal)
-$customHash  = substr(strtoupper(sha1(json_encode($invoice))), 0, 16);
-$customId    = "INVREF-$customHash";
-// If the cart contains a single order, set custom_id to the numeric order id so webhooks
-// can match the order directly (payment_success matches numeric custom -> order_id).
-if (is_array($invoice) && count($invoice) === 1 && !empty($invoice[0]['order_id'])) {
-  $customId = (string) intval($invoice[0]['order_id']);
-}
-
-// Text on the PayPal side
-$description = 'Game server order (' . count($lineItems) . ' item' . (count($lineItems)===1?'': 's') . ')';
-
-// URLs
-// Define the site base URL - detect protocol and host dynamically
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$siteBase = $protocol . $host;
-
-// Return URLs are root-relative (website will be deployed at root, not modules/billing)
-$returnUrl  = $siteBase . '/payment_success.php?invoice=' . urlencode($invoiceId);
-$cancelUrl  = $siteBase . '/payment_cancel.php?invoice=' . urlencode($invoiceId);
-
-// API base (relative) - point to billing module API endpoints
-$apiBase = 'api';
-?>
-<!-- PayPal JS SDK (Sandbox). Use LIVE client-id when going live. -->
-<script src="https://www.paypal.com/sdk/js?client-id=AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c&currency=USD&intent=capture"></script>
-
-<!-- Debug: Cart values -->
-<?php if (isset($_GET['debug'])): ?>
-<div style="background:#f0f0f0; padding:10px; margin:10px 0; font:12px monospace;">
-  <strong>Debug Info:</strong><br>
-  Grand Total: $<?php echo htmlspecialchars($grandTotal); ?><br>
-  Invoice Items: <?php echo count($invoice); ?><br>
-  Line Items: <?php echo count($lineItems); ?><br>
-  Amount: <?php echo htmlspecialchars($amount); ?><br>
-  Invoice ID: <?php echo htmlspecialchars($invoiceId); ?><br>
-  Custom ID: <?php echo htmlspecialchars($customId); ?><br>
-</div>
-<?php endif; ?>
-
-<div id="paypal-button-container"></div>
-<div id="pp-status" class="mt-12" style="font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;"></div>
-
-<script>
-(function(){
-  const statusEl    = document.getElementById('pp-status');
-
-  // Values from PHP - use json_encode for proper JavaScript escaping
-  const amount      = <?php echo json_encode($amount); ?>;
-  const currency    = <?php echo json_encode($currency); ?>;
-  const invoice_id  = <?php echo json_encode($invoiceId); ?>;
-  const custom_id   = <?php echo json_encode($customId); ?>;
-  const description = <?php echo json_encode($description); ?>;
-  const return_url  = <?php echo json_encode($returnUrl); ?>;
-  const cancel_url  = <?php echo json_encode($cancelUrl); ?>;
-
-  // Line items (serverID + per-item amount) for your records and webhook correlation
-  const line_invoices = <?php echo json_encode($invoice, JSON_UNESCAPED_SLASHES); ?>;
-
-  // PayPal "items" for purchase_units (shows on PayPal + returns in webhook under purchase_units)
-  const items = <?php echo json_encode($lineItems, JSON_UNESCAPED_SLASHES); ?>;
-
-  // Debug logging
-  console.log('PayPal cart debug:', {
-    amount, currency, invoice_id, custom_id, description,
-    line_invoices_count: line_invoices.length,
-    items_count: items.length,
-    return_url, cancel_url
-  });
-
-  function setStatus(msg, isError = false){ 
-    if(statusEl) {
-      statusEl.textContent = msg; 
-      statusEl.style.color = isError ? '#dc3545' : '#000';
-      statusEl.style.fontWeight = isError ? 'bold' : 'normal';
-    }
-  }
-  
-  function logError(context, error) {
-    const errorData = {
-      timestamp: new Date().toISOString(),
-      context: context,
-      error: error,
-      invoice_id: invoice_id,
-      amount: amount
-    };
-    console.error('PayPal Error:', errorData);
-    // Try to send error to server for logging
-    fetch("<?= $apiBase ?>/log_error.php", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(errorData)
-    }).catch(e => console.error('Failed to log error to server:', e));
-  }
-
-
-  paypal.Buttons({
-    createOrder: function() {
-      setStatus('Creating order…');
-      console.log('createOrder: Starting request to create_order.php');
-      
-      return fetch("<?= $apiBase ?>/create_order.php", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({
-          amount, currency, invoice_id, custom_id, description,
-          return_url, cancel_url,
-          // The next two are for your server to include:
-          items,             // PayPal purchase_units[0].items
-          line_invoices      // your raw cart detail, persisted in your DB if you choose
-        })
-      })
-      .then(res => {
-        console.log('createOrder: Response received', { status: res.status, ok: res.ok });
-        if (!res.ok) {
-          return res.text().then(errText => {
-            console.error('createOrder: Error response text:', errText);
-            logError('create_order_http_error', { status: res.status, response: errText });
-            
-            // Try to parse as JSON for better error display
-            let errorMsg = 'API error ' + res.status;
-            try {
-              const errJson = JSON.parse(errText);
-              if (errJson.error) errorMsg += ': ' + errJson.error;
-              if (errJson.request_id) errorMsg += ' (Ref: ' + errJson.request_id + ')';
-            } catch (e) {
-              errorMsg += ': ' + errText.substring(0, 100);
-            }
-            throw new Error(errorMsg);
-          });
-        }
-        return res.json();
-      })
-      .then(data => {
-        console.log('createOrder: Parsed response', data);
-        if (!data.id) {
-          const errMsg = 'No order ID in response';
-          console.error('createOrder:', errMsg, data);
-          logError('create_order_no_id', { response: data });
-          throw new Error(errMsg + (data.request_id ? ' (Ref: ' + data.request_id + ')' : '')); 
-        }
-        setStatus('Order created.');
-        console.log('createOrder: Success, order ID:', data.id);
-        return data.id;
-      })
-      .catch(err => {
-        console.error('createOrder: Caught error', err);
-        const errorMsg = 'Failed to create order: ' + err.message;
-        setStatus(errorMsg, true);
-        logError('create_order_exception', { message: err.message, stack: err.stack });
-        throw err;
-      });
-    },
-
-    onApprove: function(data) {
-      setStatus('Capturing payment…');
-      console.log('onApprove: Starting capture for order', data.orderID);
-      
-      return fetch("<?= $apiBase ?>/capture_order.php", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ order_id: data.orderID })
-      })
-      .then(res => {
-        console.log('onApprove: Capture response received', { status: res.status, ok: res.ok });
-        if (!res.ok) {
-          return res.text().then(errText => {
-            console.error('onApprove: Error response text:', errText);
-            logError('capture_order_http_error', { status: res.status, response: errText });
-            
-            let errorMsg = 'Capture failed (HTTP ' + res.status + ')';
-            try {
-              const errJson = JSON.parse(errText);
-              if (errJson.error) errorMsg += ': ' + errJson.error;
-              if (errJson.request_id) errorMsg += ' (Ref: ' + errJson.request_id + ')';
-            } catch (e) {
-              errorMsg += ': ' + errText.substring(0, 100);
-            }
-            throw new Error(errorMsg);
-          });
-        }
-        return res.json();
-      })
-      .then(capture => {
-        console.log('onApprove: Parsed capture response', capture);
-        if (capture.status === 'COMPLETED') {
-          console.log('onApprove: Payment completed, redirecting to success page');
-          setStatus('Payment completed! Redirecting...');
-          // go to your return page; webhook will fill data/<invoice_id>.json
-          window.location.href = return_url;
-        } else if (capture.error) {
-          const errorMsg = 'Capture error: ' + capture.error + (capture.request_id ? ' (Ref: ' + capture.request_id + ')' : '');
-          console.error('onApprove:', errorMsg);
-          logError('capture_order_error_response', capture);
-          setStatus(errorMsg, true);
-        } else {
-          const statusMsg = 'Unexpected capture status: ' + (capture.status || 'UNKNOWN');
-          console.warn('onApprove:', statusMsg, capture);
-          logError('capture_order_unexpected_status', capture);
-          setStatus(statusMsg, true);
-        }
-      })
-      .catch(err => {
-        console.error('onApprove: Caught error', err);
-        const errorMsg = 'Payment capture failed: ' + err.message;
-        setStatus(errorMsg, true);
-        logError('capture_order_exception', { message: err.message, stack: err.stack });
-      });
-    },
-
-    onCancel: function() {
-      console.log('onCancel: User cancelled payment');
-      logError('payment_cancelled', { invoice_id: invoice_id });
-      window.location.href = cancel_url;
-    },
-
-    onError: function(err){
-      console.error('onError: PayPal SDK error', err);
-      const errorMsg = 'PayPal error: ' + (err && err.message ? err.message : JSON.stringify(err));
-      setStatus(errorMsg, true);
-      logError('paypal_sdk_error', { error: err });
-    }
-  }).render('#paypal-button-container');
-})();
-</script>
-  
-
-</div>
-
-<?php
-// Close database connection
-mysqli_close($db);
-?>
-<?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>

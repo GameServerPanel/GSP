@@ -66,8 +66,16 @@ header('Location: /modules/billing/cart.php');
   - Data mappings that reference existing tables/fields.
 
 ## 3) Scope & principles
-- **Website ↔ Panel on the same host.** Website uses the **panel DB for authentication** and the **panel’s internal APIs** for provisioning. **Sessions remain separate** (website session ≠ panel session).
-- **Billing module is STANDALONE.** The `modules/billing/` frontend is a **standalone product** that can run on the **same machine as the panel** or on an **external web host**. It must **NEVER** use `require_once` to include panel files like `includes/database_mysqli.php` or any panel helper functions. Instead, it connects directly to the MySQL database using standard `mysqli_connect()` with credentials from `modules/billing/includes/config.inc.php`. All database operations must use native mysqli functions (mysqli_query, mysqli_real_escape_string, etc.), NOT panel-specific helper functions like `$db->query()` or `createDatabaseConnection()`.
+- **Website ↔ Panel on the same host.** Website uses the **panel DB for authentication** and the **panel's internal APIs** for provisioning. **Sessions remain separate** (website session ≠ panel session).
+- **Billing module is STANDALONE AND RELOCATABLE.** The `modules/billing/` directory is a **complete standalone website** that:
+  - Can be deployed on the **same machine as the panel** OR on a **completely separate external web host**
+  - Must **NEVER** use `require_once` to include panel files (like `includes/database_mysqli.php`, `includes/functions.php`, or any panel helper files)
+  - Must use **ONLY standard PHP libraries** (mysqli, json, curl, session, etc.)
+  - Connects directly to MySQL using `mysqli_connect()` with credentials from `modules/billing/includes/config.inc.php`
+  - All database operations use native mysqli functions: `mysqli_query()`, `mysqli_real_escape_string()`, `mysqli_fetch_assoc()`, etc.
+  - Must **NOT** use panel-specific functions like `$db->query()`, `createDatabaseConnection()`, `get_lang()`, etc.
+  - All file paths for includes use `__DIR__` relative paths (e.g., `require_once(__DIR__ . '/includes/config.inc.php')`)
+  - All URLs/redirects/links use root-relative paths WITHOUT `/modules/billing/` prefix (see CRITICAL section above)
 - **Catalog = XML.** Enable **every game** present under `modules/config_games/server_configs/`. The website reads those XMLs for ports, params, install/update metadata. New XMLs should become available without code changes.
 - **Regions/Nodes = panel DB.** Regions and nodes are configured in the panel and must be **queried live** from the panel DB. Never hardcode or mirror region lists on the website.
 - **Slotless model.** Pricing/UX must not enforce slot caps. If an engine requires a player count parameter, set a safe high default and surface engine limits transparently if they exist.

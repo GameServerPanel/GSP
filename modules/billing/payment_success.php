@@ -1,18 +1,44 @@
 <?php
 /**
  * Payment Success Page
- * User lands here after successful PayPal payment
+ * Shows order confirmation after successful PayPal payment
+ * Standalone billing module - uses only standard PHP mysqli
  */
-
 session_start();
-require_once(__DIR__ . '/includes/header.php');
 require_once(__DIR__ . '/includes/config.inc.php');
-require_once(__DIR__ . '/../../includes/database_mysqli.php');
-require_once(__DIR__ . '/includes/log.php');
-require_once(__DIR__ . '/includes/payment_processor.php');
 
-$invoice_ref = isset($_GET['invoice']) ? $_GET['invoice'] : '';
-$user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
+// Get PayPal order ID from URL
+$paypal_order_id = isset($_GET['order_id']) ? trim($_GET['order_id']) : '';
+
+// Get user ID from session
+$user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
+           (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
+
+// Connect to database
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$orders = [];
+$total_paid = 0;
+
+if ($db && $user_id > 0) {
+    // Get recent orders for this user (just paid)
+    $query = "SELECT o.*, s.game_name 
+              FROM {$table_prefix}billing_orders o
+              LEFT JOIN {$table_prefix}billing_services s ON o.service_id = s.service_id
+              WHERE o.user_id = $user_id 
+              AND o.status = 'paid'
+              ORDER BY o.order_date DESC 
+              LIMIT 10";
+    
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $orders[] = $row;
+            $total_paid += floatval($row['price']);
+        }
+    }
+    
+    mysqli_close($db);
+}
 
 ?>
 <!DOCTYPE html>
@@ -21,72 +47,173 @@ $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful - Game Server Panel</title>
-    <link rel="stylesheet" href="includes/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success-header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid #28a745;
+            margin-bottom: 30px;
+        }
+        .success-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #28a745;
+            margin: 0 0 10px 0;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .info-box li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        .orders-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+        .orders-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            background: #28a745;
+            color: white;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px 10px 10px 0;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #dee2e6;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="success-header">
+            <div class="success-icon">✓</div>
+            <h1>Payment Successful!</h1>
+            <p class="subtitle">Your payment has been processed successfully</p>
+            <?php if ($paypal_order_id): ?>
+            <p style="color: #999; font-size: 0.9em; margin-top: 10px;">
+                Transaction ID: <?php echo htmlspecialchars($paypal_order_id); ?>
+            </p>
+            <?php endif; ?>
+        </div>
 
-<div class="container" style="max-width: 800px; margin: 40px auto; padding: 20px;">
-    <div class="success-box" style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-        <h1 style="margin-top: 0;">✓ Payment Successful!</h1>
-        <p>Thank you for your purchase. Your payment has been received and is being processed.</p>
-        <?php if ($invoice_ref): ?>
-        <p><strong>Invoice Reference:</strong> <?php echo htmlspecialchars($invoice_ref); ?></p>
+        <div class="info-box">
+            <h3>What Happens Next?</h3>
+            <ul>
+                <li><strong>✓ Payment Confirmed:</strong> Your payment has been captured by PayPal</li>
+                <li><strong>⚙️ Server Provisioning:</strong> Your game server(s) will be automatically created when you log into the panel</li>
+                <li><strong>📧 Email Notification:</strong> You'll receive a confirmation email with your order details</li>
+                <li><strong>🎮 Access Your Servers:</strong> Log into the Game Server Panel to manage your new servers</li>
+            </ul>
+        </div>
+
+        <?php if (count($orders) > 0): ?>
+        <h2>Your Orders</h2>
+        <table class="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Server Name</th>
+                    <th>Game</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($orders as $order): ?>
+                <tr>
+                    <td>#<?php echo htmlspecialchars($order['order_id']); ?></td>
+                    <td><?php echo htmlspecialchars($order['home_name']); ?></td>
+                    <td><?php echo htmlspecialchars($order['game_name'] ?? 'Game Server'); ?></td>
+                    <td><?php echo htmlspecialchars($order['qty']); ?>x <?php echo htmlspecialchars($order['invoice_duration']); ?></td>
+                    <td><span class="status-badge">PAID</span></td>
+                    <td style="text-align: right; font-weight: 600; color: #28a745;">
+                        $<?php echo number_format(floatval($order['price']), 2); ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php else: ?>
+        <div class="info-box" style="background: #fff3cd; border-left-color: #856404;">
+            <p><strong>Note:</strong> Your orders are being processed. If you don't see them listed above, please log into your account or contact support.</p>
+        </div>
         <?php endif; ?>
+
+        <div class="actions">
+            <a href="/my_account.php" class="btn">View My Account</a>
+            <a href="/order.php" class="btn btn-secondary">Order Another Server</a>
+            <a href="/index.php" class="btn btn-secondary">Back to Home</a>
+        </div>
     </div>
-
-    <div class="info-box" style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
-        <h2>What happens next?</h2>
-        <ol>
-            <li><strong>Payment Confirmation:</strong> Your payment has been captured by PayPal</li>
-            <li><strong>Order Creation:</strong> Your game server order has been created</li>
-            <li><strong>Server Provisioning:</strong> Your server will be provisioned automatically (this may take a few minutes)</li>
-            <li><strong>Email Notification:</strong> You'll receive an email with your server details and login credentials</li>
-        </ol>
-    </div>
-
-    <?php
-    // Show user's recent orders
-    if ($user_id > 0) {
-        $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
-        if ($db) {
-            $result = mysqli_query($db, "SELECT * FROM ogp_billing_orders WHERE user_id=$user_id ORDER BY order_date DESC LIMIT 5");
-            if ($result && mysqli_num_rows($result) > 0) {
-                echo '<div class="orders-box" style="background: #fff; border: 1px solid #dee2e6; padding: 20px; border-radius: 5px;">';
-                echo '<h2>Your Recent Orders</h2>';
-                echo '<table style="width: 100%; border-collapse: collapse;">';
-                echo '<thead><tr style="background: #f8f9fa;">';
-                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Order ID</th>';
-                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Server</th>';
-                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Status</th>';
-                echo '<th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Date</th>';
-                echo '<th style="padding: 10px; text-align: right; border-bottom: 2px solid #dee2e6;">Price</th>';
-                echo '</tr></thead><tbody>';
-                
-                while ($order = mysqli_fetch_assoc($result)) {
-                    $statusColor = $order['status'] === 'paid' ? '#28a745' : '#6c757d';
-                    echo '<tr style="border-bottom: 1px solid #dee2e6;">';
-                    echo '<td style="padding: 10px;">#' . htmlspecialchars($order['order_id']) . '</td>';
-                    echo '<td style="padding: 10px;">' . htmlspecialchars($order['home_name']) . '</td>';
-                    echo '<td style="padding: 10px;"><span style="color: ' . $statusColor . '; font-weight: bold;">' . htmlspecialchars(ucfirst($order['status'])) . '</span></td>';
-                    echo '<td style="padding: 10px;">' . htmlspecialchars($order['order_date']) . '</td>';
-                    echo '<td style="padding: 10px; text-align: right;">$' . htmlspecialchars(number_format($order['price'], 2)) . '</td>';
-                    echo '</tr>';
-                }
-                
-                echo '</tbody></table>';
-                echo '</div>';
-            }
-            mysqli_close($db);
-        }
-    }
-    ?>
-
-    <div class="actions" style="margin-top: 30px; text-align: center;">
-        <a href="my_account.php" style="display: inline-block; padding: 12px 24px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-right: 10px;">View My Servers</a>
-        <a href="order.php" style="display: inline-block; padding: 12px 24px; background: #28a745; color: white; text-decoration: none; border-radius: 5px;">Order Another Server</a>
-    </div>
-</div>
-
-<?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
