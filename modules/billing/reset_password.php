@@ -32,7 +32,7 @@ if (empty($token)) {
     $token = mysqli_real_escape_string($db, $token);
     
     // Verify token
-    $query = "SELECT user_id, expires, used FROM ogp_password_reset_tokens 
+    $query = "SELECT user_id, expires, used FROM {$table_prefix}password_reset_tokens 
               WHERE token = '$token' LIMIT 1";
     $result = mysqli_query($db, $query);
     
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password']) && 
         
         // Check if shadow column exists
         $has_shadow = false;
-        $res_cols = mysqli_query($db, "SHOW COLUMNS FROM ogp_users LIKE 'users_pass_hash'");
+        $res_cols = mysqli_query($db, "SHOW COLUMNS FROM {$table_prefix}users LIKE 'users_pass_hash'");
         if ($res_cols && mysqli_num_rows($res_cols) > 0) {
             $has_shadow = true;
         }
@@ -78,16 +78,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password']) && 
         // Update password
         if ($has_shadow) {
             $modern_hash = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $db->prepare("UPDATE ogp_users SET users_passwd = ?, users_pass_hash = ? WHERE user_id = ?");
+            $stmt = $db->prepare("UPDATE {$table_prefix}users SET users_passwd = ?, users_pass_hash = ? WHERE user_id = ?");
             $stmt->bind_param('ssi', $md5_password, $modern_hash, $user_id);
         } else {
-            $stmt = $db->prepare("UPDATE ogp_users SET users_passwd = ? WHERE user_id = ?");
+            $stmt = $db->prepare("UPDATE {$table_prefix}users SET users_passwd = ? WHERE user_id = ?");
             $stmt->bind_param('si', $md5_password, $user_id);
         }
         
         if ($stmt->execute()) {
             // Mark token as used
-            $stmt2 = $db->prepare("UPDATE ogp_password_reset_tokens SET used = 1 WHERE token = ?");
+            $stmt2 = $db->prepare("UPDATE {$table_prefix}password_reset_tokens SET used = 1 WHERE token = ?");
             $stmt2->bind_param('s', $token);
             $stmt2->execute();
             $stmt2->close();

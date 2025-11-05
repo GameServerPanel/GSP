@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         $resolved_uid = null;
         if ($db) {
             $safe = mysqli_real_escape_string($db, $username);
-            $res = @mysqli_query($db, "SELECT user_id FROM ogp_users WHERE users_login = '$safe' LIMIT 1");
+            $res = @mysqli_query($db, "SELECT user_id FROM {$table_prefix}users WHERE users_login = '$safe' LIMIT 1");
             if ($res && mysqli_num_rows($res) === 1) {
                 $r = mysqli_fetch_assoc($res);
                 $resolved_uid = intval($r['user_id'] ?? 0);

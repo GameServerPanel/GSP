@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reset'])) {
         $identifier = mysqli_real_escape_string($db, $identifier);
         
         // Check if it's an email or username
-        $query = "SELECT user_id, users_login, users_email FROM ogp_users 
+        $query = "SELECT user_id, users_login, users_email FROM {$table_prefix}users 
                   WHERE users_login = '$identifier' OR users_email = '$identifier' LIMIT 1";
         $result = mysqli_query($db, $query);
         
@@ -43,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reset'])) {
             $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
             
             // Check if password_reset_tokens table exists
-            $table_check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_password_reset_tokens'");
+            $table_check = mysqli_query($db, "SHOW TABLES LIKE '{$table_prefix}password_reset_tokens'");
             if (!$table_check || mysqli_num_rows($table_check) === 0) {
                 // Create table if it doesn't exist
-                $create_table = "CREATE TABLE IF NOT EXISTS ogp_password_reset_tokens (
+                $create_table = "CREATE TABLE IF NOT EXISTS {$table_prefix}password_reset_tokens (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     user_id INT NOT NULL,
                     token VARCHAR(64) NOT NULL,
@@ -60,13 +60,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['request_reset'])) {
             }
             
             // Delete any existing tokens for this user
-            $stmt = $db->prepare("DELETE FROM ogp_password_reset_tokens WHERE user_id = ?");
+            $stmt = $db->prepare("DELETE FROM {$table_prefix}password_reset_tokens WHERE user_id = ?");
             $stmt->bind_param('i', $user['user_id']);
             $stmt->execute();
             $stmt->close();
             
             // Insert new token
-            $stmt = $db->prepare("INSERT INTO ogp_password_reset_tokens (user_id, token, expires) VALUES (?, ?, ?)");
+            $stmt = $db->prepare("INSERT INTO {$table_prefix}password_reset_tokens (user_id, token, expires) VALUES (?, ?, ?)");
             $stmt->bind_param('iss', $user['user_id'], $token, $expires);
             $stmt->execute();
             $stmt->close();

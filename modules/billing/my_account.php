@@ -52,7 +52,7 @@ $user_id = intval($_SESSION['website_user_id'] ?? 0);
 // Fetch user information from database
 $user_info = null;
 if ($user_id > 0) {
-    $query = "SELECT user_id, users_login, users_email, users_fname, users_lname FROM ogp_users WHERE user_id = $user_id LIMIT 1";
+    $query = "SELECT user_id, users_login, users_email, users_fname, users_lname FROM {$table_prefix}users WHERE user_id = $user_id LIMIT 1";
     $result = mysqli_query($db, $query);
     if ($result && mysqli_num_rows($result) === 1) {
         $user_info = mysqli_fetch_assoc($result);
@@ -74,13 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
     } else {
         // Verify current password (using MD5 as per panel legacy)
         $current_hash = md5($current_password);
-        $verify_query = "SELECT user_id FROM ogp_users WHERE user_id = $user_id AND users_passwd = '$current_hash' LIMIT 1";
+        $verify_query = "SELECT user_id FROM {$table_prefix}users WHERE user_id = $user_id AND users_passwd = '$current_hash' LIMIT 1";
         $verify_result = mysqli_query($db, $verify_query);
         
         if ($verify_result && mysqli_num_rows($verify_result) === 1) {
             // Update password
             $new_hash = md5($new_password);
-            $update_query = "UPDATE ogp_users SET users_passwd = '$new_hash' WHERE user_id = $user_id LIMIT 1";
+            $update_query = "UPDATE {$table_prefix}users SET users_passwd = '$new_hash' WHERE user_id = $user_id LIMIT 1";
             if (mysqli_query($db, $update_query)) {
                 $success_message = 'Password changed successfully!';
             } else {
@@ -101,11 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_info'])) {
     if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = 'Invalid email address.';
     } else {
-        $update_query = "UPDATE ogp_users SET users_fname = '$fname', users_lname = '$lname', users_email = '$email' WHERE user_id = $user_id LIMIT 1";
+        $update_query = "UPDATE {$table_prefix}users SET users_fname = '$fname', users_lname = '$lname', users_email = '$email' WHERE user_id = $user_id LIMIT 1";
         if (mysqli_query($db, $update_query)) {
             $success_message = 'Account information updated successfully!';
             // Refresh user info
-            $query = "SELECT user_id, users_login, users_email, users_fname, users_lname FROM ogp_users WHERE user_id = $user_id LIMIT 1";
+            $query = "SELECT user_id, users_login, users_email, users_fname, users_lname FROM {$table_prefix}users WHERE user_id = $user_id LIMIT 1";
             $result = mysqli_query($db, $query);
             if ($result && mysqli_num_rows($result) === 1) {
                 $user_info = mysqli_fetch_assoc($result);
@@ -127,8 +127,8 @@ $servers_query = "SELECT
                                         o.home_id,
                                         o.end_date,
                                         bs.service_name
-                                    FROM ogp_billing_orders o
-                                    LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
+                                    FROM {$table_prefix}billing_orders o
+                                    LEFT JOIN {$table_prefix}billing_services bs ON o.service_id = bs.service_id
                                     WHERE o.user_id = $user_id
                                     ORDER BY o.order_id DESC";
 $servers_result = mysqli_query($db, $servers_query);

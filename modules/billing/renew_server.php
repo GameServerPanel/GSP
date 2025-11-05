@@ -24,7 +24,7 @@ if (!$db) {
 $user_id = intval($_SESSION['website_user_id'] ?? $_SESSION['user_id'] ?? 0);
 if ($user_id <= 0 && isset($_SESSION['website_username']) && !empty($_SESSION['website_username'])) {
     $safe_uname = mysqli_real_escape_string($db, $_SESSION['website_username']);
-    $qr = mysqli_query($db, "SELECT user_id FROM ogp_users WHERE users_login = '$safe_uname' LIMIT 1");
+    $qr = mysqli_query($db, "SELECT user_id FROM {$table_prefix}users WHERE users_login = '$safe_uname' LIMIT 1");
     if ($qr && mysqli_num_rows($qr) === 1) {
         $rr = mysqli_fetch_assoc($qr);
         $user_id = intval($rr['user_id'] ?? 0);
@@ -47,7 +47,7 @@ if ($order_id <= 0 || $user_id <= 0) {
 }
 
 // Fetch order and verify ownership (get all needed fields for invoice creation)
-$stmt = $db->prepare('SELECT order_id, user_id, service_id, qty, invoice_duration, price, home_id, home_name, ip, max_players, remote_control_password, ftp_password FROM ogp_billing_orders WHERE order_id = ? LIMIT 1');
+$stmt = $db->prepare("SELECT order_id, user_id, service_id, qty, invoice_duration, price, home_id, home_name, ip, max_players, remote_control_password, ftp_password FROM {$table_prefix}billing_orders WHERE order_id = ? LIMIT 1");
 if (!$stmt) {
     header('Location: ' . $redirect_to);
     exit;
@@ -73,7 +73,7 @@ if (intval($order['user_id']) !== intval($user_id)) {
 $service_id = intval($order['service_id'] ?? 0);
 $price_val = floatval($order['price'] ?? 0.0);
 if ($service_id > 0) {
-    $sstmt = $db->prepare('SELECT price_monthly, price_year FROM ogp_billing_services WHERE service_id = ? LIMIT 1');
+    $sstmt = $db->prepare("SELECT price_monthly, price_year FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
     if ($sstmt) {
         $sstmt->bind_param('i', $service_id);
         $sstmt->execute();
@@ -93,7 +93,7 @@ if ($service_id > 0) {
 // Get user email for invoice
 $user_email = '';
 $user_name = '';
-$user_stmt = $db->prepare('SELECT users_email, users_login, users_fname, users_lname FROM ogp_users WHERE user_id = ? LIMIT 1');
+$user_stmt = $db->prepare("SELECT users_email, users_login, users_fname, users_lname FROM {$table_prefix}users WHERE user_id = ? LIMIT 1");
 if ($user_stmt) {
     $user_stmt->bind_param('i', $user_id);
     $user_stmt->execute();
@@ -163,9 +163,9 @@ if ($inv_insert) {
         
         // Try to log to panel logger
         $logger_table = null;
-        $check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_logger'");
+        $check = mysqli_query($db, "SHOW TABLES LIKE '{$table_prefix}logger'");
         if ($check && mysqli_num_rows($check) > 0) {
-            $logger_table = 'ogp_logger';
+            $logger_table = '{$table_prefix}logger';
         } else {
             $reslt = mysqli_query($db, "SHOW TABLES LIKE '%logger'");
             if ($reslt && mysqli_num_rows($reslt) > 0) {
@@ -204,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_renewal'])) {
     $price = ($duration === 'year' && !empty($order['price_year']) && floatval($order['price_year']) > 0) ? floatval($order['price_year']) : floatval($order['price_monthly']);
 
     // Prepare update to set this order into renew state
-    if ($upd = $db->prepare("UPDATE ogp_billing_orders SET status = ?, invoice_duration = ?, qty = ?, price = ? WHERE order_id = ? AND user_id = ? LIMIT 1")) {
+    if ($upd = $db->prepare("UPDATE {$table_prefix}billing_orders SET status = ?, invoice_duration = ?, qty = ?, price = ? WHERE order_id = ? AND user_id = ? LIMIT 1")) {
         $new_status = 'renew';
         $orderIdInt = intval($order_id);
         $userIdInt = intval($user_id);

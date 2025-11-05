@@ -393,7 +393,7 @@ class Theme
 					
 					// delete old stats (keep only entries from last 1 day)
 					$ThemeDB->query("
-						DELETE FROM ogp_adminlte_serverstats WHERE current_stamp < DATE_ADD(NOW(), INTERVAL -1 DAY)
+						DELETE FROM ".$ThemeDB->serverStatsTable." WHERE current_stamp < DATE_ADD(NOW(), INTERVAL -1 DAY)
 					");
 					
 					return "successfully updated";

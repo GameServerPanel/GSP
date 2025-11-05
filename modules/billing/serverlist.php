@@ -24,7 +24,7 @@ if (!$db) {
 if (isset($_POST['save']) && !empty($_POST['description'])) {
     $new_description = str_replace("\\r\\n", "<br>", $_POST['description']);
     $service = intval($_POST['service_id']);
-    $stmt = $db->prepare("UPDATE ogp_billing_services SET description = ? WHERE service_id = ?");
+    $stmt = $db->prepare("UPDATE {$table_prefix}billing_services SET description = ? WHERE service_id = ?");
     $stmt->bind_param("si", $new_description, $service);
     $stmt->execute();
     $stmt->close();
@@ -33,7 +33,7 @@ if (isset($_POST['save']) && !empty($_POST['description'])) {
 // Fetch services
 $service_id = isset($_REQUEST['service_id']) ? intval($_REQUEST['service_id']) : 0;
 $where_service_id = $service_id !== 0 ? "WHERE enabled = 1 AND service_id = $service_id" : "WHERE enabled = 1";
-$qry_services = "SELECT * FROM ogp_billing_services $where_service_id ORDER BY service_name";
+$qry_services = "SELECT * FROM {$table_prefix}billing_services $where_service_id ORDER BY service_name";
 $services = $db->query($qry_services);
 
 if (!$services) {

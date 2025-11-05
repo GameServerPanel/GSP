@@ -28,8 +28,8 @@ $user_id = intval($_SESSION['website_user_id']);
 
 // Fetch user's active servers
 // We'll look for homes assigned to this user
-// The relationship is: ogp_billing_orders -> user_id and contains home_id references
-// We need to join with ogp_home to get server details
+// The relationship is: {table_prefix}billing_orders -> user_id and contains home_id references
+// We need to join with {table_prefix}home to get server details
 
 $query = "SELECT 
             h.home_id,
@@ -49,12 +49,12 @@ $query = "SELECT
             o.coupon_id,
             bc.code AS coupon_code,
             bc.discount_percent AS coupon_discount_percent
-          FROM ogp_home h
-          LEFT JOIN ogp_remote_servers rs ON h.remote_server_id = rs.remote_server_id
-          LEFT JOIN ogp_game_configs gc ON h.home_cfg_id = gc.home_cfg_id
-          LEFT JOIN ogp_billing_orders o ON h.user_id = o.user_id
-          LEFT JOIN ogp_billing_services bs ON o.service_id = bs.service_id
-          LEFT JOIN ogp_billing_coupons bc ON o.coupon_id = bc.coupon_id
+          FROM {$table_prefix}home h
+          LEFT JOIN {$table_prefix}remote_servers rs ON h.remote_server_id = rs.remote_server_id
+          LEFT JOIN {$table_prefix}game_configs gc ON h.home_cfg_id = gc.home_cfg_id
+          LEFT JOIN {$table_prefix}billing_orders o ON h.user_id = o.user_id
+          LEFT JOIN {$table_prefix}billing_services bs ON o.service_id = bs.service_id
+          LEFT JOIN {$table_prefix}billing_coupons bc ON o.coupon_id = bc.coupon_id
           WHERE h.user_id = $user_id
           ORDER BY h.home_id DESC";
 

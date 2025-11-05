@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newStatus = mysqli_real_escape_string($db, $_POST['status']);
         $newPrice = floatval($_POST['price']);
         
-        $sql = "UPDATE ogp_billing_orders SET status = '$newStatus', price = $newPrice WHERE order_id = $orderId LIMIT 1";
+        $sql = "UPDATE {$table_prefix}billing_orders SET status = '$newStatus', price = $newPrice WHERE order_id = $orderId LIMIT 1";
         mysqli_query($db, $sql);
         header('Location: admin_invoices.php?updated=' . $orderId);
         exit;
@@ -23,9 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch all orders with coupon information
 $orders = mysqli_query($db, "SELECT o.*, u.user_name, c.code AS coupon_code, c.discount_percent AS coupon_discount 
-    FROM ogp_billing_orders o 
-    LEFT JOIN ogp_users u ON o.user_id = u.user_id 
-    LEFT JOIN ogp_billing_coupons c ON o.coupon_id = c.coupon_id
+    FROM {$table_prefix}billing_orders o 
+    LEFT JOIN {$table_prefix}users u ON o.user_id = u.user_id 
+    LEFT JOIN {$table_prefix}billing_coupons c ON o.coupon_id = c.coupon_id
     ORDER BY o.order_id DESC");
 
 function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }

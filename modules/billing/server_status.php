@@ -21,10 +21,10 @@ include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
 // Check if server status table exists, if not create it
-$table_check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_server_status'");
+$table_check = mysqli_query($db, "SHOW TABLES LIKE '{$table_prefix}server_status'");
 if (!$table_check || mysqli_num_rows($table_check) === 0) {
     // Create table for server status updates
-    $create_table = "CREATE TABLE IF NOT EXISTS ogp_server_status (
+    $create_table = "CREATE TABLE IF NOT EXISTS {$table_prefix}server_status (
         status_id INT AUTO_INCREMENT PRIMARY KEY,
         remote_server_id INT NOT NULL,
         server_name VARCHAR(255) NOT NULL,
@@ -55,8 +55,8 @@ $query = "SELECT
             ss.uptime,
             ss.last_updated,
             ss.notes
-          FROM ogp_remote_servers rs
-          LEFT JOIN ogp_server_status ss ON rs.remote_server_id = ss.remote_server_id
+          FROM {$table_prefix}remote_servers rs
+          LEFT JOIN {$table_prefix}server_status ss ON rs.remote_server_id = ss.remote_server_id
           ORDER BY rs.remote_server_name";
 
 $result = mysqli_query($db, $query);

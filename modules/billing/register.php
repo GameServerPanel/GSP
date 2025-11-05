@@ -3,7 +3,7 @@ session_name("gameservers_website");
 session_start();
 require_once(__DIR__ . '/includes/config.inc.php');
 
-// Simple registration form (creates a user in ogp_users with MD5 password)
+// Simple registration form (creates a user in {table_prefix}users with MD5 password)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
     $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
     if ($db) {
@@ -21,16 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empt
 
             // Try to insert with shadow column if it exists
             $has_shadow = false;
-            $res = $db->query("SHOW COLUMNS FROM ogp_users LIKE 'users_pass_hash'");
+            $res = $db->query("SHOW COLUMNS FROM {$table_prefix}users LIKE 'users_pass_hash'");
             if ($res && $res->num_rows > 0) {
                 $has_shadow = true;
             }
 
             if ($has_shadow) {
-                $stmt = $db->prepare("INSERT INTO ogp_users (users_login, users_passwd, users_pass_hash, users_email, users_role) VALUES (?, ?, ?, ?, 'user')");
+                $stmt = $db->prepare("INSERT INTO {$table_prefix}users (users_login, users_passwd, users_pass_hash, users_email, users_role) VALUES (?, ?, ?, ?, 'user')");
                 $stmt->bind_param('ssss', $username, $md5pw, $modern, $email);
             } else {
-                $stmt = $db->prepare("INSERT INTO ogp_users (users_login, users_passwd, users_email, users_role) VALUES (?, ?, ?, 'user')");
+                $stmt = $db->prepare("INSERT INTO {$table_prefix}users (users_login, users_passwd, users_email, users_role) VALUES (?, ?, ?, 'user')");
                 $stmt->bind_param('sss', $username, $md5pw, $email);
             }
 

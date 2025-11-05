@@ -2,7 +2,7 @@
 /**
  * Database Connection Test Script
  * 
- * This script tests the database connection and queries the ogp_users table
+ * This script tests the database connection and queries the {$table_prefix}users table
  * to verify the login functionality will work correctly.
  * 
  * ⚠️ SECURITY WARNING: Delete this file after testing!
@@ -53,14 +53,14 @@ if ($db && mysqli_ping($db)) {
 }
 echo "</div>";
 
-// Test 2: Check if ogp_users table exists
+// Test 2: Check if {$table_prefix}users table exists
 echo "<div class='section'>";
-echo "<h2>Test 2: Check ogp_users Table</h2>";
-$result = mysqli_query($db, "SHOW TABLES LIKE 'ogp_users'");
+echo "<h2>Test 2: Check {$table_prefix}users Table</h2>";
+$result = mysqli_query($db, "SHOW TABLES LIKE '{$table_prefix}users'");
 if ($result && mysqli_num_rows($result) > 0) {
-    echo "<p class='success'>✓ ogp_users table exists!</p>";
+    echo "<p class='success'>✓ {$table_prefix}users table exists!</p>";
 } else {
-    echo "<p class='error'>✗ ogp_users table not found!</p>";
+    echo "<p class='error'>✗ {$table_prefix}users table not found!</p>";
     echo "</div></body></html>";
     exit();
 }
@@ -69,7 +69,7 @@ echo "</div>";
 // Test 3: Check table structure
 echo "<div class='section'>";
 echo "<h2>Test 3: Table Structure</h2>";
-$result = mysqli_query($db, "DESCRIBE ogp_users");
+$result = mysqli_query($db, "DESCRIBE {$table_prefix}users");
 if ($result) {
     echo "<p class='success'>✓ Table structure retrieved</p>";
     echo "<p>Columns:</p><pre>";
@@ -85,7 +85,7 @@ echo "</div>";
 // Test 4: Count users
 echo "<div class='section'>";
 echo "<h2>Test 4: User Count</h2>";
-$result = mysqli_query($db, "SELECT COUNT(*) as count FROM ogp_users");
+$result = mysqli_query($db, "SELECT COUNT(*) as count FROM {$table_prefix}users");
 if ($result) {
     $row = mysqli_fetch_assoc($result);
     echo "<p class='success'>✓ Total users in database: " . $row['count'] . "</p>";
@@ -98,7 +98,7 @@ echo "</div>";
 echo "<div class='section'>";
 echo "<h2>Test 5: Required Columns Check</h2>";
 $required_columns = ['user_id', 'users_login', 'users_passwd', 'users_role', 'users_email'];
-$result = mysqli_query($db, "SHOW COLUMNS FROM ogp_users");
+$result = mysqli_query($db, "SHOW COLUMNS FROM {$table_prefix}users");
 $existing_columns = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $existing_columns[] = $row['Field'];

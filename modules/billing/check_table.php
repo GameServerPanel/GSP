@@ -1,6 +1,6 @@
 <?php
 /**
- * Check ogp_billing_invoices table structure
+ * Check {table_prefix}billing_invoices table structure
  */
 
 require_once('../../includes/config.inc.php');
@@ -12,9 +12,9 @@ if (!$db) {
     die("Database connection failed: " . mysqli_connect_error());
 }
 
-echo "<h2>ogp_billing_invoices Table Structure</h2>\n";
+echo "<h2>{$table_prefix}billing_invoices Table Structure</h2>\n";
 
-$result = mysqli_query($db, "DESCRIBE ogp_billing_invoices");
+$result = mysqli_query($db, "DESCRIBE {$table_prefix}billing_invoices");
 
 if (!$result) {
     die("Table doesn't exist or query failed: " . mysqli_error($db));
@@ -37,13 +37,13 @@ while ($row = mysqli_fetch_assoc($result)) {
 echo "</table>\n";
 
 // Count existing invoices
-$count_result = mysqli_query($db, "SELECT COUNT(*) as cnt FROM ogp_billing_invoices");
+$count_result = mysqli_query($db, "SELECT COUNT(*) as cnt FROM {$table_prefix}billing_invoices");
 $count = mysqli_fetch_assoc($count_result);
 echo "<p><strong>Total invoices in table:</strong> {$count['cnt']}</p>\n";
 
 // Show last 5 invoices
 echo "<h2>Last 5 Invoices</h2>\n";
-$last_result = mysqli_query($db, "SELECT * FROM ogp_billing_invoices ORDER BY invoice_id DESC LIMIT 5");
+$last_result = mysqli_query($db, "SELECT * FROM {$table_prefix}billing_invoices ORDER BY invoice_id DESC LIMIT 5");
 
 if (mysqli_num_rows($last_result) > 0) {
     echo "<table border='1' style='border-collapse: collapse;'>\n";

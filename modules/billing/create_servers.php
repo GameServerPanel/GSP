@@ -80,8 +80,8 @@ function exec_ogp_module()
  $settings = $db->getSettings();
          $subject = "Gameserver Renewel at " . $settings['panel_name'];
       $email = $db->resultQuery("   SELECT DISTINCT users_email
-                           FROM ogp_users, ogp_billing_orders
-                           WHERE ogp_users.user_id = $user_id")[0]["users_email"];
+                           FROM {$table_prefix}users, {$table_prefix}billing_orders
+                           WHERE {$table_prefix}users.user_id = $user_id")[0]["users_email"];
 
       $message = "Your server, " . $home_name ." ID #". $home_id . " at " . $settings['panel_name'] . "  has just been renewed.<br>
                   Thank You for your continued support.<br>
@@ -245,8 +245,8 @@ function exec_ogp_module()
 					$settings = $db->getSettings();
 					 $subject = "New Gameserver installed at " . $settings['panel_name'];
 					  $email = $db->resultQuery("   SELECT DISTINCT users_email
-										   FROM ogp_users, ogp_billing_orders
-										   WHERE ogp_users.user_id = $user_id")[0]["users_email"];
+										   FROM {$table_prefix}users, {$table_prefix}billing_orders
+										   WHERE {$table_prefix}users.user_id = $user_id")[0]["users_email"];
 
 					  $message =  "Your server, " . $home_name ." ID #". $home_id . " at " . $settings['panel_name'] . "  has just been created.<br>
 					               Thank You for your continued support.<br>

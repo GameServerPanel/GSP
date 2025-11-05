@@ -67,7 +67,7 @@ if (!$db) {
 if (!empty($resolve_username_for_user_id) && $db) {
     $safe_uname = mysqli_real_escape_string($db, $resolve_username_for_user_id);
     // users_login is the correct column name in this schema
-    $q = mysqli_query($db, "SELECT user_id FROM ogp_users WHERE users_login = '$safe_uname' LIMIT 1");
+    $q = mysqli_query($db, "SELECT user_id FROM {$table_prefix}users WHERE users_login = '$safe_uname' LIMIT 1");
     if ($q && mysqli_num_rows($q) === 1) {
         $r = mysqli_fetch_assoc($q);
         $user_id = intval($r['user_id'] ?? 0);
@@ -76,7 +76,7 @@ if (!empty($resolve_username_for_user_id) && $db) {
             $_SESSION['website_user_id'] = $user_id;
             site_log_info('resolved_user_id_from_username', ['username'=>$resolve_username_for_user_id,'user_id'=>$user_id]);
             // Also resolve and persist the user's role so menus and admin checks are consistent
-            $role_q = mysqli_query($db, "SELECT users_role FROM ogp_users WHERE user_id = " . intval($user_id) . " LIMIT 1");
+            $role_q = mysqli_query($db, "SELECT users_role FROM {$table_prefix}users WHERE user_id = " . intval($user_id) . " LIMIT 1");
             if ($role_q && mysqli_num_rows($role_q) === 1) {
                 $role_row = mysqli_fetch_assoc($role_q);
                 $_SESSION['website_user_role'] = $role_row['users_role'] ?? '';
@@ -89,7 +89,7 @@ if (!empty($resolve_username_for_user_id) && $db) {
 
 $price = 0.0;
 if ($service_id > 0) {
-    $stmt = $db->prepare('SELECT price_monthly, slot_min_qty, slot_max_qty FROM ogp_billing_services WHERE service_id = ? LIMIT 1');
+    $stmt = $db->prepare("SELECT price_monthly, slot_min_qty, slot_max_qty FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
     if ($stmt) {
         $stmt->bind_param('i', $service_id);
         $stmt->execute();
@@ -104,7 +104,7 @@ if ($service_id > 0) {
     }
 }
 
-// Insert into ogp_billing_invoices (NOT orders - invoice created first)
+// Insert into {table_prefix}billing_invoices (NOT orders - invoice created first)
 $now = date('Y-m-d H:i:s');
 $status = 'due'; // Invoice status: due (unpaid), paid
 
@@ -116,10 +116,10 @@ $debug = (isset($_GET['debug']) && $_GET['debug'] == '1') || (isset($_POST['debu
 $logfile = __DIR__ . '/logs/add_to_cart.log';
 site_log_info('add_to_cart_invoked', ['user_id'=>$user_id, 'service_id'=>$service_id]);
 
-// Get customer name and email from ogp_users
+// Get customer name and email from {table_prefix}users
 $customer_name = '';
 $customer_email = '';
-$user_q = mysqli_query($db, "SELECT users_fname, users_lname, users_email FROM ogp_users WHERE user_id = " . intval($user_id) . " LIMIT 1");
+$user_q = mysqli_query($db, "SELECT users_fname, users_lname, users_email FROM {$table_prefix}users WHERE user_id = " . intval($user_id) . " LIMIT 1");
 if ($user_q && mysqli_num_rows($user_q) === 1) {
     $user_row = mysqli_fetch_assoc($user_q);
     $customer_name = trim(($user_row['users_fname'] ?? '') . ' ' . ($user_row['users_lname'] ?? ''));
@@ -148,7 +148,7 @@ $esc_customer_email = mysqli_real_escape_string($db, $customer_email);
 $esc_due_date = mysqli_real_escape_string($db, $due_date);
 $esc_description = mysqli_real_escape_string($db, "New server: {$home_name}");
 
-$sql = "INSERT INTO ogp_billing_invoices (
+$sql = "INSERT INTO {$table_prefix}billing_invoices (
     user_id, service_id, home_name, ip, max_players, qty, invoice_duration, 
     amount, remote_control_password, ftp_password, status, customer_name, 
     customer_email, due_date, description, currency, order_id
@@ -172,9 +172,9 @@ if (!$res || $err_no > 0) {
     site_log_error('mysqli_query_failed', ['errno'=>$err_no, 'error'=>$err, 'sql'=>$sql]);
     file_put_contents($logfile, date('c') . " - ERROR: " . $err . " (errno: {$err_no})\n", FILE_APPEND);
     // Log table existence check
-    $tbl_check = mysqli_query($db, "SHOW TABLES LIKE 'ogp_billing_invoices'");
+    $tbl_check = mysqli_query($db, "SHOW TABLES LIKE '{$table_prefix}billing_invoices'");
     $tbl_exists = ($tbl_check && mysqli_num_rows($tbl_check) > 0) ? 'yes' : 'no';
-    site_log_warn('ogp_billing_invoices_exists', ['exists'=>$tbl_exists]);
+    site_log_warn('billing_invoices_exists', ['exists'=>$tbl_exists]);
     file_put_contents($logfile, date('c') . " - Table exists check: {$tbl_exists}\n", FILE_APPEND);
     
     // Show user-friendly error
