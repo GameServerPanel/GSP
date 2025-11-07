@@ -11,7 +11,7 @@ $db_host="mysql.iaregamer.com";
 $db_user="remoteuser";
 $db_pass="Pkloyn7yvpht!";
 $db_name="panel";
-$table_prefix="ogp_";
+$table_prefix="gsp_";
 $db_type="mysql";
 // Optional: base URL used by admin pages to build absolute image previews.
 // Leave empty to prefer relative paths (local folder).
