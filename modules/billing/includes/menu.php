@@ -88,6 +88,7 @@ if ($is_logged_in) {
     <nav class="gsw-header-nav">
       <a href="index.php" class="gsw-nav-link">Home</a>
       <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
+      <a href="docs.php" class="gsw-nav-link">Documentation</a>
       <?php if ($is_logged_in): ?>
         <!-- Make My Account a prominent header button and remove My Servers link per UX request -->
         <a href="my_account.php" class="gsw-header-btn gsw-nav-link-myaccount">My Account</a>
