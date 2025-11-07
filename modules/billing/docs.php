@@ -96,7 +96,7 @@ foreach ($categories as $cat) {
     $grouped[$category][] = $cat;
 }
 
-// Category labels
+// Category labels - can be extended via JSON
 $categoryLabels = [
     'game' => 'Game Servers',
     'panel' => 'Panel Documentation',
@@ -104,6 +104,16 @@ $categoryLabels = [
     'troubleshooting' => 'Troubleshooting',
     'other' => 'Other'
 ];
+
+// Sort categories by number of items (fewest to most)
+uksort($grouped, function($a, $b) use ($grouped) {
+    $countA = count($grouped[$a]);
+    $countB = count($grouped[$b]);
+    if ($countA !== $countB) {
+        return $countA - $countB; // ascending order (fewest first)
+    }
+    return strcmp($a, $b);
+});
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -274,6 +284,59 @@ $categoryLabels = [
             background: none;
             padding: 0;
         }
+        
+        .nav-links {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-links h3 {
+            margin: 0 0 15px;
+            color: var(--accent);
+            font-size: 18px;
+        }
+        
+        .nav-links a {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 5px 10px 5px 0;
+            background: #1f2937;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .nav-links a:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+        
+        .return-to-top {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .return-to-top a {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--accent);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .return-to-top a:hover {
+            background: #1f2937;
+            border-color: var(--accent);
+        }
     </style>
 </head>
 <body>
@@ -301,7 +364,7 @@ $categoryLabels = [
         <?php else: ?>
             <!-- List all documentation categories -->
             <div class="header">
-                <h1>Documentation</h1>
+                <h1 id="top">Documentation</h1>
                 <p>Browse our comprehensive documentation for game servers, panel features, and troubleshooting guides.</p>
             </div>
             
@@ -315,8 +378,19 @@ $categoryLabels = [
                     </ul>
                 </div>
             <?php else: ?>
+                <!-- Navigation Links -->
+                <div class="nav-links">
+                    <h3>Jump to Section:</h3>
+                    <?php foreach ($grouped as $category => $docs): ?>
+                        <a href="#<?php echo htmlspecialchars($category); ?>">
+                            <?php echo htmlspecialchars($categoryLabels[$category] ?? ucfirst($category)); ?>
+                            (<?php echo count($docs); ?>)
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+                
                 <?php foreach ($grouped as $category => $docs): ?>
-                    <div class="category-section">
+                    <div class="category-section" id="<?php echo htmlspecialchars($category); ?>">
                         <h2 class="category-title"><?php echo htmlspecialchars($categoryLabels[$category] ?? ucfirst($category)); ?></h2>
                         
                         <div class="docs-grid">
@@ -336,6 +410,10 @@ $categoryLabels = [
                                     <?php endif; ?>
                                 </a>
                             <?php endforeach; ?>
+                        </div>
+                        
+                        <div class="return-to-top">
+                            <a href="#top">↑ Return to Top</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
