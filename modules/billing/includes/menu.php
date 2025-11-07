@@ -106,7 +106,7 @@ if ($is_logged_in) {
       <?php if ($is_logged_in && $is_admin): ?>
         <a href="admin.php" class="gsw-nav-link">Admin</a>
       <?php endif; ?>
-      <a href="http://panel.iaregamer.com" class="gsw-nav-link" target="_blank">Panel Login</a>
+      <a href="http://panel.iaregamer.com" class="gsw-nav-link" target="_blank">Control Panel</a>
     </nav>
   </div>
 </div>
