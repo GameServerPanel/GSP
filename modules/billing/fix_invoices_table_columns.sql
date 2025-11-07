@@ -1,10 +1,11 @@
--- Fix missing columns / indexes for ogp_billing_invoices
+-- Fix missing columns / indexes for gsp_billing_invoices
 -- Safe script: checks information_schema and adds each missing column/index using prepared statements.
 -- IMPORTANT: Run on the target database (use the panel DB). Make a backup before running.
+-- Table prefix is hardcoded to gsp_ for standalone billing module
 
 -- Use the current database
 SET @db = DATABASE();
-SET @tbl = 'ogp_billing_invoices';
+SET @tbl = 'gsp_billing_invoices';
 
 -- Helper: add a column if missing
 -- Usage pattern below; repeated for every column we expect from module.php
