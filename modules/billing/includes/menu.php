@@ -43,7 +43,7 @@ if ($is_logged_in) {
       $uid = intval($_SESSION['website_user_id']);
     }
     if (!empty($uid)) {
-      $res = mysqli_query($menu_db, "SELECT users_role FROM ogp_users WHERE user_id = $uid LIMIT 1");
+      $res = mysqli_query($menu_db, "SELECT users_role FROM {$table_prefix}users WHERE user_id = $uid LIMIT 1");
       if ($res && mysqli_num_rows($res) === 1) {
         $row = mysqli_fetch_assoc($res);
         if (strtolower((string)($row['users_role'] ?? '')) === 'admin') $is_admin = true;

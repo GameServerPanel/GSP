@@ -161,6 +161,52 @@ $now = date('Y-m-d H:i:s');
 $esc_txid = mysqli_real_escape_string($db, $txid);
 $esc_paypal_json = mysqli_real_escape_string($db, $paypal_json);
 
+// Apply coupon from session to invoices before marking paid
+session_start();
+$coupon_id = isset($_SESSION['cart_coupon_id']) ? intval($_SESSION['cart_coupon_id']) : 0;
+if ($coupon_id > 0) {
+    // Get unpaid invoices for this user to apply coupon
+    $invoices_query = "SELECT invoice_id, amount FROM {$table_prefix}billing_invoices 
+                      WHERE user_id=$user_id AND status='due'";
+    $invoices_result = mysqli_query($db, $invoices_query);
+    
+    // Get coupon details
+    $coupon_query = "SELECT discount_percent FROM {$table_prefix}billing_coupons 
+                    WHERE coupon_id=$coupon_id AND is_active=1 LIMIT 1";
+    $coupon_result = mysqli_query($db, $coupon_query);
+    
+    if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
+        $coupon_row = mysqli_fetch_assoc($coupon_result);
+        $discount_percent = floatval($coupon_row['discount_percent']);
+        
+        // Update each invoice with coupon
+        while ($inv_row = mysqli_fetch_assoc($invoices_result)) {
+            $inv_id = intval($inv_row['invoice_id']);
+            $inv_amount = floatval($inv_row['amount']);
+            $discount_amt = $inv_amount * ($discount_percent / 100);
+            $new_amount = $inv_amount - $discount_amt;
+            
+            $update_coupon_sql = "UPDATE {$table_prefix}billing_invoices 
+                                 SET coupon_id=$coupon_id, 
+                                     discount_amount=" . number_format($discount_amt, 2, '.', '') . ",
+                                     amount=" . number_format($new_amount, 2, '.', '') . "
+                                 WHERE invoice_id=$inv_id";
+            mysqli_query($db, $update_coupon_sql);
+            log_payment('COUPON_APPLIED', ['invoice_id' => $inv_id, 'discount' => $discount_amt]);
+        }
+        
+        // Increment coupon usage
+        $update_usage_sql = "UPDATE {$table_prefix}billing_coupons 
+                            SET current_uses = current_uses + 1 
+                            WHERE coupon_id=$coupon_id";
+        mysqli_query($db, $update_usage_sql);
+        
+        // Clear coupon from session
+        unset($_SESSION['cart_coupon_code']);
+        unset($_SESSION['cart_coupon_id']);
+    }
+}
+
 // Mark all due invoices for this user as paid
 $updateInvoicesSql = "UPDATE {$table_prefix}billing_invoices 
                       SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'
