@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
                 if (!$game_valid) {
                     $coupon_error = 'This coupon is not valid for the items in your cart.';
                 } else {
-                    // Apply coupon
+                    // Apply coupon (stored in session, applied at checkout)
                     $applied_coupon = $coupon;
                     $coupon_code = $submitted_code;
                     $coupon_discount_percent = floatval($coupon['discount_percent']);

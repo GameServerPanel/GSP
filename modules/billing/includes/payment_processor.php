@@ -136,6 +136,17 @@ function process_payment_record(array $record) {
             mysqli_stmt_close($stmt);
         }
 
+        // If invoice has a coupon, increment usage count
+        $coupon_id = intval($inv['coupon_id'] ?? 0);
+        if ($coupon_id > 0) {
+            $upd_coupon = "UPDATE `" . $TABLE_PREFIX . "billing_coupons` SET current_uses = current_uses + 1 WHERE coupon_id = ?";
+            if ($stmt = mysqli_prepare($db, $upd_coupon)) {
+                mysqli_stmt_bind_param($stmt, 'i', $coupon_id);
+                mysqli_stmt_execute($stmt);
+                mysqli_stmt_close($stmt);
+            }
+        }
+
         // If this invoice already has an order -> treat as renewal
         if ($order_id > 0) {
             // compute months
