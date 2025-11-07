@@ -1,0 +1,6 @@
+{
+    "name": "FlightGear Multiplayer Server",
+    "description": "Setup and configuration guide for FlightGear Multiplayer Server game servers",
+    "category": "game",
+    "order": 81
+}
