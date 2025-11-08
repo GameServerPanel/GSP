@@ -3,7 +3,11 @@
  * Shopping Cart - Display unpaid invoices and PayPal checkout
  * Standalone billing module - uses only standard PHP mysqli
  */
-session_start();
+// Start session using the website session name to match the rest of the site
+if (session_status() === PHP_SESSION_NONE) {
+    session_name("gameservers_website");
+    session_start();
+}
 require_once(__DIR__ . '/includes/config.inc.php');
 require_once(__DIR__ . '/includes/login_required.php');
 
