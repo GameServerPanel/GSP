@@ -188,6 +188,7 @@ mysqli_close($db);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - Game Server Panel</title>
+    <link rel="stylesheet" href="css/header.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -334,6 +335,7 @@ mysqli_close($db);
     <?php endif; ?>
 </head>
 <body>
+    <?php include(__DIR__ . '/includes/menu.php'); ?>
     <div class="container">
         <h1>🛒 Shopping Cart</h1>
         
