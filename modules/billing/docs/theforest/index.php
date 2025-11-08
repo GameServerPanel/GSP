@@ -8,12 +8,14 @@
 <h2>Overview</h2>
 <p><strong>The Forest</strong> is available for hosting on our platform. This guide covers the basics of setting up and managing your The Forest server.</p>
 
-<div style="background: #f0f7ff; padding: 15px; border-left: 4px solid #0066cc; margin: 20px 0;">
-    <h3>Quick Info</h3>
-    <ul>
-        <li><strong>Game Key:</strong> theforest_win32</li>
-        <li><strong>Installer:</strong> steamcmd</li>
-        <li><strong>Max Players:</strong> 100</li>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
+    <ul style="color: #e5e7eb; line-height: 1.8;">
+        <li><strong style="color: #ffffff;">Game Key:</strong> theforest_win32</li>
+        <li><strong style="color: #ffffff;">Startup Command:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">-batchmode %IP% %PORT% %QUERY_PORT% %STEAM_PORT% %HOSTNAME% %PLAYERS% %CONTROL_PASSWORD% %IT% %SLOT% %SSA% %VAC% %SAVEINTERNAL% -configfilepath "%HOME_PATH%/Server.cfg" -savefolderpath "%HOME_PATH%/saves/" %LOG% -nographics</code></li>
+        <li><strong style="color: #ffffff;">Log File:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Not specified</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> Not specified</li>
+        <li><strong style="color: #ffffff;">Max Players:</strong> 100</li>
     </ul>
 </div>
 
@@ -55,9 +57,9 @@
     <li>Visit the official The Forest community for game-specific help</li>
 </ul>
 
-<div style="background: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
-    <h3>⚠️ Important Notes</h3>
-    <ul>
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
         <li>Always keep your server updated to the latest version</li>
         <li>Make regular backups of your server configuration</li>
         <li>Review and follow the game's End User License Agreement (EULA)</li>
