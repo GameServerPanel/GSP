@@ -16,7 +16,8 @@ $user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_
            (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
 
 if ($user_id <= 0) {
-    header('Location: /login.php?return_to=' . urlencode($_SERVER['REQUEST_URI']));
+    $return_to = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/cart.php';
+    header('Location: /login.php?return_to=' . urlencode($return_to));
     exit;
 }
 
