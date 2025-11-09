@@ -22,30 +22,37 @@ if ($user_id <= 0) {
 }
 
 // Connect to database using mysqli
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-if (!$db) {
-    die('Database connection failed: ' . mysqli_connect_error());
-}
+$db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db_error = '';
 
-// Fetch all unpaid invoices for this user
+// Initialize defaults
 $invoices = [];
 $total_amount = 0.00;
-$query = "SELECT i.*, s.game_key, s.game_name 
-          FROM {$table_prefix}billing_invoices i
-          LEFT JOIN {$table_prefix}billing_services s ON i.service_id = s.service_id
-          WHERE i.user_id = " . intval($user_id) . " AND i.status = 'due'
-          ORDER BY i.invoice_date ASC";
+$cart_empty = true;
 
-$result = mysqli_query($db, $query);
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $invoices[] = $row;
-        $total_amount += floatval($row['amount']);
+if (!$db) {
+    // Do not fatal: show a friendly message in the UI instead. This allows the page to load
+    // even when DB is temporarily unreachable (useful for local development).
+    $db_error = 'Database connection failed: ' . mysqli_connect_error();
+} else {
+    // Fetch all unpaid invoices for this user
+    $query = "SELECT i.*, s.game_key, s.game_name 
+              FROM {$table_prefix}billing_invoices i
+              LEFT JOIN {$table_prefix}billing_services s ON i.service_id = s.service_id
+              WHERE i.user_id = " . intval($user_id) . " AND i.status = 'due'
+              ORDER BY i.invoice_date ASC";
+
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $invoices[] = $row;
+            $total_amount += floatval($row['amount']);
+        }
     }
-}
 
-// If cart is empty, show message
-$cart_empty = count($invoices) === 0;
+    // If cart is empty, show message
+    $cart_empty = count($invoices) === 0;
+}
 
 // Coupon handling
 $coupon_code = '';
@@ -66,70 +73,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
     if (empty($submitted_code)) {
         $coupon_error = 'Please enter a coupon code.';
     } else {
-        // Validate coupon
-        $safe_code = mysqli_real_escape_string($db, $submitted_code);
-        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
-                        WHERE code = '$safe_code' AND is_active = 1";
-        $coupon_result = mysqli_query($db, $coupon_query);
-        
-        if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
-            $coupon = mysqli_fetch_assoc($coupon_result);
+        if (!$db) {
+            $coupon_error = 'Coupon system unavailable: no database connection.';
+        } else {
+            // Validate coupon
+            $safe_code = mysqli_real_escape_string($db, $submitted_code);
+            $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
+                            WHERE code = '$safe_code' AND is_active = 1";
+            $coupon_result = mysqli_query($db, $coupon_query);
             
-            // Check expiration
-            $expired = false;
-            if (!empty($coupon['expires'])) {
-                $expires_time = strtotime($coupon['expires']);
-                if ($expires_time && $expires_time < time()) {
-                    $expired = true;
-                }
-            }
-            
-            // Check usage limit
-            $max_uses_reached = false;
-            if (!empty($coupon['max_uses'])) {
-                if (intval($coupon['current_uses']) >= intval($coupon['max_uses'])) {
-                    $max_uses_reached = true;
-                }
-            }
-            
-            if ($expired) {
-                $coupon_error = 'This coupon has expired.';
-            } elseif ($max_uses_reached) {
-                $coupon_error = 'This coupon has reached its maximum usage limit.';
-            } else {
-                // Check game filter
-                $game_valid = true;
-                if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
-                    $allowed_games = json_decode($coupon['game_filter_list'], true);
-                    if (is_array($allowed_games) && count($allowed_games) > 0) {
-                        // Check if any invoice game is in allowed list
-                        $has_valid_game = false;
-                        foreach ($invoices as $inv) {
-                            if (in_array($inv['game_key'], $allowed_games)) {
-                                $has_valid_game = true;
-                                break;
-                            }
-                        }
-                        if (!$has_valid_game) {
-                            $game_valid = false;
-                        }
+            if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
+                $coupon = mysqli_fetch_assoc($coupon_result);
+                
+                // Check expiration
+                $expired = false;
+                if (!empty($coupon['expires'])) {
+                    $expires_time = strtotime($coupon['expires']);
+                    if ($expires_time && $expires_time < time()) {
+                        $expired = true;
                     }
                 }
                 
-                if (!$game_valid) {
-                    $coupon_error = 'This coupon is not valid for the items in your cart.';
-                } else {
-                    // Apply coupon (stored in session, applied at checkout)
-                    $applied_coupon = $coupon;
-                    $coupon_code = $submitted_code;
-                    $coupon_discount_percent = floatval($coupon['discount_percent']);
-                    $_SESSION['cart_coupon_code'] = $coupon_code;
-                    $_SESSION['cart_coupon_id'] = $coupon['coupon_id'];
-                    $coupon_success = 'Coupon "' . htmlspecialchars($coupon['name']) . '" applied! You save ' . $coupon_discount_percent . '%';
+                // Check usage limit
+                $max_uses_reached = false;
+                if (!empty($coupon['max_uses'])) {
+                    if (intval($coupon['current_uses']) >= intval($coupon['max_uses'])) {
+                        $max_uses_reached = true;
+                    }
                 }
+                
+                if ($expired) {
+                    $coupon_error = 'This coupon has expired.';
+                } elseif ($max_uses_reached) {
+                    $coupon_error = 'This coupon has reached its maximum usage limit.';
+                } else {
+                    // Check game filter
+                    $game_valid = true;
+                    if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
+                        $allowed_games = json_decode($coupon['game_filter_list'], true);
+                        if (is_array($allowed_games) && count($allowed_games) > 0) {
+                            // Check if any invoice game is in allowed list
+                            $has_valid_game = false;
+                            foreach ($invoices as $inv) {
+                                if (in_array($inv['game_key'], $allowed_games)) {
+                                    $has_valid_game = true;
+                                    break;
+                                }
+                            }
+                            if (!$has_valid_game) {
+                                $game_valid = false;
+                            }
+                        }
+                    }
+                    
+                    if (!$game_valid) {
+                        $coupon_error = 'This coupon is not valid for the items in your cart.';
+                    } else {
+                        // Apply coupon (stored in session, applied at checkout)
+                        $applied_coupon = $coupon;
+                        $coupon_code = $submitted_code;
+                        $coupon_discount_percent = floatval($coupon['discount_percent']);
+                        $_SESSION['cart_coupon_code'] = $coupon_code;
+                        $_SESSION['cart_coupon_id'] = $coupon['coupon_id'];
+                        $coupon_success = 'Coupon "' . htmlspecialchars($coupon['name']) . '" applied! You save ' . $coupon_discount_percent . '%';
+                    }
+                }
+            } else {
+                $coupon_error = 'Invalid coupon code.';
             }
-        } else {
-            $coupon_error = 'Invalid coupon code.';
         }
     }
 }
@@ -144,8 +155,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
 }
 
 // Calculate discount if coupon is applied
+// Calculate discount if coupon is applied
 $discount_amount = 0;
-if (!empty($coupon_code) && $coupon_discount_percent > 0) {
+if (!empty($coupon_code) && $coupon_discount_percent > 0 && $db) {
     // Re-validate the coupon from session
     $safe_code = mysqli_real_escape_string($db, $coupon_code);
     $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
@@ -157,6 +169,9 @@ if (!empty($coupon_code) && $coupon_discount_percent > 0) {
         $coupon_discount_percent = floatval($applied_coupon['discount_percent']);
         $discount_amount = $total_amount * ($coupon_discount_percent / 100);
     }
+} else {
+    // No DB or no coupon: ensure discount is zero
+    $discount_amount = 0;
 }
 
 $final_amount = $total_amount - $discount_amount;
@@ -185,7 +200,7 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $siteBase = $protocol . $host;
 
-mysqli_close($db);
+if ($db) mysqli_close($db);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -342,6 +357,12 @@ mysqli_close($db);
 <body>
     <?php include(__DIR__ . '/includes/menu.php'); ?>
     <div class="container">
+        <?php if (!empty($db_error)): ?>
+            <div class="alert-error" style="margin-bottom:15px;">
+                <strong>Database error:</strong> <?php echo htmlspecialchars($db_error); ?>
+                <div style="font-size:0.9em;color:#333;margin-top:6px;">The cart is read-only while the database is unavailable.</div>
+            </div>
+        <?php endif; ?>
         <h1>🛒 Shopping Cart</h1>
         
         <?php if ($cart_empty): ?>
