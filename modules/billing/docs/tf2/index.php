@@ -1,68 +1,156 @@
 <?php
 /**
- * Team Fortress 2 Server Documentation
+ * Team Fortress 2 - Comprehensive Server Hosting Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>Team Fortress 2 Server Guide</h1>
-
-<h2>Overview</h2>
-<p><strong>Team Fortress 2</strong> is available for hosting on our platform. This guide covers the basics of setting up and managing your Team Fortress 2 server.</p>
-
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Server Information</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code></li>
-        <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
-        <li><strong style="color: #ffffff;">Additional Info:</strong> Query port also uses 27015 UDP</li>
-    </ul>
-    <p style="color: #e5e7eb; margin-top: 12px; font-size: 0.95em;">
-        <em>Note: When running on a VPS or dedicated server, you can use the default port or configure a custom port in your server configuration file.</em>
-    </p>
+    <h3 style="color: #ffffff; margin-top: 0;">Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#plugins" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Plugins</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Troubleshooting</a>
+    </div>
 </div>
 
-<h2>Getting Started</h2>
-<p>To create a Team Fortress 2 server:</p>
-<ol>
-    <li>Navigate to the <a href="/serverlist.php">Game Servers</a> page</li>
-    <li>Find <strong>Team Fortress 2</strong> in the list</li>
-    <li>Select your preferred configuration (slots, duration, etc.)</li>
-    <li>Add to cart and complete checkout</li>
-    <li>Your server will be automatically provisioned within minutes</li>
-</ol>
+<h1>Team Fortress 2 Dedicated Server Hosting Guide</h1>
 
-<h2>Server Configuration</h2>
-<p>After your server is created, you can configure it through the control panel:</p>
+<h2>Overview</h2>
+<p>Team Fortress 2 (TF2) is Valve's class-based multiplayer FPS game. This guide covers hosting a TF2 dedicated server using Source Dedicated Server (srcds) on VPS or dedicated servers.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code> (UDP)</li>
+        <li><strong style="color: #ffffff;">RCON Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code> (TCP)</li>
+        <li><strong style="color: #ffffff;">Additional Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27020</code> (TCP/UDP)</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB (2GB+ recommended)</li>
+        <li><strong style="color: #ffffff;">Recommended CPU:</strong> 2+ cores @ 2.4GHz+</li>
+        <li><strong style="color: #ffffff;">Storage:</strong> 15-20GB for game files</li>
+        <li><strong style="color: #ffffff;">SteamCMD App ID:</strong> 232250</li>
+        <li><strong style="color: #ffffff;">Server Binary:</strong> srcds.exe (Windows) / srcds_run (Linux)</li>
+        <li><strong style="color: #ffffff;">Config Location:</strong> tf/cfg/server.cfg</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li>Server settings and parameters</li>
-    <li>Player slots and limits</li>
-    <li>RCON/remote control access</li>
-    <li>FTP file access</li>
+    <li><strong>OS:</strong> Windows Server 2012+ or Linux (Ubuntu/Debian)</li>
+    <li><strong>CPU:</strong> 2+ cores @ 2.4GHz minimum</li>
+    <li><strong>RAM:</strong> 2GB minimum, 4GB recommended for 24 players</li>
+    <li><strong>Storage:</strong> 15-20GB for server files</li>
+    <li><strong>Network:</strong> 100Mbps recommended</li>
 </ul>
 
-<h2>Common Tasks</h2>
+<h3>Installing via SteamCMD</h3>
+<pre><code># Install SteamCMD
+# Linux:
+sudo add-apt-repository multiverse
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install lib32gcc1 steamcmd
 
-<h3>Starting Your Server</h3>
-<p>Servers are automatically started after creation. You can stop/start your server from the control panel.</p>
+# Create server directory
+mkdir -p ~/tf2server
+cd ~/tf2server
 
-<h3>Connecting to Your Server</h3>
-<p>Use your server's IP address and port to connect from the game client.</p>
+# Download TF2 server files (App ID 232250)
+steamcmd +login anonymous +force_install_dir ~/tf2server +app_update 232250 validate +quit
+</code></pre>
 
-<h3>Managing Files</h3>
-<p>Access your server files via FTP using the credentials provided in your control panel.</p>
+<h3>Startup Scripts</h3>
+<p><strong>Windows (start_tf2.bat):</strong></p>
+<pre><code>srcds.exe -console -game tf +map ctf_2fort +maxplayers 24 -port 27015 +exec server.cfg
+</code></pre>
 
-<h2>Support</h2>
-<p>If you need assistance with your Team Fortress 2 server:</p>
+<p><strong>Linux (start_tf2.sh):</strong></p>
+<pre><code>#!/bin/bash
+./srcds_run -console -game tf +map ctf_2fort +maxplayers 24 -port 27015 +exec server.cfg
+</code></pre>
+
+<h2 id="configuration">Server Configuration</h2>
+
+<h3>server.cfg Example</h3>
+<p>Create <code>tf/cfg/server.cfg</code>:</p>
+<pre><code>// Server Information
+hostname "My TF2 Server"
+sv_region 1
+rcon_password "your_secure_password"
+
+// Server Settings
+sv_lan 0
+sv_pure 2
+mp_autoteambalance 1
+sv_visiblemaxplayers 24
+mp_timelimit 30
+mp_maxrounds 5
+
+// Communication
+sv_alltalk 0
+sv_voiceenable 1
+
+// Logging
+log on
+sv_logbans 1
+</code></pre>
+
+<h3>Port Forwarding</h3>
+<pre><code># Required ports:
+UDP 27015 - Game server
+TCP 27015 - RCON
+TCP/UDP 27020 - SourceTV
+
+# Linux:
+sudo ufw allow 27015
+sudo ufw allow 27020
+</code></pre>
+
+<h2 id="plugins">Plugins & Extensions</h2>
+
+<h3>SourceMod Installation</h3>
+<p>Most TF2 servers use SourceMod for admin commands and plugins. Install Metamod:Source first, then SourceMod.</p>
+
+<h3>Popular Plugins</h3>
 <ul>
-    <li>Check our <a href="/docs.php?action=view&doc=common-issues">Common Issues</a> guide</li>
-    <li>Contact support through your account dashboard</li>
-    <li>Visit the official Team Fortress 2 community for game-specific help</li>
+    <li><strong>AdminMenu:</strong> Complete admin interface</li>
+    <li><strong>RTV (Rock The Vote):</strong> Player map voting</li>
+    <li><strong>TF2 Competitive Fixes:</strong> Competitive tweaks</li>
+    <li><strong>MGE Mod:</strong> 1v1/2v2 training mode</li>
+</ul>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+<ul>
+    <li>Verify files: <code>steamcmd +app_update 232250 validate</code></li>
+    <li>Check port 27015 availability</li>
+    <li>Review console errors</li>
+</ul>
+
+<h3>Not in Server Browser</h3>
+<ul>
+    <li>Verify <code>sv_lan 0</code></li>
+    <li>Confirm ports forwarded</li>
+    <li>Wait 5-10 minutes for registration</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li><a href="https://wiki.teamfortress.com/wiki/Windows_dedicated_server" target="_blank">Official TF2 Server Wiki</a></li>
+    <li><a href="https://wiki.alliedmods.net/" target="_blank">SourceMod Documentation</a></li>
+    <li><a href="https://forums.alliedmods.net/forumdisplay.php?f=108" target="_blank">AlliedModders TF2 Forum</a></li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">Important Notes</h3>
     <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Always keep your server updated to the latest version</li>
-        <li>Make regular backups of your server configuration</li>
-        <li>Review and follow the game's End User License Agreement (EULA)</li>
+        <li>Keep server updated via SteamCMD</li>
+        <li>Use strong RCON passwords</li>
+        <li>Regular config backups</li>
+        <li>Monitor for exploits</li>
     </ul>
 </div>
