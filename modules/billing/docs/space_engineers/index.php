@@ -9,14 +9,15 @@
 <p><strong>Space Engineers</strong> is available for hosting on our platform. This guide covers the basics of setting up and managing your Space Engineers server.</p>
 
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">Server Information</h3>
     <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game Key:</strong> space_engineers_win32</li>
-        <li><strong style="color: #ffffff;">Startup Command:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">-console %BASE_PATH% -ignorelastsession</code></li>
-        <li><strong style="color: #ffffff;">Log File:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">SpaceEngineersDedicated.log</code></li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> ServerPort</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 32</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27016</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
+        <li><strong style="color: #ffffff;">Additional Info:</strong> Steam port for query</li>
     </ul>
+    <p style="color: #e5e7eb; margin-top: 12px; font-size: 0.95em;">
+        <em>Note: When running on a VPS or dedicated server, you can use the default port or configure a custom port in your server configuration file.</em>
+    </p>
 </div>
 
 <h2>Getting Started</h2>

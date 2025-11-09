@@ -9,14 +9,15 @@
 <p><strong>Battlefield Bad Company 2</strong> is available for hosting on our platform. This guide covers the basics of setting up and managing your Battlefield Bad Company 2 server.</p>
 
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">Server Information</h3>
     <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game Key:</strong> bfbc2</li>
-        <li><strong style="color: #ffffff;">Startup Command:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">-serverInstancePath "Instance/" -mapPack2Enabled 1 %PORT% %QUERY_PORT% %PLAYERS% -region EU -runtimeLog 0 -displayErrors 0 -displayAsserts 0 -crashDumpAsserts 0 -serverAdminLogs 1 -plasmaServerLog 1 -revisionLevel 8 -revisionKey 7C0A303E-F4D2-985E-763D-E7C41B1E06A3 %GAMEMODEID%</code></li>
-        <li><strong style="color: #ffffff;">Log File:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Instance/AdminLogs/ServerAdminLog.log</code></li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> Not specified</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 32</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">19567</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
+        <li><strong style="color: #ffffff;">Additional Info:</strong> Default game port</li>
     </ul>
+    <p style="color: #e5e7eb; margin-top: 12px; font-size: 0.95em;">
+        <em>Note: When running on a VPS or dedicated server, you can use the default port or configure a custom port in your server configuration file.</em>
+    </p>
 </div>
 
 <h2>Getting Started</h2>

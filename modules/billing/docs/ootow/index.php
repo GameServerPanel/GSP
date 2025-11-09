@@ -9,14 +9,13 @@
 <p><strong>Outlaws of the Old West</strong> is available for hosting on our platform. This guide covers the basics of setting up and managing your Outlaws of the Old West server.</p>
 
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game Key:</strong> ootow</li>
-        <li><strong style="color: #ffffff;">Startup Command:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">/Game/Maps/MainMap/MainMap -log %IP% %PORT% %QUERY_PORT% %HOSTNAME% %PLAYERS% %CONTROL_PASSWORD% %TYPE%</code></li>
-        <li><strong style="color: #ffffff;">Log File:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Outlaws/Saved/Logs/Outlaws.log</code></li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> Not specified</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 150</li>
-    </ul>
+    <h3 style="color: #ffffff; margin-top: 0;">Server Information</h3>
+    <p style="color: #e5e7eb;">
+        This game server can be hosted on a VPS or dedicated server. Port configuration depends on the game engine and can typically be set in the server configuration files.
+    </p>
+    <p style="color: #e5e7eb; margin-top: 12px; font-size: 0.95em;">
+        <em>Refer to the official game server documentation for specific port requirements and configuration details.</em>
+    </p>
 </div>
 
 <h2>Getting Started</h2>

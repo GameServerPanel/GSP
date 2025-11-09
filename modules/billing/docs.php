@@ -128,21 +128,7 @@ uksort($grouped, function($a, $b) use ($grouped) {
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        :root {
-            --bg: #0f172a;
-            --card: #111827;
-            --text: #e5e7eb;
-            --muted: #94a3b8;
-            --accent: #38bdf8;
-            --border: #1f2937;
-        }
-        
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial;
-            margin: 0;
-        }
+        /* Documentation-specific styles - consistent with site theme */
         
         .container {
             max-width: 1200px;
@@ -157,28 +143,29 @@ uksort($grouped, function($a, $b) use ($grouped) {
         .header h1 {
             font-size: 32px;
             margin: 0 0 12px;
+            color: #fff;
         }
         
         .header p {
-            color: var(--muted);
+            color: rgba(255,255,255,0.7);
             margin: 0;
         }
         
         .back-button {
             display: inline-block;
             padding: 10px 20px;
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
-            color: var(--accent);
+            color: #7fb3ff;
             text-decoration: none;
             margin-bottom: 20px;
             transition: all 0.2s;
         }
         
         .back-button:hover {
-            background: #1f2937;
-            border-color: var(--accent);
+            background: rgba(255,255,255,0.06);
+            border-color: #667eea;
         }
         
         .category-section {
@@ -187,10 +174,10 @@ uksort($grouped, function($a, $b) use ($grouped) {
         
         .category-title {
             font-size: 24px;
-            color: var(--accent);
+            color: #667eea;
             margin: 0 0 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
         }
         
         .docs-grid {
@@ -200,8 +187,8 @@ uksort($grouped, function($a, $b) use ($grouped) {
         }
         
         .doc-card {
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             padding: 20px;
             transition: all 0.2s;
@@ -211,15 +198,15 @@ uksort($grouped, function($a, $b) use ($grouped) {
         }
         
         .doc-card:hover {
-            border-color: var(--accent);
+            border-color: #667eea;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
         }
         
         .doc-icon-wrapper {
             width: 60px;
             height: 60px;
-            background: #1f2937;
+            background: rgba(0,0,0,0.3);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -235,26 +222,26 @@ uksort($grouped, function($a, $b) use ($grouped) {
         
         .doc-icon-placeholder {
             font-size: 28px;
-            color: var(--muted);
+            color: rgba(255,255,255,0.6);
         }
         
         .doc-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text);
+            color: #fff;
             margin: 0 0 8px;
         }
         
         .doc-description {
             font-size: 14px;
-            color: var(--muted);
+            color: rgba(255,255,255,0.7);
             margin: 0;
             flex-grow: 1;
         }
         
         .doc-view-container {
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             padding: 30px;
             min-height: 400px;
@@ -264,22 +251,23 @@ uksort($grouped, function($a, $b) use ($grouped) {
         .doc-view-container h2,
         .doc-view-container h3,
         .doc-view-container h4 {
-            color: var(--text);
+            color: #fff;
         }
         
         .doc-view-container a {
-            color: var(--accent);
+            color: #7fb3ff;
         }
         
         .doc-view-container code {
-            background: #1f2937;
+            background: rgba(0,0,0,0.3);
             padding: 2px 6px;
             border-radius: 4px;
             font-family: 'Courier New', monospace;
+            color: #a5b4fc;
         }
         
         .doc-view-container pre {
-            background: #1f2937;
+            background: rgba(0,0,0,0.3);
             padding: 15px;
             border-radius: 8px;
             overflow-x: auto;
@@ -291,8 +279,8 @@ uksort($grouped, function($a, $b) use ($grouped) {
         }
         
         .nav-links {
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 30px;
@@ -300,7 +288,7 @@ uksort($grouped, function($a, $b) use ($grouped) {
         
         .nav-links h3 {
             margin: 0 0 15px;
-            color: var(--accent);
+            color: #667eea;
             font-size: 18px;
         }
         
@@ -308,18 +296,18 @@ uksort($grouped, function($a, $b) use ($grouped) {
             display: inline-block;
             padding: 8px 15px;
             margin: 5px 10px 5px 0;
-            background: #1f2937;
-            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 5px;
-            color: var(--accent);
+            color: #7fb3ff;
             text-decoration: none;
             transition: all 0.2s;
         }
         
         .nav-links a:hover {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: #667eea;
+            color: #fff;
+            border-color: #667eea;
         }
         
         .return-to-top {
@@ -330,17 +318,17 @@ uksort($grouped, function($a, $b) use ($grouped) {
         .return-to-top a {
             display: inline-block;
             padding: 10px 20px;
-            background: var(--card);
-            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 8px;
-            color: var(--accent);
+            color: #7fb3ff;
             text-decoration: none;
             transition: all 0.2s;
         }
         
         .return-to-top a:hover {
-            background: #1f2937;
-            border-color: var(--accent);
+            background: rgba(255,255,255,0.06);
+            border-color: #667eea;
         }
     </style>
 </head>
