@@ -313,9 +313,9 @@ $siteBase = $protocol . $host;
     <title>Shopping Cart - Game Server Panel</title>
     <link rel="stylesheet" href="css/header.css">
     <style>
+        /* Do not override site-wide font or header/menu styles here.
+           Keep body reset minimal so includes/menu.php can control header styling. */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
             margin: 0;
             padding: 0;
         }
