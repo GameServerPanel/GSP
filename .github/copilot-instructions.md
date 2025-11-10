@@ -148,4 +148,28 @@ header('Location: /modules/billing/cart.php');
 
 ---
 
+## Additional UI requirement: "Last updated" footer on key pages
+
+When making small content or page edits to the website, ensure the following pages display a human-friendly "Last updated" timestamp at the very bottom of the page (visible to site visitors):
+
+- `modules/billing/index.php`
+- `index.php` (site root)
+- `modules/dashboard/dashboard.php`
+
+Requirements:
+- The text must read exactly: "Last updated at YYYY-MM-DD HH:MM:SS" (24-hour time) where the timestamp reflects the deliberate edit time of the page (see acceptance criteria below).
+- Place the timestamp in the page footer area so it does not break layout on mobile or desktop. Keep styling minimal and consistent with the existing footer typography.
+- Use the server/local timezone for the timestamp and include the date and time in the format above. Do not include timezone abbreviations in the UI; internal logs may record timezone if needed.
+
+Acceptance criteria:
+- Visiting each page shows the "Last updated at" line at the very bottom of the rendered HTML.
+- The timestamp matches the time the page's source was last edited (file modification time) or the annotated edit time used by the deployment process. The project maintainer must decide which of these sources is canonical; document the choice in the change plan.
+- The line is visible and readable on small screens and does not overlap other UI elements.
+
+Testing checklist:
+- Manually open each page and confirm the timestamp is present.
+- After making a small edit and deploying, confirm the timestamp updates to the new edit time.
+- If using automated deploys, ensure the deploy process preserves or updates the canonical timestamp source (e.g., touch file, update metadata) so the displayed value is accurate.
+
+
 **End of Copilot Instructions (No-Code).**
