@@ -171,5 +171,11 @@ Testing checklist:
 - After making a small edit and deploying, confirm the timestamp updates to the new edit time.
 - If using automated deploys, ensure the deploy process preserves or updates the canonical timestamp source (e.g., touch file, update metadata) so the displayed value is accurate.
 
+Maintainer update requirement:
+- The canonical human-friendly timestamp is stored in `modules/billing/timestamp.txt` and MUST be updated whenever site files or content are edited and deployed.
+- Format and wording: use a single-line plain-text entry such as: "Last Updated at 7:25am on 2025-15-11". This exact text (including capitalization) is what appears in theme footers.
+- Update process: include the `timestamp.txt` change in the same commit/PR as any content change that should alter the "Last Updated" time, or ensure your deployment process updates the file automatically (for example, a post-deploy hook that writes the current deploy time in the agreed format).
+- Rationale: themes are non-PHP files and may not support SSI on all servers; keeping a single canonical plain-text file reduces duplication and avoids server-side includes.
+
 
 **End of Copilot Instructions (No-Code).**
