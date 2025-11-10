@@ -27,3 +27,4 @@ Thumbs.db
 # Ignore temporary files
 /tmp/
 *.tmp
+modules/billing/data/*.log
