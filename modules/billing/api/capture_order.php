@@ -136,8 +136,11 @@ log_payment('PAYMENT_CAPTURED', [
     'payer_name' => trim($payer_name)
 ]);
 
-// Start session to get user_id
-session_start();
+// Start session to get user_id (use billing website session name)
+if (session_status() === PHP_SESSION_NONE) {
+    session_name("gameservers_website");
+    session_start();
+}
 $user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
            (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
 

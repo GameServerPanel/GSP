@@ -5,14 +5,15 @@
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
         <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
         <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
-        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Parameters</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#plugins-mods" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Plugins & Mods</a>
-        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Troubleshooting</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
         <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
@@ -35,6 +36,90 @@
         <li><strong style="color: #ffffff;">Log File:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">logs/latest.log</code></li>
         <li><strong style="color: #ffffff;">Main Config:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">server.properties</code></li>
         <li><strong style="color: #ffffff;">EULA:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">eula.txt</code> (must set eula=true)</li>
+    </ul>
+</div>
+
+<h2 id="ports">🔌 Network Ports Used</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #0f172a;">
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Required?</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">25565</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">Main game connection (players connect here)</td>
+                <td style="padding: 10px;"><span style="color: #10b981;">✓ Yes</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">25565</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Server query protocol (for server lists)</td>
+                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">25575</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">RCON (remote console administration)</td>
+                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">19132</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Bedrock Edition (if running Geyser plugin)</td>
+                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration Examples</h3>
+    <p style="color: #e5e7eb;">Allow Minecraft server through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow 25565/tcp comment 'Minecraft Server'
+sudo ufw allow 25565/udp comment 'Minecraft Query'
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=25565/tcp
+sudo firewall-cmd --permanent --add-port=25565/udp
+sudo firewall-cmd --reload
+
+# iptables
+sudo iptables -A INPUT -p tcp --dport 25565 -j ACCEPT
+sudo iptables -A INPUT -p udp --dport 25565 -j ACCEPT
+sudo iptables-save > /etc/iptables/rules.v4
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Minecraft Server" dir=in action=allow protocol=TCP localport=25565
+netsh advfirewall firewall add rule name="Minecraft Query" dir=in action=allow protocol=UDP localport=25565
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">Port Configuration in server.properties</h3>
+    <pre><code style="color: #a5b4fc;"># Main server port (TCP)
+server-port=25565
+
+# Query port (UDP) - usually same as server-port
+query.port=25565
+enable-query=true
+
+# RCON port (TCP) - remote administration
+rcon.port=25575
+enable-rcon=false
+rcon.password=changeme_use_strong_password
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Never expose RCON port to the internet without strong authentication</li>
+        <li>Consider using a non-standard port to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups to allow only required ports</li>
+        <li>Monitor connection attempts in server logs regularly</li>
     </ul>
 </div>
 
