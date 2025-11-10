@@ -183,21 +183,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
 // Re-validate coupon from session if present
 if (empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
     $coupon_code = $_SESSION['cart_coupon_code'];
-    if ($db) {
-        $safe_code = mysqli_real_escape_string($db, $coupon_code);
-        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
-                        WHERE code = '$safe_code' AND is_active = 1";
-        $coupon_result = mysqli_query($db, $coupon_query);
-        
-        if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
-            $applied_coupon = mysqli_fetch_assoc($coupon_result);
-            $coupon_discount_percent = floatval($applied_coupon['discount_percent']);
-            mysqli_free_result($coupon_result);
-        } else {
-            // Coupon no longer valid, clear from session
-            unset($_SESSION['cart_coupon_code']);
-            unset($_SESSION['cart_coupon_id']);
-        }
+    $safe_code = mysqli_real_escape_string($db, $coupon_code);
+    $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
+                    WHERE code = '$safe_code' AND is_active = 1";
+    $coupon_result = mysqli_query($db, $coupon_query);
+    
+    if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
+        $applied_coupon = mysqli_fetch_assoc($coupon_result);
+        $coupon_discount_percent = floatval($applied_coupon['discount_percent']);
+        mysqli_free_result($coupon_result);
+    } else {
+        // Coupon no longer valid, clear from session
+        unset($_SESSION['cart_coupon_code']);
+        unset($_SESSION['cart_coupon_id']);
     }
 }
 
@@ -233,8 +231,8 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $siteBase = $protocol . $host;
 
-// Close database connection if opened
-if ($db) mysqli_close($db);
+// Close database connection
+mysqli_close($db);
 ?>
 <!DOCTYPE html>
 <html lang="en">
