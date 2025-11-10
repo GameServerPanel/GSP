@@ -1,4 +1,32 @@
 <?php
+// Debugging helper: enable when visiting with ?debug_cart=1
+$debug_cart = isset($_GET['debug_cart']) && $_GET['debug_cart'] === '1';
+if ($debug_cart) {
+    // Show all errors for immediate feedback
+    @ini_set('display_errors', '1');
+    @ini_set('display_startup_errors', '1');
+    @error_reporting(E_ALL);
+}
+
+// Register a shutdown function to capture fatal errors and write diagnostics to a debug log
+register_shutdown_function(function() use ($debug_cart) {
+    $err = error_get_last();
+    $logPath = __DIR__ . '/data';
+    if (!is_dir($logPath)) @mkdir($logPath, 0755, true);
+    $logFile = $logPath . '/debug_cart.log';
+    $out = "[" . date('Y-m-d H:i:s') . "] SHUTDOWN: ";
+    if ($err) {
+        $out .= json_encode($err) . "\n";
+    } else {
+        $out .= "no error\n";
+    }
+    @file_put_contents($logFile, $out, FILE_APPEND | LOCK_EX);
+    if ($debug_cart && $err) {
+        echo '<pre style="background:#fff7e6;border:1px solid #e6b800;padding:10px;">';
+        echo "Shutdown error:\n" . htmlspecialchars(print_r($err, true));
+        echo '</pre>';
+    }
+});
 /**
  * Shopping Cart - Rebuilt from scratch for reliability
  * Displays unpaid invoices and provides PayPal checkout
