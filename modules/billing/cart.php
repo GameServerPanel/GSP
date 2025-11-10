@@ -209,6 +209,68 @@ if (empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
     }
 }
 
+// AJAX remove invoice action (hard delete) - returns JSON when remove_invoice_ajax is set
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_invoice_ajax']) && isset($_POST['invoice_id'])) {
+    header('Content-Type: application/json');
+    $remove_id = intval($_POST['invoice_id']);
+    if ($remove_id <= 0) {
+        echo json_encode(['success' => false, 'error' => 'Invalid invoice id.']);
+        exit;
+    }
+
+    if (!$db) {
+        echo json_encode(['success' => false, 'error' => 'Database unavailable.']);
+        exit;
+    }
+
+    // Verify ownership and that invoice is still due
+    $check_q = "SELECT invoice_id FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+    $check_r = mysqli_query($db, $check_q);
+    if (!($check_r && mysqli_num_rows($check_r) === 1)) {
+        echo json_encode(['success' => false, 'error' => 'Invoice not found or cannot be removed.']);
+        exit;
+    }
+
+    // Hard-delete the invoice row
+    $del_q = "DELETE FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+    $ok = mysqli_query($db, $del_q);
+    if ($ok && mysqli_affected_rows($db) > 0) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Failed to delete invoice.']);
+    }
+    exit;
+}
+
+// Handle non-AJAX remove invoice action (hard delete + redirect)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_invoice']) && isset($_POST['invoice_id'])) {
+    $remove_id = intval($_POST['invoice_id']);
+    if ($remove_id <= 0) {
+        $error_message = 'Invalid invoice id.';
+    } else {
+        if (!$db) {
+            $error_message = 'Unable to remove item: database unavailable.';
+        } else {
+            // Verify ownership and that invoice is still due
+            $check_q = "SELECT invoice_id FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+            $check_r = mysqli_query($db, $check_q);
+            if ($check_r && mysqli_num_rows($check_r) === 1) {
+                // Hard-delete to remove from cart
+                $del_q = "DELETE FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+                if (mysqli_query($db, $del_q)) {
+                    // Reload to avoid form re-submission and refresh invoice list
+                    header('Location: /cart.php');
+                    exit;
+                } else {
+                    $error_message = 'Failed to remove item from cart.';
+                }
+            } else {
+                $error_message = 'Invoice not found or cannot be removed.';
+            }
+        }
+    }
+}
+
 // Calculate discount
 if ($applied_coupon && $coupon_discount_percent > 0) {
     $discount_amount = $total_amount * ($coupon_discount_percent / 100);
@@ -468,6 +530,8 @@ $siteBase = $protocol . $host;
             margin-top: 30px;
         }
     </style>
+    <?php // Font Awesome for small icon buttons ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <?php if (!$cart_empty): ?>
     <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=USD&intent=capture"></script>
     <?php endif; ?>
@@ -506,6 +570,7 @@ $siteBase = $protocol . $host;
                         <th>Quantity</th>
                         <th>Status</th>
                         <th style="text-align: right;">Price</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -518,12 +583,17 @@ $siteBase = $protocol . $host;
                             <div class="description"><?php echo htmlspecialchars($inv['description']); ?></div>
                             <?php endif; ?>
                         </td>
-                        <td><?php echo htmlspecialchars($inv['invoice_duration']); ?></td>
-                        <td><?php echo intval($inv['qty']); ?>x</td>
-                        <td><span class="status-badge"><?php echo htmlspecialchars(strtoupper($inv['status'])); ?></span></td>
-                        <td style="text-align: right;">
-                            <span class="price">$<?php echo number_format(floatval($inv['amount']), 2); ?></span>
-                        </td>
+                                <td><?php echo htmlspecialchars($inv['invoice_duration']); ?></td>
+                                <td><?php echo intval($inv['qty']); ?>x</td>
+                                <td><span class="status-badge"><?php echo htmlspecialchars(strtoupper($inv['status'])); ?></span></td>
+                                <td style="text-align: right;">
+                                    <span class="price">$<?php echo number_format(floatval($inv['amount']), 2); ?></span>
+                                </td>
+                                <td style="text-align: right;">
+                                    <button type="button" class="btn btn-secondary btn-small" title="Remove" onclick="removeInvoice(<?php echo intval($inv['invoice_id']); ?>)">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -666,6 +736,49 @@ $siteBase = $protocol . $host;
                     }
                 }).render('#paypal-button-container');
             </script>
+                <script>
+                    // Remove invoice via AJAX and perform a partial reload of the cart container
+                    function removeInvoice(invoiceId) {
+                        if (!confirm('Remove this item from your cart?')) return;
+                        setStatus('Removing item...');
+
+                        var body = 'remove_invoice_ajax=1&invoice_id=' + encodeURIComponent(invoiceId);
+
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: body
+                        })
+                        .then(function(res) { return res.json(); })
+                        .then(function(data) {
+                            if (data && data.success) {
+                                // Partial reload: fetch the current page and replace the cart container
+                                fetch(window.location.href, { method: 'GET', credentials: 'same-origin' })
+                                    .then(function(r) { return r.text(); })
+                                    .then(function(html) {
+                                        var parser = new DOMParser();
+                                        var doc = parser.parseFromString(html, 'text/html');
+                                        var newContainer = doc.querySelector('.cart-container');
+                                        var oldContainer = document.querySelector('.cart-container');
+                                        if (newContainer && oldContainer) {
+                                            oldContainer.innerHTML = newContainer.innerHTML;
+                                        } else {
+                                            // Fallback to full reload
+                                            window.location.reload();
+                                        }
+                                    });
+                            } else {
+                                alert(data && data.error ? data.error : 'Failed to remove item.');
+                                setStatus('');
+                            }
+                        })
+                        .catch(function(err) {
+                            console.error('Remove error', err);
+                            alert('Error removing item. See console for details.');
+                            setStatus('');
+                        });
+                    }
+                </script>
         <?php endif; ?>
     </div>
 </body>
