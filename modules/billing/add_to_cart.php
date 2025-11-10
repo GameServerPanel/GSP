@@ -5,6 +5,13 @@ require_once(__DIR__ . '/includes/config.inc.php');
 require_once(__DIR__ . '/includes/login_required.php');
 require_once(__DIR__ . '/includes/log.php');
 
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+
 // Start session if not already
 if (session_status() === PHP_SESSION_NONE) session_start();
 
