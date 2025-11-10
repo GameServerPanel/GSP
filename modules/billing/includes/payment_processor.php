@@ -21,6 +21,13 @@ if (is_file($moduleConfig)) {
     error_log('[payment_processor] Module config not found: expected ' . $moduleConfig);
 }
 
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+
 // Normalize table prefix variable: many files use $table_prefix (lowercase)
 if (!isset($TABLE_PREFIX) && isset($table_prefix)) {
     $TABLE_PREFIX = $table_prefix;

@@ -25,6 +25,14 @@ if (empty($_SESSION['website_user_id'])) {
 // Require DB config and check role live from panel DB
 
 require_once(__DIR__ . '/config.inc.php');
+
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+
 // Use a local connection variable so we don't clash with pages that also use $db
 $auth_db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 if (!$auth_db) {
