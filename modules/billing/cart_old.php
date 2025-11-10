@@ -1,137 +1,146 @@
 <?php
 /**
- * Shopping Cart - Rebuilt from scratch for reliability
- * Displays unpaid invoices and provides PayPal checkout
+ * Shopping Cart - Display unpaid invoices and PayPal checkout
  * Standalone billing module - uses only standard PHP mysqli
  */
-
-// Start session with website session name
+// Start session using the website session name to match the rest of the site
 if (session_status() === PHP_SESSION_NONE) {
     session_name("gameservers_website");
     session_start();
 }
-
-// Load configuration
 require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/login_required.php');
 
-// Check if user is logged in
-$user_id = 0;
-if (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) {
-    $user_id = intval($_SESSION['website_user_id']);
-} elseif (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
-    $user_id = intval($_SESSION['user_id']);
-}
+// Get user ID from session (website_user_id preferred)
+$user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
+           (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
 
-// Redirect to login if not authenticated
 if ($user_id <= 0) {
-    $return_to = urlencode($_SERVER['REQUEST_URI'] ?? '/cart.php');
-    header('Location: /login.php?return_to=' . $return_to);
+    $return_to = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/cart.php';
+    header('Location: /login.php?return_to=' . urlencode($return_to));
     exit;
 }
 
-// Connect to database
+// Connect to database using mysqli
 $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-if (!$db) {
-    die('Database connection failed. Please try again later.');
-}
+$db_error = '';
 
-// Initialize variables
+// Initialize defaults
 $invoices = [];
 $total_amount = 0.00;
-$discount_amount = 0.00;
-$coupon_discount_percent = 0;
-$applied_coupon = null;
-$error_message = '';
-$success_message = '';
+$cart_empty = true;
 
-// Fetch unpaid invoices for this user
-$query = "SELECT i.*, s.game_key, s.game_name 
-          FROM {$table_prefix}billing_invoices i
-          LEFT JOIN {$table_prefix}billing_services s ON i.service_id = s.service_id
-          WHERE i.user_id = " . $user_id . " AND i.status = 'due'
-          ORDER BY i.invoice_date ASC";
+if (!$db) {
+    // Do not fatal: show a friendly message in the UI instead. This allows the page to load
+    // even when DB is temporarily unreachable (useful for local development).
+    $db_error = 'Database connection failed: ' . mysqli_connect_error();
+} else {
+    // Fetch all unpaid invoices for this user
+    $query = "SELECT i.*, s.game_key, s.game_name 
+              FROM {$table_prefix}billing_invoices i
+              LEFT JOIN {$table_prefix}billing_services s ON i.service_id = s.service_id
+              WHERE i.user_id = " . intval($user_id) . " AND i.status = 'due'
+              ORDER BY i.invoice_date ASC";
 
-$result = mysqli_query($db, $query);
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $invoices[] = $row;
-        $total_amount += floatval($row['amount']);
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $invoices[] = $row;
+            $total_amount += floatval($row['amount']);
+        }
     }
-    mysqli_free_result($result);
+
+    // If cart is empty, show message
+    $cart_empty = count($invoices) === 0;
 }
 
-$cart_empty = (count($invoices) === 0);
+// Coupon handling
+$coupon_code = '';
+$coupon_discount_percent = 0;
+$coupon_error = '';
+$coupon_success = '';
+$applied_coupon = null;
+
+// Check for coupon in session
+if (isset($_SESSION['cart_coupon_code'])) {
+    $coupon_code = $_SESSION['cart_coupon_code'];
+}
 
 // Handle coupon application
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
-    $coupon_code = trim($_POST['coupon_code'] ?? '');
+    $submitted_code = trim($_POST['coupon_code'] ?? '');
     
-    if (empty($coupon_code)) {
-        $error_message = 'Please enter a coupon code.';
+    if (empty($submitted_code)) {
+        $coupon_error = 'Please enter a coupon code.';
     } else {
-        // Validate coupon
-        $safe_code = mysqli_real_escape_string($db, $coupon_code);
-        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
-                        WHERE code = '$safe_code' AND is_active = 1";
-        $coupon_result = mysqli_query($db, $coupon_query);
-        
-        if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
-            $coupon = mysqli_fetch_assoc($coupon_result);
+        if (!$db) {
+            $coupon_error = 'Coupon system unavailable: no database connection.';
+        } else {
+            // Validate coupon
+            $safe_code = mysqli_real_escape_string($db, $submitted_code);
+            $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
+                            WHERE code = '$safe_code' AND is_active = 1";
+            $coupon_result = mysqli_query($db, $coupon_query);
             
-            // Check if expired
-            $expired = false;
-            if (!empty($coupon['expires'])) {
-                $expires_time = strtotime($coupon['expires']);
-                if ($expires_time && $expires_time < time()) {
-                    $expired = true;
-                }
-            }
-            
-            // Check usage limit
-            $max_uses_reached = false;
-            if (!empty($coupon['max_uses'])) {
-                if (intval($coupon['current_uses']) >= intval($coupon['max_uses'])) {
-                    $max_uses_reached = true;
-                }
-            }
-            
-            if ($expired) {
-                $error_message = 'This coupon has expired.';
-            } elseif ($max_uses_reached) {
-                $error_message = 'This coupon has reached its maximum usage limit.';
-            } else {
-                // Check game filter
-                $game_valid = true;
-                if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
-                    $allowed_games = json_decode($coupon['game_filter_list'], true);
-                    if (is_array($allowed_games) && count($allowed_games) > 0) {
-                        $has_valid_game = false;
-                        foreach ($invoices as $inv) {
-                            if (in_array($inv['game_key'], $allowed_games)) {
-                                $has_valid_game = true;
-                                break;
-                            }
-                        }
-                        if (!$has_valid_game) {
-                            $game_valid = false;
-                        }
+            if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
+                $coupon = mysqli_fetch_assoc($coupon_result);
+                
+                // Check expiration
+                $expired = false;
+                if (!empty($coupon['expires'])) {
+                    $expires_time = strtotime($coupon['expires']);
+                    if ($expires_time && $expires_time < time()) {
+                        $expired = true;
                     }
                 }
                 
-                if (!$game_valid) {
-                    $error_message = 'This coupon is not valid for the items in your cart.';
-                } else {
-                    // Apply coupon
-                    $applied_coupon = $coupon;
-                    $coupon_discount_percent = floatval($coupon['discount_percent']);
-                    $_SESSION['cart_coupon_code'] = $coupon_code;
-                    $_SESSION['cart_coupon_id'] = $coupon['coupon_id'];
-                    $success_message = 'Coupon "' . htmlspecialchars($coupon['name']) . '" applied! You save ' . $coupon_discount_percent . '%';
+                // Check usage limit
+                $max_uses_reached = false;
+                if (!empty($coupon['max_uses'])) {
+                    if (intval($coupon['current_uses']) >= intval($coupon['max_uses'])) {
+                        $max_uses_reached = true;
+                    }
                 }
+                
+                if ($expired) {
+                    $coupon_error = 'This coupon has expired.';
+                } elseif ($max_uses_reached) {
+                    $coupon_error = 'This coupon has reached its maximum usage limit.';
+                } else {
+                    // Check game filter
+                    $game_valid = true;
+                    if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
+                        $allowed_games = json_decode($coupon['game_filter_list'], true);
+                        if (is_array($allowed_games) && count($allowed_games) > 0) {
+                            // Check if any invoice game is in allowed list
+                            $has_valid_game = false;
+                            foreach ($invoices as $inv) {
+                                if (in_array($inv['game_key'], $allowed_games)) {
+                                    $has_valid_game = true;
+                                    break;
+                                }
+                            }
+                            if (!$has_valid_game) {
+                                $game_valid = false;
+                            }
+                        }
+                    }
+                    
+                    if (!$game_valid) {
+                        $coupon_error = 'This coupon is not valid for the items in your cart.';
+                    } else {
+                        // Apply coupon (stored in session, applied at checkout)
+                        $applied_coupon = $coupon;
+                        $coupon_code = $submitted_code;
+                        $coupon_discount_percent = floatval($coupon['discount_percent']);
+                        $_SESSION['cart_coupon_code'] = $coupon_code;
+                        $_SESSION['cart_coupon_id'] = $coupon['coupon_id'];
+                        $coupon_success = 'Coupon "' . htmlspecialchars($coupon['name']) . '" applied! You save ' . $coupon_discount_percent . '%';
+                    }
+                }
+            } else {
+                $coupon_error = 'Invalid coupon code.';
             }
-            mysqli_free_result($coupon_result);
-        } else {
-            $error_message = 'Invalid coupon code.';
         }
     }
 }
@@ -140,13 +149,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
     unset($_SESSION['cart_coupon_code']);
     unset($_SESSION['cart_coupon_id']);
-    $applied_coupon = null;
+    $coupon_code = '';
     $coupon_discount_percent = 0;
+    $applied_coupon = null;
 }
 
-// Re-validate coupon from session if present
-if (empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
-    $coupon_code = $_SESSION['cart_coupon_code'];
+// Calculate discount if coupon is applied
+// Calculate discount if coupon is applied
+$discount_amount = 0;
+if (!empty($coupon_code) && $coupon_discount_percent > 0 && $db) {
+    // Re-validate the coupon from session
     $safe_code = mysqli_real_escape_string($db, $coupon_code);
     $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
                     WHERE code = '$safe_code' AND is_active = 1";
@@ -155,48 +167,40 @@ if (empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
     if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
         $applied_coupon = mysqli_fetch_assoc($coupon_result);
         $coupon_discount_percent = floatval($applied_coupon['discount_percent']);
-        mysqli_free_result($coupon_result);
-    } else {
-        // Coupon no longer valid, clear from session
-        unset($_SESSION['cart_coupon_code']);
-        unset($_SESSION['cart_coupon_id']);
+        $discount_amount = $total_amount * ($coupon_discount_percent / 100);
     }
-}
-
-// Calculate discount
-if ($applied_coupon && $coupon_discount_percent > 0) {
-    $discount_amount = $total_amount * ($coupon_discount_percent / 100);
+} else {
+    // No DB or no coupon: ensure discount is zero
+    $discount_amount = 0;
 }
 
 $final_amount = $total_amount - $discount_amount;
 
 // PayPal configuration
-$sandbox = true;
+$sandbox = true; // Set to false for live PayPal
 $client_id = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
 
-// Prepare PayPal items
+// Prepare PayPal items array
 $paypal_items = [];
 foreach ($invoices as $inv) {
     $game_display = !empty($inv['game_name']) ? $inv['game_name'] : 'Game Server';
-    $qty = max(1, intval($inv['qty']));
     $paypal_items[] = [
         'name' => $inv['home_name'] . ' (' . $game_display . ')',
-        'description' => $inv['description'] ?? '',
-        'quantity' => $qty,
+        'description' => $inv['description'],
+        'quantity' => intval($inv['qty']),
         'unit_amount' => [
             'currency_code' => 'USD',
-            'value' => number_format(floatval($inv['amount']) / $qty, 2, '.', '')
+            'value' => number_format(floatval($inv['amount']) / intval($inv['qty']), 2, '.', '')
         ]
     ];
 }
 
-// Get site base URL
+// Get site base URL dynamically
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $siteBase = $protocol . $host;
 
-// Close database connection
-mysqli_close($db);
+if ($db) mysqli_close($db);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -207,14 +211,14 @@ mysqli_close($db);
     <link rel="stylesheet" href="css/header.css">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background: #f5f5f5;
             margin: 0;
-            padding: 0;
+            padding: 20px;
         }
-        .cart-container {
+        .container {
             max-width: 900px;
-            margin: 40px auto;
+            margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 8px;
@@ -223,34 +227,11 @@ mysqli_close($db);
         h1 {
             color: #333;
             margin-bottom: 30px;
-            font-size: 2em;
-        }
-        .alert {
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-        }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
         }
         .cart-empty {
             text-align: center;
-            padding: 60px 20px;
-        }
-        .cart-empty h2 {
+            padding: 40px;
             color: #666;
-            margin-bottom: 15px;
-        }
-        .cart-empty p {
-            color: #999;
-            margin-bottom: 30px;
         }
         .cart-table {
             width: 100%;
@@ -263,86 +244,25 @@ mysqli_close($db);
             text-align: left;
             border-bottom: 2px solid #dee2e6;
             font-weight: 600;
-            color: #495057;
         }
         .cart-table td {
             padding: 15px 12px;
             border-bottom: 1px solid #dee2e6;
         }
-        .cart-table tbody tr:hover {
+        .cart-table tr:hover {
             background: #f8f9fa;
         }
         .game-name {
             font-weight: 600;
             color: #007bff;
-            font-size: 1.05em;
         }
         .server-name {
             color: #666;
             font-size: 0.9em;
-            margin-top: 4px;
-        }
-        .description {
-            color: #999;
-            font-size: 0.85em;
-            margin-top: 4px;
         }
         .price {
             font-weight: 600;
             color: #28a745;
-            font-size: 1.1em;
-        }
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-            background: #fff3cd;
-            color: #856404;
-        }
-        .coupon-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .coupon-section h3 {
-            margin-top: 0;
-            color: #333;
-        }
-        .coupon-form {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-        .coupon-form > div {
-            flex: 1;
-        }
-        .coupon-form label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #495057;
-        }
-        .coupon-form input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 1em;
-        }
-        .coupon-applied {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #d4edda;
-            padding: 15px;
-            border-radius: 4px;
-            border: 1px solid #c3e6cb;
-        }
-        .coupon-applied-text {
-            color: #155724;
         }
         .cart-total {
             text-align: right;
@@ -350,28 +270,29 @@ mysqli_close($db);
             border-top: 2px solid #dee2e6;
             margin-bottom: 30px;
         }
-        .cart-total-row {
-            margin-bottom: 10px;
-        }
-        .cart-total-label {
+        .cart-total .total-label {
             font-size: 1.2em;
             font-weight: 600;
             margin-right: 20px;
-            color: #495057;
         }
-        .cart-total-amount {
+        .cart-total .total-amount {
             font-size: 1.5em;
             font-weight: 700;
             color: #28a745;
         }
-        .subtotal-amount {
-            font-size: 1.2em;
-            color: #666;
+        .checkout-section {
+            padding: 20px 0;
         }
-        .discount-amount {
-            font-size: 1.2em;
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
             font-weight: 600;
-            color: #28a745;
+        }
+        .status-due {
+            background: #fff3cd;
+            color: #856404;
         }
         .btn {
             display: inline-block;
@@ -379,11 +300,9 @@ mysqli_close($db);
             background: #007bff;
             color: white;
             text-decoration: none;
-            border: none;
             border-radius: 5px;
+            margin-right: 10px;
             font-weight: 600;
-            cursor: pointer;
-            font-size: 1em;
         }
         .btn:hover {
             background: #0056b3;
@@ -394,33 +313,41 @@ mysqli_close($db);
         .btn-secondary:hover {
             background: #545b62;
         }
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 0.9em;
-        }
-        .checkout-section {
-            padding: 20px 0;
-        }
-        .checkout-section h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .checkout-section p {
-            color: #666;
-            margin-bottom: 20px;
-        }
         #paypal-button-container {
             max-width: 400px;
             margin: 20px 0;
         }
-        .status-message {
+        .loading {
             text-align: center;
             padding: 20px;
             color: #666;
-            display: none;
         }
-        .action-buttons {
-            margin-top: 30px;
+        .coupon-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .coupon-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
         }
     </style>
     <?php if (!$cart_empty): ?>
@@ -429,17 +356,14 @@ mysqli_close($db);
 </head>
 <body>
     <?php include(__DIR__ . '/includes/menu.php'); ?>
-    
-    <div class="cart-container">
+    <div class="container">
+        <?php if (!empty($db_error)): ?>
+            <div class="alert-error" style="margin-bottom:15px;">
+                <strong>Database error:</strong> <?php echo htmlspecialchars($db_error); ?>
+                <div style="font-size:0.9em;color:#333;margin-top:6px;">The cart is read-only while the database is unavailable.</div>
+            </div>
+        <?php endif; ?>
         <h1>🛒 Shopping Cart</h1>
-        
-        <?php if ($error_message): ?>
-            <div class="alert alert-error"><?php echo htmlspecialchars($error_message); ?></div>
-        <?php endif; ?>
-        
-        <?php if ($success_message): ?>
-            <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
-        <?php endif; ?>
         
         <?php if ($cart_empty): ?>
             <div class="cart-empty">
@@ -465,12 +389,18 @@ mysqli_close($db);
                             <div class="game-name"><?php echo htmlspecialchars($inv['game_name'] ?? 'Game Server'); ?></div>
                             <div class="server-name"><?php echo htmlspecialchars($inv['home_name']); ?></div>
                             <?php if (!empty($inv['description'])): ?>
-                            <div class="description"><?php echo htmlspecialchars($inv['description']); ?></div>
+                            <div style="font-size: 0.85em; color: #999; margin-top: 4px;">
+                                <?php echo htmlspecialchars($inv['description']); ?>
+                            </div>
                             <?php endif; ?>
                         </td>
                         <td><?php echo htmlspecialchars($inv['invoice_duration']); ?></td>
-                        <td><?php echo intval($inv['qty']); ?>x</td>
-                        <td><span class="status-badge"><?php echo htmlspecialchars(strtoupper($inv['status'])); ?></span></td>
+                        <td><?php echo htmlspecialchars($inv['qty']); ?>x</td>
+                        <td>
+                            <span class="status-badge status-due">
+                                <?php echo htmlspecialchars(strtoupper($inv['status'])); ?>
+                            </span>
+                        </td>
                         <td style="text-align: right;">
                             <span class="price">$<?php echo number_format(floatval($inv['amount']), 2); ?></span>
                         </td>
@@ -480,58 +410,69 @@ mysqli_close($db);
             </table>
 
             <!-- Coupon Section -->
-            <div class="coupon-section">
-                <h3>Coupon Code</h3>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                <h3 style="margin-top: 0;">Apply Coupon Code</h3>
                 
-                <?php if (!$applied_coupon): ?>
-                    <form method="POST" class="coupon-form">
-                        <div>
-                            <label>Enter Code:</label>
-                            <input type="text" name="coupon_code" placeholder="Enter coupon code" required>
+                <?php if (!empty($coupon_error)): ?>
+                    <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                        <?php echo htmlspecialchars($coupon_error); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($coupon_success)): ?>
+                    <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                        <?php echo $coupon_success; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (empty($applied_coupon)): ?>
+                    <form method="POST" style="display: flex; gap: 10px; align-items: flex-end;">
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Coupon Code:</label>
+                            <input type="text" name="coupon_code" placeholder="Enter code" 
+                                   style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px;" 
+                                   value="<?php echo htmlspecialchars($coupon_code); ?>">
                         </div>
-                        <button type="submit" name="apply_coupon" class="btn">Apply Coupon</button>
+                        <button type="submit" name="apply_coupon" class="btn">Apply</button>
                     </form>
                 <?php else: ?>
-                    <div class="coupon-applied">
-                        <div class="coupon-applied-text">
-                            <strong>Coupon Applied:</strong> 
-                            <?php echo htmlspecialchars($applied_coupon['name']); ?> 
-                            (<?php echo htmlspecialchars($applied_coupon['discount_percent']); ?>% off)
+                    <div style="display: flex; justify-content: space-between; align-items: center; background: #d4edda; padding: 15px; border-radius: 4px;">
+                        <div>
+                            <strong style="color: #155724;">Coupon Applied:</strong> 
+                            <span style="color: #155724;"><?php echo htmlspecialchars($applied_coupon['name']); ?> 
+                            (<?php echo htmlspecialchars($applied_coupon['discount_percent']); ?>% off)</span>
                         </div>
                         <form method="POST" style="margin: 0;">
-                            <button type="submit" name="remove_coupon" class="btn btn-secondary btn-small">Remove</button>
+                            <button type="submit" name="remove_coupon" class="btn btn-secondary" 
+                                    style="padding: 8px 16px;">Remove</button>
                         </form>
                     </div>
                 <?php endif; ?>
             </div>
 
-            <!-- Cart Total -->
             <div class="cart-total">
                 <?php if ($discount_amount > 0): ?>
-                    <div class="cart-total-row">
-                        <span class="cart-total-label">Subtotal:</span>
-                        <span class="subtotal-amount">$<?php echo number_format($total_amount, 2); ?></span>
+                    <div style="margin-bottom: 10px;">
+                        <span class="total-label">Subtotal:</span>
+                        <span style="font-size: 1.2em; color: #666;">$<?php echo number_format($total_amount, 2); ?></span>
                     </div>
-                    <div class="cart-total-row">
-                        <span class="cart-total-label">Discount (<?php echo $coupon_discount_percent; ?>%):</span>
-                        <span class="discount-amount">-$<?php echo number_format($discount_amount, 2); ?></span>
+                    <div style="margin-bottom: 10px; color: #28a745;">
+                        <span class="total-label">Discount (<?php echo $coupon_discount_percent; ?>%):</span>
+                        <span style="font-size: 1.2em; font-weight: 600;">-$<?php echo number_format($discount_amount, 2); ?></span>
                     </div>
                 <?php endif; ?>
-                <div class="cart-total-row">
-                    <span class="cart-total-label">Total:</span>
-                    <span class="cart-total-amount">$<?php echo number_format($final_amount, 2); ?></span>
-                </div>
+                <span class="total-label">Total:</span>
+                <span class="total-amount">$<?php echo number_format($final_amount, 2); ?></span>
             </div>
 
-            <!-- Checkout Section -->
             <div class="checkout-section">
                 <h3>Checkout with PayPal</h3>
                 <p>Click the button below to complete your purchase securely through PayPal.</p>
                 
                 <div id="paypal-button-container"></div>
-                <div id="status-message" class="status-message"></div>
+                <div id="status-message" class="loading" style="display:none;"></div>
                 
-                <div class="action-buttons">
+                <div style="margin-top: 30px;">
                     <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
                     <a href="/my_account.php" class="btn btn-secondary">My Account</a>
                 </div>
@@ -592,6 +533,7 @@ mysqli_close($db);
                             console.log('Capture result:', orderData);
                             if (orderData.status === 'COMPLETED') {
                                 setStatus('Payment successful! Redirecting...');
+                                // Redirect to success page
                                 window.location.href = '/payment_success.php?order_id=' + data.orderID;
                             } else {
                                 throw new Error('Unexpected payment status: ' + orderData.status);
