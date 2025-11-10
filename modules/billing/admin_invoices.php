@@ -1,7 +1,7 @@
 <?php
 // Admin invoices viewer and editor
 $session_name = session_name(); session_start();
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/admin_auth.php');
 
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);

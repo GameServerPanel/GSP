@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_name("gameservers_website");
     session_start();
 }
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/login_required.php');
 require_once(__DIR__ . '/includes/log.php');
 
@@ -264,7 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_renewal'])) {
 
 <?php
 // Close database connection
-mysqli_close($db);
+    billing_maybe_close_db($db);
 ?>
 
 </body>

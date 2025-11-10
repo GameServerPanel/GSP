@@ -50,7 +50,11 @@ if ($is_logged_in) {
       }
     }
     if ($menu_db_opened) {
-      mysqli_close($menu_db);
+      if (function_exists('billing_maybe_close_db')) {
+        billing_maybe_close_db($menu_db);
+      } else {
+        @mysqli_close($menu_db);
+      }
     }
   }
 }

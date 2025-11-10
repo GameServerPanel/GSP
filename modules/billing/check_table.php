@@ -3,7 +3,7 @@
  * Check {table_prefix}billing_invoices table structure
  */
 
-require_once('../../includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 require_once('../../includes/database_mysqli.php');
 
 $db = createDatabaseConnection($db_host, $db_user, $db_pass, $db_name, $db_port);
@@ -72,5 +72,5 @@ if (mysqli_num_rows($last_result) > 0) {
     echo "<p>No invoices found.</p>\n";
 }
 
-mysqli_close($db);
+    billing_maybe_close_db($db);
 ?>

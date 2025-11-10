@@ -23,8 +23,8 @@ This method means we can use one code block in every game page and fill in the d
 // Require login for ordering
 require_once(__DIR__ . '/includes/login_required.php');
 
-// Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+// Include billing bootstrap (loads config and DB helper)
+require_once(__DIR__ . '/bootstrap.php');
 
 // Create database connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
@@ -308,7 +308,7 @@ if ($row['price_monthly'] == 0.0) {
 	</div>
 <?php
 // Close database connection
-mysqli_close($db);
+	billing_maybe_close_db($db);
 ?>
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>

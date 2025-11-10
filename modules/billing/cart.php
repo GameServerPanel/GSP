@@ -40,7 +40,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Load configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 
 // Check if user is logged in
 $user_id = 0;
@@ -231,8 +231,7 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $siteBase = $protocol . $host;
 
-// Close database connection
-mysqli_close($db);
+// (Do not close the shared DB connection here; menu and other includes may use it.)
 ?>
 <!DOCTYPE html>
 <html lang="en">

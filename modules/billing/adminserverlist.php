@@ -11,8 +11,8 @@
 
 /* === SITE_BASE_URL is loaded from includes/config.inc.php; leave empty to use relative paths === */
 
-// Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+// Include billing bootstrap (loads config and DB helper)
+require_once(__DIR__ . '/bootstrap.php');
 
 // Protect this page: require admin
 require_once(__DIR__ . '/includes/admin_auth.php');
@@ -331,8 +331,8 @@ document.querySelectorAll('.locs-box').forEach(function(box){
 </script>
 
 <?php
-// Close database connection
-mysqli_close($db);
+// Close database connection safely
+billing_maybe_close_db($db);
 ?>
 </body>
 </html>

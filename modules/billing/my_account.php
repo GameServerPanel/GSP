@@ -28,7 +28,7 @@ if (!$is_logged_in) {
 }
 
 // Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 
 // Create database connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
@@ -379,7 +379,7 @@ $status_config = [
 
 <?php
 // Close database connection
-mysqli_close($db);
+    billing_maybe_close_db($db);
 ?>
 
 </body>

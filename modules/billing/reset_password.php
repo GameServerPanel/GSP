@@ -4,7 +4,7 @@ session_name("gameservers_website");
 session_start();
 
 // Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 
 // Create database connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password']) && 
 }
 
 // Close database connection
-mysqli_close($db);
+            billing_maybe_close_db($db);
 ?>
 <!DOCTYPE html>
 <html lang="en">

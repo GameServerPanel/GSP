@@ -1,7 +1,7 @@
 <?php
 // _website/add_to_cart.php
 // Handle Add to Cart posts from order.php
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/login_required.php');
 require_once(__DIR__ . '/includes/log.php');
 

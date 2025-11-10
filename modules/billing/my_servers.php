@@ -10,8 +10,8 @@
 // Require login for this page
 require_once(__DIR__ . '/includes/login_required.php');
 
-// Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+// Include billing bootstrap (loads config and DB helper)
+require_once(__DIR__ . '/bootstrap.php');
 
 // Create database connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
@@ -136,7 +136,7 @@ $result = mysqli_query($db, $query);
 
 <?php
 // Close database connection
-mysqli_close($db);
+    billing_maybe_close_db($db);
 ?>
 
 </body>

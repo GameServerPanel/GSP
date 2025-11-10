@@ -9,8 +9,8 @@ error_reporting(E_ALL);
 
 // We'll compute a site root below (up to /_website) and define a strict sanitizer after config is loaded
 
-// Include database configuration
-require_once(__DIR__ . '/includes/config.inc.php');
+// Include billing bootstrap (loads database configuration)
+require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/log.php');
 
 // Determine site root up to /_website so we can enforce absolute redirects within this site
@@ -97,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
 }
 
-// Close database connection
-mysqli_close($db);
+// Keep DB connection open for includes (menu.php may query the DB). The
+// connection lifecycle is handled centrally; avoid closing here.
 ?>
 <!DOCTYPE html>
 <html lang="en">
