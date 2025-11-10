@@ -14,6 +14,13 @@ error_reporting(E_ALL);
 // Include database configuration
 require_once(__DIR__ . '/bootstrap.php');
 
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+
 // Create database connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 if (!$db) {

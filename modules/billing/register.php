@@ -3,6 +3,13 @@ session_name("gameservers_website");
 session_start();
 require_once(__DIR__ . '/bootstrap.php');
 
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+
 // Simple registration form (creates a user in {table_prefix}users with MD5 password)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
     $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);

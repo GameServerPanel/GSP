@@ -13,6 +13,13 @@ error_reporting(E_ALL);
 require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/log.php');
 
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+
 // Determine site root up to /_website so we can enforce absolute redirects within this site
 $script = $_SERVER['SCRIPT_NAME'] ?? '';
 $pos = strpos($script, '/_website');

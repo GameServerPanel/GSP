@@ -42,6 +42,15 @@ if (session_status() === PHP_SESSION_NONE) {
 // Load configuration
 require_once(__DIR__ . '/bootstrap.php');
 
+// Variables from config.inc.php (helps IDEs understand scope)
+/** @var string $db_host Database host */
+/** @var string $db_user Database user */
+/** @var string $db_pass Database password */
+/** @var string $db_name Database name */
+/** @var string $table_prefix Table prefix for database tables */
+/** @var string $SITE_BASE_URL Site base URL */
+/** @var string $SITE_DATA_DIR Data directory path */
+
 // Check if user is logged in
 $user_id = 0;
 if (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) {
@@ -168,6 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
             mysqli_free_result($coupon_result);
         } else {
             $error_message = 'Invalid coupon code.';
+        }
         }
     }
 }
