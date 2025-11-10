@@ -532,6 +532,9 @@ $siteBase = $protocol . $host;
     </style>
     <?php // Font Awesome for small icon buttons ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="images/logo-sm.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/logo-sm.png">
     <?php if (!$cart_empty): ?>
     <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=USD&intent=capture"></script>
     <?php endif; ?>
