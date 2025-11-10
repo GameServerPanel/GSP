@@ -57,11 +57,9 @@ if ($user_id <= 0) {
     exit;
 }
 
-// Connect to database
+// Connect to database (non-fatal)
 $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-if (!$db) {
-    die('Database connection failed. Please try again later.');
-}
+$db_error = '';
 
 // Initialize variables
 $invoices = [];
@@ -72,23 +70,29 @@ $applied_coupon = null;
 $error_message = '';
 $success_message = '';
 
-// Fetch unpaid invoices for this user
-$query = "SELECT i.*, s.game_key, s.game_name 
-          FROM {$table_prefix}billing_invoices i
-          LEFT JOIN {$table_prefix}billing_services s ON i.service_id = s.service_id
-          WHERE i.user_id = " . $user_id . " AND i.status = 'due'
-          ORDER BY i.invoice_date ASC";
+if (!$db) {
+    // record error for UI/debugging but do not die here
+    $db_error = 'Database connection failed: ' . mysqli_connect_error();
+    $cart_empty = true;
+} else {
+    // Fetch unpaid invoices for this user. Select only invoice fields to avoid referencing
+    // columns that may not exist in all deployments (some schemas differ).
+    $query = "SELECT i.* 
+              FROM {$table_prefix}billing_invoices i
+              WHERE i.user_id = " . intval($user_id) . " AND i.status = 'due'
+              ORDER BY i.invoice_date ASC";
 
-$result = mysqli_query($db, $query);
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $invoices[] = $row;
-        $total_amount += floatval($row['amount']);
+    $result = mysqli_query($db, $query);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $invoices[] = $row;
+            $total_amount += floatval($row['amount']);
+        }
+        mysqli_free_result($result);
     }
-    mysqli_free_result($result);
-}
 
-$cart_empty = (count($invoices) === 0);
+    $cart_empty = (count($invoices) === 0);
+}
 
 // Handle coupon application
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
@@ -98,10 +102,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
         $error_message = 'Please enter a coupon code.';
     } else {
         // Validate coupon
-        $safe_code = mysqli_real_escape_string($db, $coupon_code);
-        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
-                        WHERE code = '$safe_code' AND is_active = 1";
-        $coupon_result = mysqli_query($db, $coupon_query);
+        if (!$db) {
+            $error_message = 'Coupon system unavailable: database connection failed.';
+        } else {
+            $safe_code = mysqli_real_escape_string($db, $coupon_code);
+            $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
+                            WHERE code = '$safe_code' AND is_active = 1";
+            $coupon_result = mysqli_query($db, $coupon_query);
         
         if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
             $coupon = mysqli_fetch_assoc($coupon_result);
@@ -135,7 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
                     if (is_array($allowed_games) && count($allowed_games) > 0) {
                         $has_valid_game = false;
                         foreach ($invoices as $inv) {
-                            if (in_array($inv['game_key'], $allowed_games)) {
+                            $inv_game_key = isset($inv['game_key']) ? $inv['game_key'] : null;
+                            if ($inv_game_key !== null && in_array($inv_game_key, $allowed_games)) {
                                 $has_valid_game = true;
                                 break;
                             }
@@ -175,19 +183,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
 // Re-validate coupon from session if present
 if (empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
     $coupon_code = $_SESSION['cart_coupon_code'];
-    $safe_code = mysqli_real_escape_string($db, $coupon_code);
-    $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
-                    WHERE code = '$safe_code' AND is_active = 1";
-    $coupon_result = mysqli_query($db, $coupon_query);
-    
-    if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
-        $applied_coupon = mysqli_fetch_assoc($coupon_result);
-        $coupon_discount_percent = floatval($applied_coupon['discount_percent']);
-        mysqli_free_result($coupon_result);
-    } else {
-        // Coupon no longer valid, clear from session
-        unset($_SESSION['cart_coupon_code']);
-        unset($_SESSION['cart_coupon_id']);
+    if ($db) {
+        $safe_code = mysqli_real_escape_string($db, $coupon_code);
+        $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
+                        WHERE code = '$safe_code' AND is_active = 1";
+        $coupon_result = mysqli_query($db, $coupon_query);
+        
+        if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
+            $applied_coupon = mysqli_fetch_assoc($coupon_result);
+            $coupon_discount_percent = floatval($applied_coupon['discount_percent']);
+            mysqli_free_result($coupon_result);
+        } else {
+            // Coupon no longer valid, clear from session
+            unset($_SESSION['cart_coupon_code']);
+            unset($_SESSION['cart_coupon_id']);
+        }
     }
 }
 
@@ -223,8 +233,8 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https:
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $siteBase = $protocol . $host;
 
-// Close database connection
-mysqli_close($db);
+// Close database connection if opened
+if ($db) mysqli_close($db);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -459,6 +469,11 @@ mysqli_close($db);
     <?php include(__DIR__ . '/includes/menu.php'); ?>
     
     <div class="cart-container">
+        <?php if (!empty($db_error)): ?>
+            <div class="alert-error" style="margin-bottom:15px;">
+                <strong>Database error:</strong> <?php echo htmlspecialchars($db_error); ?>
+            </div>
+        <?php endif; ?>
         <h1>🛒 Shopping Cart</h1>
         
         <?php if ($error_message): ?>
