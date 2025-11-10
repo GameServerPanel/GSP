@@ -540,6 +540,7 @@ $siteBase = $protocol . $host;
     <?php endif; ?>
 </head>
 <body>
+    <?php include(__DIR__ . '/includes/top.php'); ?>
     <?php include(__DIR__ . '/includes/menu.php'); ?>
     
     <div class="cart-container">
@@ -784,5 +785,6 @@ $siteBase = $protocol . $host;
                 </script>
         <?php endif; ?>
     </div>
+    <?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
