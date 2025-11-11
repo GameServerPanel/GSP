@@ -68,20 +68,29 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
 <post_install>
 mkdir -p ./cfg
 touch ./cfg/epochmod_win32.xml
-wget http://files.iaregamer.com/installers/arma2/arma2Addons.tar .
-wget http://files.iaregamer.com/installers/epoch_mod/epoch_mod.tar .
-tar -xvf arma2Addons.tar
-tar -xvf epoch_mod.tar
+wget http://files.iaregamer.com/addons/arma2Addons.tar.gz .
+wget http://files.iaregamer.com/addons/epochmod-1.0.7.1.tar.gz .
+tar -zxvf arma2Addons.tar.gz
+tar -zxvf epoch_mod.tar.gz
 chmod +x setup_db.sh
-#chmod +x _start_co.bat
 ./setup_db.sh
-#rm setup_db.sh
-rm epoch_mod.tar
-rm arma2Addons.tar
+
+rm *.sh
+rm *.gz
+rm *.sql
+
+printf '%s\r\n' \
+'@echo off' \
+'del /q "..\_alsoRun.pid" 2>nul' \
+'cd bec \
+'start "BEC" bec.exe --dsc --dec -f config.cfg' \
+'cd .. \
+'timeout /t 1 /nobreak >nul' \
+'for /f "tokens=2 delims==" %%P in ('"'"'wmic process where "ExecutablePath='"'"'%cd:\=\\%\\bec.exe'"'"'" get ProcessId /value ^| find "="'"'"') do >"..\_alsoRun.pid" echo %%P' \
+> _alsoRun.bat
+
 </post_install>
 <pre_start>
-cd bec
-start "BEC" bec.exe --dsc --dec -f config.cfg
 </pre_start>
 
 <lock_files>

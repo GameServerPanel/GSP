@@ -1,5 +1,0 @@
----
-deployment:
-  tasks:
-    - export DEPLOYPATH=/home/domainpl/gameservers.world/
-    - /bin/cp -a * $DEPLOYPATH

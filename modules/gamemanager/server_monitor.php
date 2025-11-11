@@ -341,57 +341,33 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			//default is it never expires 
 			$expiration_dates = "This Server Will NEVER Expire";
 			//get all orders thare are active or invoiced
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status IN ('installed', 'paid', 'renew', 'invoiced', 'suspended', 'in-cart', 'unknown')" ;
+			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status >= -2" ;
 			$results = $db->resultQuery($query);
 			if(!is_null($results[0]['status'])) 
 			{
 			//there is an end date
-			if($results[0]['status'] == 'installed' || $results[0]['status'] == 'paid')
+			if($results[0]['status'] > 0)
 			{ 
-			$expire_date = strtotime($results[0]['end_date']);
-			$current_time = time();
-			$days_until_expiry = floor(($expire_date - $current_time) / 86400);
-			
-			// Color coding based on time until expiration
-			if($days_until_expiry <= 3 && $days_until_expiry >= 0) {
-				// 3 days or less before expiration - RED
-				$expiration_dates = "<font color='red'>" . read_expire($expire_date) . "</font>";
-			} elseif($days_until_expiry <= 7 && $days_until_expiry > 3) {
-				// 7 days or less (but more than 3) before expiration - YELLOW
-				$expiration_dates = "<font color='yellow'>" . read_expire($expire_date) . "</font>";
-			} elseif($days_until_expiry < 0) {
-				// Already expired - RED
-				$expiration_dates = "<font color='red'>" . read_expire($expire_date) . " (EXPIRED)</font>";
-			} else {
-				// More than 7 days - GREEN
-				$expiration_dates = "<font color='green'>" . read_expire($expire_date) . "</font>";
+			$expire_date = $results[0]['finish_date'];
+                        $expiration_dates = "<font color='green'>" . read_expire($expire_date) . "</font>";
 			}
-			}
-			
-			// renew status - renewal invoice created, server still running
-			if($results[0]['status'] == 'renew')
+				// 0 its expire, invoice printed
+			if($results[0]['status'] == 0)
                         {
-                        $expire_date = strtotime($results[0]['end_date']);
-			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Renew Invoice</a>";
-                        }
-			
-				// in-cart its expire, invoice printed
-			if($results[0]['status'] == 'in-cart' || $results[0]['status'] == 'unknown')
-                        {
-                        $expire_date = strtotime($results[0]['end_date']);
+                        $expire_date = $results[0]['finish_date'];
 			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
                         }
 
-			// invoiced its expire, invoice printed
-			if($results[0]['status'] == 'invoiced')
+			// -1 its expire, invoice printed
+			if($results[0]['status'] == -1)
                         {
-                        $expire_date = strtotime($results[0]['end_date']);
+                        $expire_date = $results[0]['finish_date'];
 			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
                         }
-			// suspended its suspended, invoice still available
-			if($results[0]['status'] == 'suspended')
+			// -2 its suspended, invoice still available
+			if($results[0]['status'] == -2)
                         {
-                        $expire_date = strtotime($results[0]['end_date']);
+                        $expire_date = $results[0]['finish_date'];
 			$expiration_dates = "<font color='red'> SUSPENDED </font><a href='home.php?m=billing&p=cart'> Invoice</a>";
                         }
 
@@ -556,7 +532,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$address = "<span style='color:darkred;font-weight:bold;'>Agent Offline</span>";
 			}
 			$user = $db->getUserById($server_home['user_id_main']);
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status = 'paid'" ;
+			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status > 0" ;
 //DISABLE SHOWING EXPIRATION DATES
 //$expiration_dates = "";
 
