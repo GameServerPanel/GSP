@@ -747,6 +747,12 @@ cd /path/to/csgo-server
 ./srcds_run -game csgo +map de_dust2 ...
 </code></pre>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Counter-Strike: Global Offensive:</p>
+<ul>
+    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod (use SourceMod for CS:GO, not AMX Mod X)</li>
+</ul>
+
 <h2>Additional Resources</h2>
 <ul>
     <li><a href="https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Dedicated_Servers" target="_blank">Valve Developer Wiki - CS:GO Dedicated Servers</a></li>

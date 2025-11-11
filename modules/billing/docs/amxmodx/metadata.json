@@ -1,0 +1,7 @@
+{
+    "name": "AMX Mod X",
+    "description": "Comprehensive guide for AMX Mod X (Counter-Strike modding framework) with Pawn scripting, MetaMod requirement, admin system, plugin compilation, and popular game modes",
+    "category": "mods",
+    "order": 62,
+    "complete": true
+}

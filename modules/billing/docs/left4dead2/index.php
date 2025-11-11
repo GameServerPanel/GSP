@@ -414,6 +414,12 @@ left4dead2/addons/sourcemod/logs/
     </ul>
 </div>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Left 4 Dead 2:</p>
+<ul>
+    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod and other Source engine plugins</li>
+</ul>
+
 <h2>Resources</h2>
 <ul>
     <li><a href="https://developer.valvesoftware.com/wiki/Left_4_Dead_2" target="_blank">Valve Developer Wiki - L4D2</a></li>

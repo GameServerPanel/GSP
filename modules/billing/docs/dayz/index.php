@@ -311,6 +311,12 @@ loginQueueConcurrentPlayers = 3;</code></pre>
     <li><strong>Network:</strong> 100+ Mbps, low latency</li>
 </ul>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with DayZ Standalone:</p>
+<ul>
+    <li><a href="../bec/">BEC (Battleye Extended Controls)</a> - Advanced RCON tool with automated restarts, scheduled messages, custom commands, and robust BattlEye integration for ARMA/DayZ servers</li>
+</ul>
+
 <h2 id="resources">📚 Resources</h2>
 
 <ul>

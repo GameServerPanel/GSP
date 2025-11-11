@@ -1,0 +1,7 @@
+{
+    "name": "Oxide / uMod",
+    "description": "Comprehensive guide for Oxide/uMod modding framework with plugin system, permissions, hooks, C# and Lua scripting for Rust, 7 Days to Die, and other games",
+    "category": "mods",
+    "order": 66,
+    "complete": true
+}

@@ -1,7 +1,7 @@
 ﻿{
-    "name":  "DayZ Mod",
-    "description":  "Setup and configuration guide for DayZ Mod game servers",
-    "category":  "game",
-    "order":  59,
-    "complete":  false
+    "name": "DayZ Mod",
+    "description": "Comprehensive guide for DayZ Mod servers (ARMA 2) with MySQL database setup, Hive server configuration, BattlEye filters, 6 maps, and two-server architecture",
+    "category": "mods",
+    "order": 59,
+    "complete": true
 }

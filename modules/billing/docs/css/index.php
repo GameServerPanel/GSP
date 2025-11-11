@@ -541,6 +541,13 @@ cd /path/to/css-server
 ./srcds_run -game cstrike +map de_dust2 ...
 </code></pre>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Counter-Strike: Source:</p>
+<ul>
+    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod and other Source engine plugins</li>
+    <li><a href="../amxmodx/">AMX Mod X</a> - Alternative plugin framework (partial CS:S support, primarily for CS 1.6)</li>
+</ul>
+
 <h2>Additional Resources</h2>
 <ul>
     <li><a href="https://developer.valvesoftware.com/wiki/Counter-Strike:_Source" target="_blank">Valve Developer Wiki - CS:Source</a></li>

@@ -212,6 +212,14 @@ CleanupUnlockedAfterDays = 6</code></pre>
     <li>Check BattlEye filters aren't too restrictive</li>
 </ul>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications and admin tools compatible with ARMA 2 Combined Operations:</p>
+<ul>
+    <li><a href="../dayzmod/">DayZ Mod</a> - Zombie survival mod with persistence and Hive architecture</li>
+    <li><a href="../epochmod/">Epoch Mod</a> - Base building, traders, and dynamic economy for DayZ</li>
+    <li><a href="../bec/">BEC (BattlEye Extended Controls)</a> - Server scheduler, auto-restart, and admin commands</li>
+</ul>
+
 <h2 id="resources">📚 Resources</h2>
 
 <ul>

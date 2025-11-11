@@ -512,6 +512,12 @@ cd /path/to/cs16-server
 ./hlds_run -game cstrike +map de_dust2 ...
 </code></pre>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Counter-Strike 1.6:</p>
+<ul>
+    <li><a href="../amxmodx/">AMX Mod X</a> - Primary plugin framework for CS 1.6 with Pawn scripting, admin system, and extensive plugin library</li>
+</ul>
+
 <h2>Additional Resources</h2>
 <ul>
     <li><a href="https://developer.valvesoftware.com/wiki/Counter-Strike" target="_blank">Valve Developer Wiki - CS 1.6</a></li>

@@ -381,6 +381,12 @@ tail -f output_log.txt
     </ul>
 </div>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with 7 Days to Die:</p>
+<ul>
+    <li><a href="../oxide/">Oxide / uMod</a> - Comprehensive modding framework with C# plugin system, permissions, hooks, and extensive plugin library for server administration and gameplay enhancement</li>
+</ul>
+
 <h2>Resources</h2>
 <ul>
     <li><a href="https://7daystodie.com/" target="_blank">Official Website</a></li>

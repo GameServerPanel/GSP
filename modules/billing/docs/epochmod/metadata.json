@@ -1,7 +1,7 @@
 ﻿{
-    "name":  "DayZ Epoch Mod",
-    "description":  "Setup and configuration guide for DayZ Epoch Mod game servers",
-    "category":  "game",
-    "order":  61,
-    "complete":  false
+    "name": "DayZ Epoch Mod",
+    "description": "Comprehensive guide for DayZ Epoch servers with base building (plot poles), trader NPCs, banking system, vehicle spawns, dynamic economy, and database maintenance",
+    "category": "mods",
+    "order": 61,
+    "complete": true
 }

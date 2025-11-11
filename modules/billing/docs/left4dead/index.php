@@ -502,6 +502,12 @@ z_tank_max_players 3000  // Distance before Tank spawns
     </ul>
 </div>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Left 4 Dead:</p>
+<ul>
+    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod and other Source engine plugins</li>
+</ul>
+
 <h2 id="resources">Resources</h2>
 <ul>
     <li><a href="https://developer.valvesoftware.com/wiki/Left_4_Dead_Dedicated_Server" target="_blank">Valve Developer Wiki - L4D Dedicated Server</a></li>

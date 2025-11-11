@@ -604,6 +604,12 @@ onUnsignedData = "kick (_this select 0)";  // Kick on unsigned data</code></pre>
     <li><a href="https://steamcommunity.com/app/107410/guides/" target="_blank">Steam Community Guides</a></li>
 </ul>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server administration tools compatible with ARMA 3:</p>
+<ul>
+    <li><a href="../bec/">BEC (BattlEye Extended Controls)</a> - Server scheduler, auto-restart, and admin commands</li>
+</ul>
+
 <h3>Server Tools & Utilities</h3>
 <ul>
     <li><a href="https://community.bistudio.com/wiki/ArmA:_Startup_Parameters" target="_blank">Complete Startup Parameters List</a></li>

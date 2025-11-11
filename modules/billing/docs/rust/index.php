@@ -495,6 +495,12 @@ weather.rain 0                   # Stop rain
 airdrop.min_players 0            # Always allow airdrops
 </code></pre>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Rust:</p>
+<ul>
+    <li><a href="../oxide/">Oxide / uMod</a> - Comprehensive modding framework with C# plugin system, permissions, hooks, and extensive plugin library for server administration and gameplay enhancement</li>
+</ul>
+
 <h2>Additional Resources</h2>
 <ul>
     <li><a href="https://wiki.facepunch.com/rust/" target="_blank">Official Rust Wiki</a></li>

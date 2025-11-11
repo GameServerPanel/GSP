@@ -50,6 +50,12 @@
 <h3>Managing Files</h3>
 <p>Access your server files via FTP using the credentials provided in your control panel.</p>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Call of Duty 2:</p>
+<ul>
+    <li><a href="../b3/">B3 (Big Brother Bot)</a> - Python-based admin bot with RCON wrapper, player warnings, ban management, statistics tracking, and automated moderation for Call of Duty servers</li>
+</ul>
+
 <h2>Support</h2>
 <p>If you need assistance with your Call of Duty 2 server:</p>
 <ul>

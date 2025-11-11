@@ -420,6 +420,12 @@ sv_downloadurl "http://yourdomain.com/tf/"
     </ul>
 </div>
 
+<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
+<p>Popular server modifications compatible with Team Fortress 2:</p>
+<ul>
+    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod and other Source engine plugins</li>
+</ul>
+
 <h2>Resources</h2>
 <ul>
     <li><a href="https://wiki.teamfortress.com/wiki/Windows_dedicated_server" target="_blank">Official TF2 Dedicated Server Wiki</a></li>
