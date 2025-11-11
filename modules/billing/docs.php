@@ -54,14 +54,8 @@ function getDocCategories($docsDir) {
             $metadata = [];
         }
         
-        // Check if documentation is complete (default to false if not specified)
-        $isComplete = isset($metadata['complete']) ? (bool)$metadata['complete'] : false;
+        // Get display name (no TODO prefix - just display all docs)
         $displayName = $metadata['name'] ?? ucfirst($folder);
-        
-        // Add TODO prefix for incomplete documentation
-        if (!$isComplete) {
-            $displayName = 'TODO: ' . $displayName;
-        }
         
         // Find icon file
         $icon = '';
@@ -77,21 +71,18 @@ function getDocCategories($docsDir) {
             'description' => $metadata['description'] ?? '',
             'category' => $metadata['category'] ?? 'other',
             'order' => $metadata['order'] ?? 999,
-            'icon' => $icon,
-            'complete' => $isComplete
+            'icon' => $icon
         ];
     }
     
-    // Sort by category, then order, then name
+    // Sort alphabetically by name within categories
     usort($categories, function($a, $b) {
         if ($a['category'] !== $b['category']) {
+            // Keep category grouping (game, mods, other)
             return strcmp($a['category'], $b['category']);
         }
-        if ($a['order'] !== $b['order']) {
-            return $a['order'] - $b['order'];
-        }
-        // Sort alphabetically by name
-        return strcmp(strtolower($a['name']), strtolower($b['name']));
+        // Sort alphabetically by name (case-insensitive)
+        return strcasecmp($a['name'], $b['name']);
     });
     
     return $categories;
@@ -113,20 +104,25 @@ foreach ($categories as $cat) {
 // Category labels - can be extended via JSON
 $categoryLabels = [
     'game' => 'Game Servers',
+    'mods' => 'Mods & Plugins',
     'panel' => 'Panel Documentation',
-    'mods' => 'Mods & Addons',
     'troubleshooting' => 'Troubleshooting',
     'other' => 'Other'
 ];
 
-// Sort categories by number of items (fewest to most)
-uksort($grouped, function($a, $b) use ($grouped) {
-    $countA = count($grouped[$a]);
-    $countB = count($grouped[$b]);
-    if ($countA !== $countB) {
-        return $countA - $countB; // ascending order (fewest first)
-    }
-    return strcmp($a, $b);
+// Define category display order
+$categoryOrder = ['panel', 'game', 'mods', 'troubleshooting', 'other'];
+
+// Sort categories by defined order
+uksort($grouped, function($a, $b) use ($categoryOrder) {
+    $posA = array_search($a, $categoryOrder);
+    $posB = array_search($b, $categoryOrder);
+    
+    // If not in order array, put at end
+    if ($posA === false) $posA = 999;
+    if ($posB === false) $posB = 999;
+    
+    return $posA - $posB;
 });
 ?>
 <!DOCTYPE html>
