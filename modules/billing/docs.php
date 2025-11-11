@@ -49,7 +49,10 @@ function getDocCategories($docsDir) {
         }
         
         // Read metadata
-        $metadata = json_decode(file_get_contents($metadataPath), true);
+        $metadataContent = file_get_contents($metadataPath);
+        // Remove UTF-8 BOM if present
+        $metadataContent = preg_replace('/^\xEF\xBB\xBF/', '', $metadataContent);
+        $metadata = json_decode($metadataContent, true);
         if (!$metadata) {
             $metadata = [];
         }
@@ -69,7 +72,7 @@ function getDocCategories($docsDir) {
             'folder' => $folder,
             'name' => $displayName,
             'description' => $metadata['description'] ?? '',
-            'category' => $metadata['category'] ?? 'other',
+            'category' => trim($metadata['category'] ?? 'other'),
             'order' => $metadata['order'] ?? 999,
             'icon' => $icon
         ];
