@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Life is Feudal",
     "description":  "Setup and configuration guide for Life is Feudal game servers",
-    "category":  "game",
+    "name":  "Life is Feudal",
     "order":  32,
-    "complete":  false
+    "category":  "todo"
 }

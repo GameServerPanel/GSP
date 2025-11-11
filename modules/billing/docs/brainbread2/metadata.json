@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "BrainBread 2",
     "description":  "Setup and configuration guide for BrainBread 2 game servers",
-    "category":  "game",
+    "name":  "BrainBread 2",
     "order":  27,
-    "complete":  false
+    "category":  "todo"
 }

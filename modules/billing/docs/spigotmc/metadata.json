@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Spigot Server",
     "description":  "Setup and configuration guide for Spigot Server game servers",
-    "category":  "game",
+    "name":  "Spigot Server",
     "order":  95,
-    "complete":  false
+    "category":  "todo"
 }

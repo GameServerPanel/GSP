@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Aliens vs Predator",
     "description":  "Setup and configuration guide for Aliens vs Predator game servers",
-    "category":  "game",
+    "name":  "Aliens vs Predator",
     "order":  5,
-    "complete":  false
+    "category":  "todo"
 }

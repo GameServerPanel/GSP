@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Quake 3",
     "description":  "Setup and configuration guide for Quake 3 game servers",
-    "category":  "game",
+    "name":  "Quake 3",
     "order":  69,
-    "complete":  false
+    "category":  "todo"
 }

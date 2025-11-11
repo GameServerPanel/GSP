@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "TrackMania Nations Forever",
     "description":  "Setup and configuration guide for TrackMania Nations Forever game servers",
-    "category":  "game",
+    "name":  "TrackMania Nations Forever",
     "order":  117,
-    "complete":  false
+    "category":  "todo"
 }

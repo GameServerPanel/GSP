@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Roadkill",
     "description":  "Setup and configuration guide for Roadkill game servers",
-    "category":  "game",
+    "name":  "Roadkill",
     "order":  75,
-    "complete":  false
+    "category":  "todo"
 }

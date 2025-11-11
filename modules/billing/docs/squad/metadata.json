@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Squad",
     "description":  "Setup and configuration guide for Squad game servers",
-    "category":  "game",
+    "name":  "Squad",
     "order":  97,
-    "complete":  false
+    "category":  "todo"
 }

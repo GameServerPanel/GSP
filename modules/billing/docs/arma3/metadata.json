@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Arma 3",
     "description":  "Comprehensive guide for Arma 3 dedicated servers with ports, mods, troubleshooting",
-    "category":  "game",
+    "name":  "Arma 3",
     "order":  12,
-    "complete":  true
+    "category":  "game"
 }

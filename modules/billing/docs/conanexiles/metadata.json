@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Conan Exiles",
     "description":  "Comprehensive guide for Conan Exiles dedicated servers with Pippi admin tools, thralls, building mechanics, mods, and barbaric survival hosting",
-    "category":  "game",
+    "name":  "Conan Exiles",
     "order":  47,
-    "complete":  true
+    "category":  "game"
 }

@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "SpunkyBot",
     "description":  "Setup and configuration guide for SpunkyBot game servers",
-    "category":  "game",
+    "name":  "SpunkyBot",
     "order":  96,
-    "complete":  false
+    "category":  "todo"
 }

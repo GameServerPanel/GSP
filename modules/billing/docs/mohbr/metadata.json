@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Medal Of Honor: Breakthrough (Windows)",
     "description":  "Setup and configuration guide for Medal Of Honor: Breakthrough (Windows) game servers",
-    "category":  "game",
+    "name":  "Medal Of Honor: Breakthrough (Windows)",
     "order":  42,
-    "complete":  false
+    "category":  "todo"
 }

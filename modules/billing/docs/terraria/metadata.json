@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Terraria",
     "description":  "Comprehensive guide for Terraria dedicated servers with TShock, port configuration, mods, and 2D sandbox adventure hosting",
-    "category":  "game",
+    "name":  "Terraria",
     "order":  86,
-    "complete":  true
+    "category":  "game"
 }

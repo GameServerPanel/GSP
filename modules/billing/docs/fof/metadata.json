@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Fistful of Frags",
     "description":  "Setup and configuration guide for Fistful of Frags game servers",
-    "category":  "game",
+    "name":  "Fistful of Frags",
     "order":  82,
-    "complete":  false
+    "category":  "todo"
 }

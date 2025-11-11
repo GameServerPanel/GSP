@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Warsow",
     "description":  "Setup and configuration guide for Warsow game servers",
-    "category":  "game",
+    "name":  "Warsow",
     "order":  138,
-    "complete":  false
+    "category":  "todo"
 }

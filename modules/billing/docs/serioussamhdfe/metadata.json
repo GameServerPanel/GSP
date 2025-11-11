@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Serious Sam HD The First Encounter",
     "description":  "Setup and configuration guide for Serious Sam HD The First Encounter game servers",
-    "category":  "game",
+    "name":  "Serious Sam HD The First Encounter",
     "order":  82,
-    "complete":  false
+    "category":  "todo"
 }

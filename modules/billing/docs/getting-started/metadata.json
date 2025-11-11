@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Getting Started",
     "description":  "Learn how to use the game server panel and manage your servers",
-    "category":  "panel",
+    "name":  "Getting Started",
     "order":  1,
-    "complete":  false
+    "category":  "todo"
 }

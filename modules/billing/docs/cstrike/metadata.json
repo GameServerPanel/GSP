@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Counter-Strike 1.6",
     "description":  "Comprehensive guide for CS 1.6 dedicated servers with AMX Mod X plugins, game modes, and troubleshooting",
-    "category":  "game",
+    "name":  "Counter-Strike 1.6",
     "order":  54,
-    "complete":  true
+    "category":  "game"
 }

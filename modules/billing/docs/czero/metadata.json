@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Counter-Strike Condition Zero",
     "description":  "Setup and configuration guide for Counter-Strike Condition Zero game servers",
-    "category":  "game",
+    "name":  "Counter-Strike Condition Zero",
     "order":  56,
-    "complete":  false
+    "category":  "todo"
 }

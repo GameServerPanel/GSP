@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Arma Reforger",
     "description":  "Setup and configuration guide for Arma Reforger game servers",
-    "category":  "game",
+    "name":  "Arma Reforger",
     "order":  9,
-    "complete":  false
+    "category":  "todo"
 }

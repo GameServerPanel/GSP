@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Atlas",
     "description":  "Setup and configuration guide for Atlas game servers",
-    "category":  "game",
+    "name":  "Atlas",
     "order":  17,
-    "complete":  false
+    "category":  "todo"
 }

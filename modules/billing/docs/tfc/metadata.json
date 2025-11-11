@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Team Fortress Classic",
     "description":  "Setup and configuration guide for Team Fortress Classic game servers",
-    "category":  "game",
+    "name":  "Team Fortress Classic",
     "order":  112,
-    "complete":  false
+    "category":  "todo"
 }

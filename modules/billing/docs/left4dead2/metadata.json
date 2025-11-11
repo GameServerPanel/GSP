@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Left 4 Dead 2",
     "description":  "Comprehensive guide for L4D2 dedicated servers with SourceMod/MetaMod, game modes, Workshop content, and co-op zombie shooter hosting",
-    "category":  "game",
+    "name":  "Left 4 Dead 2",
     "order":  18,
-    "complete":  true
+    "category":  "game"
 }

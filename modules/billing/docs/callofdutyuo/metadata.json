@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Call of Duty: United Offensive",
     "description":  "Setup and configuration guide for Call of Duty: United Offensive game servers",
-    "category":  "game",
+    "name":  "Call of Duty: United Offensive",
     "order":  37,
-    "complete":  false
+    "category":  "todo"
 }

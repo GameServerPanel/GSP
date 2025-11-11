@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Halo CE",
     "description":  "Setup and configuration guide for Halo CE game servers",
-    "category":  "game",
+    "name":  "Halo CE",
     "order":  1,
-    "complete":  false
+    "category":  "todo"
 }

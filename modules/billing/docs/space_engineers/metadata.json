@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Space Engineers",
     "description":  "Setup and configuration guide for Space Engineers game servers",
-    "category":  "game",
+    "name":  "Space Engineers",
     "order":  93,
-    "complete":  false
+    "category":  "todo"
 }

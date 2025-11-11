@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Valheim",
     "description":  "Comprehensive guide for Valheim dedicated servers with ports, Valheim+ mods, world management, and Viking survival hosting",
-    "category":  "game",
+    "name":  "Valheim",
     "order":  85,
-    "complete":  true
+    "category":  "game"
 }

@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Counter-Strike: Global Offensive & CS2",
     "description":  "Comprehensive guide for CS:GO and CS2 dedicated servers with ports, 128-tick setup, SourceMod plugins, and troubleshooting",
-    "category":  "game",
+    "name":  "Counter-Strike: Global Offensive \u0026 CS2",
     "order":  50,
-    "complete":  true
+    "category":  "game"
 }

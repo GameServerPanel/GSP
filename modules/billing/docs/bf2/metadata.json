@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Battlefield 2",
     "description":  "Setup and configuration guide for Battlefield 2 game servers",
-    "category":  "game",
+    "name":  "Battlefield 2",
     "order":  21,
-    "complete":  false
+    "category":  "todo"
 }

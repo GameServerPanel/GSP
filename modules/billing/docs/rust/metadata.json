@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Rust",
     "description":  "Comprehensive guide for Rust dedicated servers with ports, uMod/Oxide plugins, wipe schedules, and performance optimization",
-    "category":  "game",
+    "name":  "Rust",
     "order":  78,
-    "complete":  true
+    "category":  "game"
 }

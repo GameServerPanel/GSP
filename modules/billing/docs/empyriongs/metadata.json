@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Empyrion",
     "description":  "Setup and configuration guide for Empyrion game servers",
-    "category":  "game",
+    "name":  "Empyrion",
     "order":  75,
-    "complete":  false
+    "category":  "todo"
 }

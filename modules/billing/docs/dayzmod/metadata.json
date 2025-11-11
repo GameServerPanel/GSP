@@ -1,7 +1,6 @@
 ﻿{
-    "name": "DayZ Mod",
-    "description": "Comprehensive guide for DayZ Mod servers (ARMA 2) with MySQL database setup, Hive server configuration, BattlEye filters, 6 maps, and two-server architecture",
-    "category": "mods",
-    "order": 59,
-    "complete": true
+    "description":  "Comprehensive guide for DayZ Mod servers (ARMA 2) with MySQL database setup, Hive server configuration, BattlEye filters, 6 maps, and two-server architecture",
+    "name":  "DayZ Mod",
+    "order":  59,
+    "category":  "mods"
 }

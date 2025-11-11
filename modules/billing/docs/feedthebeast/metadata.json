@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Feed The Beast Server",
     "description":  "Setup and configuration guide for Feed The Beast Server game servers",
-    "category":  "game",
+    "name":  "Feed The Beast Server",
     "order":  79,
-    "complete":  false
+    "category":  "todo"
 }

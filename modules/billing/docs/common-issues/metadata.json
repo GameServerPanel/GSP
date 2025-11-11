@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Common Issues \u0026 Solutions",
     "description":  "Troubleshooting guide for common server problems",
-    "category":  "troubleshooting",
+    "name":  "Common Issues \u0026 Solutions",
     "order":  1,
-    "complete":  false
+    "category":  "todo"
 }

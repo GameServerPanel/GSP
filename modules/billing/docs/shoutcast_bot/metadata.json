@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Shoutcast server Bot",
     "description":  "Setup and configuration guide for Shoutcast server Bot game servers",
-    "category":  "game",
+    "name":  "Shoutcast server Bot",
     "order":  87,
-    "complete":  false
+    "category":  "todo"
 }

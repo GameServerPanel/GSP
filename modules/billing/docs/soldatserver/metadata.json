@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Soldat",
     "description":  "Setup and configuration guide for Soldat game servers",
-    "category":  "game",
+    "name":  "Soldat",
     "order":  92,
-    "complete":  false
+    "category":  "todo"
 }

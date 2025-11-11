@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Avorion",
     "description":  "Setup and configuration guide for Avorion game servers",
-    "category":  "game",
+    "name":  "Avorion",
     "order":  19,
-    "complete":  false
+    "category":  "todo"
 }

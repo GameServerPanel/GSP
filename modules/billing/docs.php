@@ -106,6 +106,7 @@ foreach ($categories as $cat) {
 
 // Category labels - can be extended via JSON
 $categoryLabels = [
+    'todo' => 'TODO',
     'game' => 'Game Servers',
     'mods' => 'Mods & Plugins',
     'panel' => 'Panel Documentation',
@@ -114,7 +115,7 @@ $categoryLabels = [
 ];
 
 // Define category display order
-$categoryOrder = ['panel', 'game', 'mods', 'troubleshooting', 'other'];
+ $categoryOrder = ['todo', 'panel', 'game', 'mods', 'troubleshooting', 'other'];
 
 // Sort categories by defined order
 uksort($grouped, function($a, $b) use ($categoryOrder) {

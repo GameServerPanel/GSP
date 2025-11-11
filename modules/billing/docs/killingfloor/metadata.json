@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Killing Floor",
     "description":  "Comprehensive guide for Killing Floor dedicated servers with Web Admin, all 7 perks (level 0-6), difficulty levels (Beginner to Hell on Earth), mutator support, and wave-based co-op survival hosting on Unreal Engine 2.5",
-    "category":  "game",
+    "name":  "Killing Floor",
     "order":  25,
-    "complete":  true
+    "category":  "game"
 }

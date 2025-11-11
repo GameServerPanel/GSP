@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "CoD: Black Ops",
     "description":  "Setup and configuration guide for CoD: Black Ops game servers",
-    "category":  "game",
+    "name":  "CoD: Black Ops",
     "order":  43,
-    "complete":  false
+    "category":  "todo"
 }

@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Urban Terror 4",
     "description":  "Setup and configuration guide for Urban Terror 4 game servers",
-    "category":  "game",
+    "name":  "Urban Terror 4",
     "order":  124,
-    "complete":  false
+    "category":  "todo"
 }

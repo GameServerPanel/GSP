@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Half-Life 2: Deathmatch",
     "description":  "Setup and configuration guide for Half-Life 2: Deathmatch game servers",
-    "category":  "game",
+    "name":  "Half-Life 2: Deathmatch",
     "order":  5,
-    "complete":  false
+    "category":  "todo"
 }

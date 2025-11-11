@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Killing Floor 2",
     "description":  "Comprehensive guide for KF2 dedicated servers with Web Admin, all 10 perks, difficulty levels, Workshop content, and wave-based co-op survival hosting",
-    "category":  "game",
+    "name":  "Killing Floor 2",
     "order":  25,
-    "complete":  true
+    "category":  "game"
 }

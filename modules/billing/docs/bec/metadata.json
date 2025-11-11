@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "BEC (BattlEye Extended Controls)",
     "description":  "Comprehensive guide for BEC scheduler and admin tool for ARMA series with Bec.cfg configuration, scheduled restarts, admin commands, auto-restart on crash, and BattlEye integration",
-    "category":  "mods",
+    "name":  "BEC (BattlEye Extended Controls)",
     "order":  65,
-    "complete":  true
+    "category":  "mods"
 }

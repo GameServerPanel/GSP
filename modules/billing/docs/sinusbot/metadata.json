@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "SinusBot for TS 3 and Discord",
     "description":  "Setup and configuration guide for SinusBot for TS 3 and Discord game servers",
-    "category":  "game",
+    "name":  "SinusBot for TS 3 and Discord",
     "order":  88,
-    "complete":  false
+    "category":  "todo"
 }

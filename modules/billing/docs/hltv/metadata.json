@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "HLTV",
     "description":  "Setup and configuration guide for HLTV game servers",
-    "category":  "game",
+    "name":  "HLTV",
     "order":  9,
-    "complete":  false
+    "category":  "todo"
 }

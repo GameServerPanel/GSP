@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "ARK: Survival Evolved",
     "description":  "Comprehensive guide for ARK dedicated servers with ports, maps, mods, taming, and performance optimization",
-    "category":  "game",
+    "name":  "ARK: Survival Evolved",
     "order":  59,
-    "complete":  true
+    "category":  "game"
 }

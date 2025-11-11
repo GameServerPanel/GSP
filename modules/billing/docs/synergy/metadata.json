@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Synergy",
     "description":  "Setup and configuration guide for Synergy game servers",
-    "category":  "game",
+    "name":  "Synergy",
     "order":  4,
-    "complete":  false
+    "category":  "todo"
 }

@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Citadel: Forged with Fire",
     "description":  "Setup and configuration guide for Citadel: Forged with Fire game servers",
-    "category":  "game",
+    "name":  "Citadel: Forged with Fire",
     "order":  41,
-    "complete":  false
+    "category":  "todo"
 }

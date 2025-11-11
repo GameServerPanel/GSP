@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Serious Sam HD The Second Encounter",
     "description":  "Setup and configuration guide for Serious Sam HD The Second Encounter game servers",
-    "category":  "game",
+    "name":  "Serious Sam HD The Second Encounter",
     "order":  83,
-    "complete":  false
+    "category":  "todo"
 }

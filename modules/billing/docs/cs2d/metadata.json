@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "CS2D",
     "description":  "Setup and configuration guide for CS2D game servers",
-    "category":  "game",
+    "name":  "CS2D",
     "order":  48,
-    "complete":  false
+    "category":  "todo"
 }

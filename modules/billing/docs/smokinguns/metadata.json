@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Smokin Guns",
     "description":  "Setup and configuration guide for Smokin Guns game servers",
-    "category":  "game",
+    "name":  "Smokin Guns",
     "order":  89,
-    "complete":  false
+    "category":  "todo"
 }

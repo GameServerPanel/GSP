@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Counter-Strike: Source",
     "description":  "Comprehensive guide for CS:Source dedicated servers with ports, SourceMod plugins, game modes, and troubleshooting",
-    "category":  "game",
+    "name":  "Counter-Strike: Source",
     "order":  46,
-    "complete":  true
+    "category":  "game"
 }

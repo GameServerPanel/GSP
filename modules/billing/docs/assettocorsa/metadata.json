@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Assetto Corsa",
     "description":  "Setup and configuration guide for Assetto Corsa game servers",
-    "category":  "game",
+    "name":  "Assetto Corsa",
     "order":  15,
-    "complete":  false
+    "category":  "todo"
 }

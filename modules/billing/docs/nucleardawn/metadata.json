@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Nuclear Dawn (Linux)",
     "description":  "Setup and configuration guide for Nuclear Dawn (Linux) game servers",
-    "category":  "game",
+    "name":  "Nuclear Dawn (Linux)",
     "order":  60,
-    "complete":  false
+    "category":  "todo"
 }

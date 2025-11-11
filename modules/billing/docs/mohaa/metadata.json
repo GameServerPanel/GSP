@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Medal Of Honor: Allied Assault",
     "description":  "Setup and configuration guide for Medal Of Honor: Allied Assault game servers",
-    "category":  "game",
+    "name":  "Medal Of Honor: Allied Assault",
     "order":  40,
-    "complete":  false
+    "category":  "todo"
 }

@@ -1,7 +1,6 @@
 ﻿{
-    "name":  "Stationeers",
     "description":  "Setup and configuration guide for Stationeers game servers",
-    "category":  "game",
+    "name":  "Stationeers",
     "order":  101,
-    "complete":  false
+    "category":  "todo"
 }
