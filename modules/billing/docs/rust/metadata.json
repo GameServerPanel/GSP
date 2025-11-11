@@ -1,6 +1,7 @@
-{
-    "name": "Rust",
-    "description": "Setup and configuration guide for Rust game servers",
-    "category": "game",
-    "order": 78
+﻿{
+    "name":  "Rust",
+    "description":  "Comprehensive guide for Rust dedicated servers with ports, uMod/Oxide plugins, wipe schedules, and performance optimization",
+    "category":  "game",
+    "order":  78,
+    "complete":  true
 }

@@ -1,6 +1,7 @@
-{
-    "name": "ARK:SE",
-    "description": "Setup and configuration guide for ARK:SE game servers",
-    "category": "game",
-    "order": 7
+﻿{
+    "name":  "ARK: Survival Evolved",
+    "description":  "Comprehensive guide for ARK dedicated servers with ports, maps, mods, taming, and performance optimization",
+    "category":  "game",
+    "order":  59,
+    "complete":  true
 }

@@ -1,6 +1,7 @@
-{
-    "name": "Dystopia",
-    "description": "Setup and configuration guide for Dystopia game servers",
-    "category": "game",
-    "order": 73
+﻿{
+    "name":  "Dystopia",
+    "description":  "Setup and configuration guide for Dystopia game servers",
+    "category":  "game",
+    "order":  73,
+    "complete":  false
 }

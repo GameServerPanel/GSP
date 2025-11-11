@@ -1,6 +1,7 @@
-{
-    "name": "Battlefield Bad Company 2",
-    "description": "Setup and configuration guide for Battlefield Bad Company 2 game servers",
-    "category": "game",
-    "order": 23
+﻿{
+    "name":  "Battlefield Bad Company 2",
+    "description":  "Setup and configuration guide for Battlefield Bad Company 2 game servers",
+    "category":  "game",
+    "order":  23,
+    "complete":  false
 }

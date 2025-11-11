@@ -1,6 +1,7 @@
-{
-    "name": "Insurgency: Sandstorm",
-    "description": "Setup and configuration guide for Insurgency: Sandstorm game servers",
-    "category": "game",
-    "order": 18
+﻿{
+    "name":  "Insurgency: Sandstorm",
+    "description":  "Setup and configuration guide for Insurgency: Sandstorm game servers",
+    "category":  "game",
+    "order":  18,
+    "complete":  false
 }

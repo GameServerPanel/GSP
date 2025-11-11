@@ -1,6 +1,7 @@
-{
-    "name": "Hurtworld",
-    "description": "Setup and configuration guide for Hurtworld game servers",
-    "category": "game",
-    "order": 11
+﻿{
+    "name":  "Hurtworld",
+    "description":  "Setup and configuration guide for Hurtworld game servers",
+    "category":  "game",
+    "order":  11,
+    "complete":  false
 }

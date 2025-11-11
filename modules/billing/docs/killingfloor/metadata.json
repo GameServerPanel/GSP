@@ -1,6 +1,7 @@
-{
-    "name": "Killing Floor",
-    "description": "Setup and configuration guide for Killing Floor game servers",
-    "category": "game",
-    "order": 25
+﻿{
+    "name":  "Killing Floor",
+    "description":  "Setup and configuration guide for Killing Floor game servers",
+    "category":  "game",
+    "order":  25,
+    "complete":  false
 }

@@ -1,6 +1,7 @@
-{
-    "name": "Day of Defeat Source",
-    "description": "Setup and configuration guide for Day of Defeat Source game servers",
-    "category": "game",
-    "order": 68
+﻿{
+    "name":  "Day of Defeat Source",
+    "description":  "Setup and configuration guide for Day of Defeat Source game servers",
+    "category":  "game",
+    "order":  68,
+    "complete":  false
 }

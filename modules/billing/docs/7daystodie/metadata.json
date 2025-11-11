@@ -1,6 +1,7 @@
-{
-    "name": "7 Days to Die",
-    "description": "Setup and configuration guide for 7 Days to Die game servers",
-    "category": "game",
-    "order": 0
+﻿{
+    "name":  "7 Days to Die",
+    "description":  "Comprehensive guide for 7 Days to Die dedicated servers with XML modding, ports, web control panel, and zombie survival hosting",
+    "category":  "game",
+    "order":  33,
+    "complete":  true
 }

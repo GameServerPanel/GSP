@@ -1,6 +1,7 @@
-{
-    "name": "TeamSpeak 2",
-    "description": "Setup and configuration guide for TeamSpeak 2 game servers",
-    "category": "game",
-    "order": 102
+﻿{
+    "name":  "TeamSpeak 2",
+    "description":  "Setup and configuration guide for TeamSpeak 2 game servers",
+    "category":  "game",
+    "order":  102,
+    "complete":  false
 }

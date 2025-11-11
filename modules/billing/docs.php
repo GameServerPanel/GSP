@@ -54,6 +54,15 @@ function getDocCategories($docsDir) {
             $metadata = [];
         }
         
+        // Check if documentation is complete (default to false if not specified)
+        $isComplete = isset($metadata['complete']) ? (bool)$metadata['complete'] : false;
+        $displayName = $metadata['name'] ?? ucfirst($folder);
+        
+        // Add TODO prefix for incomplete documentation
+        if (!$isComplete) {
+            $displayName = 'TODO: ' . $displayName;
+        }
+        
         // Find icon file
         $icon = '';
         if (file_exists($folderPath . '/icon.png')) {
@@ -64,11 +73,12 @@ function getDocCategories($docsDir) {
         
         $categories[] = [
             'folder' => $folder,
-            'name' => $metadata['name'] ?? ucfirst($folder),
+            'name' => $displayName,
             'description' => $metadata['description'] ?? '',
             'category' => $metadata['category'] ?? 'other',
             'order' => $metadata['order'] ?? 999,
-            'icon' => $icon
+            'icon' => $icon,
+            'complete' => $isComplete
         ];
     }
     

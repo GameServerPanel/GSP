@@ -1,6 +1,7 @@
-{
-    "name": "Garrys Mod",
-    "description": "Setup and configuration guide for Garrys Mod game servers",
-    "category": "game",
-    "order": 91
+﻿{
+    "name":  "Garrys Mod",
+    "description":  "Setup and configuration guide for Garrys Mod game servers",
+    "category":  "game",
+    "order":  91,
+    "complete":  false
 }

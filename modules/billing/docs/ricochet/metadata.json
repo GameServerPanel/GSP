@@ -1,6 +1,7 @@
-{
-    "name": "Ricochet",
-    "description": "Setup and configuration guide for Ricochet game servers",
-    "category": "game",
-    "order": 73
+﻿{
+    "name":  "Ricochet",
+    "description":  "Setup and configuration guide for Ricochet game servers",
+    "category":  "game",
+    "order":  73,
+    "complete":  false
 }

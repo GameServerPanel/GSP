@@ -1,6 +1,7 @@
-{
-    "name": "Smashball",
-    "description": "Setup and configuration guide for Smashball game servers",
-    "category": "game",
-    "order": 3
+﻿{
+    "name":  "Smashball",
+    "description":  "Setup and configuration guide for Smashball game servers",
+    "category":  "game",
+    "order":  3,
+    "complete":  false
 }

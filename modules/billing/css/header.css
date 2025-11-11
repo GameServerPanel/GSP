@@ -1,3 +1,8 @@
+/* Global font family - legible sans-serif stack */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
 .gsw-top{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#fff;border-bottom:1px solid rgba(0,0,0,0.05);}
 .gsw-top img{height:40px;width:auto;display:block}
 .gsw-top .gsw-site-name{font-weight:700;font-size:1.1rem;color:#333}

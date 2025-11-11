@@ -1,6 +1,7 @@
-{
-    "name": "Arma2",
-    "description": "Setup and configuration guide for Arma2 game servers",
-    "category": "game",
-    "order": 10
+﻿{
+    "name":  "Arma 2: Operation Arrowhead",
+    "description":  "Complete guide for Arma 2 OA servers including DayZ Mod setup",
+    "category":  "game",
+    "order":  10,
+    "complete":  true
 }

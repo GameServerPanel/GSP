@@ -1,6 +1,7 @@
-{
-    "name": "Conan Exiles",
-    "description": "Setup and configuration guide for Conan Exiles game servers",
-    "category": "game",
-    "order": 45
+﻿{
+    "name":  "Conan Exiles",
+    "description":  "Comprehensive guide for Conan Exiles dedicated servers with Pippi admin tools, thralls, building mechanics, mods, and barbaric survival hosting",
+    "category":  "game",
+    "order":  47,
+    "complete":  true
 }

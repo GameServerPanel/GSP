@@ -1,6 +1,7 @@
-{
-    "name": "Starbound",
-    "description": "Setup and configuration guide for Starbound game servers",
-    "category": "game",
-    "order": 99
+﻿{
+    "name":  "Starbound",
+    "description":  "Setup and configuration guide for Starbound game servers",
+    "category":  "game",
+    "order":  99,
+    "complete":  false
 }

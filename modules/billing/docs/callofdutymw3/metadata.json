@@ -1,6 +1,7 @@
-{
-    "name": "Call of Duty: Modern Warfare 3",
-    "description": "Setup and configuration guide for Call of Duty: Modern Warfare 3 game servers",
-    "category": "game",
-    "order": 36
+﻿{
+    "name":  "Call of Duty: Modern Warfare 3",
+    "description":  "Setup and configuration guide for Call of Duty: Modern Warfare 3 game servers",
+    "category":  "game",
+    "order":  36,
+    "complete":  false
 }

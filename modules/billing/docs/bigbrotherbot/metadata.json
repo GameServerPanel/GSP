@@ -1,6 +1,7 @@
-{
-    "name": "Big Brother Bot",
-    "description": "Setup and configuration guide for Big Brother Bot game servers",
-    "category": "game",
-    "order": 24
+﻿{
+    "name":  "Big Brother Bot",
+    "description":  "Setup and configuration guide for Big Brother Bot game servers",
+    "category":  "game",
+    "order":  24,
+    "complete":  false
 }

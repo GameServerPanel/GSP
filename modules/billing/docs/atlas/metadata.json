@@ -1,6 +1,7 @@
-{
-    "name": "Atlas",
-    "description": "Setup and configuration guide for Atlas game servers",
-    "category": "game",
-    "order": 17
+﻿{
+    "name":  "Atlas",
+    "description":  "Setup and configuration guide for Atlas game servers",
+    "category":  "game",
+    "order":  17,
+    "complete":  false
 }

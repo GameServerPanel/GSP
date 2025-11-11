@@ -1,6 +1,7 @@
-{
-    "name": "Common Issues & Solutions",
-    "description": "Troubleshooting guide for common server problems",
-    "category": "troubleshooting",
-    "order": 1
+﻿{
+    "name":  "Common Issues \u0026 Solutions",
+    "description":  "Troubleshooting guide for common server problems",
+    "category":  "troubleshooting",
+    "order":  1,
+    "complete":  false
 }

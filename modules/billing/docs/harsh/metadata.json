@@ -1,6 +1,7 @@
-{
-    "name": "Operation Harsh Doorstop",
-    "description": "Setup and configuration guide for Operation Harsh Doorstop game servers",
-    "category": "game",
-    "order": 2
+﻿{
+    "name":  "Operation Harsh Doorstop",
+    "description":  "Setup and configuration guide for Operation Harsh Doorstop game servers",
+    "category":  "game",
+    "order":  2,
+    "complete":  false
 }

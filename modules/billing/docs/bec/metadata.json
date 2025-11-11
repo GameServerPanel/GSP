@@ -1,6 +1,7 @@
-{
-    "name": "BEC",
-    "description": "Setup and configuration guide for BEC game servers",
-    "category": "game",
-    "order": 20
+﻿{
+    "name":  "BEC",
+    "description":  "Setup and configuration guide for BEC game servers",
+    "category":  "game",
+    "order":  20,
+    "complete":  false
 }

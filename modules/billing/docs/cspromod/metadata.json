@@ -1,6 +1,7 @@
-{
-    "name": "CSPromod",
-    "description": "Setup and configuration guide for CSPromod game servers",
-    "category": "game",
-    "order": 52
+﻿{
+    "name":  "CSPromod",
+    "description":  "Setup and configuration guide for CSPromod game servers",
+    "category":  "game",
+    "order":  52,
+    "complete":  false
 }

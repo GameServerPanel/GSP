@@ -1,6 +1,7 @@
-{
-    "name": "Zombie Panic! Source",
-    "description": "Setup and configuration guide for Zombie Panic! Source game servers",
-    "category": "game",
-    "order": 149
+﻿{
+    "name":  "Zombie Panic! Source",
+    "description":  "Setup and configuration guide for Zombie Panic! Source game servers",
+    "category":  "game",
+    "order":  149,
+    "complete":  false
 }

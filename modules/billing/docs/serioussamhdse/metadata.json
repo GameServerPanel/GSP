@@ -1,6 +1,7 @@
-{
-    "name": "Serious Sam HD The Second Encounter",
-    "description": "Setup and configuration guide for Serious Sam HD The Second Encounter game servers",
-    "category": "game",
-    "order": 83
+﻿{
+    "name":  "Serious Sam HD The Second Encounter",
+    "description":  "Setup and configuration guide for Serious Sam HD The Second Encounter game servers",
+    "category":  "game",
+    "order":  83,
+    "complete":  false
 }

@@ -1,6 +1,7 @@
-{
-    "name": "Call of Duty",
-    "description": "Setup and configuration guide for Call of Duty game servers",
-    "category": "game",
-    "order": 33
+﻿{
+    "name":  "Call of Duty",
+    "description":  "Setup and configuration guide for Call of Duty game servers",
+    "category":  "game",
+    "order":  33,
+    "complete":  false
 }

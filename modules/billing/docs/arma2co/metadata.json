@@ -1,6 +1,7 @@
-{
-    "name": "Arma2 CO",
-    "description": "Setup and configuration guide for Arma2 CO game servers",
-    "category": "game",
-    "order": 11
+﻿{
+    "name":  "Arma 2: Combined Operations",
+    "description":  "Complete guide for Arma 2 CO and DayZ Mod hosting with database setup",
+    "category":  "game",
+    "order":  11,
+    "complete":  true
 }

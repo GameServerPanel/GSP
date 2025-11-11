@@ -1,6 +1,7 @@
-{
-    "name": "Xonotic",
-    "description": "Setup and configuration guide for Xonotic game servers",
-    "category": "game",
-    "order": 146
+﻿{
+    "name":  "Xonotic",
+    "description":  "Setup and configuration guide for Xonotic game servers",
+    "category":  "game",
+    "order":  146,
+    "complete":  false
 }

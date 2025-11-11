@@ -5,13 +5,14 @@
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
         <a href="#tshock" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">TShock</a>
-        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Troubleshooting</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
     </div>
 </div>
@@ -34,6 +35,52 @@
         <li><strong style="color: #ffffff;">Config File:</strong> serverconfig.txt</li>
     </ul>
 </div>
+
+<h2 id="ports">🔌 Ports Required</h2>
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
+    <thead>
+        <tr style="background: #0f172a;">
+            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
+            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
+            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
+            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
+        </tr>
+    </thead>
+    <tbody style="color: #e5e7eb;">
+        <tr style="background: #1e3a5f;">
+            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">7777</code></td>
+            <td style="padding: 12px;"><span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
+            <td style="padding: 12px;">Game server port (player connections)</td>
+            <td style="padding: 12px;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
+        </tr>
+    </tbody>
+</table>
+
+<div style="background: #1e3a5f; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <p style="color: #e5e7eb; margin: 0;"><strong>Note:</strong> Terraria is one of the simpler games to configure - it only requires a single TCP port. You can change this to any available port (1024-65535), just ensure it matches your <code>serverconfig.txt</code> configuration.</p>
+</div>
+
+<h3>Firewall Configuration Examples</h3>
+
+<h4>UFW (Ubuntu/Debian)</h4>
+<pre><code>sudo ufw allow 7777/tcp comment 'Terraria server'
+sudo ufw reload
+</code></pre>
+
+<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
+<pre><code>sudo firewall-cmd --permanent --add-port=7777/tcp
+sudo firewall-cmd --reload
+</code></pre>
+
+<h4>Windows Firewall</h4>
+<pre><code># Run in PowerShell as Administrator
+New-NetFirewallRule -DisplayName "Terraria Server" -Direction Inbound -Protocol TCP -LocalPort 7777 -Action Allow
+</code></pre>
+
+<h4>iptables (Legacy Linux)</h4>
+<pre><code>sudo iptables -A INPUT -p tcp --dport 7777 -j ACCEPT
+sudo service iptables save
+</code></pre>
 
 <h2 id="installation">Installation & Setup</h2>
 

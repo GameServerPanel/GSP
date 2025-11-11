@@ -1,6 +1,7 @@
-{
-    "name": "PixARK",
-    "description": "Setup and configuration guide for PixARK game servers",
-    "category": "game",
-    "order": 67
+﻿{
+    "name":  "PixARK",
+    "description":  "Setup and configuration guide for PixARK game servers",
+    "category":  "game",
+    "order":  67,
+    "complete":  false
 }
