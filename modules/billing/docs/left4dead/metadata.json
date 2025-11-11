@@ -1,7 +1,7 @@
 ﻿{
     "name":  "Left 4 Dead",
-    "description":  "Setup and configuration guide for Left 4 Dead game servers",
+    "description":  "Comprehensive guide for L4D dedicated servers with SourceMod/MetaMod, all 5 campaigns, game modes, and original co-op zombie survival hosting",
     "category":  "game",
-    "order":  31,
-    "complete":  false
+    "order":  17,
+    "complete":  true
 }

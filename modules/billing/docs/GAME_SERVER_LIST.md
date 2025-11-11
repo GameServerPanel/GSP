@@ -26,11 +26,11 @@ This list contains multiplayer games that support dedicated server hosting, orde
 ## High Popularity
 
 11. ~~DayZ Standalone~~ - Zombie survival
-12. Team Fortress 2 - Team-based FPS
-13. Left 4 Dead 2 - Co-op zombie shooter
+12. ~~Team Fortress 2~~ - Team-based FPS
+13. ~~Left 4 Dead 2~~ - Co-op zombie shooter
 14. Squad - Tactical military FPS
-15. Killing Floor 2 - Co-op wave shooter
-16. Insurgency: Sandstorm - Tactical FPS
+15. ~~Killing Floor 2~~ - Co-op wave shooter
+16. 21. ~~Insurgency: Sandstorm~~ - Tactical FPS
 17. Space Engineers - Space sandbox engineering
 18. Don't Starve Together - Survival co-op
 19. ~~Conan Exiles~~ - Survival and building
@@ -42,8 +42,8 @@ This list contains multiplayer games that support dedicated server hosting, orde
 22. ~~Counter-Strike 1.6~~ - Original CS (GoldSrc engine)
 23. ~~Arma 2: Operation Arrowhead~~ - Military sim (DayZ Mod base)
 24. ~~Arma 2: Combined Operations~~ - Arma 2 + OA (DayZ Mod)
-25. Left 4 Dead - Co-op zombie shooter
-26. Killing Floor - Wave-based shooter
+25. ~~Left 4 Dead~~ - Co-op zombie shooter
+26. 13. ~~Killing Floor~~ - Co-op horror shooter
 27. Insurgency - Tactical FPS
 28. The Forest - Survival horror co-op
 29. Starbound - 2D space exploration

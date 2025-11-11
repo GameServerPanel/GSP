@@ -1,7 +1,7 @@
 ﻿{
     "name":  "Insurgency: Sandstorm",
-    "description":  "Setup and configuration guide for Insurgency: Sandstorm game servers",
+    "description":  "Comprehensive guide for Insurgency: Sandstorm dedicated servers with 7 game modes (Push, Firefight, Frontline, Skirmish, Checkpoint, Outpost, Survival), tactical FPS gameplay, Workshop mod support, and UE4-based server hosting",
     "category":  "game",
-    "order":  18,
-    "complete":  false
+    "order":  22,
+    "complete":  true
 }
