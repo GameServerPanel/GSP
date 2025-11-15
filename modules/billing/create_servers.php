@@ -6,20 +6,41 @@ function exec_ogp_module()
 {
 	global $db,$view,$settings;
 	$user_id = $_SESSION['user_id'];
-	if (isset($_POST['order_id'])) {
-		$order_id = $_POST['order_id'];
-	}
-	if(isset($_GET['order_id'])){
-		$order_id = $_GET['order_id'];
-	}
 	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
-	if ( $isAdmin ){
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND status='paid'" );
-	} else {
-		$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND user_id=".$db->realEscapeSingle($user_id)." AND status='paid'" );
+	
+	// Handle provision_all request - provision all paid orders for this user
+	if (isset($_POST['provision_all'])) {
+		if ( $isAdmin ){
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE status='paid' ORDER BY order_id" );
+		} else {
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='paid' ORDER BY order_id" );
+		}
+	}
+	// Handle provision_single or order_id parameter - provision specific order
+	else {
+		$order_id = null;
+		if (isset($_POST['order_id'])) {
+			$order_id = $_POST['order_id'];
+		}
+		if(isset($_GET['order_id'])){
+			$order_id = $_GET['order_id'];
+		}
+		
+		if (!$order_id) {
+			echo "<div class='failure'>No order ID specified.</div>";
+			return;
+		}
+		
+		if ( $isAdmin ){
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND status='paid'" );
+		} else {
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND user_id=".$db->realEscapeSingle($user_id)." AND status='paid'" );
+		}
 	}
 	if( !empty($orders) )
 	{
+		$provisioned_count = 0;
+		$failed_count = 0;
 		
 		foreach($orders as $order)
 		{
@@ -357,17 +378,37 @@ function exec_ogp_module()
 			// Save home id created by this order
 			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
 						SET home_id='" . $db->realEscapeSingle($home_id) . "' WHERE order_id=".$db->realEscapeSingle($order_id));
+			
+			$provisioned_count++;
 						
 		}
 					
         $db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
-
-		//Refresh to Game Monitor.
-		$view->refresh("home.php?m=gamemanager&p=game_monitor");
-
 	}
 	
+	// Show results and redirect
+	if ($provisioned_count > 0) {
+		echo "<div class='success'>";
+		echo "<h3>Server Provisioning Complete</h3>";
+		echo "<p>Successfully provisioned $provisioned_count server(s). Your server(s) are now active.</p>";
+		echo "</div>";
+		echo "<p><a href='home.php?m=gamemanager&p=game_monitor' class='btn'>View My Servers</a></p>";
+		// Auto-redirect after 3 seconds
+		echo "<script>setTimeout(function(){ window.location.href='home.php?m=gamemanager&p=game_monitor'; }, 3000);</script>";
+	} else {
+		echo "<div class='info'>";
+		echo "<p>No servers to provision. All orders have already been processed.</p>";
+		echo "</div>";
+		echo "<p><a href='home.php?m=billing&p=my_orders' class='btn'>View My Orders</a></p>";
+	}
+	
+	} else {
+		echo "<div class='failure'>";
+		echo "<p>No paid orders found to provision.</p>";
+		echo "</div>";
+		echo "<p><a href='home.php?m=billing&p=my_orders' class='btn'>View My Orders</a></p>";
+	}
 }
 ?>
 
