@@ -53,6 +53,8 @@ function config_games_print_editor_css()
 .xml-children{margin-top:10px;border-left:2px solid #2a2a2a;padding-left:12px}
 .xml-actions{text-align:right;margin-top:16px}
 .xml-node__actions{display:flex;gap:8px;align-items:center}
+.xml-node__apply{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer}
+.xml-node__apply:hover{background:#1f7aec}
 .xml-hint{font-size:0.85rem;color:#999;margin-top:4px}
 </style>
 CSS;
@@ -75,8 +77,11 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
     $isScript = in_array(strtolower($name), ['pre_install','post_install','precmd','postcmd','cli_template']);
 
     $html = "<div class='xml-node depth-{$depth}'>";
+    $actionId = 'node_action_' . substr(md5($safePath . $index), 0, 8);
     $html .= "<div class='xml-node__header'><div><div class='xml-node__title'>{$safeLabel}</div><div class='xml-node__path'>{$displayPath}</div></div>";
-    $html .= "<div class='xml-node__actions'><label>Action</label><select name=\"nodes[{$safePath}][action]\"><option value='keep'>Keep</option><option value='remove'>Remove</option></select></div></div>";
+    $html .= "<div class='xml-node__actions'><label for=\"{$actionId}\">Action</label>";
+    $html .= "<select id=\"{$actionId}\" name=\"nodes[{$safePath}][action]\"><option value='keep'>Save Changes</option><option value='remove'>Remove Node</option></select>";
+    $html .= "<button type='submit' name='save_xml' value='1' class='xml-node__apply'>Apply</button></div></div>";
     $html .= "<div class='xml-node__body'>";
     $html .= "<input type='hidden' name=\"nodes[{$safePath}][path]\" value=\"{$safePath}\">";
     $html .= "<input type='hidden' name=\"nodes[{$safePath}][has_children]\" value=\"" . ($hasChildren ? '1' : '0') . "\">";
