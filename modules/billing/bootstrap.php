@@ -3,6 +3,9 @@
 // Central bootstrap for billing website pages. Loads config, provides safe DB helper
 // and ensures $table_prefix is available.
 
+// Ensure session sync with panel happens first
+require_once __DIR__ . '/includes/session_bridge.php';
+
 // Load configuration (includes/config.inc.php) if present
 $config_path = __DIR__ . '/includes/config.inc.php';
 if (file_exists($config_path)) {

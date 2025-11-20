@@ -9,7 +9,7 @@
 <?php
 // Start session to check login status
 if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
+    session_name("opengamepanel_web");
     session_start();
 }
 
@@ -392,3 +392,4 @@ $status_config = [
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>
+

@@ -1,9 +1,6 @@
 <?php
 // Admin authorization include — include early (before output) on admin pages
-if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
-    session_start();
-}
+require_once(__DIR__ . '/session_bridge.php');
 
 // If not logged in, redirect to login
 if (empty($_SESSION['website_user_id'])) {
@@ -66,3 +63,5 @@ if (strtolower($role) !== 'admin') {
 
 // If we reach here, user is an admin
 ?>
+
+

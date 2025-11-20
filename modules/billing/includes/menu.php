@@ -4,11 +4,7 @@
  * This file provides a consistent navigation menu across all website pages
  */
 
-// Start the website session to check if user is logged in (if not already started)
-if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
-    session_start();
-}
+require_once(__DIR__ . '/session_bridge.php');
 
 // Check login status
 // Primary check uses website_user_id, but some remote deployments may only set website_username.
@@ -122,3 +118,4 @@ if ($is_logged_in) {
     </nav>
   </div>
 </div>
+

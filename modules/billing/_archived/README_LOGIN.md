@@ -8,7 +8,7 @@ This implementation adds login functionality to the website that authenticates u
 ### 1. `_website/login.php` (NEW)
 - Full-featured login page with modern UI
 - Authenticates against panel DB using MD5 password hashing (panel-compatible)
-- Creates separate website session using `gameservers_website` session name
+- Creates separate website session using `opengamepanel_web` session name
 - Logs all login attempts via logger() function
 - Session variables set:
   - `$_SESSION['website_user_id']` - User ID from ogp_users
@@ -32,7 +32,7 @@ This implementation adds login functionality to the website that authenticates u
 ## Session Management
 
 ### Separate Sessions
-- **Website Session**: `gameservers_website` (this implementation)
+- **Website Session**: `opengamepanel_web` (this implementation)
 - **Panel Session**: `opengamepanel_web` (existing panel)
 
 These sessions are completely separate - users can be logged into one without being logged into the other.
@@ -62,7 +62,7 @@ Requires connection to panel database with access to:
 ### For Developers:
 Check if user is logged in:
 ```php
-session_name("gameservers_website");
+session_name("opengamepanel_web");
 session_start();
 
 if (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) {
@@ -107,3 +107,4 @@ This implementation follows the no-code planning guidelines from `.github/copilo
 - Login credentials are the same as panel login (same user table)
 - Website session does not grant access to panel - separate login required
 - Logger function from db.php creates logfile.txt for audit trail
+

@@ -1,6 +1,6 @@
 <?php
 // Start the website session
-session_name("gameservers_website");
+session_name("opengamepanel_web");
 session_start();
 
 // Logger function
@@ -30,3 +30,4 @@ $siteRoot = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rt
 header('Location: ' . $siteRoot . '/index.php');
 exit();
 ?>
+

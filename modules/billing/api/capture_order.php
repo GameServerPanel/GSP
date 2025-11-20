@@ -138,7 +138,7 @@ log_payment('PAYMENT_CAPTURED', [
 
 // Start session to get user_id (use billing website session name)
 if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
+    session_name("opengamepanel_web");
     session_start();
 }
 $user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
@@ -152,8 +152,8 @@ if ($user_id <= 0) {
 }
 
 // Connect to database
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
-if (!$db) {
+$mysqli = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+if (!$mysqli) {
     log_payment('DB_CONNECTION_FAILED', mysqli_connect_error());
     ob_clean();
     echo json_encode(['error' => 'db_connection_failed', 'request_id' => $requestId]);
@@ -161,8 +161,8 @@ if (!$db) {
 }
 
 $now = date('Y-m-d H:i:s');
-$esc_txid = mysqli_real_escape_string($db, $txid);
-$esc_paypal_json = mysqli_real_escape_string($db, $paypal_json);
+$esc_txid = mysqli_real_escape_string($mysqli, $txid);
+$esc_paypal_json = mysqli_real_escape_string($mysqli, $paypal_json);
 
 // Apply coupon from session to invoices before marking paid
 session_start();
@@ -171,12 +171,12 @@ if ($coupon_id > 0) {
     // Get unpaid invoices for this user to apply coupon
     $invoices_query = "SELECT invoice_id, amount FROM {$table_prefix}billing_invoices 
                       WHERE user_id=$user_id AND status='due'";
-    $invoices_result = mysqli_query($db, $invoices_query);
+    $invoices_result = mysqli_query($mysqli, $invoices_query);
     
     // Get coupon details
     $coupon_query = "SELECT discount_percent FROM {$table_prefix}billing_coupons 
                     WHERE coupon_id=$coupon_id AND is_active=1 LIMIT 1";
-    $coupon_result = mysqli_query($db, $coupon_query);
+    $coupon_result = mysqli_query($mysqli, $coupon_query);
     
     if ($coupon_result && mysqli_num_rows($coupon_result) === 1) {
         $coupon_row = mysqli_fetch_assoc($coupon_result);
@@ -194,7 +194,7 @@ if ($coupon_id > 0) {
                                      discount_amount=" . number_format($discount_amt, 2, '.', '') . ",
                                      amount=" . number_format($new_amount, 2, '.', '') . "
                                  WHERE invoice_id=$inv_id";
-            mysqli_query($db, $update_coupon_sql);
+            mysqli_query($mysqli, $update_coupon_sql);
             log_payment('COUPON_APPLIED', ['invoice_id' => $inv_id, 'discount' => $discount_amt]);
         }
         
@@ -202,7 +202,7 @@ if ($coupon_id > 0) {
         $update_usage_sql = "UPDATE {$table_prefix}billing_coupons 
                             SET current_uses = current_uses + 1 
                             WHERE coupon_id=$coupon_id";
-        mysqli_query($db, $update_usage_sql);
+        mysqli_query($mysqli, $update_usage_sql);
         
         // Clear coupon from session
         unset($_SESSION['cart_coupon_code']);
@@ -216,45 +216,84 @@ $updateInvoicesSql = "UPDATE {$table_prefix}billing_invoices
                       WHERE user_id=$user_id AND status='due'";
 
 log_payment('UPDATE_INVOICES_SQL', $updateInvoicesSql);
-$updateResult = mysqli_query($db, $updateInvoicesSql);
+$updateResult = mysqli_query($mysqli, $updateInvoicesSql);
 
 if (!$updateResult) {
-    log_payment('UPDATE_INVOICES_FAILED', mysqli_error($db));
-    mysqli_close($db);
+    log_payment('UPDATE_INVOICES_FAILED', mysqli_error($mysqli));
+    mysqli_close($mysqli);
     ob_clean();
     echo json_encode(['error' => 'update_invoices_failed', 'request_id' => $requestId]);
     exit;
 }
 
-$affectedInvoices = mysqli_affected_rows($db);
+$affectedInvoices = mysqli_affected_rows($mysqli);
 log_payment('INVOICES_MARKED_PAID', ['count' => $affectedInvoices]);
 
 // Get all invoices we just marked paid
 $getInvoicesSql = "SELECT * FROM {$table_prefix}billing_invoices 
                    WHERE user_id=$user_id AND payment_txid='$esc_txid'";
-$invoicesResult = mysqli_query($db, $getInvoicesSql);
+$invoicesResult = mysqli_query($mysqli, $getInvoicesSql);
 
 $ordersCreated = 0;
+$renewedOrders = 0;
+$newOrderIds = [];
 while ($inv = mysqli_fetch_assoc($invoicesResult)) {
     $invoice_id = intval($inv['invoice_id']);
     $existing_order_id = intval($inv['order_id'] ?? 0);
     
-    // Skip if invoice already linked to an order (renewal)
+    // Handle renewals by extending the existing order
     if ($existing_order_id > 0) {
-        log_payment('RENEWAL_INVOICE', ['invoice_id' => $invoice_id, 'order_id' => $existing_order_id]);
+        $durationUnit = strtolower(trim($inv['invoice_duration'] ?? 'month'));
+        $allowedDurations = ['day','month','year'];
+        if (!in_array($durationUnit, $allowedDurations, true)) {
+            $durationUnit = 'month';
+        }
+        $qty = max(1, intval($inv['qty'] ?? 1));
+        $orderInfoSql = "SELECT end_date FROM {$table_prefix}billing_orders WHERE order_id=$existing_order_id LIMIT 1";
+        $orderInfoRes = mysqli_query($mysqli, $orderInfoSql);
+        $currentEnd = null;
+        if ($orderInfoRes && mysqli_num_rows($orderInfoRes) === 1) {
+            $infoRow = mysqli_fetch_assoc($orderInfoRes);
+            $currentEnd = $infoRow['end_date'] ?? null;
+        }
+        $baseTs = time();
+        if (!empty($currentEnd)) {
+            $parsed = strtotime($currentEnd);
+            if ($parsed !== false && $parsed > time()) {
+                $baseTs = $parsed;
+            }
+        }
+        $newEndDate = date('Y-m-d H:i:s', strtotime("+$qty $durationUnit", $baseTs));
+        $renewSql = "UPDATE {$table_prefix}billing_orders 
+                     SET status='installed', end_date='$newEndDate', paid_ts='$now', payment_txid='$esc_txid'
+                     WHERE order_id=$existing_order_id LIMIT 1";
+        if (mysqli_query($mysqli, $renewSql)) {
+            $renewedOrders++;
+            log_payment('ORDER_RENEWED', [
+                'order_id' => $existing_order_id,
+                'invoice_id' => $invoice_id,
+                'new_end_date' => $newEndDate
+            ]);
+        } else {
+            log_payment('ORDER_RENEWAL_FAILED', [
+                'order_id' => $existing_order_id,
+                'invoice_id' => $invoice_id,
+                'error' => mysqli_error($mysqli)
+            ]);
+        }
         continue;
     }
     
     // Create new order
     $service_id = intval($inv['service_id']);
-    $home_name = mysqli_real_escape_string($db, $inv['home_name']);
+    $home_name = mysqli_real_escape_string($mysqli, $inv['home_name']);
     $ip = intval($inv['ip']);
     $max_players = intval($inv['max_players']);
     $qty = intval($inv['qty']);
-    $duration = mysqli_real_escape_string($db, $inv['invoice_duration']);
+    $duration = mysqli_real_escape_string($mysqli, $inv['invoice_duration']);
     $amount = floatval($inv['amount']);
-    $rcon_pw = mysqli_real_escape_string($db, $inv['remote_control_password']);
-    $ftp_pw = mysqli_real_escape_string($db, $inv['ftp_password']);
+    $rcon_pw = mysqli_real_escape_string($mysqli, $inv['remote_control_password']);
+    $ftp_pw = mysqli_real_escape_string($mysqli, $inv['ftp_password']);
     
     // Calculate end_date
     $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
@@ -272,25 +311,46 @@ while ($inv = mysqli_fetch_assoc($invoicesResult)) {
     
     log_payment('INSERT_ORDER_SQL', substr($insertOrderSql, 0, 300));
     
-    if (mysqli_query($db, $insertOrderSql)) {
-        $new_order_id = mysqli_insert_id($db);
+    if (mysqli_query($mysqli, $insertOrderSql)) {
+        $new_order_id = mysqli_insert_id($mysqli);
         log_payment('ORDER_CREATED', ['order_id' => $new_order_id, 'invoice_id' => $invoice_id]);
+        $newOrderIds[] = $new_order_id;
         
         // Link invoice to order
         $linkSql = "UPDATE {$table_prefix}billing_invoices SET order_id=$new_order_id WHERE invoice_id=$invoice_id";
-        mysqli_query($db, $linkSql);
+        mysqli_query($mysqli, $linkSql);
         
         $ordersCreated++;
     } else {
-        log_payment('INSERT_ORDER_FAILED', mysqli_error($db));
+        log_payment('INSERT_ORDER_FAILED', mysqli_error($mysqli));
     }
 }
 
-mysqli_close($db);
+mysqli_close($mysqli);
+
+$autoProvisionResult = ['provisioned_count' => 0, 'failed_count' => 0, 'orders' => []];
+if (!empty($newOrderIds)) {
+    require_once __DIR__ . '/../includes/panel_bridge.php';
+    $panelCtx = billing_panel_bootstrap();
+    if ($panelCtx && isset($panelCtx['db']) && $panelCtx['db'] instanceof OGPDatabase) {
+        $GLOBALS['db'] = $panelCtx['db'];
+        $GLOBALS['settings'] = $panelCtx['settings'];
+        require_once __DIR__ . '/../create_servers.php';
+        $autoProvisionResult = billing_invoke_provision([
+            'order_ids' => $newOrderIds,
+            'user_id' => $user_id,
+            'is_admin' => true
+        ]);
+        log_payment('AUTO_PROVISION_COMPLETE', $autoProvisionResult);
+    } else {
+        log_payment('AUTO_PROVISION_SKIPPED', 'panel bootstrap failed');
+    }
+}
 
 log_payment('PROCESSING_COMPLETE', [
     'invoices_paid' => $affectedInvoices,
     'orders_created' => $ordersCreated,
+    'orders_renewed' => $renewedOrders,
     'txid' => $txid
 ]);
 
@@ -301,5 +361,9 @@ echo json_encode([
     'order_id' => $paypal_order_id,
     'txid' => $txid,
     'invoices_paid' => $affectedInvoices,
-    'orders_created' => $ordersCreated
+    'orders_created' => $ordersCreated,
+    'orders_renewed' => $renewedOrders,
+    'provisioned' => $autoProvisionResult['provisioned_count'] ?? 0
 ]);
+
+

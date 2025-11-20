@@ -1,6 +1,6 @@
 <?php
 // Start a separate session for the website
-session_name("gameservers_website");
+session_name("opengamepanel_web");
 session_start();
 
 // Include database configuration
@@ -301,3 +301,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password']) && 
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>
+

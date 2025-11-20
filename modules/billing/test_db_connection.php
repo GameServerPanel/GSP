@@ -134,7 +134,7 @@ echo "</div>";
 // Test 7: Test session functionality
 echo "<div class='section'>";
 echo "<h2>Test 7: Session Test</h2>";
-session_name("gameservers_website");
+session_name("opengamepanel_web");
 session_start();
 $_SESSION['test_key'] = 'test_value';
 if (isset($_SESSION['test_key']) && $_SESSION['test_key'] === 'test_value') {
@@ -155,3 +155,4 @@ echo "</div>";
 
 echo "</body></html>";
 ?>
+

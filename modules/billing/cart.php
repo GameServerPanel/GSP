@@ -7,7 +7,7 @@
 
 // Start session with website session name
 if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
+    session_name("opengamepanel_web");
     session_start();
 }
 
@@ -760,3 +760,4 @@ $siteBase = $protocol . $host;
     <?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
+

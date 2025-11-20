@@ -1,15 +1,48 @@
 <?php
-require_once("includes/lib_remote.php");
-require_once("modules/config_games/server_config_parser.php");
+require_once __DIR__ . '/../../includes/lib_remote.php';
+require_once __DIR__ . '/../config_games/server_config_parser.php';
+
+if (!function_exists('billing_invoke_provision')) {
+	function billing_invoke_provision(array $options = array())
+	{
+		$GLOBALS['BILLING_PROVISION_OVERRIDE'] = $options;
+		ob_start();
+		exec_ogp_module();
+		$output = ob_get_clean();
+		$result = isset($GLOBALS['BILLING_PROVISION_LAST_RESULT']) ? $GLOBALS['BILLING_PROVISION_LAST_RESULT'] : array();
+		$result['output'] = $output;
+		unset($GLOBALS['BILLING_PROVISION_OVERRIDE'], $GLOBALS['BILLING_PROVISION_LAST_RESULT']);
+		return $result;
+	}
+}
 
 function exec_ogp_module()
 {
 	global $db,$view,$settings;
-	$user_id = $_SESSION['user_id'];
-	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
+
+	$override = isset($GLOBALS['BILLING_PROVISION_OVERRIDE']) ? $GLOBALS['BILLING_PROVISION_OVERRIDE'] : null;
+	$user_id = isset($override['user_id']) ? intval($override['user_id']) : (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
+	$isAdmin = isset($override['is_admin']) ? (bool)$override['is_admin'] : $db->isAdmin($user_id);
+	$provision_all = $override ? !empty($override['provision_all']) : isset($_POST['provision_all']);
+	$orderIds = array();
+	if ($override && !empty($override['order_ids'])) {
+		$orderIds = array_map('intval', (array)$override['order_ids']);
+	}
+	if (empty($orderIds)) {
+		$order_id = null;
+		if (isset($_POST['order_id'])) {
+			$order_id = $_POST['order_id'];
+		}
+		if(isset($_GET['order_id'])){
+			$order_id = $_GET['order_id'];
+		}
+		if (!empty($order_id)) {
+			$orderIds = array(intval($order_id));
+		}
+	}
 	
 	// Handle provision_all request - provision all paid orders for this user
-	if (isset($_POST['provision_all'])) {
+	if ($provision_all) {
 		if ( $isAdmin ){
 			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE status='paid' ORDER BY order_id" );
 		} else {
@@ -18,25 +51,19 @@ function exec_ogp_module()
 	}
 	// Handle provision_single or order_id parameter - provision specific order
 	else {
-		$order_id = null;
-		if (isset($_POST['order_id'])) {
-			$order_id = $_POST['order_id'];
-		}
-		if(isset($_GET['order_id'])){
-			$order_id = $_GET['order_id'];
-		}
-		
-		if (!$order_id) {
+		if (empty($orderIds)) {
 			echo "<div class='failure'>No order ID specified.</div>";
+			$GLOBALS['BILLING_PROVISION_LAST_RESULT'] = array('provisioned_count'=>0,'failed_count'=>0,'orders'=>array());
 			return;
 		}
-		
+		$idList = implode(',', array_map('intval', $orderIds));
 		if ( $isAdmin ){
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND status='paid'" );
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND status='paid'" );
 		} else {
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id=".$db->realEscapeSingle($order_id)." AND user_id=".$db->realEscapeSingle($user_id)." AND status='paid'" );
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND user_id=".$db->realEscapeSingle($user_id)." AND status='paid'" );
 		}
 	}
+	$processed_orders = array();
 	if( !empty($orders) )
 	{
 		$provisioned_count = 0;
@@ -45,6 +72,7 @@ function exec_ogp_module()
 		foreach($orders as $order)
 		{
 			$order_id = $order['order_id'];
+			$processed_orders[] = intval($order_id);
 			$service_id = $order['service_id'];
 			$home_name = $order['home_name'];
 			$remote_control_password = $order['remote_control_password'];
@@ -408,7 +436,14 @@ function exec_ogp_module()
 		echo "<p>No paid orders found to provision.</p>";
 		echo "</div>";
 		echo "<p><a href='home.php?m=billing&p=my_orders' class='btn'>View My Orders</a></p>";
+		$provisioned_count = 0;
+		$failed_count = 0;
 	}
+	$GLOBALS['BILLING_PROVISION_LAST_RESULT'] = array(
+		'provisioned_count' => isset($provisioned_count) ? $provisioned_count : 0,
+		'failed_count' => isset($failed_count) ? $failed_count : 0,
+		'orders' => $processed_orders,
+	);
 }
 ?>
 

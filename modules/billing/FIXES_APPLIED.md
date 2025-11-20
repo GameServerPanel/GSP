@@ -205,7 +205,7 @@ The billing module is designed to be standalone and relocatable:
 - Does NOT include panel files (like includes/functions.php)
 - Connects directly to MySQL using mysqli_connect()
 - Can be deployed on same machine as panel OR external web host
-- Sessions are separate: "gameservers_website" namespace
+- Sessions are separate: "opengamepanel_web" namespace
 
 ---
 
@@ -245,3 +245,4 @@ The billing module is now functional with:
 4. All files validated for syntax correctness
 
 The changes are minimal, surgical, and follow the repository guidelines for standalone billing module architecture.
+

@@ -9,7 +9,7 @@ Successfully implemented login functionality for the website (_website/) that au
 Full-featured login page with:
 - Modern, responsive UI design
 - Authentication against panel DB using MD5 (panel-compatible)
-- Separate website session: `gameservers_website`
+- Separate website session: `opengamepanel_web`
 - Input validation and sanitization
 - Error and success message display
 - Automatic redirect after successful login
@@ -71,7 +71,7 @@ Database testing utility that checks:
 ## Technical Details
 
 ### Session Management
-- **Website Session Name:** `gameservers_website`
+- **Website Session Name:** `opengamepanel_web`
 - **Panel Session Name:** `opengamepanel_web` (unchanged)
 - **Complete separation:** Users can be logged into one without the other
 
@@ -178,3 +178,4 @@ All requirements from the problem statement have been met:
 ✅ Authenticate against panel DB  
 ✅ Create separate login session  
 ✅ Maintain panel compatibility  
+

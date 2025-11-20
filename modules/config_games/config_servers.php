@@ -24,6 +24,205 @@
 
 require_once("server_config_parser.php");
 
+function config_games_normalize_path($path)
+{
+    $clean = preg_replace('/[^A-Za-z0-9_\\[\\]\\/\\-]/', '', (string)$path);
+    return ltrim($clean, '/');
+}
+
+function config_games_print_editor_css()
+{
+    static $printed = false;
+    if ($printed) {
+        return;
+    }
+    $printed = true;
+    echo <<<CSS
+<style>
+.xml-editor-wrapper{margin:20px 0;padding:12px;background:#111;border:1px solid #222;border-radius:8px}
+.xml-node{border:1px solid #333;border-radius:6px;padding:12px;margin-bottom:10px;background:#181818}
+.xml-node__header{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #2a2a2a;padding-bottom:6px;margin-bottom:8px}
+.xml-node__title{font-weight:600;color:#f5f5f5}
+.xml-node__path{font-size:0.85rem;color:#989898}
+.xml-node__body label{font-size:0.85rem;color:#bbb;display:block;margin-bottom:4px}
+.xml-node__body input[type="text"], .xml-node__body textarea, .xml-node__body select{width:100%;padding:8px;border:1px solid #3a3a3a;border-radius:4px;background:#101010;color:#fff;font-family:monospace}
+.xml-node__body textarea{min-height:120px}
+.xml-node__attributes{margin-top:8px}
+.xml-node__attributes .attr-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.xml-node__attributes .attr-row input[type="text"]{flex:1}
+.xml-children{margin-top:10px;border-left:2px solid #2a2a2a;padding-left:12px}
+.xml-actions{text-align:right;margin-top:16px}
+.xml-node__actions{display:flex;gap:8px;align-items:center}
+.xml-hint{font-size:0.85rem;color:#999;margin-top:4px}
+</style>
+CSS;
+}
+
+function config_games_render_node(SimpleXMLElement $node, array $ancestors, array &$counters, int $depth = 0)
+{
+    $name = $node->getName();
+    $pathKey = implode('/', $ancestors) === '' ? $name : implode('/', $ancestors) . '/' . $name;
+    $counters[$pathKey] = ($counters[$pathKey] ?? 0) + 1;
+    $index = $counters[$pathKey];
+    $pathParts = array_merge($ancestors, ["{$name}[{$index}]"]);
+    $rawPath = implode('/', $pathParts);
+    $path = config_games_normalize_path($rawPath);
+    $hasChildren = count($node->children()) > 0;
+    $value = (string)$node;
+    $safeLabel = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+    $safePath = htmlspecialchars($path, ENT_QUOTES, 'UTF-8');
+    $displayPath = htmlspecialchars(str_replace('[', '[', $rawPath), ENT_QUOTES, 'UTF-8');
+    $isScript = in_array(strtolower($name), ['pre_install','post_install','precmd','postcmd','cli_template']);
+
+    $html = "<div class='xml-node depth-{$depth}'>";
+    $html .= "<div class='xml-node__header'><div><div class='xml-node__title'>{$safeLabel}</div><div class='xml-node__path'>{$displayPath}</div></div>";
+    $html .= "<div class='xml-node__actions'><label>Action</label><select name=\"nodes[{$safePath}][action]\"><option value='keep'>Keep</option><option value='remove'>Remove</option></select></div></div>";
+    $html .= "<div class='xml-node__body'>";
+    $html .= "<input type='hidden' name=\"nodes[{$safePath}][path]\" value=\"{$safePath}\">";
+    $html .= "<input type='hidden' name=\"nodes[{$safePath}][has_children]\" value=\"" . ($hasChildren ? '1' : '0') . "\">";
+
+    if (!$hasChildren || $isScript) {
+        $safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        if ($isScript || strlen($value) > 120) {
+            $html .= "<label>Value</label><textarea name=\"nodes[{$safePath}][value]\">{$safeValue}</textarea>";
+        } else {
+            $html .= "<label>Value</label><input type='text' name=\"nodes[{$safePath}][value]\" value=\"{$safeValue}\">";
+        }
+    } elseif (trim($value) !== '') {
+        $safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        $html .= "<label>Inner Text</label><textarea name=\"nodes[{$safePath}][value]\">{$safeValue}</textarea>";
+        $html .= "<p class='xml-hint'>This element contains nested tags; clearing the text does not remove children.</p>";
+    }
+
+    $attributes = $node->attributes();
+    if ($attributes && count($attributes) > 0) {
+        $html .= "<div class='xml-node__attributes'><strong>Attributes</strong>";
+        foreach ($attributes as $attrName => $attrValue) {
+            $attrSafe = htmlspecialchars($attrName, ENT_QUOTES, 'UTF-8');
+            $valSafe = htmlspecialchars((string)$attrValue, ENT_QUOTES, 'UTF-8');
+            $html .= "<div class='attr-row'><span>{$attrSafe}</span><input type='text' name=\"nodes[{$safePath}][attributes][{$attrSafe}]\" value=\"{$valSafe}\" placeholder='Leave blank to remove'></div>";
+        }
+        $html .= "<div class='attr-row'><input type='text' name=\"nodes[{$safePath}][new_attribute][name]\" placeholder='New attribute name'><input type='text' name=\"nodes[{$safePath}][new_attribute][value]\" placeholder='New attribute value'></div>";
+        $html .= "</div>";
+    } else {
+        $html .= "<div class='xml-node__attributes'><div class='attr-row'><input type='text' name=\"nodes[{$safePath}][new_attribute][name]\" placeholder='Attribute name'><input type='text' name=\"nodes[{$safePath}][new_attribute][value]\" placeholder='Attribute value'></div></div>";
+    }
+
+    if ($hasChildren) {
+        $html .= "<div class='xml-children'>";
+        foreach ($node->children() as $child) {
+            $html .= config_games_render_node($child, array_merge($ancestors, ["{$name}[{$index}]"]), $counters, $depth + 1);
+        }
+        $html .= "</div>";
+    }
+
+    $html .= "</div></div>";
+    return $html;
+}
+
+function config_games_render_editor(SimpleXMLElement $xml)
+{
+    config_games_print_editor_css();
+    $rootName = $xml->getName();
+    $html = "<div class='xml-editor-wrapper'>";
+    $counters = [];
+    foreach ($xml->children() as $child) {
+        $html .= config_games_render_node($child, [$rootName], $counters);
+    }
+    $html .= "</div>";
+    return $html;
+}
+
+function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
+{
+    $cfg_info = $db->getGameCfg($home_cfg_id);
+    if ($cfg_info === FALSE) {
+        return false;
+    }
+    $config_file = SERVER_CONFIG_LOCATION . $cfg_info['home_cfg_file'];
+    if (!file_exists($config_file) || !is_readable($config_file)) {
+        return false;
+    }
+    $nodes = [];
+    foreach ($nodesPayload as $path => $data) {
+        $cleanPath = config_games_normalize_path($path);
+        if ($cleanPath === '') {
+            continue;
+        }
+        $nodes[$cleanPath] = $data;
+    }
+    if (empty($nodes)) {
+        return false;
+    }
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = false;
+    $dom->formatOutput = true;
+    if (@$dom->load($config_file) === false) {
+        return false;
+    }
+    $xpath = new DOMXPath($dom);
+    uksort($nodes, function ($a, $b) {
+        return substr_count($b, '/') <=> substr_count($a, '/');
+    });
+    foreach ($nodes as $path => $nodeData) {
+        $query = '/' . $path;
+        $nodeList = @$xpath->query($query);
+        if (!$nodeList || $nodeList->length === 0) {
+            continue;
+        }
+        $domNode = $nodeList->item(0);
+        $action = $nodeData['action'] ?? 'keep';
+        if ($action === 'remove') {
+            if ($domNode->parentNode) {
+                $domNode->parentNode->removeChild($domNode);
+            }
+            continue;
+        }
+        $hasChildren = !empty($nodeData['has_children']);
+        if (array_key_exists('value', $nodeData)) {
+            while ($domNode->firstChild) {
+                $domNode->removeChild($domNode->firstChild);
+            }
+            if ($nodeData['value'] !== '') {
+                $domNode->appendChild($dom->createTextNode($nodeData['value']));
+            }
+        } elseif (!$hasChildren) {
+            while ($domNode->firstChild) {
+                $domNode->removeChild($domNode->firstChild);
+            }
+        }
+        if (isset($nodeData['attributes']) && is_array($nodeData['attributes'])) {
+            foreach ($nodeData['attributes'] as $attrName => $attrValue) {
+                $attrNameClean = preg_replace('/[^A-Za-z0-9_\\-:]/', '', (string)$attrName);
+                if ($attrNameClean === '') {
+                    continue;
+                }
+                $attrValue = trim((string)$attrValue);
+                if ($attrValue === '') {
+                    $domNode->removeAttribute($attrNameClean);
+                } else {
+                    $domNode->setAttribute($attrNameClean, $attrValue);
+                }
+            }
+        }
+        if (isset($nodeData['new_attribute']['name']) && $nodeData['new_attribute']['name'] !== '') {
+            $newName = preg_replace('/[^A-Za-z0-9_\\-:]/', '', (string)$nodeData['new_attribute']['name']);
+            $newValue = (string)($nodeData['new_attribute']['value'] ?? '');
+            if ($newName !== '' && $newValue !== '') {
+                $domNode->setAttribute($newName, $newValue);
+            }
+        }
+    }
+    if ($dom->save($config_file) === false) {
+        return false;
+    }
+    $config = read_server_config($config_file);
+    if ($config !== FALSE) {
+        $db->addGameCfg($config);
+    }
+    return true;
+}
+
 function exec_ogp_module() {
 
     global $db,$view;
@@ -90,6 +289,17 @@ function exec_ogp_module() {
 		}
 
         print_success(get_lang('configs_updated_ok'));
+    }
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_xml']) && isset($_POST['home_cfg_id'])) {
+        $edit_id = (int)$_POST['home_cfg_id'];
+        $nodesPayload = isset($_POST['nodes']) && is_array($_POST['nodes']) ? $_POST['nodes'] : [];
+        if (config_games_save_xml($db, $edit_id, $nodesPayload)) {
+            print_success(get_lang('configs_updated_ok'));
+        } else {
+            print_failure('Failed to save XML configuration.');
+        }
+        $_GET['home_cfg_id'] = $edit_id;
     }
 	
 	$game_cfgs = $db->getGameCfgs();
@@ -165,31 +375,19 @@ function exec_ogp_module() {
 			{
 				echo "<a href='?m=config_games&home_cfg_id=".$home_cfg_id."&delete'>".get_lang_f('delete_game_config_for',$cfg_info['game_name']." $os $arch")."</a><br>";
 				
-				$configs = read_server_config($config_file);
-				echo "<table>\n";
-				foreach( $configs as $key => $value )
-				{
-					echo "<tr><td><b>$key<b></td><td colspan=25 >$value</td></tr>\n";
-					foreach($value as $subkey => $subvalue )
-					{
-						echo "<tr><td><b>$subkey<b></td><td>$subvalue</td>\n";
-						
-						list($attributes,$attrvalue)=each($subvalue);
-
-						foreach($attrvalue as $attrkey => $attrval)
-						{
-							echo "<td><b>$attrkey<b></td><td>$attrval</td>\n";
-						}
-
-						echo "</td>";
-						foreach($subvalue as $option => $options )
-						{
-								echo "<td><b>$option<b></td><td>$options</td>\n";
-						}
-					}
-					echo "</tr>\n";
+				$xml = @simplexml_load_file($config_file);
+				if ($xml === false) {
+					print_failure(get_lang_f("error_when_handling_file",$config_file));
+				} else {
+					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
+					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
+					echo "<button type='submit' name='save_xml' value='1' style='float:right;margin-bottom:10px;'>".get_lang('save')."</button>";
+					echo "<div style='clear:both'></div>";
+					echo config_games_render_editor($xml);
+					echo "<div class='xml-actions'><button type='submit' name='save_xml' value='1'>".get_lang('save')."</button></div>";
+					echo "</form>";
+					echo "<p class='note'>Use the action dropdown to remove entire sections. Attribute values left blank will be removed. Script sections such as post_install are fully editable.</p>";
 				}
-				echo "</table>\n";
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 <?php
 // Start a separate session for the website (not the panel session)
-session_name("gameservers_website");
+session_name("opengamepanel_web");
 session_start();
 // Enable error display for debugging the white screen issue. Remove or gate in production.
 ini_set('display_errors', 1);
@@ -73,34 +73,62 @@ $success_message = '';
 // Process login form submission: simplified for debugging
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $username = trim($_POST['ulogin'] ?? '');
-    if ($username === '') {
-        $error_message = 'Please enter a username.';
-        site_log_warn('login_failed_empty_username', ['ip'=>$_SERVER['REMOTE_ADDR'] ?? '', 'script'=>$_SERVER['SCRIPT_NAME'] ?? '']);
+    $password = $_POST['upassword'] ?? '';
+    if ($username === '' || $password === '') {
+        $error_message = 'Please enter both a username and password.';
+        site_log_warn('login_failed_missing_fields', ['ip'=>$_SERVER['REMOTE_ADDR'] ?? '', 'script'=>$_SERVER['SCRIPT_NAME'] ?? '']);
     } else {
-        // Normal operation: create website session (should be set after proper auth)
-        // In final mode, preserve username but do not fabricate IDs. The site should set website_user_id after proper registration/login.
-        $_SESSION['website_username'] = $username;
-        $_SESSION['website_login_time'] = time();
-        // Try to resolve an existing panel user_id by username so the menu and admin checks work.
-        $resolved_uid = null;
-        if ($db) {
-            $safe = mysqli_real_escape_string($db, $username);
-            $res = @mysqli_query($db, "SELECT user_id FROM {$table_prefix}users WHERE users_login = '$safe' LIMIT 1");
-            if ($res && mysqli_num_rows($res) === 1) {
-                $r = mysqli_fetch_assoc($res);
-                $resolved_uid = intval($r['user_id'] ?? 0);
+        $safe = mysqli_real_escape_string($db, $username);
+        $sql = "SELECT user_id, users_login, users_passwd, users_pass_hash, users_role, users_lang, users_theme FROM {$table_prefix}users WHERE users_login = '$safe' LIMIT 1";
+        $res = mysqli_query($db, $sql);
+        if ($res && mysqli_num_rows($res) === 1) {
+            $row = mysqli_fetch_assoc($res);
+            $userId = intval($row['user_id']);
+            $legacyHash = $row['users_passwd'] ?? '';
+            $modernHash = $row['users_pass_hash'] ?? '';
+            $authOk = false;
+            if (!empty($modernHash) && function_exists('password_verify')) {
+                $authOk = password_verify($password, $modernHash);
+            }
+            if (!$authOk && !empty($legacyHash)) {
+                $authOk = (md5($password) === $legacyHash);
+                if ($authOk && function_exists('password_hash')) {
+                    $newHash = password_hash($password, PASSWORD_DEFAULT);
+                    $escapedHash = mysqli_real_escape_string($db, $newHash);
+                    mysqli_query($db, "UPDATE {$table_prefix}users SET users_pass_hash = '$escapedHash' WHERE user_id = $userId LIMIT 1");
+                }
+            }
+            if ($authOk) {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = $userId;
+                $_SESSION['users_login'] = $row['users_login'] ?? $username;
+                $_SESSION['users_passwd'] = $legacyHash;
+                $_SESSION['users_group'] = $row['users_role'] ?? 'user';
+                $_SESSION['users_lang'] = $row['users_lang'] ?? '';
+                $_SESSION['users_theme'] = $row['users_theme'] ?? '';
+                $_SESSION['website_user_id'] = $userId;
+                $_SESSION['website_username'] = $row['users_login'] ?? $username;
+                $_SESSION['website_user_role'] = $row['users_role'] ?? '';
+                $_SESSION['website_login_time'] = time();
+                require_once(__DIR__ . '/includes/panel_bridge.php');
+                $panelCtx = billing_panel_bootstrap();
+                if ($panelCtx && isset($panelCtx['db']) && $panelCtx['db'] instanceof OGPDatabase) {
+                    $_SESSION['users_api_key'] = $panelCtx['db']->getApiToken($userId);
+                } else {
+                    $_SESSION['users_api_key'] = $_SESSION['users_api_key'] ?? '';
+                }
+                site_log_info('login_success', ['username'=>$username, 'ip'=>$_SERVER['REMOTE_ADDR'] ?? '']);
+                $returnToParam = $_POST['return_to'] ?? '';
+                $destination = $sanitize_return_path($returnToParam);
+                if ($destination === '') {
+                    $destination = $SITE_ROOT_PATH . '/index.php';
+                }
+                header('Location: ' . $destination);
+                exit();
             }
         }
-        if (!empty($resolved_uid)) {
-            $_SESSION['website_user_id'] = $resolved_uid;
-        } else {
-            // Fallback: assign a numeric session id so the menu treats the user as logged in during debugging
-            $_SESSION['website_user_id'] = time();
-        }
-        site_log_info('login_success', ['username'=>$username, 'ip'=>$_SERVER['REMOTE_ADDR'] ?? '']);
-        // Always redirect to index.php under site root
-        header('Location: ' . $SITE_ROOT_PATH . '/index.php');
-        exit();
+        $error_message = 'Invalid username or password.';
+        site_log_warn('login_failed_invalid_credentials', ['username'=>$username, 'ip'=>$_SERVER['REMOTE_ADDR'] ?? '']);
     }
 }
 
@@ -310,3 +338,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>
+

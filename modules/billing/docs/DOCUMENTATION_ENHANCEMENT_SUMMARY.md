@@ -8,12 +8,12 @@ This document summarizes the comprehensive enhancements made to the billing modu
 ### 1. Documentation Page Login Button Issue ✅
 **Problem:** Documentation page showed "Login" button even when user was logged in.
 **Root Cause:** docs.php used basic `session_start()` instead of the website's session name.
-**Solution:** Changed to use `gameservers_website` session name to match rest of website.
+**Solution:** Changed to use `opengamepanel_web` session name to match rest of website.
 
 ### 2. Cart Page Display Issue ✅
 **Problem:** Cart page didn't display when clicking menu link.
 **Root Cause:** cart.php also used basic `session_start()` causing session inconsistency.
-**Solution:** Changed to use `gameservers_website` session name for consistency.
+**Solution:** Changed to use `opengamepanel_web` session name for consistency.
 
 ### 3. Documentation Content Enhancement ✅
 **Problem:** Documentation was basic, system-specific, and not comprehensive enough for SEO.
@@ -33,7 +33,7 @@ session_start();
 
 // NEW
 if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
+    session_name("opengamepanel_web");
     session_start();
 }
 ```
@@ -179,7 +179,7 @@ The same comprehensive template can be applied to all remaining games:
 ## Implementation Notes
 
 ### Session Name Consistency
-The entire billing module now uses `gameservers_website` session name:
+The entire billing module now uses `opengamepanel_web` session name:
 - login.php ✅
 - register.php ✅
 - logout.php ✅
@@ -247,3 +247,4 @@ The documentation system is now:
 
 *Created: November 8, 2024*
 *Last Updated: November 8, 2024*
+

@@ -27,8 +27,15 @@ $module_title = "billing";
 $module_version = "3.0";
 $db_version = 1;
 $module_required = FALSE;
-// Navigation disabled - this is now a purely external module
-$module_menus = array();
+// Module description
+$module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
+
+// Register module menus so panel can show links (user and admin views)
+$module_menus = array(
+    array('subpage' => 'my_orders', 'name' => 'My Orders', 'group' => 'user'),
+    array('subpage' => 'provision_servers', 'name' => 'Provision Servers', 'group' => 'user'),
+    array('subpage' => 'admin_orders', 'name' => 'Manage Orders', 'group' => 'admin')
+);
 
 $install_queries = array();
 

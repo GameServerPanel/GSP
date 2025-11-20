@@ -65,9 +65,9 @@ Implemented comprehensive system to visually identify incomplete game documentat
 ### 1. PayPal Payment Capture Session Issue (FIXED)
 **Problem:** Payment capture was failing with `NO_USER_SESSION` error even though user was logged in.
 
-**Root Cause:** The `api/capture_order.php` file was calling `session_start()` without setting the session name first, so it couldn't access the `gameservers_website` session where the user_id is stored.
+**Root Cause:** The `api/capture_order.php` file was calling `session_start()` without setting the session name first, so it couldn't access the `opengamepanel_web` session where the user_id is stored.
 
-**Solution:** Added `session_name("gameservers_website")` before `session_start()` in `capture_order.php`.
+**Solution:** Added `session_name("opengamepanel_web")` before `session_start()` in `capture_order.php`.
 
 **File Modified:** `modules/billing/api/capture_order.php` (line ~148)
 
@@ -323,3 +323,4 @@ Each game's `index.php` should follow this structure:
 ---
 
 **End of Summary**
+

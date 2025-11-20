@@ -13,6 +13,7 @@
 
 // Include billing bootstrap (loads config and DB helper)
 require_once(__DIR__ . '/bootstrap.php');
+$siteBaseUrl = isset($SITE_BASE_URL) ? trim((string)$SITE_BASE_URL) : '';
 
 // Protect this page: require admin
 require_once(__DIR__ . '/includes/admin_auth.php');
@@ -26,6 +27,10 @@ if (!$db) {
 // Include top bar and menu
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
+
+echo "<div class='panel mb-12'><strong>Need the XML field reference?</strong> ";
+echo "<a href=\"/modules/billing/docs/xml_notes.php\" target=\"_blank\" rel=\"noopener\">Open XML Notes</a>";
+echo "</div>";
 
 /* show errors during setup */
 @ini_set('display_errors','1'); 
@@ -79,7 +84,12 @@ if (isset($_POST['update_remote_servers'])) {
 /* helper: update one service row from posted array */
 function update_service_row(mysqli $db, string $locationCol, int $sid, array $svc){
   $name  = esc_mysqli($db, trim($svc['service_name'] ?? ''));
-  $price = esc_mysqli($db, trim($svc['price_monthly'] ?? '0.00'));
+  $priceMonthly = number_format((float)($svc['price_monthly'] ?? 0), 2, '.', '');
+  $priceYearly = number_format((float)($svc['price_year'] ?? 0), 2, '.', '');
+  $priceDaily = number_format((float)($svc['price_daily'] ?? 0), 2, '.', '');
+  $priceMonthEsc = esc_mysqli($db, $priceMonthly);
+  $priceYearEsc = esc_mysqli($db, $priceYearly);
+  $priceDailyEsc = esc_mysqli($db, $priceDaily);
   $img   = esc_mysqli($db, trim($svc['img_url'] ?? ''));
   $en    = !empty($svc['enabled']) ? 1 : 0;
 
@@ -104,7 +114,9 @@ function update_service_row(mysqli $db, string $locationCol, int $sid, array $sv
                  `{$locationCol}`='{$locListEsc}',
                  slot_min_qty={$minSlots},
                  slot_max_qty={$maxSlots},
-                 price_monthly='{$price}',
+                 price_daily='{$priceDailyEsc}',
+                 price_monthly='{$priceMonthEsc}',
+                 price_year='{$priceYearEsc}',
                  img_url='{$img}',
                  enabled={$en}
            WHERE service_id={$sid}";
@@ -178,7 +190,9 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
   <th>Service Name <small class="muted">(ID below)</small></th>
   <th>Min Slots</th>
   <th>Max Slots</th>
+  <th>Price (Daily)</th>
   <th>Price (Monthly)</th>
+  <th>Price (Year)</th>
   <th>Thumbnail URL</th>
   <th>Preview</th>
   <th>Update Row</th>
@@ -196,8 +210,8 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
         if ($imgUrl !== '') {
           if (is_abs_url($imgUrl)) {
             $displayUrl = $imgUrl;
-          } elseif ($SITE_BASE_URL !== '') {
-            $displayUrl = join_base($SITE_BASE_URL, $imgUrl);
+          } elseif ($siteBaseUrl !== '') {
+            $displayUrl = join_base($siteBaseUrl, $imgUrl);
           } else {
             // Use relative path (local folder)
             $displayUrl = $imgUrl;
@@ -228,7 +242,15 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
         </td>
 
         <td>
+          <input type="text" name="service[<?php echo $sid; ?>][price_daily]" value="<?php echo h(number_format((float)$row['price_daily'], 2, '.', '')); ?>" size="8">
+        </td>
+
+        <td>
           <input type="text" name="service[<?php echo $sid; ?>][price_monthly]" value="<?php echo h($row['price_monthly']); ?>" size="8">
+        </td>
+
+        <td>
+          <input type="text" name="service[<?php echo $sid; ?>][price_year]" value="<?php echo h(number_format((float)$row['price_year'], 2, '.', '')); ?>" size="8">
         </td>
 
         <!-- Thumbnail URL input -->
@@ -304,6 +326,17 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
     <button type="submit" onclick="return confirm('Remove this service? This cannot be undone.')">Remove</button>
   </form>
 <?php endif; ?>
+
+<div class="panel" style="margin-top:20px;">
+  <h3>Environment</h3>
+  <table class="cart-table">
+    <tr><th>Site Base URL</th><td><?php echo $siteBaseUrl !== '' ? h($siteBaseUrl) : '(empty — using relative paths)'; ?></td></tr>
+    <tr><th>Data directory</th><td><?php echo isset($SITE_DATA_DIR) ? h($SITE_DATA_DIR) : '(unset)'; ?></td></tr>
+    <tr><th>PHP SAPI</th><td><?php echo h(PHP_SAPI); ?></td></tr>
+    <tr><th>Writable?</th><td><?php echo (isset($SITE_DATA_DIR) && is_writable($SITE_DATA_DIR)) ? 'yes' : 'no'; ?></td></tr>
+    <tr><th>XML Reference</th><td><a href="/modules/billing/docs/xml_notes.php" target="_blank" rel="noopener">Open XML Notes</a></td></tr>
+  </table>
+</div>
 
 <!-- JS: Per-row: enable/disable Primary radios based on whether that location is checked -->
 <script>

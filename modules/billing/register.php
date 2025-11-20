@@ -1,5 +1,5 @@
 <?php
-session_name("gameservers_website");
+session_name("opengamepanel_web");
 session_start();
 require_once(__DIR__ . '/bootstrap.php');
 
@@ -70,3 +70,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empt
 </form>
 </body>
 </html>
+

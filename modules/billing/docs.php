@@ -6,7 +6,7 @@
 
 // Start session using the website session name to match the rest of the site
 if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
+    session_name("opengamepanel_web");
     session_start();
 }
 
@@ -428,3 +428,4 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
     </div>
 </body>
 </html>
+

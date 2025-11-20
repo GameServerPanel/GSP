@@ -4,7 +4,7 @@
 
 // Require login and configuration
 if (session_status() === PHP_SESSION_NONE) {
-    session_name("gameservers_website");
+    session_name("opengamepanel_web");
     session_start();
 }
 require_once(__DIR__ . '/bootstrap.php');
@@ -277,3 +277,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_renewal'])) {
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>
+

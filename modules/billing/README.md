@@ -151,7 +151,7 @@ When game documentation is finished:
 ## Technical Notes
 
 ### Session Management
-- **CRITICAL:** Always use `session_name("gameservers_website")` before `session_start()`
+- **CRITICAL:** Always use `session_name("opengamepanel_web")` before `session_start()`
 - Sessions are separate from panel sessions
 - User authentication stored in `$_SESSION['website_user_id']`
 
@@ -175,3 +175,4 @@ When game documentation is finished:
 ---
 **Last Updated:** December 19, 2024  
 **Version:** 2.0 (with Visual TODO System)
+

@@ -15,7 +15,7 @@ echo "Session cookie params: " . json_encode(session_get_cookie_params()) . "\n"
 echo "Session status (before start): " . session_status() . "\n";
 
 // Try to start a named session used by _website
-session_name('gameservers_website');
+session_name('opengamepanel_web');
 @session_start();
 echo "Session status (after start): " . session_status() . "\n";
 echo "Session id: " . session_id() . "\n";
@@ -70,3 +70,4 @@ echo " - Ensure the site path is served under the expected /_website/ path and t
 echo " - If sessions aren't persistent across requests, check webserver user permissions and session.save_path.\n";
 
 ?>
+
