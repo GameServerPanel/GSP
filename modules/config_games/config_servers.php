@@ -30,6 +30,13 @@ function config_games_normalize_path($path)
     return ltrim($clean, '/');
 }
 
+function config_games_next_form_key(): string
+{
+    static $counter = 0;
+    $counter++;
+    return 'node_' . $counter;
+}
+
 function config_games_print_editor_css()
 {
     static $printed = false;
@@ -73,6 +80,8 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
     $value = (string)$node;
     $safeLabel = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
     $safePath = htmlspecialchars($path, ENT_QUOTES, 'UTF-8');
+    $nodeKey = config_games_next_form_key();
+    $safeNodeKey = htmlspecialchars($nodeKey, ENT_QUOTES, 'UTF-8');
     $displayPath = htmlspecialchars(str_replace('[', '[', $rawPath), ENT_QUOTES, 'UTF-8');
     $isScript = in_array(strtolower($name), ['pre_install','post_install','precmd','postcmd','cli_template']);
 
@@ -80,22 +89,22 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
     $actionId = 'node_action_' . substr(md5($safePath . $index), 0, 8);
     $html .= "<div class='xml-node__header'><div><div class='xml-node__title'>{$safeLabel}</div><div class='xml-node__path'>{$displayPath}</div></div>";
     $html .= "<div class='xml-node__actions'><label for=\"{$actionId}\">Action</label>";
-    $html .= "<select id=\"{$actionId}\" name=\"nodes[{$safePath}][action]\"><option value='keep'>Save Changes</option><option value='remove'>Remove Node</option></select>";
+    $html .= "<select id=\"{$actionId}\" name=\"nodes[{$safeNodeKey}][action]\"><option value='keep'>Save Changes</option><option value='remove'>Remove Node</option></select>";
     $html .= "<button type='submit' name='save_xml' value='1' class='xml-node__apply'>Apply</button></div></div>";
     $html .= "<div class='xml-node__body'>";
-    $html .= "<input type='hidden' name=\"nodes[{$safePath}][path]\" value=\"{$safePath}\">";
-    $html .= "<input type='hidden' name=\"nodes[{$safePath}][has_children]\" value=\"" . ($hasChildren ? '1' : '0') . "\">";
+    $html .= "<input type='hidden' name=\"nodes[{$safeNodeKey}][path]\" value=\"{$safePath}\">";
+    $html .= "<input type='hidden' name=\"nodes[{$safeNodeKey}][has_children]\" value=\"" . ($hasChildren ? '1' : '0') . "\">";
 
     if (!$hasChildren || $isScript) {
         $safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
         if ($isScript || strlen($value) > 120) {
-            $html .= "<label>Value</label><textarea name=\"nodes[{$safePath}][value]\">{$safeValue}</textarea>";
+            $html .= "<label>Value</label><textarea name=\"nodes[{$safeNodeKey}][value]\">{$safeValue}</textarea>";
         } else {
-            $html .= "<label>Value</label><input type='text' name=\"nodes[{$safePath}][value]\" value=\"{$safeValue}\">";
+            $html .= "<label>Value</label><input type='text' name=\"nodes[{$safeNodeKey}][value]\" value=\"{$safeValue}\">";
         }
     } elseif (trim($value) !== '') {
         $safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-        $html .= "<label>Inner Text</label><textarea name=\"nodes[{$safePath}][value]\">{$safeValue}</textarea>";
+        $html .= "<label>Inner Text</label><textarea name=\"nodes[{$safeNodeKey}][value]\">{$safeValue}</textarea>";
         $html .= "<p class='xml-hint'>This element contains nested tags; clearing the text does not remove children.</p>";
     }
 
@@ -105,12 +114,12 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
         foreach ($attributes as $attrName => $attrValue) {
             $attrSafe = htmlspecialchars($attrName, ENT_QUOTES, 'UTF-8');
             $valSafe = htmlspecialchars((string)$attrValue, ENT_QUOTES, 'UTF-8');
-            $html .= "<div class='attr-row'><span>{$attrSafe}</span><input type='text' name=\"nodes[{$safePath}][attributes][{$attrSafe}]\" value=\"{$valSafe}\" placeholder='Leave blank to remove'></div>";
+            $html .= "<div class='attr-row'><span>{$attrSafe}</span><input type='text' name=\"nodes[{$safeNodeKey}][attributes][{$attrSafe}]\" value=\"{$valSafe}\" placeholder='Leave blank to remove'></div>";
         }
-        $html .= "<div class='attr-row'><input type='text' name=\"nodes[{$safePath}][new_attribute][name]\" placeholder='New attribute name'><input type='text' name=\"nodes[{$safePath}][new_attribute][value]\" placeholder='New attribute value'></div>";
+        $html .= "<div class='attr-row'><input type='text' name=\"nodes[{$safeNodeKey}][new_attribute][name]\" placeholder='New attribute name'><input type='text' name=\"nodes[{$safeNodeKey}][new_attribute][value]\" placeholder='New attribute value'></div>";
         $html .= "</div>";
     } else {
-        $html .= "<div class='xml-node__attributes'><div class='attr-row'><input type='text' name=\"nodes[{$safePath}][new_attribute][name]\" placeholder='Attribute name'><input type='text' name=\"nodes[{$safePath}][new_attribute][value]\" placeholder='Attribute value'></div></div>";
+        $html .= "<div class='xml-node__attributes'><div class='attr-row'><input type='text' name=\"nodes[{$safeNodeKey}][new_attribute][name]\" placeholder='Attribute name'><input type='text' name=\"nodes[{$safeNodeKey}][new_attribute][value]\" placeholder='Attribute value'></div></div>";
     }
 
     if ($hasChildren) {
@@ -149,11 +158,13 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
         return false;
     }
     $nodes = [];
-    foreach ($nodesPayload as $path => $data) {
-        $cleanPath = config_games_normalize_path($path);
+    foreach ($nodesPayload as $key => $data) {
+        $rawPath = isset($data['path']) ? (string)$data['path'] : (string)$key;
+        $cleanPath = config_games_normalize_path($rawPath);
         if ($cleanPath === '') {
             continue;
         }
+        $data['path'] = $cleanPath;
         $nodes[$cleanPath] = $data;
     }
     if (empty($nodes)) {
