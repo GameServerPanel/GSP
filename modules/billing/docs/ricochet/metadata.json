@@ -1,6 +1,6 @@
 ﻿{
-    "description":  "Setup and configuration guide for Ricochet game servers",
+    "description":  "Self-hosted Ricochet dedicated server reference (Linux/Windows)",
     "name":  "Ricochet",
     "order":  73,
-    "category":  "todo"
+    "category":  "game"
 }
