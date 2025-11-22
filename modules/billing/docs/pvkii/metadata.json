@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Pirates, Vikings and Knights II game servers",
-    "name":  "Pirates, Vikings and Knights II",
-    "order":  68,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Pirates, Vikings and Knights II game servers",
+    "name": "Pirates, Vikings and Knights II",
+    "order": 68,
+    "category": "game"
 }

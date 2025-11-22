@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for TeamSpeak 3 game servers",
-    "name":  "TeamSpeak 3",
-    "order":  104,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for TeamSpeak 3 game servers",
+    "name": "TeamSpeak 3",
+    "order": 104,
+    "category": "game"
 }

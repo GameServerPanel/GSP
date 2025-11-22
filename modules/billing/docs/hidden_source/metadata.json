@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Hidden: Source game servers",
-    "name":  "Hidden: Source",
-    "order":  4,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Hidden: Source game servers",
+    "name": "Hidden: Source",
+    "order": 4,
+    "category": "game"
 }

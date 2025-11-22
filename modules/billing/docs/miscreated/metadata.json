@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Miscreated game servers",
-    "name":  "Miscreated",
-    "order":  39,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Miscreated game servers",
+    "name": "Miscreated",
+    "order": 39,
+    "category": "game"
 }

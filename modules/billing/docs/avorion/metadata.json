@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Avorion game servers",
-    "name":  "Avorion",
-    "order":  19,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Avorion game servers",
+    "name": "Avorion",
+    "order": 19,
+    "category": "game"
 }

@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for CS2D game servers",
-    "name":  "CS2D",
-    "order":  48,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for CS2D game servers",
+    "name": "CS2D",
+    "order": 48,
+    "category": "game"
 }

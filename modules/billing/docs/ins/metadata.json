@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Insurgency game servers",
-    "name":  "Insurgency",
-    "order":  15,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Insurgency game servers",
+    "name": "Insurgency",
+    "order": 15,
+    "category": "game"
 }

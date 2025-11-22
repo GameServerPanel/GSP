@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Death Match Classic game servers",
-    "name":  "Death Match Classic",
-    "order":  64,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Death Match Classic game servers",
+    "name": "Death Match Classic",
+    "order": 64,
+    "category": "game"
 }
