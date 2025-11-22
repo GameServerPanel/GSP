@@ -26,7 +26,7 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27960</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
@@ -38,23 +38,7 @@
 <h2 id="ports">🔌 Network Ports</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
-<p style="color: #e5e7eb;">The following ports are used by this game server:</p>
-    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #0f172a;">
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27960</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Game/Query port</td>
-            </tr>
-        </tbody>
-    </table>
+    <p style="color: #e5e7eb;">The Quake 3 server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
     
     <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
     <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
@@ -144,19 +128,58 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%PUNKBUSTER% %BASE_PATH% %MASTER% %FSGAME% %IP% %PORT% %PLAYERS% %EXEC%</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+exec</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +exec</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Set the name of your server configuration file.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">server.cfg</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+set sv_punkbuster</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +set sv_punkbuster</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Set your PunkBuster Server Enabled or Disabled.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - Enabled</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">0</code> - Disabled</li>
+        </ul>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+set dedicated</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +set dedicated</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Show server on Gamespy.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">2</code> - Yes</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - No</li>
+        </ul>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+set fs_game</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +set fs_game</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Mod folder (if any).</p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

@@ -26,7 +26,7 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28015</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
@@ -38,33 +38,7 @@
 <h2 id="ports">🔌 Network Ports</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
-<p style="color: #e5e7eb;">The following ports are used by this game server:</p>
-    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #0f172a;">
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">28015</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Game port</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">28016</code></td>
-                <td style="padding: 10px;">TCP</td>
-                <td style="padding: 10px;">RCON</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">28082</code></td>
-                <td style="padding: 10px;">TCP</td>
-                <td style="padding: 10px;">Web panel (if enabled)</td>
-            </tr>
-        </tbody>
-    </table>
+    <p style="color: #e5e7eb;">The Rust server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
     
     <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
     <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
@@ -194,19 +168,116 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>-batchmode -nographics +server.ip %IP% %PORT% %QUERY_PORT% %PLAYERS% %HOSTNAME% %IDENTITY% %DESCRIPTION% %WORLDSIZE% %SEED% %SALT% %TICKRATE% %MAP% %BCK% %SAVEINTERNAL% %SECURE% %RCONWEB% %CONTROL_PASSWORD% -logfile output.txt</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.identity</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.identity</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Changes path to your server data (e.g. rust/server/my_server_identity).</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">server_identity</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.description</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.description</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Server Description shown on server browser</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">Plain old Rust Server</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.worldsize</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.worldsize</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the size of the map generated (min 1000, max 8000).</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">1000</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.seed</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.seed</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the map generation seed.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">0</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.salt</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.salt</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the randomization to mining resources.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">0</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.tickrate</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.tickrate</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the server tickrate (going higher than 30 is not recommended).</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">30</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.level</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.level</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the map of the server.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Barren</code> - Barren</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">CraggyIsland</code> - Craggy Island</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">HapisIsland</code> - Hapis Island</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Procedural Map</code> - Procedural Map</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">SavasIsland</code> - Savas Island</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">SavasIsland_koth</code> - Savas Island KoTH</li>
+        </ul>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+backup</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +backup</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable automatic backups.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.saveinterval</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.saveinterval</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Interval between the server saves the map.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">600</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+rcon.web</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +rcon.web</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">If set to enabled, use websocket RCON. If set to disabled, use legacy source engine RCON.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">0</code> - Disabled</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - Enabled</li>
+        </ul>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

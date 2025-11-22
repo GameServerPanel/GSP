@@ -168,19 +168,47 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%IP% %PORT% %CONNECT% %PLAYERS% %PID_FILE% +hostname "%HOSTNAME%" +name "%HOSTNAME%"</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+connect</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Address</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Specify the IP:Port for the game server.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+serverpassword</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Game server password, just for private servers.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+delay</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Delay</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">In seconds, delay between game server and TV.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+adminpassword</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - RCON password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Password to access the HLTV console remotely.</p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

@@ -1,26 +1,81 @@
 #!/usr/bin/env bash
+#
+# GSP GitHub Push Script
+# ======================
+# This script commits local changes in your GSP panel directory and pushes
+# them to GitHub via a Pull Request.
+#
+# HOW IT WORKS:
+# 1. Initializes git in the panel directory (if needed)
+# 2. Commits all changes (excluding sensitive files like config.inc.php)
+# 3. Creates a timestamped branch
+# 4. Attempts to push to upstream repo (requires write access)
+# 5. If no write access, creates/uses a fork and submits PR from there
+#
+# CONFIGURATION:
+# Configure settings via environment variables or by editing the defaults below.
+#
+# ENVIRONMENT VARIABLES:
+# - PANEL_DIR: Path to your GSP panel installation (default: /var/www/html/panel)
+# - TOKEN_FILE: File containing GitHub Personal Access Token (default: ~/.github-token)
+# - GITHUB_TOKEN: GitHub token directly (used if TOKEN_FILE doesn't exist)
+# - UPSTREAM_REPO: Target repository in "owner/repo" format (default: GameServerPanel/GSP)
+# - BR_PREFIX: Branch name prefix for PRs (default: panel-sync)
+# - GIT_USER_NAME: Git commit author name (default: Server Sync Bot)
+# - GIT_USER_EMAIL: Git commit author email (default: server-sync@local)
+#
+# GITHUB TOKEN SETUP:
+# You need a GitHub Personal Access Token with 'repo' scope.
+# Create one at: https://github.com/settings/tokens
+# 
+# Option 1: Store in file (recommended):
+#   echo "your_token_here" > ~/.github-token
+#   chmod 600 ~/.github-token
+#
+# Option 2: Use environment variable:
+#   export GITHUB_TOKEN="your_token_here"
+#
+# EXAMPLE USAGE:
+#   # Use defaults:
+#   ./push_to_github.sh
+#
+#   # Custom panel directory:
+#   PANEL_DIR=/home/panel/public_html ./push_to_github.sh
+#
+#   # Using environment token:
+#   GITHUB_TOKEN="ghp_xxxx" ./push_to_github.sh
+#
 set -Eeuo pipefail
 umask 022
 
-# ---------- HARD-CODED PROJECT SETTINGS ----------
-PANEL_DIR="/var/www/html/panel"
-TOKEN_FILE="/home/gameserver/git.token"
+# ---------- CONFIGURABLE SETTINGS ----------
+PANEL_DIR="${PANEL_DIR:-/var/www/html/panel}"
+TOKEN_FILE="${TOKEN_FILE:-$HOME/.github-token}"
 
-UPSTREAM_REPO="GameServerPanel/GSP"                 # owner/repo
+UPSTREAM_REPO="${UPSTREAM_REPO:-GameServerPanel/GSP}"    # owner/repo
 UPSTREAM_URL="https://github.com/${UPSTREAM_REPO}.git"
 
-BR_PREFIX="panel-sync"                              # branch prefix for PRs
-GIT_USER_NAME="Server Sync Bot"
-GIT_USER_EMAIL="server-sync@local"
+BR_PREFIX="${BR_PREFIX:-panel-sync}"                     # branch prefix for PRs
+GIT_USER_NAME="${GIT_USER_NAME:-Server Sync Bot}"
+GIT_USER_EMAIL="${GIT_USER_EMAIL:-server-sync@local}"
 
 log(){ printf '[%s] %s\n' "$(date +'%F %T')" "$*"; }
 die(){ echo "ERROR: $*" >&2; exit 1; }
 
 # ---------- PRECHECKS ----------
 [[ -d "$PANEL_DIR" ]] || die "Panel dir not found: $PANEL_DIR"
-[[ -s "$TOKEN_FILE" ]] || die "Token file missing/empty: $TOKEN_FILE"
-TOKEN="$(<"$TOKEN_FILE")"
-[[ ${#TOKEN} -ge 10 ]] || die "Token in $TOKEN_FILE looks invalid"
+
+# Try to get token from file or environment
+TOKEN=""
+if [[ -s "$TOKEN_FILE" ]]; then
+    TOKEN="$(<"$TOKEN_FILE")"
+elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
+    TOKEN="$GITHUB_TOKEN"
+else
+    die "GitHub token not found. Set GITHUB_TOKEN env var or create $TOKEN_FILE with your token. Get a token at: https://github.com/settings/tokens (requires 'repo' scope)"
+fi
+
+[[ ${#TOKEN} -ge 10 ]] || die "Token looks invalid (too short)"
 
 cd "$PANEL_DIR"
 if [[ ! -d ".git" ]]; then

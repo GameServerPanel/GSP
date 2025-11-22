@@ -1,4 +1,40 @@
 #!/usr/bin/env bash
+#
+# GSP Deployment Script
+# =====================
+# This script deploys the Game Server Panel (GSP) from GitHub to a web server.
+#
+# HOW IT WORKS:
+# 1. Clones/updates the GSP repository to a staging directory
+# 2. Syncs files to the web root using rsync (preserving configs)
+# 3. Sets proper permissions for OGP panel operation
+#
+# CONFIGURATION:
+# All settings can be configured via environment variables or by editing
+# the defaults in the "Config" section below.
+#
+# ENVIRONMENT VARIABLES:
+# - REPO_URL: Git repository URL (default: https://github.com/GameServerPanel/GSP.git)
+# - STAGE_DIR: Staging directory for git clone (default: $HOME/gsp_stage)
+# - WEB_ROOT: Live web server directory (default: /var/www/html/panel)
+# - OWNER: File owner user (default: www-data)
+# - GROUP: File owner group (default: www-data)
+# - SUDO: Command prefix for privilege escalation (default: sudo, set empty to skip)
+# - DRY_RUN: Set to 1 to test without making changes (default: 0)
+#
+# EXAMPLE USAGE:
+#   # Use defaults:
+#   ./deploy_gsp.sh
+#
+#   # Custom web root:
+#   WEB_ROOT=/home/panel/public_html ./deploy_gsp.sh
+#
+#   # Dry run to test:
+#   DRY_RUN=1 ./deploy_gsp.sh
+#
+#   # Different user/group:
+#   OWNER=apache GROUP=apache ./deploy_gsp.sh
+#
 set -Eeuo pipefail
 umask 022
 
