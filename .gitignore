@@ -28,3 +28,4 @@ Thumbs.db
 /tmp/
 *.tmp
 modules/billing/data/*.log
+tools/__pycache__/
