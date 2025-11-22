@@ -58,10 +58,13 @@ function config_games_print_editor_css()
 .xml-node__attributes .attr-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
 .xml-node__attributes .attr-row input[type="text"]{flex:1}
 .xml-children{margin-top:10px;border-left:2px solid #2a2a2a;padding-left:12px}
-.xml-actions{text-align:right;margin-top:16px}
+.xml-actions{display:flex;justify-content:flex-end;margin-top:16px;padding:8px 18px 0}
 .xml-node__actions{display:flex;gap:8px;align-items:center}
 .xml-node__apply{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer}
 .xml-node__apply:hover{background:#1f7aec}
+.xml-global-save{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:10px 28px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;cursor:pointer;transition:background 0.2s ease,transform 0.2s ease;box-shadow:0 2px 6px rgba(0,0,0,0.35)}
+.xml-global-save:hover{background:#1f7aec;transform:translateY(-1px)}
+.xml-global-save--top{float:right;margin:0 18px 12px 0}
 .xml-hint{font-size:0.85rem;color:#999;margin-top:4px}
 </style>
 CSS;
@@ -397,10 +400,10 @@ function exec_ogp_module() {
 				} else {
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
-					echo "<button type='submit' name='save_xml' value='1' style='float:right;margin-bottom:10px;'>".get_lang('save')."</button>";
+					echo "<button type='submit' name='save_xml' value='1' class='xml-global-save xml-global-save--top'>".get_lang('save')."</button>";
 					echo "<div style='clear:both'></div>";
 					echo config_games_render_editor($xml);
-					echo "<div class='xml-actions'><button type='submit' name='save_xml' value='1'>".get_lang('save')."</button></div>";
+					echo "<div class='xml-actions'><button type='submit' name='save_xml' value='1' class='xml-global-save'>".get_lang('save')."</button></div>";
 					echo "</form>";
 					echo "<p class='note'>Use the action dropdown to remove entire sections. Attribute values left blank will be removed. Script sections such as post_install are fully editable.</p>";
 				}
