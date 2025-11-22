@@ -1,8 +1,42 @@
 #!/usr/bin/env python3
 """
 Comprehensive Game Server Documentation Generator for GSP
-Generates PHP documentation files for all games in the "todo" category
-Based on the Minecraft template structure
+
+This script generates PHP documentation files for game servers in the GSP billing module.
+
+USAGE:
+    # Generate docs for all incomplete games:
+    python3 generate_game_docs.py
+    
+    # Generate docs for specific game(s):
+    python3 generate_game_docs.py --games minecraft csgo rust
+    
+    # Regenerate docs (overwrite existing):
+    python3 generate_game_docs.py --games minecraft --force
+    
+    # Process all "todo" category games:
+    python3 generate_game_docs.py --todo-only
+
+OPTIONS:
+    --games GAME1 GAME2 ...  Generate docs for specific game folder names
+    --force                  Overwrite existing documentation files
+    --todo-only              Only process games with category="todo"
+    --help                   Show this help message
+
+The generator extracts information from:
+- XML configurations (modules/config_games/server_configs/*.xml)
+- YAML knowledgepack (modules/billing/docs/gameserver_knowledgepack_v2.yaml)
+- Existing metadata.json files
+
+Generated documentation includes:
+- Quick info (ports, RAM, Steam App ID)
+- Network ports and firewall configuration
+- Installation steps with SteamCMD commands
+- Server configuration files and settings
+- Detailed startup parameters from XML
+- Comprehensive troubleshooting guide
+- Performance optimization tips
+- Security best practices
 """
 
 import os
@@ -10,6 +44,7 @@ import sys
 import json
 import yaml
 import re
+import argparse
 from pathlib import Path
 from datetime import datetime
 import xml.etree.ElementTree as ET
@@ -115,6 +150,68 @@ class GameDocGenerator:
         
         return ports
     
+    def extract_startup_parameters_from_xml(self, xml_root):
+        """Extract detailed startup parameters from XML server_params section"""
+        startup_params = []
+        
+        # Get CLI template and params
+        cli_template = xml_root.find('cli_template')
+        cli_template_text = cli_template.text if cli_template is not None else ""
+        
+        cli_params_elem = xml_root.find('cli_params')
+        cli_params_info = {}
+        if cli_params_elem is not None:
+            for param in cli_params_elem.findall('cli_param'):
+                param_id = param.get('id', '')
+                cli_string = param.get('cli_string', '')
+                options = param.get('options', '')
+                if param_id:
+                    cli_params_info[param_id] = {
+                        'cli_string': cli_string,
+                        'options': options
+                    }
+        
+        # Extract server_params - these are the configurable startup parameters
+        server_params = xml_root.find('server_params')
+        if server_params is not None:
+            for param in server_params.findall('param'):
+                param_key = param.get('key', '')
+                param_id = param.get('id', '')
+                param_type = param.get('type', 'text')
+                
+                # Get caption and description
+                caption_elem = param.find('caption')
+                desc_elem = param.find('desc')
+                default_elem = param.find('default')
+                
+                caption = caption_elem.text if caption_elem is not None else param_key
+                description = desc_elem.text if desc_elem is not None else "No description available"
+                default_value = default_elem.text if default_elem is not None else None
+                
+                # For select type, get options
+                options = []
+                if param_type == 'select':
+                    for option in param.findall('option'):
+                        opt_value = option.get('value', '')
+                        opt_text = option.text if option.text else opt_value
+                        options.append({'value': opt_value, 'text': opt_text})
+                
+                startup_params.append({
+                    'key': param_key,
+                    'id': param_id,
+                    'type': param_type,
+                    'caption': caption,
+                    'description': description,
+                    'default': default_value,
+                    'options': options
+                })
+        
+        return {
+            'cli_template': cli_template_text,
+            'cli_params': cli_params_info,
+            'server_params': startup_params
+        }
+    
     def extract_config_files_from_xml(self, xml_root):
         """Extract configuration file paths from XML"""
         config_files = []
@@ -139,15 +236,17 @@ class GameDocGenerator:
         kb_info = self.get_game_info_from_knowledgepack(game_name)
         xml_config = self.get_xml_config(folder_name)
         
-        # Extract ports and configs
+        # Extract ports, configs, and startup parameters
         ports_info = []
         config_files = []
+        startup_params_data = {}
         if xml_config is not None:
             ports_info = self.extract_ports_from_xml(xml_config)
             config_files = self.extract_config_files_from_xml(xml_config)
+            startup_params_data = self.extract_startup_parameters_from_xml(xml_config)
         
         # Build the PHP document
-        php_content = self.build_php_content(game_name, folder_name, kb_info, xml_config, ports_info, config_files)
+        php_content = self.build_php_content(game_name, folder_name, kb_info, xml_config, ports_info, config_files, startup_params_data)
         
         return php_content
     
@@ -180,7 +279,7 @@ class GameDocGenerator:
         
         return 'N/A'
     
-    def build_php_content(self, game_name, folder_name, kb_info, xml_config, ports_info, config_files):
+    def build_php_content(self, game_name, folder_name, kb_info, xml_config, ports_info, config_files, startup_params_data):
         """Build the complete PHP documentation content"""
         
         # Extract data from various sources
@@ -495,21 +594,81 @@ setadminpassword [password]
 </code></pre>
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
+'''
 
+        # Add detailed startup parameters from XML if available
+        if startup_params_data and startup_params_data.get('server_params'):
+            server_params = startup_params_data['server_params']
+            cli_template = startup_params_data.get('cli_template', '')
+            
+            if cli_template:
+                php_doc += f'''
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>{cli_template}</code></pre>
+'''
+            
+            php_doc += '''
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+'''
+            for param in server_params:
+                param_key = param['key']
+                caption = param['caption']
+                description = param['description']
+                param_type = param['type']
+                default = param.get('default')
+                options = param.get('options', [])
+                
+                # Clean HTML from description
+                description_clean = re.sub(r'<[^>]+>', '', description) if description else "No description available"
+                
+                php_doc += f'''
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">{param_key}</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - {caption}</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">{description_clean}</p>
+'''
+                
+                if param_type == 'select' and options:
+                    php_doc += '''        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+'''
+                    for opt in options:
+                        php_doc += f'''            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">{opt['value']}</code> - {opt['text']}</li>\n'''
+                    php_doc += '''        </ul>
+'''
+                
+                if default:
+                    php_doc += f'''        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">{default}</code></p>
+'''
+                
+                php_doc += '''    </div>
+'''
+            
+            php_doc += '''</div>
+'''
+        else:
+            # Fallback to generic parameters if no XML data
+            php_doc += '''
 <h3>Basic Startup</h3>
 '''
 
-        if startup_cmd:
-            php_doc += f'''<pre><code>{startup_cmd}
+            if startup_cmd:
+                php_doc += f'''<pre><code>{startup_cmd}
 </code></pre>
 '''
-        else:
-            php_doc += '''<pre><code># Generic startup command structure
+            else:
+                php_doc += '''<pre><code># Generic startup command structure
 ./server_executable [parameters]
 </code></pre>
 '''
 
-        php_doc += '''
+            php_doc += '''
 <h3>Common Parameters</h3>
 <ul>
     <li><code>-port [number]</code> - Set the server port</li>
@@ -892,8 +1051,103 @@ sudo ufw enable
                 errors.append(error_msg)
         
         return processed, errors
+    
+    def process_specific_games(self, game_names, force_overwrite=False):
+        """Process specific game folders by name"""
+        processed = 0
+        skipped = 0
+        errors = []
+        
+        for game_name in game_names:
+            folder = self.docs_dir / game_name
+            
+            if not folder.is_dir():
+                error_msg = f"Game folder not found: {game_name}"
+                print(f"  ✗ {error_msg}")
+                errors.append(error_msg)
+                continue
+            
+            metadata_file = folder / 'metadata.json'
+            index_file = folder / 'index.php'
+            
+            if not metadata_file.exists():
+                error_msg = f"metadata.json not found for {game_name}"
+                print(f"  ✗ {error_msg}")
+                errors.append(error_msg)
+                continue
+            
+            try:
+                # Read metadata
+                with open(metadata_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    content = content.lstrip('\ufeff')
+                    metadata = json.loads(content)
+                
+                # Check if we should skip
+                if index_file.exists() and not force_overwrite:
+                    print(f"Skipping {game_name} (file exists, use --force to overwrite)")
+                    skipped += 1
+                    continue
+                
+                print(f"Processing: {game_name}")
+                
+                # Generate new documentation
+                php_content = self.generate_php_doc(folder.name, metadata)
+                
+                # Write the new index.php
+                with open(index_file, 'w', encoding='utf-8') as f:
+                    f.write(php_content)
+                
+                # Update metadata if it was todo
+                if metadata.get('category', '').lower() == 'todo':
+                    metadata['category'] = 'game'
+                
+                # Mark as complete
+                metadata['complete'] = True
+                
+                with open(metadata_file, 'w', encoding='utf-8') as f:
+                    json.dump(metadata, f, indent=4, ensure_ascii=False)
+                
+                processed += 1
+                print(f"  ✓ Generated documentation for {game_name}")
+                
+            except Exception as e:
+                error_msg = f"Error processing {game_name}: {e}"
+                print(f"  ✗ {error_msg}")
+                errors.append(error_msg)
+        
+        return processed, skipped, errors
 
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Generate comprehensive game server documentation for GSP',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Generate docs for all incomplete games:
+  python3 generate_game_docs.py
+  
+  # Generate docs for specific game(s):
+  python3 generate_game_docs.py --games minecraft csgo rust
+  
+  # Regenerate docs (overwrite existing):
+  python3 generate_game_docs.py --games minecraft --force
+  
+  # Process all "todo" category games:
+  python3 generate_game_docs.py --todo-only
+        """
+    )
+    
+    parser.add_argument('--games', nargs='+', metavar='GAME',
+                        help='Generate docs for specific game folder names')
+    parser.add_argument('--force', action='store_true',
+                        help='Overwrite existing documentation files')
+    parser.add_argument('--todo-only', action='store_true',
+                        help='Only process games with category="todo"')
+    
+    args = parser.parse_args()
+    
     docs_dir = "/home/runner/work/GSP/GSP/modules/billing/docs"
     config_dir = "/home/runner/work/GSP/GSP/modules/config_games/server_configs"
     knowledgepack = "/home/runner/work/GSP/GSP/modules/billing/docs/gameserver_knowledgepack_v2.yaml"
@@ -908,15 +1162,37 @@ def main():
     generator.load_knowledgepack()
     generator.load_xml_configs()
     
-    print("\n" + "="*70)
-    print("Processing INCOMPLETE game documentation...")
-    print("="*70)
-    processed, skipped, errors = generator.process_incomplete_games()
+    processed = 0
+    skipped = 0
+    errors = []
+    
+    # Determine which mode to run
+    if args.games:
+        # Process specific games
+        print("\n" + "="*70)
+        print(f"Processing {len(args.games)} specified game(s)...")
+        if args.force:
+            print("FORCE mode: Will overwrite existing files")
+        print("="*70)
+        processed, skipped, errors = generator.process_specific_games(args.games, args.force)
+    elif args.todo_only:
+        # Process only todo category games
+        print("\n" + "="*70)
+        print("Processing TODO category games...")
+        print("="*70)
+        processed, errors = generator.process_todo_folders()
+    else:
+        # Process incomplete games (default)
+        print("\n" + "="*70)
+        print("Processing INCOMPLETE game documentation...")
+        print("="*70)
+        processed, skipped, errors = generator.process_incomplete_games()
     
     print(f"\n{'='*70}")
     print(f"Documentation generation complete!")
     print(f"  ✓ Processed: {processed}")
-    print(f"  → Skipped (already complete): {skipped}")
+    if skipped > 0:
+        print(f"  → Skipped: {skipped}")
     print(f"  ✗ Errors: {len(errors)}")
     
     if errors:
@@ -926,12 +1202,12 @@ def main():
         if len(errors) > 10:
             print(f"  ... and {len(errors) - 10} more")
     
-    print(f"\nAll documentation has been enhanced with:")
-    print(f"  • Actual port information (not 'Check server configuration')")
+    print(f"\nGenerated documentation includes:")
+    print(f"  • Actual port information from XML configs")
     print(f"  • Steam App IDs and exact SteamCMD commands")
     print(f"  • Configuration file details from XML configs")
-    print(f"  • Startup parameters extracted from XML")
-    print(f"  • Troubleshooting info from knowledgepack")
+    print(f"  • DETAILED startup parameters extracted from XML")
+    print(f"  • Comprehensive troubleshooting sections")
     print("="*70)
     
     return 0 if not errors else 1
