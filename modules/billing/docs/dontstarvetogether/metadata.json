@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Dont Starve Together game servers",
-    "name":  "Dont Starve Together",
-    "order":  72,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Dont Starve Together game servers",
+    "name": "Dont Starve Together",
+    "order": 72,
+    "category": "game",
+    "complete": true
 }

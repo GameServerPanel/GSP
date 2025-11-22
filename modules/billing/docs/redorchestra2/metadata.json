@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Red Orchestra 2 game servers",
     "name": "Red Orchestra 2",
     "order": 71,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

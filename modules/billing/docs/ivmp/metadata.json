@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for IV Multiplayer game servers",
     "name": "IV Multiplayer",
     "order": 19,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

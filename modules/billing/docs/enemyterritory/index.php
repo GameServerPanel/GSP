@@ -30,6 +30,7 @@
         <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 512 MB–1 GB baseline</li>
         <li><strong style="color: #ffffff;">Engine:</strong> id Tech 3</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
         <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
@@ -117,24 +118,13 @@ cd ~/gameserver
 <h4>Windows Server</h4>
 <p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-<h3>Using SteamCMD (if applicable)</h3>
-<p>Many game servers can be installed via SteamCMD:</p>
-<pre><code># Install SteamCMD (Ubuntu/Debian)
-sudo apt install lib32gcc-s1 steamcmd
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
 
-# Run SteamCMD
-steamcmd
-
-# Login and download (use your Steam credentials or anonymous)
-login anonymous
-force_install_dir /path/to/server
-app_update [APP_ID] validate
-quit
-</code></pre>
 
 <h2 id="configuration">Server Configuration</h2>
 
-<p>After installation, configure your server through the configuration files typically located in the server directory.</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
 <h3>Essential Settings</h3>
 <ul>

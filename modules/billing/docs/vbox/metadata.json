@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for VirtualBox game servers",
     "name": "VirtualBox",
     "order": 131,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for ShootMania Storm game servers",
     "name": "ShootMania Storm",
     "order": 84,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

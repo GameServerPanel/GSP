@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Call of Duty: World at War game servers",
-    "name":  "Call of Duty: World at War",
-    "order":  39,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Call of Duty: World at War game servers",
+    "name": "Call of Duty: World at War",
+    "order": 39,
+    "category": "game",
+    "complete": true
 }

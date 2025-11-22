@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Sniper Elite V2 game servers",
     "name": "Sniper Elite V2",
     "order": 91,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

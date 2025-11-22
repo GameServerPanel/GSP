@@ -1,494 +1,449 @@
 <?php
 /**
- * Team Fortress 2 - Comprehensive Server Hosting Guide
+ * Team Fortress 2 Server Documentation - Comprehensive Guide
  * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
         <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
-        <a href="#gamemodes" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Game Modes</a>
-        <a href="#plugins" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Plugins</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
-<h1>Team Fortress 2 Dedicated Server Hosting Guide</h1>
+<h1>Team Fortress 2 Server Hosting Guide</h1>
 
 <h2>Overview</h2>
-<p>Team Fortress 2 (TF2) is Valve's class-based multiplayer FPS game. This guide covers hosting a TF2 dedicated server using Source Dedicated Server (srcds) on VPS or dedicated servers.</p>
+<p>Team Fortress 2 is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Team Fortress 2 server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code> (UDP)</li>
-        <li><strong style="color: #ffffff;">RCON Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code> (TCP)</li>
-        <li><strong style="color: #ffffff;">Additional Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27020</code> (TCP/UDP)</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB (2GB+ recommended)</li>
-        <li><strong style="color: #ffffff;">Recommended CPU:</strong> 2+ cores @ 2.4GHz+</li>
-        <li><strong style="color: #ffffff;">Storage:</strong> 15-20GB for game files</li>
-        <li><strong style="color: #ffffff;">SteamCMD App ID:</strong> 232250</li>
-        <li><strong style="color: #ffffff;">Server Binary:</strong> srcds.exe (Windows) / srcds_run (Linux)</li>
-        <li><strong style="color: #ffffff;">Config Location:</strong> tf/cfg/server.cfg</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 2–4 GB per process baseline (varies by game/players)</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Source / SRCDS</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">232250</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports Required</h2>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27015</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span> / <span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Game + RCON port (UDP for game, TCP for RCON)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27020</code></td>
-            <td style="padding: 12px;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span> / <span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px;">SourceTV (spectator/streaming)</td>
-            <td style="padding: 12px;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 27015/udp comment 'TF2 game port'
-sudo ufw allow 27015/tcp comment 'TF2 RCON'
-sudo ufw allow 27020 comment 'TF2 SourceTV'
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #0f172a;">
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Game/Query (can change with -port)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">RCON</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27020</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">SourceTV (tv_port)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27005</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Client port (outbound/varies)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">26900</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Steam (outbound, -sport) <span style="color: #f59e0b;">(Optional)</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27031-27036</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Steam Remote Play / P2P (outbound) <span style="color: #f59e0b;">(Optional)</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27036-27037</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">Steam Remote Play (inbound where applicable) <span style="color: #f59e0b;">(Optional)</span></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
 sudo ufw reload
-</code></pre>
 
-<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=27015/udp
-sudo firewall-cmd --permanent --add-port=27015/tcp
-sudo firewall-cmd --permanent --add-port=27020/tcp
-sudo firewall-cmd --permanent --add-port=27020/udp
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Team Fortress 2 Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Team Fortress 2 Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Run in PowerShell as Administrator
-New-NetFirewallRule -DisplayName "TF2 Game/RCON" -Direction Inbound -Protocol UDP -LocalPort 27015 -Action Allow
-New-NetFirewallRule -DisplayName "TF2 RCON TCP" -Direction Inbound -Protocol TCP -LocalPort 27015 -Action Allow
-New-NetFirewallRule -DisplayName "TF2 SourceTV" -Direction Inbound -LocalPort 27020 -Action Allow
-</code></pre>
-
-<h4>iptables (Legacy Linux)</h4>
-<pre><code>sudo iptables -A INPUT -p udp --dport 27015 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 27015 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 27020 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 27020 -j ACCEPT
-sudo service iptables save
-</code></pre>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Windows Server 2012+ or Linux (Ubuntu/Debian)</li>
-    <li><strong>CPU:</strong> 2+ cores @ 2.4GHz minimum</li>
-    <li><strong>RAM:</strong> 2GB minimum, 4GB recommended for 24 players</li>
-    <li><strong>Storage:</strong> 15-20GB for server files</li>
-    <li><strong>Network:</strong> 100Mbps recommended</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 2–4 GB per process baseline (varies by game/players) minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installing via SteamCMD</h3>
-<pre><code># Install SteamCMD
-# Linux:
-sudo add-apt-repository multiverse
-sudo dpkg --add-architecture i386
-sudo apt update
-sudo apt install lib32gcc1 steamcmd
+<h3>Required Dependencies</h3>
+<ul>
+    <li>SteamCMD</li>
+    <li>Open firewall for listed ports</li>
+</ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
 # Create server directory
-mkdir -p ~/tf2server
-cd ~/tf2server
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-# Download TF2 server files (App ID 232250)
-steamcmd +login anonymous +force_install_dir ~/tf2server +app_update 232250 validate +quit
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>Startup Scripts</h3>
-<p><strong>Windows (start_tf2.bat):</strong></p>
-<pre><code>srcds.exe -console -game tf +map ctf_2fort +maxplayers 24 -port 27015 +exec server.cfg
+<h4>Starting the Server</h4>
+<pre><code>./srcds_run -console -game tf -ip 0.0.0.0 -port 27015 +map cp_dustbowl +maxplayers 24 +exec server.cfg
 </code></pre>
 
-<p><strong>Linux (start_tf2.sh):</strong></p>
-<pre><code>#!/bin/bash
-./srcds_run -console -game tf +map ctf_2fort +maxplayers 24 -port 27015 +exec server.cfg
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 232250</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/tf2
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/tf2 \
+         +app_update 232250 validate \
+         +quit
+
+# Server files are now in ~/gameservers/tf2/
+cd ~/gameservers/tf2
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\tf2 ^
+             +app_update 232250 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>server.cfg Example</h3>
-<p>Create <code>tf/cfg/server.cfg</code>:</p>
-<pre><code>// Server Information
-hostname "My TF2 Server"
-sv_region 1  // 0=US East, 1=US West, 2=South America, 3=Europe, etc.
-rcon_password "your_secure_password"
-sv_password ""  // Leave empty for public, or set server password
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-// Server Settings
-sv_lan 0
-sv_pure 2  // 0=off, 1=loose, 2=strict file checking
-mp_autoteambalance 1
-sv_visiblemaxplayers 24
-mp_timelimit 30
-mp_maxrounds 5
-mp_winlimit 0
-
-// Class Limits (competitive servers)
-// tf_tournament_classlimit_scout 2
-// tf_tournament_classlimit_soldier 2
-// tf_tournament_classlimit_demoman 2
-// tf_tournament_classlimit_medic 1
-
-// Communication
-sv_alltalk 0  // 0=team only, 1=all players
-sv_voiceenable 1
-sv_allow_voice_from_file 0
-
-// Logging
-log on
-sv_logbans 1
-sv_logecho 1
-sv_logfile 1
-sv_log_onefile 0
-
-// Network Settings
-sv_minrate 20000
-sv_maxrate 100000
-sv_mincmdrate 66
-sv_maxcmdrate 66
-sv_minupdaterate 66
-sv_maxupdaterate 66
-
-// Anti-Cheat
-sv_cheats 0
-sv_consistency 1
-sv_pure 2
-</code></pre>
-
-<h2 id="gamemodes">Game Modes & Maps</h2>
-
-<h3>Official Game Modes</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Mode</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Description</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Example Maps</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Capture the Flag</strong></td>
-            <td style="padding: 12px;">Capture enemy intelligence briefcase</td>
-            <td style="padding: 12px;">ctf_2fort, ctf_turbine</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Control Point</strong></td>
-            <td style="padding: 12px;">Capture all control points</td>
-            <td style="padding: 12px;">cp_dustbowl, cp_gorge</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Payload</strong></td>
-            <td style="padding: 12px;">Push/stop cart to destination</td>
-            <td style="padding: 12px;">pl_badwater, pl_upward</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Payload Race</strong></td>
-            <td style="padding: 12px;">Both teams push carts</td>
-            <td style="padding: 12px;">plr_hightower, plr_pipeline</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>King of the Hill</strong></td>
-            <td style="padding: 12px;">Control single point for timer</td>
-            <td style="padding: 12px;">koth_harvest, koth_viaduct</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Arena</strong></td>
-            <td style="padding: 12px;">No respawns, last team standing</td>
-            <td style="padding: 12px;">arena_lumberyard, arena_well</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Mann vs Machine</strong></td>
-            <td style="padding: 12px;">Co-op vs AI robot waves</td>
-            <td style="padding: 12px;">mvm_decoy, mvm_coaltown</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Pass Time</strong></td>
-            <td style="padding: 12px;">Sports-like mode with JACK</td>
-            <td style="padding: 12px;">pass_brickyard, pass_district</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Map Rotation</h3>
-<p>Create <code>tf/cfg/mapcycle.txt</code>:</p>
-<pre><code>ctf_2fort
-ctf_turbine
-cp_dustbowl
-cp_gorge
-pl_badwater
-pl_upward
-koth_harvest
-koth_viaduct
-</code></pre>
-
-<h3>Popular Community Maps</h3>
+<h3>Essential Settings</h3>
 <ul>
-    <li><strong>pl_barnblitz:</strong> Community favorite payload map</li>
-    <li><strong>cp_process:</strong> Competitive 5CP map</li>
-    <li><strong>koth_product:</strong> Competitive KOTH variant</li>
-    <li><strong>pl_swiftwater:</strong> Popular payload map</li>
-    <li><strong>cp_steel:</strong> Unique attack/defend CP map</li>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
 </ul>
 
-<h3>Installing Custom Maps</h3>
-<pre><code># Download map .bsp file
-# Place in: tf/maps/
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
 
-# Download .nav file (for bots) if available
-# Place in: tf/maps/
+# Ban player
+ban [player_name]
 
-# Add to mapcycle.txt
-echo "custom_map_name" >> tf/cfg/mapcycle.txt
+# Change map/level (syntax varies by game)
+changelevel [map_name]
 
-# Change map via RCON
-rcon changelevel custom_map_name
+# Set admin password (if supported)
+setadminpassword [password]
 </code></pre>
 
-<h2 id="plugins">Plugins & Extensions</h2>
+<h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>SourceMod & MetaMod Installation</h3>
-
-<h4>1. Install MetaMod:Source</h4>
-<pre><code># Download from https://www.sourcemm.net/downloads.php?branch=stable
-# Extract to tf/ directory
-
-# Verify - should see:
-tf/addons/metamod/
-
-# Test in server console:
-meta version
+<h3>Basic Startup</h3>
+<pre><code>./srcds_run -console -game tf -ip 0.0.0.0 -port 27015 +map cp_dustbowl +maxplayers 24 +exec server.cfg
 </code></pre>
 
-<h4>2. Install SourceMod</h4>
-<pre><code># Download from https://www.sourcemod.net/downloads.php?branch=stable
-# Extract to tf/ directory
-
-# Should see:
-tf/addons/sourcemod/
-
-# Add admin in: tf/addons/sourcemod/configs/admins_simple.ini
-"STEAM_0:1:12345678" "99:z"  // Replace with your SteamID
-
-# Test in server:
-sm version
-</code></pre>
-
-<h3>Essential Plugins</h3>
+<h3>Common Parameters</h3>
 <ul>
-    <li><strong>AdminMenu:</strong> In-game admin panel (included with SourceMod)</li>
-    <li><strong>RTV (Rock The Vote):</strong> Player-initiated map voting</li>
-    <li><strong>MapChooser:</strong> End-of-map voting system</li>
-    <li><strong>Basic Votes:</strong> Kick, ban, map change votes</li>
-    <li><strong>BaseBans:</strong> Permanent ban system</li>
-    <li><strong>BaseComm:</strong> Mute/gag player communications</li>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
 </ul>
 
-<h3>Popular TF2-Specific Plugins</h3>
-<ul>
-    <li><strong>TF2 Competitive Fixes:</strong> Tournament mode improvements</li>
-    <li><strong>TF2 Stats:</strong> Track player statistics</li>
-    <li><strong>MGE Mod:</strong> 1v1/2v2 training arenas</li>
-    <li><strong>Randomizer:</strong> Random weapon/class attributes</li>
-    <li><strong>PropHunt:</strong> Hide as props, seekers find them</li>
-    <li><strong>Dodgeball:</strong> Airblast-redirected rocket gameplay</li>
-    <li><strong>Surf Timer:</strong> Surfing movement maps with records</li>
-    <li><strong>VSH (Vs Saxton Hale):</strong> All players vs one boss</li>
-</ul>
+<h3>Creating a Start Script</h3>
 
-<h3>Installing Plugins</h3>
-<pre><code># Download .smx plugin file
-# Place in: tf/addons/sourcemod/plugins/
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
 
-# Restart server or reload plugins:
-sm plugins reload pluginname
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
 
-# List loaded plugins:
-sm plugins list
+<h3>Running as a Service</h3>
 
-# Disable plugin:
-sm plugins unload pluginname
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Team Fortress 2 Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
 </code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Server Not in Browser</h3>
-<pre><code># Verify sv_lan setting
-sv_lan 0  // Must be 0
-
-# Check region
-sv_region 1
-
-# Test connectivity
-netstat -an | grep 27015
-
-# Wait 5-10 minutes for Steam master server registration
-</code></pre>
-
-<h3>Players Can't Connect</h3>
-<ul>
-    <li>Check firewall allows UDP 27015</li>
-    <li>Verify <code>sv_password</code> is empty or known to players</li>
-    <li>Ensure server has valid Steam connection</li>
-    <li>Check <code>sv_pure</code> settings aren't too strict</li>
-    <li>Review server console for connection errors</li>
-</ul>
-
-<h3>MetaMod/SourceMod Not Loading</h3>
-<pre><code># Check file structure
-tf/
-  addons/
-    metamod/
-      bin/
-    sourcemod/
-      plugins/
-      configs/
-
-# Verify in server console
-meta version
-sm version
-
-# Check logs
-tf/addons/sourcemod/logs/errors_*.log
-</code></pre>
-
-<h3>Performance Issues / Low FPS</h3>
-<pre><code># Optimize rates
-sv_maxrate 100000
-sv_maxcmdrate 66
-sv_maxupdaterate 66
-
-# Set tickrate (requires startup parameter)
--tickrate 66  // Add to startup command
-
-# Check server FPS
-stats  // In server console
-
-# Reduce max players if needed
-maxplayers 16  // Instead of 24
-</code></pre>
-
-<h3>Custom Content Not Downloading</h3>
-<pre><code># Enable downloads in server.cfg
-sv_allowdownload 1
-sv_allowupload 1
-net_maxfilesize 64  // MB
-
-# Use FastDL for faster downloads
-sv_downloadurl "http://yourdomain.com/tf/"
-// Upload maps/materials/sounds to web server
-</code></pre>
-
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Tickrate:</strong> TF2 defaults to 66 tick - use <code>-tickrate 66</code> for consistency</li>
-        <li><strong>sv_pure:</strong> Set to 2 for competitive, 1 for casual with custom content</li>
-        <li><strong>Class limits:</strong> Use tournament cvars for competitive format restrictions</li>
-        <li><strong>Crits:</strong> Disable random crits in competitive: <code>tf_weapon_criticals 0</code></li>
-        <li><strong>Spread:</strong> Disable random spread: <code>tf_use_fixed_weaponspreads 1</code></li>
-        <li><strong>FastDL:</strong> Essential for custom maps - set up web server for fast downloads</li>
-        <li><strong>Logs.tf:</strong> Use for match statistics and competitive logging</li>
-    </ul>
-</div>
-
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with Team Fortress 2:</p>
-<ul>
-    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod and other Source engine plugins</li>
-</ul>
-
-<h2>Resources</h2>
-<ul>
-    <li><a href="https://wiki.teamfortress.com/wiki/Windows_dedicated_server" target="_blank">Official TF2 Dedicated Server Wiki</a></li>
-    <li><a href="https://wiki.alliedmods.net/Introduction_to_SourceMod_Plugins" target="_blank">SourceMod Plugin Development</a></li>
-    <li><a href="https://forums.alliedmods.net/forumdisplay.php?f=108" target="_blank">AlliedModders TF2 Forum</a></li>
-    <li><a href="https://comp.tf/" target="_blank">Competitive TF2 Community</a></li>
-    <li><a href="https://logs.tf/" target="_blank">Logs.tf - Match Statistics</a></li>
-    <li><a href="https://tf2maps.net/" target="_blank">TF2Maps - Custom Map Community</a></li>
-</ul>
-
-<h3>Port Forwarding</h3>
-<pre><code># Required ports:
-UDP 27015 - Game server
-TCP 27015 - RCON
-TCP/UDP 27020 - SourceTV
-
-# Linux:
-sudo ufw allow 27015
-sudo ufw allow 27020
-</code></pre>
-
-<h2 id="plugins">Plugins & Extensions</h2>
-
-<h3>SourceMod Installation</h3>
-<p>Most TF2 servers use SourceMod for admin commands and plugins. Install Metamod:Source first, then SourceMod.</p>
-
-<h3>Popular Plugins</h3>
-<ul>
-    <li><strong>AdminMenu:</strong> Complete admin interface</li>
-    <li><strong>RTV (Rock The Vote):</strong> Player map voting</li>
-    <li><strong>TF2 Competitive Fixes:</strong> Competitive tweaks</li>
-    <li><strong>MGE Mod:</strong> 1v1/2v2 training mode</li>
-</ul>
-
-<h2 id="troubleshooting">Troubleshooting</h2>
-
 <h3>Server Won't Start</h3>
+
+<h4>Server not listed or query fails</h4>
+<p>Open 27015/udp and 27015/tcp; check -ip/-port; ensure sv_lan 0; verify external firewall/NAT.</p>
+
+<h4>Workshop maps not downloading</h4>
+<p>Ensure -authkey is present; server has internet access; use +host_workshop_collection and +workshop_start_map or fall back to FastDL.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Verify files: <code>steamcmd +app_update 232250 validate</code></li>
-    <li>Check port 27015 availability</li>
-    <li>Review console errors</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Not in Server Browser</h3>
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li>Verify <code>sv_lan 0</code></li>
-    <li>Confirm ports forwarded</li>
-    <li>Wait 5-10 minutes for registration</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
 <h2>Additional Resources</h2>
 <ul>
-    <li><a href="https://wiki.teamfortress.com/wiki/Windows_dedicated_server" target="_blank">Official TF2 Server Wiki</a></li>
-    <li><a href="https://wiki.alliedmods.net/" target="_blank">SourceMod Documentation</a></li>
-    <li><a href="https://forums.alliedmods.net/forumdisplay.php?f=108" target="_blank">AlliedModders TF2 Forum</a></li>
+    <li>Official Team Fortress 2 documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<h3>External References</h3>
+<ul>
+    <li><a href="https://developer.valvesoftware.com/wiki/Source_Dedicated_Server" target="_blank">https://developer.valvesoftware.com/wiki/Source_Dedicated_Server</a></li>
+    <li><a href="https://help.steampowered.com/en/faqs/view/2EA8-4D75-DA21-31EB" target="_blank">https://help.steampowered.com/en/faqs/view/2EA8-4D75-DA21-31EB</a></li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Keep server updated via SteamCMD</li>
-        <li>Use strong RCON passwords</li>
-        <li>Regular config backups</li>
-        <li>Monitor for exploits</li>
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Team Fortress 2 server hosting</em>
+</p>

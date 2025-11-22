@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Vice City Multiplayer game servers",
-    "name":  "Vice City Multiplayer",
-    "order":  134,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Vice City Multiplayer game servers",
+    "name": "Vice City Multiplayer",
+    "order": 134,
+    "category": "game",
+    "complete": true
 }

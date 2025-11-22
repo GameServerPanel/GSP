@@ -1,592 +1,402 @@
 <?php
 /**
- * Killing Floor 2 Server Documentation
+ * Killing Floor 2 Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>📚 Killing Floor 2 Server Guide</h1>
-
-<h3 style="color: #94a3b8; margin-top: 8px;">Wave-Based Co-Op Survival - Comprehensive Setup</h3>
-
-<div style="background: #1e3a5f; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #3b82f6;">
-    <h3 style="color: #ffffff; margin-top: 0;">📋 Quick Info</h3>
-    <table style="width: 100%; color: #e5e7eb;">
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Engine:</strong></td><td>Unreal Engine 3 (Modified)</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Developer:</strong></td><td>Tripwire Interactive</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">App ID:</strong></td><td>232130</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Game Port:</strong></td><td>7777 UDP (default)</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Query Port:</strong></td><td>27015 UDP (default)</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Web Admin:</strong></td><td>8080 TCP (default)</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Max Players:</strong></td><td>6 (standard), up to 32 with mods</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Game Modes:</strong></td><td>Survival, Endless, Weekly Outbreak, Versus Survival</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Perks:</strong></td><td>10 unique classes (Berserker, Commando, Medic, etc.)</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Platform:</strong></td><td>Windows, Linux</td></tr>
-    </table>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h3 style="margin-top: 30px;">Navigation</h3>
-<ul style="line-height: 2; font-size: 1.05em;">
-    <li><a href="#overview">Overview</a></li>
-    <li><a href="#ports">🔌 Ports & Firewall</a></li>
-    <li><a href="#installation">Installation</a></li>
-    <li><a href="#configuration">⚙️ Configuration</a></li>
-    <li><a href="#webadmin">Web Admin Interface</a></li>
-    <li><a href="#gamemodes">Game Modes & Maps</a></li>
-    <li><a href="#perks">Perks & Difficulty</a></li>
-    <li><a href="#startup">Startup Commands</a></li>
-    <li><a href="#troubleshooting">🔧 Troubleshooting</a></li>
-    <li><a href="#resources">Resources</a></li>
-</ul>
-
-<h2 id="overview">Overview</h2>
-<p><strong>Killing Floor 2</strong> is a brutal wave-based co-op FPS where teams of up to 6 players fight through hordes of genetically engineered monsters (Zeds) developed by the Horzine Biotech Corporation. Each player selects a unique Perk class with specialized weapons and abilities.</p>
-
-<p>The game features a sophisticated economy system where players earn "Dosh" during waves to buy weapons, ammo, and armor. Between waves, players strategically shop at Trader Pods scattered across maps. The action culminates in an epic boss battle after the final wave.</p>
-
-<h3>Key Features</h3>
-<ul>
-    <li><strong>10 Perk Classes:</strong> Berserker, Commando, Medic, Demolitionist, Firebug, Gunslinger, Sharpshooter, Support, SWAT, Survivalist</li>
-    <li><strong>Wave-Based Survival:</strong> 4, 7, or 10 waves with scaling difficulty</li>
-    <li><strong>Boss Fights:</strong> Multiple unique bosses (Hans Volter, Patriarch, King Fleshpound, etc.)</li>
-    <li><strong>MEAT System:</strong> Realistic gore and dismemberment system</li>
-    <li><strong>Weapon Trading:</strong> Buy, upgrade, and share weapons with teammates</li>
-    <li><strong>Difficulty Levels:</strong> Normal, Hard, Suicidal, Hell on Earth</li>
-    <li><strong>Weekly Outbreaks:</strong> Special modifiers and challenges rotate weekly</li>
-</ul>
-
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-
-<h3>Required Ports</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #0f172a; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #1e293b;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; font-family: monospace; color: #a5b4fc;">7777</td>
-            <td style="padding: 12px;">
-                <span style="background: #22c55e; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;">UDP</span>
-            </td>
-            <td style="padding: 12px;">Game server (main connection)</td>
-            <td style="padding: 12px; color: #22c55e; font-weight: bold;">✓ Yes</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; font-family: monospace; color: #a5b4fc;">27015</td>
-            <td style="padding: 12px;">
-                <span style="background: #22c55e; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;">UDP</span>
-            </td>
-            <td style="padding: 12px;">Query port (server browser)</td>
-            <td style="padding: 12px; color: #22c55e; font-weight: bold;">✓ Yes</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; font-family: monospace; color: #a5b4fc;">8080</td>
-            <td style="padding: 12px;">
-                <span style="background: #3b82f6; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;">TCP</span>
-            </td>
-            <td style="padding: 12px;">Web Admin interface</td>
-            <td style="padding: 12px; color: #94a3b8;">Optional (Recommended)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; font-family: monospace; color: #a5b4fc;">20560</td>
-            <td style="padding: 12px;">
-                <span style="background: #22c55e; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;">UDP</span>
-            </td>
-            <td style="padding: 12px;">Steam server list port</td>
-            <td style="padding: 12px; color: #94a3b8;">Optional</td>
-        </tr>
-    </tbody>
-</table>
-
-<div style="background: #1e3a5f; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <p style="color: #e5e7eb; margin: 0;"><strong>💡 Note:</strong> Port numbers are configurable. Defaults shown above. Multiple servers require unique port combinations (e.g., Game: 7777, 7778; Query: 27015, 27016).</p>
-</div>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>Ubuntu/Debian (UFW)</h4>
-<pre><code># Allow KF2 game port
-sudo ufw allow 7777/udp
-
-# Allow query port (server browser)
-sudo ufw allow 27015/udp
-
-# Allow Web Admin (if using)
-sudo ufw allow 8080/tcp
-
-# Steam port (optional)
-sudo ufw allow 20560/udp
-
-# Enable firewall
-sudo ufw enable
-sudo ufw status
-</code></pre>
-
-<h4>CentOS/RHEL (FirewallD)</h4>
-<pre><code># Add KF2 ports
-sudo firewall-cmd --permanent --add-port=7777/udp
-sudo firewall-cmd --permanent --add-port=27015/udp
-sudo firewall-cmd --permanent --add-port=8080/tcp
-sudo firewall-cmd --permanent --add-port=20560/udp
-sudo firewall-cmd --reload
-sudo firewall-cmd --list-ports
-</code></pre>
-
-<h4>Windows Firewall (PowerShell)</h4>
-<pre><code># Game server
-New-NetFirewallRule -DisplayName "KF2 Game Port" -Direction Inbound -LocalPort 7777 -Protocol UDP -Action Allow
-
-# Query port
-New-NetFirewallRule -DisplayName "KF2 Query Port" -Direction Inbound -LocalPort 27015 -Protocol UDP -Action Allow
-
-# Web Admin
-New-NetFirewallRule -DisplayName "KF2 Web Admin" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow
-</code></pre>
-
-<h4>iptables (Advanced)</h4>
-<pre><code># Allow KF2 ports
-iptables -A INPUT -p udp --dport 7777 -j ACCEPT
-iptables -A INPUT -p udp --dport 27015 -j ACCEPT
-iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
-iptables -A INPUT -p udp --dport 20560 -j ACCEPT
-
-# Save rules (Ubuntu/Debian)
-netfilter-persistent save
-
-# Save rules (CentOS/RHEL)
-service iptables save
-</code></pre>
-
-<h2 id="installation">Installation</h2>
-
-<h3>Prerequisites</h3>
-<ul>
-    <li><strong>SteamCMD</strong> installed (<a href="https://developer.valvesoftware.com/wiki/SteamCMD" target="_blank">Installation Guide</a>)</li>
-    <li>Disk space: ~30 GB for full installation</li>
-    <li>RAM: 4GB minimum, 8GB recommended for 6 players</li>
-    <li>Open firewall ports (7777, 27015, 8080 TCP)</li>
-    <li>Linux: 64-bit system with required libraries</li>
-</ul>
-
-<h3>Linux Installation</h3>
-<pre><code># Create server directory
-mkdir -p ~/kf2_server
-cd ~/kf2_server
-
-# Install required libraries (Ubuntu/Debian)
-sudo apt-get update
-sudo apt-get install libstdc++6:i386 lib32gcc1 libcurl4-gnutls-dev:i386
-
-# Download server files with SteamCMD
-steamcmd +force_install_dir ~/kf2_server +login anonymous +app_update 232130 validate +quit
-
-# Note: App ID 232130 is for Killing Floor 2 Dedicated Server
-# Download size is approximately 25-30 GB
-</code></pre>
-
-<h3>Windows Installation</h3>
-<pre><code># Download SteamCMD for Windows
-# Extract to C:\steamcmd\
-
-# Create server directory
-mkdir C:\kf2_server
-
-# Run SteamCMD
-C:\steamcmd\steamcmd.exe +force_install_dir C:\kf2_server +login anonymous +app_update 232130 validate +quit
-</code></pre>
-
-<h2 id="configuration">⚙️ Configuration</h2>
-
-<h3>Main Configuration Files</h3>
-<p>KF2 server configuration is split across multiple .ini files in <code>KFGame/Config/</code>:</p>
-
-<ul>
-    <li><strong>PCServer-KFGame.ini</strong> - Main server settings (game mode, difficulty, maps)</li>
-    <li><strong>PCServer-KFEngine.ini</strong> - Engine settings (ports, web admin, network)</li>
-    <li><strong>KFWeb.ini</strong> - Web Admin configuration</li>
-</ul>
-
-<h3>PCServer-KFEngine.ini (Essential Settings)</h3>
-<p>Edit <code>KFGame/Config/PCServer-KFEngine.ini</code>:</p>
-<pre><code>[Engine.GameReplicationInfo]
-ServerName=My Killing Floor 2 Server
-ShortName=KF2
-
-[IpDrv.TcpNetDriver]
-AllowDownloads=True
-ConnectionTimeout=60.0
-InitialConnectTimeout=120.0
-MaxClientRate=20000
-MaxInternetClientRate=10000
-NetServerMaxTickRate=30
-LanServerMaxTickRate=35
-
-[OnlineSubsystemSteamworks.KFWorkshopSteamworks]
-ServerSubscribedWorkshopItems=  # Add Workshop item IDs here
-
-[IpDrv.TcpNetDriver]
-DownloadManagers=IpDrv.HTTPDownload
-
-[IpDrv.HTTPDownload]
-# Set up FastDL (optional)
-# RedirectToURL=http://yourfastdl.com/kf2/
-
-[Engine.AccessControl]
-AdminPassword=YourAdminPassword
-GamePassword=  # Leave empty for public server
-
-[SystemSettings]
-ResX=800
-ResY=600
-</code></pre>
-
-<h3>PCServer-KFGame.ini (Game Settings)</h3>
-<p>Edit <code>KFGame/Config/PCServer-KFGame.ini</code>:</p>
-<pre><code>[KFGame.KFGameInfo]
-ServerName=My KF2 Server
-GameDifficulty=1  # 0=Normal, 1=Hard, 2=Suicidal, 3=Hell on Earth
-GameLength=1  # 0=4 waves, 1=7 waves, 2=10 waves
-bDisableMapVote=False
-MapVoteDuration=30
-
-[Engine.Game]
-MaxPlayers=6
-MaxSpectators=2
-
-[KFGame.KFGameReplicationInfo]
-bAllowGrenade=True
-
-[SystemSettings]
-bAllowBulletHitDecals=True
-bAllowBloodDecals=True
-
-# Map Rotation
-[KFGame.KFMapSummary]
-MapAssociation=(Name="KF-BurningParis",bUsesAuth=False)
-MapAssociation=(Name="KF-BlackForest",bUsesAuth=False)
-MapAssociation=(Name="KF-ContainmentStation",bUsesAuth=False)
-# Add more maps as needed
-
-[KFGame.KFGameInfo_Survival]
-GameLengthOptions=(Name="Short", Weight=0)
-GameLengthOptions=(Name="Medium", Weight=1)
-GameLengthOptions=(Name="Long", Weight=2)
-</code></pre>
-
-<h3>Difficulty Levels</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Difficulty</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Value</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Zed Health</th>
-            <th style="padding: #12px; text-align: left; color: #ffffff;">Recommended For</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Normal</strong></td>
-            <td style="padding: 12px;"><code>0</code></td>
-            <td style="padding: 12px;">100%</td>
-            <td style="padding: 12px;">New players, casual play</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Hard</strong></td>
-            <td style="padding: 12px;"><code>1</code></td>
-            <td style="padding: 12px;">135%</td>
-            <td style="padding: 12px;">Intermediate players</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Suicidal</strong></td>
-            <td style="padding: 12px;"><code>2</code></td>
-            <td style="padding: 12px;">185%</td>
-            <td style="padding: 12px;">Experienced teams</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Hell on Earth</strong></td>
-            <td style="padding: 12px;"><code>3</code></td>
-            <td style="padding: 12px;">255%</td>
-            <td style="padding: 12px;">Elite players, competitive</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="webadmin">Web Admin Interface</h2>
-
-<h3>Enabling Web Admin</h3>
-<p>Edit <code>KFGame/Config/KFWeb.ini</code>:</p>
-<pre><code>[IpDrv.WebServer]
-bEnabled=True
-ListenPort=8080
-
-[WebAdmin.WebAdmin]
-bEnabled=True
-AuthenticationClass=WebAdmin.MultiWebAdminAuth
-
-[WebAdmin.Chatlog]
-Filename=../Logs/chat.log
-bIncludeTimeStamp=True
-</code></pre>
-
-<h3>Creating Admin Account</h3>
-<pre><code># First admin created automatically at first Web Admin access
-# Or manually edit: KFGame/Config/KFWebAdmin.ini
-
-[WebAdmin.WebAdminSettings]
-AdminName=admin
-Password=yourpassword  # Will be hashed on first use
-</code></pre>
-
-<h3>Accessing Web Admin</h3>
-<p>Open browser to: <code>http://your-server-ip:8080</code></p>
-
-<h4>Web Admin Features</h4>
-<ul>
-    <li><strong>Dashboard:</strong> Server status, player count, current map</li>
-    <li><strong>Current Game:</strong> Live player list, kick/ban controls</li>
-    <li><strong>Settings:</strong> Change difficulty, game length, maps</li>
-    <li><strong>Maps:</strong> Manage map rotation and voting</li>
-    <li><strong>Access Policy:</strong> Ban management and IP whitelist</li>
-    <li><strong>Console:</strong> Execute server commands remotely</li>
-</ul>
-
-<h2 id="gamemodes">Game Modes & Maps</h2>
-
-<h3>Game Modes</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Mode</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Description</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Waves</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Survival</strong></td>
-            <td style="padding: 12px;">Standard wave-based mode with boss at the end</td>
-            <td style="padding: 12px;">4, 7, or 10 + Boss</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Endless</strong></td>
-            <td style="padding: 12px;">Continuous waves with periodic boss fights</td>
-            <td style="padding: 12px;">Infinite</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Weekly Outbreak</strong></td>
-            <td style="padding: 12px;">Rotating special modifiers (Poundemonium, Bobble Zed, etc.)</td>
-            <td style="padding: 12px;">4 waves</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Versus Survival</strong></td>
-            <td style="padding: 12px;">PvP mode - players control Zeds vs Survivors</td>
-            <td style="padding: 12px;">4 rounds</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Official Maps (Selection)</h3>
-<ul>
-    <li><strong>KF-BurningParis</strong> - Burning streets of Paris</li>
-    <li><strong>KF-BlackForest</strong> - German countryside castle</li>
-    <li><strong>KF-BioticsLab</strong> - Horzine research facility</li>
-    <li><strong>KF-Outpost</strong> - Desert military outpost</li>
-    <li><strong>KF-ContainmentStation</strong> - Space station</li>
-    <li><strong>KF-InfernalRealm</strong> - Halloween-themed hellscape</li>
-    <li><strong>KF-Nightmare</strong> - Twisted carnival</li>
-    <li><strong>KF-Prison</strong> - Abandoned prison facility</li>
-</ul>
-
-<h3>Workshop Content</h3>
-<p>Subscribe to Workshop items and add to <code>PCServer-KFEngine.ini</code>:</p>
-<pre><code>[OnlineSubsystemSteamworks.KFWorkshopSteamworks]
-ServerSubscribedWorkshopItems=123456789  # Workshop item ID
-ServerSubscribedWorkshopItems=987654321  # Add multiple lines for multiple items
-</code></pre>
-
-<h2 id="perks">Perks & Classes</h2>
-
-<h3>The 10 Perks</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Perk</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Role</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Primary Weapons</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Berserker</strong></td>
-            <td style="padding: 12px;">Tank/Melee DPS</td>
-            <td style="padding: 12px;">Eviscerator, Pulverizer, Katana</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Commando</strong></td>
-            <td style="padding: 12px;">Trash Killer</td>
-            <td style="padding: 12px;">SCAR, AK-12, M16 M203</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Medic</strong></td>
-            <td style="padding: 12px;">Healer/Support</td>
-            <td style="padding: 12px;">Medic Assault Rifle, HMTech-501</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Demolitionist</strong></td>
-            <td style="padding: 12px;">Explosive Specialist</td>
-            <td style="padding: 12px;">RPG-7, M79, C4</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Firebug</strong></td>
-            <td style="padding: 12px;">Area Denial/DoT</td>
-            <td style="padding: 12px;">Flamethrower, Microwave Gun</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Gunslinger</strong></td>
-            <td style="padding: 12px;">Precision DPS</td>
-            <td style="padding: 12px;">Dual Magnums, AF2011-A1</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Sharpshooter</strong></td>
-            <td style="padding: 12px;">Long-range Sniper</td>
-            <td style="padding: 12px;">M14 EBR, Railgun, Crossbow</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Support</strong></td>
-            <td style="padding: 12px;">Ammo/Armor Specialist</td>
-            <td style="padding: 12px;">AA-12, Doomstick</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>SWAT</strong></td>
-            <td style="padding: 12px;">Close-range Tank</td>
-            <td style="padding: 12px;">Kriss, P90, MP7</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Survivalist</strong></td>
-            <td style="padding: 12px;">Flexible/Hybrid</td>
-            <td style="padding: 12px;">Any weapon type</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="startup">Startup Commands</h2>
-
-<h3>Linux</h3>
-<pre><code>#!/bin/bash
-# start_kf2.sh
-
-cd ~/kf2_server/Binaries/Win64
-
-./KFGameSteamServer.bin.x86_64 \
-  KF-BurningParis \
-  ?Game=KFGameContent.KFGameInfo_Survival \
-  ?Difficulty=1 \
-  ?GameLength=1 \
-  ?MaxPlayers=6 \
-  -Port=7777 \
-  -QueryPort=27015 \
-  -WebAdminPort=8080
-</code></pre>
-
-<h3>Windows</h3>
-<pre><code>@echo off
-REM start_kf2.bat
-
-cd C:\kf2_server\Binaries\Win64
-
-KFServer.exe KF-BurningParis ^
-  ?Game=KFGameContent.KFGameInfo_Survival ^
-  ?Difficulty=1 ^
-  ?GameLength=1 ^
-  ?MaxPlayers=6 ^
-  -Port=7777 ^
-  -QueryPort=27015 ^
-  -WebAdminPort=8080
-</code></pre>
-
-<h3>Startup Parameters</h3>
-<ul>
-    <li><code>KF-MapName</code> - Starting map</li>
-    <li><code>?Game=</code> - Game mode class path</li>
-    <li><code>?Difficulty=</code> - 0-3 (Normal, Hard, Suicidal, Hell on Earth)</li>
-    <li><code>?GameLength=</code> - 0-2 (Short 4 waves, Medium 7, Long 10)</li>
-    <li><code>?MaxPlayers=6</code> - Maximum players</li>
-    <li><code>-Port=7777</code> - Game port</li>
-    <li><code>-QueryPort=27015</code> - Server browser port</li>
-    <li><code>-WebAdminPort=8080</code> - Web Admin port</li>
-</ul>
-
-<h2 id="troubleshooting">🔧 Troubleshooting</h2>
-
-<h3>Server Not in Browser</h3>
-<pre><code># Check ports are open
-netstat -an | grep 7777
-netstat -an | grep 27015
-
-# Verify GamePassword is empty in PCServer-KFEngine.ini
-[Engine.AccessControl]
-GamePassword=
-
-# Restart server and wait 5-10 minutes for Steam registration
-</code></pre>
-
-<h3>Web Admin Won't Load</h3>
-<pre><code># Verify KFWeb.ini settings
-[IpDrv.WebServer]
-bEnabled=True
-ListenPort=8080
-
-# Check firewall allows TCP 8080
-# Access via: http://server-ip:8080
-</code></pre>
-
-<h3>Performance Issues</h3>
-<ul>
-    <li>Reduce <code>MaxPlayers</code> to 4 or lower</li>
-    <li>Set <code>NetServerMaxTickRate=20</code> in PCServer-KFEngine.ini</li>
-    <li>Lower resolution: <code>ResX=640</code>, <code>ResY=480</code></li>
-    <li>Disable blood decals: <code>bAllowBloodDecals=False</code></li>
-</ul>
-
-<h3>Workshop Content Not Downloading</h3>
-<pre><code># Verify Workshop item IDs in PCServer-KFEngine.ini
-[OnlineSubsystemSteamworks.KFWorkshopSteamworks]
-ServerSubscribedWorkshopItems=123456789
-
-# Check KFGame/Cache/ for downloaded content
-# Restart server after adding new Workshop items
-</code></pre>
-
-<h3>Players Can't Join</h3>
-<ul>
-    <li>Check firewall allows UDP 7777 and 27015</li>
-    <li>Verify <code>MaxPlayers</code> setting</li>
-    <li>Ensure server isn't password-protected unless intended</li>
-    <li>Check server logs in <code>KFGame/Logs/</code></li>
-</ul>
-
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Web Admin:</strong> Essential for remote management - set it up first</li>
-        <li><strong>Balanced Teams:</strong> 6 players is optimal for difficulty scaling</li>
-        <li><strong>Perk Diversity:</strong> Encourage varied perk selection for team synergy</li>
-        <li><strong>Workshop Maps:</strong> Keep official maps for 95% uptime, custom for variety</li>
-        <li><strong>Weekly Outbreaks:</strong> Great for attracting players with fresh challenges</li>
-        <li><strong>Suicidal+:</strong> Most active community plays Suicidal and Hell on Earth</li>
-        <li><strong>Boss Selection:</strong> Can be configured to specific bosses or random</li>
-        <li><strong>FastDL:</strong> Highly recommended for custom maps to reduce join times</li>
+<h1>Killing Floor 2 Server Hosting Guide</h1>
+
+<h2>Overview</h2>
+<p>Killing Floor 2 is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Killing Floor 2 server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">232130</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="resources">Resources</h2>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Killing Floor 2 server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Killing Floor 2 Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Killing Floor 2 Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><a href="https://wiki.killingfloor2.com/index.php?title=Dedicated_Server_(Killing_Floor_2)" target="_blank">Official KF2 Dedicated Server Wiki</a></li>
-    <li><a href="https://steamcommunity.com/app/232090/discussions/1/" target="_blank">KF2 Server Hosting Forum</a></li>
-    <li><a href="https://steamcommunity.com/app/232090/workshop/" target="_blank">KF2 Steam Workshop</a></li>
-    <li><a href="https://forums.tripwireinteractive.com/index.php?forums/kf2-server-hosting.125/" target="_blank">Tripwire Interactive Server Hosting Forum</a></li>
-    <li><a href="https://github.com/GenZmeY/KF2-SRV" target="_blank">KF2-SRV - Server Management Scripts</a></li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 232130</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/killingfloor2
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/killingfloor2 \
+         +app_update 232130 validate \
+         +quit
+
+# Server files are now in ~/gameservers/killingfloor2/
+cd ~/gameservers/killingfloor2
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\killingfloor2 ^
+             +app_update 232130 validate ^
+             +quit
+</code></pre>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
+
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Killing Floor 2 Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Killing Floor 2 documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Killing Floor 2 server hosting</em>
+</p>

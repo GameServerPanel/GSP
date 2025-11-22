@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for BrainBread 2 game servers",
     "name": "BrainBread 2",
     "order": 27,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

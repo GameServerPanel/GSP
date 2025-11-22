@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Citadel: Forged with Fire game servers",
     "name": "Citadel: Forged with Fire",
     "order": 41,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

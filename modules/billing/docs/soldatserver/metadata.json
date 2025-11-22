@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Soldat game servers",
     "name": "Soldat",
     "order": 92,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

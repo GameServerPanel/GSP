@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Rising Storm 2: Vietnam game servers",
     "name": "Rising Storm 2: Vietnam",
     "order": 74,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

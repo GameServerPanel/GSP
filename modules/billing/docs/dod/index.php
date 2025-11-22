@@ -1,495 +1,420 @@
 <?php
 /**
- * Day of Defeat Server Documentation
+ * Day of Defeat Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<style>
-.nav-menu {
-    background: #1a1a2e;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-}
-.nav-menu a {
-    color: #4a9eff;
-    text-decoration: none;
-    margin-right: 15px;
-    font-size: 14px;
-}
-.nav-menu a:hover {
-    color: #6bb3ff;
-    text-decoration: underline;
-}
-.info-box {
-    background: #1e3a5f;
-    padding: 20px;
-    border-left: 4px solid #3b82f6;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.warning-box {
-    background: #78350f;
-    padding: 20px;
-    border-left: 4px solid #f59e0b;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.code-block {
-    background: #0f172a;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 15px 0;
-    overflow-x: auto;
-}
-.code-block code {
-    color: #a5b4fc;
-    font-family: 'Courier New', monospace;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background: #1a1a2e;
-}
-table th {
-    background: #2a2a4e;
-    color: #ffffff;
-    padding: 12px;
-    text-align: left;
-    border: 1px solid #3a3a6e;
-}
-table td {
-    padding: 10px 12px;
-    border: 1px solid #3a3a6e;
-    color: #e5e7eb;
-}
-table tr:nth-child(even) {
-    background: #222244;
-}
-</style>
-
-<div class="nav-menu">
-    <strong style="color: #ffffff;">Quick Navigation:</strong>
-    <a href="#quick-info">Quick Info</a> |
-    <a href="#ports">Ports</a> |
-    <a href="#installation">Installation</a> |
-    <a href="#configuration">Configuration</a> |
-    <a href="#parameters">Parameters</a> |
-    <a href="#troubleshooting">Troubleshooting</a> |
-    <a href="#game-modes">Game Modes</a> |
-    <a href="#maps">Maps</a> |
-    <a href="#related-mods">Mods</a>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h1>Day of Defeat Server Guide</h1>
+<h1>Day of Defeat Server Hosting Guide</h1>
 
-<h2 id="quick-info">📋 Quick Info</h2>
-<div class="info-box">
-    <h3 style="color: #ffffff; margin-top: 0;">Server Specifications</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game:</strong> Day of Defeat (GoldSrc Engine)</li>
-        <li><strong style="color: #ffffff;">Platform:</strong> Windows, Linux</li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015/UDP</code></li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 32 (typical: 16-32)</li>
-        <li><strong style="color: #ffffff;">Control Protocol:</strong> RCON</li>
-        <li><strong style="color: #ffffff;">Server Binary:</strong> hlds_run (Linux), hlds.exe (Windows)</li>
-        <li><strong style="color: #ffffff;">Mod Folder:</strong> dod</li>
-        <li><strong style="color: #ffffff;">Special Features:</strong> WW2 team-based combat, class system</li>
+<h2>Overview</h2>
+<p>Day of Defeat is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Day of Defeat server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 512 MB–1 GB baseline</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> GoldSrc / HLDS</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">90</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-<p>Day of Defeat servers require specific ports for proper operation:</p>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #0f172a;">
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Game/Query</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">RCON</td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
-<table>
-    <thead>
-        <tr>
-            <th>Port</th>
-            <th>Protocol</th>
-            <th>Purpose</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>27015 (configurable)</td>
-            <td>UDP</td>
-            <td>Game port</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>27015 (same as game)</td>
-            <td>TCP</td>
-            <td>RCON remote control</td>
-            <td>Optional</td>
-        </tr>
-        <tr>
-            <td>27005</td>
-            <td>UDP</td>
-            <td>Client port (outbound)</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>26900</td>
-            <td>UDP</td>
-            <td>Master server communication</td>
-            <td>Optional</td>
-        </tr>
-    </tbody>
-</table>
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
 
-<h3>Firewall Examples</h3>
+# Windows Firewall
+netsh advfirewall firewall add rule name="Day of Defeat Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Day of Defeat Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
 
-<p><strong>UFW (Ubuntu/Debian):</strong></p>
-<div class="code-block">
-<code>sudo ufw allow 27015/udp comment 'DoD Game Port'
-sudo ufw allow 27015/tcp comment 'DoD RCON'
-sudo ufw allow 27005/udp comment 'DoD Client Port'</code>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
 </div>
 
-<p><strong>FirewallD (CentOS/RHEL):</strong></p>
-<div class="code-block">
-<code>sudo firewall-cmd --permanent --add-port=27015/udp
-sudo firewall-cmd --permanent --add-port=27015/tcp
-sudo firewall-cmd --permanent --add-port=27005/udp
-sudo firewall-cmd --reload</code>
-</div>
-
-<p><strong>iptables:</strong></p>
-<div class="code-block">
-<code>iptables -A INPUT -p udp --dport 27015 -j ACCEPT
-iptables -A INPUT -p tcp --dport 27015 -j ACCEPT
-iptables -A INPUT -p udp --dport 27005 -j ACCEPT</code>
-</div>
-
-<h2 id="installation">⚙️ Installation & Setup</h2>
+<h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Linux (Ubuntu 18.04+, Debian 9+, CentOS 7+) or Windows Server</li>
-    <li><strong>CPU:</strong> 1+ cores @ 2.0GHz minimum</li>
-    <li><strong>RAM:</strong> 512MB minimum, 1GB+ recommended</li>
-    <li><strong>Disk:</strong> 2GB for game files</li>
-    <li><strong>Network:</strong> Stable connection, 5Mbps+ bandwidth</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 512 MB–1 GB baseline minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installation via SteamCMD (Linux)</h3>
-<ol>
-    <li><strong>Install SteamCMD:</strong>
-        <div class="code-block"><code>sudo apt-get install steamcmd  # Debian/Ubuntu
-sudo yum install steamcmd      # CentOS/RHEL</code></div>
-    </li>
-    <li><strong>Run SteamCMD and install DoD server:</strong>
-        <div class="code-block"><code>steamcmd +login anonymous +force_install_dir /home/steam/dod +app_update 90 validate +quit</code></div>
-    </li>
-    <li><strong>Create server.cfg:</strong> Navigate to <code>/home/steam/dod/dod/</code> and create configuration file</li>
-</ol>
+<h3>Required Dependencies</h3>
+<ul>
+    <li>SteamCMD</li>
+    <li>Firewall rules for ports</li>
+</ul>
 
-<h3>Installation via SteamCMD (Windows)</h3>
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Starting the Server</h4>
+<pre><code>./hlds_run -game dod +map dod_anzio -port 27015 +maxplayers 24 +exec server.cfg
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 90</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/dod
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/dod \
+         +app_update 90 validate \
+         +quit
+
+# Server files are now in ~/gameservers/dod/
+cd ~/gameservers/dod
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
 <ol>
-    <li>Download SteamCMD from Valve's website</li>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
     <li>Extract to <code>C:\steamcmd\</code></li>
-    <li>Run: <code>steamcmd +login anonymous +force_install_dir C:\dod +app_update 90 validate +quit</code></li>
-    <li>Create <code>server.cfg</code> in <code>C:\dod\dod\</code></li>
+    <li>Open Command Prompt and run:</li>
 </ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\dod ^
+             +app_update 90 validate ^
+             +quit
+</code></pre>
 
-<h2 id="configuration">📝 Configuration</h2>
 
-<h3>Basic server.cfg Example</h3>
-<div class="code-block">
-<code>// Server Name
-hostname "My Day of Defeat Server"
+<h2 id="configuration">Server Configuration</h2>
 
-// RCON Password
-rcon_password "your_secure_password"
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-// Server Password (leave blank for public)
-sv_password ""
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
 
-// Network Settings
-sv_region 255  // 0=US East, 1=US West, 2=South America, 3=Europe, etc.
-sv_contact "admin@example.com"
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
 
-// Game Settings
-mp_teamplay 1
-mp_friendlyfire 0
-mp_fraglimit 0
-mp_timelimit 30  // Minutes per map
-mp_maxrounds 0
+# Ban player
+ban [player_name]
 
-// Team Balance
-mp_autoteambalance 1
-mp_limitteams 2  // Max player difference between teams
+# Change map/level (syntax varies by game)
+changelevel [map_name]
 
-// Class Limits (per team)
-mp_limit_allies -1    // -1 = no limit
-mp_limit_axis -1
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
 
-// Specific Class Limits
-mp_limit_rifleman -1
-mp_limit_assault -1
-mp_limit_support -1
-mp_limit_sniper 2      // Limit snipers
-mp_limit_mg 2          // Limit machine gunners
+<h2 id="parameters">⚙️ Startup Parameters</h2>
 
-// Spawn Settings
-mp_respawnstyle 0     // 0=wave spawn, 1=instant
-mp_respawndelay 0
+<h3>Basic Startup</h3>
+<pre><code>./hlds_run -game dod +map dod_anzio -port 27015 +maxplayers 24 +exec server.cfg
+</code></pre>
 
-// Hit Registration
-sv_maxrate 20000
-sv_minrate 5000
-sv_maxupdaterate 101
-sv_minupdaterate 20
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
 
-// Server Performance
-sv_maxspeed 320
-sv_fps_max 1000
+<h3>Creating a Start Script</h3>
 
-// Logging
-log on
-sv_logblocks 1
-sv_logecho 0
-sv_logfile 1
-sv_log_onefile 0
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
 
-// Map Cycle
-mapcyclefile "mapcycle.txt"
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
 
-// Execute additional configs
-exec banned.cfg</code>
-</div>
+<h3>Running as a Service</h3>
 
-<h3>mapcycle.txt Example</h3>
-<div class="code-block">
-<code>dod_anzio
-dod_avalanche
-dod_caen
-dod_charlie
-dod_chemille
-dod_donner
-dod_flash
-dod_forest
-dod_glider
-dod_kalt
-dod_kraftstoff
-dod_merderet
-dod_northbound
-dod_palermo
-dod_saints
-dod_sturm
-dod_vicenza
-dod_zalec</code>
-</div>
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Day of Defeat Server
+After=network.target
 
-<h2 id="parameters">🚀 Startup Parameters</h2>
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
 
-<table>
-    <thead>
-        <tr>
-            <th>Parameter</th>
-            <th>Description</th>
-            <th>Example</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>-game</td>
-            <td>Specify game mod (dod)</td>
-            <td>-game dod</td>
-        </tr>
-        <tr>
-            <td>-port</td>
-            <td>Server port</td>
-            <td>-port 27015</td>
-        </tr>
-        <tr>
-            <td>+maxplayers</td>
-            <td>Maximum player slots</td>
-            <td>+maxplayers 32</td>
-        </tr>
-        <tr>
-            <td>+map</td>
-            <td>Starting map</td>
-            <td>+map dod_avalanche</td>
-        </tr>
-        <tr>
-            <td>+exec</td>
-            <td>Execute config file on startup</td>
-            <td>+exec server.cfg</td>
-        </tr>
-        <tr>
-            <td>-ip</td>
-            <td>Bind to specific IP</td>
-            <td>-ip 192.168.1.100</td>
-        </tr>
-        <tr>
-            <td>-console</td>
-            <td>Enable console output</td>
-            <td>-console</td>
-        </tr>
-        <tr>
-            <td>-condebug</td>
-            <td>Log console output to file</td>
-            <td>-condebug</td>
-        </tr>
-    </tbody>
-</table>
+[Install]
+WantedBy=multi-user.target
+</code></pre>
 
-<h3>Example Startup Command (Linux)</h3>
-<div class="code-block">
-<code>./hlds_run -game dod -port 27015 +maxplayers 32 +map dod_avalanche +exec server.cfg -console</code>
-</div>
-
-<h3>Example Startup Command (Windows)</h3>
-<div class="code-block">
-<code>hlds.exe -game dod -port 27015 +maxplayers 32 +map dod_avalanche +exec server.cfg -console</code>
-</div>
-
-<h3>Example Startup Script (Linux)</h3>
-<div class="code-block">
-<code>#!/bin/bash
-cd /home/steam/dod
-./hlds_run -game dod -port 27015 +maxplayers 32 +map dod_avalanche +exec server.cfg -console</code>
-</div>
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Server Not Appearing in Browser</h3>
-<p><strong>Issue:</strong> Server not visible in the in-game server browser.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Verify UDP port 27015 is open in firewall</li>
-    <li>Ensure <code>sv_lan 0</code> is set (not LAN-only mode)</li>
-    <li>Check that master server communication port (26900/UDP) is open</li>
-    <li>Try direct connect using IP:PORT to verify server is running</li>
-    <li>Wait 5-10 minutes for server to appear in master server list</li>
-</ul>
+<h3>Server Won't Start</h3>
+
+<h4>Logs not capturing kills/chat</h4>
+<p>Set log on; sv_logfile 1; sv_log_onefile 1; verify write perms to logs/.</p>
 
 <h3>Connection Issues</h3>
-<p><strong>Issue:</strong> Players cannot connect or timeout.</p>
-<p><strong>Solutions:</strong></p>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Verify firewall allows traffic on game port</li>
-    <li>Check server is not full (<code>maxplayers</code> limit)</li>
-    <li>Disable password if testing: <code>sv_password ""</code></li>
-    <li>Verify clients have same game version</li>
-    <li>Check server logs in <code>dod/logs/</code> for connection errors</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>High Ping/Lag Issues</h3>
-<p><strong>Issue:</strong> Players experiencing high latency.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li>Increase <code>sv_maxrate</code> and <code>sv_maxupdaterate</code></li>
-    <li>Set <code>sv_fps_max 1000</code> for smoother gameplay</li>
-    <li>Check server CPU usage (should be under 50%)</li>
-    <li>Verify network bandwidth is sufficient</li>
-    <li>Reduce <code>maxplayers</code> if server is overloaded</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<h3>RCON Not Working</h3>
-<p><strong>Issue:</strong> Cannot connect via RCON.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
 <ul>
-    <li>Verify <code>rcon_password</code> is set in <code>server.cfg</code></li>
-    <li>Ensure TCP port (same as game port) is open</li>
-    <li>Use RCON tools compatible with GoldSrc/HLDS</li>
-    <li>Test RCON from in-game console first</li>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
-<h3>Server Crashes on Startup</h3>
-<p><strong>Issue:</strong> Dedicated server crashes immediately.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
 <ul>
-    <li>Check <code>dod/logs/</code> for error messages</li>
-    <li>Verify all game files are present (validate with SteamCMD)</li>
-    <li>Ensure <code>server.cfg</code> syntax is correct</li>
-    <li>Remove custom plugins/mods temporarily</li>
-    <li>On Linux, check library dependencies: <code>ldd hlds_linux</code></li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<h3>Maps Not Loading</h3>
-<p><strong>Issue:</strong> Server fails to load specific maps.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Regular Updates</h3>
 <ul>
-    <li>Verify map files exist in <code>dod/maps/</code></li>
-    <li>Check <code>mapcycle.txt</code> for typos in map names</li>
-    <li>Custom maps require .bsp, .nav, and .txt files</li>
-    <li>Validate game files via SteamCMD</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
 </ul>
 
-<h2 id="game-modes">🎮 Game Modes</h2>
-<p>Day of Defeat features team-based World War 2 combat with objective-based gameplay:</p>
-
+<h3>Access Control</h3>
 <ul>
-    <li><strong>Territory Control:</strong> Capture and hold flag points to win</li>
-    <li><strong>Round-Based:</strong> Teams alternate attacking/defending objectives</li>
-    <li><strong>Team Deathmatch:</strong> Eliminate enemy players (custom servers)</li>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
 </ul>
 
-<h3>Player Classes</h3>
+<h3>DDoS Protection</h3>
 <ul>
-    <li><strong>Rifleman:</strong> Basic infantry with semi-automatic rifle</li>
-    <li><strong>Assault:</strong> Close-quarters specialist with SMG</li>
-    <li><strong>Support:</strong> Provides ammunition and light machine gun fire</li>
-    <li><strong>Sniper:</strong> Long-range specialist with scoped rifle</li>
-    <li><strong>Machine Gunner:</strong> Heavy suppression with mounted MG</li>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
-<h2 id="maps">🗺️ Default Maps</h2>
-
-<h3>Official Maps</h3>
+<h2>Additional Resources</h2>
 <ul>
-    <li><strong>dod_anzio</strong> - Italian beach landing</li>
-    <li><strong>dod_avalanche</strong> - Mountain village combat</li>
-    <li><strong>dod_caen</strong> - French city ruins</li>
-    <li><strong>dod_charlie</strong> - Dense jungle warfare</li>
-    <li><strong>dod_chemille</strong> - French countryside</li>
-    <li><strong>dod_donner</strong> - Snowy mountain pass</li>
-    <li><strong>dod_flash</strong> - Urban street combat</li>
-    <li><strong>dod_forest</strong> - Woodland fighting</li>
-    <li><strong>dod_glider</strong> - Crashed glider site</li>
-    <li><strong>dod_kalt</strong> - Winter village</li>
-    <li><strong>dod_kraftstoff</strong> - Fuel depot raid</li>
-    <li><strong>dod_merderet</strong> - River crossing</li>
-    <li><strong>dod_northbound</strong> - Train station assault</li>
-    <li><strong>dod_palermo</strong> - Sicilian city</li>
-    <li><strong>dod_saints</strong> - Church district</li>
-    <li><strong>dod_sturm</strong> - Bunker assault</li>
-    <li><strong>dod_vicenza</strong> - Italian plaza</li>
-    <li><strong>dod_zalec</strong> - Eastern European town</li>
+    <li>Official Day of Defeat documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with Day of Defeat:</p>
+<h3>External References</h3>
 <ul>
-    <li><a href="../amxmodx/">AMX Mod X</a> - Popular plugin platform for Half-Life engine games with admin commands, custom plugins, and gameplay modifications</li>
-    <li><a href="../metamodsource/">Metamod</a> - Core plugin loader for Source/GoldSrc engines</li>
-    <li><strong>DoD Stats:</strong> Player statistics and ranking systems</li>
-    <li><strong>Custom Maps:</strong> Thousands of community-created maps available</li>
+    <li><a href="https://forums.srcds.com/viewtopic/16703" target="_blank">https://forums.srcds.com/viewtopic/16703</a></li>
 </ul>
 
-<h2>📚 Resources</h2>
-<ul>
-    <li><strong>SteamCMD:</strong> <a href="https://developer.valvesoftware.com/wiki/SteamCMD" target="_blank">https://developer.valvesoftware.com/wiki/SteamCMD</a></li>
-    <li><strong>DoD Community:</strong> Forums and mapping communities</li>
-    <li><strong>Map Resources:</strong> GameBanana, DoD-Central</li>
-    <li><strong>RCON Tools:</strong> HLSW, SourceMod admin panels</li>
-</ul>
-
-<div class="warning-box">
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Day of Defeat runs on the <strong>GoldSrc engine</strong> (original Half-Life engine)</li>
-        <li>Maximum <strong>32 players</strong> supported per server</li>
-        <li>Regular updates via SteamCMD recommended for security patches</li>
-        <li><strong>Class limits</strong> should be configured to prevent team imbalance</li>
-        <li>Custom maps require clients to download .bsp and associated files</li>
-        <li>AMX Mod X provides extensive admin and gameplay features</li>
-        <li>Always secure your RCON password</li>
-        <li>World War 2 theme with historical Allied vs Axis combat</li>
-        <li>Territory control is the primary game mode</li>
-        <li>Server browser may take 5-10 minutes to update after changes</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Day of Defeat server hosting</em>
+</p>

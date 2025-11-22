@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Comprehensive guide for B3 bot (COD/Battlefield admin system) with Python setup, MySQL/SQLite database, b3.xml config, RCON integration, plugin system, and web interface",
-    "name":  "B3 (Big Brother Bot)",
-    "order":  64,
-    "category":  "mods"
+{
+    "description": "Comprehensive guide for B3 bot (COD/Battlefield admin system) with Python setup, MySQL/SQLite database, b3.xml config, RCON integration, plugin system, and web interface",
+    "name": "B3 (Big Brother Bot)",
+    "order": 64,
+    "category": "mods",
+    "complete": true
 }

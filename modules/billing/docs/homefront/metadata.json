@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Homefront game servers",
     "name": "Homefront",
     "order": 10,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

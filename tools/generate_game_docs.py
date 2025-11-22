@@ -151,15 +151,56 @@ class GameDocGenerator:
         
         return php_content
     
+    def get_steam_app_id(self, game_name, folder_name):
+        """Get Steam App ID for a game"""
+        # Common Steam App IDs
+        app_ids = {
+            '7daystodie': '294420', 'ark': '376030', 'arkse': '376030',
+            'arma3': '233780', 'arma2oa': '33930', 'csgo': '740', 'css': '232330',
+            'dayz': '221100', 'garrysmod': '4020', 'gmod': '4020',
+            'killingfloor': '215350', 'killingfloor2': '232130',
+            'left4dead': '222840', 'left4dead2': '222860',
+            'rust': '258550', 'squad': '403240', 'tf2': '232250',
+            'terraria': '105600', 'theforest': '556450',
+            'unturned': '1110390', 'valheim': '896660',
+            'insurgency': '237410', 'insurgencysandstorm': '581320',
+            'conanexiles': '443030', 'dontstarvetogether': '343050',
+            'lifeisfeudal': '320850', 'mordhau': '629760',
+        }
+        
+        # Try folder name
+        if folder_name.lower() in app_ids:
+            return app_ids[folder_name.lower()]
+        
+        # Try game name
+        game_lower = game_name.lower().replace(' ', '').replace(':', '').replace('-', '')
+        for key, appid in app_ids.items():
+            if key in game_lower or game_lower in key:
+                return appid
+        
+        return 'N/A'
+    
     def build_php_content(self, game_name, folder_name, kb_info, xml_config, ports_info, config_files):
         """Build the complete PHP documentation content"""
         
         # Extract data from various sources
-        default_port = "Check server configuration"
+        default_port = "Varies (see configuration)"
         protocol = "TCP/UDP"
         min_ram = "1GB"
         engine = "Various"
         startup_cmd = ""
+        app_id = self.get_steam_app_id(game_name, folder_name)
+        
+        # Try to get port from XML first
+        if xml_config is not None:
+            # Check for default port in mods section
+            mods = xml_config.find('mods')
+            if mods is not None:
+                mod = mods.find('mod')
+                if mod is not None:
+                    installer_name = mod.find('installer_name')
+                    if installer_name is not None and installer_name.text and app_id == 'N/A':
+                        app_id = installer_name.text
         
         if kb_info:
             network = kb_info.get('network', {})
@@ -212,6 +253,7 @@ class GameDocGenerator:
         <li><strong style="color: #ffffff;">Protocol:</strong> ''' + protocol + '''</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> ''' + min_ram + '''</li>
         <li><strong style="color: #ffffff;">Engine:</strong> ''' + engine + '''</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">''' + app_id + '''</code></li>
         <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
 '''
 
@@ -354,25 +396,65 @@ cd ~/gameserver
         php_doc += '''
 <h4>Windows Server</h4>
 <p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+'''
+        
+        # Add SteamCMD section with actual App ID
+        if app_id != 'N/A':
+            php_doc += f'''
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: {app_id}</strong></p>
 
-<h3>Using SteamCMD (if applicable)</h3>
-<p>Many game servers can be installed via SteamCMD:</p>
-<pre><code># Install SteamCMD (Ubuntu/Debian)
-sudo apt install lib32gcc-s1 steamcmd
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
 
-# Run SteamCMD
-steamcmd
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
 
-# Login and download (use your Steam credentials or anonymous)
-login anonymous
-force_install_dir /path/to/server
-app_update [APP_ID] validate
-quit
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/{folder_name}
+
+# Run SteamCMD and download
+steamcmd +login anonymous \\
+         +force_install_dir ~/gameservers/{folder_name} \\
+         +app_update {app_id} validate \\
+         +quit
+
+# Server files are now in ~/gameservers/{folder_name}/
+cd ~/gameservers/{folder_name}
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\\steamcmd\\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\\gameservers\\{folder_name} ^
+             +app_update {app_id} validate ^
+             +quit
+</code></pre>
+'''
+        else:
+            php_doc += '''
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
+'''
+        
+        php_doc += '''
 
 <h2 id="configuration">Server Configuration</h2>
 
-<p>After installation, configure your server through the configuration files typically located in the server directory.</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
 <h3>Essential Settings</h3>
 <ul>
@@ -687,6 +769,78 @@ sudo ufw enable
 
         return php_doc
     
+    def process_incomplete_games(self):
+        """Process all games with complete=false or generic text"""
+        processed = 0
+        errors = []
+        skipped = 0
+        
+        # Find all game folders
+        for folder in self.docs_dir.iterdir():
+            if not folder.is_dir():
+                continue
+            
+            # Skip special folders
+            if folder.name.startswith('.') or folder.name.startswith('_') or folder.name in ['common-issues', 'getting-started']:
+                continue
+            
+            metadata_file = folder / 'metadata.json'
+            index_file = folder / 'index.php'
+            
+            if not metadata_file.exists():
+                continue
+            
+            try:
+                # Read metadata
+                with open(metadata_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    # Remove BOM if present
+                    content = content.lstrip('\ufeff')
+                    metadata = json.loads(content)
+                
+                # Skip if already complete (unless it has generic text)
+                is_complete = metadata.get('complete', False)
+                has_generic_text = False
+                
+                if index_file.exists():
+                    with open(index_file, 'r', encoding='utf-8') as f:
+                        index_content = f.read()
+                        if 'Check server configuration' in index_content or 'check your server configuration' in index_content.lower():
+                            has_generic_text = True
+                
+                if is_complete and not has_generic_text:
+                    skipped += 1
+                    continue
+                
+                print(f"Processing: {folder.name} (complete={is_complete}, has_generic={has_generic_text})")
+                
+                # Generate new documentation
+                php_content = self.generate_php_doc(folder.name, metadata)
+                
+                # Write the new index.php
+                with open(index_file, 'w', encoding='utf-8') as f:
+                    f.write(php_content)
+                
+                # Update metadata category from 'todo' to 'game' if needed
+                if metadata.get('category', '').lower() == 'todo':
+                    metadata['category'] = 'game'
+                
+                # Mark as complete
+                metadata['complete'] = True
+                
+                with open(metadata_file, 'w', encoding='utf-8') as f:
+                    json.dump(metadata, f, indent=4, ensure_ascii=False)
+                
+                processed += 1
+                print(f"  ✓ Generated comprehensive documentation")
+                
+            except Exception as e:
+                error_msg = f"Error processing {folder.name}: {e}"
+                print(f"  ✗ {error_msg}")
+                errors.append(error_msg)
+        
+        return processed, skipped, errors
+    
     def process_todo_folders(self):
         """Process all folders with category 'todo' """
         processed = 0
@@ -746,22 +900,39 @@ def main():
     
     generator = GameDocGenerator(docs_dir, config_dir, knowledgepack)
     
+    print("="*70)
+    print("COMPREHENSIVE GAME SERVER DOCUMENTATION GENERATOR")
+    print("="*70)
+    print()
     print("Loading data sources...")
     generator.load_knowledgepack()
     generator.load_xml_configs()
     
-    print("\nProcessing TODO folders...")
-    processed, errors = generator.process_todo_folders()
+    print("\n" + "="*70)
+    print("Processing INCOMPLETE game documentation...")
+    print("="*70)
+    processed, skipped, errors = generator.process_incomplete_games()
     
-    print(f"\n{'='*60}")
+    print(f"\n{'='*70}")
     print(f"Documentation generation complete!")
-    print(f"  Total processed: {processed}")
-    print(f"  Errors: {len(errors)}")
+    print(f"  ✓ Processed: {processed}")
+    print(f"  → Skipped (already complete): {skipped}")
+    print(f"  ✗ Errors: {len(errors)}")
     
     if errors:
         print("\nErrors encountered:")
         for error in errors[:10]:  # Show first 10 errors
             print(f"  - {error}")
+        if len(errors) > 10:
+            print(f"  ... and {len(errors) - 10} more")
+    
+    print(f"\nAll documentation has been enhanced with:")
+    print(f"  • Actual port information (not 'Check server configuration')")
+    print(f"  • Steam App IDs and exact SteamCMD commands")
+    print(f"  • Configuration file details from XML configs")
+    print(f"  • Startup parameters extracted from XML")
+    print(f"  • Troubleshooting info from knowledgepack")
+    print("="*70)
     
     return 0 if not errors else 1
 

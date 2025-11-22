@@ -1,6 +1,7 @@
 <?php
 /**
  * Call of Duty Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
@@ -12,30 +13,29 @@
         <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
         <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
-        <a href="#related-mods" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Related Mods</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
 <h1>Call of Duty Server Hosting Guide</h1>
 
 <h2>Overview</h2>
-<p>Call of Duty is a legendary World War II first-person shooter that revolutionized multiplayer gaming. This guide covers everything you need to know about hosting a dedicated Call of Duty server on Linux or Windows platforms.</p>
+<p>Call of Duty is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Call of Duty server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28960</code> (UDP)</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28960</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 64 (recommended 16-32 for best performance)</li>
-        <li><strong style="color: #ffffff;">Server Executable:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">cod_lnxded</code> (Linux) / <code>CoDMP.exe</code> (Windows)</li>
-        <li><strong style="color: #ffffff;">Control Protocol:</strong> RCON (Remote Console)</li>
-        <li><strong style="color: #ffffff;">Main Config:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">server.cfg</code></li>
-        <li><strong style="color: #ffffff;">Recommended RAM:</strong> 512MB - 1GB</li>
-        <li><strong style="color: #ffffff;">PunkBuster Support:</strong> Yes</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 512 MB–1 GB baseline</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> id Tech 3 derivative</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Network Ports Used</h2>
+<h2 id="ports">🔌 Network Ports</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
     <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
@@ -44,310 +44,342 @@
                 <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
                 <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
                 <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Required?</th>
             </tr>
         </thead>
         <tbody>
             <tr style="border-bottom: 1px solid #374151;">
                 <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">28960</code></td>
                 <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Main game server port (default)</td>
-                <td style="padding: 10px;"><span style="color: #10b981;">✓ Yes</span></td>
+                <td style="padding: 10px;">Game/Query</td>
             </tr>
             <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">20500-20510</code></td>
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">20800</code></td>
                 <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Master server queries</td>
-                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
+                <td style="padding: 10px;">Legacy query (varies) <span style="color: #f59e0b;">(Optional)</span></td>
             </tr>
         </tbody>
     </table>
     
-    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration Examples</h3>
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
     <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
-sudo ufw allow 28960/udp comment 'CoD Server'
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
 # FirewallD (CentOS/RHEL)
-sudo firewall-cmd --permanent --add-port=28960/udp
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
 
-# iptables
-sudo iptables -A INPUT -p udp --dport 28960 -j ACCEPT
-sudo iptables-save > /etc/iptables/rules.v4
+# Windows Firewall
+netsh advfirewall firewall add rule name="Call of Duty Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Call of Duty Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
 </div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Linux (32-bit or 64-bit with 32-bit libraries) or Windows</li>
-    <li><strong>CPU:</strong> 1+ GHz processor</li>
-    <li><strong>RAM:</strong> Minimum 512MB, 1GB recommended</li>
-    <li><strong>Storage:</strong> 500MB for server files</li>
-    <li><strong>Bandwidth:</strong> 256kbps upload per player</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 512 MB–1 GB baseline minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Linux Installation</h3>
-<pre><code># Install 32-bit libraries (if on 64-bit system)
-sudo dpkg --add-architecture i386
-sudo apt update
-sudo apt install lib32gcc1 lib32stdc++6
+<h3>Required Dependencies</h3>
+<ul>
+    <li>DirectX/VC runtimes (Windows)</li>
+    <li>Router/NAT port forward</li>
+</ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
 # Create server directory
-mkdir ~/cod-server
-cd ~/cod-server
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-# Extract server files (upload via FTP or download)
-# Server files typically include: cod_lnxded, main/ directory, etc.
-chmod +x cod_lnxded
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>First-Time Setup</h3>
-<pre><code># Create basic server.cfg
-cat > main/server.cfg << 'EOF'
-// Server Settings
-set sv_hostname "My CoD Server"
-set sv_maxclients 32
-set rcon_password "your_secure_password"
-
-// Game Settings
-set g_gametype "dm"  // dm, tdm, sd, retrieval
-set scr_friendlyfire "1"
-set g_allowvote "1"
-
-// Map Rotation
-set sv_mapRotation "gametype dm map mp_harbor gametype tdm map mp_pavlov"
-EOF
-
-# Start server
-./cod_lnxded +set dedicated 2 +set net_port 28960 +exec server.cfg +map_rotate
+<h4>Starting the Server</h4>
+<pre><code>wine cod4x18_dedrun.exe +set dedicated 2 +set net_port 28960 +set fs_game mods/<mod> +exec server.cfg
 </code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>server.cfg - Essential Settings</h3>
-<pre><code>// Server Identity
-set sv_hostname "^1My ^7CoD Server"
-set sv_maxclients 32
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-// Network Settings
-set sv_maxRate 25000
-set sv_maxPing 0
-set sv_minPing 0
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
 
-// Administrative
-set rcon_password "your_secure_rcon_password"
-set g_password ""  // Server password (leave empty for public)
-set g_log "games_mp.log"
-set g_logsync "1"
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
 
-// Gameplay Settings
-set g_gametype "dm"  // dm, tdm, sd, retrieval, hq
-set scr_friendlyfire "1"
-set scr_killcam "1"
-set scr_drawfriend "1"
-set g_allowvote "1"
+# Ban player
+ban [player_name]
 
-// Time Limits and Score
-set scr_dm_timelimit "15"
-set scr_dm_scorelimit "50"
-set scr_tdm_timelimit "15"
-set scr_tdm_scorelimit "100"
+# Change map/level (syntax varies by game)
+changelevel [map_name]
 
-// Map Rotation
-set sv_mapRotation "gametype dm map mp_harbor gametype tdm map mp_pavlov gametype dm map mp_brecourt gametype tdm map mp_carentan"
-
-// PunkBuster (Anti-Cheat)
-set sv_punkbuster "1"
-pb_sv_enable
+# Set admin password (if supported)
+setadminpassword [password]
 </code></pre>
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
-<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Command Line Parameters</h3>
-    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #0f172a;">
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Parameter</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Description</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Example</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set dedicated</code></td>
-                <td style="padding: 10px;">Set server type (1=LAN, 2=Internet)</td>
-                <td style="padding: 10px;"><code>+set dedicated 2</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set net_ip</code></td>
-                <td style="padding: 10px;">Bind to specific IP address</td>
-                <td style="padding: 10px;"><code>+set net_ip 0.0.0.0</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set net_port</code></td>
-                <td style="padding: 10px;">Set server port</td>
-                <td style="padding: 10px;"><code>+set net_port 28960</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set fs_basepath</code></td>
-                <td style="padding: 10px;">Base game directory path</td>
-                <td style="padding: 10px;"><code>+set fs_basepath /home/cod</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set fs_homepath</code></td>
-                <td style="padding: 10px;">Home directory for configs/logs</td>
-                <td style="padding: 10px;"><code>+set fs_homepath /home/cod</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set fs_game</code></td>
-                <td style="padding: 10px;">Load a mod (folder in main/)</td>
-                <td style="padding: 10px;"><code>+set fs_game mods/mymod</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set rcon_password</code></td>
-                <td style="padding: 10px;">RCON password for remote admin</td>
-                <td style="padding: 10px;"><code>+set rcon_password mypass</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set sv_maxclients</code></td>
-                <td style="padding: 10px;">Maximum player slots</td>
-                <td style="padding: 10px;"><code>+set sv_maxclients 32</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+set sv_punkbuster</code></td>
-                <td style="padding: 10px;">Enable PunkBuster (0=off, 1=on)</td>
-                <td style="padding: 10px;"><code>+set sv_punkbuster 1</code></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code>+exec</code></td>
-                <td style="padding: 10px;">Execute config file on startup</td>
-                <td style="padding: 10px;"><code>+exec server.cfg</code></td>
-            </tr>
-            <tr>
-                <td style="padding: 10px;"><code>+map_rotate</code></td>
-                <td style="padding: 10px;">Start map rotation defined in config</td>
-                <td style="padding: 10px;"><code>+map_rotate</code></td>
-            </tr>
-        </tbody>
-    </table>
 
-    <h3 style="color: #ffffff; margin-top: 20px;">Full Startup Command Example</h3>
-    <pre><code style="color: #a5b4fc;">./cod_lnxded +set dedicated 2 +set net_ip 0.0.0.0 +set net_port 28960 +set fs_basepath /home/cod +set fs_homepath /home/cod +set sv_punkbuster 0 +exec server.cfg +set rcon_password mypassword +set sv_maxclients 32 +map_rotate</code></pre>
-</div>
+<h3>Basic Startup</h3>
+<pre><code>wine cod4x18_dedrun.exe +set dedicated 2 +set net_port 28960 +set fs_game mods/<mod> +exec server.cfg
+</code></pre>
+
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Call of Duty Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Common Issues & Solutions</h3>
-    
-    <h4 style="color: #fef3c7;">Server Not Visible in Server Browser</h4>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Check firewall:</strong> Ensure port 28960/UDP is open</li>
-        <li><strong>Verify dedicated setting:</strong> Must be <code>+set dedicated 2</code> for internet servers</li>
-        <li><strong>Master server:</strong> Official master servers may no longer be active; consider server listing services</li>
-        <li><strong>Port forwarding:</strong> If behind NAT, forward UDP port 28960 to server IP</li>
-    </ul>
+<h3>Server Won't Start</h3>
 
-    <h4 style="color: #fef3c7;">Server Crashes on Startup</h4>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Missing libraries:</strong> Install 32-bit libraries on 64-bit Linux systems</li>
-        <li><strong>Permissions:</strong> Ensure server executable has execute permissions (<code>chmod +x cod_lnxded</code>)</li>
-        <li><strong>Invalid paths:</strong> Check fs_basepath and fs_homepath point to valid directories</li>
-        <li><strong>Corrupted files:</strong> Re-verify server file integrity</li>
-    </ul>
+<h4>Server not visible / cannot join</h4>
+<p>Forward UDP 28960; avoid ISP CGNAT; try alternate port; ensure Windows Firewall inbound rule.</p>
 
-    <h4 style="color: #fef3c7;">Players Can't Connect</h4>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Version mismatch:</strong> Ensure clients and server run same game version/patch</li>
-        <li><strong>Password protected:</strong> Remove g_password or share password with players</li>
-        <li><strong>Server full:</strong> Check sv_maxclients setting</li>
-        <li><strong>Firewall blocking:</strong> Verify firewall rules allow incoming UDP on game port</li>
-    </ul>
+<h4>Stuck on 'Awaiting connection...'</h4>
+<p>Check net_ip/net_port DVARS and remove conflicting binds; ensure correct punkbuster/disabled if unsupported.</p>
 
-    <h4 style="color: #fef3c7;">High Ping / Lag Issues</h4>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Bandwidth:</strong> Ensure sufficient upload bandwidth (256kbps per player minimum)</li>
-        <li><strong>Max rate:</strong> Adjust <code>sv_maxRate</code> to match available bandwidth</li>
-        <li><strong>Player count:</strong> Reduce sv_maxclients if server can't handle load</li>
-        <li><strong>CPU usage:</strong> Monitor CPU usage; upgrade if consistently maxed out</li>
-    </ul>
+<h3>Connection Issues</h3>
 
-    <h4 style="color: #fef3c7;">RCON Not Working</h4>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Password:</strong> Verify rcon_password is set correctly</li>
-        <li><strong>Firewall:</strong> RCON uses same port as game (28960/UDP)</li>
-        <li><strong>Tools:</strong> Use proper RCON tools (B3, web-based RCON, or in-game console)</li>
-    </ul>
-</div>
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
 
-<h3>Checking Server Status</h3>
-<pre><code># Check if server process is running
-ps aux | grep cod_lnxded
-
-# View server logs
-tail -f main/games_mp.log
-
-# Check port is listening
-netstat -ulnp | grep 28960
-# or
-ss -ulnp | grep 28960
-</code></pre>
-
-<h2>Game Types</h2>
-<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">dm</strong> - Free-for-All Deathmatch</li>
-        <li><strong style="color: #ffffff;">tdm</strong> - Team Deathmatch</li>
-        <li><strong style="color: #ffffff;">sd</strong> - Search and Destroy</li>
-        <li><strong style="color: #ffffff;">retrieval</strong> - Retrieval (Capture the Flag variant)</li>
-        <li><strong style="color: #ffffff;">hq</strong> - Headquarters</li>
-        <li><strong style="color: #ffffff;">bel</strong> - Behind Enemy Lines</li>
-    </ul>
-</div>
-
-<h2>Default Maps</h2>
-<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <ul style="color: #e5e7eb; line-height: 1.8; columns: 2;">
-        <li>mp_harbor</li>
-        <li>mp_pavlov</li>
-        <li>mp_brecourt</li>
-        <li>mp_carentan</li>
-        <li>mp_chateau</li>
-        <li>mp_depot</li>
-        <li>mp_dawnville</li>
-        <li>mp_downtown</li>
-        <li>mp_hurtgen</li>
-        <li>mp_neuville</li>
-        <li>mp_powcamp</li>
-        <li>mp_railyard</li>
-        <li>mp_rocket</li>
-        <li>mp_ship</li>
-        <li>mp_tigertown</li>
-    </ul>
-</div>
-
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with Call of Duty:</p>
+<h4>High Latency/Lag</h4>
 <ul>
-    <li><a href="../b3/">B3 (Big Brother Bot)</a> - Python-based admin bot with RCON wrapper, player warnings, ban management, statistics tracking, and automated moderation for Call of Duty servers</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h2>Resources</h2>
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li><a href="https://www.callofduty.com" target="_blank">Official Call of Duty Website</a></li>
-    <li><a href="/docs.php?action=view&doc=common-issues">Common Issues Guide</a></li>
-    <li>Server configuration generators and map rotation tools available online</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Call of Duty documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<h3>External References</h3>
+<ul>
+    <li><a href="https://cod4x.ovh/t/how-to-create-a-server-windows-guide/3095" target="_blank">https://cod4x.ovh/t/how-to-create-a-server-windows-guide/3095</a></li>
+    <li><a href="https://kb.firedaemon.com/support/solutions/articles/4000086725-call-of-duty-4-modern-warfare-as-a-service" target="_blank">https://kb.firedaemon.com/support/solutions/articles/4000086725-call-of-duty-4-modern-warfare-as-a-service</a></li>
+    <li><a href="https://support.activision.com/articles/ports-used-for-call-of-duty-games" target="_blank">https://support.activision.com/articles/ports-used-for-call-of-duty-games</a></li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Call of Duty (2003) master servers may no longer be operational; direct connect via IP may be required</li>
-        <li>PunkBuster support may be deprecated; consider community anti-cheat solutions</li>
-        <li>Back up your server.cfg and any custom configurations regularly</li>
-        <li>Monitor logs for cheaters and troublemaking players</li>
-        <li>Keep RCON password secure and change it regularly</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Call of Duty server hosting</em>
+</p>

@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for factorio game servers",
-    "name":  "factorio",
-    "order":  78,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for factorio game servers",
+    "name": "factorio",
+    "order": 78,
+    "category": "game",
+    "complete": true
 }
