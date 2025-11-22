@@ -26,7 +26,7 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">7777</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
@@ -38,38 +38,7 @@
 <h2 id="ports">🔌 Network Ports</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
-<p style="color: #e5e7eb;">The following ports are used by this game server:</p>
-    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #0f172a;">
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Game/Query port</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
-                <td style="padding: 10px;">TCP</td>
-                <td style="padding: 10px;">RCON</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27020</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">SourceTV (if enabled)</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27005</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Client port (outbound)</td>
-            </tr>
-        </tbody>
-    </table>
+    <p style="color: #e5e7eb;">The Age of Chivalry server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
     
     <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
     <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
@@ -199,19 +168,47 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%GAME_TYPE% %PID_FILE% %MAP% %IP% %PORT% %PLAYERS%</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-insecure</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable Valve Anti-Cheat</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Valve Anti-Cheat technology.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nohltv</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Half-life TV</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Half-life TV.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-restart</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Restart</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">The server restarts when it crashes.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nomaster</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable master server communication</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

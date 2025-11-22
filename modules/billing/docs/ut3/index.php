@@ -26,7 +26,7 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">7777</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
@@ -38,33 +38,7 @@
 <h2 id="ports">🔌 Network Ports</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
-<p style="color: #e5e7eb;">The following ports are used by this game server:</p>
-    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #0f172a;">
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">7777</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Game port</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">7778</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Query port (+1)</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">8080</code></td>
-                <td style="padding: 10px;">TCP</td>
-                <td style="padding: 10px;">Web admin</td>
-            </tr>
-        </tbody>
-    </table>
+    <p style="color: #e5e7eb;">The Unreal Tournament 3 server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
     
     <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
     <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
@@ -154,19 +128,160 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>server %MAP%%MOD%%PLAYERS%?mutator=%MUTATOR1%%MUTATOR2%%MUTATOR3%%MUTATOR4%%MUTATOR5%%MUTATOR6%%MUTATOR7%%MUTATOR8%%MUTATOR9%%MUTATOR10%%MUTATOR11%%MUTATOR12%%ADMINPASS%%SVRPASS%?bIsDedicated=True %IP% %PORT% %QUERY_PORT%  -log=../ut3.log -nohomedir %LOGIN% %PASSWORD% -unattended</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">?Game=</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Game Type</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Starts the server with the Game</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">UTGame.UTDeathmatch</code> - Deathmatch</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">UTGame.UTTeamGame</code> - Team DeatMatch</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">UTGame.UTDuelGame</code> - Duel</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">UTGameContent.UTCTFGame_Content</code> - Capture the Flag</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">UTGameContent.UTOnslaughtGame_Content</code> - Warfare</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">UTGameContent.UTVehicleCTFGame_Content</code> - Vehicle Capture the Flag</li>
+        </ul>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-login=</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Login</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">This login has to be created via the client &quot;Create Profile&quot;. You can create multiple profiles under the same email address but you must use the same password for each if you do so.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-password=</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Profile Password.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">UTGame.UTMutator_Instagib</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Instagib</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Instagib Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_BigHead</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - BigHead</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable BigHead Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_LowGrav</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Low Gravity</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Low Gravity Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_SuperBerserk</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Super Berserk</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Super Berserk Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_FriendlyFire</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Friendly Fire</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Friendly Fire Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_NoTranslocator</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Translocator</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable No Translocator Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_SpeedFreak</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Speed Freak</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Speed Freak Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_Handicap</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Handicap</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Handicap Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_NoPowerups</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Powerups</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable No Powerups Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_Slomo</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Slomo</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Slomo Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_WeaponReplacement</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Weapon Replacement</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Weapon Replacement Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">,UTGame.UTMutator_WeaponsRespawn</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Weapon Respawn</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable Weapon Respawn Mutator.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">?AdminPassword=</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Admin Password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">In-game Admin Password.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">?GamePassword=</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Server Password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Players must know this password to connect.</p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

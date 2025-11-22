@@ -324,7 +324,7 @@ setadminpassword [password]
             <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-norestart</code>
             <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Restart</span>
         </h4>
-        <p style="color: #e5e7eb; margin: 10px 0;">Won't attempt to restart failed servers.</p>
+        <p style="color: #e5e7eb; margin: 10px 0;">Won&#x27;t attempt to restart failed servers.</p>
     </div>
 </div>
 

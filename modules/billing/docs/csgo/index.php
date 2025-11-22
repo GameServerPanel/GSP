@@ -201,7 +201,7 @@ setadminpassword [password]
             <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+mapgroup</code>
             <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Map Group</span>
         </h4>
-        <p style="color: #e5e7eb; margin: 10px 0;">Default groups: mg_bomb, mg_hostage, mg_armsrace and mg_demolition, to add more maps or mapgroups download "Gamemodes Helper" at http://csgodev.com/downloads/Helper.zip </p>
+        <p style="color: #e5e7eb; margin: 10px 0;">Default groups: mg_bomb, mg_hostage, mg_armsrace and mg_demolition, to add more maps or mapgroups download &quot;Gamemodes Helper&quot; at http://csgodev.com/downloads/Helper.zip </p>
     </div>
 
     <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">

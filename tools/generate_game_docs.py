@@ -185,8 +185,9 @@ class GameDocGenerator:
                 desc_elem = param.find('desc')
                 default_elem = param.find('default')
                 
-                caption = caption_elem.text if caption_elem is not None else param_key
-                description = desc_elem.text if desc_elem is not None else "No description available"
+                # Handle empty captions by falling back to param_key
+                caption = caption_elem.text if (caption_elem is not None and caption_elem.text) else param_key
+                description = desc_elem.text if (desc_elem is not None and desc_elem.text) else "No description available"
                 default_value = default_elem.text if default_elem is not None else None
                 
                 # For select type, get options
