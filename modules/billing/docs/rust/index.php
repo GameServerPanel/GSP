@@ -26,7 +26,7 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28015</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
