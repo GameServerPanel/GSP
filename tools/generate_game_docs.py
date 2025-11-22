@@ -677,7 +677,10 @@ setadminpassword [password]
     <li><code>-console</code> - Enable console output</li>
     <li><code>-nographics</code> - Run without graphics (headless mode)</li>
 </ul>
+'''
 
+        # Common sections for all games (whether they have XML params or not)
+        php_doc += '''
 <h3>Creating a Start Script</h3>
 
 <p><strong>Linux (start.sh):</strong></p>
