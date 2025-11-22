@@ -623,7 +623,7 @@ setadminpassword [password]
                 default = param.get('default')
                 options = param.get('options', [])
                 
-                # Clean HTML from description - unescape HTML entities and remove tags
+                # Clean HTML from description - unescape HTML entities, remove tags, then re-escape for output
                 if description:
                     description_clean = html.unescape(description)
                     # Remove HTML tags (simple but effective for our use case)
@@ -631,13 +631,18 @@ setadminpassword [password]
                 else:
                     description_clean = "No description available"
                 
+                # Escape all values for HTML output to prevent XSS
+                param_key_escaped = html.escape(param_key, quote=True)
+                caption_escaped = html.escape(caption, quote=True)
+                description_escaped = html.escape(description_clean, quote=True)
+                
                 php_doc += f'''
     <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
         <h4 style="color: #ffffff; margin-top: 0;">
-            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">{param_key}</code>
-            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - {caption}</span>
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">{param_key_escaped}</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - {caption_escaped}</span>
         </h4>
-        <p style="color: #e5e7eb; margin: 10px 0;">{description_clean}</p>
+        <p style="color: #e5e7eb; margin: 10px 0;">{description_escaped}</p>
 '''
                 
                 if param_type == 'select' and options:
@@ -645,12 +650,15 @@ setadminpassword [password]
         <ul style="color: #e5e7eb; margin-left: 20px;">
 '''
                     for opt in options:
-                        php_doc += f'''            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">{opt['value']}</code> - {opt['text']}</li>\n'''
+                        opt_value_escaped = html.escape(opt['value'], quote=True)
+                        opt_text_escaped = html.escape(opt['text'], quote=True)
+                        php_doc += f'''            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">{opt_value_escaped}</code> - {opt_text_escaped}</li>\n'''
                     php_doc += '''        </ul>
 '''
                 
                 if default:
-                    php_doc += f'''        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">{default}</code></p>
+                    default_escaped = html.escape(str(default), quote=True)
+                    php_doc += f'''        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">{default_escaped}</code></p>
 '''
                 
                 php_doc += '''    </div>
