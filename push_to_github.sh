@@ -72,8 +72,7 @@ if [[ -s "$TOKEN_FILE" ]]; then
 elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
     TOKEN="$GITHUB_TOKEN"
 else
-    die "GitHub token not found. Set GITHUB_TOKEN env var or create $TOKEN_FILE with your token.
-    Get a token at: https://github.com/settings/tokens (requires 'repo' scope)"
+    die "GitHub token not found. Set GITHUB_TOKEN env var or create $TOKEN_FILE with your token. Get a token at: https://github.com/settings/tokens (requires 'repo' scope)"
 fi
 
 [[ ${#TOKEN} -ge 10 ]] || die "Token looks invalid (too short)"

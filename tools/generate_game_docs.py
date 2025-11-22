@@ -45,6 +45,7 @@ import json
 import yaml
 import re
 import argparse
+import html
 from pathlib import Path
 from datetime import datetime
 import xml.etree.ElementTree as ET
@@ -193,7 +194,7 @@ class GameDocGenerator:
                 if param_type == 'select':
                     for option in param.findall('option'):
                         opt_value = option.get('value', '')
-                        opt_text = option.text if option.text else opt_value
+                        opt_text = option.text if option.text is not None else opt_value
                         options.append({'value': opt_value, 'text': opt_text})
                 
                 startup_params.append({
@@ -622,8 +623,13 @@ setadminpassword [password]
                 default = param.get('default')
                 options = param.get('options', [])
                 
-                # Clean HTML from description
-                description_clean = re.sub(r'<[^>]+>', '', description) if description else "No description available"
+                # Clean HTML from description - unescape HTML entities and remove tags
+                if description:
+                    description_clean = html.unescape(description)
+                    # Remove HTML tags (simple but effective for our use case)
+                    description_clean = re.sub(r'<[^<>]+>', '', description_clean)
+                else:
+                    description_clean = "No description available"
                 
                 php_doc += f'''
     <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
