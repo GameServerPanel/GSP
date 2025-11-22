@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Jedi Knight: Jedi Academy game servers",
-    "name":  "Jedi Knight: Jedi Academy",
-    "order":  24,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Jedi Knight: Jedi Academy game servers",
+    "name": "Jedi Knight: Jedi Academy",
+    "order": 24,
+    "category": "game"
 }

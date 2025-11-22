@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Wolfenstein: Enemy Territory game servers",
-    "name":  "Wolfenstein: Enemy Territory",
-    "order":  142,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Wolfenstein: Enemy Territory game servers",
+    "name": "Wolfenstein: Enemy Territory",
+    "order": 142,
+    "category": "game"
 }

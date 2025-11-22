@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Troubleshooting guide for common server problems",
-    "name":  "Common Issues \u0026 Solutions",
-    "order":  1,
-    "category":  "todo"
+{
+    "description": "Troubleshooting guide for common server problems",
+    "name": "Common Issues & Solutions",
+    "order": 1,
+    "category": "game"
 }

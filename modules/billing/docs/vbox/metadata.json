@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for VirtualBox game servers",
-    "name":  "VirtualBox",
-    "order":  131,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for VirtualBox game servers",
+    "name": "VirtualBox",
+    "order": 131,
+    "category": "game"
 }

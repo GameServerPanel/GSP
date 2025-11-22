@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Ventrilo game servers",
-    "name":  "Ventrilo",
-    "order":  132,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Ventrilo game servers",
+    "name": "Ventrilo",
+    "order": 132,
+    "category": "game"
 }

@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Mount and Blade Warband game servers",
-    "name":  "Mount and Blade Warband",
-    "order":  47,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Mount and Blade Warband game servers",
+    "name": "Mount and Blade Warband",
+    "order": 47,
+    "category": "game"
 }

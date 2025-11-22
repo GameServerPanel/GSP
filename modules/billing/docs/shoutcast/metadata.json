@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Shoutcast server game servers",
-    "name":  "Shoutcast server",
-    "order":  86,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Shoutcast server game servers",
+    "name": "Shoutcast server",
+    "order": 86,
+    "category": "game"
 }

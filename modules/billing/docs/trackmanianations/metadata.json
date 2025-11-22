@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for TrackMania Nations game servers",
-    "name":  "TrackMania Nations",
-    "order":  115,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for TrackMania Nations game servers",
+    "name": "TrackMania Nations",
+    "order": 115,
+    "category": "game"
 }

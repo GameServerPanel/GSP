@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Smashball game servers",
-    "name":  "Smashball",
-    "order":  3,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Smashball game servers",
+    "name": "Smashball",
+    "order": 3,
+    "category": "game"
 }

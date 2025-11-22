@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for FiveM game servers",
-    "name":  "FiveM",
-    "order":  84,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for FiveM game servers",
+    "name": "FiveM",
+    "order": 84,
+    "category": "game"
 }

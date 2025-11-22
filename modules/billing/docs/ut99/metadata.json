@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Unreal Tournament game servers",
-    "name":  "Unreal Tournament",
-    "order":  119,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Unreal Tournament game servers",
+    "name": "Unreal Tournament",
+    "order": 119,
+    "category": "game"
 }

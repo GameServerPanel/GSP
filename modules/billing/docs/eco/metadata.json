@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Eco game servers",
-    "name":  "Eco",
-    "order":  74,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Eco game servers",
+    "name": "Eco",
+    "order": 74,
+    "category": "game"
 }

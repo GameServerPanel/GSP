@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Euro Truck Simulator 2 game servers",
-    "name":  "Euro Truck Simulator 2",
-    "order":  77,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Euro Truck Simulator 2 game servers",
+    "name": "Euro Truck Simulator 2",
+    "order": 77,
+    "category": "game"
 }

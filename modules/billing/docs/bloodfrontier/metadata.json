@@ -1,6 +1,6 @@
-﻿{
-    "description":  "Setup and configuration guide for Blood Frontier game servers",
-    "name":  "Blood Frontier",
-    "order":  26,
-    "category":  "todo"
+{
+    "description": "Setup and configuration guide for Blood Frontier game servers",
+    "name": "Blood Frontier",
+    "order": 26,
+    "category": "game"
 }
