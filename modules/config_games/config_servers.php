@@ -30,6 +30,11 @@ function config_games_normalize_path($path)
     return ltrim($clean, '/');
 }
 
+function config_games_normalize_newlines($text)
+{
+    return preg_replace("/\\r\\n?/", "\\n", (string)$text);
+}
+
 function config_games_next_form_key(): string
 {
     static $counter = 0;
@@ -199,11 +204,12 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
         }
         $hasChildren = !empty($nodeData['has_children']);
         if (array_key_exists('value', $nodeData)) {
+            $normalizedValue = config_games_normalize_newlines($nodeData['value']);
             while ($domNode->firstChild) {
                 $domNode->removeChild($domNode->firstChild);
             }
-            if ($nodeData['value'] !== '') {
-                $domNode->appendChild($dom->createTextNode($nodeData['value']));
+            if ($normalizedValue !== '') {
+                $domNode->appendChild($dom->createTextNode($normalizedValue));
             }
         } elseif (!$hasChildren) {
             while ($domNode->firstChild) {
@@ -234,6 +240,13 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
     }
     if ($dom->save($config_file) === false) {
         return false;
+    }
+    $savedContents = @file_get_contents($config_file);
+    if ($savedContents !== false) {
+        $normalizedContents = config_games_normalize_newlines($savedContents);
+        if ($normalizedContents !== $savedContents) {
+            file_put_contents($config_file, $normalizedContents);
+        }
     }
     $config = read_server_config($config_file);
     if ($config !== FALSE) {

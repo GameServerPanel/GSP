@@ -160,6 +160,7 @@ function exec_ogp_module() {
 	echo "<b>".$myXML."</b>";
 	echo "<xmp>".$template."</xmp>";
 	$myXML = "modules/config_games/server_configs/".$key_name."_".$os.$arch.".xml";
+	$template = preg_replace("/\r\n?|\n/", "\n", $template);
 	$fh = fopen($myXML, 'w') or die("No Write Permission.");
 	fwrite($fh, $template);
 	fclose($fh);
