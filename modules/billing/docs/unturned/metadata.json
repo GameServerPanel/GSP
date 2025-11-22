@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Unturned game servers",
-    "name":  "Unturned",
-    "order":  120,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Unturned game servers",
+    "name": "Unturned",
+    "order": 120,
+    "category": "game",
+    "complete": true
 }

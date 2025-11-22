@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Space Engineers game servers",
     "name": "Space Engineers",
     "order": 93,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

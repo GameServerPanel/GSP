@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Comprehensive guide for Metamod:Source (Source engine plugin loader) with VDF configuration, SourceMod integration, game-specific paths, and troubleshooting",
-    "name":  "Metamod:Source",
-    "order":  63,
-    "category":  "mods"
+{
+    "description": "Comprehensive guide for Metamod:Source (Source engine plugin loader) with VDF configuration, SourceMod integration, game-specific paths, and troubleshooting",
+    "name": "Metamod:Source",
+    "order": 63,
+    "category": "mods",
+    "complete": true
 }

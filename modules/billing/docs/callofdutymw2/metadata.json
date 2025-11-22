@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Call of Duty: Modern Warfare 2 (IW4x) game servers",
-    "name":  "Call of Duty: Modern Warfare 2 (IW4x)",
-    "order":  35,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Call of Duty: Modern Warfare 2 (IW4x) game servers",
+    "name": "Call of Duty: Modern Warfare 2 (IW4x)",
+    "order": 35,
+    "category": "game",
+    "complete": true
 }

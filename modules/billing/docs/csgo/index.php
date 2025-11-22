@@ -1,784 +1,413 @@
 <?php
 /**
- * Counter-Strike: Global Offensive / CS2 Server Documentation
- * Comprehensive game server hosting guide
- * Enhanced with ports table and complete troubleshooting
+ * Counter-Strike: Global Offensive & CS2 Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#overview" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
         <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
-        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Parameters</a>
-        <a href="#plugins" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Plugins & Mods</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
-        <a href="#gamemodes" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Game Modes</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
 <h1>Counter-Strike: Global Offensive & CS2 Server Hosting Guide</h1>
 
-<h2 id="overview">Overview</h2>
-<p>Counter-Strike: Global Offensive (CS:GO) and Counter-Strike 2 (CS2) are competitive tactical first-person shooters developed by Valve. CS2 replaced CS:GO in September 2023, transitioning from Source 1 to Source 2 engine.</p>
+<h2>Overview</h2>
+<p>Counter-Strike: Global Offensive & CS2 is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Counter-Strike: Global Offensive & CS2 server for your community.</p>
 
+<h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Reference</h3>
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Engine:</strong> Source 2 (CS2) / Source (CS:GO)</li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code> (UDP)</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 2GB (CS:GO), 4GB (CS2)</li>
-        <li><strong style="color: #ffffff;">Recommended RAM:</strong> 4GB+ (CS:GO), 8GB+ (CS2)</li>
-        <li><strong style="color: #ffffff;">CPU:</strong> High single-thread performance critical</li>
-        <li><strong style="color: #ffffff;">SteamCMD App ID:</strong> 740 (CS:GO), 730 (CS2)</li>
-        <li><strong style="color: #ffffff;">GSLT Required:</strong> Yes (<a href="https://steamcommunity.com/dev/managegameservers" target="_blank" style="color: #a5b4fc;">Get Token</a>)</li>
-        <li><strong style="color: #ffffff;">Log Files:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">csgo/logs/</code> or <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">game/csgo/logs/</code></li>
-        <li><strong style="color: #ffffff;">Main Config:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">server.cfg</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">740</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">csgo/cfg/server.cfg</code> - Server settings</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">workshop_installed.txt</code> - Steam Workshop</li>
+        </ul></li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports Required</h2>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27015</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Main game server port (client connections)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27015</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">RCON (Remote Console) access</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27020</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">SourceTV (GOTV) spectator port</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27005</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Client port (Steam connection)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27035-27036</code></td>
-            <td style="padding: 12px;"><span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px;">Steam P2P communication (outbound)</td>
-            <td style="padding: 12px;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 27015/udp comment 'CS:GO/CS2 game port'
-sudo ufw allow 27015/tcp comment 'CS:GO/CS2 RCON'
-sudo ufw allow 27020/udp comment 'CS:GO/CS2 SourceTV'
-sudo ufw allow 27005/udp comment 'CS:GO/CS2 client port'
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Counter-Strike: Global Offensive & CS2 server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
 sudo ufw reload
-</code></pre>
 
-<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=27015/udp --add-port=27015/tcp
-sudo firewall-cmd --permanent --add-port=27020/udp --add-port=27005/udp
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Counter-Strike: Global Offensive & CS2 Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Counter-Strike: Global Offensive & CS2 Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Run in PowerShell as Administrator
-New-NetFirewallRule -DisplayName "CS:GO/CS2 UDP" -Direction Inbound -Protocol UDP -LocalPort 27015,27020,27005 -Action Allow
-New-NetFirewallRule -DisplayName "CS:GO/CS2 TCP" -Direction Inbound -Protocol TCP -LocalPort 27015 -Action Allow
-</code></pre>
-
-<h4>iptables (Legacy Linux)</h4>
-<pre><code>sudo iptables -A INPUT -p udp --dport 27015 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 27015 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 27020 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 27005 -j ACCEPT
-sudo service iptables save
-</code></pre>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0;">
-    <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; border-radius: 4px;">
-        <h4 style="color: #ffffff; margin-top: 0;">CS:GO Server</h4>
-        <ul style="color: #e5e7eb; line-height: 1.8;">
-            <li><strong style="color: #fff;">OS:</strong> Linux (Ubuntu 18.04+) / Windows Server 2012+</li>
-            <li><strong style="color: #fff;">CPU:</strong> Dual-core 3GHz+ (quad-core recommended)</li>
-            <li><strong style="color: #fff;">RAM:</strong> 2GB minimum, 4GB+ recommended</li>
-            <li><strong style="color: #fff;">Disk:</strong> 30GB SSD recommended</li>
-            <li><strong style="color: #fff;">Network:</strong> 10Mbps+ (1Mbps per player)</li>
-        </ul>
-    </div>
-    <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #10b981; border-radius: 4px;">
-        <h4 style="color: #ffffff; margin-top: 0;">CS2 Server</h4>
-        <ul style="color: #e5e7eb; line-height: 1.8;">
-            <li><strong style="color: #fff;">OS:</strong> Linux (Ubuntu 20.04+) / Windows Server 2016+</li>
-            <li><strong style="color: #fff;">CPU:</strong> Quad-core 3.5GHz+ (6-core recommended)</li>
-            <li><strong style="color: #fff;">RAM:</strong> 4GB minimum, 8GB+ recommended</li>
-            <li><strong style="color: #fff;">Disk:</strong> 50GB SSD (Source 2 engine larger)</li>
-            <li><strong style="color: #fff;">Network:</strong> 15Mbps+ (1.5Mbps per player)</li>
-        </ul>
-    </div>
-</div>
-
-<h3>Installation via SteamCMD (Linux)</h3>
-
-<h4>Install SteamCMD</h4>
-<pre><code># Ubuntu/Debian
-sudo add-apt-repository multiverse
-sudo dpkg --add-architecture i386
-sudo apt update
-sudo apt install lib32gcc-s1 steamcmd
-
-# Create steam user
-sudo useradd -m -s /bin/bash steam
-sudo su - steam
-
-# CentOS/RHEL
-sudo yum install glibc.i686 libstdc++.i686
-mkdir ~/steamcmd && cd ~/steamcmd
-wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
-tar -xvzf steamcmd_linux.tar.gz
-</code></pre>
-
-<h4>CS:GO Server Installation</h4>
-<pre><code># Run SteamCMD
-./steamcmd.sh
-
-# Login anonymously
-login anonymous
-
-# Set install directory
-force_install_dir ./csgo-server
-
-# Install CS:GO dedicated server (App ID 740)
-app_update 740 validate
-
-# Exit
-quit
-</code></pre>
-
-<h4>CS2 Server Installation</h4>
-<pre><code># Run SteamCMD
-./steamcmd.sh
-
-# Login (CS2 may require Steam account with CS2)
-login anonymous
-# Or: login <username> <password>
-
-# Set install directory
-force_install_dir ./cs2-server
-
-# Install CS2 dedicated server (App ID 730)
-app_update 730 validate
-
-# Exit
-quit
-</code></pre>
-
-<h3>Windows Installation</h3>
-<ol>
-    <li>Download <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">SteamCMD for Windows</a></li>
-    <li>Extract to <code>C:\steamcmd\</code></li>
-    <li>Run <code>steamcmd.exe</code></li>
-    <li>Execute same commands as Linux (use Windows paths)</li>
-</ol>
-
-<h2 id="configuration">⚙️ Server Configuration</h2>
-
-<h3>server.cfg - Essential Settings</h3>
-<p>Create <code>csgo/cfg/server.cfg</code> (CS:GO) or <code>game/csgo/cfg/server.cfg</code> (CS2):</p>
-<pre><code>// ========================================
-// Server Information
-// ========================================
-hostname "My CS:GO/CS2 Server [128 Tick]"
-sv_password ""                      // Server password (blank = public)
-sv_region "1"                       // 0=US East, 1=US West, 2=SA, 3=EU, 4=Asia, etc.
-sv_tags "128tick,competitive"       // Server browser tags
-
-// ========================================
-// RCON Configuration
-// ========================================
-rcon_password "YourSecurePasswordHere"  // CHANGE THIS!
-sv_rcon_banpenalty 0
-sv_rcon_maxfailures 5
-sv_rcon_minfailures 3
-sv_rcon_minfailuretime 30
-
-// ========================================
-// Server Core Settings
-// ========================================
-sv_cheats 0
-sv_lan 0
-sv_pure 1                           // 0=off, 1=on, 2=strict file consistency
-sv_pure_kick_clients 1
-sv_minrate 128000                   // Min bandwidth rate (128 tick)
-sv_maxrate 0                        // Max bandwidth (0=unlimited)
-sv_mincmdrate 128                   // Min client update rate
-sv_maxcmdrate 128                   // Max client update rate
-sv_minupdaterate 128                // Min server update rate
-sv_maxupdaterate 128                // Max server update rate
-
-// ========================================
-// Game Settings - Competitive 5v5
-// ========================================
-game_type 0                         // 0=Classic, 1=Arms Race, etc.
-game_mode 1                         // 0=Casual, 1=Competitive, 2=Wingman
-mp_teamcashawards 1
-mp_playercashawards 1
-mp_maxmoney 16000
-mp_startmoney 800
-mp_buytime 90
-mp_buy_anywhere 0
-mp_freezetime 15
-mp_friendlyfire 0
-mp_autoteambalance 1
-mp_limitteams 1
-mp_maxrounds 30
-mp_roundtime 1.92                   // Round time (minutes)
-mp_roundtime_defuse 1.92
-mp_roundtime_hostage 1.92
-mp_c4timer 40                       // C4 bomb timer (seconds)
-
-// ========================================
-// Overtime Settings
-// ========================================
-mp_overtime_enable 1
-mp_overtime_maxrounds 6
-mp_overtime_startmoney 10000
-mp_overtime_halftime_pausetimer 1
-
-// ========================================
-// Warmup & Match Settings
-// ========================================
-mp_do_warmup_period 1
-mp_warmuptime 30
-mp_warmup_pausetimer 1
-mp_halftime 1
-mp_halftime_duration 15
-mp_match_end_restart 1
-mp_match_restart_delay 15
-
-// ========================================
-// Communication
-// ========================================
-sv_alltalk 0                        // Dead players can't talk to alive
-sv_deadtalk 0                       // Dead players can't be heard
-sv_full_alltalk 0
-sv_talk_enemy_dead 1                // Dead can hear enemy team
-sv_talk_enemy_living 0              // Living can't hear enemy team
-
-// ========================================
-// Voting
-// ========================================
-sv_vote_issue_kick_allowed 0        // Disable kick votes
-sv_vote_issue_changelevel_allowed 0
-sv_vote_issue_nextlevel_allowed 0
-sv_vote_allow_spectators 0
-
-// ========================================
-// SourceTV (GOTV) Configuration
-// ========================================
-tv_enable 1
-tv_delay 90                         // 90 second delay (anti-cheat)
-tv_advertise_watchable 1            // List in server browser
-tv_name "GOTV"
-tv_title "Source TV"
-tv_autorecord 1                     // Auto-record matches
-tv_allow_camera_man 1
-tv_maxclients 10                    // Max GOTV spectators
-
-// ========================================
-// Logging
-// ========================================
-log on
-sv_logbans 1
-sv_logecho 1
-sv_logfile 1
-sv_log_onefile 0                    // New log file each map
-
-// ========================================
-// Security & Protection
-// ========================================
-sv_steamauth_enforce 2              // Strict Steam authentication
-sv_allow_wait_command 0             // Disable wait command (anti-exploit)
-sv_maxconsecutive losses_max 2      // Disconnect laggy players
-
-// ========================================
-// Execute Additional Configs
-// ========================================
-exec banned_user.cfg
-exec banned_ip.cfg
-</code></pre>
-
-<h3>Game Mode Configuration</h3>
-
-<h4>Competitive 5v5 (server.cfg above already configured)</h4>
-<pre><code>game_type 0
-game_mode 1
-mp_maxrounds 30
-mp_roundtime 1.92
-</code></pre>
-
-<h4>Casual 10v10</h4>
-<pre><code>game_type 0
-game_mode 0
-mp_maxrounds 10
-mp_roundtime 3
-mp_friendlyfire 0
-</code></pre>
-
-<h4>Wingman 2v2</h4>
-<pre><code>game_type 0
-game_mode 2
-mp_maxrounds 16
-mp_roundtime 1.92
-</code></pre>
-
-<h4>Deathmatch</h4>
-<pre><code>game_type 1
-game_mode 2
-mp_respawn_on_death_ct 1
-mp_respawn_on_death_t 1
-</code></pre>
-
-<h2 id="parameters">Startup Parameters</h2>
-
-<h3>Linux Start Script (srcds_run)</h3>
-<pre><code>#!/bin/bash
-# CS:GO/CS2 Server Startup Script
-
-cd /home/steam/csgo-server  # or cs2-server
-
-./srcds_run \
-    -game csgo \
-    -console \
-    -usercon \
-    +ip 0.0.0.0 \
-    -port 27015 \
-    +game_type 0 \
-    +game_mode 1 \
-    +mapgroup mg_active \
-    +map de_dust2 \
-    -tickrate 128 \
-    +maxplayers 10 \
-    +sv_setsteamaccount "YOUR_GSLT_TOKEN_HERE" \
-    +sv_lan 0 \
-    +exec server.cfg \
-    +tv_port 27020 \
-    +tv_enable 1
-</code></pre>
-
-<h3>Windows Startup (srcds.exe)</h3>
-<pre><code>srcds.exe ^
-    -game csgo ^
-    -console ^
-    -usercon ^
-    +ip 0.0.0.0 ^
-    -port 27015 ^
-    +game_type 0 ^
-    +game_mode 1 ^
-    +mapgroup mg_active ^
-    +map de_dust2 ^
-    -tickrate 128 ^
-    +maxplayers 10 ^
-    +sv_setsteamaccount "YOUR_GSLT_TOKEN_HERE" ^
-    +exec server.cfg
-</code></pre>
-
-<h3>Parameter Reference</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Parameter</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Description</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-game csgo</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Specify game directory (csgo for both CS:GO and CS2)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-console</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Enable console output</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-usercon</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Enable RCON (remote console)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+ip 0.0.0.0</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Bind to all network interfaces</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-port 27015</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Server port (default 27015)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+map de_dust2</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Starting map</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-tickrate 128</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Server tick rate (64 default, 128 competitive)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+maxplayers 10</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Maximum player slots</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+sv_setsteamaccount</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Game Server Login Token (REQUIRED for public servers)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+game_type</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">0=Classic, 1=Arms Race, 2=Demolition, 3=Deathmatch</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+game_mode</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">0=Casual, 1=Competitive, 2=Wingman/Skirmish</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+mapgroup</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Map rotation group (mg_active, mg_reserves, etc.)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+tv_port 27020</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">SourceTV (GOTV) port</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+exec server.cfg</code></td>
-            <td style="padding: 12px;">Execute server configuration file</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="plugins">Plugins & Mods</h2>
-
-<h3>SourceMod & MetaMod:Source</h3>
-<p>Most popular server modification framework for Source engine games.</p>
-
-<h4>Installation</h4>
-<ol>
-    <li>Download <a href="https://www.metamodsource.net/downloads.php" target="_blank">MetaMod:Source</a> (get latest stable build)</li>
-    <li>Download <a href="https://www.sourcemod.net/downloads.php" target="_blank">SourceMod</a> (get latest stable build)</li>
-    <li>Extract both to <code>csgo/</code> directory (they merge with existing folders)</li>
-    <li>Restart server</li>
-    <li>Type <code>sm version</code> in console to verify</li>
-</ol>
-
-<h4>Popular SourceMod Plugins</h4>
 <ul>
-    <li><strong>Admin System:</strong> Built-in admin management (edit <code>configs/admins_simple.ini</code>)</li>
-    <li><strong>PugSetup:</strong> 10-man competitive match setup (ReadyUp, map voting, team selection)</li>
-    <li><strong>Get5:</strong> Match management and configuration system</li>
-    <li><strong>Retakes:</strong> Automated retake scenarios (B site, A site practice)</li>
-    <li><strong>Deathmatch:</strong> Respawn, weapon menus, spawn protection</li>
-    <li><strong>Advertisements:</strong> Server advertisements in chat</li>
-    <li><strong>MapChooser Extended:</strong> Advanced map voting system</li>
-    <li><strong>RankMe:</strong> Player statistics and ranking</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h4>Installing Plugins</h4>
-<pre><code># Download .smx file (compiled plugin)
-# Place in: csgo/addons/sourcemod/plugins/
+<h3>Installation Steps</h3>
 
-# If .sp file (source):
-cd csgo/addons/sourcemod/scripting
-./compile.sh pluginname.sp
-# Compiled .smx appears in compiled/ directory
-mv compiled/pluginname.smx ../plugins/
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
-# Reload plugins without restart
-sm plugins reload pluginname
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>Workshop Maps (CS:GO/CS2)</h3>
-<pre><code># Add to server.cfg or startup params
-host_workshop_collection "COLLECTION_ID"
-workshop_start_map "MAP_ID"
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-# Or in startup command
-+host_workshop_collection 125499818 +workshop_start_map 125488374
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 740</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/csgo
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/csgo \
+         +app_update 740 validate \
+         +quit
+
+# Server files are now in ~/gameservers/csgo/
+cd ~/gameservers/csgo
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\csgo ^
+             +app_update 740 validate ^
+             +quit
+</code></pre>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>csgo/cfg/server.cfg</code></strong> - Server settings</li>
+    <li><strong><code>workshop_installed.txt</code></strong> - Steam Workshop</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
+
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Counter-Strike: Global Offensive & CS2 Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
 </code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
 <h3>Server Won't Start</h3>
 
-<h4>Missing GSLT Token</h4>
-<pre><code>[ERROR] Failed to contact master server
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
 
-# Fix: Get GSLT token from Steam
-# https://steamcommunity.com/dev/managegameservers
-# Add to startup: +sv_setsteamaccount "YOUR_TOKEN"
+# Or check system logs
+journalctl -u gameserver -f
 </code></pre>
 
 <h4>Port Already in Use</h4>
-<pre><code># Check what's using port 27015
-sudo lsof -i :27015
-# Or on Windows:
-netstat -ano | findstr :27015
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
 
-# Kill existing process or change port
-./srcds_run -game csgo -port 27016 ...
+# Kill the process or change server port
 </code></pre>
 
-<h4>Missing Libraries (Linux)</h4>
-<pre><code># Ubuntu/Debian
-sudo dpkg --add-architecture i386
-sudo apt update
-sudo apt install lib32gcc-s1 lib32stdc++6
-
-# CentOS/RHEL
-sudo yum install glibc.i686 libstdc++.i686
-</code></pre>
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
 
 <h3>Connection Issues</h3>
 
-<h4>Server Not Listed in Browser</h4>
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li><strong>Check GSLT token:</strong> Must be valid and not VAC banned</li>
-    <li><strong>Verify sv_lan:</strong> Must be <code>sv_lan 0</code> (not LAN mode)</li>
-    <li><strong>Check firewall:</strong> UDP 27015 must be open</li>
-    <li><strong>Wait 5-10 minutes:</strong> Steam master server updates are slow</li>
-    <li><strong>Use direct IP:</strong> <code>connect IP:27015</code> in console</li>
-</ul>
-
-<h4>Players Can't Connect</h4>
-<pre><code># Test from external location
-nc -u -v YOUR_SERVER_IP 27015
-
-# Check server status
-status
-sv_lan
-</code></pre>
-
-<h4>High Ping / Lag</h4>
-<ul>
-    <li><strong>Enable sv_pure:</strong> <code>sv_pure 1</code> (file consistency checking)</li>
-    <li><strong>Check rates:</strong> Ensure <code>sv_minrate 128000</code> for 128 tick</li>
-    <li><strong>Monitor resources:</strong> <code>top</code> or <code>htop</code> - CPU at 100%?</li>
-    <li><strong>Network bandwidth:</strong> 1Mbps per player minimum</li>
-    <li><strong>Geographic location:</strong> Host server near player base</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
 <h3>Performance Issues</h3>
 
-<h4>Low FPS / Stuttering</h4>
-<ul>
-    <li><strong>CPU bottleneck:</strong> CS requires high single-thread performance</li>
-    <li><strong>Reduce tick rate:</strong> Try <code>-tickrate 64</code> instead of 128</li>
-    <li><strong>Lower player count:</strong> Reduce <code>maxplayers</code></li>
-    <li><strong>Disable SourceTV:</strong> <code>tv_enable 0</code> saves resources</li>
-    <li><strong>Check plugins:</strong> Disable SourceMod plugins one-by-one to identify issues</li>
-</ul>
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
 
-<h4>Memory Usage High</h4>
-<pre><code># Monitor memory
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
 free -h
-htop
+top -p $(pgrep -f server)
 
-# CS2 uses more RAM than CS:GO (Source 2 engine)
-# Ensure 8GB+ available for CS2, 4GB+ for CS:GO
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
 </code></pre>
 
-<h3>Plugin/Mod Issues</h3>
+<h2 id="performance">Performance Optimization</h2>
 
-<h4>SourceMod Not Loading</h4>
-<pre><code># Check MetaMod loaded first
-meta list
-
-# Check SourceMod
-sm version
-
-# Enable developer mode
-developer 1
-
-# Check logs
-tail -f csgo/logs/latest.log
-tail -f csgo/addons/sourcemod/logs/errors_*.txt
-</code></pre>
-
-<h4>Plugin Crashes Server</h4>
+<h3>Server Tuning</h3>
 <ul>
-    <li><strong>Remove plugin:</strong> Move .smx file out of <code>plugins/</code> folder</li>
-    <li><strong>Check compatibility:</strong> Ensure plugin supports your game version</li>
-    <li><strong>Update SourceMod:</strong> Get latest stable build</li>
-    <li><strong>Check logs:</strong> <code>addons/sourcemod/logs/errors_*.txt</code></li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<h3>Map Issues</h3>
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
 
-<h4>Workshop Map Won't Download</h4>
-<pre><code># Verify server can access Steam Workshop
-# Check firewall allows outbound HTTPS (443)
-
-# Manual workshop download
-# Use tool like DepotDownloader or CSGO Server Launcher
-# Place .bsp in csgo/maps/
-# Place .nav in csgo/maps/
-# Place other files in csgo/maps/workshop/
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
 </code></pre>
 
-<h4>Custom Map Missing Resources</h4>
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
 <ul>
-    <li><strong>FastDL:</strong> Set up fast download server for custom content</li>
-    <li><strong>sv_downloadurl:</strong> <code>sv_downloadurl "http://yoursite.com/csgo/"</code></li>
-    <li><strong>Use Workshop:</strong> Upload custom maps to Steam Workshop</li>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
-<h3>Security Issues</h3>
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
-<h4>Server Hacked / Unauthorized Access</h4>
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
 <ul>
-    <li><strong>Change RCON password immediately:</strong> Strong password (20+ chars)</li>
-    <li><strong>Check admins:</strong> Review <code>configs/admins_simple.ini</code></li>
-    <li><strong>Update server:</strong> <code>app_update 740 validate</code></li>
-    <li><strong>Firewall RCON:</strong> Block TCP 27015 or whitelist IPs only</li>
-    <li><strong>Monitor logs:</strong> Check for suspicious RCON commands</li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<h2 id="gamemodes">Game Modes</h2>
-
-<h3>Competitive 5v5</h3>
-<pre><code>game_type 0
-game_mode 1
-mp_maxrounds 30
-mp_roundtime 1.92
-mp_c4timer 40
-mp_startmoney 800
-mp_maxmoney 16000
--tickrate 128
-</code></pre>
-
-<h3>Casual 10v10</h3>
-<pre><code>game_type 0
-game_mode 0
-mp_maxrounds 10
-mp_roundtime 3
-mp_friendlyfire 0
-mp_autokick 0
--tickrate 64
-</code></pre>
-
-<h3>Wingman 2v2</h3>
-<pre><code>game_type 0
-game_mode 2
-mp_maxrounds 16
-mp_roundtime 1.92
-mp_maxplayers 4
--tickrate 128
-</code></pre>
-
-<h3>Deathmatch</h3>
-<pre><code>game_type 1
-game_mode 2
-mp_respawn_on_death_ct 1
-mp_respawn_on_death_t 1
-mp_respawnwavetime_ct 0
-mp_respawnwavetime_t 0
-mp_timelimit 10
--tickrate 64
-</code></pre>
-
-<h3>Retakes (Requires Plugin)</h3>
-<p>Install <a href="https://github.com/splewis/csgo-retakes" target="_blank">Retakes plugin</a> via SourceMod.</p>
-<pre><code>sm_retakes_enabled 1
-sm_retakes_scramble_teams 1
-sm_retakes_max_players 10
-</code></pre>
-
-<h3>1v1 Arena (Requires Plugin)</h3>
-<p>Install <a href="https://github.com/splewis/csgo-multi-1v1" target="_blank">Multi-1v1 plugin</a> via SourceMod.</p>
-
-<h2>Performance Optimization</h2>
+<h3>Regular Updates</h3>
 <ul>
-    <li><strong>Use SSD storage:</strong> Faster map loads and asset streaming</li>
-    <li><strong>128 tick requires good CPU:</strong> 3.5GHz+ single-thread performance</li>
-    <li><strong>Limit SourceTV spectators:</strong> <code>tv_maxclients 5</code></li>
-    <li><strong>Disable unnecessary logs:</strong> Reduce I/O overhead</li>
-    <li><strong>Monitor resources:</strong> <code>htop</code>, <code>iotop</code>, <code>nethogs</code></li>
-    <li><strong>Geographic proximity:</strong> Host near player base for low ping</li>
-    <li><strong>Dedicated server:</strong> Don't run on shared hosting</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
 </ul>
 
-<h2>Security Best Practices</h2>
+<h3>Access Control</h3>
 <ul>
-    <li><strong>Strong RCON password:</strong> 20+ characters, random</li>
-    <li><strong>Firewall RCON port:</strong> Whitelist admin IPs only (TCP 27015)</li>
-    <li><strong>Keep server updated:</strong> Weekly <code>app_update</code> via SteamCMD</li>
-    <li><strong>Use sv_pure:</strong> <code>sv_pure 1</code> or <code>2</code> for competitive integrity</li>
-    <li><strong>Monitor logs:</strong> Watch for exploit attempts</li>
-    <li><strong>Secure SourceMod admins:</strong> Use Steam ID authentication, not passwords</li>
-    <li><strong>Disable unnecessary services:</strong> Unused ports, SSH password auth, etc.</li>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
 </ul>
 
-<h2>Updating Server</h2>
-<pre><code># Stop server gracefully
-rcon quit
-# Or: killall srcds_linux (Linux) / taskkill /IM srcds.exe (Windows)
-
-# Run SteamCMD update
-cd /home/steam/steamcmd
-./steamcmd.sh +login anonymous +force_install_dir /path/to/csgo-server +app_update 740 validate +quit
-
-# Restart server
-cd /path/to/csgo-server
-./srcds_run -game csgo +map de_dust2 ...
-</code></pre>
-
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with Counter-Strike: Global Offensive:</p>
+<h3>DDoS Protection</h3>
 <ul>
-    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod (use SourceMod for CS:GO, not AMX Mod X)</li>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
 <h2>Additional Resources</h2>
 <ul>
-    <li><a href="https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Dedicated_Servers" target="_blank">Valve Developer Wiki - CS:GO Dedicated Servers</a></li>
-    <li><a href="https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers" target="_blank">Valve Developer Wiki - CS2 Dedicated Servers</a></li>
-    <li><a href="https://www.sourcemod.net/" target="_blank">SourceMod Official Site</a></li>
-    <li><a href="https://www.metamodsource.net/" target="_blank">MetaMod:Source Official Site</a></li>
-    <li><a href="https://forums.alliedmods.net/" target="_blank">AlliedModders Forums</a></li>
-    <li><a href="https://steamcommunity.com/dev/managegameservers" target="_blank">Steam Game Server Login Tokens (GSLT)</a></li>
-    <li><a href="https://github.com/GameServerManagers/LinuxGSM" target="_blank">LinuxGSM - Server Management Scripts</a></li>
-    <li><a href="https://www.reddit.com/r/GlobalOffensive/" target="_blank">r/GlobalOffensive Reddit Community</a></li>
+    <li>Official Counter-Strike: Global Offensive & CS2 documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
     <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
-        <li>Always obtain and use a valid <strong>Game Server Login Token (GSLT)</strong> for public servers</li>
-        <li>Keep server files updated via SteamCMD (<code>app_update 740 validate</code>)</li>
-        <li>Monitor server resources (CPU, RAM, network bandwidth)</li>
-        <li>Use <strong>strong RCON password</strong> and secure firewall rules</li>
-        <li>Configure firewall properly - UDP 27015 must be accessible</li>
-        <li>128 tick requires good CPU (3.5GHz+ single-thread) and bandwidth (1Mbps per player)</li>
-        <li>CS2 requires more resources than CS:GO (Source 2 engine)</li>
-        <li>Join CS:GO/CS2 server admin communities for support and updates</li>
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
 
 <p style="text-align: center; margin-top: 30px; color: #666;">
-    <em>Last updated: January 2025 | Covers CS:GO & CS2 | Complete guide with ports, configs, troubleshooting</em>
+    <em>Last updated: November 2025 | For Counter-Strike: Global Offensive & CS2 server hosting</em>
 </p>

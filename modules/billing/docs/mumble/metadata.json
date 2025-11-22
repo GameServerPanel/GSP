@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Murmur [Mumble server] game servers",
     "name": "Murmur [Mumble server]",
     "order": 52,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

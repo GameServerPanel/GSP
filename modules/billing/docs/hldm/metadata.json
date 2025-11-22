@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Half Life: Death Match game servers",
     "name": "Half Life: Death Match",
     "order": 7,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

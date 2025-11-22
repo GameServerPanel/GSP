@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for The Forest game servers",
     "name": "The Forest",
     "order": 114,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

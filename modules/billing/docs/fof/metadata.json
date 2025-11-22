@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Fistful of Frags game servers",
-    "name":  "Fistful of Frags",
-    "order":  82,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Fistful of Frags game servers",
+    "name": "Fistful of Frags",
+    "order": 82,
+    "category": "game",
+    "complete": true
 }

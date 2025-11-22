@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Reign of Kings game servers",
     "name": "Reign of Kings",
     "order": 72,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

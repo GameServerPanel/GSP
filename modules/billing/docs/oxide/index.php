@@ -1,484 +1,362 @@
 <?php
 /**
- * Oxide / uMod Documentation
+ * Oxide / uMod Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>📚 Oxide / uMod Guide</h1>
-<p style="font-size: 1.1em; color: rgba(255,255,255,0.8);">Universal modding framework for Rust, 7 Days to Die, and more</p>
-
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
-    <table style="width: 100%; color: #e5e7eb;">
-        <tr><td><strong style="color: #ffffff;">Supported Games:</strong></td><td>Rust, 7 Days to Die, Hurtworld, Reign of Kings, The Forest</td></tr>
-        <tr><td><strong style="color: #ffffff;">Languages:</strong></td><td>C# (primary), Lua (limited support)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Plugin Repository:</strong></td><td>umod.org (formerly oxidemod.org)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Current Version:</strong></td><td>uMod 2.x (successor to Oxide 2.0)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Permissions System:</strong></td><td>Built-in group and user permissions</td></tr>
-        <tr><td><strong style="color: #ffffff;">Website:</strong></td><td>umod.org</td></tr>
-    </table>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h2>Navigation</h2>
-<ul style="list-style: none; padding: 0;">
-    <li>📚 <a href="#overview">Overview</a></li>
-    <li>📥 <a href="#installation">Installation</a></li>
-    <li>🔌 <a href="#plugins">Plugin System</a></li>
-    <li>👤 <a href="#permissions">Permissions & Groups</a></li>
-    <li>💻 <a href="#development">Plugin Development</a></li>
-    <li>🎮 <a href="#gamespecific">Game-Specific Setup</a></li>
-    <li>🔧 <a href="#troubleshooting">Troubleshooting</a></li>
-    <li>📖 <a href="#resources">Resources</a></li>
-</ul>
+<h1>Oxide / uMod Server Hosting Guide</h1>
 
-<h2 id="overview">Overview</h2>
-<p>Oxide (now uMod) is a modding framework that provides a universal API for creating plugins across multiple games. It allows server owners to add custom functionality without modifying game files.</p>
+<h2>Overview</h2>
+<p>Oxide / uMod is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Oxide / uMod server for your community.</p>
 
-<h3>Key Features</h3>
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+    </ul>
+</div>
+
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Oxide / uMod server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Oxide / uMod Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Oxide / uMod Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><strong>Cross-Game Support:</strong> Same framework works across multiple games</li>
-    <li><strong>C# Plugins:</strong> Write plugins in C# with hot-reloading</li>
-    <li><strong>Hook System:</strong> Intercept game events (player join, death, chat, etc.)</li>
-    <li><strong>Permissions:</strong> Built-in user/group permission system</li>
-    <li><strong>Data Storage:</strong> Built-in JSON/SQLite data storage</li>
-    <li><strong>Plugin Repository:</strong> Thousands of free plugins at umod.org</li>
-    <li><strong>Hot-Reload:</strong> Update plugins without server restart</li>
-    <li><strong>Console Commands:</strong> Add custom admin and player commands</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Supported Games</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Game</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Support Level</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Popular Plugins</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Rust</td>
-            <td style="padding: 12px;"><span style="color: #10b981;">★★★★★ Full</span></td>
-            <td style="padding: 12px;">Kits, Economics, Clans, TP, Vote</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">7 Days to Die</td>
-            <td style="padding: 12px;"><span style="color: #10b981;">★★★★★ Full</span></td>
-            <td style="padding: 12px;">Admin Tools, Teleport, Bloodmoon</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Hurtworld</td>
-            <td style="padding: 12px;"><span style="color: #fbbf24;">★★★★☆ Good</span></td>
-            <td style="padding: 12px;">Admin Tools, Kits, Economy</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">Reign of Kings</td>
-            <td style="padding: 12px;"><span style="color: #fbbf24;">★★★☆☆ Fair</span></td>
-            <td style="padding: 12px;">Admin Tools, Custom Commands</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">The Forest</td>
-            <td style="padding: 12px;"><span style="color: #fbbf24;">★★★☆☆ Fair</span></td>
-            <td style="padding: 12px;">Limited plugin support</td>
-        </tr>
-    </tbody>
-</table>
+<h3>Installation Steps</h3>
 
-<h2 id="installation">📥 Installation</h2>
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
-<h3>Rust Installation</h3>
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-<h4>Windows</h4>
-<pre><code># Stop your Rust server first
-
-# Download uMod for Rust from umod.org
-# Extract Oxide.Rust.zip to your server directory
-# Files extract to: RustDedicated_Data/Managed/
-
-# Start server - Oxide will create directories:
-# oxide/plugins/      (place plugins here)
-# oxide/config/       (plugin configs)
-# oxide/data/         (plugin data)
-# oxide/logs/         (Oxide logs)
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h4>Linux</h4>
-<pre><code># Stop Rust server
-cd /home/rustserver
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-# Download and extract Oxide
-wget https://umod.org/games/rust/download
-unzip -o Oxide.Rust.zip
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
 
-# Set permissions
-chmod +x RustDedicated
 
-# Start server
-./RustDedicated -batchmode +server.port 28015 +server.level "Procedural Map" +server.seed 12345 +server.worldsize 4000 +server.maxplayers 100 +server.hostname "My Rust Server" +server.description "Powered by Oxide" +server.identity "server1"
-</code></pre>
+<h2 id="configuration">Server Configuration</h2>
 
-<h3>7 Days to Die Installation</h3>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-<h4>Windows</h4>
-<pre><code># Stop 7 Days to Die server
-
-# Download uMod for 7 Days to Die from umod.org
-# Extract to 7DaysToDieServer directory
-# Files go to: 7DaysToDieServer_Data/Managed/
-
-# Start server - Oxide directories created in:
-# 7DaysToDieServer_Data/oxide/
-</code></pre>
-
-<h4>Linux</h4>
-<pre><code># Stop server
-cd /home/7daysserver
-
-# Download and extract
-wget https://umod.org/games/7-days-to-die/download
-unzip -o Oxide.7DaysToDie.zip
-
-# Start server
-./7DaysToDieServer.sh
-</code></pre>
-
-<h2 id="plugins">🔌 Plugin System</h2>
-
-<h3>Installing Plugins</h3>
-
-<h4>Method 1: Manual Installation</h4>
-<pre><code># Download plugin .cs file from umod.org
-# Example: AdminPanel.cs
-
-# Place in oxide/plugins/ directory
-oxide/
-└── plugins/
-    └── AdminPanel.cs
-
-# Oxide automatically compiles and loads the plugin
-# Check oxide/logs/oxide.log for any errors
-</code></pre>
-
-<h4>Method 2: In-Game Commands (if supported)</h4>
-<pre><code># Some admin tools allow downloading plugins in-game
-oxide.load PluginName
-oxide.reload PluginName
-oxide.unload PluginName
-</code></pre>
-
-<h3>Popular Rust Plugins</h3>
-
-<h4>Essential Administration Plugins</h4>
+<h3>Essential Settings</h3>
 <ul>
-    <li><strong>Admin Radar:</strong> ESP-style admin tool showing players/entities</li>
-    <li><strong>Vanish:</strong> Make admins invisible to players</li>
-    <li><strong>Admin Panel:</strong> GUI admin menu</li>
-    <li><strong>Better Chat:</strong> Enhanced chat with colors, titles, groups</li>
-    <li><strong>Anti Cheat:</strong> Detect and ban cheaters</li>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
 </ul>
 
-<h4>Player Features</h4>
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
+
+<h3>Common Parameters</h3>
 <ul>
-    <li><strong>Kits:</strong> Starter kits and VIP kits for players</li>
-    <li><strong>TP (Teleport):</strong> /home, /tpr (teleport request), /town commands</li>
-    <li><strong>Economics:</strong> Virtual currency system</li>
-    <li><strong>Clans:</strong> Team/clan system with shared bases</li>
-    <li><strong>Vote:</strong> Reward players for voting on server lists</li>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
 </ul>
 
-<h4>Server Enhancement</h4>
-<ul>
-    <li><strong>Auto Purge:</strong> Remove old/inactive bases</li>
-    <li><strong>Stack Size Controller:</strong> Modify stack sizes</li>
-    <li><strong>Loot Multiplier:</strong> Increase/decrease loot spawns</li>
-    <li><strong>Gather Manager:</strong> Modify resource gathering rates</li>
-    <li><strong>Skip Night:</strong> Vote to skip night time</li>
-</ul>
+<h3>Creating a Start Script</h3>
 
-<h3>Plugin Configuration</h3>
-<p>After first load, plugins create config files in <code>oxide/config/</code>:</p>
-<pre><code># Example: oxide/config/Kits.json
-{
-  "Kits": {
-    "starter": {
-      "items": [
-        {"shortname": "stones", "amount": 3000},
-        {"shortname": "wood", "amount": 5000},
-        {"shortname": "bandage", "amount": 5}
-      ],
-      "cooldown": 3600
-    }
-  }
-}
-
-# Edit configs and use: oxide.reload Kits
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
 </code></pre>
 
-<h2 id="permissions">👤 Permissions & Groups</h2>
-
-<h3>Permission System Overview</h3>
-<p>Oxide uses a hierarchical permission system with groups and individual user permissions.</p>
-
-<h3>Basic Permission Commands</h3>
-<pre><code># Grant permission to user (use Steam64 ID)
-oxide.grant user 76561198012345678 pluginname.permission
-
-# Grant permission to group
-oxide.grant group admin adminradar.allowed
-
-# Revoke permission
-oxide.revoke user 76561198012345678 pluginname.permission
-
-# Show user permissions
-oxide.show user 76561198012345678
-
-# Show group permissions
-oxide.show group admin
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
 </code></pre>
 
-<h3>Group Management</h3>
-<pre><code># Create group
-oxide.group add vip "VIP Members" 1
+<h3>Running as a Service</h3>
 
-# Add user to group
-oxide.usergroup add 76561198012345678 vip
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Oxide / uMod Server
+After=network.target
 
-# Remove user from group
-oxide.usergroup remove 76561198012345678 vip
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
 
-# List all groups
-oxide.show groups
-
-# Set parent group (inheritance)
-oxide.group parent vip default
+[Install]
+WantedBy=multi-user.target
 </code></pre>
 
-<h3>Default Groups</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Group</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Rank</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Purpose</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">admin</td>
-            <td style="padding: 12px;">0 (highest)</td>
-            <td style="padding: 12px;">Full permissions</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">moderator</td>
-            <td style="padding: 12px;">1</td>
-            <td style="padding: 12px;">Moderate permissions</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">vip</td>
-            <td style="padding: 12px;">2</td>
-            <td style="padding: 12px;">VIP player perks</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">default</td>
-            <td style="padding: 12px;">3 (lowest)</td>
-            <td style="padding: 12px;">Regular players</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Finding Steam64 ID</h3>
-<ul>
-    <li><strong>In-Game (Rust):</strong> F1 console, type <code>players</code> - shows online players with Steam IDs</li>
-    <li><strong>Website:</strong> steamid.io - convert Steam profile URL to Steam64 ID</li>
-    <li><strong>Server Logs:</strong> Check oxide/logs/ for player connections</li>
-</ul>
-
-<h2 id="development">💻 Plugin Development</h2>
-
-<h3>Basic Plugin Structure</h3>
-<pre><code>using Oxide.Core;
-using Oxide.Core.Libraries.Covalence;
-
-namespace Oxide.Plugins
-{
-    [Info("HelloWorld", "YourName", "1.0.0")]
-    [Description("Simple hello world plugin")]
-    class HelloWorld : RustPlugin
-    {
-        // Called when plugin is loaded
-        void Init()
-        {
-            Puts("HelloWorld plugin loaded!");
-        }
-
-        // Chat command: /hello
-        [Command("hello")]
-        void HelloCommand(IPlayer player, string command, string[] args)
-        {
-            player.Reply("Hello, " + player.Name + "!");
-        }
-
-        // Hook: Called when player connects
-        void OnPlayerConnected(BasePlayer player)
-        {
-            PrintToChat($"{player.displayName} has joined the server!");
-        }
-    }
-}
-</code></pre>
-
-<h3>Common Hooks (Rust)</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Hook</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Purpose</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>Init()</code></td>
-            <td style="padding: 12px;">Plugin initialization</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>OnServerInitialized()</code></td>
-            <td style="padding: 12px;">Server fully loaded</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>OnPlayerConnected(BasePlayer)</code></td>
-            <td style="padding: 12px;">Player joins server</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>OnPlayerDisconnected(BasePlayer)</code></td>
-            <td style="padding: 12px;">Player leaves server</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>OnPlayerChat(BasePlayer, string)</code></td>
-            <td style="padding: 12px;">Player sends chat message</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>OnEntityDeath(BaseCombatEntity)</code></td>
-            <td style="padding: 12px;">Entity (player/NPC) dies</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>OnEntitySpawned(BaseNetworkable)</code></td>
-            <td style="padding: 12px;">Entity spawns</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Data Storage Example</h3>
-<pre><code>// Store player data in JSON file
-class PlayerData
-{
-    public string Name;
-    public int Points;
-    public DateTime LastSeen;
-}
-
-class MyPlugin : RustPlugin
-{
-    Dictionary<ulong, PlayerData> playerData = new Dictionary<ulong, PlayerData>();
-
-    void LoadData()
-    {
-        playerData = Interface.Oxide.DataFileSystem.ReadObject<Dictionary<ulong, PlayerData>>("MyPlugin_Data");
-    }
-
-    void SaveData()
-    {
-        Interface.Oxide.DataFileSystem.WriteObject("MyPlugin_Data", playerData);
-    }
-}
-</code></pre>
-
-<h2 id="gamespecific">🎮 Game-Specific Setup</h2>
-
-<h3>Rust</h3>
-<pre><code># Server startup with Oxide
-./RustDedicated -batchmode \
-  +server.port 28015 \
-  +server.level "Procedural Map" \
-  +server.hostname "My Oxide Server" \
-  +rcon.port 28016 \
-  +rcon.password "your_rcon_password"
-
-# Essential first plugins:
-# 1. BetterChat (chat enhancement)
-# 2. AdminRadar (admin tool)
-# 3. Vanish (admin invisibility)
-</code></pre>
-
-<h3>7 Days to Die</h3>
-<pre><code># Oxide config location:
-# 7DaysToDieServer_Data/oxide/config/
-
-# Essential plugins:
-# 1. Admin Tools
-# 2. Teleport System
-# 3. Player Info
-
-# Check oxide/logs/ for plugin errors
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
 </code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Plugin Not Loading</h3>
-<pre><code># Check oxide/logs/oxide.log for errors
-tail -f oxide/logs/oxide.log
+<h3>Server Won't Start</h3>
 
-# Common issues:
-# 1. Syntax errors in plugin code
-# 2. Missing dependencies
-# 3. Outdated plugin version
-# 4. Permission denied (file permissions)
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
 
-# Reload plugin manually
-oxide.reload PluginName
+# Or check system logs
+journalctl -u gameserver -f
 </code></pre>
 
-<h3>Permissions Not Working</h3>
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Verify user's Steam64 ID is correct</li>
-    <li>Check group membership: <code>oxide.show user STEAMID</code></li>
-    <li>Ensure permission format matches plugin docs (case-sensitive)</li>
-    <li>Check plugin config for permission names</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Plugin Conflicts</h3>
-<pre><code># Disable plugins one by one to find conflict
-oxide.unload PluginName
+<h3>Performance Issues</h3>
 
-# Check oxide/logs/ for conflict errors
-# Some plugins modify same hooks - may conflict
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
 </code></pre>
 
-<h3>High CPU Usage</h3>
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li>Disable resource-intensive plugins (radar, ESP tools)</li>
-    <li>Check for plugin loops in oxide/logs/</li>
-    <li>Update to latest Oxide version</li>
-    <li>Limit entities tracked by admin tools</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Oxide / uMod documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Start Simple:</strong> Install essential plugins first, add more gradually</li>
-        <li><strong>Read Plugin Docs:</strong> Each plugin page on umod.org has detailed config examples</li>
-        <li><strong>Backup Configs:</strong> Backup oxide/config/ before major changes</li>
-        <li><strong>Test Permissions:</strong> Use non-admin account to test player permissions</li>
-        <li><strong>Monitor Logs:</strong> Regularly check oxide/logs/ for errors</li>
-        <li><strong>Update Plugins:</strong> Keep plugins updated for bug fixes and new game versions</li>
-        <li><strong>VIP System:</strong> Use groups for VIP perks (kits, teleports, etc.)</li>
-        <li><strong>Hot-Reload:</strong> Most plugin changes can reload without server restart</li>
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
 
-<h2 id="resources">Resources</h2>
-<ul>
-    <li><a href="https://umod.org/" target="_blank">uMod Official Website</a></li>
-    <li><a href="https://umod.org/plugins" target="_blank">Plugin Repository</a></li>
-    <li><a href="https://umod.org/documentation" target="_blank">Developer Documentation</a></li>
-    <li><a href="https://discord.gg/umod" target="_blank">uMod Discord Community</a></li>
-    <li>Related Game Documentation: <a href="../rust/">Rust</a>, <a href="../7daystodie/">7 Days to Die</a></li>
-</ul>
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Oxide / uMod server hosting</em>
+</p>

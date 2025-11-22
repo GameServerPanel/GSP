@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Outlaws of the Old West game servers",
     "name": "Outlaws of the Old West",
     "order": 62,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

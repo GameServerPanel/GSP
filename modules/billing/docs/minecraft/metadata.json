@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Complete guide for hosting and managing Minecraft Java Edition servers",
-    "name":  "Minecraft Server",
-    "order":  1,
-    "category":  "game"
+{
+    "description": "Complete guide for hosting and managing Minecraft Java Edition servers",
+    "name": "Minecraft Server",
+    "order": 1,
+    "category": "game",
+    "complete": true
 }

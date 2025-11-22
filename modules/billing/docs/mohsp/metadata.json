@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Medal Of Honor: Spearhead game servers",
     "name": "Medal Of Honor: Spearhead",
     "order": 43,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

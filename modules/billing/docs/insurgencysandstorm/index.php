@@ -1,490 +1,415 @@
 <?php
 /**
- * Insurgency: Sandstorm Server Documentation
+ * Insurgency: Sandstorm Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>📚 Insurgency: Sandstorm Server Guide</h1>
-<p style="font-size: 1.1em; color: rgba(255,255,255,0.8);">Tactical team-based FPS with realistic combat mechanics</p>
-
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
-    <table style="width: 100%; color: #e5e7eb;">
-        <tr><td><strong style="color: #ffffff;">Engine:</strong></td><td>Unreal Engine 4</td></tr>
-        <tr><td><strong style="color: #ffffff;">Developer:</strong></td><td>New World Interactive</td></tr>
-        <tr><td><strong style="color: #ffffff;">App ID:</strong></td><td>581320 (Dedicated Server)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Default Ports:</strong></td><td>27102 (Game), 27131 (Query), 27015 (RCON)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Max Players:</strong></td><td>8v8 (16 players typical), up to 32 possible</td></tr>
-        <tr><td><strong style="color: #ffffff;">Game Modes:</strong></td><td>Push, Firefight, Skirmish, Frontline, Checkpoint, Outpost, Survival</td></tr>
-        <tr><td><strong style="color: #ffffff;">Platforms:</strong></td><td>Linux, Windows</td></tr>
-    </table>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h2>Navigation</h2>
-<ul style="list-style: none; padding: 0;">
-    <li>📚 <a href="#overview">Overview</a></li>
-    <li>🔌 <a href="#ports">Ports & Firewall</a></li>
-    <li>📥 <a href="#installation">Installation</a></li>
-    <li>⚙️ <a href="#configuration">Configuration</a></li>
-    <li>🎮 <a href="#gamemodes">Game Modes</a></li>
-    <li>🗺️ <a href="#maps">Maps & Scenarios</a></li>
-    <li>🔧 <a href="#admin">Admin Tools</a></li>
-    <li>🛠️ <a href="#mods">Mods & Mutators</a></li>
-    <li>🚀 <a href="#startup">Startup Commands</a></li>
-    <li>🔧 <a href="#troubleshooting">Troubleshooting</a></li>
-    <li>📖 <a href="#resources">Resources</a></li>
-</ul>
-
-<h2 id="overview">Overview</h2>
-<p>Insurgency: Sandstorm is a hardcore tactical FPS focusing on close-quarters combat and teamwork. The game features realistic ballistics, minimal HUD, and high lethality combat where positioning and communication matter more than twitch reflexes.</p>
-
-<h3>Key Features</h3>
-<ul>
-    <li><strong>Realistic Combat:</strong> Minimal HUD, no health regeneration, realistic weapon behavior</li>
-    <li><strong>7 Game Modes:</strong> Competitive and cooperative gameplay options</li>
-    <li><strong>Tactical Depth:</strong> Fire support, smoke grenades, objective-based gameplay</li>
-    <li><strong>Customizable Loadouts:</strong> Weapon attachments and gear choices affect playstyle</li>
-    <li><strong>Mod Support:</strong> Community maps, mutators, and custom scenarios</li>
-    <li><strong>Voice Communication:</strong> Proximity-based voice chat adds immersion</li>
-    <li><strong>Fire Support:</strong> Call in artillery, helicopter gunships, and smoke strikes</li>
-</ul>
-
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-
-<h3>Required Ports</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Required?</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>27102</code></td>
-            <td style="padding: 12px;"><span style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">UDP</span></td>
-            <td style="padding: 12px;">Game Port (client connections)</td>
-            <td style="padding: 12px;"><strong style="color: #10b981;">✓ Required</strong></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>27131</code></td>
-            <td style="padding: 12px;"><span style="background: #10b981; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">UDP</span></td>
-            <td style="padding: 12px;">Query Port (server browser)</td>
-            <td style="padding: 12px;"><strong style="color: #10b981;">✓ Required</strong></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>27015</code></td>
-            <td style="padding: 12px;"><span style="background: #3b82f6; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">TCP</span></td>
-            <td style="padding: 12px;">RCON Port (remote administration)</td>
-            <td style="padding: 12px;"><span style="color: #fbbf24;">Optional Recommended</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<p><strong>Note:</strong> Ports are configurable in Game.ini and Engine.ini. Default ports shown above.</p>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>Ubuntu/Debian (UFW)</h4>
-<pre><code># Allow Insurgency: Sandstorm ports
-sudo ufw allow 27102/udp comment "Insurgency Game Port"
-sudo ufw allow 27131/udp comment "Insurgency Query Port"
-sudo ufw allow 27015/tcp comment "Insurgency RCON"
-sudo ufw reload
-</code></pre>
-
-<h4>CentOS/RHEL (FirewallD)</h4>
-<pre><code># Add Insurgency: Sandstorm ports
-sudo firewall-cmd --permanent --add-port=27102/udp  # Game
-sudo firewall-cmd --permanent --add-port=27131/udp  # Query
-sudo firewall-cmd --permanent --add-port=27015/tcp  # RCON
-sudo firewall-cmd --reload
-</code></pre>
-
-<h4>Windows (PowerShell - Run as Administrator)</h4>
-<pre><code># Create firewall rules for Insurgency: Sandstorm
-New-NetFirewallRule -DisplayName "Insurgency Game" -Direction Inbound -Protocol UDP -LocalPort 27102 -Action Allow
-New-NetFirewallRule -DisplayName "Insurgency Query" -Direction Inbound -Protocol UDP -LocalPort 27131 -Action Allow
-New-NetFirewallRule -DisplayName "Insurgency RCON" -Direction Inbound -Protocol TCP -LocalPort 27015 -Action Allow
-</code></pre>
-
-<h4>iptables (Advanced)</h4>
-<pre><code># Allow Insurgency: Sandstorm ports
-iptables -A INPUT -p udp --dport 27102 -j ACCEPT -m comment --comment "Insurgency Game"
-iptables -A INPUT -p udp --dport 27131 -j ACCEPT -m comment --comment "Insurgency Query"
-iptables -A INPUT -p tcp --dport 27015 -j ACCEPT -m comment --comment "Insurgency RCON"
-
-# Save rules (Ubuntu/Debian)
-netfilter-persistent save
-
-# Save rules (CentOS/RHEL)
-service iptables save
-</code></pre>
-
-<h2 id="installation">Installation</h2>
-
-<h3>Prerequisites</h3>
-<ul>
-    <li><strong>SteamCMD</strong> installed (<a href="https://developer.valvesoftware.com/wiki/SteamCMD" target="_blank">Installation Guide</a>)</li>
-    <li>Disk space: ~20 GB for full installation</li>
-    <li>RAM: 4GB minimum, 8GB recommended for 16+ players</li>
-    <li>Open firewall ports (27102, 27131 UDP, 27015 TCP)</li>
-</ul>
-
-<h3>Linux Installation</h3>
-<pre><code># Create server directory
-mkdir -p ~/insurgency_server
-cd ~/insurgency_server
-
-# Download server files with SteamCMD
-steamcmd +force_install_dir ~/insurgency_server +login anonymous +app_update 581320 validate +quit
-
-# Note: App ID 581320 is for Insurgency: Sandstorm Dedicated Server
-# Download size is approximately 18-20 GB
-</code></pre>
-
-<h3>Windows Installation</h3>
-<pre><code># Download SteamCMD for Windows
-# Extract to C:\steamcmd\
-
-# Create server directory
-mkdir C:\insurgency_server
-
-# Run SteamCMD
-C:\steamcmd\steamcmd.exe +force_install_dir C:\insurgency_server +login anonymous +app_update 581320 validate +quit
-</code></pre>
-
-<h2 id="configuration">⚙️ Configuration</h2>
-
-<h3>Main Configuration Files</h3>
-<p>Configuration files are in <code>Insurgency/Saved/Config/LinuxServer/</code> (Linux) or <code>Insurgency/Saved/Config/WindowsServer/</code> (Windows):</p>
-
-<ul>
-    <li><strong>Game.ini</strong> - Game settings, scenarios, map rotation</li>
-    <li><strong>Engine.ini</strong> - Network settings, port configuration</li>
-    <li><strong>ServerConfig.txt</strong> - Server name, admin password, RCON</li>
-</ul>
-
-<h3>Engine.ini (Network Configuration)</h3>
-<p>Edit <code>Insurgency/Saved/Config/LinuxServer/Engine.ini</code>:</p>
-<pre><code>[URL]
-Port=27102
-
-[/Script/Engine.GameNetworkManager]
-TotalNetBandwidth=64000
-MaxDynamicBandwidth=32000
-MinDynamicBandwidth=16000
-
-[SystemSettings]
-net.MaxRepArraySize=2048
-net.MaxRepArrayMemory=2048
-
-[/Script/OnlineSubsystemUtils.IpNetDriver]
-MaxClientRate=25000
-MaxInternetClientRate=25000
-</code></pre>
-
-<h3>Game.ini (Server Settings)</h3>
-<p>Edit <code>Insurgency/Saved/Config/LinuxServer/Game.ini</code>:</p>
-<pre><code>[/Script/Insurgency.INSMultiplayerMode]
-bAllowFriendlyFire=True
-bMapVoting=True
-RoundLimit=3
-WinLimit=3
-GameTimeLimit=-1
-PreRoundTime=15
-PostRoundTime=15
-PostGameTime=15
-
-[/Script/Insurgency.INSCoopMode]
-bAllowFriendlyFire=True
-RoundLimit=1
-WinLimit=1
-</code></pre>
-
-<h3>Map Rotation Configuration</h3>
-<p>Create <code>Insurgency/Saved/Config/LinuxServer/MapCycle.txt</code>:</p>
-<pre><code># Competitive Push rotation
-(Scenario="Scenario_Crossing_Push",Lighting="Day")
-(Scenario="Scenario_Hideout_Push",Lighting="Day")
-(Scenario="Scenario_Summit_Push",Lighting="Day")
-(Scenario="Scenario_Tell_Push",Lighting="Day")
-(Scenario="Scenario_Ministry_Push",Lighting="Day")
-
-# Mix in night maps
-(Scenario="Scenario_Hideout_Push",Lighting="Night")
-(Scenario="Scenario_Ministry_Push",Lighting="Night")
-</code></pre>
-
-<h2 id="gamemodes">Game Modes</h2>
-
-<h3>Competitive Modes (PvP)</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Mode</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Description</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Players</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Push</strong></td>
-            <td style="padding: 12px;">Attackers push through objectives, defenders hold ground</td>
-            <td style="padding: 12px;">8v8 (16)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Firefight</strong></td>
-            <td style="padding: 12px;">Fast-paced 3 objective control, single life per round</td>
-            <td style="padding: 12px;">5v5 (10)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Frontline</strong></td>
-            <td style="padding: 12px;">Tug-of-war over middle objectives with respawn waves</td>
-            <td style="padding: 12px;">8v8 (16)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Skirmish</strong></td>
-            <td style="padding: 12px;">Elimination with limited respawns, capture objectives to gain more</td>
-            <td style="padding: 12px;">8v8 (16)</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Cooperative Modes (PvE)</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Mode</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Description</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Players</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Checkpoint</strong></td>
-            <td style="padding: 12px;">Team captures objectives against AI defenders</td>
-            <td style="padding: 12px;">Up to 8 co-op</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Outpost</strong></td>
-            <td style="padding: 12px;">Defend single objective against AI waves (Horde mode)</td>
-            <td style="padding: 12px;">Up to 8 co-op</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Survival</strong></td>
-            <td style="padding: 12px;">Extract-based co-op with permadeath and limited resources</td>
-            <td style="padding: 12px;">Up to 8 co-op</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="maps">🗺️ Official Maps</h2>
-
-<h3>Core Maps</h3>
-<ul>
-    <li><strong>Crossing</strong> - Mountain pass with open sightlines</li>
-    <li><strong>Hideout</strong> - Close-quarters village combat</li>
-    <li><strong>Summit</strong> - Snowy mountain compound</li>
-    <li><strong>Tell</strong> - Dense urban environment</li>
-    <li><strong>Ministry</strong> - Multi-story government building</li>
-    <li><strong>Precinct</strong> - Police station and streets</li>
-    <li><strong>Refinery</strong> - Industrial oil refinery complex</li>
-    <li><strong>Farmhouse</strong> - Rural farmland and buildings</li>
-</ul>
-
-<h3>DLC Maps</h3>
-<ul>
-    <li><strong>Citadel</strong> - Ancient fortress ruins</li>
-    <li><strong>Gap</strong> - Afghan village in mountain valley</li>
-    <li><strong>PowerPlant</strong> - Geothermal power facility</li>
-    <li><strong>Tideway</strong> - Port and cargo ship</li>
-</ul>
-
-<h3>Lighting Options</h3>
-<p>Most maps support multiple lighting scenarios:</p>
-<ul>
-    <li><strong>Day</strong> - Standard daytime lighting</li>
-    <li><strong>Night</strong> - Nighttime with NVG gameplay</li>
-    <li><strong>Dusk/Dawn</strong> - Available on select maps</li>
-</ul>
-
-<h2 id="admin">🔧 Admin Tools & RCON</h2>
-
-<h3>Enabling RCON</h3>
-<p>RCON allows remote administration. Configure in startup parameters or config files.</p>
-
-<h4>RCON Commands (Sample)</h4>
-<pre><code># Player management
-kick [PlayerName] [Reason]
-ban [PlayerName]
-listplayers
-
-# Map control
-travel [MapName]
-restartround
-
-# Server settings
-say [Message]
-setnextmap [MapName]
-</code></pre>
-
-<h3>Admin Console Commands</h3>
-<p>In-game console (tilde key ~):</p>
-<pre><code># Admin commands (requires admin login)
-adminlogin [password]
-kick [PlayerName]
-ban [PlayerName]
-travel [MapName]
-restartround
-say [Message]
-</code></pre>
-
-<h2 id="mods">🛠️ Mods & Mutators</h2>
-
-<h3>Workshop Content</h3>
-<p>Insurgency: Sandstorm supports Steam Workshop mods:</p>
-<ul>
-    <li>Custom maps and scenarios</li>
-    <li>New weapons and attachments</li>
-    <li>Gameplay mutators</li>
-    <li>Cosmetic items</li>
-</ul>
-
-<h3>Installing Workshop Mods</h3>
-<p>Subscribe to mods on Steam Workshop, then add their IDs to your startup command:</p>
-<pre><code>-Mods=123456789,987654321
-</code></pre>
-
-<h3>Popular Mutators</h3>
-<ul>
-    <li><strong>Ismc Mod:</strong> Adds 100+ weapons and attachments</li>
-    <li><strong>Day of Infamy Maps:</strong> Classic maps ported to Sandstorm</li>
-    <li><strong>Custom Scenarios:</strong> Community-created game modes</li>
-    <li><strong>Hardcore Mutators:</strong> Increased realism and difficulty</li>
-</ul>
-
-<h2 id="startup">Startup Commands</h2>
-
-<h3>Linux</h3>
-<pre><code>#!/bin/bash
-# start_insurgency.sh
-
-cd ~/insurgency_server
-
-./Insurgency/Binaries/Linux/InsurgencyServer-Linux-Shipping \
-  Crossing?Scenario=Scenario_Crossing_Push?Lighting=Day \
-  -Port=27102 -QueryPort=27131 \
-  -log -AdminList=Admins -MapCycle=MapCycle \
-  -MaxPlayers=16 -Mods
-</code></pre>
-
-<h3>Windows</h3>
-<pre><code>@echo off
-REM start_insurgency.bat
-
-cd C:\insurgency_server
-
-InsurgencyServer.exe Crossing?Scenario=Scenario_Crossing_Push?Lighting=Day ^
-  -Port=27102 -QueryPort=27131 ^
-  -log -AdminList=Admins -MapCycle=MapCycle ^
-  -MaxPlayers=16 -Mods
-</code></pre>
-
-<h3>Startup Parameters</h3>
-<ul>
-    <li><code>MapName?Scenario=ScenarioName?Lighting=Day</code> - Start map with scenario</li>
-    <li><code>-Port=27102</code> - Game port</li>
-    <li><code>-QueryPort=27131</code> - Server browser query port</li>
-    <li><code>-MaxPlayers=16</code> - Maximum players (8v8 typical)</li>
-    <li><code>-AdminList=Admins</code> - Admin list file (Admins.txt)</li>
-    <li><code>-MapCycle=MapCycle</code> - Map rotation file (MapCycle.txt)</li>
-    <li><code>-Mods</code> - Enable Workshop mods</li>
-    <li><code>-log</code> - Enable detailed logging</li>
-    <li><code>-hostname="Server Name"</code> - Server name in browser</li>
-    <li><code>-password=serverpass</code> - Server password (optional)</li>
-</ul>
-
-<h2 id="troubleshooting">🔧 Troubleshooting</h2>
-
-<h3>Server Not Appearing in Browser</h3>
-<pre><code># Check ports are open
-netstat -an | grep 27102
-netstat -an | grep 27131
-
-# Verify server is running
-ps aux | grep Insurgency  # Linux
-tasklist | findstr Insurgency  # Windows
-
-# Check firewall allows both game and query ports
-# Wait 5-10 minutes for Steam master server registration
-</code></pre>
-
-<h3>High Ping / Lag Issues</h3>
-<ul>
-    <li>Increase <code>MaxClientRate</code> in Engine.ini (try 50000-100000)</li>
-    <li>Reduce <code>MaxPlayers</code> if server hardware is limited</li>
-    <li>Ensure server has adequate CPU (UE4 is CPU-intensive)</li>
-    <li>Check network bandwidth and latency to players</li>
-</ul>
-
-<h3>Mods Not Loading</h3>
-<pre><code># Ensure -Mods flag is in startup command
-# Verify Workshop mod IDs are correct
-# Check mod compatibility with current game version
-# Some mods require client and server to both have them
-
-# Example with specific mod IDs:
--Mods=2389387394,2318862735
-</code></pre>
-
-<h3>Players Can't Connect</h3>
-<ul>
-    <li>Verify game port (27102) is open in firewall</li>
-    <li>Check server isn't password-protected unintentionally</li>
-    <li>Ensure server and client game versions match</li>
-    <li>Verify <code>MaxPlayers</code> isn't reached</li>
-    <li>Check logs in <code>Insurgency/Saved/Logs/</code></li>
-</ul>
-
-<h3>RCON Won't Connect</h3>
-<pre><code># Verify RCON port (27015) is open
-# Check RCON password is set in startup command or config
-# Try connecting from localhost first (127.0.0.1)
-# Use RCON tools compatible with Source-style RCON protocol
-</code></pre>
-
-<h3>Server Crashes on Startup</h3>
-<ul>
-    <li>Verify full installation via SteamCMD (validate)</li>
-    <li>Check map/scenario names are spelled correctly</li>
-    <li>Remove conflicting mods</li>
-    <li>Ensure adequate disk space and RAM</li>
-    <li>Check logs: <code>Insurgency/Saved/Logs/Insurgency.log</code></li>
-</ul>
-
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Mixed Lighting:</strong> Rotate day/night versions of maps for variety</li>
-        <li><strong>Balanced Teams:</strong> 8v8 is optimal for most maps and modes</li>
-        <li><strong>Fire Support:</strong> Configure in Game.ini - adds tactical depth</li>
-        <li><strong>Friendly Fire:</strong> Enable for realistic tactical gameplay</li>
-        <li><strong>Vote Systems:</strong> Enable map voting for community choice</li>
-        <li><strong>RCON Tools:</strong> Use tools like RconSharp or HLSW for easier admin</li>
-        <li><strong>Regular Updates:</strong> Game updates frequently - validate files weekly</li>
-        <li><strong>Hardware:</strong> CPU-heavy game - prioritize single-thread performance</li>
-        <li><strong>Competitive Focus:</strong> Push and Firefight are most popular competitive modes</li>
-        <li><strong>Co-op Casual:</strong> Checkpoint is great for casual co-op sessions</li>
+<h1>Insurgency: Sandstorm Server Hosting Guide</h1>
+
+<h2>Overview</h2>
+<p>Insurgency: Sandstorm is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Insurgency: Sandstorm server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">581320</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Insurgency/Saved/Config/LinuxServer/Game.ini</code> - Server Configs</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Insurgency/Config/Server/MapCycleCustom.txt</code> - Custom Map Cycle</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Insurgency/Config/Server/Admins.txt</code> - Admins List</li>
+        </ul></li>
     </ul>
 </div>
 
-<h2 id="resources">Resources</h2>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Insurgency: Sandstorm server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Insurgency: Sandstorm Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Insurgency: Sandstorm Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><a href="https://insurgencysandstorm.mod.io/" target="_blank">Insurgency: Sandstorm Mod.io</a></li>
-    <li><a href="https://steamcommunity.com/app/581320/discussions/" target="_blank">Official Community Discussions</a></li>
-    <li><a href="https://newworldinteractive.com/" target="_blank">New World Interactive (Developer)</a></li>
-    <li><a href="https://sandstorm-support.newworldinteractive.com/hc/en-us" target="_blank">Official Support Portal</a></li>
-    <li><a href="https://www.reddit.com/r/insurgency/" target="_blank">r/insurgency - Community Subreddit</a></li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 581320</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/insurgencysandstorm
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/insurgencysandstorm \
+         +app_update 581320 validate \
+         +quit
+
+# Server files are now in ~/gameservers/insurgencysandstorm/
+cd ~/gameservers/insurgencysandstorm
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\insurgencysandstorm ^
+             +app_update 581320 validate ^
+             +quit
+</code></pre>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>Insurgency/Saved/Config/LinuxServer/Game.ini</code></strong> - Server Configs</li>
+    <li><strong><code>Insurgency/Config/Server/MapCycleCustom.txt</code></strong> - Custom Map Cycle</li>
+    <li><strong><code>Insurgency/Config/Server/Admins.txt</code></strong> - Admins List</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
+
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Insurgency: Sandstorm Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Insurgency: Sandstorm documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Insurgency: Sandstorm server hosting</em>
+</p>

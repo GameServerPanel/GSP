@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Complete guide for DayZ servers with mods, persistence, and troubleshooting",
-    "name":  "DayZ Standalone",
-    "order":  62,
-    "category":  "game"
+{
+    "description": "Complete guide for DayZ servers with mods, persistence, and troubleshooting",
+    "name": "DayZ Standalone",
+    "order": 62,
+    "category": "game",
+    "complete": true
 }

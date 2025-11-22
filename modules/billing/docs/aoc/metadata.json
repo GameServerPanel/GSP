@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Age of Chivalry game servers",
     "name": "Age of Chivalry",
     "order": 6,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }
