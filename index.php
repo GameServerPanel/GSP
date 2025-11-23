@@ -305,14 +305,19 @@ function ogpHome()
                $msg = "Admin Login :warning: \nIP:".$client_ip." \nID:".$userInfo['user_id']."  \nUser:".$userInfo['users_login'];
                $json_data = array ('content'=>"$msg");
                $make_json = json_encode($json_data);
-               $ch = curl_init( $webhookurl );
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-               curl_setopt( $ch, CURLOPT_POST, 1);
-               curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-               curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-               curl_setopt( $ch, CURLOPT_HEADER, 0);
-               curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-               $response = curl_exec( $ch );
+			   if(!function_exists('curl_init')){
+				   error_log("OGP Discord webhook skipped: PHP curl extension is not loaded.");
+			   }else{
+				   $ch = curl_init( $webhookurl );
+				   curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+				   curl_setopt( $ch, CURLOPT_POST, 1);
+				   curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
+				   curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+				   curl_setopt( $ch, CURLOPT_HEADER, 0);
+				   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+				   $response = curl_exec( $ch );
+				   curl_close($ch);
+			   }
                //end WEBHOOK Discord
                 }
 				
@@ -497,7 +502,6 @@ function ogpHome()
 <?php
 }
 ?>
-
 
 
 

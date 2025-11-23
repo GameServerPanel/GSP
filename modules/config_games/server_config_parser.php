@@ -29,6 +29,18 @@ define("XML_SCHEMA","modules/config_games/schema_server_config.xml");
 /// \return array containing the elements on success.
 function read_server_config( $filename )
 {
+	if ( !class_exists('DOMDocument') )
+	{
+		print_failure("PHP DOM extension not found. Install the php-xml package to enable game configuration parsing.");
+		return FALSE;
+	}
+
+	if ( !function_exists('simplexml_load_file') )
+	{
+		print_failure("PHP SimpleXML extension not found. Install the php-xml package to enable game configuration parsing.");
+		return FALSE;
+	}
+
     $dom = new DOMDocument();
     if ( $dom->load($filename) === FALSE )
     {
