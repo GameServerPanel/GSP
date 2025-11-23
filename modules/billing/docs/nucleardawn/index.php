@@ -26,10 +26,11 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Check server configuration</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">111710</code></li>
         <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
@@ -93,24 +94,53 @@ cd ~/gameserver
 <h4>Windows Server</h4>
 <p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-<h3>Using SteamCMD (if applicable)</h3>
-<p>Many game servers can be installed via SteamCMD:</p>
-<pre><code># Install SteamCMD (Ubuntu/Debian)
-sudo apt install lib32gcc-s1 steamcmd
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 111710</strong></p>
 
-# Run SteamCMD
-steamcmd
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
 
-# Login and download (use your Steam credentials or anonymous)
-login anonymous
-force_install_dir /path/to/server
-app_update [APP_ID] validate
-quit
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/nucleardawn
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/nucleardawn \
+         +app_update 111710 validate \
+         +quit
+
+# Server files are now in ~/gameservers/nucleardawn/
+cd ~/gameservers/nucleardawn
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\nucleardawn ^
+             +app_update 111710 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<p>After installation, configure your server through the configuration files typically located in the server directory.</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
 <h3>Essential Settings</h3>
 <ul>
@@ -138,19 +168,55 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%GAME_TYPE% %PID_FILE% %MAP% %IP% %PORT% %PLAYERS%</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-autoupdate -steam_dir {OGP_STEAM_CMD_DIR} -steamcmd_script {STEAMCMD_INSTALL_FILE}</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Auto-Update</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">The server will automatically download official updates as they are released.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-insecure</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable Valve Anti-Cheat</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Valve Anti-Cheat technology.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nohltv</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No SourceTV</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Disables SourceTV and closes its port.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-norestart</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Restart</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Won&#x27;t attempt to restart failed servers.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nomaster</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable master server communication</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

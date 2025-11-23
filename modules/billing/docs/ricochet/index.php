@@ -1,275 +1,438 @@
 <?php
 /**
- * Ricochet Dedicated Server Reference (self-hosted Linux/Windows)
+ * Ricochet Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<div style="background:#1e3a5f;padding:20px;border-left:4px solid #3b82f6;margin:20px 0;border-radius:4px;">
-    <h3 style="color:#fff;margin-top:0;">📚 Quick Navigation</h3>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;">
-        <a href="#overview" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Overview</a>
-        <a href="#ports" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Ports & Firewall</a>
-        <a href="#install" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Installation</a>
-        <a href="#startup" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Startup Parameters</a>
-        <a href="#config" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Configuration</a>
-        <a href="#maintenance" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Maintenance</a>
-        <a href="#troubleshooting" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Troubleshooting</a>
-        <a href="#resources" style="background:#0f172a;padding:8px 16px;border-radius:4px;color:#a5b4fc;text-decoration:none;">Resources</a>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
-<h1 id="overview">Ricochet Dedicated Server Hosting Guide</h1>
-<p>Ricochet is a Half-Life 1 era arena shooter that still uses the classic HLDS (GoldSrc) dedicated server stack. The notes below describe how to deploy and operate a Ricochet server on any Linux or Windows VPS without relying on a control panel.</p>
+<h1>Ricochet Server Hosting Guide</h1>
 
-<h2>Quick Facts</h2>
-<ul>
-    <li><strong>Engine:</strong> GoldSrc (HLDS AppID 90, mod folder <code>ricochet</code>)</li>
-    <li><strong>Default Map:</strong> <code>rc_deathmatch</code>; other stock maps include <code>rc_arena</code> and <code>rc_trinity</code></li>
-    <li><strong>Max Players:</strong> 32 (16 recommended for stability)</li>
-    <li><strong>Primary Configs:</strong> <code>ricochet/server.cfg</code>, <code>ricochet/mapcycle.txt</code>, <code>ricochet/motd.txt</code></li>
-    <li><strong>Binary:</strong> <code>hlds_run</code> (Linux) or <code>hlds.exe</code> (Windows)</li>
-    <li><strong>Log Files:</strong> <code>ricochet/logs/Lxxxxx.log</code></li>
-</ul>
+<h2>Overview</h2>
+<p>Ricochet is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Ricochet server for your community.</p>
 
-<h2 id="ports">🔌 Ports & Firewall Rules</h2>
-<div style="background:#1e3a5f;padding:20px;border-left:4px solid #3b82f6;margin:20px 0;border-radius:4px;">
-    <table style="width:100%;color:#e5e7eb;border-collapse:collapse;">
-        <thead>
-            <tr style="background:#0f172a;">
-                <th style="padding:10px;text-align:left;color:#fff;">Port</th>
-                <th style="padding:10px;text-align:left;color:#fff;">Protocol</th>
-                <th style="padding:10px;text-align:left;color:#fff;">Purpose</th>
-                <th style="padding:10px;text-align:left;color:#fff;">Required?</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom:1px solid #374151;">
-                <td style="padding:10px;"><code style="background:#0f172a;padding:2px 6px;border-radius:3px;">27015</code></td>
-                <td style="padding:10px;">UDP</td>
-                <td style="padding:10px;">Game traffic & master server heartbeats</td>
-                <td style="padding:10px;"><span style="color:#10b981;">Required</span></td>
-            </tr>
-            <tr style="border-bottom:1px solid #374151;">
-                <td style="padding:10px;"><code style="background:#0f172a;padding:2px 6px;border-radius:3px;">27015</code></td>
-                <td style="padding:10px;">TCP</td>
-                <td style="padding:10px;">RCON & remote console</td>
-                <td style="padding:10px;"><span style="color:#f59e0b;">Optional</span></td>
-            </tr>
-            <tr style="border-bottom:1px solid #374151;">
-                <td style="padding:10px;"><code style="background:#0f172a;padding:2px 6px;border-radius:3px;">27016</code></td>
-                <td style="padding:10px;">UDP</td>
-                <td style="padding:10px;">Spectator / HLTV relay (if used)</td>
-                <td style="padding:10px;"><span style="color:#f59e0b;">Optional</span></td>
-            </tr>
-            <tr>
-                <td style="padding:10px;"><code style="background:#0f172a;padding:2px 6px;border-radius:3px;">27005</code></td>
-                <td style="padding:10px;">UDP (outbound)</td>
-                <td style="padding:10px;">Client auth replies; allow outbound so players can connect</td>
-                <td style="padding:10px;"><span style="color:#10b981;">Required outbound</span></td>
-            </tr>
-        </tbody>
-    </table>
-    <p style="margin-top:16px;color:#e5e7eb;">Valve master servers also require outbound UDP 27010-27012; keep them open so your instance appears on public listings.</p>
-    <div>
-<pre><code># UFW (Ubuntu/Debian)
-sudo ufw allow 27015/udp comment 'Ricochet game'
-sudo ufw allow 27015/tcp comment 'Ricochet RCON'
-sudo ufw allow 27016/udp comment 'Ricochet HLTV (optional)'
-
-# FirewallD (RHEL/CentOS)
-sudo firewall-cmd --permanent --add-port=27015/udp
-sudo firewall-cmd --permanent --add-port=27015/tcp
-sudo firewall-cmd --permanent --add-port=27016/udp
-sudo firewall-cmd --reload
-
-# Windows Defender Firewall
-netsh advfirewall firewall add rule name="Ricochet Game" dir=in action=allow protocol=UDP localport=27015
-netsh advfirewall firewall add rule name="Ricochet RCON" dir=in action=allow protocol=TCP localport=27015
-</code></pre>
-    </div>
-</div>
-
-<h2 id="install">Installation & SteamCMD Setup</h2>
-<h3>Prerequisites</h3>
-<ul>
-    <li>64-bit Linux distro (Ubuntu 22.04+, Debian 12+, Rocky/Alma 9) or Windows Server 2019+</li>
-    <li>x86_64 CPU, 1 vCPU is plenty</li>
-    <li>512 MB RAM minimum (1 GB recommended to leave headroom)</li>
-    <li>5 GB disk for HLDS + logs</li>
-    <li>Firewall/port forwarding access</li>
-</ul>
-
-<h3>Linux Deployment</h3>
-<pre><code># Create user	sudo useradd -m -s /bin/bash ricochet
-sudo passwd ricochet
-sudo -u ricochet bash
-
-# Install dependencies and SteamCMD
-sudo apt update && sudo apt install steamcmd lib32gcc-s1 lib32stdc++6 -y
-mkdir -p ~/ricochet-server && cd ~/ricochet-server
-steamcmd +login anonymous +force_install_dir $PWD +app_update 90 validate +quit
-
-# Launch once (tmux/screen recommended)
-./hlds_run -game ricochet -console -port 27015 +ip 0.0.0.0 \
-    +map rc_deathmatch +maxplayers 16 +sv_lan 0 +exec server.cfg
-</code></pre>
-
-<h3>Windows Deployment</h3>
-<ol>
-    <li>Install SteamCMD from <a href="https://developer.valvesoftware.com/wiki/SteamCMD" target="_blank">Valve's developer wiki</a> and extract to <code>C:\steamcmd</code>.</li>
-    <li>Create <code>C:\servers\ricochet</code> and run:<br>
-        <code>steamcmd +login anonymous +force_install_dir C:\servers\ricochet +app_update 90 validate +quit</code></li>
-    <li>Launch via batch file:<pre><code>cd /d C:\servers\ricochet
-hlds.exe -console -game ricochet -port 27015 -ip 0.0.0.0 ^
-    +map rc_deathmatch +maxplayers 16 +sv_lan 0 +exec server.cfg</code></pre></li>
-    <li>Use Task Scheduler or NSSM to keep the process running after reboots.</li>
-</ol>
-
-<h2 id="startup">Startup Parameters</h2>
-<table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
-    <thead>
-        <tr style="background:#0f172a;color:#fff;">
-            <th style="padding:10px;text-align:left;">Parameter</th>
-            <th style="padding:10px;text-align:left;">Description</th>
-            <th style="padding:10px;text-align:left;">Example</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>-game ricochet</code></td>
-            <td style="padding:10px;">Loads the Ricochet mod data folder</td>
-            <td style="padding:10px;">Always required</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>-console</code></td>
-            <td style="padding:10px;">Forces console-only mode (no GUI)</td>
-            <td style="padding:10px;">Recommended on servers</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>-port</code> / <code>-sport</code></td>
-            <td style="padding:10px;">Sets game and spectator ports</td>
-            <td style="padding:10px;">-port 27015 -sport 27016</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>-ip</code></td>
-            <td style="padding:10px;">Binds to a specific interface</td>
-            <td style="padding:10px;">-ip 192.0.2.10</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>-autoupdate</code></td>
-            <td style="padding:10px;">Linux only; pulls updates via SteamCMD when server restarts</td>
-            <td style="padding:10px;">-autoupdate -steam_dir ~/steamcmd -steamcmd_script ~/ricochet/update.txt</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>+map</code></td>
-            <td style="padding:10px;">Starting map when the process boots</td>
-            <td style="padding:10px;">+map rc_deathmatch</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>+maxplayers</code></td>
-            <td style="padding:10px;">Hard slot limit (1–32)</td>
-            <td style="padding:10px;">+maxplayers 16</td>
-        </tr>
-        <tr style="border-bottom:1px solid #374151;">
-            <td style="padding:10px;"><code>+sv_lan</code></td>
-            <td style="padding:10px;">0 exposes to internet, 1 keeps LAN-only</td>
-            <td style="padding:10px;">+sv_lan 0</td>
-        </tr>
-        <tr>
-            <td style="padding:10px;"><code>+exec server.cfg</code></td>
-            <td style="padding:10px;">Ensures your config runs on boot</td>
-            <td style="padding:10px;">+exec server.cfg</td>
-        </tr>
-    </tbody>
-</table>
-<p>Append <code>+log on</code> and <code>+sv_password "pass"</code> directly on the command line to guarantee they are processed even if configs fail.</p>
-
-<h2 id="config">Core Configuration Files</h2>
-<h3>server.cfg Template</h3>
-<pre><code>// Identity & access
-hostname "My Ricochet Arena"
-sv_password ""            // Set for private servers
-rcon_password "ChangeMe!2025"
-sv_lan 0
-sv_region 0                // 0 = worldwide listing
-
-// Gameplay
-mp_timelimit 20
-mp_fraglimit 20
-mp_weaponstay 1
-mp_falldamage 1
-mp_friendlyfire 0
-mp_flashlight 0
-mp_chattime 10
-mp_footsteps 1
-sv_cheats 0
-
-// Physics
-sv_gravity 800
-sv_airaccelerate 10
-sv_accelerate 10
-sv_friction 4
-sv_maxspeed 320
-
-// Networking
-sv_minrate 1500
-sv_maxrate 20000
-sv_minupdaterate 20
-sv_maxupdaterate 60
-sys_ticrate 300
-
-// Logging & security
-log on
-sv_logbans 1
-sv_logecho 1
-sv_log_onefile 0
-writeid
-writeip
-</code></pre>
-
-<h3>mapcycle.txt</h3>
-<pre><code>rc_deathmatch
-rc_arena
-rc_trinity
-rc_bounce
-</code></pre>
-<p>Reorder or duplicate entries to weight the rotation. Use <code>mp_timelimit</code> and <code>mp_fraglimit</code> to control the length of each round.</p>
-
-<h3>Scheduled Maintenance Scripts</h3>
-<p>Create <code>restart.sh</code> (Linux) to keep the process alive:</p>
-<pre><code>#!/bin/bash
-cd /home/ricochet/ricochet-server
-while true; do
-  ./hlds_run -game ricochet -console -port 27015 \
-    +map rc_deathmatch +maxplayers 16 +sv_lan 0 +exec server.cfg
-  echo "Server crashed/restarted at $(date)" >> restart.log
-  sleep 5
-done
-</code></pre>
-<p>Run it inside <code>tmux</code> or <code>screen</code>, or convert to a <code>systemd</code> service for automatic boot.</p>
-
-<h2 id="maintenance">Maintenance & Best Practices</h2>
-<ul>
-    <li><strong>Updates:</strong> rerun <code>steamcmd +login anonymous +app_update 90 validate +quit</code> after Valve pushes patches.</li>
-    <li><strong>Backups:</strong> copy the entire <code>ricochet/</code> directory (configs, logs, demos) before experimenting with mods.</li>
-    <li><strong>Performance:</strong> keep <code>sys_ticrate</code> around 300–500; higher values increase CPU usage without visible benefit.</li>
-    <li><strong>Security:</strong> never reuse the same RCON password across servers; restrict RCON by IP using host firewalls when possible.</li>
-    <li><strong>Monitoring:</strong> enable <code>log on</code> and parse logs for <code>Banid</code>, <code>kick</code>, or crash traces.</li>
-</ul>
-
-<h2 id="troubleshooting">Troubleshooting</h2>
-<div style="background:#78350f;padding:20px;border-left:4px solid #f59e0b;margin:20px 0;border-radius:4px;">
-    <ul style="color:#fde68a;line-height:1.8;">
-        <li><strong>Server does not appear in Steam listings:</strong> confirm <code>sv_lan 0</code>, firewall allows outbound UDP 27010-27012, and public IP is bound via <code>-ip</code>. Restart after making changes.</li>
-        <li><strong>Players get "Server is out of date":</strong> run a fresh SteamCMD update with <code>validate</code>. Old binaries are the primary cause.</li>
-        <li><strong>Packet loss or warping:</strong> reduce <code>sv_maxrate</code> and <code>sv_maxupdaterate</code>, and ensure the host is not power-saving the CPU. Monitor with <code>net_graph 3</code> in-game.</li>
-        <li><strong>Crash on launch in 64-bit Linux:</strong> missing 32-bit libraries. Install <code>lib32gcc-s1</code>, <code>lib32stdc++6</code>, and <code>lib32z1</code> (Debian/Ubuntu) or <code>glibc.i686</code> packages (RHEL).</li>
-        <li><strong>RCON brute-force noise:</strong> move RCON to a high random port using <code>-port</code> + <code>+rcon_password</code> and limit access with firewall source rules.</li>
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">90</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="resources">Reference Links</h2>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Ricochet server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Ricochet Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Ricochet Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><a href="https://developer.valvesoftware.com/wiki/Ricochet_Dedicated_Server" target="_blank">Valve Developer Wiki – Ricochet Dedicated Server</a></li>
-    <li><a href="https://developer.valvesoftware.com/wiki/Half-Life_Dedicated_Server" target="_blank">HLDS documentation and launch options</a></li>
-    <li><a href="https://steamcommunity.com/app/60/discussions/" target="_blank">Steam Community Discussions (Ricochet)</a></li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 90</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/ricochet
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/ricochet \
+         +app_update 90 validate \
+         +quit
+
+# Server files are now in ~/gameservers/ricochet/
+cd ~/gameservers/ricochet
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\ricochet ^
+             +app_update 90 validate ^
+             +quit
+</code></pre>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%GAME_TYPE% %HOSTNAME% %PID_FILE% %MAP% %IP% %PORT% %PLAYERS%</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-autoupdate -steam_dir {OGP_STEAM_CMD_DIR} -steamcmd_script {STEAMCMD_INSTALL_FILE}</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Auto-Update</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">The server will automatically download official updates as they are released.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-insecure</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable Valve Anti-Cheat</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Valve Anti-Cheat technology.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nohltv</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Half-life TV</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Half-life TV.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-norestart</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Restart</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Won&#x27;t attempt to restart failed servers.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nomaster</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable master server communication</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+</div>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Ricochet Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Ricochet documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Ricochet server hosting</em>
+</p>

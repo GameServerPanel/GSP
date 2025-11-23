@@ -1,463 +1,407 @@
 <?php
 /**
- * Call of Duty: Modern Warfare 3 Server Documentation
+ * Call of Duty: Modern Warfare 3 Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<style>
-.nav-menu {
-    background: #1a1a2e;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-}
-.nav-menu a {
-    color: #4a9eff;
-    text-decoration: none;
-    margin-right: 15px;
-    font-size: 14px;
-}
-.nav-menu a:hover {
-    color: #6bb3ff;
-    text-decoration: underline;
-}
-.info-box {
-    background: #1e3a5f;
-    padding: 20px;
-    border-left: 4px solid #3b82f6;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.warning-box {
-    background: #78350f;
-    padding: 20px;
-    border-left: 4px solid #f59e0b;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.code-block {
-    background: #0f172a;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 15px 0;
-    overflow-x: auto;
-}
-.code-block code {
-    color: #a5b4fc;
-    font-family: 'Courier New', monospace;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background: #1a1a2e;
-}
-table th {
-    background: #2a2a4e;
-    color: #ffffff;
-    padding: 12px;
-    text-align: left;
-    border: 1px solid #3a3a6e;
-}
-table td {
-    padding: 10px 12px;
-    border: 1px solid #3a3a6e;
-    color: #e5e7eb;
-}
-table tr:nth-child(even) {
-    background: #222244;
-}
-</style>
-
-<div class="nav-menu">
-    <strong style="color: #ffffff;">Quick Navigation:</strong>
-    <a href="#quick-info">Quick Info</a> |
-    <a href="#ports">Ports</a> |
-    <a href="#installation">Installation</a> |
-    <a href="#configuration">Configuration</a> |
-    <a href="#parameters">Parameters</a> |
-    <a href="#troubleshooting">Troubleshooting</a> |
-    <a href="#game-types">Game Types</a> |
-    <a href="#maps">Maps</a> |
-    <a href="#related-mods">Mods</a>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h1>Call of Duty: Modern Warfare 3 Server Guide</h1>
+<h1>Call of Duty: Modern Warfare 3 Server Hosting Guide</h1>
 
-<h2 id="quick-info">📋 Quick Info</h2>
-<div class="info-box">
-    <h3 style="color: #ffffff; margin-top: 0;">Server Specifications</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game:</strong> Call of Duty: Modern Warfare 3 (2011)</li>
-        <li><strong style="color: #ffffff;">Platform:</strong> Windows</li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (configurable)</code></li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 18 (engine limitation)</li>
-        <li><strong style="color: #ffffff;">Control Protocol:</strong> RCON</li>
-        <li><strong style="color: #ffffff;">Executable:</strong> iw5mp_server.exe</li>
-        <li><strong style="color: #ffffff;">Special:</strong> Multi-port configuration required</li>
+<h2>Overview</h2>
+<p>Call of Duty: Modern Warfare 3 is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Call of Duty: Modern Warfare 3 server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">42750</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-<p>Modern Warfare 3 servers require multiple port configurations for proper operation:</p>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Call of Duty: Modern Warfare 3 server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
-<table>
-    <thead>
-        <tr>
-            <th>Port</th>
-            <th>Protocol</th>
-            <th>Purpose</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>27016 (configurable)</td>
-            <td>UDP</td>
-            <td>Game port</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>Game port - 1</td>
-            <td>UDP</td>
-            <td>Query port (net_queryPort)</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>-18249</td>
-            <td>UDP</td>
-            <td>Auth port (net_authPort)</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>Same as game port</td>
-            <td>TCP</td>
-            <td>RCON remote control</td>
-            <td>Optional</td>
-        </tr>
-    </tbody>
-</table>
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
 
-<h3>Firewall Examples</h3>
+# Windows Firewall
+netsh advfirewall firewall add rule name="Call of Duty: Modern Warfare 3 Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Call of Duty: Modern Warfare 3 Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
 
-<p><strong>UFW (Ubuntu/Debian):</strong></p>
-<div class="code-block">
-<code>sudo ufw allow 27016/udp comment 'MW3 Game Port'
-sudo ufw allow 27015/udp comment 'MW3 Query Port'
-sudo ufw allow 27016/tcp comment 'MW3 RCON'</code>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
 </div>
 
-<p><strong>Windows Firewall:</strong></p>
-<div class="code-block">
-<code>netsh advfirewall firewall add rule name="MW3 Game" dir=in action=allow protocol=UDP localport=27016
-netsh advfirewall firewall add rule name="MW3 Query" dir=in action=allow protocol=UDP localport=27015
-netsh advfirewall firewall add rule name="MW3 RCON" dir=in action=allow protocol=TCP localport=27016</code>
-</div>
-
-<h2 id="installation">⚙️ Installation & Setup</h2>
+<h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Windows 7/8/10/11 or Windows Server 2016+</li>
-    <li><strong>CPU:</strong> 2+ cores @ 2.5GHz recommended</li>
-    <li><strong>RAM:</strong> 2GB minimum, 4GB recommended</li>
-    <li><strong>Disk:</strong> 20GB for game files</li>
-    <li><strong>Network:</strong> Low latency connection, 10Mbps+ bandwidth</li>
-    <li><strong>Requirements:</strong> Legitimate MW3 game files</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
 <h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 42750</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/callofdutymw3
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/callofdutymw3 \
+         +app_update 42750 validate \
+         +quit
+
+# Server files are now in ~/gameservers/callofdutymw3/
+cd ~/gameservers/callofdutymw3
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
 <ol>
-    <li><strong>Install Modern Warfare 3:</strong> You must have legitimate MW3 game files</li>
-    <li><strong>Locate Dedicated Server Files:</strong> Server files included with MW3 installation</li>
-    <li><strong>Create Server Directory:</strong> Separate directory recommended for dedicated server</li>
-    <li><strong>Create Server Config:</strong> Create <code>server.cfg</code> in <code>players2</code> folder</li>
-    <li><strong>Configure Firewall:</strong> Allow required ports through Windows Firewall</li>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
 </ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\callofdutymw3 ^
+             +app_update 42750 validate ^
+             +quit
+</code></pre>
 
-<h2 id="configuration">📝 Configuration</h2>
 
-<h3>Basic server.cfg Example</h3>
-<div class="code-block">
-<code>// Server Name
-set sv_hostname "My MW3 Server"
+<h2 id="configuration">Server Configuration</h2>
 
-// Network Settings (CRITICAL - Multi-port configuration)
-set net_port 27016
-set net_queryPort -1        // Auto-set to net_port - 1 (27015)
-set net_masterServerPort -1 // Disable master server
-set net_authPort -18249     // Auth port offset
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-// Server Type
-set dedicated 2
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
 
-// Player Limits (MAX 18 for MW3)
-set sv_maxclients 18
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
 
-// RCON Password
-set rcon_password "your_secure_password_here"
+# Ban player
+ban [player_name]
 
-// Game Settings
-set g_gametype "war"    // dm, war, sab, koth, sd, dom, dd, ctf
-set sv_maxPing 350
+# Change map/level (syntax varies by game)
+changelevel [map_name]
 
-// Map Rotation
-set sv_mapRotation "gametype war map mp_dome gametype war map mp_hardhat gametype war map mp_seatown"
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
 
-// Password Protection (leave empty for public)
-set g_password ""
+<h2 id="parameters">⚙️ Startup Parameters</h2>
 
-// Friendly Fire
-set scr_team_fftype 0    // 0=off, 1=on, 2=reflect
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>+set dedicated 2 %IP% %PORT% %QUERY_PORT% %AUTH_PORT% %EXEC% %CONTROL_PASSWORD% %PLAYERS% +start_map_rotate</code></pre>
 
-// Kill Cam
-set scr_game_allowkillcam 1
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
 
-// Hardcore Mode
-set scr_hardcore 0
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
 
-// Game Log
-set g_log "games_mp.log"
-set logfile 2
-
-// Voice Chat
-set sv_voice 0
-
-// Anti-Lag
-set sv_fps 20
-
-// Auto-Balance
-set scr_teambalance 1</code>
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+set sv_config</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +set sv_config</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Set the name of your server configuration file.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">server.cfg</code></p>
+    </div>
 </div>
 
-<h2 id="parameters">🚀 Startup Parameters</h2>
+<h3>Creating a Start Script</h3>
 
-<table>
-    <thead>
-        <tr>
-            <th>Parameter</th>
-            <th>Description</th>
-            <th>Example</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>+set dedicated</td>
-            <td>Server mode (2=Internet)</td>
-            <td>+set dedicated 2</td>
-        </tr>
-        <tr>
-            <td>+set net_port</td>
-            <td>Main game port</td>
-            <td>+set net_port 27016</td>
-        </tr>
-        <tr>
-            <td>+set net_queryPort</td>
-            <td>Query port (-1 for auto: port-1)</td>
-            <td>+set net_queryPort -1</td>
-        </tr>
-        <tr>
-            <td>+set net_authPort</td>
-            <td>Auth port (-18249 standard)</td>
-            <td>+set net_authPort -18249</td>
-        </tr>
-        <tr>
-            <td>+set net_masterServerPort</td>
-            <td>Master server port (-1 to disable)</td>
-            <td>+set net_masterServerPort -1</td>
-        </tr>
-        <tr>
-            <td>+set sv_maxclients</td>
-            <td>Maximum player slots (MAX 18)</td>
-            <td>+set sv_maxclients 18</td>
-        </tr>
-        <tr>
-            <td>+set rcon_password</td>
-            <td>RCON password for remote admin</td>
-            <td>+set rcon_password "secret123"</td>
-        </tr>
-        <tr>
-            <td>+exec</td>
-            <td>Execute config file on startup</td>
-            <td>+exec server.cfg</td>
-        </tr>
-        <tr>
-            <td>+map_rotate</td>
-            <td>Start map rotation from config</td>
-            <td>+map_rotate</td>
-        </tr>
-        <tr>
-            <td>+map</td>
-            <td>Start with specific map</td>
-            <td>+map mp_dome</td>
-        </tr>
-    </tbody>
-</table>
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
 
-<h3>Example Startup Command</h3>
-<div class="code-block">
-<code>iw5mp_server.exe +set dedicated 2 +set net_port 27016 +set net_queryPort -1 +set net_authPort -18249 +set net_masterServerPort -1 +set sv_maxclients 18 +exec server.cfg +map_rotate</code>
-</div>
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
 
-<h3>Example Batch File (start_server.bat)</h3>
-<div class="code-block">
-<code>@echo off
-title MW3 Dedicated Server
-iw5mp_server.exe +set dedicated 2 +set net_port 27016 +set net_queryPort -1 +set net_authPort -18249 +set net_masterServerPort -1 +set sv_maxclients 18 +exec server.cfg +map_rotate
-pause</code>
-</div>
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Call of Duty: Modern Warfare 3 Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Server Not Appearing in Browser</h3>
-<p><strong>Issue:</strong> Players cannot see the server in MW3 browser.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Verify all required ports are open (game, query, auth)</li>
-    <li>Ensure <code>+set dedicated 2</code> is set</li>
-    <li>Check <code>net_queryPort</code> is set to -1 (auto)</li>
-    <li>Verify <code>net_authPort -18249</code> is configured</li>
-    <li>Try direct connect using IP:PORT</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Port Configuration Issues</h3>
-<p><strong>Issue:</strong> Server fails to start or clients cannot connect.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li>MW3 requires <strong>specific port configuration</strong>:</li>
-    <li>Game port: Your chosen port (e.g., 27016)</li>
-    <li>Query port: Set to -1 (automatically becomes game port - 1)</li>
-    <li>Auth port: Must be set to -18249</li>
-    <li>Master server port: Set to -1 (disabled)</li>
-    <li>Verify all three ports are open in firewall</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<h3>Server Crashes on Startup</h3>
-<p><strong>Issue:</strong> Dedicated server crashes immediately after launch.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
 <ul>
-    <li>Check <code>games_mp.log</code> for error messages</li>
-    <li>Verify all required MW3 game files are present</li>
-    <li>Ensure <code>server.cfg</code> syntax is correct</li>
-    <li>Verify <code>sv_maxclients</code> does not exceed 18</li>
-    <li>Check that port configuration is correct</li>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
-<h3>Connection Problems</h3>
-<p><strong>Issue:</strong> Players cannot connect or timeout.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
 <ul>
-    <li>Verify firewall rules allow traffic on all required ports</li>
-    <li>Check <code>sv_maxPing</code> setting</li>
-    <li>Ensure server is not full (max 18 players)</li>
-    <li>Disable password if testing: <code>set g_password ""</code></li>
-    <li>Verify clients are using same MW3 version</li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<h3>High Lag/Ping Issues</h3>
-<p><strong>Issue:</strong> Players experience significant lag.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Regular Updates</h3>
 <ul>
-    <li>Increase <code>sv_fps</code> setting (recommended: 20)</li>
-    <li>Reduce <code>sv_maxclients</code> if server is overloaded</li>
-    <li>Check server CPU and RAM usage</li>
-    <li>Verify network bandwidth is sufficient</li>
-    <li>Lower <code>sv_maxPing</code> to restrict high-ping players</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
 </ul>
 
-<h3>Player Limit Issues</h3>
-<p><strong>Issue:</strong> Cannot set more than 18 players.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Access Control</h3>
 <ul>
-    <li>MW3 has a <strong>hard limit of 18 players</strong> - this is by design</li>
-    <li>Do not attempt to exceed this limit as it will cause issues</li>
-    <li>This is an engine limitation, not a configuration issue</li>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
 </ul>
 
-<h3>RCON Not Working</h3>
-<p><strong>Issue:</strong> Cannot connect via RCON.</p>
-<p><strong>Solutions:</strong></p>
+<h3>DDoS Protection</h3>
 <ul>
-    <li>Verify <code>rcon_password</code> is set in <code>server.cfg</code></li>
-    <li>Ensure TCP port is open (same as game UDP port)</li>
-    <li>Use MW3-compatible RCON tools</li>
-    <li>Test RCON from in-game console first</li>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
-<h2 id="game-types">🎮 Game Types</h2>
-<p>Modern Warfare 3 supports the following game modes:</p>
+<h2>Additional Resources</h2>
 <ul>
-    <li><strong>dm</strong> - Deathmatch (Free-for-all)</li>
-    <li><strong>war</strong> - Team Deathmatch</li>
-    <li><strong>sab</strong> - Sabotage</li>
-    <li><strong>koth</strong> - Headquarters (King of the Hill)</li>
-    <li><strong>sd</strong> - Search & Destroy</li>
-    <li><strong>dom</strong> - Domination</li>
-    <li><strong>dd</strong> - Demolition</li>
-    <li><strong>ctf</strong> - Capture the Flag</li>
+    <li>Official Call of Duty: Modern Warfare 3 documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
-<h2 id="maps">🗺️ Default Maps</h2>
-<p>Modern Warfare 3 includes the following multiplayer maps:</p>
-
-<h3>Base Game Maps</h3>
-<ul>
-    <li><strong>mp_dome</strong> - Dome</li>
-    <li><strong>mp_hardhat</strong> - Hardhat</li>
-    <li><strong>mp_paris</strong> - Resistance</li>
-    <li><strong>mp_seatown</strong> - Seatown</li>
-    <li><strong>mp_bravo</strong> - Mission</li>
-    <li><strong>mp_underground</strong> - Underground</li>
-    <li><strong>mp_village</strong> - Village</li>
-    <li><strong>mp_alpha</strong> - Lockdown</li>
-    <li><strong>mp_bootleg</strong> - Bootleg</li>
-    <li><strong>mp_carbon</strong> - Carbon</li>
-    <li><strong>mp_exchange</strong> - Downturn</li>
-    <li><strong>mp_hillside_ss</strong> - Fallen</li>
-    <li><strong>mp_interchange</strong> - Interchange</li>
-    <li><strong>mp_lambeth</strong> - Lambeth</li>
-    <li><strong>mp_mogadishu</strong> - Bakaara</li>
-    <li><strong>mp_plaza2</strong> - Arkaden</li>
-</ul>
-
-<h3>DLC Maps</h3>
-<ul>
-    <li>Collection 1: Liberation, Piazza, Overwatch, Black Box</li>
-    <li>Collection 2: Sanctuary, Foundation, Oasis, Terminal (MW2 remake)</li>
-    <li>Collection 3: Boardwalk, Parish, Off Shore, Gulch</li>
-    <li>Collection 4: Intersection, Vortex, U-Turn, Lookout</li>
-</ul>
-
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with MW3:</p>
-<ul>
-    <li><a href="../b3/">B3 (Big Brother Bot)</a> - Python-based admin bot with RCON wrapper, player warnings, ban management, statistics tracking, and automated moderation for Call of Duty servers</li>
-    <li><strong>Custom GSC Scripts</strong> - Server-side gameplay modifications</li>
-</ul>
-
-<h2>📚 Resources</h2>
-<ul>
-    <li><strong>Community Forums:</strong> MW3 modding and server communities</li>
-    <li><strong>Documentation:</strong> Limited official documentation available</li>
-    <li><strong>RCON Tools:</strong> B3, various web-based RCON panels</li>
-</ul>
-
-<div class="warning-box">
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Maximum 18 players</strong> - this is a hard engine limit and cannot be exceeded</li>
-        <li>MW3 requires <strong>multi-port configuration</strong> for proper operation:
-            <ul style="margin-top: 8px;">
-                <li>Game port: Your chosen port</li>
-                <li>Query port: -1 (auto: game port - 1)</li>
-                <li>Auth port: -18249 (required)</li>
-                <li>Master server port: -1 (disabled)</li>
-            </ul>
-        </li>
-        <li>You <strong>must own legitimate Modern Warfare 3</strong> game files</li>
-        <li>MW3 is <strong>Windows-only</strong> for dedicated servers</li>
-        <li>The <code>players2</code> folder contains server configuration and data</li>
-        <li>Always secure your RCON password and restrict access</li>
-        <li>Regular backups recommended for server configurations</li>
-        <li>Ensure all three required ports (game, query, auth) are open in firewall</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Call of Duty: Modern Warfare 3 server hosting</em>
+</p>

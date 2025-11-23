@@ -1,6 +1,6 @@
 <?php
 /**
- * Minecraft Server Documentation - Comprehensive Guide
+ * Minecraft Server Server Documentation - Comprehensive Guide
  * General game server hosting information (not platform-specific)
  */
 ?>
@@ -12,114 +12,57 @@
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
         <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
         <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
-        <a href="#plugins-mods" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Plugins & Mods</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
         <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
-<h1>Minecraft Java Edition Server Hosting Guide</h1>
+<h1>Minecraft Server Server Hosting Guide</h1>
 
 <h2>Overview</h2>
-<p>Minecraft Java Edition is one of the most popular sandbox games worldwide, supporting extensive multiplayer capabilities. This comprehensive guide covers everything you need to know about hosting a Minecraft server on a VPS or dedicated server.</p>
+<p>Minecraft Server is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Minecraft Server server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">25565</code> (TCP)</li>
-        <li><strong style="color: #ffffff;">Protocol:</strong> TCP (Query on UDP 25565 if enabled)</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 2GB (Vanilla), 4GB+ (Modded)</li>
-        <li><strong style="color: #ffffff;">Recommended RAM:</strong> 1GB per 5-10 players + 2GB base</li>
-        <li><strong style="color: #ffffff;">Java Version:</strong> Java 17+ (Minecraft 1.17+), Java 8+ (older versions)</li>
-        <li><strong style="color: #ffffff;">Server Software:</strong> Vanilla, Spigot, Paper, Forge, Fabric</li>
-        <li><strong style="color: #ffffff;">Log File:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">logs/latest.log</code></li>
-        <li><strong style="color: #ffffff;">Main Config:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">server.properties</code></li>
-        <li><strong style="color: #ffffff;">EULA:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">eula.txt</code> (must set eula=true)</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Network Ports Used</h2>
+<h2 id="ports">🔌 Network Ports</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
-    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
-        <thead>
-            <tr style="background: #0f172a;">
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
-                <th style="padding: 10px; text-align: left; color: #ffffff;">Required?</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">25565</code></td>
-                <td style="padding: 10px;">TCP</td>
-                <td style="padding: 10px;">Main game connection (players connect here)</td>
-                <td style="padding: 10px;"><span style="color: #10b981;">✓ Yes</span></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">25565</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Server query protocol (for server lists)</td>
-                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
-            </tr>
-            <tr style="border-bottom: 1px solid #374151;">
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">25575</code></td>
-                <td style="padding: 10px;">TCP</td>
-                <td style="padding: 10px;">RCON (remote console administration)</td>
-                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
-            </tr>
-            <tr>
-                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">19132</code></td>
-                <td style="padding: 10px;">UDP</td>
-                <td style="padding: 10px;">Bedrock Edition (if running Geyser plugin)</td>
-                <td style="padding: 10px;"><span style="color: #f59e0b;">○ Optional</span></td>
-            </tr>
-        </tbody>
-    </table>
+    <p style="color: #e5e7eb;">The Minecraft Server server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
     
-    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration Examples</h3>
-    <p style="color: #e5e7eb;">Allow Minecraft server through your firewall:</p>
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
     <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
-sudo ufw allow 25565/tcp comment 'Minecraft Server'
-sudo ufw allow 25565/udp comment 'Minecraft Query'
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
 # FirewallD (CentOS/RHEL)
-sudo firewall-cmd --permanent --add-port=25565/tcp
-sudo firewall-cmd --permanent --add-port=25565/udp
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
 
-# iptables
-sudo iptables -A INPUT -p tcp --dport 25565 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 25565 -j ACCEPT
-sudo iptables-save > /etc/iptables/rules.v4
-
 # Windows Firewall
-netsh advfirewall firewall add rule name="Minecraft Server" dir=in action=allow protocol=TCP localport=25565
-netsh advfirewall firewall add rule name="Minecraft Query" dir=in action=allow protocol=UDP localport=25565
-</code></pre>
-
-    <h3 style="color: #ffffff; margin-top: 20px;">Port Configuration in server.properties</h3>
-    <pre><code style="color: #a5b4fc;"># Main server port (TCP)
-server-port=25565
-
-# Query port (UDP) - usually same as server-port
-query.port=25565
-enable-query=true
-
-# RCON port (TCP) - remote administration
-rcon.port=25575
-enable-rcon=false
-rcon.password=changeme_use_strong_password
+netsh advfirewall firewall add rule name="Minecraft Server Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Minecraft Server Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
     <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
     <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Never expose RCON port to the internet without strong authentication</li>
-        <li>Consider using a non-standard port to reduce automated attacks</li>
-        <li>If using cloud hosting, configure security groups to allow only required ports</li>
-        <li>Monitor connection attempts in server logs regularly</li>
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
     </ul>
 </div>
 
@@ -127,167 +70,98 @@ rcon.password=changeme_use_strong_password
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Linux (Ubuntu/Debian recommended), Windows Server, or any Java-compatible OS</li>
-    <li><strong>CPU:</strong> 2+ cores (single-threaded performance is critical)</li>
-    <li><strong>RAM:</strong> Minimum 2GB, 4GB+ recommended for 10+ players</li>
-    <li><strong>Storage:</strong> 1GB+ for server files, additional for worlds (can grow to 10GB+)</li>
-    <li><strong>Bandwidth:</strong> ~1Mbps per player</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installing Java</h3>
-<p>Minecraft requires Java to run. Install the appropriate version:</p>
-<pre><code># Ubuntu/Debian - Java 17 (for MC 1.17+)
-sudo apt update
-sudo apt install openjdk-17-jre-headless
+<h3>Installation Steps</h3>
 
-# Check Java version
-java -version
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
-# Set Java 17 as default if multiple versions installed
-sudo update-alternatives --config java
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>Downloading Server Files</h3>
-<p>Download the official Minecraft server from <a href="https://www.minecraft.net/en-us/download/server" target="_blank">Minecraft.net</a>:</p>
-<pre><code># Create server directory
-mkdir minecraft-server
-cd minecraft-server
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-# Download server jar (replace version number with desired version)
-wget https://piston-data.mojang.com/v1/objects/[hash]/server.jar -O minecraft_server.jar
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
 
-# Or use curl
-curl -o minecraft_server.jar https://piston-data.mojang.com/v1/objects/[hash]/server.jar
-</code></pre>
-
-<h3>First-Time Setup</h3>
-<pre><code># Run server once to generate files
-java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui
-
-# Accept EULA
-echo "eula=true" > eula.txt
-
-# Start server
-java -Xmx2048M -Xms2048M -jar minecraft_server.jar nogui
-</code></pre>
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>server.properties - Essential Settings</h3>
-<p>The <code>server.properties</code> file controls all server behavior:</p>
-<pre><code># Server identification
-server-name=My Minecraft Server
-motd=Welcome to My Server!
-server-port=25565
-server-ip=0.0.0.0
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-# Gameplay settings
-gamemode=survival
-difficulty=normal
-hardcore=false
-pvp=true
-enable-command-block=false
-
-# World settings
-level-name=world
-level-seed=
-level-type=default
-generate-structures=true
-spawn-protection=16
-max-build-height=256
-view-distance=10
-simulation-distance=10
-
-# Player limits
-max-players=20
-white-list=false
-online-mode=true
-
-# Performance & resource settings
-max-tick-time=60000
-max-world-size=29999984
-network-compression-threshold=256
-spawn-npcs=true
-spawn-animals=true
-spawn-monsters=true
-
-# Query & RCON
-enable-query=true
-query.port=25565
-enable-rcon=false
-rcon.port=25575
-rcon.password=changeme
-
-# Misc
-allow-flight=false
-enforce-whitelist=false
-resource-pack=
-resource-pack-sha1=
-</code></pre>
-
-<h3>ops.json - Server Operators</h3>
-<p>Grant admin privileges to players:</p>
-<pre><code>[
-  {
-    "uuid": "player-uuid-here",
-    "name": "PlayerName",
-    "level": 4,
-    "bypassesPlayerLimit": true
-  }
-]
-</code></pre>
-<p>Permission levels: 1 (bypass spawn protection), 2 (use cheat commands), 3 (kick/ban), 4 (full control)</p>
-
-<h3>whitelist.json - Whitelist</h3>
-<p>When <code>white-list=true</code> in server.properties:</p>
-<pre><code>[
-  {
-    "uuid": "player-uuid-here",
-    "name": "PlayerName"
-  }
-]
-</code></pre>
-
-<h2 id="parameters">Startup Parameters & JVM Arguments</h2>
-
-<h3>Basic Startup Command</h3>
-<pre><code>java -Xmx4G -Xms4G -jar minecraft_server.jar nogui
-</code></pre>
-
-<h3>Recommended JVM Arguments (Aikar's Flags)</h3>
-<p>Optimized for Minecraft server performance:</p>
-<pre><code>java -Xms4G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled \
-     -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions \
-     -XX:+DisableExplicitGC -XX:+AlwaysPreTouch \
-     -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 \
-     -XX:G1HeapRegionSize=8M -XX:G1ReservePercent=20 \
-     -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 \
-     -XX:InitiatingHeapOccupancyPercent=15 \
-     -XX:G1MixedGCLiveThresholdPercent=90 \
-     -XX:G1RSetUpdatingPauseTimePercent=5 \
-     -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem \
-     -XX:MaxTenuringThreshold=1 \
-     -Dusing.aikars.flags=https://mcflags.emc.gs \
-     -Daikars.new.flags=true \
-     -jar minecraft_server.jar nogui
-</code></pre>
-
-<h3>Parameter Breakdown</h3>
+<h3>Essential Settings</h3>
 <ul>
-    <li><code>-Xms4G</code> - Initial heap size (4GB)</li>
-    <li><code>-Xmx4G</code> - Maximum heap size (4GB) - should match Xms</li>
-    <li><code>-XX:+UseG1GC</code> - Use G1 Garbage Collector (best for MC)</li>
-    <li><code>-XX:+ParallelRefProcEnabled</code> - Parallel reference processing</li>
-    <li><code>-XX:MaxGCPauseMillis=200</code> - Target max GC pause time</li>
-    <li><code>-XX:+UnlockExperimentalVMOptions</code> - Enable experimental JVM options</li>
-    <li><code>-XX:+AlwaysPreTouch</code> - Pre-touch memory pages on startup</li>
-    <li><code>nogui</code> - Disable graphical interface (better performance)</li>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
 </ul>
 
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>java %XMS% %XMX% -jar minecraft_server.jar nogui</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-Xms</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - -Xms</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Initial memory size for Java can be specified.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">1024M</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-Xmx</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - -Xmx</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Maximum memory size for Java can be specified.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">1024M</code></p>
+    </div>
+</div>
+
 <h3>Creating a Start Script</h3>
+
 <p><strong>Linux (start.sh):</strong></p>
 <pre><code>#!/bin/bash
-java -Xms4G -Xmx4G -XX:+UseG1GC -jar minecraft_server.jar nogui
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
 </code></pre>
 <pre><code>chmod +x start.sh
 ./start.sh
@@ -295,340 +169,208 @@ java -Xms4G -Xmx4G -XX:+UseG1GC -jar minecraft_server.jar nogui
 
 <p><strong>Windows (start.bat):</strong></p>
 <pre><code>@echo off
-java -Xms4G -Xmx4G -XX:+UseG1GC -jar minecraft_server.jar nogui
+cd /d "%~dp0"
+server_executable.exe [parameters]
 pause
 </code></pre>
 
-<h2 id="plugins-mods">Plugins, Mods & Server Software</h2>
+<h3>Running as a Service</h3>
 
-<h3>Server Software Options</h3>
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Minecraft Server Server
+After=network.target
 
-<h4>1. Vanilla</h4>
-<ul>
-    <li>Official Mojang server</li>
-    <li>No plugin/mod support</li>
-    <li>Best for pure vanilla experience</li>
-    <li>Download: <a href="https://www.minecraft.net/en-us/download/server" target="_blank">Minecraft.net</a></li>
-</ul>
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
 
-<h4>2. Spigot</h4>
-<ul>
-    <li>Popular plugin platform</li>
-    <li>Better performance than vanilla</li>
-    <li>Large plugin ecosystem</li>
-    <li>Download: <a href="https://www.spigotmc.org/" target="_blank">SpigotMC.org</a></li>
-    <li>Build with BuildTools or download pre-built</li>
-</ul>
-
-<h4>3. Paper (Recommended)</h4>
-<ul>
-    <li>Fork of Spigot with major performance improvements</li>
-    <li>Compatible with most Spigot plugins</li>
-    <li>Additional bug fixes and features</li>
-    <li>Download: <a href="https://papermc.io/" target="_blank">PaperMC.io</a></li>
-</ul>
-
-<h4>4. Forge</h4>
-<ul>
-    <li>Mod platform (not plugins)</li>
-    <li>Required for most mods</li>
-    <li>Download: <a href="https://files.minecraftforge.net/" target="_blank">MinecraftForge.net</a></li>
-</ul>
-
-<h4>5. Fabric</h4>
-<ul>
-    <li>Lightweight mod platform</li>
-    <li>Faster updates than Forge</li>
-    <li>Download: <a href="https://fabricmc.net/" target="_blank">FabricMC.net</a></li>
-</ul>
-
-<h3>Essential Plugins (Spigot/Paper)</h3>
-
-<h4>EssentialsX</h4>
-<p>Core commands and utilities for server management.</p>
-<ul>
-    <li>Download: <a href="https://essentialsx.net/" target="_blank">EssentialsX.net</a></li>
-    <li>Features: /home, /spawn, /tpa, kits, warps, economy</li>
-</ul>
-
-<h4>LuckPerms</h4>
-<p>Advanced permission management system.</p>
-<ul>
-    <li>Download: <a href="https://luckperms.net/" target="_blank">LuckPerms.net</a></li>
-    <li>Features: Groups, permissions, prefixes, web editor</li>
-</ul>
-
-<h4>WorldEdit & WorldGuard</h4>
-<p>In-game world editing and region protection.</p>
-<ul>
-    <li>Download: <a href="https://enginehub.org/" target="_blank">EngineHub.org</a></li>
-    <li>WorldEdit: Bulk editing, schematics</li>
-    <li>WorldGuard: Region protection, flags</li>
-</ul>
-
-<h4>Vault</h4>
-<p>Economy and permission API bridge.</p>
-<ul>
-    <li>Required by many plugins for economy/permissions</li>
-    <li>Download: <a href="https://www.spigotmc.org/resources/vault.34315/" target="_blank">SpigotMC</a></li>
-</ul>
-
-<h3>Installing Plugins</h3>
-<pre><code># 1. Stop server
-# 2. Download plugin .jar file
-# 3. Place in plugins/ directory
-cd plugins/
-wget https://example.com/plugin.jar
-
-# 4. Start server
-# 5. Configure in plugins/PluginName/config.yml
+[Install]
+WantedBy=multi-user.target
 </code></pre>
 
-<h3>Popular Mods (Forge/Fabric)</h3>
-<ul>
-    <li><strong>OptiFine:</strong> Graphics and performance optimization</li>
-    <li><strong>JourneyMap:</strong> In-game mapping</li>
-    <li><strong>Biomes O' Plenty:</strong> New biomes</li>
-    <li><strong>Applied Energistics 2:</strong> Storage and automation</li>
-    <li><strong>Tinkers' Construct:</strong> Tool customization</li>
-</ul>
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
-<h2 id="troubleshooting">Troubleshooting</h2>
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
 <h3>Server Won't Start</h3>
 
-<h4>Java Not Found</h4>
-<pre><code># Check if Java is installed
-java -version
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
 
-# If not installed, install Java (Ubuntu/Debian)
-sudo apt update
-sudo apt install openjdk-17-jre-headless
-</code></pre>
-
-<h4>EULA Not Accepted</h4>
-<pre><code># You must agree to Minecraft EULA
-echo "eula=true" > eula.txt
+# Or check system logs
+journalctl -u gameserver -f
 </code></pre>
 
 <h4>Port Already in Use</h4>
-<pre><code># Check what's using port 25565
-sudo lsof -i :25565
-sudo netstat -tulpn | grep 25565
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
 
-# Kill process or change server-port in server.properties
+# Kill the process or change server port
 </code></pre>
 
-<h4>Out of Memory</h4>
-<pre><code># Increase allocated RAM
-java -Xms4G -Xmx4G -jar minecraft_server.jar nogui
-
-# Or reduce if system has limited RAM
-java -Xms2G -Xmx2G -jar minecraft_server.jar nogui
-</code></pre>
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
 
 <h3>Connection Issues</h3>
 
 <h4>Can't Connect to Server</h4>
 <ol>
-    <li><strong>Check server is running:</strong> <code>ps aux | grep java</code></li>
-    <li><strong>Verify port is listening:</strong> <code>netstat -an | grep 25565</code></li>
-    <li><strong>Check firewall:</strong>
-        <pre><code># Ubuntu/Debian (UFW)
-sudo ufw allow 25565/tcp
-sudo ufw reload
-
-# CentOS/RHEL (firewalld)
-sudo firewall-cmd --permanent --add-port=25565/tcp
-sudo firewall-cmd --reload
-</code></pre>
-    </li>
-    <li><strong>Verify server IP:</strong> Use external IP, not 127.0.0.1</li>
-    <li><strong>Check online-mode:</strong> If cracked clients, set <code>online-mode=false</code></li>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
 </ol>
 
-<h4>Connection Timed Out</h4>
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Router/NAT: Forward port 25565 to server</li>
-    <li>Cloud provider: Add inbound rule for port 25565</li>
-    <li>Server IP: Ensure <code>server-ip=</code> is blank or <code>0.0.0.0</code></li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
 <h3>Performance Issues</h3>
 
-<h4>Server Lag/TPS Drop</h4>
+<h4>Server Lag</h4>
 <ol>
-    <li><strong>Check TPS:</strong> <code>/tps</code> or use Spark profiler</li>
-    <li><strong>Reduce view distance:</strong> Set <code>view-distance=6-8</code></li>
-    <li><strong>Reduce simulation distance:</strong> <code>simulation-distance=4-6</code></li>
-    <li><strong>Limit entities:</strong>
-        <pre><code># spigot.yml or paper.yml
-entity-activation-range:
-  animals: 16
-  monsters: 24
-  misc: 8
-</code></pre>
-    </li>
-    <li><strong>Use Paper:</strong> Better performance than Spigot/Vanilla</li>
-    <li><strong>Pregenerate world:</strong> Use Chunky plugin to pre-generate chunks</li>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
 </ol>
 
 <h4>Memory Leaks</h4>
 <pre><code># Monitor memory usage
 free -h
-top -p $(pgrep -f minecraft_server)
+top -p $(pgrep -f server)
 
-# Restart server regularly (daily/weekly) via cron
-0 4 * * * /path/to/restart-script.sh
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
 </code></pre>
-
-<h3>World Corruption</h3>
-<ol>
-    <li><strong>Stop server immediately</strong></li>
-    <li><strong>Backup world folder:</strong> <code>cp -r world/ world_backup/</code></li>
-    <li><strong>Use MCEdit or Amulet to repair:</strong> <a href="https://www.amuletmc.com/" target="_blank">AmuletMC.com</a></li>
-    <li><strong>Restore from backup if needed</strong></li>
-    <li><strong>Prevention:</strong> Always stop server properly, use backup plugins</li>
-</ol>
-
-<h3>Plugin Conflicts</h3>
-<ol>
-    <li><strong>Check console for errors</strong></li>
-    <li><strong>Disable plugins one-by-one to isolate issue</strong></li>
-    <li><strong>Update all plugins to latest versions</strong></li>
-    <li><strong>Check plugin compatibility with server version</strong></li>
-</ol>
 
 <h2 id="performance">Performance Optimization</h2>
 
-<h3>Server Configuration</h3>
-<pre><code># server.properties
-view-distance=8
-simulation-distance=6
-network-compression-threshold=256
-entity-broadcast-range-percentage=100
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
 </code></pre>
 
-<h3>Paper Configuration</h3>
-<p>Create/edit <code>paper.yml</code> or <code>config/paper-global.yml</code>:</p>
-<pre><code>chunk-loading:
-  target-chunk-send-rate: 100.0
-  max-concurrent-sends: 2
-
-async-chunks:
-  enable: true
-  threads: -1
-
-entity-activation-range:
-  animals: 16
-  monsters: 24
-  raiders: 48
-  misc: 8
-  water: 8
-  villagers: 16
-  flying-monsters: 48
-
-tick-rates:
-  sensor:
-    villager:
-      secondarypoisensor: 80
-  behavior:
-    villager:
-      validatenearbypoi: 60
-</code></pre>
-
-<h3>Pregenerate World</h3>
-<p>Use Chunky plugin to pre-generate chunks:</p>
-<pre><code># Install Chunky plugin
-# In-game or console:
-/chunky radius 5000
-/chunky world world
-/chunky start
-
-# Let it complete before opening server to players
-</code></pre>
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
 
 <h3>Backup Strategy</h3>
 <pre><code>#!/bin/bash
 # backup.sh - Run via cron
 DATE=$(date +%Y%m%d_%H%M%S)
-BACKUP_DIR="/backups/minecraft"
-SERVER_DIR="/home/minecraft/server"
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
 # Create backup
-tar -czf $BACKUP_DIR/world_$DATE.tar.gz -C $SERVER_DIR world/
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
 
 # Keep only last 7 days
-find $BACKUP_DIR -name "world_*.tar.gz" -mtime +7 -delete
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
 </code></pre>
 
 <h2 id="security">Security Best Practices</h2>
 
 <h3>Firewall Configuration</h3>
-<pre><code># Only allow Minecraft port
+<pre><code># Minimal firewall - only allow necessary ports
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow 25565/tcp
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
 sudo ufw allow 22/tcp  # SSH
 sudo ufw enable
 </code></pre>
 
-<h3>Whitelist</h3>
-<pre><code># Enable whitelist in server.properties
-white-list=true
-
-# Add players in-game or console
-/whitelist add PlayerName
-/whitelist on
-</code></pre>
-
-<h3>RCON Security</h3>
-<pre><code># If using RCON, use strong password
-enable-rcon=true
-rcon.password=Use_A_Very_Strong_Random_Password_Here
-rcon.port=25575
-
-# Bind to localhost only if possible
-rcon.ip=127.0.0.1
-</code></pre>
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
 
 <h3>Regular Updates</h3>
 <ul>
-    <li>Keep server software updated</li>
-    <li>Update plugins regularly</li>
-    <li>Monitor security advisories</li>
-    <li>Test updates on staging server first</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
 </ul>
 
 <h3>DDoS Protection</h3>
 <ul>
-    <li>Use TCP SYN cookies: <code>echo 1 > /proc/sys/net/ipv4/tcp_syncookies</code></li>
-    <li>Consider DDoS protection service (Cloudflare Spectrum, OVH Game, etc.)</li>
-    <li>Use BungeeCord/Velocity proxy for multiple servers</li>
-    <li>Implement rate limiting with iptables/fail2ban</li>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
 <h2>Additional Resources</h2>
 <ul>
-    <li><a href="https://minecraft.fandom.com/wiki/Server.properties" target="_blank">Minecraft Wiki - Server.properties</a></li>
-    <li><a href="https://www.spigotmc.org/" target="_blank">SpigotMC Forums & Resources</a></li>
-    <li><a href="https://papermc.io/downloads" target="_blank">Paper Downloads & Documentation</a></li>
-    <li><a href="https://aikar.co/mcflags.html" target="_blank">Aikar's JVM Flags</a></li>
-    <li><a href="https://docs.papermc.io/" target="_blank">Paper Documentation</a></li>
-    <li><a href="https://github.com/YouHaveTrouble/minecraft-optimization" target="_blank">Minecraft Server Optimization Guide</a></li>
+    <li>Official Minecraft Server documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
     <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
-        <li>Always accept Mojang's EULA before running a server</li>
-        <li>Make regular backups of your world data</li>
-        <li>Keep server software and plugins updated</li>
-        <li>Monitor server resources (CPU, RAM, disk)</li>
-        <li>Join Minecraft server admin communities for support</li>
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
 
 <p style="text-align: center; margin-top: 30px; color: #666;">
-    <em>Last updated: November 2024 | For Minecraft Java Edition 1.20+</em>
+    <em>Last updated: November 2025 | For Minecraft Server server hosting</em>
 </p>

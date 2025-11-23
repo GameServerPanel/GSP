@@ -1,570 +1,362 @@
 <?php
 /**
- * AMX Mod X Documentation
+ * AMX Mod X Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>📚 AMX Mod X Server Guide</h1>
-<p style="font-size: 1.1em; color: rgba(255,255,255,0.8);">Powerful plugin framework for Counter-Strike servers</p>
-
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
-    <table style="width: 100%; color: #e5e7eb;">
-        <tr><td><strong style="color: #ffffff;">Supported Games:</strong></td><td>Counter-Strike 1.6, CS:Source, CS:GO (limited)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Language:</strong></td><td>Pawn scripting (.sma source, .amxx compiled)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Requirement:</strong></td><td>MetaMod must be installed first</td></tr>
-        <tr><td><strong style="color: #ffffff;">Admin System:</strong></td><td>users.ini file-based or database</td></tr>
-        <tr><td><strong style="color: #ffffff;">Latest Version:</strong></td><td>1.10+ (actively maintained)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Website:</strong></td><td>amxmodx.org</td></tr>
-        <tr><td><strong style="color: #ffffff;">Forum:</strong></td><td>forums.alliedmods.net</td></tr>
-    </table>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h2>Navigation</h2>
-<ul style="list-style: none; padding: 0;">
-    <li>📚 <a href="#overview">Overview</a></li>
-    <li>⚙️ <a href="#installation">Installation</a></li>
-    <li>👤 <a href="#admin">Admin System</a></li>
-    <li>🔌 <a href="#plugins">Plugin Management</a></li>
-    <li>💻 <a href="#scripting">Pawn Scripting Basics</a></li>
-    <li>🎮 <a href="#gamemodes">Popular Game Modes</a></li>
-    <li>🛠️ <a href="#compilation">Compiling Plugins</a></li>
-    <li>🔧 <a href="#troubleshooting">Troubleshooting</a></li>
-    <li>📖 <a href="#resources">Resources</a></li>
-</ul>
-
-<h2 id="overview">Overview</h2>
-<p>AMX Mod X (AMXX) is a powerful server-side modification framework for Half-Life 1 engine games, particularly Counter-Strike. It allows server administrators to add custom functionality through plugins written in Pawn scripting language.</p>
-
-<h3>Key Features</h3>
-<ul>
-    <li><strong>Plugin System:</strong> Hot-load plugins without server restart</li>
-    <li><strong>Admin Management:</strong> Comprehensive admin system with flags/permissions</li>
-    <li><strong>Custom Commands:</strong> Create server-side commands and cvars</li>
-    <li><strong>Event Hooks:</strong> Hook into game events (player death, spawn, etc.)</li>
-    <li><strong>Database Support:</strong> MySQL, SQLite integration</li>
-    <li><strong>Menu System:</strong> Create interactive menus for players</li>
-    <li><strong>Game Modes:</strong> Enable custom game modes (Zombie Plague, Superhero, etc.)</li>
-</ul>
-
-<h3>Game Compatibility</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Game</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Support Level</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Notes</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Counter-Strike 1.6</td>
-            <td style="padding: 12px;"><span style="color: #10b981;">Full Support</span></td>
-            <td style="padding: 12px;">Best compatibility, most plugins available</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">CS:Source</td>
-            <td style="padding: 12px;"><span style="color: #eab308;">Partial Support</span></td>
-            <td style="padding: 12px;">Works but SourceMod preferred</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">CS:GO</td>
-            <td style="padding: 12px;"><span style="color: #ef4444;">Limited</span></td>
-            <td style="padding: 12px;">SourceMod strongly recommended</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">Day of Defeat</td>
-            <td style="padding: 12px;"><span style="color: #10b981;">Full Support</span></td>
-            <td style="padding: 12px;">HL1 engine, full compatibility</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">TFC, NS, TS</td>
-            <td style="padding: 12px;"><span style="color: #10b981;">Full Support</span></td>
-            <td style="padding: 12px;">All HL1 mods supported</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="installation">⚙️ Installation</h2>
-
-<h3>Prerequisites</h3>
-<p><strong>Critical:</strong> MetaMod must be installed before AMX Mod X!</p>
-<ul>
-    <li>Counter-Strike dedicated server</li>
-    <li>MetaMod 1.21+ (for CS 1.6) or MetaMod:Source (for Source games)</li>
-    <li>Admin access to server files</li>
-</ul>
-
-<h3>Step 1: Install MetaMod (CS 1.6)</h3>
-<pre><code># Download MetaMod from metamod.org
-wget https://www.metamod.org/files/metamod-1.21-am.tar.gz
-tar -xzf metamod-1.21-am.tar.gz
-
-# Copy to server (Linux)
-cp metamod.so /path/to/cstrike/addons/metamod/dlls/
-
-# Create metamod plugin config
-mkdir -p /path/to/cstrike/addons/metamod
-echo 'linux addons/metamod/dlls/metamod.so' > /path/to/cstrike/addons/metamod/metamod.so
-
-# Update liblist.gam (CS 1.6 only)
-# Replace: gamedll_linux "dlls/cs.so"
-# With: gamedll_linux "addons/metamod/dlls/metamod.so"
-</code></pre>
-
-<h4>Windows MetaMod Installation</h4>
-<pre><code># Download Windows version
-# Extract metamod.dll to cstrike\addons\metamod\dlls\
-
-# Edit liblist.gam:
-# Replace: gamedll "dlls\mp.dll"
-# With: gamedll "addons\metamod\dlls\metamod.dll"
-</code></pre>
-
-<h3>Step 2: Install AMX Mod X</h3>
-
-<h4>Linux Installation</h4>
-<pre><code># Download latest AMXX from amxmodx.org
-cd /tmp
-wget https://www.amxmodx.org/amxxdrop/1.10/amxmodx-1.10.0-git5467-base-linux.tar.gz
-wget https://www.amxmodx.org/amxxdrop/1.10/amxmodx-1.10.0-git5467-cstrike-linux.tar.gz
-
-# Extract to server root
-cd /path/to/cstrike
-tar -xzf /tmp/amxmodx-1.10.0-git5467-base-linux.tar.gz
-tar -xzf /tmp/amxmodx-1.10.0-git5467-cstrike-linux.tar.gz
-
-# Set permissions
-chmod +x addons/amxmodx/dlls/amxmodx_mm_i386.so
-
-# AMX Mod X automatically registers with MetaMod
-</code></pre>
-
-<h4>Windows Installation</h4>
-<pre><code># Download Windows packages:
-# - amxmodx-1.10.0-git5467-base-windows.zip
-# - amxmodx-1.10.0-git5467-cstrike-windows.zip
-
-# Extract both to cstrike\ folder
-# Folder structure should be:
-# cstrike\
-#   addons\
-#     amxmodx\
-#       configs\
-#       dlls\
-#       plugins\
-#       scripting\
-</code></pre>
-
-<h3>Step 3: Verify Installation</h3>
-<pre><code># Start server and check console for:
-# "AMX Mod X version X.X.X loaded"
-
-# In-game, type in console:
-amx_version
-
-# Expected output:
-# AMX Mod X 1.10.0-git5467 (Counter-Strike 1.6)
-</code></pre>
-
-<h2 id="admin">👤 Admin System</h2>
-
-<h3>Admin Configuration (users.ini)</h3>
-<p>Located at: <code>addons/amxmodx/configs/users.ini</code></p>
-
-<h4>Basic Admin Entry</h4>
-<pre><code>; Name or IP with flags
-"PlayerName" "" "abcdefghijklmnopqrstu" "ce"
-
-; Admin by SteamID (recommended)
-"STEAM_0:1:12345678" "" "abcdefghijklmnopqrstu" "ce"
-
-; Admin by IP address
-"192.168.1.100" "" "abcdefghijklmnopqrstu" "a"
-
-; Password-based admin
-"" "mypassword" "abcdefghijklmnopqrstu" "a"
-</code></pre>
-
-<h3>Admin Flags Explained</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Flag</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Permission</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>a</code></td>
-            <td style="padding: 12px;">Immunity (can't be kicked/banned)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>b</code></td>
-            <td style="padding: 12px;">Reservation (can join full server)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>c</code></td>
-            <td style="padding: 12px;">amx_kick command</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>d</code></td>
-            <td style="padding: 12px;">amx_ban and amx_unban</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>e</code></td>
-            <td style="padding: 12px;">amx_slay and amx_slap</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>f</code></td>
-            <td style="padding: 12px;">amx_map command</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>g</code></td>
-            <td style="padding: 12px;">amx_cvar (change server cvars)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>h</code></td>
-            <td style="padding: 12px;">amx_cfg (execute configs)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>i</code></td>
-            <td style="padding: 12px;">amx_chat and other chat commands</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>j</code></td>
-            <td style="padding: 12px;">amx_vote commands</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>k</code></td>
-            <td style="padding: 12px;">Access to sv_password cvar</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>l</code></td>
-            <td style="padding: 12px;">amx_rcon command</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code>m</code></td>
-            <td style="padding: 12px;">Custom level A (defined by plugins)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code>z</code></td>
-            <td style="padding: 12px;">User (no admin privileges)</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Common Admin Commands</h3>
-<pre><code># Player management
-amx_kick <player> [reason]
-amx_ban <player> <minutes> [reason]
-amx_slay <player>
-amx_slap <player> [damage]
-
-# Server management
-amx_map <mapname>
-amx_cvar <cvar> <value>
-amx_cfg <config file>
-amx_pausecfg
-
-# Chat and communication
-amx_say <message>
-amx_chat <message>  # Admin-only chat
-amx_psay <player> <message>  # Private message
-
-# Voting
-amx_vote <question>
-amx_votemap <map1> <map2> <map3>
-amx_votekick <player>
-
-# Information
-amx_who  # List online players with info
-amx_plugins  # List loaded plugins
-amx_modules  # List loaded modules
-</code></pre>
-
-<h2 id="plugins">🔌 Plugin Management</h2>
-
-<h3>Plugin Files Location</h3>
-<ul>
-    <li><strong>Compiled plugins (.amxx):</strong> <code>addons/amxmodx/plugins/</code></li>
-    <li><strong>Source code (.sma):</strong> <code>addons/amxmodx/scripting/</code></li>
-    <li><strong>Plugin configuration:</strong> <code>addons/amxmodx/configs/plugins.ini</code></li>
-</ul>
-
-<h3>plugins.ini Configuration</h3>
-<p>Located at: <code>addons/amxmodx/configs/plugins.ini</code></p>
-<pre><code>; Core plugins (required)
-admin.amxx
-adminhelp.amxx
-adminslots.amxx
-multilingual.amxx
-menufront.amxx
-cmdmenu.amxx
-plmenu.amxx
-mapchooser.amxx
-admincmd.amxx
-
-; Counter-Strike plugins
-statsx.amxx
-restmenu.amxx
-scrollmsg.amxx
-
-; Custom plugins (add your own)
-; myplugin.amxx
-; zombieplague.amxx
-
-; Disable plugin with semicolon:
-; disabled_plugin.amxx
-</code></pre>
-
-<h3>Installing New Plugins</h3>
-<pre><code># 1. Download .amxx file or .sma source
-# 2. If .amxx - copy to plugins/ folder
-cp myplugin.amxx /path/to/cstrike/addons/amxmodx/plugins/
-
-# 3. Add to plugins.ini
-echo "myplugin.amxx" >> /path/to/cstrike/addons/amxmodx/configs/plugins.ini
-
-# 4. Reload plugins without restart:
-# In-game: amx_plugins reload
-# Or restart server
-</code></pre>
-
-<h3>Plugin Commands</h3>
-<pre><code># List all plugins
-amx_plugins
-
-# Enable/disable specific plugin
-amx_pause <plugin name>
-amx_unpause <plugin name>
-
-# Reload all plugins
-amx_plugins reload
-</code></pre>
-
-<h2 id="scripting">💻 Pawn Scripting Basics</h2>
-
-<h3>Simple Plugin Example</h3>
-<pre><code>/* hello_world.sma */
-#include <amxmodx>
-#include <amxmisc>
-
-#define PLUGIN "Hello World"
-#define VERSION "1.0"
-#define AUTHOR "YourName"
-
-public plugin_init() {
-    register_plugin(PLUGIN, VERSION, AUTHOR)
-    register_clcmd("say /hello", "cmd_hello")
-}
-
-public cmd_hello(id) {
-    client_print(id, print_chat, "Hello, %s!", get_user_name(id))
-    return PLUGIN_HANDLED
-}
-</code></pre>
-
-<h3>Common Includes</h3>
-<ul>
-    <li><code>#include &lt;amxmodx&gt;</code> - Core AMXX functions</li>
-    <li><code>#include &lt;amxmisc&gt;</code> - Miscellaneous utility functions</li>
-    <li><code>#include &lt;cstrike&gt;</code> - Counter-Strike specific functions</li>
-    <li><code>#include &lt;fun&gt;</code> - Fun commands (slap, godmode, etc.)</li>
-    <li><code>#include &lt;engine&gt;</code> - Engine entity manipulation</li>
-    <li><code>#include &lt;fakemeta&gt;</code> - Advanced entity control</li>
-</ul>
-
-<h3>Event Hooking</h3>
-<pre><code>public plugin_init() {
-    register_event("DeathMsg", "event_death", "a")
-    register_event("CurWeapon", "event_curweapon", "be", "1=1")
-}
-
-public event_death() {
-    new killer = read_data(1)
-    new victim = read_data(2)
-    
-    client_print(killer, print_chat, "You killed %s!", get_user_name(victim))
-}
-
-public event_curweapon(id) {
-    new weaponid = read_data(2)
-    // Do something when player switches weapon
-}
-</code></pre>
-
-<h2 id="gamemodes">🎮 Popular Game Modes</h2>
-
-<h3>Zombie Plague</h3>
-<p>Most popular zombie mod for CS 1.6:</p>
-<ul>
-    <li><strong>Features:</strong> Zombies vs Humans, special classes, custom models</li>
-    <li><strong>Download:</strong> forums.alliedmods.net</li>
-    <li><strong>Installation:</strong> Extract to addons/amxmodx/, add to plugins.ini</li>
-    <li><strong>Configuration:</strong> Edit zombieplague.cfg in configs/</li>
-</ul>
-
-<h3>Superhero Mod</h3>
-<p>Players gain superhero powers:</p>
-<ul>
-    <li><strong>Features:</strong> 20+ heroes (Superman, Flash, etc.), XP system</li>
-    <li><strong>Heroes:</strong> Special abilities (speed, strength, invisibility)</li>
-    <li><strong>Config:</strong> Extensive configuration in sh_heroes.cfg</li>
-</ul>
-
-<h3>Jailbreak</h3>
-<p>Prison-themed game mode:</p>
-<ul>
-    <li><strong>Teams:</strong> Guards (CTs) vs Prisoners (Ts)</li>
-    <li><strong>Features:</strong> Simon says, games, last request system</li>
-    <li><strong>Requirements:</strong> Special jailbreak maps</li>
-</ul>
-
-<h3>Deathmatch</h3>
-<p>Instant respawn deathmatch:</p>
-<ul>
-    <li><strong>Plugin:</strong> csdm.amxx (CS DeathMatch)</li>
-    <li><strong>Features:</strong> Instant respawn, weapon menu, spawn protection</li>
-    <li><strong>Config:</strong> csdm.cfg for spawn points and settings</li>
-</ul>
-
-<h2 id="compilation">🛠️ Compiling Plugins</h2>
-
-<h3>Using Web Compiler (Easiest)</h3>
-<pre><code># Visit: https://www.amxmodx.org/websc.php
-# 1. Paste your .sma source code
-# 2. Click "Compile"
-# 3. Download resulting .amxx file
-# 4. Upload to plugins/ folder
-</code></pre>
-
-<h3>Local Compilation (Linux)</h3>
-<pre><code># Navigate to scripting folder
-cd /path/to/cstrike/addons/amxmodx/scripting
-
-# Compile single plugin
-./amxxpc myplugin.sma
-
-# Result: myplugin.amxx in compiled/ folder
-# Copy to plugins/ folder
-cp compiled/myplugin.amxx ../plugins/
-</code></pre>
-
-<h3>Local Compilation (Windows)</h3>
-<pre><code># Navigate to scripting folder
-cd cstrike\addons\amxmodx\scripting
-
-# Compile using batch file
-compile.exe myplugin.sma
-
-# Or double-click compile.bat and follow prompts
-# Compiled .amxx will be in compiled\ folder
-</code></pre>
-
-<h3>Compilation Errors</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Error</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Cause & Fix</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">fatal error 100: cannot read from file</td>
-            <td style="padding: 12px;">Missing include file - download required .inc file</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">error 017: undefined symbol</td>
-            <td style="padding: 12px;">Missing function or variable - check includes</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">error 021: symbol already defined</td>
-            <td style="padding: 12px;">Duplicate variable/function name</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="troubleshooting">🔧 Troubleshooting</h2>
-
-<h3>AMX Mod X Not Loading</h3>
-<pre><code># Check MetaMod is loaded first
-# In server console: meta list
-# Should show: AMX Mod X
-
-# If not listed:
-# 1. Verify MetaMod installation
-# 2. Check addons/metamod/plugins.ini contains:
-linux addons/amxmodx/dlls/amxmodx_mm_i386.so
-# Or for Windows:
-win32 addons/amxmodx/dlls/amxmodx_mm.dll
-
-# Check file permissions (Linux)
-chmod +x addons/amxmodx/dlls/amxmodx_mm_i386.so
-</code></pre>
-
-<h3>Plugin Not Working</h3>
-<pre><code># Check plugin is enabled in plugins.ini
-cat addons/amxmodx/configs/plugins.ini | grep myplugin
-
-# Verify plugin loaded
-# In-game: amx_plugins
-# Should list your plugin
-
-# Check for compilation errors
-# Recompile plugin and check for errors
-
-# Enable debug mode
-# In amxx.cfg: amx_debug 1
-# Check logs/L*.log files for errors
-</code></pre>
-
-<h3>Admin Commands Not Working</h3>
-<ul>
-    <li>Verify admin entry in users.ini is correct (check SteamID format)</li>
-    <li>Ensure admin flags include required permission (e.g., 'd' for ban)</li>
-    <li>Check admincmd.amxx plugin is loaded</li>
-    <li>Verify immunity flag 'a' for admin protection</li>
-</ul>
-
-<h3>Server Crash After Plugin Installation</h3>
-<pre><code># Disable recently added plugin
-# Edit plugins.ini and comment out:
-; problematic_plugin.amxx
-
-# Restart server and check if crash persists
-
-# Check logs for specific error:
-tail -f logs/L*.log
-
-# Common causes:
-# - Incompatible plugin version
-# - Missing dependencies
-# - Conflicting plugins
-</code></pre>
-
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>MetaMod First:</strong> Always install MetaMod before AMX Mod X</li>
-        <li><strong>SteamID Admins:</strong> Use SteamID in users.ini, not names (easily changed)</li>
-        <li><strong>Test Plugins:</strong> Test new plugins on dev server before production</li>
-        <li><strong>Backup configs:</strong> Keep backups of users.ini and plugins.ini</li>
-        <li><strong>Plugin Updates:</strong> Check forums regularly for plugin updates</li>
-        <li><strong>Performance:</strong> Disable unused plugins to improve server performance</li>
-        <li><strong>Security:</strong> Never give 'l' flag (rcon) to untrusted admins</li>
-        <li><strong>Documentation:</strong> Read plugin documentation before installation</li>
+<h1>AMX Mod X Server Hosting Guide</h1>
+
+<h2>Overview</h2>
+<p>AMX Mod X is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a AMX Mod X server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="resources">Resources</h2>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The AMX Mod X server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="AMX Mod X Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="AMX Mod X Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><a href="https://www.amxmodx.org/" target="_blank">Official AMX Mod X Website</a></li>
-    <li><a href="https://forums.alliedmods.net/" target="_blank">Allied Modders Forums</a></li>
-    <li><a href="https://www.amxmodx.org/api/" target="_blank">AMX Mod X API Documentation</a></li>
-    <li><a href="https://www.amxmodx.org/websc.php" target="_blank">Online Plugin Compiler</a></li>
-    <li><a href="https://wiki.alliedmods.net/AMX_Mod_X_Plugins" target="_blank">Plugin Development Tutorial</a></li>
-    <li><a href="../cstrike/">Counter-Strike 1.6 Server Documentation</a></li>
-    <li><a href="../css/">CS:Source Server Documentation</a></li>
-    <li><a href="../csgo/">CS:GO Server Documentation</a></li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
+
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=AMX Mod X Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official AMX Mod X documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For AMX Mod X server hosting</em>
+</p>

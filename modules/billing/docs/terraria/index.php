@@ -1,407 +1,430 @@
 <?php
 /**
- * Terraria Dedicated Server - Comprehensive Hosting Guide
+ * Terraria Server Documentation - Comprehensive Guide
  * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
         <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
-        <a href="#tshock" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">TShock</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
-<h1>Terraria Dedicated Server Hosting Guide</h1>
+<h1>Terraria Server Hosting Guide</h1>
 
 <h2>Overview</h2>
-<p>Terraria is a 2D action-adventure sandbox game developed by Re-Logic. With over 5000 items, bosses, NPCs, and extensive building mechanics, Terraria offers rich multiplayer experiences. This comprehensive guide covers hosting a Terraria dedicated server on a VPS or dedicated server.</p>
+<p>Terraria is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Terraria server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">7777</code> (TCP)</li>
-        <li><strong style="color: #ffffff;">Protocol:</strong> TCP</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB (2GB+ for mods)</li>
-        <li><strong style="color: #ffffff;">Recommended RAM:</strong> 4-8GB for larger servers</li>
-        <li><strong style="color: #ffffff;">Storage:</strong> 500MB+ for server, additional for worlds</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 8-255 (configurable)</li>
-        <li><strong style="color: #ffffff;">Server Executable:</strong> TerrariaServer.exe (Windows), TerrariaServer (Linux)</li>
-        <li><strong style="color: #ffffff;">Config File:</strong> serverconfig.txt</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">105600</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">serverconfig.txt</code> - Server Configurations</li>
+        </ul></li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports Required</h2>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">7777</code></td>
-            <td style="padding: 12px;"><span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px;">Game server port (player connections)</td>
-            <td style="padding: 12px;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<div style="background: #1e3a5f; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <p style="color: #e5e7eb; margin: 0;"><strong>Note:</strong> Terraria is one of the simpler games to configure - it only requires a single TCP port. You can change this to any available port (1024-65535), just ensure it matches your <code>serverconfig.txt</code> configuration.</p>
-</div>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 7777/tcp comment 'Terraria server'
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Terraria server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
 sudo ufw reload
-</code></pre>
 
-<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=7777/tcp
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Terraria Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Terraria Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Run in PowerShell as Administrator
-New-NetFirewallRule -DisplayName "Terraria Server" -Direction Inbound -Protocol TCP -LocalPort 7777 -Action Allow
-</code></pre>
-
-<h4>iptables (Legacy Linux)</h4>
-<pre><code>sudo iptables -A INPUT -p tcp --dport 7777 -j ACCEPT
-sudo service iptables save
-</code></pre>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Windows, Linux, or macOS</li>
-    <li><strong>CPU:</strong> Dual-core minimum; Quad-core for 8+ players</li>
-    <li><strong>RAM:</strong> 1GB minimum; 4-8GB for larger modded servers</li>
-    <li><strong>Storage:</strong> 500MB+ for server files; SSD recommended</li>
-    <li><strong>Network:</strong> 512kbps per player recommended</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Windows Installation</h3>
-<pre><code>1. Locate Terraria installation directory:
-   C:\Program Files (x86)\Steam\steamapps\common\Terraria\
+<h3>Installation Steps</h3>
 
-2. Find TerrariaServer.exe in the main folder
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
-3. Run TerrariaServer.exe
-   - Follow the setup wizard
-   - Choose existing world or create new
-   - Set max players
-   - Set port (default 7777)
-   - Set password (optional)
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-4. Server will start and display connection information
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>Linux Installation</h3>
-<pre><code># Download Terraria server files
-wget https://terraria.org/api/download/pc-dedicated-server/terraria-server-1449.zip
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-# Extract files
-unzip terraria-server-1449.zip
-cd 1449/Linux/
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 105600</strong></p>
 
-# Make executable
-chmod +x TerrariaServer*
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
 
-# Run server
-./TerrariaServer.bin.x86_64
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
 
-# Or for headless/background:
-screen -S terraria ./TerrariaServer.bin.x86_64
-# Detach with Ctrl+A, D
-# Reattach with: screen -r terraria
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
 
-<h3>macOS Installation</h3>
-<pre><code># Download server files from terraria.org
-# Extract and navigate to Mac folder
-cd ~/terraria-server/Mac/
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/terraria
 
-# Make executable
-chmod +x TerrariaServer*
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/terraria \
+         +app_update 105600 validate \
+         +quit
 
-# Run server
-./TerrariaServer.bin.osx
+# Server files are now in ~/gameservers/terraria/
+cd ~/gameservers/terraria
+ls -la
 </code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\terraria ^
+             +app_update 105600 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>Configuration File (serverconfig.txt)</h3>
-<p>Create <code>serverconfig.txt</code> in the server directory:</p>
-<pre><code># World Configuration
-world=/path/to/Worlds/MyWorld.wld
-autocreate=3
-worldname=MyWorld
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-# Server Settings
-maxplayers=16
-port=7777
-password=YourPassword
-motd=Welcome to my Terraria server!
-
-# Security
-banlist=banlist.txt
-secure=1
-
-# Network
-priority=1
-npcstream=60
-</code></pre>
-
-<h3>Configuration Parameters</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <tr style="background: #f8f9fa;">
-        <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Parameter</th>
-        <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Description</th>
-        <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Values</th>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>world</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Path to world file</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">/path/to/world.wld</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>autocreate</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Auto-create world size</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">1=Small, 2=Medium, 3=Large</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>maxplayers</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Maximum player slots</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">1-255 (8-16 typical)</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>port</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Server port</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Default: 7777</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>password</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Server password</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Any string (optional)</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>motd</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Message of the day</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Text message</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>difficulty</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">World difficulty</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">0=Normal, 1=Expert, 2=Master</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>secure</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Prevent cheating</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">0=Off, 1=On</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>npcstream</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">NPC update frequency</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Default: 60</td>
-    </tr>
-</table>
-
-<h3>Port Forwarding</h3>
-<pre><code># Forward TCP port 7777 (or your configured port)
-# Linux firewall (UFW):
-sudo ufw allow 7777/tcp
-sudo ufw reload
-
-# Windows Firewall:
-New-NetFirewallRule -DisplayName "Terraria Server" -Direction Inbound -Protocol TCP -LocalPort 7777 -Action Allow
-</code></pre>
-
-<h2 id="tshock">TShock Server Framework</h2>
-
-<h3>What is TShock?</h3>
-<p>TShock is a server modification that adds extensive administrative features, permissions, anti-grief protection, and plugin support to Terraria servers.</p>
-
-<h3>Installing TShock</h3>
-<pre><code># Download TShock from https://github.com/Pryaxis/TShock/releases
-
-# Extract TShock files
-unzip TShock.zip
-
-# Run TShock server
-./TShock.Server
-
-# First run creates configuration files
-# Configure in tshock/config.json
-</code></pre>
-
-<h3>TShock Features</h3>
+<h3>Essential Settings</h3>
 <ul>
-    <li><strong>User Permissions:</strong> Fine-grained permission system</li>
-    <li><strong>Anti-Grief:</strong> Protect regions, prevent item spawn abuse</li>
-    <li><strong>User Management:</strong> Registration, login, groups</li>
-    <li><strong>Admin Commands:</strong> Extensive server control</li>
-    <li><strong>Plugins:</strong> Extend functionality with community plugins</li>
-    <li><strong>REST API:</strong> Remote server management</li>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
 </ul>
 
-<h3>Common TShock Commands</h3>
-<pre><code>/user add USERNAME PASSWORD GROUP
-/group add GROUPNAME "permissions"
-/region define REGIONNAME
-/whitelist add USERNAME
-/ban add USERNAME reason
-/give PLAYER ITEMID AMOUNT
-/time set 12:00
-/butcher - Kill all hostile NPCs
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>serverconfig.txt</code></strong> - Server Configurations</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
 </code></pre>
 
-<h2 id="troubleshooting">Troubleshooting</h2>
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%IP% %PORT% %PLAYERS% %CONTROL_PASSWORD% -world%HOME_PATH%\Save\Worlds\%HOSTNAME%.wld %AUTOCREATE% -worldname %HOSTNAME% %SEED% -secure -worldpath%HOME_PATH%\Save\Worlds\ -banlist%HOME_PATH%\banlist.txt -savedirectory%HOME_PATH%\Save</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-autocreate</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - -autocreate</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">The size of the world to be created.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - Small</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">2</code> - Medium</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">3</code> - Large</li>
+        </ul>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-seed</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - -seed</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Seed used to generate your world</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">MyAwesomeSeed</code></p>
+    </div>
+</div>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Terraria Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
 <h3>Server Won't Start</h3>
-<p><strong>Problem:</strong> Server fails to launch or crashes immediately.</p>
-<p><strong>Solutions:</strong></p>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Check server logs for error messages</li>
-    <li>Verify all paths in serverconfig.txt are correct</li>
-    <li>Ensure port 7777 isn't already in use (<code>netstat -an | grep 7777</code>)</li>
-    <li>Check file permissions (Linux: <code>chmod +x TerrariaServer*</code>)</li>
-    <li>Verify world file isn't corrupted</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Players Cannot Connect</h3>
-<p><strong>Problem:</strong> Players can't join the server.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Verify port 7777 TCP is forwarded on router</li>
-    <li>Check firewall allows traffic on port 7777</li>
-    <li>Confirm password is correct (case-sensitive)</li>
-    <li>Use external IP address, not local/LAN IP</li>
-    <li>Test with <code>telnet SERVERIP 7777</code></li>
-    <li>Ensure server is running and accepting connections</li>
-</ul>
+<h3>Performance Issues</h3>
 
-<h3>Lag and Performance Issues</h3>
-<p><strong>Problem:</strong> Server experiences lag or stuttering.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Reduce max players if exceeding capacity</li>
-    <li>Use SSD instead of HDD for better I/O</li>
-    <li>Increase server RAM allocation</li>
-    <li>Disable or reduce mods/plugins</li>
-    <li>Clean up excessive items/projectiles in world</li>
-    <li>Use smaller world size for lower player counts</li>
-</ul>
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
 
-<h3>World Corruption</h3>
-<p><strong>Problem:</strong> World file corrupted or won't load.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Restore from backup (always maintain backups!)</li>
-    <li>Try loading world in single-player Terraria client</li>
-    <li>Use world repair tools if available</li>
-    <li>Check disk for errors</li>
-    <li>Avoid forced server shutdowns</li>
-</ul>
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
 
-<h3>Mod/Plugin Issues</h3>
-<p><strong>Problem:</strong> Mods not loading or causing crashes.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Ensure mod/plugin versions match Terraria version</li>
-    <li>Check for mod conflicts</li>
-    <li>Update TShock and plugins to latest versions</li>
-    <li>Review mod documentation for dependencies</li>
-    <li>Test mods individually to identify problematic ones</li>
-</ul>
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
 
 <h2 id="performance">Performance Optimization</h2>
 
-<h3>Server Sizing Guidelines</h3>
+<h3>Server Tuning</h3>
 <ul>
-    <li><strong>Small (2-4 players):</strong> 1GB RAM, dual-core CPU</li>
-    <li><strong>Medium (5-8 players):</strong> 2-4GB RAM, dual/quad-core CPU</li>
-    <li><strong>Large (10-16 players):</strong> 4-8GB RAM, quad-core CPU</li>
-    <li><strong>Modded servers:</strong> Add 2-4GB RAM depending on mod count</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
 <h3>Backup Strategy</h3>
-<pre><code># Linux backup script
-#!/bin/bash
-WORLD_DIR="/path/to/Terraria/Worlds"
-BACKUP_DIR="/path/to/backups"
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
 DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
 # Create backup
-tar -czf $BACKUP_DIR/terraria_backup_$DATE.tar.gz $WORLD_DIR
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
 
-# Keep only last 14 days
-find $BACKUP_DIR -name "terraria_backup_*.tar.gz" -mtime +14 -delete
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
 </code></pre>
 
-<h3>Automated Restarts</h3>
-<p>Set up daily restarts for optimal performance:</p>
-<pre><code># Linux crontab for 4 AM restart
-0 4 * * * /path/to/restart_terraria.sh
+<h2 id="security">Security Best Practices</h2>
 
-# restart_terraria.sh:
-#!/bin/bash
-pkill -9 TerrariaServer
-sleep 5
-cd /path/to/terraria
-screen -dmS terraria ./TerrariaServer.bin.x86_64 -config serverconfig.txt
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
 </code></pre>
 
-<h3>World Management</h3>
+<h3>Strong Passwords</h3>
 <ul>
-    <li>Regular backups before major events or boss fights</li>
-    <li>Clean up unnecessary items periodically</li>
-    <li>Monitor world file size growth</li>
-    <li>Consider starting fresh worlds for new major updates</li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<h2>Modding Resources</h2>
-
-<h3>TModLoader</h3>
-<p><a href="https://github.com/tModLoader/tModLoader" target="_blank">TModLoader</a> is a mod loader for Terraria that allows players to create and play mods.</p>
-
-<h3>Popular Mods</h3>
+<h3>Regular Updates</h3>
 <ul>
-    <li><strong>Calamity Mod:</strong> Massive content expansion</li>
-    <li><strong>Thorium Mod:</strong> New items, bosses, and biomes</li>
-    <li><strong>Fargo's Mods:</strong> Quality of life improvements</li>
-    <li><strong>Magic Storage:</strong> Advanced item storage system</li>
-    <li><strong>Boss Checklist:</strong> Track boss progression</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
 <h2>Additional Resources</h2>
 <ul>
-    <li><a href="https://terraria.fandom.com/wiki/Guide:Setting_up_a_Terraria_server" target="_blank">Terraria Wiki - Server Setup Guide</a></li>
-    <li><a href="https://github.com/Pryaxis/TShock" target="_blank">TShock GitHub Repository</a></li>
-    <li><a href="https://tshock.readme.io/docs" target="_blank">TShock Documentation</a></li>
-    <li><a href="https://forums.terraria.org/index.php?forums/server-help.61/" target="_blank">Official Terraria Forums - Server Help</a></li>
-    <li><a href="https://www.reddit.com/r/Terraria/" target="_blank">r/Terraria Community</a></li>
+    <li>Official Terraria documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Always backup your world files before major changes</li>
-        <li>Keep server software updated to match client versions</li>
-        <li>Use strong passwords to protect your server</li>
-        <li>Monitor resource usage and adjust player limits accordingly</li>
-        <li>Consider TShock for advanced server management</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Terraria server hosting</em>
+</p>

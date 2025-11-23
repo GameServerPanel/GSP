@@ -1,6 +1,7 @@
-﻿{
-    "description":  "Setup and configuration guide for Call of Duty 4: Modern Warfare game servers",
-    "name":  "Call of Duty 4: Modern Warfare",
-    "order":  31,
-    "category":  "game"
+{
+    "description": "Setup and configuration guide for Call of Duty 4: Modern Warfare game servers",
+    "name": "Call of Duty 4: Modern Warfare",
+    "order": 31,
+    "category": "game",
+    "complete": true
 }

@@ -1,490 +1,415 @@
 <?php
 /**
- * Conan Exiles Dedicated Server - Comprehensive Hosting Guide
+ * Conan Exiles Server Documentation - Comprehensive Guide
  * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#overview" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
         <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
-        <a href="#mods" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Mods & Admin</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
-<h1>Conan Exiles Dedicated Server Hosting Guide</h1>
+<h1>Conan Exiles Server Hosting Guide</h1>
 
-<h2 id="overview">Overview</h2>
-<p><strong>Conan Exiles</strong> is an open-world survival game set in the brutal lands of Conan the Barbarian. Players must survive in a vast sandbox world, build massive structures, tame thralls, and battle gods and other players in this savage civilization-building game.</p>
+<h2>Overview</h2>
+<p>Conan Exiles is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Conan Exiles server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">7777</code> (UDP)</li>
-        <li><strong style="color: #ffffff;">Query Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code> (UDP)</li>
-        <li><strong style="color: #ffffff;">RCON Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">25575</code> (TCP, optional)</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 6GB (Recommended: 16-32GB)</li>
-        <li><strong style="color: #ffffff;">Recommended CPU:</strong> 4+ cores @ 3.5GHz+</li>
-        <li><strong style="color: #ffffff;">Storage:</strong> 30GB+ (SSD strongly recommended)</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 40-70 typical (configurable)</li>
-        <li><strong style="color: #ffffff;">SteamCMD App ID:</strong> 443030</li>
-        <li><strong style="color: #ffffff;">Config Files:</strong> ServerSettings.ini, Engine.ini, Game.ini</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">443030</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">ConanSandbox\Config\DefaultEngine.ini</code> - Engine.ini </li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">ConanSandbox\Config\DefaultGame.ini</code> - Game.ini </li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">ConanSandbox\Config\DefaultServerSettings.ini</code> - ServerSettings.ini</li>
+        </ul></li>
     </ul>
 </div>
 
-    </ul>
-</div>
-
-<h2 id="ports">🔌 Ports Required</h2>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">7777</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Primary game port (player connections)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">7778</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Raw UDP socket (automatic +1)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">27015</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Query port (server browser, Steam)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">25575</code></td>
-            <td style="padding: 12px;"><span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px;">RCON port (remote admin console)</td>
-            <td style="padding: 12px;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<div style="background: #1e3a5f; padding: 15px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <p style="color: #e5e7eb; margin: 0;"><strong>Note:</strong> Like ARK: Survival Evolved, Conan Exiles automatically uses port+1 for raw UDP socket connections. Always open both the main port and the port immediately after it (e.g., 7777 and 7778).</p>
-</div>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 7777:7778/udp comment 'Conan Exiles game ports'
-sudo ufw allow 27015/udp comment 'Conan Exiles query'
-sudo ufw allow 25575/tcp comment 'Conan Exiles RCON'
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Conan Exiles server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
 sudo ufw reload
-</code></pre>
 
-<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=7777-7778/udp
-sudo firewall-cmd --permanent --add-port=27015/udp
-sudo firewall-cmd --permanent --add-port=25575/tcp
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Conan Exiles Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Conan Exiles Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Run in PowerShell as Administrator
-New-NetFirewallRule -DisplayName "Conan Exiles Game" -Direction Inbound -Protocol UDP -LocalPort 7777,7778,27015 -Action Allow
-New-NetFirewallRule -DisplayName "Conan Exiles RCON" -Direction Inbound -Protocol TCP -LocalPort 25575 -Action Allow
-</code></pre>
-
-<h4>iptables (Legacy Linux)</h4>
-<pre><code>sudo iptables -A INPUT -p udp --dport 7777:7778 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 27015 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 25575 -j ACCEPT
-sudo service iptables save
-</code></pre>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Windows Server 2016+ or Linux 64-bit (Ubuntu/Debian recommended)</li>
-    <li><strong>CPU:</strong> Minimum 4 cores @ 3.0GHz; Recommended 6-8 cores @ 3.5GHz+</li>
-    <li><strong>RAM:</strong> 6GB minimum, 16-32GB recommended for 40+ players</li>
-    <li><strong>Storage:</strong> 30GB+ for game files; SSD strongly recommended (world size grows)</li>
-    <li><strong>Network:</strong> 5Mbps minimum upload; 20-50Mbps for larger servers</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installing via SteamCMD (Linux)</h3>
-<pre><code># Install SteamCMD
-sudo add-apt-repository multiverse
-sudo dpkg --add-architecture i386
-sudo apt update
-sudo apt install steamcmd
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
 # Create server directory
-mkdir -p ~/conan-server
-cd ~/conan-server
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-# Download server files
-steamcmd +login anonymous +force_install_dir ~/conan-server +app_update 443030 validate +exit
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>Installing via SteamCMD (Windows)</h3>
-<pre><code># Download SteamCMD from https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip
-# Extract to C:\steamcmd\
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-# Run CMD as Administrator
-cd C:\steamcmd
-steamcmd.exe +login anonymous +force_install_dir "C:\ConanServer" +app_update 443030 validate +exit
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 443030</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/conanexiles
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/conanexiles \
+         +app_update 443030 validate \
+         +quit
+
+# Server files are now in ~/gameservers/conanexiles/
+cd ~/gameservers/conanexiles
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\conanexiles ^
+             +app_update 443030 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>Key Configuration Files</h3>
-<p>Conan Exiles uses three main INI files located in <code>ConanSandbox/Saved/Config/WindowsServer/</code> (or <code>LinuxServer/</code>):</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-<h4>1. ServerSettings.ini</h4>
-<p>Primary server configuration file for gameplay settings:</p>
-<pre><code>[ServerSettings]
-; Server Identity
-ServerName=My Conan Server
-ServerPassword=
-AdminPassword=YourSecureAdminPassword
-ServerRegion=0
-
-; Network
-Port=7777
-QueryPort=27015
-MaxPlayers=40
-
-; PvP Settings
-PVPEnabled=True
-RestrictPVPBuilding=True
-RestrictPVPBuildingDamageTime=True
-PVPBlitzServer=False
-
-; Server Type (affects XP/harvesting rates)
-; 0=No Selection, 1=Conflict, 2=PvE-Conflict, 3=PvE, 4=PvP
-ServerType=4
-
-; Progression
-PlayerXPRateMultiplier=1.0
-PlayerXPKillMultiplier=1.0
-PlayerXPHarvestMultiplier=1.0
-PlayerXPCraftMultiplier=1.0
-PlayerXPTimeMultiplier=1.0
-
-; Harvesting
-HarvestAmountMultiplier=1.0
-ItemConvertionMultiplier=1.0
-ResourceRespawnSpeedMultiplier=1.0
-
-; Thralls & NPCs
-ThrallConversionMultiplier=1.0
-ThrallCraftingTimeMultiplier=1.0
-ThrallDecayTime=604800
-
-; Building & Decay
-BuildingDecayTime=604800
-BuildingDecayTimeMultiplier=1.0
-
-; Combat
-PlayerDamageMultiplier=1.0
-NPCDamageMultiplier=1.0
-PlayerDamageTakenMultiplier=1.0
-MinionDamageMultiplier=1.0
-
-; Containers
-ContainerIgnoreOwnership=False
-
-; Purge Settings
-EnablePurge=True
-PurgeLevel=5
-PurgeFrequency=14400
-
-; Stamina & Resources
-PlayerStaminaCostMultiplier=1.0
-PlayerActiveThirstMultiplier=1.0
-PlayerActiveHungerMultiplier=1.0
-
-; Community
-ClanMaxSize=10
-ServerCommunity=0
-</code></pre>
-
-<h4>2. Engine.ini</h4>
-<p>Performance and network optimization:</p>
-<pre><code>[OnlineSubsystemSteam]
-ServerName=My Conan Server
-ServerPassword=
-bEnabled=true
-
-[/Script/Engine.GameSession]
-MaxPlayers=40
-
-[Core.System]
-Paths=../../../Engine/Content
-Paths=%GAMEDIR%Content
-Paths=../../../Engine/Plugins/Runtime/Firebase/FirebaseGoodies/Content
-Paths=../../../ConanSandbox/Plugins/ControlIconsToolkit/Content
-</code></pre>
-
-<h4>3. Game.ini</h4>
-<p>Advanced gameplay customization:</p>
-<pre><code>[/Script/ConanSandbox.ConanGameMode]
-; Tweak specific game mechanics
-NPCRespawnMultiplier=1.0
-</code></pre>
-
-<h3>Starting the Server</h3>
-
-<h4>Windows</h4>
-<pre><code># Navigate to ConanSandbox\Binaries\Win64\
-cd C:\ConanServer\ConanSandbox\Binaries\Win64\
-
-# Basic startup
-ConanSandboxServer.exe -log
-
-# With custom config and multihome
-ConanSandboxServer.exe -log -Port=7777 -QueryPort=27015 -MaxPlayers=40 MULTIHOME=YOUR_SERVER_IP
-</code></pre>
-
-<h4>Linux</h4>
-<pre><code># Make executable
-chmod +x ConanSandboxServer.sh
-
-# Run in screen session
-screen -S conan ./ConanSandboxServer.sh -log
-
-# With custom parameters
-./ConanSandboxServer.sh -log -Port=7777 -QueryPort=27015 -MaxPlayers=40
-
-# Detach: Ctrl+A, D
-# Reattach: screen -r conan
-</code></pre>
-
-<h2 id="mods">Mods & Admin Tools</h2>
-
-<h3>Installing Mods</h3>
-<ol>
-    <li><strong>Subscribe to mods</strong> on Steam Workshop</li>
-    <li><strong>Note the Mod IDs</strong> from Workshop URLs (e.g., 1234567890)</li>
-    <li><strong>Edit modlist.txt</strong> in server root directory:</li>
-</ol>
-
-<pre><code># modlist.txt format (one mod ID per line)
-*1234567890
-*9876543210
-*5555555555
-</code></pre>
-
-<ol start="4">
-    <li><strong>Restart server</strong> - mods download automatically on startup</li>
-    <li><strong>Check logs</strong> for mod loading confirmation</li>
-</ol>
-
-<h3>Popular Mods</h3>
+<h3>Essential Settings</h3>
 <ul>
-    <li><strong>Pippi - User & Server Management:</strong> Essential admin tools, teleportation, spawning</li>
-    <li><strong>Age of Calamitous:</strong> Massive content expansion with new armor, weapons, dungeons</li>
-    <li><strong>LBPR - Less Building Placement Restrictions:</strong> More flexible building</li>
-    <li><strong>Emberlight:</strong> Immersive crafting and character development overhaul</li>
-    <li><strong>Fashionist:</strong> Appearance customization and transmogrification</li>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
 </ul>
 
-<h3>Admin Commands</h3>
-<p>Press <code>Insert</code> (or configured key) to open admin panel after authenticating with admin password.</p>
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>ConanSandbox\Config\DefaultEngine.ini</code></strong> - Engine.ini </li>
+    <li><strong><code>ConanSandbox\Config\DefaultGame.ini</code></strong> - Game.ini </li>
+    <li><strong><code>ConanSandbox\Config\DefaultServerSettings.ini</code></strong> - ServerSettings.ini</li>
+</ul>
 
-<h4>Common Admin Console Commands</h4>
-<pre><code># Make yourself admin (in-game)
-MakeMeAdmin YourAdminPassword
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
 
-# Teleport
-TeleportPlayer X Y Z
-TeleportToPlayer PlayerName
+# Ban player
+ban [player_name]
 
-# Spawning
-Summon ItemName
-SpawnItem ItemID Quantity
+# Change map/level (syntax varies by game)
+changelevel [map_name]
 
-# God mode
-God
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
 
-# Fly mode
-Fly / Walk
+<h2 id="parameters">⚙️ Startup Parameters</h2>
 
-# Invisibility
-Invisibility
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
 
-# Give all recipes
-LearnEmote *
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
 
-# Server control
-SaveGame
-RestartServer
+<h3>Creating a Start Script</h3>
 
-# Clan management
-SetClanOwner ClanID PlayerID
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Conan Exiles Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
 </code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Server Not Appearing in Browser</h3>
-<pre><code># 1. Check ports are open
-netstat -an | grep 7777
-netstat -an | grep 27015
+<h3>Server Won't Start</h3>
 
-# 2. Verify ServerSettings.ini
-ServerRegion=0  # Should be set
-MaxPlayers=40   # Must be configured
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
 
-# 3. Check firewall rules
-sudo ufw status verbose
-
-# 4. Try direct connect instead of browser
-# In game: Open server list → Direct Connect → IP:Port
+# Or check system logs
+journalctl -u gameserver -f
 </code></pre>
 
-<h3>High Memory Usage / Crashes</h3>
-<pre><code># Reduce max players
-MaxPlayers=20  # Instead of 40+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
 
-# Increase server RAM allocation (Linux)
-# Edit startup script to use ulimit
-ulimit -v 33554432  # 32GB limit
-
-# Disable building decay temporarily for testing
-BuildingDecayTime=0
-
-# Regular restarts recommended
-# Schedule automatic restart every 24-48 hours
+# Kill the process or change server port
 </code></pre>
 
-<h3>Mods Not Loading</h3>
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Verify <code>modlist.txt</code> exists in server root</li>
-    <li>Ensure each line starts with asterisk (*)</li>
-    <li>Check mod IDs are correct (from Steam Workshop URL)</li>
-    <li>Look for <code>*_ModControlPanel.txt</code> file generation</li>
-    <li>Review server logs for mod loading errors</li>
-    <li>Some mods require client-side installation too</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Performance Issues / Lag</h3>
-<pre><code># Reduce tick rate (ServerSettings.ini)
-ServerTickRate=30  # Default is higher
+<h3>Performance Issues</h3>
 
-# Lower view distance
-ViewDistance=0.5
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
 
-# Reduce NPC density
-NPCRespawnMultiplier=0.5
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
 
-# Clean up abandoned buildings
-BuildingDecayTime=86400  # 1 day instead of 7
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
 </code></pre>
 
 <h2 id="performance">Performance Optimization</h2>
 
-<h3>Hardware Recommendations by Player Count</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Players</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">RAM</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">CPU Cores</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Storage</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">1-10</td>
-            <td style="padding: 12px;">6-8GB</td>
-            <td style="padding: 12px;">4</td>
-            <td style="padding: 12px;">SSD 30GB+</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">11-20</td>
-            <td style="padding: 12px;">12-16GB</td>
-            <td style="padding: 12px;">6</td>
-            <td style="padding: 12px;">SSD 40GB+</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">21-40</td>
-            <td style="padding: 12px;">16-24GB</td>
-            <td style="padding: 12px;">8</td>
-            <td style="padding: 12px;">SSD 50GB+</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">41-70</td>
-            <td style="padding: 12px;">32GB+</td>
-            <td style="padding: 12px;">12+</td>
-            <td style="padding: 12px;">NVMe 60GB+</td>
-        </tr>
-    </tbody>
-</table>
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
 
-<h3>Optimization Settings</h3>
-<pre><code># ServerSettings.ini performance tweaks
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
 
-; Reduce resource intensity
-HarvestAmountMultiplier=2.0  # Faster gathering = less time farming
-ThrallConversionMultiplier=0.5  # Faster thrall conversion
-
-; Faster decay for abandoned structures
-BuildingDecayTime=259200  # 3 days instead of 7
-
-; Purge optimization
-EnablePurge=False  # Disable if causing performance issues
-PurgeFrequency=21600  # Less frequent if enabled
-
-; NPC spawn rates
-NPCRespawnMultiplier=0.75  # Reduce if too many NPCs
-
-; Stamina (reduces combat calculations)
-PlayerStaminaCostMultiplier=0.75  # Less stamina drain
-
-; Clan sizes (affects database queries)
-ClanMaxSize=5  # Smaller = better performance
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
 </code></pre>
 
-<h3>Database Maintenance</h3>
-<p>Conan Exiles uses SQLite database for world persistence. Regular maintenance improves performance:</p>
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
 
-<pre><code># Backup database regularly
-cp game.db game.db.backup
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
-# The server automatically maintains the database
-# But you can manually optimize offline:
-sqlite3 game.db "VACUUM;"
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
 </code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Conan Exiles documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>SSD is mandatory:</strong> World database writes constantly - HDD will cause severe lag</li>
-        <li><strong>Restart schedule:</strong> Auto-restart every 24-48 hours prevents memory leaks</li>
-        <li><strong>Purge carefully:</strong> The Purge system is resource-intensive; test on low player count first</li>
-        <li><strong>Thrall limits:</strong> Too many thralls cause lag - set reasonable limits or use decay</li>
-        <li><strong>Building limits:</strong> Large bases impact performance - enforce reasonable building policies</li>
-        <li><strong>Backup everything:</strong> Database corruption can occur - automated hourly backups recommended</li>
-        <li><strong>Admin tools:</strong> Pippi mod is essential for server management and admin tasks</li>
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
 
-<h2>Resources</h2>
-<ul>
-    <li><a href="https://www.conanexiles.com/" target="_blank">Official Conan Exiles Website</a></li>
-    <li><a href="https://forums.funcom.com/c/conan-exiles/pc-discussion" target="_blank">Official Forums</a></li>
-    <li><a href="https://steamcommunity.com/app/440900/workshop/" target="_blank">Steam Workshop (Mods)</a></li>
-    <li><a href="https://conanexiles.fandom.com/" target="_blank">Conan Exiles Wiki</a></li>
-    <li><a href="https://www.conanexilesmap.com/" target="_blank">Interactive Map</a></li>
-</ul>
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Conan Exiles server hosting</em>
+</p>

@@ -1,527 +1,499 @@
 <?php
 /**
- * Rust Server Documentation - Comprehensive Hosting Guide
+ * Rust Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
         <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
-        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Parameters</a>
-        <a href="#plugins-mods" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Plugins & Mods</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
 <h1>Rust Server Hosting Guide</h1>
 
 <h2>Overview</h2>
-<p>Rust is a popular multiplayer survival game where players gather resources, build bases, and compete for survival. This comprehensive guide covers hosting a dedicated Rust server on Linux or Windows.</p>
+<p>Rust is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Rust server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28015</code> (UDP)</li>
-        <li><strong style="color: #ffffff;">RCON Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28016</code> (TCP)</li>
-        <li><strong style="color: #ffffff;">Query Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">28017</code> (UDP/TCP - Rust+ app)</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 8GB (small server)</li>
-        <li><strong style="color: #ffffff;">Recommended RAM:</strong> 16GB+ (medium/large servers)</li>
-        <li><strong style="color: #ffffff;">Storage:</strong> 20GB+ (can grow to 50GB+)</li>
-        <li><strong style="color: #ffffff;">App ID:</strong> 258550 (dedicated server)</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> Configurable (50-500+)</li>
-        <li><strong style="color: #ffffff;">Map Size:</strong> 3000-6000 (default 4000)</li>
-        <li><strong style="color: #ffffff;">Log Files:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">RustDedicated_Data/output_log.txt</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">258550</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports Required</h2>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">28015</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Main game server port (client connections)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">28016</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">RCON (Remote Console) port</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">28017</code></td>
-            <td style="padding: 12px;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span> / <span style="background: #1e40af; padding: 4px 8px; border-radius: 3px; color: #dbeafe;">TCP</span></td>
-            <td style="padding: 12px;">Query port (Rust+ app, server browser)</td>
-            <td style="padding: 12px;"><span style="background: #713f12; padding: 4px 8px; border-radius: 3px; color: #fef3c7;">Optional</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 28015/udp comment 'Rust game port'
-sudo ufw allow 28016/tcp comment 'Rust RCON'
-sudo ufw allow 28017 comment 'Rust query/Rust+'
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Rust server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
 sudo ufw reload
-</code></pre>
 
-<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=28015/udp
-sudo firewall-cmd --permanent --add-port=28016/tcp
-sudo firewall-cmd --permanent --add-port=28017/udp
-sudo firewall-cmd --permanent --add-port=28017/tcp
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Rust Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Rust Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Run in PowerShell as Administrator
-New-NetFirewallRule -DisplayName "Rust Game" -Direction Inbound -Protocol UDP -LocalPort 28015 -Action Allow
-New-NetFirewallRule -DisplayName "Rust RCON" -Direction Inbound -Protocol TCP -LocalPort 28016 -Action Allow
-New-NetFirewallRule -DisplayName "Rust Query" -Direction Inbound -Protocol UDP -LocalPort 28017 -Action Allow
-New-NetFirewallRule -DisplayName "Rust Query TCP" -Direction Inbound -Protocol TCP -LocalPort 28017 -Action Allow
-</code></pre>
-
-<h4>iptables (Legacy Linux)</h4>
-<pre><code>sudo iptables -A INPUT -p udp --dport 28015 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 28016 -j ACCEPT
-sudo iptables -A INPUT -p udp --dport 28017 -j ACCEPT
-sudo iptables -A INPUT -p tcp --dport 28017 -j ACCEPT
-sudo service iptables save
-</code></pre>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Linux (Ubuntu 20.04+, Debian 10+) or Windows Server 2016+</li>
-    <li><strong>CPU:</strong> Quad-core 3.2GHz+ (high single-thread performance)</li>
-    <li><strong>RAM:</strong> 8GB minimum, 16GB+ recommended</li>
-    <li><strong>Storage:</strong> 20GB+ SSD (HDD not recommended)</li>
-    <li><strong>Bandwidth:</strong> 1Gbps+ recommended for 100+ players</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installing via SteamCMD</h3>
-<p>Download: <a href="https://developer.valvesoftware.com/wiki/SteamCMD" target="_blank">SteamCMD Guide</a></p>
+<h3>Installation Steps</h3>
 
-<h4>Linux Installation</h4>
-<pre><code># Install SteamCMD
-mkdir ~/steamcmd && cd ~/steamcmd
-wget https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
-tar -xvzf steamcmd_linux.tar.gz
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
-# Run SteamCMD and install Rust
-./steamcmd.sh
-login anonymous
-force_install_dir /home/rust/server
-app_update 258550 validate
-quit
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h4>Windows Installation</h4>
-<pre><code>1. Download SteamCMD for Windows
-2. Extract to C:\steamcmd
-3. Run steamcmd.exe
-4. login anonymous
-5. force_install_dir C:\RustServer
-6. app_update 258550 validate
-7. quit
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 258550</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/rust
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/rust \
+         +app_update 258550 validate \
+         +quit
+
+# Server files are now in ~/gameservers/rust/
+cd ~/gameservers/rust
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\rust ^
+             +app_update 258550 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>Basic Startup Script (Linux)</h3>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>-batchmode -nographics +server.ip %IP% %PORT% %QUERY_PORT% %PLAYERS% %HOSTNAME% %IDENTITY% %DESCRIPTION% %WORLDSIZE% %SEED% %SALT% %TICKRATE% %MAP% %BCK% %SAVEINTERNAL% %SECURE% %RCONWEB% %CONTROL_PASSWORD% -logfile output.txt</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.identity</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.identity</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Changes path to your server data (e.g. rust/server/my_server_identity).</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">server_identity</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.description</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.description</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Server Description shown on server browser</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">Plain old Rust Server</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.worldsize</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.worldsize</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the size of the map generated (min 1000, max 8000).</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">1000</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.seed</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.seed</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the map generation seed.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">0</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.salt</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.salt</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the randomization to mining resources.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">0</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.tickrate</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.tickrate</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the server tickrate (going higher than 30 is not recommended).</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">30</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.level</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.level</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Defines the map of the server.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Barren</code> - Barren</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">CraggyIsland</code> - Craggy Island</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">HapisIsland</code> - Hapis Island</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Procedural Map</code> - Procedural Map</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">SavasIsland</code> - Savas Island</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">SavasIsland_koth</code> - Savas Island KoTH</li>
+        </ul>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+backup</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +backup</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Enable automatic backups.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+server.saveinterval</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +server.saveinterval</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Interval between the server saves the map.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">600</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+rcon.web</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +rcon.web</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">If set to enabled, use websocket RCON. If set to disabled, use legacy source engine RCON.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">0</code> - Disabled</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - Enabled</li>
+        </ul>
+    </div>
+</div>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
 <pre><code>#!/bin/bash
-# start.sh
-
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/rust/server/RustDedicated_Data/Plugins/x86_64
-
-cd /home/rust/server
-
-./RustDedicated -batchmode \
-    +server.ip 0.0.0.0 \
-    +server.port 28015 \
-    +server.tickrate 30 \
-    +server.hostname "My Rust Server" \
-    +server.identity "myserver" \
-    +server.maxplayers 100 \
-    +server.worldsize 4000 \
-    +server.seed 12345 \
-    +server.saveinterval 300 \
-    +server.globalchat true \
-    +server.description "Welcome to my server" \
-    +server.headerimage "https://i.imgur.com/yourimage.png" \
-    +server.url "https://yourwebsite.com" \
-    +rcon.ip 0.0.0.0 \
-    +rcon.port 28016 \
-    +rcon.password "YourSecurePassword" \
-    +rcon.web true \
-    -logfile "logs/$(date +%Y%m%d_%H%M%S).txt"
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
 </code></pre>
 
-<h3>Windows Startup (start.bat)</h3>
+<p><strong>Windows (start.bat):</strong></p>
 <pre><code>@echo off
-cls
-:start
-echo Starting Rust server...
-
-RustDedicated.exe -batchmode ^
-    +server.ip 0.0.0.0 ^
-    +server.port 28015 ^
-    +server.hostname "My Rust Server" ^
-    +server.identity "myserver" ^
-    +server.maxplayers 100 ^
-    +server.worldsize 4000 ^
-    +server.saveinterval 300 ^
-    +rcon.port 28016 ^
-    +rcon.password "YourSecurePassword"
-
-goto start
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
 </code></pre>
 
-<h3>Server Identity</h3>
-<p>Server data is stored in: <code>server/[identity]/</code></p>
-<ul>
-    <li><code>server/myserver/cfg/</code> - Config files</li>
-    <li><code>server/myserver/UserPersistence/</code> - Player data</li>
-    <li><code>server/myserver/proceduralmap.[seed].[size].map</code> - World file</li>
-</ul>
+<h3>Running as a Service</h3>
 
-<h3>server.cfg</h3>
-<p>Create <code>server/myserver/cfg/server.cfg</code>:</p>
-<pre><code>server.hostname "My Rust Server"
-server.description "Welcome to my Rust server!"
-server.url "https://yourwebsite.com"
-server.headerimage "https://i.imgur.com/yourimage.png"
-server.identity "myserver"
-server.seed 12345
-server.worldsize 4000
-server.maxplayers 100
-server.saveinterval 300
-server.tickrate 30
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Rust Server
+After=network.target
 
-# Gameplay
-server.pve false
-server.radiation true
-server.stability true
-decay.scale 1.0
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
 
-# Performance
-server.entityrate 16
-server.planttick 60
-server.planttickscale 1
-
-# Global chat
-server.globalchat true
-server.chathistory 500
-
-# Voice chat
-voice.decay true
-
-# RCON
-rcon.password "YourSecurePassword"
-rcon.web true
+[Install]
+WantedBy=multi-user.target
 </code></pre>
 
-<h2 id="parameters">Startup Parameters Reference</h2>
-
-<h3>Essential Parameters</h3>
-<pre><code>+server.ip "0.0.0.0"              # Server IP (0.0.0.0 = all interfaces)
-+server.port 28015                 # Game port (UDP)
-+server.hostname "Name"            # Server name (appears in browser)
-+server.identity "folder_name"     # Server data folder name
-+server.maxplayers 100             # Maximum players
-+server.worldsize 4000             # Map size (1000-6000)
-+server.seed 12345                 # World seed (random if not set)
-+server.saveinterval 300           # Autosave interval (seconds)
-+server.tickrate 30                # Server tick rate (10-30)
-+server.description "Text"         # Server description
-+server.url "https://url"          # Server website
-+server.headerimage "URL"          # Server banner image
-+rcon.ip "0.0.0.0"                 # RCON bind IP
-+rcon.port 28016                   # RCON port (TCP)
-+rcon.password "password"          # RCON password
-+rcon.web true                     # Enable web/Rust+ RCON
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
 </code></pre>
 
-<h3>Gameplay Parameters</h3>
-<pre><code>+server.pve false                  # PvE mode (true/false)
-+server.radiation true             # Radiation enabled
-+server.stability true             # Building stability
-+server.secure true                # Require VAC
-decay.scale 1.0                    # Decay rate multiplier
-server.itemdespawn 180             # Item despawn time (minutes)
-</code></pre>
-
-<h3>Performance Parameters</h3>
-<pre><code>+server.entityrate 16              # Entity network update rate
-+fps.limit 60                      # Server FPS limit
-+gc.buffer 4096                    # Garbage collection buffer
-server.planttick 60                # Plant growth tick rate
-server.planttickscale 1            # Plant growth speed
-</code></pre>
-
-<h2 id="plugins-mods">Plugins & Mods (Oxide/uMod)</h2>
-
-<h3>Installing Oxide/uMod</h3>
-<ol>
-    <li>Download uMod: <a href="https://umod.org/games/rust" target="_blank">uMod.org</a></li>
-    <li>Extract to server root directory</li>
-    <li>Files go directly into <code>/server/</code> directory</li>
-    <li>Restart server</li>
-    <li>Plugins folder created at <code>oxide/plugins/</code></li>
-</ol>
-
-<h3>Essential Plugins</h3>
-
-<h4>Admin Tools</h4>
-<ul>
-    <li><strong>Admin Radar:</strong> ESP-style admin radar</li>
-    <li><strong>Vanish:</strong> Invisible admin mode</li>
-    <li><strong>Better Chat:</strong> Chat formatting and moderation</li>
-    <li><strong>Admin Hammer:</strong> Building modification tool</li>
-</ul>
-
-<h4>Gameplay Enhancements</h4>
-<ul>
-    <li><strong>Kits:</strong> Item kit system</li>
-    <li><strong>Teleportation:</strong> /home, /tp commands</li>
-    <li><strong>Clans:</strong> Clan/team system</li>
-    <li><strong>Economics:</strong> Server currency system</li>
-    <li><strong>Skip Night Vote:</strong> Vote to skip night</li>
-</ul>
-
-<h4>Protection</h4>
-<ul>
-    <li><strong>Anti Cheat Enhanced:</strong> Cheat detection</li>
-    <li><strong>Raid Block:</strong> Prevent offline raiding</li>
-    <li><strong>No Give:</strong> Prevent admin abuse</li>
-</ul>
-
-<h4>Performance</h4>
-<ul>
-    <li><strong>Auto Purge:</strong> Remove abandoned buildings</li>
-    <li><strong>Entity Cleanup:</strong> Remove excess entities</li>
-</ul>
-
-<h3>Installing Plugins</h3>
-<pre><code># 1. Download .cs plugin file
-# 2. Place in oxide/plugins/
-cd /home/rust/server/oxide/plugins/
-wget https://umod.org/plugins/Plugin.cs
-
-# 3. Plugin auto-loads (or use oxide.reload PluginName)
-# 4. Configure in oxide/config/PluginName.json
-</code></pre>
-
-<h3>Plugin Configuration</h3>
-<p>Configs auto-generate in <code>oxide/config/</code> on first load.</p>
-<pre><code># Edit config
-nano oxide/config/Kits.json
-
-# In-game or RCON
-oxide.reload Kits
-</code></pre>
-
-<h2 id="troubleshooting">Troubleshooting</h2>
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
 <h3>Server Won't Start</h3>
 
-<h4>Missing Libraries (Linux)</h4>
-<pre><code># Install required libraries
-sudo apt update
-sudo apt install lib32gcc-s1 libcurl4-gnutls-dev:i386
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
 
-# If still issues
-sudo apt install lib32stdc++6 libc6-i386
+# Or check system logs
+journalctl -u gameserver -f
 </code></pre>
 
 <h4>Port Already in Use</h4>
-<pre><code># Check ports
-sudo netstat -tulpn | grep 28015
-sudo lsof -i :28015
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
 
-# Kill process or change port
-+server.port 28016 +rcon.port 28017
+# Kill the process or change server port
 </code></pre>
 
-<h4>Permission Denied (Linux)</h4>
-<pre><code>chmod +x RustDedicated
-chmod +x start.sh
-</code></pre>
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
 
-<h3>Server Not in Browser</h3>
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
 <ol>
-    <li><strong>Check firewall:</strong>
-        <pre><code>sudo ufw allow 28015/udp
-sudo ufw allow 28016/tcp
-sudo ufw allow 28017/tcp
-</code></pre>
-    </li>
-    <li><strong>Verify ports open:</strong> <code>netstat -tulpn | grep Rust</code></li>
-    <li><strong>Wait 5-10 minutes:</strong> Can take time to appear</li>
-    <li><strong>Direct connect:</strong> Press F1, type <code>client.connect your.ip:28015</code></li>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
 </ol>
 
-<h3>High RAM Usage</h3>
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
 <ol>
-    <li><strong>Reduce worldsize:</strong> <code>+server.worldsize 3000</code></li>
-    <li><strong>Lower max players:</strong> <code>+server.maxplayers 50</code></li>
-    <li><strong>Increase saveinterval:</strong> <code>+server.saveinterval 600</code></li>
-    <li><strong>Use Auto Purge plugin</strong></li>
-    <li><strong>Regular wipes:</strong> Restart with fresh map weekly/monthly</li>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
 </ol>
 
-<h3>Lag/Low FPS</h3>
-<ol>
-    <li><strong>Reduce entity count:</strong> Use Entity Cleanup plugin</li>
-    <li><strong>Lower tickrate:</strong> <code>+server.tickrate 20</code> (default 30)</li>
-    <li><strong>Increase planttick:</strong> <code>server.planttick 120</code></li>
-    <li><strong>Monitor with:</strong> <code>perf 1</code> in console</li>
-    <li><strong>Upgrade hardware:</strong> Rust is resource-intensive</li>
-</ol>
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
 
-<h3>Map Wipe</h3>
-<pre><code># Stop server
-# Delete map file
-rm server/myserver/proceduralmap.*
-
-# Change seed (optional)
-+server.seed 54321
-
-# Start server (generates new map)
-./start.sh
-</code></pre>
-
-<h3>Blueprint Wipe</h3>
-<pre><code># Stop server
-# Delete blueprint data
-rm -rf server/myserver/UserPersistence/
-
-# Start server
-./start.sh
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
 </code></pre>
 
 <h2 id="performance">Performance Optimization</h2>
 
-<h3>Server Configuration</h3>
-<pre><code>server.tickrate 25                 # Lower = better performance
-server.entityrate 12               # Lower = less bandwidth
-server.planttick 90                # Higher = less CPU usage
-fps.limit 60                       # Limit server FPS
-gc.buffer 4096                     # Garbage collection
-</code></pre>
-
-<h3>Map Size vs Performance</h3>
+<h3>Server Tuning</h3>
 <ul>
-    <li><strong>3000:</strong> Small, 50-75 players, 8GB RAM</li>
-    <li><strong>4000:</strong> Medium, 100-150 players, 12GB RAM</li>
-    <li><strong>5000:</strong> Large, 200+ players, 16GB+ RAM</li>
-    <li><strong>6000:</strong> Huge, 300+ players, 24GB+ RAM</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<h3>Scheduled Tasks</h3>
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
 <pre><code>#!/bin/bash
-# Auto-restart script with backup
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
-# Backup
-tar -czf backup_$(date +%Y%m%d).tar.gz server/myserver/
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
 
-# Stop server
-killall RustDedicated
-sleep 10
-
-# Update server
-cd ~/steamcmd
-./steamcmd.sh +login anonymous +force_install_dir /home/rust/server +app_update 258550 +quit
-
-# Start server
-cd /home/rust/server
-./start.sh
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
 </code></pre>
 
-<h3>Crontab Auto-Restart</h3>
-<pre><code># Edit crontab
-crontab -e
+<h2 id="security">Security Best Practices</h2>
 
-# Restart daily at 6 AM
-0 6 * * * /home/rust/restart.sh
-
-# Save weekly at Sunday 5 AM
-0 5 * * 0 tar -czf /backups/rust_$(date +\%Y\%m\%d).tar.gz /home/rust/server/myserver/
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
 </code></pre>
 
-<h2>RCON Management</h2>
-
-<h3>RCON Tools</h3>
+<h3>Strong Passwords</h3>
 <ul>
-    <li><strong>RustAdmin:</strong> <a href="https://www.rustadmin.com/" target="_blank">RustAdmin.com</a></li>
-    <li><strong>RCONc:</strong> Web-based RCON</li>
-    <li><strong>Rust+:</strong> Official mobile app (requires +rcon.web true)</li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<h3>Common RCON Commands</h3>
-<pre><code># Player management
-kick "PlayerName" "Reason"
-ban "PlayerName" "Reason"
-banid "SteamID64"
-unban "SteamID64"
-listid                           # List banned IDs
-status                           # Show connected players
-
-# Server management
-save                             # Manual save
-server.writecfg                  # Save config
-server.stop                      # Stop server
-server.restart                   # Restart server
-oxide.reload PluginName          # Reload plugin
-
-# Game settings
-env.time 12                      # Set time (0-24)
-weather.rain 0                   # Stop rain
-airdrop.min_players 0            # Always allow airdrops
-</code></pre>
-
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with Rust:</p>
+<h3>Regular Updates</h3>
 <ul>
-    <li><a href="../oxide/">Oxide / uMod</a> - Comprehensive modding framework with C# plugin system, permissions, hooks, and extensive plugin library for server administration and gameplay enhancement</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
 <h2>Additional Resources</h2>
 <ul>
-    <li><a href="https://wiki.facepunch.com/rust/" target="_blank">Official Rust Wiki</a></li>
-    <li><a href="https://umod.org/documentation" target="_blank">uMod Documentation</a></li>
-    <li><a href="https://www.corrosionhour.com/" target="_blank">Corrosion Hour (Community & Guides)</a></li>
-    <li><a href="https://www.rustafied.com/" target="_blank">Rustafied (News & Updates)</a></li>
-    <li><a href="https://discord.gg/rust-server-admins" target="_blank">Rust Server Admin Discord</a></li>
+    <li>Official Rust documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">⚠️ Important Notes</h3>
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
     <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
-        <li>Rust servers require significant resources (8GB+ RAM minimum)</li>
-        <li>Regular map wipes recommended (weekly/monthly)</li>
-        <li>Keep server updated via SteamCMD</li>
-        <li>Use strong RCON password</li>
-        <li>Monitor server performance regularly</li>
-        <li>Backup server data before updates</li>
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
 
 <p style="text-align: center; margin-top: 30px; color: #666;">
-    <em>Last updated: November 2024</em>
+    <em>Last updated: November 2025 | For Rust server hosting</em>
 </p>

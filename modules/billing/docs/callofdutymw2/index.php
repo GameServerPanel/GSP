@@ -1,426 +1,375 @@
 <?php
 /**
- * Call of Duty: Modern Warfare 2 (IW4x) Server Documentation
+ * Call of Duty: Modern Warfare 2 (IW4x) Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<style>
-.nav-menu {
-    background: #1a1a2e;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-}
-.nav-menu a {
-    color: #4a9eff;
-    text-decoration: none;
-    margin-right: 15px;
-    font-size: 14px;
-}
-.nav-menu a:hover {
-    color: #6bb3ff;
-    text-decoration: underline;
-}
-.info-box {
-    background: #1e3a5f;
-    padding: 20px;
-    border-left: 4px solid #3b82f6;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.warning-box {
-    background: #78350f;
-    padding: 20px;
-    border-left: 4px solid #f59e0b;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.code-block {
-    background: #0f172a;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 15px 0;
-    overflow-x: auto;
-}
-.code-block code {
-    color: #a5b4fc;
-    font-family: 'Courier New', monospace;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background: #1a1a2e;
-}
-table th {
-    background: #2a2a4e;
-    color: #ffffff;
-    padding: 12px;
-    text-align: left;
-    border: 1px solid #3a3a6e;
-}
-table td {
-    padding: 10px 12px;
-    border: 1px solid #3a3a6e;
-    color: #e5e7eb;
-}
-table tr:nth-child(even) {
-    background: #222244;
-}
-</style>
-
-<div class="nav-menu">
-    <strong style="color: #ffffff;">Quick Navigation:</strong>
-    <a href="#quick-info">Quick Info</a> |
-    <a href="#ports">Ports</a> |
-    <a href="#installation">Installation</a> |
-    <a href="#configuration">Configuration</a> |
-    <a href="#parameters">Parameters</a> |
-    <a href="#troubleshooting">Troubleshooting</a> |
-    <a href="#game-types">Game Types</a> |
-    <a href="#maps">Maps</a> |
-    <a href="#related-mods">Mods</a>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h1>Call of Duty: Modern Warfare 2 (IW4x) Server Guide</h1>
+<h1>Call of Duty: Modern Warfare 2 (IW4x) Server Hosting Guide</h1>
 
-<h2 id="quick-info">📋 Quick Info</h2>
-<div class="info-box">
-    <h3 style="color: #ffffff; margin-top: 0;">Server Specifications</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game:</strong> Call of Duty: Modern Warfare 2 (2009) - IW4x Client</li>
-        <li><strong style="color: #ffffff;">Platform:</strong> Windows (IW4x community project)</li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (configurable)</code></li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 18 (IW4x limitation)</li>
-        <li><strong style="color: #ffffff;">Control Protocol:</strong> RCON</li>
-        <li><strong style="color: #ffffff;">Executable:</strong> iw4x.exe</li>
-        <li><strong style="color: #ffffff;">Special:</strong> Community-maintained client with enhancements</li>
+<h2>Overview</h2>
+<p>Call of Duty: Modern Warfare 2 (IW4x) is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Call of Duty: Modern Warfare 2 (IW4x) server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-<p>IW4x Modern Warfare 2 servers use configurable ports. Default configuration typically uses:</p>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Call of Duty: Modern Warfare 2 (IW4x) server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
-<table>
-    <thead>
-        <tr>
-            <th>Port</th>
-            <th>Protocol</th>
-            <th>Purpose</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>28960 (configurable)</td>
-            <td>UDP</td>
-            <td>Game port</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>Same as game port</td>
-            <td>TCP</td>
-            <td>RCON remote control</td>
-            <td>Optional</td>
-        </tr>
-    </tbody>
-</table>
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
 
-<h3>Firewall Examples</h3>
+# Windows Firewall
+netsh advfirewall firewall add rule name="Call of Duty: Modern Warfare 2 (IW4x) Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Call of Duty: Modern Warfare 2 (IW4x) Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
 
-<p><strong>UFW (Ubuntu/Debian):</strong></p>
-<div class="code-block">
-<code>sudo ufw allow 28960/udp comment 'MW2 IW4x Game Port'
-sudo ufw allow 28960/tcp comment 'MW2 IW4x RCON'</code>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
 </div>
 
-<p><strong>FirewallD (CentOS/RHEL/Fedora):</strong></p>
-<div class="code-block">
-<code>sudo firewall-cmd --permanent --add-port=28960/udp
-sudo firewall-cmd --permanent --add-port=28960/tcp
-sudo firewall-cmd --reload</code>
-</div>
-
-<p><strong>Windows Firewall:</strong></p>
-<div class="code-block">
-<code>netsh advfirewall firewall add rule name="MW2 IW4x UDP" dir=in action=allow protocol=UDP localport=28960
-netsh advfirewall firewall add rule name="MW2 IW4x TCP" dir=in action=allow protocol=TCP localport=28960</code>
-</div>
-
-<h2 id="installation">⚙️ Installation & Setup</h2>
+<h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Windows 7/8/10/11 or Windows Server 2016+</li>
-    <li><strong>CPU:</strong> 2+ cores @ 2.5GHz recommended</li>
-    <li><strong>RAM:</strong> 2GB minimum, 4GB recommended</li>
-    <li><strong>Disk:</strong> 15GB for game files</li>
-    <li><strong>Network:</strong> Low latency connection, 10Mbps+ bandwidth</li>
-    <li><strong>Requirements:</strong> Original MW2 game files + IW4x client</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
 <h3>Installation Steps</h3>
-<ol>
-    <li><strong>Install Modern Warfare 2:</strong> You must have legitimate MW2 game files</li>
-    <li><strong>Download IW4x:</strong> Obtain IW4x client from official IW4x website (https://iw4x.org)</li>
-    <li><strong>Extract IW4x:</strong> Extract IW4x files into your MW2 game directory</li>
-    <li><strong>Create Server Config:</strong> Create <code>server.cfg</code> in <code>userraw</code> folder</li>
-    <li><strong>Configure Firewall:</strong> Allow game ports through Windows Firewall</li>
-</ol>
 
-<h2 id="configuration">📝 Configuration</h2>
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
-<h3>Basic server.cfg Example</h3>
-<div class="code-block">
-<code>// Server Name
-set sv_hostname "My MW2 IW4x Server"
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-// Network Settings
-set net_port 28960
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
 
-// Server Type
-set dedicated 1
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-// Player Limits (MAX 18 for IW4x)
-set sv_maxclients 18
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
 
-// RCON Password
-set rcon_password "your_secure_password_here"
 
-// Game Settings
-set g_gametype "war"    // dm, war, sab, koth, sd, arena, dd, ctf, oneflag
-set sv_maxPing 350
+<h2 id="configuration">Server Configuration</h2>
 
-// Map Rotation
-set sv_mapRotation "gametype war map mp_terminal gametype war map mp_highrise gametype war map mp_rust"
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-// Password Protection (leave empty for public)
-set g_password ""
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
 
-// Friendly Fire
-set scr_team_fftype 0    // 0=off, 1=on, 2=reflect
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
 
-// Kill Cam
-set scr_game_allowkillcam 1
+# Ban player
+ban [player_name]
 
-// Hardcore Mode
-set scr_hardcore 0
+# Change map/level (syntax varies by game)
+changelevel [map_name]
 
-// Game Log
-set g_log "games_mp.log"
-set g_logsync 2
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
 
-// Voice Chat
-set sv_voice 0
+<h2 id="parameters">⚙️ Startup Parameters</h2>
 
-// Anti-Lag
-set sv_fps 20
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>-dedicated -stdout %IP% %PORT% %FS_GAME% %EXEC% %CONTROL_PASSWORD% %PLAYERS% +set party_enable 0 +map_rotate</code></pre>
 
-// Auto-Balance
-set scr_teambalance 1
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
 
-// IW4x-Specific Settings
-set party_enable 0
-set party_maxplayers 18</code>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+set fs_game</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +set fs_game</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Set the server to run a mod. For example: mods/my_mod</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">+exec</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - +exec</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Set the name of your server configuration file.</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">server.cfg</code></p>
+    </div>
 </div>
 
-<h2 id="parameters">🚀 Startup Parameters</h2>
+<h3>Creating a Start Script</h3>
 
-<table>
-    <thead>
-        <tr>
-            <th>Parameter</th>
-            <th>Description</th>
-            <th>Example</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>-dedicated</td>
-            <td>Run as dedicated server</td>
-            <td>-dedicated</td>
-        </tr>
-        <tr>
-            <td>+set net_port</td>
-            <td>Server port</td>
-            <td>+set net_port 28960</td>
-        </tr>
-        <tr>
-            <td>+set sv_maxclients</td>
-            <td>Maximum player slots (MAX 18)</td>
-            <td>+set sv_maxclients 18</td>
-        </tr>
-        <tr>
-            <td>+set rcon_password</td>
-            <td>RCON password for remote admin</td>
-            <td>+set rcon_password "secret123"</td>
-        </tr>
-        <tr>
-            <td>+exec</td>
-            <td>Execute config file on startup</td>
-            <td>+exec server.cfg</td>
-        </tr>
-        <tr>
-            <td>+map_rotate</td>
-            <td>Start map rotation from config</td>
-            <td>+map_rotate</td>
-        </tr>
-        <tr>
-            <td>+map</td>
-            <td>Start with specific map</td>
-            <td>+map mp_terminal</td>
-        </tr>
-    </tbody>
-</table>
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
 
-<h3>Example Startup Command</h3>
-<div class="code-block">
-<code>iw4x.exe -dedicated +set net_port 28960 +set sv_maxclients 18 +exec server.cfg +map_rotate</code>
-</div>
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
 
-<h3>Example Batch File (start_server.bat)</h3>
-<div class="code-block">
-<code>@echo off
-title MW2 IW4x Dedicated Server
-iw4x.exe -dedicated +set net_port 28960 +set sv_maxclients 18 +exec server.cfg +map_rotate
-pause</code>
-</div>
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Call of Duty: Modern Warfare 2 (IW4x) Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Server Not Appearing in Server Browser</h3>
-<p><strong>Issue:</strong> Players cannot see the server in IW4x browser.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Verify <code>-dedicated</code> parameter is set</li>
-    <li>Ensure UDP port is open in Windows Firewall</li>
-    <li>Check IW4x master server connectivity</li>
-    <li>Try direct connect using IP:PORT</li>
-    <li>Verify latest IW4x version is installed</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Server Crashes on Startup</h3>
-<p><strong>Issue:</strong> Dedicated server crashes immediately after launch.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li>Check <code>games_mp.log</code> for error messages</li>
-    <li>Verify all required MW2 game files are present</li>
-    <li>Ensure <code>server.cfg</code> syntax is correct</li>
-    <li>Update to latest IW4x version</li>
-    <li>Verify <code>sv_maxclients</code> does not exceed 18</li>
-    <li>Check that IW4x files are not corrupted</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<h3>Connection Problems</h3>
-<p><strong>Issue:</strong> Players cannot connect or timeout.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
 <ul>
-    <li>Verify firewall rules allow traffic on game port</li>
-    <li>Check <code>sv_maxPing</code> setting</li>
-    <li>Ensure server is not full (max 18 players)</li>
-    <li>Disable password if testing: <code>set g_password ""</code></li>
-    <li>Verify clients are using same IW4x version</li>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
-<h3>High Lag/Ping Issues</h3>
-<p><strong>Issue:</strong> Players experience significant lag.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
 <ul>
-    <li>Increase <code>sv_fps</code> setting (recommended: 20)</li>
-    <li>Reduce <code>sv_maxclients</code> if server is overloaded</li>
-    <li>Check server CPU and RAM usage</li>
-    <li>Verify network bandwidth is sufficient</li>
-    <li>Lower <code>sv_maxPing</code> to restrict high-ping players</li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<h3>Player Limit Issues</h3>
-<p><strong>Issue:</strong> Cannot set more than 18 players.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Regular Updates</h3>
 <ul>
-    <li>IW4x has a <strong>hard limit of 18 players</strong> - this is by design</li>
-    <li>Do not attempt to exceed this limit as it will cause crashes</li>
-    <li>This is a limitation of the IW4x engine modification</li>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
 </ul>
 
-<h3>RCON Not Working</h3>
-<p><strong>Issue:</strong> Cannot connect via RCON.</p>
-<p><strong>Solutions:</strong></p>
+<h3>Access Control</h3>
 <ul>
-    <li>Verify <code>rcon_password</code> is set in <code>server.cfg</code></li>
-    <li>Ensure TCP port is open (same port as game UDP port)</li>
-    <li>Use IW4x-compatible RCON tools</li>
-    <li>Test RCON from in-game console first</li>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
 </ul>
 
-<h2 id="game-types">🎮 Game Types</h2>
-<p>Modern Warfare 2 (IW4x) supports the following game modes:</p>
+<h3>DDoS Protection</h3>
 <ul>
-    <li><strong>dm</strong> - Deathmatch (Free-for-all)</li>
-    <li><strong>war</strong> - Team Deathmatch</li>
-    <li><strong>sab</strong> - Sabotage</li>
-    <li><strong>koth</strong> - Headquarters</li>
-    <li><strong>sd</strong> - Search & Destroy</li>
-    <li><strong>arena</strong> - Arena</li>
-    <li><strong>dd</strong> - Demolition</li>
-    <li><strong>ctf</strong> - Capture the Flag</li>
-    <li><strong>oneflag</strong> - One Flag CTF</li>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
-<h2 id="maps">🗺️ Default Maps</h2>
-<p>Modern Warfare 2 includes the following multiplayer maps:</p>
-
-<h3>Base Game Maps</h3>
+<h2>Additional Resources</h2>
 <ul>
-    <li><strong>mp_afghan</strong> - Afghan</li>
-    <li><strong>mp_derail</strong> - Derail</li>
-    <li><strong>mp_estate</strong> - Estate</li>
-    <li><strong>mp_favela</strong> - Favela</li>
-    <li><strong>mp_highrise</strong> - Highrise</li>
-    <li><strong>mp_invasion</strong> - Invasion</li>
-    <li><strong>mp_checkpoint</strong> - Karachi</li>
-    <li><strong>mp_quarry</strong> - Quarry</li>
-    <li><strong>mp_rundown</strong> - Rundown</li>
-    <li><strong>mp_rust</strong> - Rust</li>
-    <li><strong>mp_boneyard</strong> - Scrapyard</li>
-    <li><strong>mp_nightshift</strong> - Skidrow</li>
-    <li><strong>mp_subbase</strong> - Sub Base</li>
-    <li><strong>mp_terminal</strong> - Terminal</li>
-    <li><strong>mp_underpass</strong> - Underpass</li>
-    <li><strong>mp_brecourt</strong> - Wasteland</li>
+    <li>Official Call of Duty: Modern Warfare 2 (IW4x) documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
-<h3>DLC Maps</h3>
-<ul>
-    <li>Stimulus Package: Bailout, Salvage, Storm, Overgrown (CoD4 remake), Crash (CoD4 remake)</li>
-    <li>Resurgence Pack: Carnival, Fuel, Trailer Park, Strike (CoD4 remake), Vacant (CoD4 remake)</li>
-</ul>
-
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with IW4x:</p>
-<ul>
-    <li><a href="../b3/">B3 (Big Brother Bot)</a> - Python-based admin bot with RCON wrapper, player warnings, ban management, statistics tracking, and automated moderation for Call of Duty servers</li>
-    <li><strong>IW4x Scripts</strong> - Custom GSC scripts for enhanced gameplay</li>
-    <li><strong>Custom Maps</strong> - Community-created maps compatible with IW4x</li>
-</ul>
-
-<h2>📚 Resources</h2>
-<ul>
-    <li><strong>Official Website:</strong> https://iw4x.org</li>
-    <li><strong>Community Discord:</strong> IW4x Discord server</li>
-    <li><strong>Forums:</strong> IW4x community forums</li>
-    <li><strong>Documentation:</strong> IW4x wiki and guides</li>
-</ul>
-
-<div class="warning-box">
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>IW4x is a community-maintained client</strong> that provides dedicated server functionality and bug fixes for MW2</li>
-        <li><strong>Maximum 18 players</strong> - this is a hard limit in IW4x and cannot be exceeded</li>
-        <li>You <strong>must own legitimate Modern Warfare 2</strong> game files to use IW4x</li>
-        <li>IW4x uses <strong>different command-line syntax</strong> than older CoD games (-dedicated flag instead of +set dedicated)</li>
-        <li>IW4x includes <strong>built-in anti-cheat</strong> and security improvements</li>
-        <li>Custom maps and mods are supported through IW4x</li>
-        <li>Always use the <strong>latest IW4x version</strong> for best compatibility and security</li>
-        <li>Regular backups recommended for server configurations</li>
-        <li>IW4x is <strong>Windows-only</strong> (no Linux dedicated server)</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Call of Duty: Modern Warfare 2 (IW4x) server hosting</em>
+</p>

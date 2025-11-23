@@ -1,264 +1,435 @@
 <?php
 /**
- * Arma 2: Operation Arrowhead Server Documentation
- * Comprehensive guide for hosting and managing Arma 2: OA dedicated servers
- * 
- * Sources: Bohemia Interactive Wiki, LGSM, Steam Community
- * Last Updated: November 10, 2025
- * Note: This version is the base for DayZ Mod servers (requires Combined Operations)
+ * Arma 2: Operation Arrowhead Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<style>
-    .doc-nav { background: #1e3a5f; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .doc-nav h3 { color: #ffffff; margin-top: 0; }
-    .doc-nav a { display: inline-block; padding: 8px 15px; margin: 5px 10px 5px 0; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #7fb3ff; text-decoration: none; }
-    .doc-nav a:hover { background: #3b82f6; color: #ffffff; }
-    .info-box { background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px; }
-    .warning-box { background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px; }
-    .ports-table { width: 100%; border-collapse: collapse; margin: 20px 0; background: rgba(0,0,0,0.2); }
-    .ports-table th, .ports-table td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .ports-table th { background: #1e3a5f; color: #ffffff; font-weight: 600; }
-    .ports-table code { background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc; }
-    .required { color: #10b981; font-weight: 600; }
-    .optional { color: #f59e0b; }
-</style>
-
-<!-- Navigation -->
-<div class="doc-nav">
-    <h3>📚 Quick Navigation</h3>
-    <a href="#overview">Overview</a>
-    <a href="#ports">🔌 Ports</a>
-    <a href="#installation">Installation</a>
-    <a href="#configuration">Configuration</a>
-    <a href="#startup">⚙️ Startup Parameters</a>
-    <a href="#dayzmod">DayZ Mod Setup</a>
-    <a href="#troubleshooting">🔧 Troubleshooting</a>
-    <a href="#performance">Performance</a>
-    <a href="#resources">Resources</a>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h1 id="overview">Arma 2: Operation Arrowhead Server Guide</h1>
+<h1>Arma 2: Operation Arrowhead Server Hosting Guide</h1>
 
-<div class="info-box">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Information</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game:</strong> Arma 2: Operation Arrowhead (Military Simulation)</li>
-        <li><strong style="color: #ffffff;">Developer:</strong> Bohemia Interactive</li>
-        <li><strong style="color: #ffffff;">Release:</strong> 2010 (Legacy game)</li>
-        <li><strong style="color: #ffffff;">Server Type:</strong> Dedicated Server (Windows/Linux)</li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">2302 UDP</code></li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 50-100+ configurable</li>
-        <li><strong style="color: #ffffff;">Special Note:</strong> Required base for DayZ Mod (with Combined Operations)</li>
+<h2>Overview</h2>
+<p>Arma 2: Operation Arrowhead is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Arma 2: Operation Arrowhead server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">33930</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">cfg\server.cfg</code> - Server settings</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">cfg\basic.cfg</code> - Basic Network settings</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">cfg\battleye\beserver.cfg</code> - BattlEye Rcon Password</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">cfg\hiveext.ini</code> - DB settings and Date/Time</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">cfg\users\dayz\dayz.arma2oaprofile</code> - Difficulty Settings</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">steam_appid.txt</code> - For DayZmod: 224580 All others: 33930</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">bec\config\scheduler.xml</code> - BEC Scheduler</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">bec\config\admins.xml</code> - BEC Admins</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">bec\config\whitelist.xml</code> - BEC Whitelist</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">bec\config\fortune.txt</code> - BEC Message List</li>
+        </ul></li>
     </ul>
 </div>
 
-<p><strong>Arma 2: Operation Arrowhead</strong> is the standalone expansion for Arma 2. When combined with Arma 2 (Combined Operations), it serves as the foundation for the popular <strong>DayZ Mod</strong>. This guide covers dedicated server setup for both standard OA gameplay and DayZ Mod hosting.</p>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Arma 2: Operation Arrowhead server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
-<h2 id="ports">🔌 Server Ports</h2>
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
 
-<table class="ports-table">
-    <thead>
-        <tr>
-            <th>Port</th>
-            <th>Protocol</th>
-            <th>Purpose</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>2302</code></td>
-            <td>UDP</td>
-            <td>Game Port - Primary connection port</td>
-            <td><span class="required">REQUIRED</span></td>
-        </tr>
-        <tr>
-            <td><code>2303</code></td>
-            <td>UDP</td>
-            <td>Steam Query Port - Server browser</td>
-            <td><span class="required">REQUIRED</span></td>
-        </tr>
-        <tr>
-            <td><code>2304</code></td>
-            <td>UDP</td>
-            <td>Steam Port - Steam connectivity</td>
-            <td><span class="required">REQUIRED</span></td>
-        </tr>
-        <tr>
-            <td><code>2305</code></td>
-            <td>UDP</td>
-            <td>VON (Voice Over Network)</td>
-            <td><span class="optional">Optional</span></td>
-        </tr>
-    </tbody>
-</table>
+# Windows Firewall
+netsh advfirewall firewall add rule name="Arma 2: Operation Arrowhead Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Arma 2: Operation Arrowhead Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
 
-<h3>Firewall Configuration</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 2302:2305/udp comment 'Arma 2 OA Server'</code></pre>
-
-<h4>FirewallD (CentOS/RHEL)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=2302-2305/udp
-sudo firewall-cmd --reload</code></pre>
-
-<h4>Windows Firewall</h4>
-<pre><code>New-NetFirewallRule -DisplayName "Arma 2 OA Server" -Direction Inbound -Protocol UDP -LocalPort 2302-2305 -Action Allow</code></pre>
-
-<h2 id="startup">⚙️ Startup Parameters</h2>
-
-<h3>Windows Startup</h3>
-<pre><code>arma2oaserver.exe -port=2302 -config=server.cfg -cfg=basic.cfg -profiles=SC -mod=@mod1;@mod2</code></pre>
-
-<h3>Linux Startup</h3>
-<pre><code>./arma2oaserver -port=2302 -config=server.cfg -cfg=basic.cfg -profiles=SC -mod=@mod1;@mod2</code></pre>
-
-<h3>Key Parameters</h3>
-<table class="ports-table">
-    <thead>
-        <tr>
-            <th>Parameter</th>
-            <th>Description</th>
-            <th>Example</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><code>-port=</code></td>
-            <td>Game port</td>
-            <td><code>-port=2302</code></td>
-        </tr>
-        <tr>
-            <td><code>-config=</code></td>
-            <td>Path to server.cfg</td>
-            <td><code>-config=server.cfg</code></td>
-        </tr>
-        <tr>
-            <td><code>-cfg=</code></td>
-            <td>Path to basic.cfg</td>
-            <td><code>-cfg=basic.cfg</code></td>
-        </tr>
-        <tr>
-            <td><code>-profiles=</code></td>
-            <td>Profile folder</td>
-            <td><code>-profiles=SC</code></td>
-        </tr>
-        <tr>
-            <td><code>-mod=</code></td>
-            <td>Mods to load</td>
-            <td><code>-mod=@DayZ;@DayZ_Epoch</code></td>
-        </tr>
-        <tr>
-            <td><code>-world=</code></td>
-            <td>Default world</td>
-            <td><code>-world=Takistan</code></td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 id="dayzmod">DayZ Mod Setup</h2>
-
-<div class="warning-box">
-    <h3 style="color: #ffffff; margin-top: 0;">DayZ Mod Requirements</h3>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
     <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Requires <strong>Arma 2: Combined Operations</strong> (Arma 2 + Operation Arrowhead)</li>
-        <li>DayZ Mod files must be installed in <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">@DayZ</code> folder</li>
-        <li>Optional variants: DayZ Epoch, DayZ Overpoch, DayZ Origins</li>
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
     </ul>
 </div>
 
-<h3>DayZ Mod Startup Example</h3>
-<pre><code># Standard DayZ Mod
--mod=Expansion\beta;Expansion\beta\Expansion;ca;@DayZ -world=Chernarus
+<h2 id="installation">Installation & Setup</h2>
 
-# DayZ Epoch
--mod=Expansion\beta;Expansion\beta\Expansion;ca;@DayZ_Epoch -world=Chernarus
-
-# DayZ Overpoch (Overwatch + Epoch)
--mod=Expansion\beta;Expansion\beta\Expansion;ca;@DayZ_Overwatch;@DayZ_Epoch</code></pre>
-
-<h3>Common DayZ Mod Variants</h3>
+<h3>System Requirements</h3>
 <ul>
-    <li><strong>DayZ Mod:</strong> Original zombie survival mod</li>
-    <li><strong>DayZ Epoch:</strong> Building/crafting focus</li>
-    <li><strong>DayZ Overpoch:</strong> Overwatch + Epoch combined</li>
-    <li><strong>DayZ Origins:</strong> Custom lore and mechanics</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 33930</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/arma2oa
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/arma2oa \
+         +app_update 33930 validate \
+         +quit
+
+# Server files are now in ~/gameservers/arma2oa/
+cd ~/gameservers/arma2oa
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\arma2oa ^
+             +app_update 33930 validate ^
+             +quit
+</code></pre>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>cfg\server.cfg</code></strong> - Server settings</li>
+    <li><strong><code>cfg\basic.cfg</code></strong> - Basic Network settings</li>
+    <li><strong><code>cfg\battleye\beserver.cfg</code></strong> - BattlEye Rcon Password</li>
+    <li><strong><code>cfg\hiveext.ini</code></strong> - DB settings and Date/Time</li>
+    <li><strong><code>cfg\users\dayz\dayz.arma2oaprofile</code></strong> - Difficulty Settings</li>
+    <li><strong><code>steam_appid.txt</code></strong> - For DayZmod: 224580 All others: 33930</li>
+    <li><strong><code>bec\config\scheduler.xml</code></strong> - BEC Scheduler</li>
+    <li><strong><code>bec\config\admins.xml</code></strong> - BEC Admins</li>
+    <li><strong><code>bec\config\whitelist.xml</code></strong> - BEC Whitelist</li>
+    <li><strong><code>bec\config\fortune.txt</code></strong> - BEC Message List</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%MODLIST% -cfg=cfg\basic.cfg -config=cfg\server.cfg -name=player -profiles=profile %IP% %PORT%</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-mod=</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Mods ex: @dayz;@hive or @dayz_epoch;@dayz_epoch_server</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Semicolon after each mod and you MUST copy the KEY into your keys folder.
+Make sure if you install a MOD, you list the name here or else it wont get loaded.
+ </p>
+    </div>
+</div>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Arma 2: Operation Arrowhead Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
 <h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li><strong>Missing Beta Folder:</strong> Ensure <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Expansion\beta</code> exists for DayZ</li>
-    <li><strong>Port Conflicts:</strong> Check if 2302 is already in use</li>
-    <li><strong>Config Errors:</strong> Validate server.cfg syntax (semicolons required)</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Players Can't Join</h3>
-<ul>
-    <li>Verify firewall allows UDP 2302-2305</li>
-    <li>Check mod versions match between server and clients</li>
-    <li>Ensure BattlEye is enabled if required</li>
-</ul>
+<h3>Performance Issues</h3>
 
-<h3>DayZ Mod Issues</h3>
-<ul>
-    <li><strong>Database connection:</strong> MySQL required for DayZ Epoch/Overpoch</li>
-    <li><strong>HiveExt errors:</strong> Check <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">@DayZ_Epoch\HiveExt.ini</code> configuration</li>
-    <li><strong>Loot not spawning:</strong> Verify mission file and database tables</li>
-</ul>
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
 
 <h2 id="performance">Performance Optimization</h2>
 
-<h3>Server.cfg Performance Settings</h3>
-<pre><code>MaxMsgSend = 256;
-MaxSizeGuaranteed = 512;
-MaxSizeNonguaranteed = 256;
-MinBandwidth = 131072;
-MaxBandwidth = 10000000000;
-MinErrorToSend = 0.001;
-MaxCustomFileSize = 160000;</code></pre>
-
-<h3>Hardware Recommendations</h3>
+<h3>Server Tuning</h3>
 <ul>
-    <li><strong>CPU:</strong> 2-4 cores, 3.0+ GHz</li>
-    <li><strong>RAM:</strong> 4-8 GB minimum</li>
-    <li><strong>Storage:</strong> HDD acceptable, SSD preferred</li>
-    <li><strong>Network:</strong> 50+ Mbps</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications and admin tools compatible with ARMA 2 Operation Arrowhead:</p>
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
 <ul>
-    <li><a href="../dayzmod/">DayZ Mod</a> - Zombie survival mod with persistence and Hive architecture</li>
-    <li><a href="../epochmod/">Epoch Mod</a> - Base building, traders, and dynamic economy for DayZ</li>
-    <li><a href="../bec/">BEC (BattlEye Extended Controls)</a> - Server scheduler, auto-restart, and admin commands</li>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
-<h2 id="resources">📚 Resources</h2>
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
 <ul>
-    <li><a href="https://community.bistudio.com/wiki/Arma_2:_Operation_Arrowhead:_Dedicated_Server" target="_blank">BI Wiki - OA Dedicated Server</a></li>
-    <li><a href="https://github.com/GameServerManagers/LinuxGSM" target="_blank">LinuxGSM - Arma 2 OA Script</a></li>
-    <li><a href="https://dayzepoch.com/" target="_blank">DayZ Epoch Official Site</a></li>
-    <li><a href="https://www.reddit.com/r/dayzmod/" target="_blank">r/dayzmod Community</a></li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
 </ul>
 
-<div class="warning-box">
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Arma 2: Operation Arrowhead documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>Legacy Game:</strong> Arma 2 OA is a 2010 game; community support is limited</li>
-        <li><strong>DayZ Standalone Exists:</strong> Consider DayZ Standalone for modern experience</li>
-        <li><strong>Combined Operations:</strong> Required for DayZ Mod functionality</li>
-        <li><strong>Database Required:</strong> DayZ Epoch/Overpoch need MySQL database</li>
-        <li><strong>Backup Regularly:</strong> Always backup database and mission files</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
 
-<hr style="margin: 40px 0; border: none; border-top: 1px solid rgba(255,255,255,0.1);">
-
-<p style="text-align: center; color: rgba(255,255,255,0.6); font-size: 0.9em;">
-    <strong>Documentation Version:</strong> 1.0 | <strong>Last Updated:</strong> November 10, 2025<br>
-    <strong>Sources:</strong> Bohemia Interactive Wiki, LinuxGSM, DayZ Epoch Community<br>
-    <em>For DayZ Standalone, see our <a href="/docs.php?action=view&doc=dayz">DayZ Standalone Guide</a>.</em>
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Arma 2: Operation Arrowhead server hosting</em>
 </p>

@@ -1,553 +1,430 @@
 <?php
 /**
- * Factorio Server Documentation
+ * factorio Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<style>
-.nav-menu {
-    background: #1a1a2e;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 25px;
-}
-.nav-menu a {
-    color: #4a9eff;
-    text-decoration: none;
-    margin-right: 15px;
-    font-size: 14px;
-}
-.nav-menu a:hover {
-    color: #6bb3ff;
-    text-decoration: underline;
-}
-.info-box {
-    background: #1e3a5f;
-    padding: 20px;
-    border-left: 4px solid #3b82f6;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.warning-box {
-    background: #78350f;
-    padding: 20px;
-    border-left: 4px solid #f59e0b;
-    margin: 20px 0;
-    border-radius: 4px;
-}
-.code-block {
-    background: #0f172a;
-    padding: 15px;
-    border-radius: 4px;
-    margin: 15px 0;
-    overflow-x: auto;
-}
-.code-block code {
-    color: #a5b4fc;
-    font-family: 'Courier New', monospace;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    background: #1a1a2e;
-}
-table th {
-    background: #2a2a4e;
-    color: #ffffff;
-    padding: 12px;
-    text-align: left;
-    border: 1px solid #3a3a6e;
-}
-table td {
-    padding: 10px 12px;
-    border: 1px solid #3a3a6e;
-    color: #e5e7eb;
-}
-table tr:nth-child(even) {
-    background: #222244;
-}
-</style>
-
-<div class="nav-menu">
-    <strong style="color: #ffffff;">Quick Navigation:</strong>
-    <a href="#quick-info">Quick Info</a> |
-    <a href="#ports">Ports</a> |
-    <a href="#installation">Installation</a> |
-    <a href="#configuration">Configuration</a> |
-    <a href="#parameters">Parameters</a> |
-    <a href="#troubleshooting">Troubleshooting</a> |
-    <a href="#game-modes">Game Modes</a> |
-    <a href="#mods">Mods</a> |
-    <a href="#admin">Admin</a>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h1>Factorio Server Guide</h1>
+<h1>factorio Server Hosting Guide</h1>
 
-<h2 id="quick-info">📋 Quick Info</h2>
-<div class="info-box">
-    <h3 style="color: #ffffff; margin-top: 0;">Server Specifications</h3>
-    <ul style="color: #e5e7eb; line-height: 1.8;">
-        <li><strong style="color: #ffffff;">Game:</strong> Factorio (Automation/Factory Building)</li>
-        <li><strong style="color: #ffffff;">Platform:</strong> Windows, Linux, macOS</li>
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">34197/UDP</code></li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> Unlimited (practical: 10-50 depending on hardware)</li>
-        <li><strong style="color: #ffffff;">Control Protocol:</strong> RCON</li>
-        <li><strong style="color: #ffffff;">Server Binary:</strong> factorio (headless)</li>
-        <li><strong style="color: #ffffff;">Special Features:</strong> Mods, blueprints, trains, logistics, multiplayer scenarios</li>
+<h2>Overview</h2>
+<p>factorio is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a factorio server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">none</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">data/server-settings.json</code> - Server settings (use SERVER SETTINGS to edit this file</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">data/server-whitelist.json</code> - Whitelist File</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">data/server-adminlist.json</code> - Adminlist File</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">data/server-banlist.json</code> - Banlist File</li>
+        </ul></li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-<p>Factorio servers require specific ports for proper operation:</p>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The factorio server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
 
-<table>
-    <thead>
-        <tr>
-            <th>Port</th>
-            <th>Protocol</th>
-            <th>Purpose</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>34197 (configurable)</td>
-            <td>UDP</td>
-            <td>Game port</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>27015</td>
-            <td>TCP</td>
-            <td>RCON (if enabled)</td>
-            <td>Optional</td>
-        </tr>
-    </tbody>
-</table>
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
 
-<h3>Firewall Examples</h3>
+# Windows Firewall
+netsh advfirewall firewall add rule name="factorio Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="factorio Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
 
-<p><strong>UFW (Ubuntu/Debian):</strong></p>
-<div class="code-block">
-<code>sudo ufw allow 34197/udp comment 'Factorio Game Port'
-sudo ufw allow 27015/tcp comment 'Factorio RCON'</code>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
 </div>
 
-<p><strong>FirewallD (CentOS/RHEL):</strong></p>
-<div class="code-block">
-<code>sudo firewall-cmd --permanent --add-port=34197/udp
-sudo firewall-cmd --permanent --add-port=27015/tcp
-sudo firewall-cmd --reload</code>
-</div>
-
-<p><strong>iptables:</strong></p>
-<div class="code-block">
-<code>iptables -A INPUT -p udp --dport 34197 -j ACCEPT
-iptables -A INPUT -p tcp --dport 27015 -j ACCEPT</code>
-</div>
-
-<h2 id="installation">⚙️ Installation & Setup</h2>
+<h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Linux (Ubuntu 18.04+, Debian 9+, CentOS 7+), Windows Server 2012+</li>
-    <li><strong>CPU:</strong> 2+ cores @ 3.0GHz recommended (single-threaded performance critical)</li>
-    <li><strong>RAM:</strong> 2GB minimum, 4GB+ recommended, 8GB+ for large multiplayer games</li>
-    <li><strong>Disk:</strong> 2GB for base game, additional space for saves and mods</li>
-    <li><strong>Network:</strong> Stable connection, 1Mbps+ per player</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installation (Linux - Manual Download)</h3>
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: none</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/factorio
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/factorio \
+         +app_update none validate \
+         +quit
+
+# Server files are now in ~/gameservers/factorio/
+cd ~/gameservers/factorio
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
 <ol>
-    <li><strong>Download Factorio headless server:</strong>
-        <div class="code-block"><code>cd /home/factorio
-wget -O factorio.tar.xz https://www.factorio.com/get-download/latest/headless/linux64
-tar -xf factorio.tar.xz</code></div>
-    </li>
-    <li><strong>Create data directory:</strong>
-        <div class="code-block"><code>mkdir -p ~/.factorio
-cd factorio</code></div>
-    </li>
-    <li><strong>Generate new map (optional):</strong>
-        <div class="code-block"><code>./bin/x64/factorio --create my-save</code></div>
-    </li>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
 </ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\factorio ^
+             +app_update none validate ^
+             +quit
+</code></pre>
 
-<h3>Installation (Windows)</h3>
-<ol>
-    <li>Download headless server from <a href="https://www.factorio.com/download" target="_blank">factorio.com/download</a></li>
-    <li>Extract to <code>C:\factorio\</code></li>
-    <li>Run <code>factorio.exe --create my-save</code> to generate map</li>
-</ol>
 
-<h2 id="configuration">📝 Configuration</h2>
+<h2 id="configuration">Server Configuration</h2>
 
-<h3>Directory Structure</h3>
-<div class="code-block">
-<code>~/.factorio/                # Config directory (Linux)
-%APPDATA%\Factorio\         # Config directory (Windows)
-├── saves/                   # Save games
-├── mods/                    # Installed mods
-├── config/
-│   ├── server-settings.json
-│   ├── server-whitelist.json
-│   ├── server-banlist.json
-│   └── server-adminlist.json
-└── script-output/           # Script output files</code>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>data/server-settings.json</code></strong> - Server settings (use SERVER SETTINGS to edit this file</li>
+    <li><strong><code>data/server-whitelist.json</code></strong> - Whitelist File</li>
+    <li><strong><code>data/server-adminlist.json</code></strong> - Adminlist File</li>
+    <li><strong><code>data/server-banlist.json</code></strong> - Banlist File</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%SAVES% --server-settings ./data/server-settings.json %WL% %PORT%</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">--start-server </code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - --start-server </span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Path and name of file to load</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">saves/save.zip</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">--use-server-whitelist true </code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> -  Enable Whitelist</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
 </div>
 
-<h3>server-settings.json Example</h3>
-<div class="code-block">
-<code>{
-  "name": "My Factorio Server",
-  "description": "Vanilla cooperative factory building",
-  "tags": ["game", "tags"],
-  
-  "_comment_max_players": "Maximum number of players allowed",
-  "max_players": 0,
-  
-  "_comment_visibility": "public: Game will be published on the official Factorio matching server",
-  "visibility": {
-    "public": true,
-    "lan": true
-  },
-  
-  "username": "",
-  "password": "",
-  "token": "",
-  "game_password": "",
-  
-  "require_user_verification": true,
-  "max_upload_in_kilobytes_per_second": 0,
-  "max_upload_slots": 5,
-  
-  "minimum_latency_in_ticks": 0,
-  "ignore_player_limit_for_returning_players": false,
-  "allow_commands": "admins-only",
-  
-  "autosave_interval": 10,
-  "autosave_slots": 5,
-  "afk_autokick_interval": 0,
-  
-  "auto_pause": true,
-  "only_admins_can_pause_the_game": true,
-  
-  "autosave_only_on_server": true,
-  "non_blocking_saving": false,
-  
-  "_comment_admins": "List of case insensitive usernames, that will be admins on the server",
-  "admins": []
-}</code>
-</div>
+<h3>Creating a Start Script</h3>
 
-<h3>server-whitelist.json Example</h3>
-<div class="code-block">
-<code>[
-  "player1",
-  "player2",
-  "player3"
-]</code>
-</div>
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
 
-<h3>server-adminlist.json Example</h3>
-<div class="code-block">
-<code>[
-  "admin1",
-  "admin2"
-]</code>
-</div>
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
 
-<h3>Map Generation Settings (map-gen-settings.json)</h3>
-<div class="code-block">
-<code>{
-  "terrain_segmentation": "normal",
-  "water": "normal",
-  "width": 0,
-  "height": 0,
-  "starting_area": "normal",
-  "peaceful_mode": false,
-  "autoplace_controls": {
-    "coal": {
-      "frequency": "normal",
-      "size": "normal",
-      "richness": "normal"
-    },
-    "iron-ore": { "frequency": "normal", "size": "normal", "richness": "normal" },
-    "copper-ore": { "frequency": "normal", "size": "normal", "richness": "normal" },
-    "stone": { "frequency": "normal", "size": "normal", "richness": "normal" },
-    "crude-oil": { "frequency": "normal", "size": "normal", "richness": "normal" },
-    "uranium-ore": { "frequency": "normal", "size": "normal", "richness": "normal" },
-    "trees": { "frequency": "normal", "size": "normal", "richness": "normal" },
-    "enemy-base": { "frequency": "normal", "size": "normal", "richness": "normal" }
-  },
-  "cliff_settings": {
-    "name": "cliff",
-    "cliff_elevation_0": 10,
-    "cliff_elevation_interval": 40,
-    "richness": "normal"
-  },
-  "property_expression_names": {},
-  "starting_points": [ { "x": 0, "y": 0 } ],
-  "seed": null
-}</code>
-</div>
+<h3>Running as a Service</h3>
 
-<h2 id="parameters">🚀 Startup Parameters</h2>
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=factorio Server
+After=network.target
 
-<table>
-    <thead>
-        <tr>
-            <th>Parameter</th>
-            <th>Description</th>
-            <th>Example</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>--start-server</td>
-            <td>Start multiplayer server with save file</td>
-            <td>--start-server my-save</td>
-        </tr>
-        <tr>
-            <td>--create</td>
-            <td>Create new map/save</td>
-            <td>--create my-save</td>
-        </tr>
-        <tr>
-            <td>--port</td>
-            <td>Network port to use</td>
-            <td>--port 34197</td>
-        </tr>
-        <tr>
-            <td>--bind</td>
-            <td>IP address to bind to</td>
-            <td>--bind 0.0.0.0</td>
-        </tr>
-        <tr>
-            <td>--server-settings</td>
-            <td>Path to server settings JSON</td>
-            <td>--server-settings settings.json</td>
-        </tr>
-        <tr>
-            <td>--server-whitelist</td>
-            <td>Path to whitelist JSON</td>
-            <td>--server-whitelist whitelist.json</td>
-        </tr>
-        <tr>
-            <td>--server-adminlist</td>
-            <td>Path to admin list JSON</td>
-            <td>--server-adminlist adminlist.json</td>
-        </tr>
-        <tr>
-            <td>--rcon-port</td>
-            <td>RCON port (requires password)</td>
-            <td>--rcon-port 27015</td>
-        </tr>
-        <tr>
-            <td>--rcon-password</td>
-            <td>RCON password</td>
-            <td>--rcon-password secret</td>
-        </tr>
-        <tr>
-            <td>--map-gen-settings</td>
-            <td>Map generation settings JSON</td>
-            <td>--map-gen-settings mapgen.json</td>
-        </tr>
-        <tr>
-            <td>--console-log</td>
-            <td>Path to write console log</td>
-            <td>--console-log server.log</td>
-        </tr>
-    </tbody>
-</table>
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
 
-<h3>Example Startup Command (Linux)</h3>
-<div class="code-block">
-<code>./bin/x64/factorio --start-server my-save --port 34197 --server-settings server-settings.json</code>
-</div>
+[Install]
+WantedBy=multi-user.target
+</code></pre>
 
-<h3>Example Startup Command (Windows)</h3>
-<div class="code-block">
-<code>factorio.exe --start-server my-save --port 34197 --server-settings server-settings.json</code>
-</div>
-
-<h3>Example Startup Script (Linux with RCON)</h3>
-<div class="code-block">
-<code>#!/bin/bash
-cd /home/factorio/factorio
-./bin/x64/factorio \
-  --start-server saves/my-save.zip \
-  --port 34197 \
-  --server-settings config/server-settings.json \
-  --server-adminlist config/server-adminlist.json \
-  --rcon-port 27015 \
-  --rcon-password "your_secure_password" \
-  --console-log /var/log/factorio/server.log</code>
-</div>
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
 
 <h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
-<h3>Server Not Appearing in Browser</h3>
-<p><strong>Issue:</strong> Server not visible in public game list.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Verify UDP port 34197 is open in firewall</li>
-    <li>Ensure <code>"visibility": {"public": true}</code> in server-settings.json</li>
-    <li>Check that <code>username</code> and <code>token</code> are set (for public listing)</li>
-    <li>Try direct connect using IP:PORT</li>
-    <li>Review server console logs for matching server errors</li>
-</ul>
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
 
 <h3>Connection Issues</h3>
-<p><strong>Issue:</strong> Players cannot connect or timeout.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Verify firewall allows UDP traffic on game port</li>
-    <li>Check <code>game_password</code> if server is password protected</li>
-    <li>Ensure server and clients are same Factorio version</li>
-    <li>Verify <code>max_players</code> is not exceeded (0 = unlimited)</li>
-    <li>Check whitelist if <code>server-whitelist.json</code> is used</li>
-</ul>
 
-<h3>High Latency/Desync Issues</h3>
-<p><strong>Issue:</strong> Players experiencing lag or desyncs.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Increase <code>minimum_latency_in_ticks</code> for high-latency players</li>
-    <li>Reduce <code>max_upload_slots</code> if bandwidth limited</li>
-    <li>Enable <code>non_blocking_saving</code> to prevent save-related lag spikes</li>
-    <li>Check server CPU usage (Factorio is CPU-intensive)</li>
-    <li>Remove mods that cause performance issues</li>
-</ul>
-
-<h3>Save File Corruption</h3>
-<p><strong>Issue:</strong> Save file won't load or crashes.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Try loading older autosave (<code>autosave_slots</code> keeps multiple backups)</li>
-    <li>Use <code>--check-save</code> parameter to validate save integrity</li>
-    <li>Disable problematic mods one at a time</li>
-    <li>Regular backups of <code>saves/</code> directory recommended</li>
-</ul>
-
-<h3>Mod Loading Issues</h3>
-<p><strong>Issue:</strong> Mods not loading or causing crashes.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Ensure all players have same mod versions</li>
-    <li>Check <code>mods/</code> directory for corrupted downloads</li>
-    <li>Verify mod compatibility with Factorio version</li>
-    <li>Use <code>mod-list.json</code> to enable/disable mods</li>
-    <li>Check factorio-current.log for mod errors</li>
-</ul>
-
-<h3>Server Performance Issues</h3>
-<p><strong>Issue:</strong> Server running slowly with many players.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Optimize factory design (reduce entity count)</li>
-    <li>Use more efficient designs (direct insertion vs belts)</li>
-    <li>Reduce <code>autosave_interval</code> frequency</li>
-    <li>Upgrade to faster CPU (single-thread performance matters)</li>
-    <li>Monitor UPS (updates per second) in game</li>
-</ul>
-
-<h2 id="game-modes">🎮 Game Modes & Features</h2>
-
-<h3>Multiplayer Modes</h3>
-<ul>
-    <li><strong>Cooperative:</strong> All players work together on one factory</li>
-    <li><strong>PvP:</strong> Players can attack each other (requires mods/scenarios)</li>
-    <li><strong>Scenario-based:</strong> Custom scenarios with specific objectives</li>
-</ul>
-
-<h3>Core Features</h3>
-<ul>
-    <li><strong>Automation:</strong> Build and optimize production lines</li>
-    <li><strong>Research:</strong> Technology tree with hundreds of upgrades</li>
-    <li><strong>Logistics:</strong> Trains, belts, robots, and logistics networks</li>
-    <li><strong>Combat:</strong> Defend against alien biters with turrets and walls</li>
-    <li><strong>Blueprints:</strong> Copy and paste factory designs</li>
-    <li><strong>Multiplayer:</strong> Cooperative building with friends</li>
-</ul>
-
-<h3>Map Settings</h3>
-<ul>
-    <li><strong>Peaceful Mode:</strong> Biters don't attack unless provoked</li>
-    <li><strong>Resource Settings:</strong> Adjust frequency, size, and richness of ores</li>
-    <li><strong>Enemy Settings:</strong> Configure biter evolution and expansion</li>
-    <li><strong>Starting Area:</strong> Size of safe starting zone</li>
-</ul>
-
-<h2 id="mods">🔌 Mods & Mod Portal</h2>
-<p>Factorio has extensive mod support via the official Mod Portal:</p>
-
-<h3>Popular Mods</h3>
-<ul>
-    <li><strong>Bob's Mods:</strong> Adds complexity with new tiers of machines</li>
-    <li><strong>Angel's Mods:</strong> Complete overhaul of production chains</li>
-    <li><strong>Krastorio 2:</strong> Major gameplay overhaul and extension</li>
-    <li><strong>Space Exploration:</strong> Adds space travel and new planets</li>
-    <li><strong>Factorissimo:</strong> Allows building factories inside buildings</li>
-    <li><strong>Quality of Life mods:</strong> Improved UI, automation helpers</li>
-</ul>
-
-<h3>Mod Installation</h3>
+<h4>Can't Connect to Server</h4>
 <ol>
-    <li>Download mods from <a href="https://mods.factorio.com/" target="_blank">mods.factorio.com</a></li>
-    <li>Place .zip files in <code>~/.factorio/mods/</code></li>
-    <li>Edit <code>mod-list.json</code> to enable/disable mods</li>
-    <li>Restart server with <code>--mod-directory</code> parameter if needed</li>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
 </ol>
 
-<h3>Mod Synchronization</h3>
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>All players must have identical mod versions</li>
-    <li>Server can provide <code>mod-list.json</code> for easy sync</li>
-    <li>In-game mod portal downloads mods automatically</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h2 id="admin">👤 Admin Commands</h2>
+<h3>Performance Issues</h3>
 
-<h3>In-Game Commands</h3>
-<div class="code-block">
-<code>/admin                  # Open admin menu
-/ban [player]             # Ban a player
-/unban [player]           # Unban a player
-/kick [player] [reason]   # Kick a player
-/promote [player]         # Promote player to admin
-/demote [player]          # Demote player from admin
-/mute [player]            # Mute player's chat
-/unmute [player]          # Unmute player
-/whitelist add [player]   # Add to whitelist
-/whitelist remove [player]# Remove from whitelist
-/save                     # Manually save game</code>
-</div>
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
 
-<h3>RCON Commands (via External Tools)</h3>
-<p>Use RCON to send console commands remotely when <code>--rcon-port</code> and <code>--rcon-password</code> are configured.</p>
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
 
-<h2>📚 Resources</h2>
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
 <ul>
-    <li><strong>Official Website:</strong> <a href="https://www.factorio.com/" target="_blank">https://www.factorio.com/</a></li>
-    <li><strong>Mod Portal:</strong> <a href="https://mods.factorio.com/" target="_blank">https://mods.factorio.com/</a></li>
-    <li><strong>Wiki:</strong> <a href="https://wiki.factorio.com/" target="_blank">https://wiki.factorio.com/</a></li>
-    <li><strong>Reddit:</strong> r/factorio community</li>
-    <li><strong>Forums:</strong> Official Factorio forums</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
 </ul>
 
-<div class="warning-box">
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official factorio documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Factorio is <strong>CPU-intensive</strong> - single-thread performance is critical</li>
-        <li><strong>Unlimited players</strong> supported but practical limit depends on factory size and CPU</li>
-        <li>All players must have <strong>identical mod versions</strong> for multiplayer compatibility</li>
-        <li><strong>Autosaves</strong> create regular backups - configure frequency and slot count</li>
-        <li>Use <strong>RCON</strong> for remote server administration</li>
-        <li><strong>Token required</strong> for public server listing (free from factorio.com account)</li>
-        <li>Map generation is <strong>highly customizable</strong> - adjust resources and enemies</li>
-        <li><strong>Regular backups</strong> of saves/ directory strongly recommended</li>
-        <li>Cooperative factory building with <strong>real-time shared control</strong></li>
-        <li>The factory must grow!</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For factorio server hosting</em>
+</p>

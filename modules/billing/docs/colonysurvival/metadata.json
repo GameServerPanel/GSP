@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Colony Survival game servers",
     "name": "Colony Survival",
     "order": 44,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

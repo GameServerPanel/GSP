@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for No More Room In Hell game servers",
     "name": "No More Room In Hell",
     "order": 58,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

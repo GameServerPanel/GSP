@@ -30,6 +30,7 @@
         <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 2–4 GB per process baseline (varies by game/players)</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Source / SRCDS</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">17585</code></li>
         <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
@@ -148,24 +149,53 @@ cd ~/gameserver
 <h4>Windows Server</h4>
 <p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-<h3>Using SteamCMD (if applicable)</h3>
-<p>Many game servers can be installed via SteamCMD:</p>
-<pre><code># Install SteamCMD (Ubuntu/Debian)
-sudo apt install lib32gcc-s1 steamcmd
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 17585</strong></p>
 
-# Run SteamCMD
-steamcmd
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
 
-# Login and download (use your Steam credentials or anonymous)
-login anonymous
-force_install_dir /path/to/server
-app_update [APP_ID] validate
-quit
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
 </code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/dystopia
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/dystopia \
+         +app_update 17585 validate \
+         +quit
+
+# Server files are now in ~/gameservers/dystopia/
+cd ~/gameservers/dystopia
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\dystopia ^
+             +app_update 17585 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<p>After installation, configure your server through the configuration files typically located in the server directory.</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
 <h3>Essential Settings</h3>
 <ul>
@@ -193,18 +223,79 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code>./srcds_run -console -game dystopia -ip 0.0.0.0 -port 27015 +map dys_broadcast +maxplayers 24 +exec server.cfg
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%GAME_TYPE% %PID_FILE% %MAP% %IP% %PORT% %PLAYERS%</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-insecure</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable Valve Anti-Cheat</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Valve Anti-Cheat technology.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nohltv</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Half-life TV</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Half-life TV.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-restart</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Restart</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">The server restarts when it crashes.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nomaster</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable master server communication</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-autoupdate</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Auto-update</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">The server is searching for updates on startup.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-debug</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Debug Mode</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nobots</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable bots</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-norestart</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Restart</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Do not attempt to restart failed servers.</p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 

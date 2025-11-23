@@ -1,485 +1,362 @@
 <?php
 /**
- * Metamod:Source Documentation
+ * Metamod:Source Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>📚 Metamod:Source Guide</h1>
-<p style="font-size: 1.1em; color: rgba(255,255,255,0.8);">Plugin loader foundation for Source engine servers</p>
-
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">Quick Info</h3>
-    <table style="width: 100%; color: #e5e7eb;">
-        <tr><td><strong style="color: #ffffff;">Supported Games:</strong></td><td>All Source engine games (CS:S, TF2, L4D, L4D2, CS:GO, DoD:S)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Purpose:</strong></td><td>Plugin loader layer between game and plugins like SourceMod</td></tr>
-        <tr><td><strong style="color: #ffffff;">Config Format:</strong></td><td>VDF (Valve Data Format) files</td></tr>
-        <tr><td><strong style="color: #ffffff;">Latest Version:</strong></td><td>1.11+ (actively maintained)</td></tr>
-        <tr><td><strong style="color: #ffffff;">Website:</strong></td><td>sourcemm.net</td></tr>
-        <tr><td><strong style="color: #ffffff;">Install Order:</strong></td><td>Metamod:Source first, then SourceMod</td></tr>
-        <tr><td><strong style="color: #ffffff;">Not Compatible:</strong></td><td>Half-Life 1 engine (use original MetaMod)</td></tr>
-    </table>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h2>Navigation</h2>
-<ul style="list-style: none; padding: 0;">
-    <li>📚 <a href="#overview">Overview</a></li>
-    <li>📥 <a href="#installation">Installation</a></li>
-    <li>⚙️ <a href="#configuration">Configuration</a></li>
-    <li>🔌 <a href="#sourcemod">SourceMod Integration</a></li>
-    <li>🎮 <a href="#gamespecific">Game-Specific Paths</a></li>
-    <li>🛠️ <a href="#plugins">Plugin Management</a></li>
-    <li>🔧 <a href="#troubleshooting">Troubleshooting</a></li>
-    <li>📖 <a href="#resources">Resources</a></li>
-</ul>
-
-<h2 id="overview">Overview</h2>
-<p>Metamod:Source is a plugin loader and abstraction layer for Source engine dedicated servers. It sits between the game server and server plugins (like SourceMod), allowing multiple plugins to hook into game events and functions without conflicting.</p>
-
-<h3>Key Concepts</h3>
-<ul>
-    <li><strong>Plugin Loader:</strong> Loads and manages server-side plugins</li>
-    <li><strong>Abstraction Layer:</strong> Provides unified API across different Source games</li>
-    <li><strong>Foundation for SourceMod:</strong> SourceMod requires Metamod:Source to function</li>
-    <li><strong>VServerPlugin Interface:</strong> Hooks into Source engine's plugin system</li>
-    <li><strong>Hot-Loading:</strong> Plugins can be loaded/unloaded without server restart</li>
-</ul>
-
-<h3>Metamod:Source vs. Original MetaMod</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Feature</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Metamod:Source</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Original MetaMod</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Engine</td>
-            <td style="padding: 12px;">Source (CS:S, TF2, L4D, etc.)</td>
-            <td style="padding: 12px;">GoldSrc (CS 1.6, DoD 1.3, etc.)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">Config Format</td>
-            <td style="padding: 12px;">VDF (.vdf files)</td>
-            <td style="padding: 12px;">INI-style (.ini files)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Plugin System</td>
-            <td style="padding: 12px;">VServerPlugin interface</td>
-            <td style="padding: 12px;">DLL/SO hooking</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">Common Plugins</td>
-            <td style="padding: 12px;">SourceMod</td>
-            <td style="padding: 12px;">AMX Mod X</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Supported Games</h3>
-<ul>
-    <li><strong>Counter-Strike: Source</strong></li>
-    <li><strong>Counter-Strike: Global Offensive</strong></li>
-    <li><strong>Team Fortress 2</strong></li>
-    <li><strong>Left 4 Dead</strong></li>
-    <li><strong>Left 4 Dead 2</strong></li>
-    <li><strong>Day of Defeat: Source</strong></li>
-    <li><strong>Half-Life 2: Deathmatch</strong></li>
-    <li><strong>Garry's Mod</strong></li>
-    <li><strong>Insurgency</strong></li>
-    <li><strong>Killing Floor</strong> (Source version)</li>
-</ul>
-
-<h2 id="installation">📥 Installation</h2>
-
-<h3>Prerequisites</h3>
-<ul>
-    <li>Source engine dedicated server installed</li>
-    <li>Admin access to server files</li>
-    <li>Know your game's folder structure</li>
-</ul>
-
-<h3>Linux Installation</h3>
-
-<h4>CS:Source / TF2 / L4D Example</h4>
-<pre><code># Download latest Metamod:Source for Linux
-cd /tmp
-wget https://mms.alliedmods.net/mmsdrop/1.11/mmsource-1.11.0-git1148-linux.tar.gz
-
-# Extract to server folder
-# For CS:S:
-cd /path/to/cstrike
-tar -xzf /tmp/mmsource-1.11.0-git1148-linux.tar.gz
-
-# For TF2:
-cd /path/to/tf
-tar -xzf /tmp/mmsource-1.11.0-git1148-linux.tar.gz
-
-# For L4D2:
-cd /path/to/left4dead2
-tar -xzf /tmp/mmsource-1.11.0-git1148-linux.tar.gz
-
-# Folder structure created:
-# addons/
-#   metamod/
-#     bin/
-#       server.so  (Linux)
-</code></pre>
-
-<h4>CS:GO Specific</h4>
-<pre><code># CS:GO requires slightly different structure
-cd /path/to/csgo
-tar -xzf /tmp/mmsource-1.11.0-git1148-linux.tar.gz
-
-# Verify structure:
-# csgo/addons/metamod/bin/server.so
-</code></pre>
-
-<h3>Windows Installation</h3>
-<pre><code># Download Windows version:
-# mmsource-1.11.0-git1148-windows.zip
-
-# Extract to game folder (CS:S example):
-# Extract to: C:\srcds\cstrike\
-
-# Folder structure:
-# cstrike\
-#   addons\
-#     metamod\
-#       bin\
-#         server.dll  (Windows)
-</code></pre>
-
-<h3>Creating metamod.vdf</h3>
-<p>Create <code>addons/metamod.vdf</code> in the game folder:</p>
-
-<h4>CS:Source</h4>
-<pre><code>"Plugin"
-{
-    "file"    "../cstrike/addons/metamod/bin/server"
-}
-</code></pre>
-
-<h4>Team Fortress 2</h4>
-<pre><code>"Plugin"
-{
-    "file"    "../tf/addons/metamod/bin/server"
-}
-</code></pre>
-
-<h4>Left 4 Dead 2</h4>
-<pre><code>"Plugin"
-{
-    "file"    "../left4dead2/addons/metamod/bin/server"
-}
-</code></pre>
-
-<h4>CS:GO</h4>
-<pre><code>"Plugin"
-{
-    "file"    "addons/metamod/bin/server"
-}
-</code></pre>
-
-<h3>Verify Installation</h3>
-<pre><code># Start server and type in console:
-meta version
-
-# Expected output:
-# Metamod:Source version 1.11.0-dev+1148
-# Built from: https://github.com/alliedmodders/metamod-source
-# Loaded As: VServerPlugin (gameinfo.txt)
-</code></pre>
-
-<h2 id="configuration">⚙️ Configuration</h2>
-
-<h3>gameinfo.txt Modification</h3>
-<p>Metamod:Source can load via VDF or gameinfo.txt. VDF method is preferred.</p>
-
-<h4>Manual gameinfo.txt Entry (Alternative Method)</h4>
-<pre><code>// Edit gameinfo.txt in game folder
-// Add under "SearchPaths":
-
-GameBin |gameinfo_path|addons/metamod/bin
-
-// Example for CS:S (cstrike/gameinfo.txt):
-"FileSystem"
-{
-    "SteamAppId"    "240"
-    "SearchPaths"
-    {
-        GameBin |gameinfo_path|addons/metamod/bin
-        Game    |gameinfo_path|.
-        Game    cstrike
-        Game    hl2
-    }
-}
-</code></pre>
-
-<h3>Plugin Configuration</h3>
-<p>Plugins load from <code>addons/metamod/metaplugins.ini</code>:</p>
-<pre><code>; Metamod:Source Plugins File
-; Each plugin is on its own line
-; Format: alias:file
-
-; Example SourceMod entry:
-sourcemod:addons/sourcemod/bin/sourcemod_mm
-</code></pre>
-
-<h3>Console Commands</h3>
-<pre><code># List loaded plugins
-meta list
-
-# Load plugin
-meta load path/to/plugin
-
-# Unload plugin
-meta unload <plugin_id>
-
-# Refresh plugin list
-meta refresh
-
-# Version info
-meta version
-
-# Plugin info
-meta info <plugin_id>
-</code></pre>
-
-<h2 id="sourcemod">🔌 SourceMod Integration</h2>
-
-<h3>Why SourceMod Needs Metamod:Source</h3>
-<p>SourceMod is built as a Metamod:Source plugin. It cannot run without Metamod:Source as the foundation layer.</p>
-
-<h3>Installation Order</h3>
-<ol>
-    <li><strong>Install Metamod:Source first</strong> (as described above)</li>
-    <li><strong>Verify Metamod works</strong> (meta version command)</li>
-    <li><strong>Download SourceMod</strong> from sourcemod.net</li>
-    <li><strong>Extract SourceMod</strong> to game folder</li>
-    <li><strong>SourceMod auto-registers</strong> with Metamod:Source</li>
-</ol>
-
-<h3>SourceMod Installation</h3>
-<pre><code># Download SourceMod (Linux example)
-wget https://sm.alliedmods.net/smdrop/1.11/sourcemod-1.11.0-git6917-linux.tar.gz
-
-# Extract to game folder (CS:S example)
-cd /path/to/cstrike
-tar -xzf sourcemod-1.11.0-git6917-linux.tar.gz
-
-# Folder structure:
-# addons/
-#   metamod/  (already exists)
-#   sourcemod/  (new)
-#     bin/
-#       sourcemod_mm.so  (auto-loads via Metamod)
-#     configs/
-#     plugins/
-#     scripting/
-</code></pre>
-
-<h3>Verify SourceMod Loaded</h3>
-<pre><code># In server console:
-meta list
-
-# Should show:
-# [01] SourceMod (1.11.0-dev+6917) by AlliedModders LLC
-
-# Or use SourceMod command:
-sm version
-</code></pre>
-
-<h2 id="gamespecific">🎮 Game-Specific Paths</h2>
-
-<h3>Path Reference Table</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Game</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Game Folder</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">metamod.vdf Path</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">CS:Source</td>
-            <td style="padding: 12px;"><code>cstrike/</code></td>
-            <td style="padding: 12px;"><code>../cstrike/addons/metamod/bin/server</code></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">CS:GO</td>
-            <td style="padding: 12px;"><code>csgo/</code></td>
-            <td style="padding: 12px;"><code>addons/metamod/bin/server</code></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Team Fortress 2</td>
-            <td style="padding: 12px;"><code>tf/</code></td>
-            <td style="padding: 12px;"><code>../tf/addons/metamod/bin/server</code></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">Left 4 Dead</td>
-            <td style="padding: 12px;"><code>left4dead/</code></td>
-            <td style="padding: 12px;"><code>../left4dead/addons/metamod/bin/server</code></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">Left 4 Dead 2</td>
-            <td style="padding: 12px;"><code>left4dead2/</code></td>
-            <td style="padding: 12px;"><code>../left4dead2/addons/metamod/bin/server</code></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;">DoD:Source</td>
-            <td style="padding: 12px;"><code>dod/</code></td>
-            <td style="padding: 12px;"><code>../dod/addons/metamod/bin/server</code></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;">HL2:DM</td>
-            <td style="padding: 12px;"><code>hl2mp/</code></td>
-            <td style="padding: 12px;"><code>../hl2mp/addons/metamod/bin/server</code></td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Multi-Server Setup</h3>
-<p>For multiple servers sharing files:</p>
-<pre><code># Install Metamod once in shared location
-/srcds/shared/addons/metamod/
-
-# Symlink to each server
-ln -s /srcds/shared/addons /srcds/server1/cstrike/addons
-ln -s /srcds/shared/addons /srcds/server2/tf/addons
-
-# Use appropriate metamod.vdf for each game
-</code></pre>
-
-<h2 id="plugins">🛠️ Plugin Management</h2>
-
-<h3>Loading Plugins Manually</h3>
-<p>Edit <code>addons/metamod/metaplugins.ini</code>:</p>
-<pre><code>; SourceMod (loads automatically if installed)
-sourcemod:addons/sourcemod/bin/sourcemod_mm
-
-; Custom plugin example
-customplugin:addons/customplugin/bin/customplugin_mm
-</code></pre>
-
-<h3>Plugin Auto-Discovery</h3>
-<p>Metamod:Source auto-discovers plugins in <code>addons/</code> folder that contain:</p>
-<ul>
-    <li>A valid plugin binary (server.so / server.dll)</li>
-    <li>Proper VServerPlugin interface implementation</li>
-</ul>
-
-<h3>Common Plugins</h3>
-<ul>
-    <li><strong>SourceMod:</strong> Admin/plugin framework (most popular)</li>
-    <li><strong>SourceBans:</strong> Centralized ban management</li>
-    <li><strong>EventScripts:</strong> Python-based scripting (older)</li>
-    <li><strong>Custom Plugins:</strong> Game-specific modifications</li>
-</ul>
-
-<h2 id="troubleshooting">🔧 Troubleshooting</h2>
-
-<h3>Metamod Not Loading</h3>
-<pre><code># Check if metamod.vdf exists
-ls -la addons/metamod.vdf
-
-# Verify VDF syntax (no syntax errors)
-cat addons/metamod.vdf
-
-# Check file permissions (Linux)
-chmod 644 addons/metamod.vdf
-chmod -R 755 addons/metamod/
-
-# Verify correct path in VDF for your game
-# CS:GO uses "addons/metamod/bin/server"
-# Others use "../gamefolder/addons/metamod/bin/server"
-</code></pre>
-
-<h3>"meta" Command Not Found</h3>
-<ul>
-    <li>Metamod:Source not loaded - check console on startup for errors</li>
-    <li>Verify metamod.vdf exists in correct location</li>
-    <li>Check server console for "Metamod:Source" loaded message</li>
-    <li>Try manual gameinfo.txt method as alternative</li>
-</ul>
-
-<h3>SourceMod Not Loading</h3>
-<pre><code># Verify Metamod loaded first
-meta version
-
-# Check if SourceMod plugin is visible
-meta list
-
-# If not listed, verify SourceMod installation:
-ls -la addons/sourcemod/bin/
-
-# Check for sourcemod_mm.so (Linux) or sourcemod_mm.dll (Windows)
-
-# Manual load:
-meta load addons/sourcemod/bin/sourcemod_mm
-</code></pre>
-
-<h3>Plugin Conflicts</h3>
-<pre><code># List all loaded plugins
-meta list
-
-# Unload problematic plugin
-meta unload <plugin_number>
-
-# Check server console for error messages
-
-# Common conflicts:
-# - Multiple admin systems (AMX Mod X + SourceMod)
-# - Outdated plugin versions
-# - Incompatible game version
-</code></pre>
-
-<h3>CS:GO Specific Issues</h3>
-<ul>
-    <li><strong>CS:GO uses different VDF path:</strong> <code>addons/metamod/bin/server</code> (no ../ prefix)</li>
-    <li><strong>Frequent updates:</strong> Valve updates may break plugins - wait for Metamod update</li>
-    <li><strong>Insecure mode:</strong> Some plugins require <code>-insecure</code> launch parameter</li>
-</ul>
-
-<h3>Server Crash After Installation</h3>
-<pre><code># Check server logs for error messages
-tail -f logs/L*.log
-
-# Common causes:
-# 1. Wrong architecture (32-bit vs 64-bit)
-# 2. Corrupted plugin binary
-# 3. Incompatible Metamod version for game
-
-# Test with clean Metamod installation (no plugins)
-# Remove addons/sourcemod temporarily
-# If server starts, issue is with SourceMod or its plugins
-</code></pre>
-
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>VDF Method Preferred:</strong> Use metamod.vdf instead of gameinfo.txt when possible</li>
-        <li><strong>Version Compatibility:</strong> Match Metamod:Source version to Source engine version</li>
-        <li><strong>CS:GO Path Different:</strong> CS:GO doesn't use "../csgo/" prefix in VDF</li>
-        <li><strong>Test After Updates:</strong> Valve updates can break Metamod - test before production</li>
-        <li><strong>Backup Configs:</strong> Keep backups of metamod.vdf and metaplugins.ini</li>
-        <li><strong>Development Builds:</strong> Use stable releases for production servers</li>
-        <li><strong>Plugin Order:</strong> Load order matters - SourceMod should load first</li>
-        <li><strong>Console Monitoring:</strong> Watch server console during startup for errors</li>
+<h1>Metamod:Source Server Hosting Guide</h1>
+
+<h2>Overview</h2>
+<p>Metamod:Source is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Metamod:Source server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="resources">Resources</h2>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Metamod:Source server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Metamod:Source Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Metamod:Source Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><a href="https://www.sourcemm.net/" target="_blank">Official Metamod:Source Website</a></li>
-    <li><a href="https://wiki.alliedmods.net/Metamod:Source" target="_blank">Metamod:Source Wiki</a></li>
-    <li><a href="https://github.com/alliedmodders/metamod-source" target="_blank">Metamod:Source GitHub</a></li>
-    <li><a href="https://www.sourcemod.net/" target="_blank">SourceMod Official Site</a></li>
-    <li><a href="https://forums.alliedmods.net/" target="_blank">Allied Modders Forums</a></li>
-    <li><a href="../css/">CS:Source Server Documentation</a></li>
-    <li><a href="../csgo/">CS:GO Server Documentation</a></li>
-    <li><a href="../tf2/">Team Fortress 2 Server Documentation</a></li>
-    <li><a href="../left4dead/">Left 4 Dead Server Documentation</a></li>
-    <li><a href="../left4dead2/">Left 4 Dead 2 Server Documentation</a></li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Basic Startup</h3>
+<pre><code># Generic startup command structure
+./server_executable [parameters]
+</code></pre>
+
+<h3>Common Parameters</h3>
+<ul>
+    <li><code>-port [number]</code> - Set the server port</li>
+    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
+    <li><code>-map [name]</code> - Starting map/level</li>
+    <li><code>-console</code> - Enable console output</li>
+    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
+</ul>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Metamod:Source Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Metamod:Source documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Metamod:Source server hosting</em>
+</p>

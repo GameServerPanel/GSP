@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Spigot Server game servers",
     "name": "Spigot Server",
     "order": 95,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

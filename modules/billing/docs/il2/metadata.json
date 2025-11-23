@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for IL-2 Sturmovik game servers",
     "name": "IL-2 Sturmovik",
     "order": 14,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

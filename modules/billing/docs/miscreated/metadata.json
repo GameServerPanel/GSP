@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Miscreated game servers",
     "name": "Miscreated",
     "order": 39,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

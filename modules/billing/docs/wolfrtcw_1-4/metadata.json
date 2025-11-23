@@ -2,5 +2,6 @@
     "description": "Setup and configuration guide for Wolfenstein: Return To Castle Wolfenstein 1.4 game servers",
     "name": "Wolfenstein: Return To Castle Wolfenstein 1.4",
     "order": 143,
-    "category": "game"
+    "category": "game",
+    "complete": true
 }

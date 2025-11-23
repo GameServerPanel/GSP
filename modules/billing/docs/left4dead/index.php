@@ -1,518 +1,487 @@
 <?php
 /**
- * Left 4 Dead Server Documentation
+ * Left 4 Dead Server Documentation - Comprehensive Guide
+ * General game server hosting information (not platform-specific)
  */
 ?>
-<h1>📚 Left 4 Dead Server Guide</h1>
-
-<h3 style="color: #94a3b8; margin-top: 8px;">Original Co-Op Zombie Survival - Comprehensive Setup</h3>
-
-<div style="background: #1e3a5f; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #3b82f6;">
-    <h3 style="color: #ffffff; margin-top: 0;">📋 Quick Info</h3>
-    <table style="width: 100%; color: #e5e7eb;">
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Engine:</strong></td><td>Source Engine</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Developer:</strong></td><td>Valve Corporation</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">App ID:</strong></td><td>222840</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Default Port:</strong></td><td>27015 UDP/TCP</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Max Players:</strong></td><td>8 default (4v4 Versus), up to 32 with mods</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Difficulty:</strong></td><td>Easy, Normal, Advanced, Expert</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Game Modes:</strong></td><td>Campaign, Versus, Survival</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">RCON:</strong></td><td>Supported (same port as game)</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Platform:</strong></td><td>Windows, Linux</td></tr>
-        <tr><td style="padding: 8px 0;"><strong style="color: #a5b4fc;">Control:</strong></td><td>RCON, SourceMod, Console</td></tr>
-    </table>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
+        <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
+        <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
+        <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
+        <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
+    </div>
 </div>
 
-<h3 style="margin-top: 30px;">Navigation</h3>
-<ul style="line-height: 2; font-size: 1.05em;">
-    <li><a href="#overview">Overview</a></li>
-    <li><a href="#ports">🔌 Ports & Firewall</a></li>
-    <li><a href="#installation">Installation</a></li>
-    <li><a href="#configuration">⚙️ Configuration</a></li>
-    <li><a href="#gamemodes">Game Modes & Campaigns</a></li>
-    <li><a href="#sourcemod">SourceMod & Plugins</a></li>
-    <li><a href="#startup">Startup Commands</a></li>
-    <li><a href="#troubleshooting">🔧 Troubleshooting</a></li>
-    <li><a href="#resources">Resources</a></li>
-</ul>
-
-<h2 id="overview">Overview</h2>
-<p><strong>Left 4 Dead</strong> is Valve's original co-operative first-person shooter where four "Survivors" must fight through hordes of infected zombies to reach safety. Released in 2008, L4D pioneered the co-op zombie survival genre and established the foundation for its sequel.</p>
-
-<p>The game features the innovative "AI Director" system that dynamically adjusts gameplay difficulty, pacing, and item placement based on player performance. Each campaign tells the story of four survivors fighting through five chapters (maps) to reach an evacuation point.</p>
-
-<h3>Key Features</h3>
-<ul>
-    <li><strong>Co-op Campaign:</strong> 4-player cooperative story campaigns against AI hordes</li>
-    <li><strong>Versus Mode:</strong> 4v4 multiplayer with players controlling Special Infected</li>
-    <li><strong>Survival Mode:</strong> Hold out against endless waves in challenge maps</li>
-    <li><strong>5 Original Campaigns:</strong> No Mercy, Crash Course, Death Toll, Dead Air, Blood Harvest</li>
-    <li><strong>Special Infected:</strong> Boomer, Hunter, Smoker, Tank, Witch</li>
-    <li><strong>AI Director:</strong> Dynamic difficulty and pacing system</li>
-    <li><strong>Four Difficulty Levels:</strong> Easy, Normal, Advanced, Expert</li>
-</ul>
-
-<h2 id="ports">🔌 Ports & Firewall Configuration</h2>
-
-<h3>Required Ports</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #0f172a; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #1e293b;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; font-family: monospace; color: #a5b4fc;">27015</td>
-            <td style="padding: 12px;">
-                <span style="background: #22c55e; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;">UDP</span>
-                <span style="background: #3b82f6; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; margin-left: 4px;">TCP</span>
-            </td>
-            <td style="padding: 12px;">Game server + RCON (dual purpose)</td>
-            <td style="padding: 12px; color: #22c55e; font-weight: bold;">✓ Yes</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; font-family: monospace; color: #a5b4fc;">27020</td>
-            <td style="padding: 12px;">
-                <span style="background: #22c55e; color: #ffffff; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold;">UDP</span>
-            </td>
-            <td style="padding: 12px;">SourceTV (optional spectating)</td>
-            <td style="padding: 12px; color: #94a3b8;">Optional</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>Ubuntu/Debian (UFW)</h4>
-<pre><code># Allow L4D game port (UDP and TCP)
-sudo ufw allow 27015
-sudo ufw allow 27015/tcp
-
-# Allow SourceTV (optional)
-sudo ufw allow 27020/udp
-
-# Enable firewall
-sudo ufw enable
-sudo ufw status
-</code></pre>
-
-<h4>CentOS/RHEL (FirewallD)</h4>
-<pre><code># Add L4D ports
-sudo firewall-cmd --permanent --add-port=27015/udp
-sudo firewall-cmd --permanent --add-port=27015/tcp
-sudo firewall-cmd --permanent --add-port=27020/udp
-sudo firewall-cmd --reload
-sudo firewall-cmd --list-ports
-</code></pre>
-
-<h4>Windows Firewall (PowerShell)</h4>
-<pre><code># Game server port
-New-NetFirewallRule -DisplayName "L4D Server" -Direction Inbound -LocalPort 27015 -Protocol UDP -Action Allow
-New-NetFirewallRule -DisplayName "L4D Server TCP" -Direction Inbound -LocalPort 27015 -Protocol TCP -Action Allow
-
-# SourceTV (optional)
-New-NetFirewallRule -DisplayName "L4D SourceTV" -Direction Inbound -LocalPort 27020 -Protocol UDP -Action Allow
-</code></pre>
-
-<h4>iptables (Advanced)</h4>
-<pre><code># Allow L4D ports
-iptables -A INPUT -p udp --dport 27015 -j ACCEPT
-iptables -A INPUT -p tcp --dport 27015 -j ACCEPT
-iptables -A INPUT -p udp --dport 27020 -j ACCEPT
-
-# Save rules (Ubuntu/Debian)
-netfilter-persistent save
-
-# Save rules (CentOS/RHEL)
-service iptables save
-</code></pre>
-
-<h2 id="installation">Installation</h2>
-
-<h3>Prerequisites</h3>
-<ul>
-    <li><strong>SteamCMD</strong> installed (<a href="https://developer.valvesoftware.com/wiki/SteamCMD" target="_blank">Installation Guide</a>)</li>
-    <li>Adequate disk space (~15 GB for full installation)</li>
-    <li>Open firewall ports (27015 UDP/TCP minimum)</li>
-    <li>Linux: 32-bit libraries (libstdc++6:i386, lib32gcc1)</li>
-</ul>
-
-<h3>Linux Installation</h3>
-<pre><code># Create server directory
-mkdir -p ~/l4d_server
-cd ~/l4d_server
-
-# Install 32-bit libraries (Ubuntu/Debian)
-sudo dpkg --add-architecture i386
-sudo apt-get update
-sudo apt-get install lib32gcc1 libstdc++6:i386
-
-# Download server files with SteamCMD
-steamcmd +force_install_dir ~/l4d_server +login anonymous +app_update 222840 validate +quit
-
-# Note: App ID 222840 is for Left 4 Dead Dedicated Server
-</code></pre>
-
-<h3>Windows Installation</h3>
-<pre><code># Download SteamCMD for Windows
-# Extract to C:\steamcmd\
-
-# Create server directory
-mkdir C:\l4d_server
-
-# Run SteamCMD
-C:\steamcmd\steamcmd.exe +force_install_dir C:\l4d_server +login anonymous +app_update 222840 validate +quit
-</code></pre>
-
-<h2 id="configuration">⚙️ Configuration</h2>
-
-<h3>server.cfg</h3>
-<p>Create or edit <code>left4dead/cfg/server.cfg</code>:</p>
-<pre><code>// Server Identity
-hostname "My Left 4 Dead Server"
-rcon_password "your_secure_rcon_password"
-sv_contact "admin@yourserver.com"
-sv_region 1  // 0=US East, 1=US West, 2=South America, 3=Europe
-
-// Basic Settings
-sv_lan 0  // 0=internet server, 1=LAN only
-sv_password ""  // Leave empty for public, set for private server
-sv_allow_lobby_connect_only 0  // Allow direct connections
-
-// Game Settings
-z_difficulty "Normal"  // Easy, Normal, Hard, Expert
-mp_gamemode "coop"  // coop, versus, survival
-sv_cheats 0  // Disable cheats in production
-
-// Player Limits
-sv_maxplayers 8  // Max 8 for versus (4v4)
-sv_visiblemaxplayers 8
-
-// Voice Communication
-sv_voiceenable 1
-sv_alltalk 0  // 0=team only, 1=all talk
-
-// Connection Settings
-sv_minrate 20000
-sv_maxrate 30000
-sv_mincmdrate 30
-sv_maxcmdrate 67
-sv_minupdaterate 30
-sv_maxupdaterate 67
-
-// Logging
-log on
-sv_logecho 1
-sv_logfile 1
-sv_log_onefile 0
-sv_logbans 1
-
-// Director AI
-director_no_death_check 0  // 0=normal spawning, 1=disable death checks
-director_build_up_min_interval 20  // Minimum seconds between events
-
-// Friendly Fire
-mp_friendlyfire 0  // 0=off, 1=on (often enabled in Versus)
-
-// Download Settings
-sv_allowdownload 1
-sv_allowupload 1
-net_maxfilesize 64  // MB
-
-// Performance
-fps_max 300  // Server FPS cap
-</code></pre>
-
-<h2 id="gamemodes">Game Modes & Campaigns</h2>
-
-<h3>Game Modes</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Mode</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Players</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Description</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Campaign (Coop)</strong></td>
-            <td style="padding: 12px;">1-4</td>
-            <td style="padding: 12px;">Fight through story campaigns as Survivors against AI infected</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Versus</strong></td>
-            <td style="padding: 12px;">4v4</td>
-            <td style="padding: 12px;">Teams alternate as Survivors and Special Infected</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Survival</strong></td>
-            <td style="padding: 12px;">1-4</td>
-            <td style="padding: 12px;">Hold out against endless waves in small challenge maps</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Official Campaigns</h3>
-<p>All 5 original campaigns included:</p>
-
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Campaign</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Starting Map</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Maps</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff;">Setting</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>No Mercy</strong></td>
-            <td style="padding: 12px;"><code>l4d_hospital01_apartment</code></td>
-            <td style="padding: 12px;">5</td>
-            <td style="padding: 12px;">Fairfield (hospital rooftop escape)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Crash Course</strong></td>
-            <td style="padding: 12px;"><code>l4d_garage01_alleys</code></td>
-            <td style="padding: 12px;">2</td>
-            <td style="padding: 12px;">Riverside (truck depot)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Death Toll</strong></td>
-            <td style="padding: 12px;"><code>l4d_river01_docks</code></td>
-            <td style="padding: 12px;">5</td>
-            <td style="padding: 12px;">Rural Pennsylvania (boathouse escape)</td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px;"><strong>Dead Air</strong></td>
-            <td style="padding: 12px;"><code>l4d_airport01_greenhouse</code></td>
-            <td style="padding: 12px;">5</td>
-            <td style="padding: 12px;">Metro Airport (airplane escape)</td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><strong>Blood Harvest</strong></td>
-            <td style="padding: 12px;"><code>l4d_farm01_hilltop</code></td>
-            <td style="padding: 12px;">5</td>
-            <td style="padding: 12px;">Allegheny National Forest (farmhouse finale)</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>Changing Maps via RCON</h3>
-<pre><code># Connect with RCON
-rcon_password your_password
-rcon changelevel l4d_hospital01_apartment
-
-# List all maps
-rcon maps *
-
-# Change game mode
-rcon mp_gamemode versus
-rcon map l4d_hospital01_apartment  // Restart map in new mode
-</code></pre>
-
-<h2 id="sourcemod">SourceMod & Plugins</h2>
-
-<h3>Installing SourceMod</h3>
-
-<h4>Step 1: Install MetaMod:Source</h4>
-<pre><code># Download from: https://www.sourcemm.net/downloads.php?branch=stable
-# Extract to left4dead/ directory
-
-# Structure should be:
-left4dead/
-  addons/
-    metamod/
-      bin/
-
-# Verify in server console:
-meta version
-</code></pre>
-
-<h4>Step 2: Install SourceMod</h4>
-<pre><code># Download from: https://www.sourcemod.net/downloads.php?branch=stable
-# Extract to left4dead/ directory
-
-# Structure should be:
-left4dead/
-  addons/
-    sourcemod/
-      plugins/
-      configs/
-
-# Add yourself as admin in:
-# left4dead/addons/sourcemod/configs/admins_simple.ini
-"STEAM_0:1:12345678" "99:z"
-
-# Verify in-game:
-sm version
-</code></pre>
-
-<h3>Essential Plugins</h3>
-<ul>
-    <li><strong>L4DToolZ:</strong> Enable 10+ player servers (bypass 8-player limit)</li>
-    <li><strong>AdminMenu:</strong> Full admin control panel (included with SourceMod)</li>
-    <li><strong>Simple Chat Processor:</strong> Chat colors and formatting</li>
-    <li><strong>Basic Votes:</strong> Kick, ban, and map voting</li>
-</ul>
-
-<h3>Popular L4D Plugins</h3>
-<ul>
-    <li><strong>Super Versus:</strong> 8v8 Versus mode support</li>
-    <li><strong>Survivor Bots:</strong> Enhanced bot AI and control</li>
-    <li><strong>Competitive Spawns:</strong> Balanced Special Infected spawning for competitive play</li>
-    <li><strong>L4D Stats:</strong> Player statistics tracking</li>
-    <li><strong>Infected Bots Control:</strong> Manage AI Special Infected behavior</li>
-</ul>
-
-<h3>Installing Plugins</h3>
-<pre><code># Place .smx files in:
-left4dead/addons/sourcemod/plugins/
-
-# Reload plugins:
-rcon sm plugins reload pluginname
-
-# List all plugins:
-rcon sm plugins list
-
-# Disable a plugin:
-rcon sm plugins unload pluginname
-</code></pre>
-
-<h2 id="startup">Startup Commands</h2>
-
-<h3>Linux</h3>
-<pre><code>#!/bin/bash
-# start_l4d.sh
-
-cd ~/l4d_server
-
-./srcds_run -console -game left4dead \
-  +map l4d_hospital01_apartment \
-  +maxplayers 8 \
-  +mp_gamemode coop \
-  -port 27015 \
-  -ip 0.0.0.0
-</code></pre>
-
-<h3>Windows</h3>
-<pre><code>@echo off
-REM start_l4d.bat
-
-cd C:\l4d_server
-
-srcds.exe -console -game left4dead ^
-  +map l4d_hospital01_apartment ^
-  +maxplayers 8 ^
-  +mp_gamemode coop ^
-  -port 27015
-</code></pre>
-
-<h3>Startup Parameters</h3>
-<ul>
-    <li><code>-console</code> - Run with visible console</li>
-    <li><code>-game left4dead</code> - Specify game directory</li>
-    <li><code>+map mapname</code> - Starting map</li>
-    <li><code>+maxplayers 8</code> - Maximum players (4 for coop, 8 for versus)</li>
-    <li><code>+mp_gamemode mode</code> - Game mode (coop, versus, survival)</li>
-    <li><code>-port 27015</code> - Server port</li>
-    <li><code>-ip 0.0.0.0</code> - Bind to all interfaces</li>
-    <li><code>+exec server.cfg</code> - Execute config file on start</li>
-</ul>
-
-<h2 id="troubleshooting">🔧 Troubleshooting</h2>
-
-<h3>Server Not in Browser</h3>
-<pre><code># Check sv_lan setting
-sv_lan 0  // Must be 0 for internet
-
-# Verify connection to Steam
-status  // Check "Connected to Steam servers"
-
-# Check port availability
-netstat -an | grep 27015
-
-# Wait for master server registration (5-10 minutes)
-</code></pre>
-
-<h3>Connection Issues</h3>
-<ul>
-    <li>Verify firewall allows UDP 27015</li>
-    <li>Check server password (<code>sv_password</code>)</li>
-    <li>Ensure clients can ping server IP</li>
-    <li>Verify router port forwarding</li>
-</ul>
-
-<h3>SourceMod Not Loading</h3>
-<pre><code># Verify directory structure
-left4dead/
-  addons/
-    metamod/
-    sourcemod/
-
-# Check metamod first
-meta version  // Should show version number
-
-# Then check sourcemod
-sm version
-
-# Review error logs
-left4dead/addons/sourcemod/logs/errors_*.log
-</code></pre>
-
-<h3>Performance Issues</h3>
-<pre><code># Check server FPS
-stats  // In server console
-
-# Optimize rates
-sv_minrate 20000
-sv_maxrate 30000
-fps_max 300
-
-# Reduce max players if needed
-sv_maxplayers 4  // For coop
-</code></pre>
-
-<h3>AI Director Too Hard/Easy</h3>
-<pre><code># Change difficulty
-z_difficulty Normal  // Easy, Normal, Hard, Expert
-
-# Adjust Special Infected spawn rates
-director_build_up_min_interval 20  // Seconds between events
-
-# Tank spawn frequency
-z_tank_max_players 3000  // Distance before Tank spawns
-</code></pre>
-
-<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i>Pro Tips</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li><strong>L4DToolZ Plugin:</strong> Unlock 10-32 player servers for custom game modes</li>
-        <li><strong>Versus Balance:</strong> 4v4 is standard competitive format</li>
-        <li><strong>Custom Campaigns:</strong> L4D has active custom campaign community</li>
-        <li><strong>Survival Mode:</strong> Great for warming up or quick sessions</li>
-        <li><strong>RCON Management:</strong> Use HLSW or similar tools for remote management</li>
-        <li><strong>sv_pure 2:</strong> Enable for competitive to prevent cheats</li>
-        <li><strong>Friendly Fire:</strong> Enable in Versus for tactical gameplay</li>
+<h1>Left 4 Dead Server Hosting Guide</h1>
+
+<h2>Overview</h2>
+<p>Left 4 Dead is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Left 4 Dead server for your community.</p>
+
+<h2 id="quick-info">Quick Info</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">27015</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 2–4 GB per process baseline (varies by game/players)</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Source / SRCDS</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">222840</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
+        <li><strong style="color: #ffffff;">Configuration Files:</strong><ul style="margin-top: 8px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">left4dead/cfg/server.cfg</code> - The main config file</li>
+        </ul></li>
     </ul>
 </div>
 
-<h2 id="related-mods">🔌 Related Mods & Plugins</h2>
-<p>Popular server modifications compatible with Left 4 Dead:</p>
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <table style="width: 100%; color: #e5e7eb; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #0f172a;">
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Port</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Protocol</th>
+                <th style="padding: 10px; text-align: left; color: #ffffff;">Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Game/Query (can change with -port)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27015</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">RCON</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27020</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">SourceTV (tv_port)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27005</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Client port (outbound/varies)</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">26900</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Steam (outbound, -sport) <span style="color: #f59e0b;">(Optional)</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27031-27036</code></td>
+                <td style="padding: 10px;">UDP</td>
+                <td style="padding: 10px;">Steam Remote Play / P2P (outbound) <span style="color: #f59e0b;">(Optional)</span></td>
+            </tr>
+            <tr style="border-bottom: 1px solid #374151;">
+                <td style="padding: 10px;"><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">27036-27037</code></td>
+                <td style="padding: 10px;">TCP</td>
+                <td style="padding: 10px;">Steam Remote Play (inbound where applicable) <span style="color: #f59e0b;">(Optional)</span></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
+sudo ufw reload
+
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
+sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Left 4 Dead Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Left 4 Dead Server" dir=in action=allow protocol=UDP localport=[PORT]
+</code></pre>
+
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
+
+<h2 id="installation">Installation & Setup</h2>
+
+<h3>System Requirements</h3>
 <ul>
-    <li><a href="../metamodsource/">Metamod:Source</a> - Foundation plugin loader required for SourceMod and other Source engine plugins</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 2–4 GB per process baseline (varies by game/players) minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h2 id="resources">Resources</h2>
+<h3>Required Dependencies</h3>
 <ul>
-    <li><a href="https://developer.valvesoftware.com/wiki/Left_4_Dead_Dedicated_Server" target="_blank">Valve Developer Wiki - L4D Dedicated Server</a></li>
-    <li><a href="https://wiki.alliedmods.net/Category:Left_4_Dead" target="_blank">AlliedModders L4D Wiki</a></li>
-    <li><a href="https://www.l4dmaps.com/" target="_blank">L4DMaps - Custom Campaign Repository</a></li>
-    <li><a href="https://forums.alliedmods.net/forumdisplay.php?f=72" target="_blank">AlliedModders L4D Forum</a></li>
-    <li><a href="https://steamcommunity.com/app/500/discussions/" target="_blank">Steam Community Discussions</a></li>
+    <li>SteamCMD</li>
+    <li>Open firewall for listed ports</li>
 </ul>
+
+<h3>Installation Steps</h3>
+
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Create server directory
+mkdir -p ~/gameserver
+cd ~/gameserver
+
+# Download server files (method varies by game)
+# Check official documentation for download links
+</code></pre>
+
+<h4>Starting the Server</h4>
+<pre><code>./srcds_run -console -game left4dead2 -ip 0.0.0.0 -port 27015 +map c1m1_hotel +maxplayers 24 +exec server.cfg
+</code></pre>
+
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 222840</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/left4dead
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/left4dead \
+         +app_update 222840 validate \
+         +quit
+
+# Server files are now in ~/gameservers/left4dead/
+cd ~/gameservers/left4dead
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\left4dead ^
+             +app_update 222840 validate ^
+             +quit
+</code></pre>
+
+
+<h2 id="configuration">Server Configuration</h2>
+
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
+
+<h3>Essential Settings</h3>
+<ul>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
+</ul>
+
+<h3>Configuration Files</h3>
+<p>Important configuration files for this server:</p>
+<ul>
+    <li><strong><code>left4dead/cfg/server.cfg</code></strong> - The main config file</li>
+</ul>
+
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
+</code></pre>
+
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%GAME_TYPE% %PID_FILE% %MAP% %IP% %PORT% %PLAYERS%</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-insecure</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable Valve Anti-Cheat</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Will start the server without Valve Anti-Cheat technology.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nohltv</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No SourceTV</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Disables SourceTV and closes its port.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-norestart</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - No Restart</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Won&#x27;t attempt to restart failed servers.</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-nomaster</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Disable master server communication</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">No description available</p>
+    </div>
+</div>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
+</code></pre>
+
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Left 4 Dead Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+<h3>Server Won't Start</h3>
+
+<h4>Server not listed or query fails</h4>
+<p>Open 27015/udp and 27015/tcp; check -ip/-port; ensure sv_lan 0; verify external firewall/NAT.</p>
+
+<h4>Workshop maps not downloading</h4>
+<p>Ensure -authkey is present; server has internet access; use +host_workshop_collection and +workshop_start_map or fall back to FastDL.</p>
+
+<h3>Connection Issues</h3>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
+<ul>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
+</ul>
+
+<h3>Performance Issues</h3>
+
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
+
+<h2 id="performance">Performance Optimization</h2>
+
+<h3>Server Tuning</h3>
+<ul>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
+</ul>
+
+<h3>Backup Strategy</h3>
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
+
+# Create backup
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
+
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
+</code></pre>
+
+<h2 id="security">Security Best Practices</h2>
+
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
+</code></pre>
+
+<h3>Strong Passwords</h3>
+<ul>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
+</ul>
+
+<h2>Additional Resources</h2>
+<ul>
+    <li>Official Left 4 Dead documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
+</ul>
+
+<h3>External References</h3>
+<ul>
+    <li><a href="https://developer.valvesoftware.com/wiki/Source_Dedicated_Server" target="_blank">https://developer.valvesoftware.com/wiki/Source_Dedicated_Server</a></li>
+    <li><a href="https://help.steampowered.com/en/faqs/view/2EA8-4D75-DA21-31EB" target="_blank">https://help.steampowered.com/en/faqs/view/2EA8-4D75-DA21-31EB</a></li>
+</ul>
+
+<div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Left 4 Dead server hosting</em>
+</p>

@@ -1,385 +1,428 @@
 <?php
 /**
- * Valheim Dedicated Server - Comprehensive Hosting Guide
+ * Valheim Server Documentation - Comprehensive Guide
  * General game server hosting information (not platform-specific)
  */
 ?>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
-    <h3 style="color: #ffffff; margin-top: 0;">📚 Navigation</h3>
+    <h3 style="color: #ffffff; margin-top: 0;">📚 Quick Navigation</h3>
     <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Overview</a>
+        <a href="#quick-info" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Quick Info</a>
         <a href="#ports" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔌 Ports</a>
         <a href="#installation" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Installation</a>
-        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Configuration</a>
-        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Parameters</a>
+        <a href="#configuration" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Configuration</a>
+        <a href="#parameters" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">⚙️ Startup Parameters</a>
         <a href="#troubleshooting" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">🔧 Troubleshooting</a>
         <a href="#performance" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Performance</a>
+        <a href="#security" style="background: #0f172a; padding: 8px 16px; border-radius: 4px; color: #a5b4fc; text-decoration: none;">Security</a>
     </div>
 </div>
 
-<h1>Valheim Dedicated Server Hosting Guide</h1>
+<h1>Valheim Server Hosting Guide</h1>
 
 <h2>Overview</h2>
-<p>Valheim is a brutal survival and exploration game for 1-10 players set in a procedurally-generated purgatory inspired by Viking culture. This comprehensive guide covers everything you need to know about hosting a Valheim dedicated server on a VPS or dedicated server.</p>
+<p>Valheim is a multiplayer game server that can be hosted on a VPS or dedicated server. This comprehensive guide covers everything you need to know about hosting a Valheim server for your community.</p>
 
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Ports:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">2456-2458</code> (UDP)</li>
-        <li><strong style="color: #ffffff;">Protocol:</strong> UDP (Steam connectivity)</li>
-        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 4GB (Recommended: 8GB+)</li>
-        <li><strong style="color: #ffffff;">Recommended CPU:</strong> 2+ cores @ 3.5GHz (4+ for 5+ players)</li>
-        <li><strong style="color: #ffffff;">Storage:</strong> 5GB+ for game files, additional for worlds</li>
-        <li><strong style="color: #ffffff;">Max Players:</strong> 10 vanilla (higher with mods, may cause lag)</li>
-        <li><strong style="color: #ffffff;">SteamCMD App ID:</strong> 896660</li>
-        <li><strong style="color: #ffffff;">Startup Scripts:</strong> start_headless_server.bat (Windows) / start_server.sh (Linux)</li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
+        <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
+        <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
+        <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">896660</code></li>
+        <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
 
-<h2 id="ports">🔌 Ports Required</h2>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #1e3a5f; border-radius: 8px; overflow: hidden;">
-    <thead>
-        <tr style="background: #0f172a;">
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Port</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Protocol</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Purpose</th>
-            <th style="padding: 12px; text-align: left; color: #ffffff; border-bottom: 2px solid #3b82f6;">Required</th>
-        </tr>
-    </thead>
-    <tbody style="color: #e5e7eb;">
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">2456</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Primary game port (client connections)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #152642;">
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">2457</code></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;">Steam query port (automatic +1)</td>
-            <td style="padding: 12px; border-bottom: 1px solid #334155;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-        <tr style="background: #1e3a5f;">
-            <td style="padding: 12px;"><code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">2458</code></td>
-            <td style="padding: 12px;"><span style="background: #065f46; padding: 4px 8px; border-radius: 3px; color: #d1fae5;">UDP</span></td>
-            <td style="padding: 12px;">Server browser port (automatic +2)</td>
-            <td style="padding: 12px;"><span style="background: #7c2d12; padding: 4px 8px; border-radius: 3px; color: #fed7aa;">✓ Yes</span></td>
-        </tr>
-    </tbody>
-</table>
-
-<div style="background: #7c2d12; padding: 15px; border-left: 4px solid #ea580c; margin: 20px 0; border-radius: 4px;">
-    <p style="color: #fed7aa; margin: 0;"><strong>Important:</strong> Valheim requires all three consecutive ports. The game automatically uses port+1 and port+2. Always open a range of three consecutive ports starting from your base port (e.g., 2456-2458).</p>
-</div>
-
-<h3>Firewall Configuration Examples</h3>
-
-<h4>UFW (Ubuntu/Debian)</h4>
-<pre><code>sudo ufw allow 2456:2458/udp comment 'Valheim server ports'
+<h2 id="ports">🔌 Network Ports</h2>
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+    <h3 style="color: #ffffff; margin-top: 0;">Required Ports</h3>
+    <p style="color: #e5e7eb;">The Valheim server typically uses a configurable port. Check your server configuration files for the specific port settings.</p>
+    
+    <h3 style="color: #ffffff; margin-top: 20px;">Firewall Configuration</h3>
+    <p style="color: #e5e7eb;">Allow server ports through your firewall:</p>
+    <pre><code style="color: #a5b4fc;"># UFW (Ubuntu/Debian)
+sudo ufw allow [PORT]/tcp
+sudo ufw allow [PORT]/udp
 sudo ufw reload
-</code></pre>
 
-<h4>FirewallD (CentOS/RHEL/Fedora)</h4>
-<pre><code>sudo firewall-cmd --permanent --add-port=2456-2458/udp
+# FirewallD (CentOS/RHEL)
+sudo firewall-cmd --permanent --add-port=[PORT]/tcp
+sudo firewall-cmd --permanent --add-port=[PORT]/udp
 sudo firewall-cmd --reload
+
+# Windows Firewall
+netsh advfirewall firewall add rule name="Valheim Server" dir=in action=allow protocol=TCP localport=[PORT]
+netsh advfirewall firewall add rule name="Valheim Server" dir=in action=allow protocol=UDP localport=[PORT]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Run in PowerShell as Administrator
-New-NetFirewallRule -DisplayName "Valheim Server" -Direction Inbound -Protocol UDP -LocalPort 2456-2458 -Action Allow
-</code></pre>
-
-<h4>iptables (Legacy Linux)</h4>
-<pre><code>sudo iptables -A INPUT -p udp --dport 2456:2458 -j ACCEPT
-sudo service iptables save
-</code></pre>
+    <h3 style="color: #ffffff; margin-top: 20px;">⚠️ Port Security Notes</h3>
+    <ul style="color: #fef3c7; line-height: 1.8;">
+        <li>Only open ports that are necessary for the game server to function</li>
+        <li>Consider using non-standard ports to reduce automated attacks</li>
+        <li>If using cloud hosting, configure security groups properly</li>
+        <li>Monitor connection attempts and unusual traffic patterns</li>
+    </ul>
+</div>
 
 <h2 id="installation">Installation & Setup</h2>
 
 <h3>System Requirements</h3>
 <ul>
-    <li><strong>OS:</strong> Windows Server 2016+ or Linux 64-bit (Ubuntu/Debian recommended)</li>
-    <li><strong>CPU:</strong> Minimum 2 cores @ 2.4GHz; Recommended 4+ cores @ 3.5GHz+</li>
-    <li><strong>RAM:</strong> 4GB minimum, 8GB recommended, 16GB for large groups</li>
-    <li><strong>Storage:</strong> 5GB+ for game files, allow extra for world saves and backups</li>
-    <li><strong>Network:</strong> 1Mbps minimum upload; 10Mbps+ recommended for stable gameplay</li>
-    <li><strong>Bandwidth:</strong> ~1Mbps per player; wired connection strongly recommended</li>
+    <li><strong>OS:</strong> Linux (Ubuntu 20.04+ or Debian 11+ recommended) or Windows Server 2019+</li>
+    <li><strong>CPU:</strong> 2+ cores recommended (single-threaded performance important for most game servers)</li>
+    <li><strong>RAM:</strong> 1GB minimum (more for larger player counts)</li>
+    <li><strong>Storage:</strong> 5GB+ for server files (SSD recommended for better performance)</li>
+    <li><strong>Network:</strong> Stable internet connection with low latency</li>
 </ul>
 
-<h3>Installing via Steam (Windows)</h3>
-<pre><code>1. Open Steam and go to your Library
-2. Use the dropdown menu and check "Tools"
-3. Locate "Valheim Dedicated Server" in the list
-4. Click "Install" and choose installation directory
-5. Wait for download to complete
-</code></pre>
+<h3>Installation Steps</h3>
 
-<h3>Installing via SteamCMD (Linux/Windows)</h3>
-<pre><code># Install SteamCMD first (if not already installed)
-# Ubuntu/Debian:
-sudo apt update
-sudo apt install steamcmd
+<h4>Linux (Ubuntu/Debian)</h4>
+<pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
 
 # Create server directory
-mkdir -p ~/valheim-server
-cd ~/valheim-server
+mkdir -p ~/gameserver
+cd ~/gameserver
 
-# Download server files
-steamcmd +login anonymous +force_install_dir ~/valheim-server +app_update 896660 validate +exit
-
-# The server files will be downloaded to your specified directory
+# Download server files (method varies by game)
+# Check official documentation for download links
 </code></pre>
 
-<h3>First-Time Setup</h3>
-<p>Before starting your server for the first time, you'll need to configure the startup parameters.</p>
+<h4>Windows Server</h4>
+<p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
+
+<h3>Using SteamCMD - RECOMMENDED METHOD</h3>
+<p><strong>This game can be installed via SteamCMD using App ID: 896660</strong></p>
+
+<h4>Install SteamCMD (Ubuntu/Debian)</h4>
+<pre><code># Update package list
+sudo apt update
+
+# Enable 32-bit architecture
+sudo dpkg --add-architecture i386
+sudo apt update
+
+# Install SteamCMD
+sudo apt install -y lib32gcc-s1 steamcmd
+</code></pre>
+
+<h4>Download Server Files</h4>
+<pre><code># Create directory for game server
+mkdir -p ~/gameservers/valheim
+
+# Run SteamCMD and download
+steamcmd +login anonymous \
+         +force_install_dir ~/gameservers/valheim \
+         +app_update 896660 validate \
+         +quit
+
+# Server files are now in ~/gameservers/valheim/
+cd ~/gameservers/valheim
+ls -la
+</code></pre>
+
+<h4>Windows Installation with SteamCMD</h4>
+<ol>
+    <li>Download SteamCMD from: <a href="https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip" target="_blank">https://steamcdn-a.akamaihd.net/client/installer/steamcmd.zip</a></li>
+    <li>Extract to <code>C:\steamcmd\</code></li>
+    <li>Open Command Prompt and run:</li>
+</ol>
+<pre><code>cd C:\steamcmd
+steamcmd.exe +login anonymous ^
+             +force_install_dir C:\gameservers\valheim ^
+             +app_update 896660 validate ^
+             +quit
+</code></pre>
+
 
 <h2 id="configuration">Server Configuration</h2>
 
-<h3>Startup Scripts</h3>
-<p>Valheim uses startup scripts to configure the server. Edit the appropriate file for your OS:</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
-<h4>Windows: start_headless_server.bat</h4>
-<pre><code>@echo off
-set SteamAppId=892970
-valheim_server.exe -nographics -batchmode ^
-    -name "MyValheimServer" ^
-    -port 2456 ^
-    -world "MyWorld" ^
-    -password "MyPassword123" ^
-    -public 1
-</code></pre>
-
-<h4>Linux: start_server.sh</h4>
-<pre><code>#!/bin/bash
-export SteamAppId=892970
-
-./valheim_server.x86_64 -nographics -batchmode \
-    -name "MyValheimServer" \
-    -port 2456 \
-    -world "MyWorld" \
-    -password "MyPassword123" \
-    -public 1 \
-    -logfile /path/to/valheim.log
-</code></pre>
-
-<h3>Admin Configuration Files</h3>
-<p>Create these files in the server directory to manage administrators, bans, and whitelists:</p>
-
-<h4>adminlist.txt</h4>
-<pre><code># Add Steam64 IDs (one per line)
-76561198012345678
-76561198087654321
-</code></pre>
-
-<h4>bannedlist.txt</h4>
-<pre><code># Add Steam64 IDs of banned players
-76561198099999999
-</code></pre>
-
-<h4>permittedlist.txt</h4>
-<pre><code># For whitelist mode - only these IDs can join
-76561198012345678
-76561198087654321
-</code></pre>
-
-<h2 id="parameters">Startup Parameters</h2>
-
-<h3>Essential Parameters</h3>
-<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-    <tr style="background: #f8f9fa;">
-        <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Parameter</th>
-        <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Description</th>
-        <th style="padding: 10px; border: 1px solid #dee2e6; text-align: left;">Example</th>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-name</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Server name (appears in browser)</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">"My Valheim Server"</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-port</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Server port (default 2456)</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">2456</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-world</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">World/save name</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">"Midgard"</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-password</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Server password (required)</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">"SecurePass123"</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-public</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">1=Public listing, 0=Private</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">1</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-savedir</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Custom save directory path</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">"/path/to/saves"</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-logfile</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Path to log file</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">"/var/log/valheim.log"</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-nographics</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Run headless (no GUI)</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Required for dedicated servers</td>
-    </tr>
-    <tr>
-        <td style="padding: 8px; border: 1px solid #dee2e6;"><code>-batchmode</code></td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Run in batch mode</td>
-        <td style="padding: 8px; border: 1px solid #dee2e6;">Required for dedicated servers</td>
-    </tr>
-</table>
-
-<h3>Port Forwarding</h3>
-<p>You must forward/open the following ports on your firewall:</p>
+<h3>Essential Settings</h3>
 <ul>
-    <li><strong>UDP 2456:</strong> Main game port (also set with -port parameter)</li>
-    <li><strong>UDP 2457:</strong> Secondary port (2456 + 1)</li>
-    <li><strong>UDP 2458:</strong> Tertiary port (2456 + 2)</li>
+    <li><strong>Server Name:</strong> Set a descriptive name for your server</li>
+    <li><strong>Max Players:</strong> Configure based on your server's resources</li>
+    <li><strong>Password:</strong> Optional password protection for private servers</li>
+    <li><strong>Admin/RCON Password:</strong> Set a strong password for remote administration</li>
+    <li><strong>Game Mode:</strong> Configure game-specific modes and settings</li>
 </ul>
 
-<h4>Linux Firewall (UFW)</h4>
-<pre><code># Allow Valheim ports
-sudo ufw allow 2456:2458/udp
-sudo ufw reload
+<h3>Server Commands</h3>
+<p>Common administrative commands (access via console or RCON):</p>
+<pre><code># Kick player
+kick [player_name]
+
+# Ban player
+ban [player_name]
+
+# Change map/level (syntax varies by game)
+changelevel [map_name]
+
+# Set admin password (if supported)
+setadminpassword [password]
 </code></pre>
 
-<h4>Windows Firewall</h4>
-<pre><code># Open Windows Defender Firewall with Advanced Security
-# Create new Inbound Rules for UDP ports 2456-2458
-# Or use PowerShell:
-New-NetFirewallRule -DisplayName "Valheim Server" -Direction Inbound -Protocol UDP -LocalPort 2456-2458 -Action Allow
+<h2 id="parameters">⚙️ Startup Parameters</h2>
+
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>%HOSTNAME% %PORT% %HOME_PATH% %WORLD% %PASSWORD% %PUBLIC%</code></pre>
+
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-world</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Server World</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Save/Load this world</p>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">Dedicated</code></p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-password</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Server Password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Require password to join server</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-public</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - -public</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Public or private server.</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - Public</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">0</code> - Private</li>
+        </ul>
+    </div>
+</div>
+
+<h3>Creating a Start Script</h3>
+
+<p><strong>Linux (start.sh):</strong></p>
+<pre><code>#!/bin/bash
+cd /path/to/server
+./server_executable [parameters] 2>&1 | tee server.log
+</code></pre>
+<pre><code>chmod +x start.sh
+./start.sh
 </code></pre>
 
-<h2 id="troubleshooting">Troubleshooting</h2>
+<p><strong>Windows (start.bat):</strong></p>
+<pre><code>@echo off
+cd /d "%~dp0"
+server_executable.exe [parameters]
+pause
+</code></pre>
+
+<h3>Running as a Service</h3>
+
+<p><strong>Linux (systemd):</strong></p>
+<pre><code># Create service file: /etc/systemd/system/gameserver.service
+[Unit]
+Description=Valheim Server
+After=network.target
+
+[Service]
+Type=simple
+User=gameserver
+WorkingDirectory=/home/gameserver/server
+ExecStart=/home/gameserver/server/start.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+
+<pre><code># Enable and start service
+sudo systemctl daemon-reload
+sudo systemctl enable gameserver
+sudo systemctl start gameserver
+sudo systemctl status gameserver
+</code></pre>
+
+<h2 id="troubleshooting">🔧 Troubleshooting</h2>
 
 <h3>Server Won't Start</h3>
-<p><strong>Problem:</strong> Server fails to start or crashes immediately.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Check log files for error messages</li>
-    <li>Verify all parameters are correctly formatted in startup script</li>
-    <li>Ensure server files are fully downloaded (run SteamCMD validate)</li>
-    <li>Check file permissions on Linux (<code>chmod +x start_server.sh</code>)</li>
-    <li>Verify you have sufficient RAM and disk space</li>
-</ul>
 
-<h3>Server Not Appearing in Browser</h3>
-<p><strong>Problem:</strong> Server doesn't show up in the in-game server list.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Ensure <code>-public 1</code> is set in startup parameters</li>
-    <li>Check that ports 2456-2458 UDP are properly forwarded</li>
-    <li>Verify firewall rules allow the ports</li>
-    <li>Try connecting directly using IP:port in Steam server list</li>
-    <li>Wait a few minutes - it can take time to appear in the browser</li>
-</ul>
+<h4>Check Server Logs</h4>
+<pre><code># View recent log entries
+tail -f server.log
+
+# Or check system logs
+journalctl -u gameserver -f
+</code></pre>
+
+<h4>Port Already in Use</h4>
+<pre><code># Find what's using the port
+sudo lsof -i :[PORT]
+sudo netstat -tulpn | grep [PORT]
+
+# Kill the process or change server port
+</code></pre>
+
+<h4>Missing Dependencies</h4>
+<p>Ensure all required dependencies are installed. Check the error messages for missing libraries or packages.</p>
 
 <h3>Connection Issues</h3>
-<p><strong>Problem:</strong> Players cannot connect to the server.</p>
-<p><strong>Solutions:</strong></p>
+
+<h4>Can't Connect to Server</h4>
+<ol>
+    <li><strong>Verify server is running:</strong> <code>ps aux | grep server</code></li>
+    <li><strong>Check port is listening:</strong> <code>netstat -an | grep [PORT]</code></li>
+    <li><strong>Verify firewall rules</strong> (see Ports section above)</li>
+    <li><strong>Check server IP:</strong> Use external IP, not localhost</li>
+    <li><strong>Router/NAT:</strong> Ensure port forwarding is configured</li>
+</ol>
+
+<h4>High Latency/Lag</h4>
 <ul>
-    <li>Double-check password is correct and communicated to players</li>
-    <li>Verify port forwarding is configured correctly</li>
-    <li>Test with the public IP address, not local/LAN IP</li>
-    <li>Check router NAT type and consider DMZ if necessary</li>
-    <li>Disable any VPN on the server</li>
+    <li>Check server resource usage (CPU, RAM, disk I/O)</li>
+    <li>Verify network bandwidth is adequate</li>
+    <li>Consider server location relative to players</li>
+    <li>Check for background processes consuming resources</li>
 </ul>
 
-<h3>Lag and Performance Issues</h3>
-<p><strong>Problem:</strong> Server experiences lag, stuttering, or poor performance.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Reduce player count if exceeding 5-10 players</li>
-    <li>Upgrade server hardware (CPU and RAM)</li>
-    <li>Use wired Ethernet connection, not WiFi</li>
-    <li>Close unnecessary background processes</li>
-    <li>Consider professional hosting for high-population servers</li>
-    <li>Keep the world size manageable (large explored worlds can lag)</li>
-</ul>
+<h3>Performance Issues</h3>
 
-<h3>World/Save Corruption</h3>
-<p><strong>Problem:</strong> World save is corrupted or progress is lost.</p>
-<p><strong>Solutions:</strong></p>
-<ul>
-    <li>Restore from backup (make regular backups!)</li>
-    <li>Check disk health and fix errors</li>
-    <li>Avoid forced shutdowns or crashes</li>
-    <li>Use a reliable backup system (automated backups recommended)</li>
-</ul>
+<h4>Server Lag</h4>
+<ol>
+    <li><strong>Monitor resources:</strong> Use <code>htop</code> or <code>top</code></li>
+    <li><strong>Check disk I/O:</strong> Use <code>iotop</code></li>
+    <li><strong>Review server logs</strong> for errors or warnings</li>
+    <li><strong>Reduce player count</strong> or increase server resources</li>
+    <li><strong>Optimize configuration</strong> based on server capacity</li>
+</ol>
+
+<h4>Memory Leaks</h4>
+<pre><code># Monitor memory usage
+free -h
+top -p $(pgrep -f server)
+
+# Restart server regularly via cron if needed
+0 4 * * * /home/gameserver/restart.sh
+</code></pre>
 
 <h2 id="performance">Performance Optimization</h2>
 
-<h3>Server Resource Management</h3>
+<h3>Server Tuning</h3>
 <ul>
-    <li><strong>RAM:</strong> Allocate 8GB+ for smoother experience with multiple players</li>
-    <li><strong>CPU:</strong> Higher single-core performance is more important than core count</li>
-    <li><strong>Storage:</strong> Use SSD for better world loading performance</li>
-    <li><strong>Network:</strong> Minimum 10Mbps upload for 5+ players</li>
+    <li><strong>CPU:</strong> Ensure adequate CPU allocation; most game servers are single-threaded</li>
+    <li><strong>RAM:</strong> Allocate sufficient memory; monitor usage and adjust as needed</li>
+    <li><strong>Disk:</strong> Use SSD storage for better I/O performance</li>
+    <li><strong>Network:</strong> Ensure stable, low-latency connection</li>
+</ul>
+
+<h3>Operating System Optimization</h3>
+<pre><code># Increase file descriptor limits
+echo "* soft nofile 65536" >> /etc/security/limits.conf
+echo "* hard nofile 65536" >> /etc/security/limits.conf
+
+# Network tuning
+sysctl -w net.core.rmem_max=16777216
+sysctl -w net.core.wmem_max=16777216
+sysctl -w net.ipv4.tcp_rmem="4096 87380 16777216"
+sysctl -w net.ipv4.tcp_wmem="4096 87380 16777216"
+</code></pre>
+
+<h3>Monitoring</h3>
+<p>Set up monitoring to track server health:</p>
+<ul>
+    <li>CPU and memory usage</li>
+    <li>Network traffic and latency</li>
+    <li>Player count and activity</li>
+    <li>Error rates and crash logs</li>
 </ul>
 
 <h3>Backup Strategy</h3>
-<pre><code># Linux backup script example
-#!/bin/bash
-WORLD_NAME="MyWorld"
-BACKUP_DIR="/path/to/backups"
+<pre><code>#!/bin/bash
+# backup.sh - Run via cron
 DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backups/gameserver"
+SERVER_DIR="/home/gameserver/server"
 
 # Create backup
-cp ~/.config/unity3d/IronGate/Valheim/worlds/$WORLD_NAME.* $BACKUP_DIR/
+tar -czf $BACKUP_DIR/backup_$DATE.tar.gz -C $SERVER_DIR .
 
-# Keep only last 7 days of backups
-find $BACKUP_DIR -name "*.fwl" -mtime +7 -delete
-find $BACKUP_DIR -name "*.db" -mtime +7 -delete
+# Keep only last 7 days
+find $BACKUP_DIR -name "backup_*.tar.gz" -mtime +7 -delete
 </code></pre>
 
-<h3>Automated Restarts</h3>
-<p>Set up daily restarts to clear memory and apply updates:</p>
-<pre><code># Linux crontab entry for 4 AM restart
-0 4 * * * /path/to/restart_valheim.sh
+<h2 id="security">Security Best Practices</h2>
 
-# restart_valheim.sh:
-#!/bin/bash
-pkill -9 valheim_server
-sleep 10
-cd /home/valheim/server
-./start_server.sh &amp;
+<h3>Firewall Configuration</h3>
+<pre><code># Minimal firewall - only allow necessary ports
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow [SERVER_PORT]/tcp
+sudo ufw allow [SERVER_PORT]/udp
+sudo ufw allow 22/tcp  # SSH
+sudo ufw enable
 </code></pre>
 
-<h3>Console Commands (In-Game Admin)</h3>
-<p>Enable console with <code>-console</code> parameter, press F5 in-game:</p>
+<h3>Strong Passwords</h3>
 <ul>
-    <li><code>devcommands</code> - Enable admin commands</li>
-    <li><code>kick [player name]</code> - Kick a player</li>
-    <li><code>ban [player name]</code> - Ban a player</li>
-    <li><code>unban [player name]</code> - Unban a player</li>
-    <li><code>save</code> - Force save the world</li>
-    <li><code>resetskill [skill]</code> - Reset player skill level</li>
+    <li>Use strong, unique passwords for admin/RCON access</li>
+    <li>Never use default passwords</li>
+    <li>Change passwords regularly</li>
+    <li>Don't share admin credentials unnecessarily</li>
+</ul>
+
+<h3>Regular Updates</h3>
+<ul>
+    <li>Keep server software updated to the latest stable version</li>
+    <li>Update operating system and dependencies regularly</li>
+    <li>Subscribe to security advisories for your game</li>
+    <li>Test updates on a staging server before production deployment</li>
+</ul>
+
+<h3>Access Control</h3>
+<ul>
+    <li>Limit SSH access to specific IPs if possible</li>
+    <li>Use SSH keys instead of passwords</li>
+    <li>Disable root login via SSH</li>
+    <li>Implement fail2ban or similar intrusion prevention</li>
+</ul>
+
+<h3>DDoS Protection</h3>
+<ul>
+    <li>Consider DDoS protection services (Cloudflare, OVH, etc.)</li>
+    <li>Implement rate limiting where supported</li>
+    <li>Monitor for unusual traffic patterns</li>
+    <li>Have an incident response plan</li>
 </ul>
 
 <h2>Additional Resources</h2>
 <ul>
-    <li><a href="https://valheim.com/support/a-guide-to-dedicated-servers/" target="_blank">Official Valheim Dedicated Server Guide</a></li>
-    <li><a href="https://valheim.fandom.com/wiki/Dedicated_servers" target="_blank">Valheim Wiki - Dedicated Servers</a></li>
-    <li><a href="https://steamcommunity.com/app/892970/discussions/" target="_blank">Steam Community Discussions</a></li>
-    <li><a href="https://www.reddit.com/r/valheim/" target="_blank">r/valheim - Community Support</a></li>
+    <li>Official Valheim documentation and forums</li>
+    <li>Community wikis and guides</li>
+    <li>Game-specific Discord or Reddit communities</li>
+    <li>Server hosting provider documentation</li>
 </ul>
 
 <div style="background: #78350f; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
     <h3 style="color: #ffffff; margin-top: 0;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>Important Notes</h3>
-    <ul style="color: #fef3c7; line-height: 1.8;">
-        <li>Always keep your server updated to the latest version via SteamCMD</li>
-        <li>Make regular automated backups of your world saves</li>
-        <li>Test firewall rules and port forwarding before inviting players</li>
-        <li>Monitor server performance and adjust resources as needed</li>
-        <li>Use strong passwords to protect your server</li>
+    <ul style="color: #fef3c7; line-height: 1.8; margin: 0;">
+        <li>Always make backups before making configuration changes</li>
+        <li>Keep your server and dependencies updated</li>
+        <li>Monitor server resources and player activity</li>
+        <li>Follow the game's End User License Agreement (EULA) and Terms of Service</li>
+        <li>Join community forums for support and best practices</li>
     </ul>
 </div>
+
+<p style="text-align: center; margin-top: 30px; color: #666;">
+    <em>Last updated: November 2025 | For Valheim server hosting</em>
+</p>

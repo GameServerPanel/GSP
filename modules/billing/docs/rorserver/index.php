@@ -26,10 +26,11 @@
 <h2 id="quick-info">Quick Info</h2>
 <div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
     <ul style="color: #e5e7eb; line-height: 1.8; margin: 0;">
-        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Check server configuration</code></li>
+        <li><strong style="color: #ffffff;">Default Port:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">Varies (see configuration)</code></li>
         <li><strong style="color: #ffffff;">Protocol:</strong> TCP/UDP</li>
         <li><strong style="color: #ffffff;">Minimum RAM:</strong> 1GB</li>
         <li><strong style="color: #ffffff;">Engine:</strong> Various</li>
+        <li><strong style="color: #ffffff;">Steam App ID:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">N/A</code></li>
         <li><strong style="color: #ffffff;">Recommended OS:</strong> Linux (Ubuntu/Debian) or Windows Server</li>
     </ul>
 </div>
@@ -93,24 +94,13 @@ cd ~/gameserver
 <h4>Windows Server</h4>
 <p>Download the server files from the official game website or through Steam (if applicable). Extract to a dedicated folder and run the server executable.</p>
 
-<h3>Using SteamCMD (if applicable)</h3>
-<p>Many game servers can be installed via SteamCMD:</p>
-<pre><code># Install SteamCMD (Ubuntu/Debian)
-sudo apt install lib32gcc-s1 steamcmd
+<h3>Manual Installation</h3>
+<p>This game requires manual download. Check the official game website or Steam store page for dedicated server downloads.</p>
 
-# Run SteamCMD
-steamcmd
-
-# Login and download (use your Steam credentials or anonymous)
-login anonymous
-force_install_dir /path/to/server
-app_update [APP_ID] validate
-quit
-</code></pre>
 
 <h2 id="configuration">Server Configuration</h2>
 
-<p>After installation, configure your server through the configuration files typically located in the server directory.</p>
+<p>After installation, you'll need to configure your server. Here's where to find the configuration files and what settings you can change.</p>
 
 <h3>Essential Settings</h3>
 <ul>
@@ -138,19 +128,46 @@ setadminpassword [password]
 
 <h2 id="parameters">⚙️ Startup Parameters</h2>
 
-<h3>Basic Startup</h3>
-<pre><code># Generic startup command structure
-./server_executable [parameters]
-</code></pre>
+<h3>Command Line Template</h3>
+<p>The server uses the following command line template:</p>
+<pre><code>-config server.cfg %MAP% %PORT% %PLAYERS%</code></pre>
 
-<h3>Common Parameters</h3>
-<ul>
-    <li><code>-port [number]</code> - Set the server port</li>
-    <li><code>-maxplayers [number]</code> - Maximum player slots</li>
-    <li><code>-map [name]</code> - Starting map/level</li>
-    <li><code>-console</code> - Enable console output</li>
-    <li><code>-nographics</code> - Run without graphics (headless mode)</li>
-</ul>
+<h3>Available Startup Parameters</h3>
+<p>The following parameters can be configured when starting the server:</p>
+
+<div style="background: #1e3a5f; padding: 20px; border-left: 4px solid #3b82f6; margin: 20px 0; border-radius: 4px;">
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-password</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Password</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Leave empty for no password</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-name</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Servername</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">name of the server (replace spaces with underscore)</p>
+    </div>
+
+    <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #374151;">
+        <h4 style="color: #ffffff; margin-top: 0;">
+            <code style="background: #0f172a; padding: 4px 8px; border-radius: 3px; color: #a5b4fc;">-vehiclelimit</code>
+            <span style="color: #e5e7eb; font-weight: normal; font-size: 0.9em;"> - Vehiclelimit</span>
+        </h4>
+        <p style="color: #e5e7eb; margin: 10px 0;">Maximum number of vehicles per player</p>
+        <p style="color: #e5e7eb;"><strong>Options:</strong></p>
+        <ul style="color: #e5e7eb; margin-left: 20px;">
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">1</code> - 1</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">2</code> - 2</li>
+            <li><code style="background: #0f172a; padding: 2px 6px; border-radius: 3px; color: #a5b4fc;">3</code> - 3</li>
+        </ul>
+        <p style="color: #fbbf24;"><strong>Default:</strong> <code style="background: #0f172a; padding: 2px 6px; border-radius: 3px;">3</code></p>
+    </div>
+</div>
 
 <h3>Creating a Start Script</h3>
 
