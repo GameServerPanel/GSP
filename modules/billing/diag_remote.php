@@ -21,15 +21,19 @@ echo "Session status (after start): " . session_status() . "\n";
 echo "Session id: " . session_id() . "\n";
 echo "Session variables: \n" . print_r($_SESSION, true) . "\n";
 
-// Check config file readability
-$cfg = __DIR__ . '/includes/config.inc.php';
-echo "Config file: " . $cfg . " exists=" . (file_exists($cfg) ? 'yes' : 'no') . " readable=" . (is_readable($cfg) ? 'yes' : 'no') . "\n";
-if (file_exists($cfg)) {
-    echo "Config contents (first 200 chars):\n" . substr(file_get_contents($cfg),0,200) . "\n";
+// Check config file readability (panel root first, module local second)
+$panelCfgRoot = realpath(__DIR__ . '/../../..');
+$panelCfg = $panelCfgRoot ? $panelCfgRoot . '/includes/config.inc.php' : __DIR__ . '/../../..' . '/includes/config.inc.php';
+$localCfg = __DIR__ . '/includes/config.inc.php';
+echo "Panel config: " . $panelCfg . " exists=" . (file_exists($panelCfg) ? 'yes' : 'no') . " readable=" . (is_readable($panelCfg) ? 'yes' : 'no') . "\n";
+echo "Local config: " . $localCfg . " exists=" . (file_exists($localCfg) ? 'yes' : 'no') . " readable=" . (is_readable($localCfg) ? 'yes' : 'no') . "\n";
+
+require_once(__DIR__ . '/includes/config_loader.php');
+echo "Active config source: " . (defined('BILLING_CONFIG_PATH') ? BILLING_CONFIG_PATH : '(unknown)') . "\n";
+if (defined('BILLING_CONFIG_PATH') && is_readable(BILLING_CONFIG_PATH)) {
+    echo "Active config preview (first 200 chars):\n" . substr(file_get_contents(BILLING_CONFIG_PATH), 0, 200) . "\n";
 }
 
-// Attempt DB connection using site config (if readable)
-if (file_exists($cfg)) require_once($cfg);
 echo "Trying DB connection...\n";
 $ok = false;
 if (isset($db_host)) {

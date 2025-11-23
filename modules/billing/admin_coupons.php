@@ -1,7 +1,7 @@
 <?php
 // Admin coupon management page - standalone billing module
 require_once(__DIR__ . '/includes/admin_auth.php');
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 
 // Variables from config.inc.php (helps IDEs understand scope)
 /** @var string $db_host Database host */

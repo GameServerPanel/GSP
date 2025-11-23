@@ -1,7 +1,7 @@
 <?php
 // Admin payments viewer — lists persisted PayPal webhook JSON files
 $session_name = session_name(); session_start();
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 require_once(__DIR__ . '/includes/admin_auth.php');
 
 $dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';

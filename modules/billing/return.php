@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 
 $dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';
 $invoice = $_GET['invoice'] ?? '';

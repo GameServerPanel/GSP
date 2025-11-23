@@ -5,7 +5,7 @@
  * Standalone billing module - uses only standard PHP mysqli
  */
 
-require_once(__DIR__ . '/../includes/config.inc.php');
+require_once(__DIR__ . '/../includes/config_loader.php');
 
 // Prevent any output before JSON
 ob_start();

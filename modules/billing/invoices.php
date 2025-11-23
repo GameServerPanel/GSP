@@ -1,7 +1,7 @@
 <?php
 // User invoice history (reads payments/data/*.json)
 $session_name = session_name(); session_start();
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 // Intentionally do not require login here; invoices should be viewable (or filtered) without forcing a login.
 
 // try to get logged-in user's email for matching

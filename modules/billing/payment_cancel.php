@@ -6,7 +6,7 @@
 
 session_start();
 require_once(__DIR__ . '/includes/header.php');
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 
 $invoice_ref = isset($_GET['invoice']) ? $_GET['invoice'] : '';
 

@@ -1,7 +1,7 @@
 <?php
 // Admin landing page
 require_once(__DIR__ . '/includes/admin_auth.php');
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 

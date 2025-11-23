@@ -22,7 +22,7 @@ if (isset($_SESSION['website_username']) && !empty($_SESSION['website_username']
 $is_admin = false;
 if ($is_logged_in) {
   // load DB credentials
-  require_once(__DIR__ . '/config.inc.php');
+  require_once(__DIR__ . '/config_loader.php');
   
   // Variables from config.inc.php (helps IDEs understand scope)
   /** @var string $db_host Database host */

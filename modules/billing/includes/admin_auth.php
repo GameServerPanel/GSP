@@ -20,8 +20,7 @@ if (empty($_SESSION['website_user_id'])) {
 }
 
 // Require DB config and check role live from panel DB
-
-require_once(__DIR__ . '/config.inc.php');
+require_once(__DIR__ . '/config_loader.php');
 
 // Variables from config.inc.php (helps IDEs understand scope)
 /** @var string $db_host Database host */

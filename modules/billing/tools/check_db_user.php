@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/../includes/config.inc.php');
+require_once(__DIR__ . '/../includes/config_loader.php');
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 if (!$db) {
     echo "DB connect failed: " . mysqli_connect_error() . PHP_EOL;

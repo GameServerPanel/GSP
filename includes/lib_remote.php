@@ -24,6 +24,24 @@
 
 require_once("Crypt/XXTEA.php");
 
+if (!defined('GSP_XMLRPC_READY')) {
+	if (!function_exists('xmlrpc_encode_request') || !function_exists('xmlrpc_decode')) {
+		$message = "GSP requires the PHP xmlrpc extension for agent communication.\n".
+		           "Install the php-xmlrpc package for your PHP version (example: sudo apt install php8.3-xmlrpc on Ubuntu 24.04 or use PECL).\n".
+		           "See https://www.php.net/manual/en/book.xmlrpc.php for installation instructions.";
+		if (PHP_SAPI === 'cli') {
+			fwrite(STDERR, $message . PHP_EOL);
+		} else {
+			if (!headers_sent()) {
+				header('Content-Type: text/plain; charset=UTF-8', true, 500);
+			}
+			echo nl2br(htmlentities($message));
+		}
+		exit(1);
+	}
+	define('GSP_XMLRPC_READY', true);
+}
+
 // Screen type for servers
 define("OGP_SCREEN_TYPE_HOME","HOME");
 define("OGP_SCREEN_TYPE_UPDATE","UPDATE");

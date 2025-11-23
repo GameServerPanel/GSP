@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 if (is_file(__DIR__ . '/includes/log.php')) require_once(__DIR__ . '/includes/log.php');
 
 $config = [

@@ -12,14 +12,8 @@
  *   process_payment_record($record);
  */
 
-// Include the module-local config (must be present in the module includes folder).
-// Use ONLY `config.inc.php` — do NOT fall back to other filenames.
-$moduleConfig = __DIR__ . '/config.inc.php';
-if (is_file($moduleConfig)) {
-    require_once $moduleConfig;
-} else {
-    error_log('[payment_processor] Module config not found: expected ' . $moduleConfig);
-}
+// Load panel config first, falling back to a module-local copy if needed.
+require_once __DIR__ . '/config_loader.php';
 
 // Variables from config.inc.php (helps IDEs understand scope)
 /** @var string $db_host Database host */
@@ -226,3 +220,4 @@ function process_payment_record(array $record) {
 }
 
 ?>
+

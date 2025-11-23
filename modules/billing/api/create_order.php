@@ -8,7 +8,7 @@
 ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
-require_once(__DIR__ . '/../includes/config.inc.php');
+require_once(__DIR__ . '/../includes/config_loader.php');
 // create_order for PayPal — adapted to run from _website/api
 $sandbox       = true; // flip to false for Live
 $client_id     = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';

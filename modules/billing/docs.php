@@ -11,7 +11,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Include config
-require_once(__DIR__ . '/includes/config.inc.php');
+require_once(__DIR__ . '/includes/config_loader.php');
 
 // Set the docs directory
 $docsDir = __DIR__ . '/docs';

@@ -5,14 +5,7 @@
 
 // Ensure session sync with panel happens first
 require_once __DIR__ . '/includes/session_bridge.php';
-
-// Load configuration (includes/config.inc.php) if present
-$config_path = __DIR__ . '/includes/config.inc.php';
-if (file_exists($config_path)) {
-    require_once $config_path;
-} else {
-    trigger_error('Billing config not found: ' . $config_path, E_USER_WARNING);
-}
+require_once __DIR__ . '/includes/config_loader.php';
 
 // Ensure $table_prefix exists (fallback to empty string)
 if (!isset($table_prefix)) {
