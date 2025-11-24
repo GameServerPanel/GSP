@@ -341,37 +341,33 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			//default is it never expires 
 			$expiration_dates = "This Server Will NEVER Expire";
 			//get all orders thare are active or invoiced
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status >= -2" ;
+			$query = "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE home_id = " . $db->realEscapeSingle($server_home['home_id']) . " AND status >= -2 ORDER BY order_id DESC LIMIT 1" ;
 			$results = $db->resultQuery($query);
-			if(!is_null($results[0]['status'])) 
+			if($results && isset($results[0]['status'])) 
 			{
-			//there is an end date
-			if($results[0]['status'] > 0)
-			{ 
-			$expire_date = $results[0]['finish_date'];
-                        $expiration_dates = "<font color='green'>" . read_expire($expire_date) . "</font>";
-			}
+				$status = (int)$results[0]['status'];
+				$expire_date = $results[0]['finish_date'];
+				//there is an end date
+				if($status > 0 && !empty($expire_date))
+				{ 
+					$expiration_dates = "<font color='green'>" . read_expire($expire_date) . "</font>";
+				}
 				// 0 its expire, invoice printed
-			if($results[0]['status'] == 0)
-                        {
-                        $expire_date = $results[0]['finish_date'];
-			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
-                        }
-
-			// -1 its expire, invoice printed
-			if($results[0]['status'] == -1)
-                        {
-                        $expire_date = $results[0]['finish_date'];
-			$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
-                        }
-			// -2 its suspended, invoice still available
-			if($results[0]['status'] == -2)
-                        {
-                        $expire_date = $results[0]['finish_date'];
-			$expiration_dates = "<font color='red'> SUSPENDED </font><a href='home.php?m=billing&p=cart'> Invoice</a>";
-                        }
-
-			}//end isnull
+				elseif($status == 0 && !empty($expire_date))
+				{
+					$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
+				}
+				// -1 its expire, invoice printed
+				elseif($status == -1 && !empty($expire_date))
+				{
+					$expiration_dates = "<font color='yellow'>".  read_expire($expire_date) . "</font><a href='home.php?m=billing&p=cart'> Invoice</a>";
+				}
+				// -2 its suspended, invoice still available
+				elseif($status == -2 && !empty($expire_date))
+				{
+					$expiration_dates = "<font color='red'> SUSPENDED </font><a href='home.php?m=billing&p=cart'> Invoice</a>";
+				}
+			}//end has result
                          
 			
 			if( !isset($server_home['mod_id']) )
@@ -532,7 +528,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$address = "<span style='color:darkred;font-weight:bold;'>Agent Offline</span>";
 			}
 			$user = $db->getUserById($server_home['user_id_main']);
-			$query = "SELECT * FROM ogp_billing_orders WHERE home_id = " . $server_home['home_id'] . " AND status > 0" ;
+			$query = "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE home_id = " . $db->realEscapeSingle($server_home['home_id']) . " AND status > 0" ;
 //DISABLE SHOWING EXPIRATION DATES
 //$expiration_dates = "";
 
@@ -625,8 +621,6 @@ echo "<div>Put the log file here</div>";
 	<?php
 }
 ?>
-
-
 
 
 

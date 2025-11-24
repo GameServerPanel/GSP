@@ -338,7 +338,7 @@ function ogpHome()
 						{
 								$servercount=$servercount + 1;
 						}
-                if ((!isAdmin) && ($servercount == 0))
+                if ((!$isAdmin) && ($servercount == 0))
 						{
 								$view->refresh("home.php?m=billing&p=shop",2);
 
