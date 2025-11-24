@@ -29,6 +29,18 @@ require_once("modules/config_games/server_config_parser.php");
 require_once("includes/refreshed.php");
 require_once('includes/lib_remote.php');
 
+if (!function_exists('game_monitor_log')) {
+	function game_monitor_log($message, array $context = array())
+	{
+		$prefix = '[GameMonitor] ';
+		if (!empty($context)) {
+			$context_json = json_encode($context, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+			$message .= ' | context=' . $context_json;
+		}
+		error_log($prefix . $message);
+	}
+}
+
 function renderParam($param, $last_param, $param_access_enabled, $home_id)
 {
 	global $db;
@@ -148,7 +160,13 @@ function get_sync_name($server_xml)
 
 function exec_ogp_module() {
 	global $db, $settings, $loggedInUserInfo;
-	echo "<h2 class='gameMonitor " . ($db->isAdmin( $_SESSION['user_id'] ) ? "isAdminUser" : "") . "'>". get_lang("game_monitor") ."</h2>";
+	$isAdminUser = $db->isAdmin( $_SESSION['user_id'] );
+	game_monitor_log('Rendering game monitor', array(
+		'user_id' => $_SESSION['user_id'],
+		'is_admin' => $isAdminUser,
+		'get' => $_GET,
+	));
+	echo "<h2 class='gameMonitor " . ($isAdminUser ? "isAdminUser" : "") . "'>". get_lang("game_monitor") ."</h2>";
 	$refresh = new refreshed();
 	set_time_limit(0);
 	$stats_servers_online = 0;
@@ -170,7 +188,7 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 		$home_limit = $loggedInUserInfo["users_page_limit"];
 	}
 	
-	$isAdmin = $db->isAdmin( $_SESSION['user_id'] );
+	$isAdmin = $isAdminUser;
 	
 	if ( $isAdmin )
 		{
@@ -192,6 +210,12 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 
 	if( $server_homes === FALSE )
 	{
+		game_monitor_log('No server homes returned', array(
+			'user_id' => $_SESSION['user_id'],
+			'query_scope' => $isAdmin ? 'admin' : 'user_and_group',
+			'home_cfg_id' => $home_cfg_id,
+			'search' => $search_field,
+		));
 		// If there are no games, then there can not be any mods either.
 
 		if (!empty($search_field)) {
@@ -294,8 +318,17 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 	$j = 1;
 	foreach( $server_homes as $server_home )
 	{
+		game_monitor_log('Processing server home', array(
+			'home_id' => isset($server_home['home_id']) ? $server_home['home_id'] : null,
+			'mod_id' => isset($server_home['mod_id']) ? $server_home['mod_id'] : null,
+			'ip' => isset($server_home['ip']) ? $server_home['ip'] : null,
+			'home_cfg_file' => isset($server_home['home_cfg_file']) ? $server_home['home_cfg_file'] : null,
+		));
 		if( ( $show_all or isset($_GET['home_cfg_id']) ) AND ( !isset($server_home['ip']) or !isset($server_home['mod_id']) ) ){
 			$j++;
+			game_monitor_log('Skipping server home due to missing ip or mod_id', array(
+				'home_id' => $server_home['home_id']
+			));
 			continue;
 		}
 		// Count the number of servers.
@@ -352,7 +385,12 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				}
 			}
 
-			$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$server_home['home_cfg_file']);
+			$config_path = SERVER_CONFIG_LOCATION."/".$server_home['home_cfg_file'];
+			game_monitor_log('Loading server config', array(
+				'home_id' => $server_home['home_id'],
+				'config_path' => $config_path
+			));
+			$server_xml = read_server_config($config_path);
 						
 			$mod = $server_home['mod_key'];
 			// If query name does not exist use mod key instead.
@@ -408,6 +446,12 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 
 			$remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 			$host_stat = $remote->status_chk();
+			game_monitor_log('Agent status check', array(
+				'home_id' => $server_home['home_id'],
+				'agent_ip' => $server_home['agent_ip'],
+				'agent_port' => $server_home['agent_port'],
+				'status' => $host_stat
+			));
 
 			if( $host_stat === 1)
 			{
@@ -498,6 +542,11 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				$status = "offline";
 				$order = 3;
 				$address = "<span style='color:darkred;font-weight:bold;'>Agent Offline</span>";
+				game_monitor_log('Agent offline', array(
+					'home_id' => $server_home['home_id'],
+					'agent_ip' => $server_home['agent_ip'],
+					'agent_port' => $server_home['agent_port']
+				));
 			}
 				$user = $db->getUserById($server_home['user_id_main']);
 
@@ -534,6 +583,11 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 		$j++;
 	}
 	echo "</tbody>";
+	game_monitor_log('Completed server home processing', array(
+		'user_id' => $_SESSION['user_id'],
+		'total_servers' => $stats_servers,
+		'online_servers' => $stats_servers_online
+	));
 
 	echo "<tfoot style='border:1px solid grey;'>
 			<tr>
@@ -590,5 +644,3 @@ echo "<div>Put the log file here</div>";
 	<?php
 }
 ?>
-
-
