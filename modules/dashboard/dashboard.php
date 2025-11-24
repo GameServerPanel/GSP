@@ -46,66 +46,6 @@ function exec_ogp_module()
  	}	
 	
 
-    //show if new server created
-	$cartresult = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = 'paid'");
-	 $newServices=0;
-        foreach($cartresult as $res){
-        $newServices=$newServices + 1;
-                }
-    //Popup notification
-        if($newServices > 0) {
-        echo'<div class="alert alert-success alert-dismissible">
-		
-            <a href="#" class="close" data-dismiss="alert" aria-label="close"></a>
-			
-            <strong>GOOD NEWS!</strong> You have a new server! <br>
-			<form method="post" action="home.php?m=billing&p=create_servers">
-            <input type="hidden" name="cart_id" value="'. $res['cart_id'].'">
-			<button type="submit" name="submit_param" value="submit_value" class="link-button">
-			Create Server
-			</button>
-			</form>
-
-        </div>';
-        }
-    //Invoice is due. 
-	$orderresult = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = 'invoiced'");
-	$invoicesDue=0;
-	foreach($orderresult as $res){
-	$invoicesDue=$invoicesDue + 1;
-		}
-    //Popup notification WARNING
-	if($invoicesDue > 0) {
-        echo'<div class="alert alert-warning alert-dismissible">
-	    <a href="#" class="close" data-dismiss="alert" aria-label="close"></a>
-            You have an Invoice Due <br>
-			<form method="post" action="home.php?m=billing&p=create_servers">
-            <input type="hidden" name="cart_id" value="'. $res['cart_id'].'">
-			<button type="submit" name="submit_param" value="submit_value" class="link-button">
-			View Invoice
-			</button>
-			
-			</div>'; 
-	}
-	//Server is suspended DANGER
-	$orderresult = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id='".$_SESSION['user_id']."' AND status = 'suspended'");
-	$invoicesDue=0;
-	foreach($orderresult as $res){
-	$invoicesDue=$invoicesDue + 1;
-		}
-    //Popup notification 
-	if($invoicesDue > 0) {
-        echo'<div class="alert alert-danger alert-dismissible">
-	    <a href="#" class="close" data-dismiss="alert" aria-label="close"></a>
-            <strong>Warning!</strong> You have an OVERDUE invoice<br>
-			<form method="post" action="home.php?m=billing&p=create_servers">
-            <input type="hidden" name="cart_id" value="'. $res['cart_id'].'">
-			<button type="submit" name="submit_param" value="submit_value" class="link-button">
-			View Overdue Invoice
-			</button>
-			</div>'; 
-	}
-	
 	if( isset($settings['welcome_title']) && $settings['welcome_title'] == "1" )
 	{
 		if( isset($settings['welcome_title_message']) && !empty($settings['welcome_title_message'] ))
@@ -126,10 +66,10 @@ function exec_ogp_module()
 	$title = array();
 	$content = array();
 	$href = array();
-	// Order History
-	$title[1] = "Order History"; // get_lang('orders');
-	$content[1] = 'View all your orders, invoices and expiration dates. ';
-	$href[1] = 'home.php?m=billing&p=orders';
+	// Account Overview
+	$title[1] = "Account Overview";
+	$content[1] = 'Review your assigned servers and jump straight into the Game Monitor.';
+	$href[1] = 'home.php?m=gamemanager&p=game_monitor';
 	
 	// Recent News
     //$xml=simplexml_load_file("modules/news/data/listings.xml");
@@ -143,10 +83,10 @@ function exec_ogp_module()
 	$content[3] = 'View all your notifications. ';
 	$href[3] = 'home.php?m=circular&p=show_circular&list=true';
 
-	// Invoices
-	$title[4] = 'Current Invoices';
-	$content[4] ='An Invoice will be created before your server expires. Click here to view current invoices.<br>Invoices Due : '. $invoicesDue ;
-	$href[4] = 'home.php?m=billing&p=cart';
+	// Support Resources quick link
+	$title[4] = 'Support Resources';
+	$content[4] ='Need help? Visit the support section to open tickets or review documentation.';
+	$href[4] = 'home.php?m=tickets';
 
 	// Support
 	$title[5] = (isset($settings['support_widget_title']) && $settings['support_widget_title'] != "") ?

@@ -2,8 +2,8 @@
 ###############################################
 # Site configuration
 ###############################################
-$db_host="localhost";
-$db_user="localuser";
+$db_host="mysql.iaregamer.com";
+$db_user="remoteuser";
 $db_pass="Pkloyn7yvpht!";
 $db_name="panel";
 $table_prefix="gsp_";
