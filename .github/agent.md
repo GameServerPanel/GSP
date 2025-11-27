@@ -3,6 +3,14 @@
 **Repo of truth:** `GameServerPanel/GSP`, branch `Panel-unstable`.  
 **Prime directive:** Read this document first. Keep `.github/agent.md` identical to this file—any edit here must be mirrored there in the same commit.
 
+## Workspace deliverables (WDS 2025 refresh)
+- Use the GSP/WDS/GSW branding across UI, docs, and comments; when heritage context matters add: “GSP is a heavily customized fork of OGP maintained by WDS.”
+- Keep `bootstrap/` current: Ubuntu 24.04 panel + agent installers, Windows Server 2019 (Cygwin) agent installer + service wrapper, and the optional `docker/compose.yml` dev stack. All scripts must be idempotent, echo next steps, and document verify/rollback procedures in their README files.
+- Author and maintain admin-only docs in `WDS_Website/content/projects/gsp.md` and `content/docs/gsp/*` (front-matter + the **Admin Documentation** banner). Cross-link these guides from panel features that need deep dives.
+- Refresh user-facing help in `modules/faq/` (RSS + UI) so the seven core topics—panel basics, file browser, Adminer/MySQL, FTP/SFTP, task scheduler, sub-users, and support—link to the latest WDS admin docs.
+- Track cross-repo progress in `WDS-Team/docs/wds-gsp-migration.md` and update `.github/copilot-instructions.md` + `.github/agent.md` in lockstep whenever these guardrails change.
+- Enforce the shared security settings everywhere: SSH port 12322, MySQL accounts `localuser@localhost` and `remoteuser@<reporter-ip>`, shared secret stored at `/home/gameserver/tools/.password`, and mention optional DR/monitoring tools in admin docs when relevant.
+
 ## Deployment model & paths
 - `modules/billing/` houses the public storefront. Those files are always present inside the panel repo and get deployed either (a) as the root of a dedicated virtual host or (b) through the panel module loader (`home.php?m=billing`).
 - Because the storefront and the control panel live in the same tree, you may include panel helpers when needed. Use the dedicated bridge include (`modules/billing/includes/panel_bridge.php`) instead of sprinkling ad-hoc `../../includes/...` calls.
