@@ -6,7 +6,7 @@ This document mirrors the internal WDS wiki entry so it can be viewed directly f
 
 - **Project scope** – PHP web panel + billing, Linux and Windows agents, 100+ XML driven game templates.
 - **Audience** – Administrators and integrators who maintain commercial hosting fleets.
-- **Companion repos** – [`GSP_Agent_Linux`](https://github.com/GameServerPanel/GSP_Agent_Linux) and [`GSP-Agent-Windows`](https://github.com/GameServerPanel/GSP-Agent-Windows).
+- **Companion repos** – [`GSP-Agent-Linux`](https://github.com/GameServerPanel/GSP-Agent-Linux) and [`GSP-Agent-Windows`](https://github.com/GameServerPanel/GSP-Agent-Windows).
 - **Color coding** – We keep the “rust + charcoal” palette across documentation so screenshots match the UX.
 
 ## Quick Install (deploy_gsp.sh)
@@ -43,7 +43,7 @@ All provisioning logic flows through XML definition files, so keep IDs, attribut
 1. Install dependencies: `sudo apt install git curl rsync perl libxml2-utils screen` (Ubuntu 24.04+).
 2. Clone and install:
    ```bash
-   sudo git clone https://github.com/GameServerPanel/GSP_Agent_Linux.git /opt/gsp-agent
+   sudo git clone https://github.com/GameServerPanel/GSP-Agent-Linux.git /opt/gsp-agent
    cd /opt/gsp-agent
    sudo bash install.sh
    sudo bash agent_conf.sh -s "yourRootPassword" -u ogp_agent

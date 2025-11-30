@@ -23,7 +23,7 @@ Cygwin-based agent that lets the GameServer Panel manage Windows Server 2019/202
 ## Related repositories
 
 - [GSP](https://github.com/GameServerPanel/GSP) – PHP panel that issues commands to the agents.
-- [GSP_Agent_Linux](https://github.com/GameServerPanel/GSP_Agent_Linux) – Linux counterpart with systemd service files.
+- [GSP-Agent-Linux](https://github.com/GameServerPanel/GSP-Agent-Linux) – Linux counterpart with systemd service files.
 
 ## Contributing
 
