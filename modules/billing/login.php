@@ -69,19 +69,23 @@ if (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id']))
 // Initialize error message
 $error_message = '';
 $success_message = '';
+$debug_messages = [];
 
 // Process login form submission: simplified for debugging
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $debug_messages[] = 'login handler hit; POST keys: ' . implode(', ', array_keys($_POST));
     $username = trim($_POST['ulogin'] ?? '');
     $password = $_POST['upassword'] ?? '';
     if ($username === '' || $password === '') {
         $error_message = 'Please enter both a username and password.';
         site_log_warn('login_failed_missing_fields', ['ip'=>$_SERVER['REMOTE_ADDR'] ?? '', 'script'=>$_SERVER['SCRIPT_NAME'] ?? '']);
+        $debug_messages[] = 'missing username or password';
     } else {
         $safe = mysqli_real_escape_string($db, $username);
         $sql = "SELECT user_id, users_login, users_passwd, users_pass_hash, users_role, users_lang, users_theme FROM {$table_prefix}users WHERE users_login = '$safe' LIMIT 1";
         $res = mysqli_query($db, $sql);
         if ($res && mysqli_num_rows($res) === 1) {
+            $debug_messages[] = 'user row located in panel DB';
             $row = mysqli_fetch_assoc($res);
             $userId = intval($row['user_id']);
             $legacyHash = $row['users_passwd'] ?? '';
@@ -89,9 +93,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $authOk = false;
             if (!empty($modernHash) && function_exists('password_verify')) {
                 $authOk = password_verify($password, $modernHash);
+                $debug_messages[] = 'password_verify ' . ($authOk ? 'accepted hash' : 'rejected hash');
             }
             if (!$authOk && !empty($legacyHash)) {
                 $authOk = (md5($password) === $legacyHash);
+                $debug_messages[] = 'md5 fallback ' . ($authOk ? 'matched legacy' : 'did not match');
                 if ($authOk && function_exists('password_hash')) {
                     $newHash = password_hash($password, PASSWORD_DEFAULT);
                     $escapedHash = mysqli_real_escape_string($db, $newHash);
@@ -99,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             if ($authOk) {
+                $debug_messages[] = 'authOk true; session variables being set';
                 session_regenerate_id(true);
                 $_SESSION['user_id'] = $userId;
                 $_SESSION['users_login'] = $row['users_login'] ?? $username;
@@ -114,8 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $panelCtx = billing_panel_bootstrap();
                 if ($panelCtx && isset($panelCtx['db']) && $panelCtx['db'] instanceof OGPDatabase) {
                     $_SESSION['users_api_key'] = $panelCtx['db']->getApiToken($userId);
+                    $debug_messages[] = 'panel bridge pulled api token';
                 } else {
                     $_SESSION['users_api_key'] = $_SESSION['users_api_key'] ?? '';
+                    $debug_messages[] = 'panel bridge unavailable';
                 }
                 site_log_info('login_success', ['username'=>$username, 'ip'=>$_SERVER['REMOTE_ADDR'] ?? '']);
                 $returnToParam = $_POST['return_to'] ?? '';
@@ -126,9 +135,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ' . $destination);
                 exit();
             }
+            $debug_messages[] = 'authentication failed for provided password';
         }
         $error_message = 'Invalid username or password.';
         site_log_warn('login_failed_invalid_credentials', ['username'=>$username, 'ip'=>$_SERVER['REMOTE_ADDR'] ?? '']);
+        $debug_messages[] = 'no matching user row or auth failure';
     }
 }
 
@@ -301,6 +312,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <?php if (!empty($success_message)): ?>
             <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
+        <?php endif; ?>
+
+        <?php if (!empty($debug_messages)): ?>
+            <div class="alert" style="background:#111;color:#0ff;border:1px solid #0ff;margin-bottom:20px;font-size:0.8rem;white-space:pre-line;">Debug:
+<?php echo htmlspecialchars(implode("\n", $debug_messages)); ?></div>
         <?php endif; ?>
         
         <?php
