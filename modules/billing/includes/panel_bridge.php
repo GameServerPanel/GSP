@@ -24,6 +24,14 @@ if (!function_exists('billing_panel_bootstrap')) {
             return null;
         }
 
+        // When storefront runs from modules/billing/_website, $root points to modules/.
+        // Adjust path so panel includes resolve from the repository root, not modules/.
+        if (is_dir($root . '/modules') && is_dir($root . '/includes')) {
+            // already at repo root
+        } elseif (is_dir(dirname($root) . '/includes')) {
+            $root = dirname($root);
+        }
+
         // Define panel constants if they are not already defined (panel runtime does this for us).
         if (!defined('INCLUDES')) {
             define('INCLUDES', 'includes/');
