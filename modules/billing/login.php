@@ -71,7 +71,7 @@ $error_message = '';
 $success_message = '';
 
 // Process login form submission: simplified for debugging
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['ulogin'] ?? '');
     $password = $_POST['upassword'] ?? '';
     if ($username === '' || $password === '') {
