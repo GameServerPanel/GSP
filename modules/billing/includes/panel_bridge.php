@@ -32,6 +32,12 @@ if (!function_exists('billing_panel_bootstrap')) {
             $root = dirname($root);
         }
 
+        static $includeInjected = false;
+        if (!$includeInjected) {
+            set_include_path($root . PATH_SEPARATOR . get_include_path());
+            $includeInjected = true;
+        }
+
         // Define panel constants if they are not already defined (panel runtime does this for us).
         if (!defined('INCLUDES')) {
             define('INCLUDES', 'includes/');
