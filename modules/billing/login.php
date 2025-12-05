@@ -83,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $safe = mysqli_real_escape_string($db, $username);
         $sql = "SELECT user_id, users_login, users_passwd, users_pass_hash, users_role, users_lang, users_theme FROM {$table_prefix}users WHERE users_login = '$safe' LIMIT 1";
+        $debug_messages[] = 'SQL: ' . $sql;
         $res = mysqli_query($db, $sql);
         if ($res && mysqli_num_rows($res) === 1) {
             $debug_messages[] = 'user row located in panel DB';
