@@ -6,6 +6,27 @@
 
 require_once(__DIR__ . '/session_bridge.php');
 
+if (!function_exists('billing_nav_escape')) {
+  function billing_nav_escape($value) {
+    return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
+  }
+}
+
+$nav_prefix = '';
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+if (is_string($scriptName) && $scriptName !== '') {
+  if (preg_match('#/modules/billing/(.*)$#', $scriptName, $match)) {
+    $subPath = $match[1];
+    if ($subPath !== '') {
+      $depth = substr_count($subPath, '/');
+      if ($depth > 0) {
+        $nav_prefix = str_repeat('../', $depth);
+      }
+    }
+  }
+}
+$nav_prefix = $nav_prefix ?: '';
+
 // Check login status
 // Primary check uses website_user_id, but some remote deployments may only set website_username.
 // Treat presence of website_username as a fallback to consider the user logged in for UI purposes.
@@ -63,7 +84,7 @@ if ($is_logged_in) {
   }
 }
 ?>
-<link rel="stylesheet" href="css/header.css">
+<link rel="stylesheet" href="<?php echo billing_nav_escape($nav_prefix . 'css/header.css'); ?>">
 
 <!-- site wrapper for scoping styles -->
 <div id="gsw-site">
@@ -71,8 +92,8 @@ if ($is_logged_in) {
 <div class="gsw-header">
   <div class="gsw-header-top">
     <div class="gsw-header-left">
-      <a href="index.php" class="gsw-logo-link">
-        <img src="images/logo-sm.png" alt="GameServers.World" class="gsw-logo">
+      <a href="<?php echo billing_nav_escape($nav_prefix . 'index.php'); ?>" class="gsw-logo-link">
+        <img src="<?php echo billing_nav_escape($nav_prefix . 'images/logo-sm.png'); ?>" alt="GameServers.World" class="gsw-logo">
         <span class="gsw-site-name">GameServers.World</span>
       </a>
     </div>
@@ -84,23 +105,23 @@ if ($is_logged_in) {
         $return_to_param = $current;
       ?>
       <?php if ($is_logged_in): ?>
-        <a href="my_account.php" class="gsw-user-info">Welcome, <?php echo $username; ?></a>
-        <a href="logout.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Logout</a>
+        <a href="<?php echo billing_nav_escape($nav_prefix . 'my_account.php'); ?>" class="gsw-user-info">Welcome, <?php echo $username; ?></a>
+        <a href="<?php echo billing_nav_escape($nav_prefix . 'logout.php?return_to=' . urlencode($return_to_param)); ?>" class="gsw-header-btn">Logout</a>
       <?php else: ?>
-        <a href="login.php?return_to=<?php echo urlencode($return_to_param); ?>" class="gsw-header-btn">Login</a>
+        <a href="<?php echo billing_nav_escape($nav_prefix . 'login.php?return_to=' . urlencode($return_to_param)); ?>" class="gsw-header-btn">Login</a>
       <?php endif; ?>
     </div>
   </div>
 
   <div class="gsw-header-bottom">
     <nav class="gsw-header-nav">
-      <a href="index.php" class="gsw-nav-link">Home</a>
-      <a href="serverlist.php" class="gsw-nav-link">Game Servers</a>
-      <a href="docs.php" class="gsw-nav-link">Documentation</a>
+      <a href="<?php echo billing_nav_escape($nav_prefix . 'index.php'); ?>" class="gsw-nav-link">Home</a>
+      <a href="<?php echo billing_nav_escape($nav_prefix . 'serverlist.php'); ?>" class="gsw-nav-link">Game Servers</a>
+      <a href="<?php echo billing_nav_escape($nav_prefix . 'docs.php'); ?>" class="gsw-nav-link">Documentation</a>
       <?php if ($is_logged_in): ?>
         <!-- My Account as a regular nav link, not a prominent button -->
-        <a href="my_account.php" class="gsw-nav-link">My Account</a>
-        <a href="cart.php" class="gsw-nav-link">Cart
+        <a href="<?php echo billing_nav_escape($nav_prefix . 'my_account.php'); ?>" class="gsw-nav-link">My Account</a>
+        <a href="<?php echo billing_nav_escape($nav_prefix . 'cart.php'); ?>" class="gsw-nav-link">Cart
           <?php
             $cart_count = 0;
             if (file_exists(__DIR__ . '/cart_helper.php')) {
@@ -112,7 +133,7 @@ if ($is_logged_in) {
         </a>
       <?php endif; ?>
       <?php if ($is_logged_in && $is_admin): ?>
-        <a href="admin.php" class="gsw-nav-link">Admin</a>
+        <a href="<?php echo billing_nav_escape($nav_prefix . 'admin.php'); ?>" class="gsw-nav-link">Admin</a>
       <?php endif; ?>
       <a href="http://panel.iaregamer.com" class="gsw-nav-link" target="_blank">Control Panel</a>
     </nav>
