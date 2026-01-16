@@ -21,62 +21,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-function sw_text($key, ...$args)
-{
-	$strings = array(
-		'no_game_servers_assigned' => 'No game servers are assigned to your account.',
-		'uninstall_mods' => 'Uninstall mods',
-		'install_mods' => 'Install mods',
-		'back' => 'Back',
-		'settings_updated' => 'Settings updated.',
-		'failed_reading_xml_file' => 'Failed reading XML file: %s',
-		'mod_id_does_not_exists_in_home' => 'Mod ID %s does not exist in home %s.',
-		'mod_key_not_found_from_xml' => 'Mod key %s was not found in the XML.',
-		'unable_to_get_os_from_game_key' => 'Unable to determine OS from game key %s.',
-		'workshop_configuration_not_found' => 'Workshop configuration not found for this game/mod.',
-		'no_workshop_configuration_available_for_this_game' => 'No workshop configuration is available for this game.',
-		'workshop_configuration_file_has_bad_format' => 'Workshop configuration file has a bad format.',
-		'remote_server_offline' => 'Remote server is offline.',
-		'update_in_progress' => 'Update in progress...',
-		'refresh_steam_workshop_status' => 'Refresh Steam Workshop status',
-		'update_completed' => 'Update completed.',
-		'game_home_not_found' => 'Game home not found.',
-		'mod_does_not_belong_to_workshop' => 'Mod %s does not belong to this workshop.',
-		'mod_installation_started' => 'Mod installation started.',
-		'invalid_mod_id' => 'Invalid workshop ID.',
-		'failed_uninstalling_mod' => 'Failed uninstalling mod %s.',
-		'failed_to_start_steam_workshop' => 'Failed to start Steam Workshop.',
-		'connection_error' => 'Connection error.',
-		'select_at_least_one_mod_or_enter_mod_id' => 'Select at least one mod or enter a mod ID.',
-		'install_mod' => 'Install mod(s)',
-		'show_mod_info' => 'Show mod info',
-		'select_game' => 'Select a game',
-		'save_config' => 'Save config',
-		'remove_mods' => 'Remove selected mods',
-		'mod_installation_failed' => 'Mod installation failed.',
-		'there_are_no_mods_installed_on_this_game_server' => 'There are no mods installed on this game server.',
-		'installed_mods' => 'Installed mods',
-		'no_mods_found' => 'No mods found.',
-		'name' => 'Name',
-		'status' => 'Status',
-		'installed' => 'Installed',
-		'pending' => 'Pending',
-		'remove' => 'Remove',
-		'add_mod' => 'Add mod',
-		'workshop_id' => 'Workshop ID',
-		'add' => 'Add',
-		'collection_id' => 'Collection ID',
-		'actions' => 'Actions',
-	);
-
-	if (!array_key_exists($key, $strings)) {
-		return $key;
-	}
-
-	$text = $strings[$key];
-	return empty($args) ? $text : vsprintf($text, $args);
-}
-
 function create_drop_box_from_array_onchange($input_array,$listname,$current_value = "")
 {
 	$only_one = count($input_array) == 1;
@@ -105,24 +49,6 @@ function create_drop_box_from_array_onchange($input_array,$listname,$current_val
     }
     $retval .= "</select>\n";
     return $retval;
-}
-
-function create_drop_box_from_array($input_array,$listname,$current_value = "")
-{
-	$retval = "<select id=\"$listname\" name=\"$listname\" style=\"max-width:330px;\">\n";
-	foreach($input_array as $key => $value)
-	{
-		$key = trim(strip_tags($key));
-		$value = trim(strip_tags($value));
-		if ($value === '' && $value !== '0')
-		{
-			continue;
-		}
-		$sel = ($key == $current_value) ? "selected='selected'" : "";
-		$retval .= "<option value='$key' $sel>$value</option>\n";
-	}
-	$retval .= "</select>\n";
-	return $retval;
 }
 
 function get_mod_names_list($mods_list, $xml_mods)
