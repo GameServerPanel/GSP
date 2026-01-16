@@ -51,23 +51,6 @@ function create_drop_box_from_array_onchange($input_array,$listname,$current_val
     return $retval;
 }
 
-function create_drop_box_from_array($input_array,$listname,$current_value = "")
-{
-	$retval = "<select id=\"$listname\" name=\"$listname\" style=\"max-width:330px;\">\n";
-	foreach($input_array as $key => $value)
-	{
-		$key = trim(strip_tags($key));
-		$value = trim(strip_tags($value));
-		if ($value === '' && $value !== '0') {
-			continue;
-		}
-		$sel = ($key == $current_value) ? "selected='selected'" : "";
-		$retval .= "<option value='$key' $sel>$value</option>\n";
-	}
-	$retval .= "</select>\n";
-	return $retval;
-}
-
 function get_mod_names_list($mods_list, $xml_mods)
 {
 	$mod_names = "";
