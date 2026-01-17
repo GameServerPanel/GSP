@@ -22,22 +22,31 @@
  *
  */
 
-if(isset($server_xml->installer) and $server_xml->installer == "steamcmd")
+if (isset($server_xml->installer) && $server_xml->installer === "steamcmd")
 {
-	$mod_xml = xml_get_mod($server_xml, $server_home['mod_key']);
-	require_once("modules/steam_workshop/functions.php");
-	if(isset($mod_xml->installer_name) and !in_array((string)$mod_xml->installer_name, get_blacklist()))
+	$homeId = isset($server_home['home_id']) ? (int)$server_home['home_id'] : 0;
+	if ($homeId > 0)
 	{
+		$label = get_lang('steam_workshop');
+		if ($label === 'steam_workshop')
+		{
+			$label = 'Steam Workshop';
+		}
+		$href = "?m=steam_workshop&p=main&action=edit&home_id=" . $homeId;
 		$module_buttons = array(
-			"<a class='monitorbutton' href='?m=steam_workshop&p=main&home_id-mod_id-ip-port=".$server_home['home_id']."-".$server_home['mod_id']."-".$server_home['ip']."-".$server_home['port']."'>
-				<img src='" . check_theme_image("images/steam_workshop.png") . "' title='Steam Workshop'>
-				<span>Steam Workshop</span>
+			"<a class='monitorbutton' href='" . $href . "'>
+				<img src='" . check_theme_image("images/steam_workshop.png") . "' title='" . $label . "'>
+				<span>" . $label . "</span>
 			</a>"
 		);
 	}
 	else
+	{
 		$module_buttons = array();
+	}
 }
 else
+{
 	$module_buttons = array();
+}
 ?>

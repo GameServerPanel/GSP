@@ -1,0 +1,69 @@
+<?php
+declare(strict_types=1);
+/** @var array $formConfig */
+/** @var array $adapterOptions */
+/** @var array $lang */
+$enabled = !empty($formConfig['workshop_enabled']);
+$interval = (int)$formConfig['update_interval_minutes'];
+$stagingDir = htmlspecialchars($formConfig['staging_dir']);
+$postInstall = htmlspecialchars($formConfig['post_install_script']);
+$rawDefinition = htmlspecialchars($formConfig['raw_definition']);
+$installStrategy = $formConfig['install_strategy'];
+$onUpdateAction = $formConfig['on_update_action'];
+?>
+<div class="sw-form__grid">
+    <label class="sw-toggle">
+        <input type="checkbox" name="workshop[workshop_enabled]" value="1" <?php echo $enabled ? 'checked' : ''; ?> />
+        <span><?php echo htmlspecialchars($lang['label_feature_flag']); ?></span>
+    </label>
+
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_adapter']); ?></span>
+        <select name="workshop[adapter_key]">
+            <?php foreach ($adapterOptions as $key => $label): ?>
+                <option value="<?php echo htmlspecialchars($key); ?>" <?php echo $formConfig['adapter_key'] === $key ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($label); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </label>
+
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_interval']); ?></span>
+        <input type="number" min="15" max="360" step="5" name="workshop[update_interval_minutes]" value="<?php echo $interval; ?>" />
+        <small><?php echo htmlspecialchars($lang['label_interval_hint']); ?></small>
+    </label>
+
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
+        <input type="text" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" placeholder="/home/ogp_agent/workshop-staging" />
+    </label>
+
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_install_strategy']); ?></span>
+        <select name="workshop[install_strategy]">
+            <option value="copy" <?php echo $installStrategy === 'copy' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_copy']); ?></option>
+            <option value="symlink" <?php echo $installStrategy === 'symlink' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_symlink']); ?></option>
+            <option value="staging" <?php echo $installStrategy === 'staging' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_staging']); ?></option>
+        </select>
+    </label>
+
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_on_update_action']); ?></span>
+        <select name="workshop[on_update_action]">
+            <option value="queue_for_restart" <?php echo $onUpdateAction === 'queue_for_restart' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['action_queue_for_restart']); ?></option>
+            <option value="hot_reload_if_supported" <?php echo $onUpdateAction === 'hot_reload_if_supported' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['action_hot_reload_if_supported']); ?></option>
+        </select>
+    </label>
+
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
+        <input type="text" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" placeholder="/home/ogp_agent/scripts/workshop-hook.sh" />
+    </label>
+</div>
+
+<label>
+    <span><?php echo htmlspecialchars($lang['label_mod_import']); ?></span>
+    <textarea name="workshop[raw_items]" rows="8" placeholder="123456789,@Example Mod&#10;987654321,@QoL Pack"><?php echo $rawDefinition; ?></textarea>
+    <small><?php echo htmlspecialchars($lang['hint_mod_import']); ?></small>
+</label>

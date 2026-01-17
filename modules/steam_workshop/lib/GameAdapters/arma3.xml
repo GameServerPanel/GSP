@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adapter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="schema.xsd"
+         key="arma3"
+         name="Arma 3"
+         supportsHotReload="false">
+    <steamAppId>107410</steamAppId>
+    <modsDir>%SERVER_ROOT%/arma3server/mods</modsDir>
+    <keysDir>%SERVER_ROOT%/keys</keysDir>
+    <activation type="launch_parameter">
+        <template>-mod=@{modlist(';')}</template>
+    </activation>
+    <postCopyRules>
+        <copyPattern source="*.bikey" destination="%SERVER_ROOT%/keys" />
+    </postCopyRules>
+    <notes>Matches Bohemia best practices: copy .bikey files and keep @Mod folders under the server root.</notes>
+</adapter>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adapter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="schema.xsd"
+         key="ark"
+         name="ARK: Survival Ascended"
+         supportsHotReload="false">
+    <steamAppId>346110</steamAppId>
+    <modsDir>%SERVER_ROOT%/ShooterGame/Content/Mods</modsDir>
+    <activation type="config_writer">
+        <template>GameUserSettings.ini:[ServerSettings].ActiveMods={modlist(',')}</template>
+    </activation>
+    <postCopyRules>
+        <copyPattern source="*.mod" destination="%SERVER_ROOT%/ShooterGame/Content/Mods" />
+    </postCopyRules>
+    <notes>Copies .mod stubs alongside mod folders and rewrites ActiveMods inside GameUserSettings.ini.</notes>
+</adapter>

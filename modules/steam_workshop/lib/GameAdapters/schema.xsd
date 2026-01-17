@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="adapter">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="steamAppId" type="xs:string" />
+                <xs:element name="modsDir" type="xs:string" />
+                <xs:element name="keysDir" type="xs:string" minOccurs="0" />
+                <xs:element name="activation" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="template" type="xs:string" />
+                        </xs:sequence>
+                        <xs:attribute name="type" type="xs:string" use="optional" />
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="postCopyRules" minOccurs="0">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="copyPattern" minOccurs="0" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:attribute name="source" type="xs:string" use="required" />
+                                    <xs:attribute name="destination" type="xs:string" use="optional" />
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="hotReloadCommand" type="xs:string" minOccurs="0" />
+                <xs:element name="notes" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+            <xs:attribute name="key" type="xs:string" use="required" />
+            <xs:attribute name="name" type="xs:string" use="required" />
+            <xs:attribute name="supportsHotReload" type="xs:boolean" use="optional" />
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
