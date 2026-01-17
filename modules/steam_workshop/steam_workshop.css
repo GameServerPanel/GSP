@@ -123,3 +123,107 @@
 .sw-toggle input {
 	width: auto;
 }
+
+.sw-game-table__wrapper {
+	margin-top: 1rem;
+	overflow-x: auto;
+}
+
+.sw-game-table__row td {
+	vertical-align: top;
+}
+
+.sw-game-label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.sw-game-label__title {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.sw-game-label__key {
+	font-weight: 600;
+}
+
+.sw-game-label__name {
+	font-weight: 600;
+}
+
+.sw-game-label__hint {
+	color: #666;
+}
+
+.sw-game-label__hint--warning {
+	color: #b15a00;
+}
+
+.sw-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.1rem 0.5rem;
+	border-radius: 999px;
+	font-size: 0.75rem;
+}
+
+.sw-badge--custom {
+	background: #eef4ff;
+	color: #0b5ed7;
+}
+
+.sw-badge--app {
+	background: #f1f3f5;
+	color: #444;
+}
+
+.sw-game-variants {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+.sw-chip {
+	background: #f4f6f8;
+	border-radius: 999px;
+	padding: 0.1rem 0.55rem;
+	font-size: 0.8rem;
+}
+
+.sw-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+.sw-inline-delete {
+	display: inline;
+}
+
+.sw-game-table__form-row {
+	display: none;
+}
+
+.sw-game-table__form-row.is-open {
+	display: table-row;
+}
+
+.sw-inline-form {
+	background: #f6f8fb;
+	border: 1px solid #d0dae9;
+	border-radius: 6px;
+	padding: 1rem;
+}
+
+.sw-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.sw-admin__mapping-actions {
+	margin-top: 1rem;
+}

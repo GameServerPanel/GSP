@@ -497,23 +497,63 @@ class SteamWorkshopService
 		return unlink($path);
 	}
 
-	public function listAvailableGameKeys(): array
+	public function listWorkshopGameGroups(): array
 	{
-		$keys = [];
 		$configDir = defined('SERVER_CONFIG_LOCATION') ? SERVER_CONFIG_LOCATION : __DIR__ . '/../../config_games/server_configs';
+		$groups = [];
+
 		foreach (glob($configDir . '/*.xml') as $file) {
 			$xml = @simplexml_load_file($file);
 			if ($xml === false) {
 				continue;
 			}
-			if (isset($xml->game_key)) {
-				$keys[] = trim((string)$xml->game_key);
+
+			$gameKey = isset($xml->game_key) ? trim((string)$xml->game_key) : '';
+			if ($gameKey === '') {
+				continue;
 			}
+
+			$appId = $this->parseSteamAppIdFromConfig($xml);
+			if ($appId === null) {
+				continue;
+			}
+
+			$groupKey = $this->buildWorkshopGroupKey($appId);
+			if (!isset($groups[$groupKey])) {
+				$gameName = isset($xml->game_name) ? trim((string)$xml->game_name) : '';
+				$groups[$groupKey] = [
+					'group_key' => $groupKey,
+					'app_id' => $appId,
+					'game_name' => $gameName !== '' ? $gameName : $gameKey,
+					'game_keys' => [],
+				];
+			}
+
+			$groups[$groupKey]['game_keys'][] = $gameKey;
 		}
 
-		$keys = array_filter(array_unique($keys));
-		sort($keys);
-		return array_values($keys);
+		foreach ($groups as &$group) {
+			$group['game_keys'] = array_values(array_unique($group['game_keys']));
+			sort($group['game_keys']);
+			$group['primary_game_key'] = $group['game_keys'][0];
+		}
+		unset($group);
+
+		usort($groups, static function (array $a, array $b): int {
+			return strcmp($a['game_name'], $b['game_name']);
+		});
+
+		return array_values($groups);
+	}
+
+	public function listAvailableGameKeys(): array
+	{
+		$keys = [];
+		foreach ($this->listWorkshopGameGroups() as $group) {
+			$keys = array_merge($keys, $group['game_keys']);
+		}
+
+		return array_values(array_unique($keys));
 	}
 
 	private function sanitizeInterval(?int $minutes): int
@@ -675,5 +715,37 @@ class SteamWorkshopService
 		if (!is_file($this->adapterMapFile)) {
 			file_put_contents($this->adapterMapFile, json_encode([]));
 		}
+	}
+	private function parseSteamAppIdFromConfig($xml): ?string
+	{
+		if (!isset($xml->mods) || !isset($xml->mods->mod)) {
+			return null;
+		}
+
+		$candidate = null;
+		foreach ($xml->mods->mod as $mod) {
+			$installerName = trim((string)($mod->installer_name ?? ''));
+			if ($installerName === '' || preg_match('/\D/', $installerName)) {
+				continue;
+			}
+
+			$modName = strtolower(trim((string)($mod->name ?? '')));
+			$modKey = strtolower(trim((string)($mod['key'] ?? '')));
+
+			if ($modKey === 'default' || $modName === 'none' || $modName === '') {
+				return $installerName;
+			}
+
+			if ($candidate === null) {
+				$candidate = $installerName;
+			}
+		}
+
+		return $candidate;
+	}
+
+	private function buildWorkshopGroupKey(string $appId): string
+	{
+		return 'steamapp_' . $appId;
 	}
 }
