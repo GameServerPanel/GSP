@@ -1,0 +1,1 @@
+- Auto-detect which server configs actually support Steam Workshop before showing adapter controls.

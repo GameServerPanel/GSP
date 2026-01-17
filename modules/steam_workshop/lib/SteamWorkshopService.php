@@ -10,6 +10,7 @@ class SteamWorkshopService
     private string $configDir;
     private string $adapterDir;
     private string $adapterMapFile;
+    private string $gameAdapterDir;
 
     public function __construct(OGPDatabase $db)
     {
@@ -17,9 +18,14 @@ class SteamWorkshopService
         $this->configDir = __DIR__ . '/../data/configs';
         $this->adapterDir = __DIR__ . '/GameAdapters';
         $this->adapterMapFile = __DIR__ . '/../data/game_adapter_map.json';
+        $this->gameAdapterDir = __DIR__ . '/../data/game_adapters';
 
         if (!is_dir($this->configDir)) {
             mkdir($this->configDir, 0775, true);
+        }
+
+        if (!is_dir($this->gameAdapterDir)) {
+            mkdir($this->gameAdapterDir, 0775, true);
         }
 
         $this->ensureDataFiles();
@@ -151,56 +157,62 @@ class SteamWorkshopService
 
         $doc->save($path);
     }
+            if ($gameKey === '') {
+                throw new RuntimeException('Game key is required.');
+            }
 
-    /**
-     * Convert POST payload into a config array and merge defaults.
-     */
-    public function buildConfigFromRequest(array $payload): array
-    {
-        $input = $payload['workshop'] ?? [];
-        $rawMods = trim((string)($input['raw_items'] ?? ''));
-        $items = $this->parseWorkshopItems($rawMods);
+            $normalized = $this->normalizeAdapterData($gameKey, $data);
+            if ($normalized['steam_app_id'] === '') {
+                throw new RuntimeException('Steam App ID is required.');
+            }
+            if ($normalized['mods_dir'] === '') {
+                throw new RuntimeException('Mods directory is required.');
+            }
 
-        return [
-            'workshop_enabled' => isset($input['workshop_enabled']) ? (bool)$input['workshop_enabled'] : false,
-            'adapter_key' => $this->sanitizeAdapterKey((string)($input['adapter_key'] ?? 'dayz')),
-            'update_interval_minutes' => $this->sanitizeInterval(isset($input['update_interval_minutes']) ? (int)$input['update_interval_minutes'] : null),
-            'staging_dir' => trim((string)($input['staging_dir'] ?? '')),
-            'install_strategy' => $this->sanitizeInstallStrategy((string)($input['install_strategy'] ?? 'copy')),
-            'on_update_action' => $this->sanitizeUpdateAction((string)($input['on_update_action'] ?? 'queue_for_restart')),
-            'post_install_script' => trim((string)($input['post_install_script'] ?? '')),
-            'workshop_items' => $items,
-            'raw_definition' => $rawMods,
-        ];
-    }
+            $doc = new DOMDocument('1.0', 'UTF-8');
+            $doc->formatOutput = true;
 
-    /**
-     * Accepts imports such as "123456,@My Mod" per line.
-     *
-     * @return array<int, array{id:string,label:string,enabled:bool,source:string}>
-     */
-    public function parseWorkshopItems(string $raw): array
-    {
-        if ($raw === '') {
-            return [];
-        }
+            $root = $doc->createElement('adapter');
+            $root->setAttribute('key', $gameKey);
+            $root->setAttribute('name', $normalized['name']);
+            $doc->appendChild($root);
 
-        $items = [];
+            $root->appendChild($doc->createElement('steamAppId', $normalized['steam_app_id']));
+            $root->appendChild($doc->createElement('modsDir', $normalized['mods_dir']));
+            if ($normalized['keys_dir'] !== '') {
+                $root->appendChild($doc->createElement('keysDir', $normalized['keys_dir']));
+            }
+            $root->appendChild($doc->createElement('supportsHotReload', $normalized['supports_hot_reload'] ? 'true' : 'false'));
+
+            $activationNode = $doc->createElement('activation');
+            $templateNode = $doc->createElement('template');
+            if ($normalized['activation_template'] !== '') {
+                $templateNode->appendChild($doc->createCDATASection($normalized['activation_template']));
+            }
+            $activationNode->appendChild($templateNode);
+            $root->appendChild($activationNode);
+
+            if ($normalized['notes'] !== '') {
+                $root->appendChild($doc->createElement('notes', $normalized['notes']));
+            }
+
+            $path = $this->getGameAdapterPath($gameKey);
+            $doc->save($path);
         $lines = preg_split('/\r\n|\r|\n/', $raw);
         foreach ($lines as $line) {
             $line = trim($line);
             if ($line === '') {
                 continue;
+            if ($gameKey === '') {
+                return false;
             }
 
-            $parts = array_map('trim', explode(',', $line, 2));
-            $id = preg_replace('/[^0-9]/', '', $parts[0]);
-            if ($id === '') {
-                continue;
+            $path = $this->getGameAdapterPath($gameKey);
+            if (!is_file($path)) {
+                return false;
             }
-            $label = $parts[1] ?? '';
-            if ($label === '') {
-                $label = '@' . $id;
+
+            return unlink($path);
             }
 
             $items[] = [
@@ -252,53 +264,41 @@ class SteamWorkshopService
      */
     public function loadAdapters(): array
     {
-        $adapters = [];
+        $result = [];
         $schema = $this->adapterDir . '/schema.xsd';
         $useSchema = is_file($schema);
         $previousLibxml = libxml_use_internal_errors(true);
 
         foreach (glob($this->adapterDir . '/*.xml') as $file) {
+            if (substr($file, -4) !== '.xml' || basename($file) === 'schema.xsd') {
+                continue;
+            }
+
+            $parsed = $this->parseAdapterFile($file, $schema, $useSchema);
+            if ($parsed !== null) {
+                $parsed['origin'] = 'shared';
+                $result[] = $parsed;
+            }
+        }
+
+        foreach (glob($this->gameAdapterDir . '/*.xml') as $file) {
             if (substr($file, -4) !== '.xml') {
                 continue;
             }
-            if (basename($file) === 'schema.xsd') {
-                continue;
-            }
 
-            $doc = new DOMDocument();
-            if (!$doc->load($file)) {
-                continue;
+            $gameKey = basename($file, '.xml');
+            $parsed = $this->parseAdapterFile($file, $schema, $useSchema, $gameKey);
+            if ($parsed !== null) {
+                $parsed['origin'] = 'custom';
+                $result[] = $parsed;
             }
-
-            if ($useSchema && !$doc->schemaValidate($schema)) {
-                libxml_clear_errors();
-                continue;
-            }
-
-            $adapter = simplexml_import_dom($doc);
-            if ($adapter === false) {
-                continue;
-            }
-
-            $adapters[] = [
-                'key' => (string)($adapter['key'] ?? ''),
-                'name' => (string)($adapter['name'] ?? ''),
-                'steam_app_id' => (string)($adapter->steamAppId ?? ''),
-                'mods_dir' => (string)($adapter->modsDir ?? ''),
-                'keys_dir' => isset($adapter->keysDir) ? (string)$adapter->keysDir : null,
-                'supports_hot_reload' => filter_var((string)($adapter->supportsHotReload ?? 'false'), FILTER_VALIDATE_BOOLEAN),
-                'activation_template' => (string)($adapter->activation->template ?? ''),
-                'notes' => (string)($adapter->notes ?? ''),
-            ];
         }
-
-        $result = array_values(array_filter($adapters, static function (array $adapter): bool {
-            return $adapter['key'] !== '';
-        }));
 
         libxml_use_internal_errors($previousLibxml);
 
-        return $result;
+        return array_values(array_filter($result, static function (array $adapter): bool {
+            return $adapter['key'] !== '';
+        }));
     }
 
     public function getAdapterByKey(string $key): array
@@ -323,7 +323,15 @@ class SteamWorkshopService
         }
 
         $map = $this->getAdapterMappings();
-        return $map[$gameKey] ?? null;
+        if (isset($map[$gameKey])) {
+            return $map[$gameKey];
+        }
+
+        if ($this->gameAdapterExists($gameKey)) {
+            return $gameKey;
+        }
+
+        return null;
     }
 
     /**
@@ -343,6 +351,33 @@ class SteamWorkshopService
         }
 
         file_put_contents($this->adapterMapFile, json_encode($sanitized, JSON_PRETTY_PRINT));
+    }
+
+    public function upsertAdapterMapping(string $gameKey, string $adapterKey): void
+    {
+        $gameKey = $this->sanitizeGameKey($gameKey);
+        $adapterKey = $this->sanitizeAdapterKey($adapterKey);
+        if ($gameKey === '' || $adapterKey === '') {
+            return;
+        }
+
+        $map = $this->getAdapterMappings();
+        $map[$gameKey] = $adapterKey;
+        file_put_contents($this->adapterMapFile, json_encode($map, JSON_PRETTY_PRINT));
+    }
+
+    public function removeAdapterMapping(string $gameKey, ?string $adapterKey = null): void
+    {
+        $gameKey = $this->sanitizeGameKey($gameKey);
+        if ($gameKey === '') {
+            return;
+        }
+
+        $map = $this->getAdapterMappings();
+        if ($adapterKey === null || (isset($map[$gameKey]) && $map[$gameKey] === $adapterKey)) {
+            unset($map[$gameKey]);
+            file_put_contents($this->adapterMapFile, json_encode($map, JSON_PRETTY_PRINT));
+        }
     }
 
     /**
@@ -369,6 +404,101 @@ class SteamWorkshopService
         }
 
         return $result;
+    }
+
+    /**
+     * Return metadata for every custom adapter stored on disk.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    public function listGameAdapters(): array
+    {
+        $adapters = [];
+        $schema = $this->adapterDir . '/schema.xsd';
+        $useSchema = is_file($schema);
+        foreach (glob($this->gameAdapterDir . '/*.xml') as $file) {
+            $gameKey = basename($file, '.xml');
+            $parsed = $this->parseAdapterFile($file, $schema, $useSchema, $gameKey);
+            if ($parsed !== null) {
+                $parsed['origin'] = 'custom';
+                $parsed['game_key'] = $gameKey;
+                $adapters[] = $parsed;
+            }
+        }
+
+        return $adapters;
+    }
+
+    public function gameAdapterExists(string $gameKey): bool
+    {
+        $gameKey = $this->sanitizeGameKey($gameKey);
+        if ($gameKey === '') {
+            return false;
+        }
+
+        return is_file($this->getGameAdapterPath($gameKey));
+    }
+
+    public function getGameAdapter(string $gameKey): ?array
+    {
+        $gameKey = $this->sanitizeGameKey($gameKey);
+        if ($gameKey === '') {
+            return null;
+        }
+
+        $path = $this->getGameAdapterPath($gameKey);
+        if (!is_file($path)) {
+            return null;
+        }
+
+        return $this->parseAdapterFile($path, $this->adapterDir . '/schema.xsd', is_file($this->adapterDir . '/schema.xsd'), $gameKey);
+    }
+
+    public function getGameAdapterUpdatedAt(string $gameKey): ?int
+    {
+        $path = $this->getGameAdapterPath($gameKey);
+        if (!is_file($path)) {
+            return null;
+        }
+
+        $mtime = filemtime($path);
+        return $mtime === false ? null : $mtime;
+    }
+
+    public function getAdapterFormData(string $gameKey, ?array $overrides = null): array
+    {
+        $gameKey = $this->sanitizeGameKey($gameKey);
+        $defaults = [
+            'game_key' => $gameKey,
+            'name' => $gameKey,
+            'steam_app_id' => '',
+            'mods_dir' => '',
+            'keys_dir' => '',
+            'supports_hot_reload' => false,
+            'activation_template' => '',
+            'notes' => '',
+            'exists' => false,
+        ];
+
+        $current = $this->getGameAdapter($gameKey);
+        if ($current !== null) {
+            $defaults = array_merge($defaults, [
+                'name' => $current['name'] ?? $gameKey,
+                'steam_app_id' => $current['steam_app_id'] ?? '',
+                'mods_dir' => $current['mods_dir'] ?? '',
+                'keys_dir' => $current['keys_dir'] ?? '',
+                'supports_hot_reload' => !empty($current['supports_hot_reload']),
+                'activation_template' => $current['activation_template'] ?? '',
+                'notes' => $current['notes'] ?? '',
+                'exists' => true,
+            ]);
+        }
+
+        if ($overrides !== null) {
+            $defaults = array_merge($defaults, $overrides);
+        }
+
+        return $defaults;
     }
 
     /**
@@ -452,6 +582,73 @@ class SteamWorkshopService
         }));
 
         return $config;
+    }
+
+    private function getGameAdapterPath(string $gameKey): string
+    {
+        return sprintf('%s/%s.xml', $this->gameAdapterDir, $gameKey);
+    }
+
+    private function sanitizeGameKey(string $gameKey): string
+    {
+        $gameKey = strtolower(trim($gameKey));
+        return preg_replace('/[^a-z0-9_\-.]/', '', $gameKey);
+    }
+
+    private function normalizeAdapterData(string $gameKey, array $data): array
+    {
+        $name = trim((string)($data['name'] ?? ''));
+        return [
+            'name' => $name !== '' ? $name : $gameKey,
+            'steam_app_id' => trim((string)($data['steam_app_id'] ?? '')),
+            'mods_dir' => trim((string)($data['mods_dir'] ?? '')),
+            'keys_dir' => trim((string)($data['keys_dir'] ?? '')),
+            'supports_hot_reload' => !empty($data['supports_hot_reload']),
+            'activation_template' => trim((string)($data['activation_template'] ?? '')),
+            'notes' => trim((string)($data['notes'] ?? '')),
+        ];
+    }
+
+    private function parseAdapterFile(string $file, string $schemaPath, bool $useSchema, ?string $forcedKey = null): ?array
+    {
+        $previous = libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        if (!$doc->load($file)) {
+            libxml_use_internal_errors($previous);
+            return null;
+        }
+
+        if ($useSchema && is_file($schemaPath) && !$doc->schemaValidate($schemaPath)) {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+            return null;
+        }
+
+        $adapter = simplexml_import_dom($doc);
+        if ($adapter === false) {
+            libxml_use_internal_errors($previous);
+            return null;
+        }
+
+        $key = $forcedKey ?? (string)($adapter['key'] ?? '');
+        if ($key === '') {
+            return null;
+        }
+
+        $result = [
+            'key' => $key,
+            'name' => (string)($adapter['name'] ?? $key),
+            'steam_app_id' => (string)($adapter->steamAppId ?? ''),
+            'mods_dir' => (string)($adapter->modsDir ?? ''),
+            'keys_dir' => isset($adapter->keysDir) ? (string)$adapter->keysDir : '',
+            'supports_hot_reload' => filter_var((string)($adapter->supportsHotReload ?? 'false'), FILTER_VALIDATE_BOOLEAN),
+            'activation_template' => (string)($adapter->activation->template ?? ''),
+            'notes' => (string)($adapter->notes ?? ''),
+        ];
+
+        libxml_use_internal_errors($previous);
+
+        return $result;
     }
 
     private function getConfigPath(int $homeId): string
