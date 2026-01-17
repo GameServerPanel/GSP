@@ -9,16 +9,20 @@ class SteamWorkshopService
     private OGPDatabase $db;
     private string $configDir;
     private string $adapterDir;
+    private string $adapterMapFile;
 
     public function __construct(OGPDatabase $db)
     {
         $this->db = $db;
         $this->configDir = __DIR__ . '/../data/configs';
         $this->adapterDir = __DIR__ . '/GameAdapters';
+        $this->adapterMapFile = __DIR__ . '/../data/game_adapter_map.json';
 
         if (!is_dir($this->configDir)) {
             mkdir($this->configDir, 0775, true);
         }
+
+        $this->ensureDataFiles();
     }
 
     /**
@@ -308,6 +312,89 @@ class SteamWorkshopService
         return [];
     }
 
+    /**
+     * Return adapter key chosen for the given game key, or null if unmapped.
+     */
+    public function getAdapterKeyForGame(string $gameKey): ?string
+    {
+        $gameKey = trim($gameKey);
+        if ($gameKey === '') {
+            return null;
+        }
+
+        $map = $this->getAdapterMappings();
+        return $map[$gameKey] ?? null;
+    }
+
+    /**
+     * Persist adapter mappings (game_key => adapter_key).
+     */
+    public function saveAdapterMappings(array $mappings): void
+    {
+        $sanitized = [];
+        $options = $this->getAdapterOptions();
+        foreach ($mappings as $gameKey => $adapterKey) {
+            $gameKey = trim((string)$gameKey);
+            $adapterKey = $this->sanitizeAdapterKey((string)$adapterKey);
+            if ($gameKey === '' || !isset($options[$adapterKey])) {
+                continue;
+            }
+            $sanitized[$gameKey] = $adapterKey;
+        }
+
+        file_put_contents($this->adapterMapFile, json_encode($sanitized, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getAdapterMappings(): array
+    {
+        if (!is_file($this->adapterMapFile)) {
+            return [];
+        }
+
+        $raw = file_get_contents($this->adapterMapFile);
+        $decoded = json_decode((string)$raw, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($decoded as $gameKey => $adapterKey) {
+            if (!is_string($gameKey) || !is_string($adapterKey)) {
+                continue;
+            }
+            $result[$gameKey] = $adapterKey;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Discover available game keys from server config XMLs.
+     *
+     * @return array<int,string>
+     */
+    public function listAvailableGameKeys(): array
+    {
+        $keys = [];
+        $configDir = defined('SERVER_CONFIG_LOCATION') ? SERVER_CONFIG_LOCATION : __DIR__ . '/../../config_games/server_configs';
+        foreach (glob($configDir . '/*.xml') as $file) {
+            $xml = @simplexml_load_file($file);
+            if ($xml === false) {
+                continue;
+            }
+            if (isset($xml->game_key)) {
+                $keys[] = trim((string)$xml->game_key);
+            }
+        }
+
+        $keys = array_filter(array_unique($keys));
+        sort($keys);
+        return array_values($keys);
+    }
+
     private function sanitizeInterval(?int $minutes): int
     {
         if ($minutes === null || $minutes <= 0) {
@@ -386,5 +473,17 @@ class SteamWorkshopService
             'raw_definition' => '',
             'last_saved_at' => null,
         ];
+    }
+
+    private function ensureDataFiles(): void
+    {
+        $dir = dirname($this->adapterMapFile);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+
+        if (!is_file($this->adapterMapFile)) {
+            file_put_contents($this->adapterMapFile, json_encode([]));
+        }
     }
 }

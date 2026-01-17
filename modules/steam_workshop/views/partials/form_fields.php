@@ -3,6 +3,7 @@ declare(strict_types=1);
 /** @var array $formConfig */
 /** @var array $adapterOptions */
 /** @var array $lang */
+/** @var bool $adapterLocked */
 $enabled = !empty($formConfig['workshop_enabled']);
 $interval = (int)$formConfig['update_interval_minutes'];
 $stagingDir = htmlspecialchars($formConfig['staging_dir']);
@@ -10,6 +11,7 @@ $postInstall = htmlspecialchars($formConfig['post_install_script']);
 $rawDefinition = htmlspecialchars($formConfig['raw_definition']);
 $installStrategy = $formConfig['install_strategy'];
 $onUpdateAction = $formConfig['on_update_action'];
+$currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper($formConfig['adapter_key']);
 ?>
 <div class="sw-form__grid">
     <label class="sw-toggle">
@@ -19,13 +21,18 @@ $onUpdateAction = $formConfig['on_update_action'];
 
     <label>
         <span><?php echo htmlspecialchars($lang['label_adapter']); ?></span>
-        <select name="workshop[adapter_key]">
-            <?php foreach ($adapterOptions as $key => $label): ?>
-                <option value="<?php echo htmlspecialchars($key); ?>" <?php echo $formConfig['adapter_key'] === $key ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($label); ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+        <?php if ($adapterLocked): ?>
+            <input type="text" value="<?php echo htmlspecialchars($currentAdapterName); ?>" disabled />
+            <small><?php echo htmlspecialchars($lang['adapter_locked_note'] ?? 'This adapter is managed by the administrator.'); ?></small>
+        <?php else: ?>
+            <select name="workshop[adapter_key]">
+                <?php foreach ($adapterOptions as $key => $label): ?>
+                    <option value="<?php echo htmlspecialchars($key); ?>" <?php echo $formConfig['adapter_key'] === $key ? 'selected' : ''; ?>>
+                        <?php echo htmlspecialchars($label); ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        <?php endif; ?>
     </label>
 
     <label>

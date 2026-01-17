@@ -54,10 +54,11 @@ class SteamWorkshopController
         }
 
         $config = $this->service->buildConfigFromRequest($_POST);
+        $adapterLocked = $this->applyGameAdapterOverride($home, $config);
         $this->service->saveConfig($homeId, $config);
         print_success($this->lang['message_config_saved'] ?? 'Workshop configuration saved.');
 
-        $this->renderEdit($home, $config, $isAdmin);
+        $this->renderEdit($home, $config, $isAdmin, $adapterLocked);
     }
 
     private function handleEdit(int $userId, bool $isAdmin): void
@@ -77,7 +78,8 @@ class SteamWorkshopController
         }
 
         $config = $this->service->loadConfig($homeId);
-        $this->renderEdit($home, $config, $isAdmin);
+        $adapterLocked = $this->applyGameAdapterOverride($home, $config);
+        $this->renderEdit($home, $config, $isAdmin, $adapterLocked);
     }
 
     private function renderIndex(int $userId, bool $isAdmin): void
@@ -86,6 +88,7 @@ class SteamWorkshopController
         $homes = $this->service->listHomesForUser($userId, $isAdmin);
         foreach ($homes as $home) {
             $config = $this->service->loadConfig((int)$home['home_id']);
+            $this->applyGameAdapterOverride($home, $config);
             $adapter = $this->service->getAdapterByKey($config['adapter_key']);
             $records[] = [
                 'home' => $home,
@@ -102,7 +105,7 @@ class SteamWorkshopController
         ]);
     }
 
-    private function renderEdit(array $home, array $config, bool $isAdmin): void
+    private function renderEdit(array $home, array $config, bool $isAdmin, bool $adapterLocked): void
     {
         $this->render('edit', [
             'lang' => $this->lang,
@@ -110,7 +113,20 @@ class SteamWorkshopController
             'config' => $config,
             'isAdmin' => $isAdmin,
             'adapterOptions' => $this->service->getAdapterOptions(),
+            'adapterLocked' => $adapterLocked,
         ]);
+    }
+
+    private function applyGameAdapterOverride(array $home, array &$config): bool
+    {
+        $gameKey = isset($home['game_key']) ? (string)$home['game_key'] : '';
+        $mapped = $this->service->getAdapterKeyForGame($gameKey);
+        if ($mapped !== null && $mapped !== '') {
+            $config['adapter_key'] = $mapped;
+            return true;
+        }
+
+        return false;
     }
 
     private function render(string $view, array $data = []): void

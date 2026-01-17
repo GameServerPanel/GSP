@@ -16,6 +16,7 @@ return [
     'label_post_install_script' => 'Post-install script (absolute path)',
     'label_mod_import' => 'Workshop IDs list (one "id,@ModName" per line)',
     'hint_mod_import' => 'Paste from Modlist.txt or import from a collection. IDs are sanitized automatically.',
+    'adapter_locked_note' => 'This adapter is enforced for the current game type by your administrator.',
     'status_enabled' => 'Enabled',
     'status_disabled' => 'Disabled',
     'status_hot_reload' => 'Hot reload ready',
