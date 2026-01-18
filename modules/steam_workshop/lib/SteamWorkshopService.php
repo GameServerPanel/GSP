@@ -11,8 +11,7 @@ class SteamWorkshopService
 	private string $adapterDir;
 	private string $adapterMapFile;
 	private string $gameAdapterDir;
-	private string $workshopConfigDir;
-	private ?array $workshopAppIds = null;
+	private string $serverConfigDir;
 
 	public function __construct(OGPDatabase $db)
 	{
@@ -21,7 +20,9 @@ class SteamWorkshopService
 		$this->adapterDir = __DIR__ . '/GameAdapters';
 		$this->adapterMapFile = __DIR__ . '/../data/game_adapter_map.json';
 		$this->gameAdapterDir = __DIR__ . '/../data/game_adapters';
-		$this->workshopConfigDir = __DIR__ . '/../game_configs';
+		$this->serverConfigDir = defined('SERVER_CONFIG_LOCATION')
+			? SERVER_CONFIG_LOCATION
+			: __DIR__ . '/../../config_games/server_configs';
 
 		if (!is_dir($this->configDir)) {
 			mkdir($this->configDir, 0775, true);
@@ -502,17 +503,20 @@ class SteamWorkshopService
 
 	public function listWorkshopGameGroups(): array
 	{
-		$configDir = defined('SERVER_CONFIG_LOCATION') ? SERVER_CONFIG_LOCATION : __DIR__ . '/../../config_games/server_configs';
-		$groups = [];
-		$supportedAppIds = $this->getWorkshopConfigAppIds();
-		if (empty($supportedAppIds)) {
+		$configDir = $this->serverConfigDir;
+		if (!is_dir($configDir)) {
 			return [];
 		}
-		$supportedLookup = array_flip($supportedAppIds);
 
+		$groups = [];
 		foreach (glob($configDir . '/*.xml') as $file) {
 			$xml = @simplexml_load_file($file);
 			if ($xml === false) {
+				continue;
+			}
+
+			$installer = isset($xml->installer) ? trim((string)$xml->installer) : '';
+			if ($installer !== 'steamcmd') {
 				continue;
 			}
 
@@ -523,10 +527,6 @@ class SteamWorkshopService
 
 			$appId = $this->parseSteamAppIdFromConfig($xml);
 			if ($appId === null) {
-				continue;
-			}
-
-			if (!isset($supportedLookup[$appId])) {
 				continue;
 			}
 
@@ -747,11 +747,7 @@ class SteamWorkshopService
 		}
 
 		$appId = $this->parseSteamAppIdFromConfig($serverXml);
-		if ($appId === null) {
-			return false;
-		}
-
-		return in_array($appId, $this->getWorkshopConfigAppIds(), true);
+		return $appId !== null;
 	}
 
 	private function parseSteamAppIdFromConfig($xml): ?string
@@ -780,39 +776,6 @@ class SteamWorkshopService
 		}
 
 		return $candidate;
-	}
-
-	private function getWorkshopConfigAppIds(): array
-	{
-		if ($this->workshopAppIds !== null) {
-			return $this->workshopAppIds;
-		}
-
-		$dir = $this->workshopConfigDir;
-		if (!is_dir($dir)) {
-			$this->workshopAppIds = [];
-			return $this->workshopAppIds;
-		}
-
-		$appIds = [];
-		foreach (glob($dir . '/*.xml') as $file) {
-			$xml = @simplexml_load_file($file);
-			if ($xml === false) {
-				continue;
-			}
-
-			$appId = preg_replace('/[^0-9]/', '', (string)($xml->workshop_id ?? ''));
-			if ($appId === '') {
-				continue;
-			}
-
-			$appIds[$appId] = true;
-		}
-
-		$this->workshopAppIds = array_keys($appIds);
-		sort($this->workshopAppIds);
-
-		return $this->workshopAppIds;
 	}
 
 	private function buildWorkshopGroupKey(string $appId): string
