@@ -22,31 +22,34 @@
  *
  */
 
-if (isset($server_xml->installer) && $server_xml->installer === "steamcmd")
+require_once __DIR__ . '/lib/SteamWorkshopService.php';
+
+global $db;
+
+$module_buttons = array();
+
+if (isset($server_xml) && isset($server_home['home_id']))
 {
-	$homeId = isset($server_home['home_id']) ? (int)$server_home['home_id'] : 0;
-	if ($homeId > 0)
+	$service = new SteamWorkshopService($db);
+	if ($service->gameSupportsWorkshop($server_xml))
 	{
-		$label = get_lang('steam_workshop');
-		if ($label === 'steam_workshop')
+		$homeId = (int)$server_home['home_id'];
+		if ($homeId > 0)
 		{
-			$label = 'Steam Workshop';
+			$label = get_lang('steam_workshop');
+			if ($label === 'steam_workshop')
+			{
+				$label = 'Steam Workshop';
+			}
+
+			$href = "?m=steam_workshop&p=main&action=edit&home_id=" . $homeId;
+			$module_buttons = array(
+				"<a class='monitorbutton' href='" . $href . "'>
+					<img src='" . check_theme_image("images/steam_workshop.png") . "' title='" . $label . "'>
+					<span>" . $label . "</span>
+				</a>"
+			);
 		}
-		$href = "?m=steam_workshop&p=main&action=edit&home_id=" . $homeId;
-		$module_buttons = array(
-			"<a class='monitorbutton' href='" . $href . "'>
-				<img src='" . check_theme_image("images/steam_workshop.png") . "' title='" . $label . "'>
-				<span>" . $label . "</span>
-			</a>"
-		);
 	}
-	else
-	{
-		$module_buttons = array();
-	}
-}
-else
-{
-	$module_buttons = array();
 }
 ?>
