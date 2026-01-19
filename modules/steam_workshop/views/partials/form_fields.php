@@ -54,15 +54,7 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
         </select>
     </label>
 
-    <?php if ($isAdmin): ?>
-        <label>
-            <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
-            <input type="text" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" placeholder="/home/ogp_agent/scripts/workshop-hook.sh" />
-        </label>
-    <?php endif; ?>
-    <?php if (!$isAdmin): ?>
-        <input type="hidden" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" />
-    <?php endif; ?>
+    <input type="hidden" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" />
 </div>
 
 <?php if ($isAdmin): ?>

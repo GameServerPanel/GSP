@@ -12,3 +12,4 @@
 - Added the Steam Workshop mod picker, including search-backed UI, JSON state handling, and refreshed styling so customers can select mods without touching raw ID lists.
 - Pointed the Workshop search endpoint at whichever panel script rendered the page so AJAX searches work in both the main panel and the customer Game Monitor.
 - Removed the per-server install-strategy selector so that behavior is governed solely by the admin adapter configuration.
+- Removed the per-server post-install script field so hook execution stays defined at the adapter level only.
