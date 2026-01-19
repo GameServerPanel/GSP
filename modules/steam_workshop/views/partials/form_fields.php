@@ -42,15 +42,7 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
         <small><?php echo htmlspecialchars($lang['label_interval_hint']); ?></small>
     </label>
 
-    <?php if ($isAdmin): ?>
-        <label>
-            <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
-            <input type="text" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" placeholder="/home/ogp_agent/workshop-staging" />
-        </label>
-    <?php endif; ?>
-    <?php if (!$isAdmin): ?>
-        <input type="hidden" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" />
-    <?php endif; ?>
+    <input type="hidden" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" />
 
     <?php if ($isAdmin): ?>
         <label>
