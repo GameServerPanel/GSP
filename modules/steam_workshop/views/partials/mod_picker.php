@@ -5,7 +5,14 @@ declare(strict_types=1);
 /** @var array $home */
 /** @var int $homeId */
 $homeId = (int)($home['home_id'] ?? 0);
-$endpoint = sprintf('?m=steam_workshop&p=main&action=search&home_id=%d', $homeId);
+$scriptPath = (string)($_SERVER['PHP_SELF'] ?? '/index.php');
+if ($scriptPath === '') {
+    $scriptPath = '/index.php';
+}
+if ($scriptPath[0] !== '/') {
+    $scriptPath = '/' . ltrim($scriptPath, '/');
+}
+$endpoint = sprintf('%s?m=steam_workshop&p=main&action=search&home_id=%d', $scriptPath, $homeId);
 $initialItems = [];
 foreach ($config['workshop_items'] ?? [] as $item) {
     if (!is_array($item)) {

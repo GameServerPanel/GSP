@@ -47,12 +47,8 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
             <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
             <input type="text" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" placeholder="/home/ogp_agent/workshop-staging" />
         </label>
-    <?php else: ?>
-        <label>
-            <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
-            <input type="text" value="<?php echo $stagingDir; ?>" disabled />
-            <small><?php echo htmlspecialchars($lang['hint_admin_only']); ?></small>
-        </label>
+    <?php endif; ?>
+    <?php if (!$isAdmin): ?>
         <input type="hidden" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" />
     <?php endif; ?>
 
@@ -65,11 +61,8 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
                 <option value="staging" <?php echo $installStrategy === 'staging' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_staging']); ?></option>
             </select>
         </label>
-    <?php else: ?>
-        <label>
-            <span><?php echo htmlspecialchars($lang['label_install_strategy']); ?></span>
-            <input type="text" value="<?php echo htmlspecialchars($lang['install_' . $installStrategy] ?? $installStrategy); ?>" disabled />
-        </label>
+    <?php endif; ?>
+    <?php if (!$isAdmin): ?>
         <input type="hidden" name="workshop[install_strategy]" value="<?php echo htmlspecialchars($installStrategy); ?>" />
     <?php endif; ?>
 
@@ -86,12 +79,8 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
             <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
             <input type="text" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" placeholder="/home/ogp_agent/scripts/workshop-hook.sh" />
         </label>
-    <?php else: ?>
-        <label>
-            <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
-            <input type="text" value="<?php echo $postInstall; ?>" disabled />
-            <small><?php echo htmlspecialchars($lang['hint_admin_only']); ?></small>
-        </label>
+    <?php endif; ?>
+    <?php if (!$isAdmin): ?>
         <input type="hidden" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" />
     <?php endif; ?>
 </div>
