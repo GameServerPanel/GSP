@@ -4,6 +4,7 @@ declare(strict_types=1);
 /** @var array $adapterOptions */
 /** @var array $lang */
 /** @var bool $adapterLocked */
+/** @var bool $isAdmin */
 $enabled = !empty($formConfig['workshop_enabled']);
 $interval = (int)$formConfig['update_interval_minutes'];
 $stagingDir = htmlspecialchars($formConfig['staging_dir']);
@@ -41,19 +42,36 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
         <small><?php echo htmlspecialchars($lang['label_interval_hint']); ?></small>
     </label>
 
-    <label>
-        <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
-        <input type="text" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" placeholder="/home/ogp_agent/workshop-staging" />
-    </label>
+    <?php if ($isAdmin): ?>
+        <label>
+            <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
+            <input type="text" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" placeholder="/home/ogp_agent/workshop-staging" />
+        </label>
+    <?php else: ?>
+        <label>
+            <span><?php echo htmlspecialchars($lang['label_staging_dir']); ?></span>
+            <input type="text" value="<?php echo $stagingDir; ?>" disabled />
+            <small><?php echo htmlspecialchars($lang['hint_admin_only']); ?></small>
+        </label>
+        <input type="hidden" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" />
+    <?php endif; ?>
 
-    <label>
-        <span><?php echo htmlspecialchars($lang['label_install_strategy']); ?></span>
-        <select name="workshop[install_strategy]">
-            <option value="copy" <?php echo $installStrategy === 'copy' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_copy']); ?></option>
-            <option value="symlink" <?php echo $installStrategy === 'symlink' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_symlink']); ?></option>
-            <option value="staging" <?php echo $installStrategy === 'staging' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_staging']); ?></option>
-        </select>
-    </label>
+    <?php if ($isAdmin): ?>
+        <label>
+            <span><?php echo htmlspecialchars($lang['label_install_strategy']); ?></span>
+            <select name="workshop[install_strategy]">
+                <option value="copy" <?php echo $installStrategy === 'copy' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_copy']); ?></option>
+                <option value="symlink" <?php echo $installStrategy === 'symlink' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_symlink']); ?></option>
+                <option value="staging" <?php echo $installStrategy === 'staging' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_staging']); ?></option>
+            </select>
+        </label>
+    <?php else: ?>
+        <label>
+            <span><?php echo htmlspecialchars($lang['label_install_strategy']); ?></span>
+            <input type="text" value="<?php echo htmlspecialchars($lang['install_' . $installStrategy] ?? $installStrategy); ?>" disabled />
+        </label>
+        <input type="hidden" name="workshop[install_strategy]" value="<?php echo htmlspecialchars($installStrategy); ?>" />
+    <?php endif; ?>
 
     <label>
         <span><?php echo htmlspecialchars($lang['label_on_update_action']); ?></span>
@@ -63,14 +81,27 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
         </select>
     </label>
 
-    <label>
-        <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
-        <input type="text" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" placeholder="/home/ogp_agent/scripts/workshop-hook.sh" />
-    </label>
+    <?php if ($isAdmin): ?>
+        <label>
+            <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
+            <input type="text" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" placeholder="/home/ogp_agent/scripts/workshop-hook.sh" />
+        </label>
+    <?php else: ?>
+        <label>
+            <span><?php echo htmlspecialchars($lang['label_post_install_script']); ?></span>
+            <input type="text" value="<?php echo $postInstall; ?>" disabled />
+            <small><?php echo htmlspecialchars($lang['hint_admin_only']); ?></small>
+        </label>
+        <input type="hidden" name="workshop[post_install_script]" value="<?php echo $postInstall; ?>" />
+    <?php endif; ?>
 </div>
 
-<label>
-    <span><?php echo htmlspecialchars($lang['label_mod_import']); ?></span>
-    <textarea name="workshop[raw_items]" rows="8" placeholder="123456789,@Example Mod&#10;987654321,@QoL Pack"><?php echo $rawDefinition; ?></textarea>
-    <small><?php echo htmlspecialchars($lang['hint_mod_import']); ?></small>
-</label>
+<?php if ($isAdmin): ?>
+    <label>
+        <span><?php echo htmlspecialchars($lang['label_mod_import']); ?></span>
+        <textarea name="workshop[raw_items]" rows="8" placeholder="123456789,@Example Mod&#10;987654321,@QoL Pack"><?php echo $rawDefinition; ?></textarea>
+        <small><?php echo htmlspecialchars($lang['hint_mod_import']); ?></small>
+    </label>
+<?php else: ?>
+    <input type="hidden" name="workshop[raw_items]" value="<?php echo $rawDefinition; ?>" />
+<?php endif; ?>

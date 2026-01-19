@@ -145,7 +145,13 @@ class SteamWorkshopService
 	{
 		$input = $payload['workshop'] ?? [];
 		$rawMods = trim((string)($input['raw_items'] ?? ''));
-		$items = $this->parseWorkshopItems($rawMods);
+		$selectedItems = $this->parseSelectedItemsJson((string)($input['selected_items'] ?? ''));
+		if (!empty($selectedItems)) {
+			$items = $selectedItems;
+			$rawMods = $this->serializeWorkshopItems($selectedItems);
+		} else {
+			$items = $this->parseWorkshopItems($rawMods);
+		}
 
 		return [
 			'workshop_enabled' => isset($input['workshop_enabled']) ? (bool)$input['workshop_enabled'] : false,
@@ -568,6 +574,41 @@ class SteamWorkshopService
 		return array_values(array_unique($keys));
 	}
 
+	public function getSteamAppIdForGameKey(string $gameKey): ?string
+	{
+		$xml = $this->loadServerConfigXml($gameKey);
+		if ($xml === null) {
+			return null;
+		}
+
+		return $this->parseSteamAppIdFromConfig($xml);
+	}
+
+	public function searchWorkshopItems(string $gameKey, string $query, int $limit = 12): array
+	{
+		$query = trim($query);
+		if ($query === '') {
+			return [];
+		}
+
+		$appId = $this->getSteamAppIdForGameKey($gameKey);
+		if ($appId === null) {
+			return [];
+		}
+
+		if (ctype_digit($query)) {
+			$item = $this->fetchWorkshopItemById($query);
+			return $item === null ? [] : [$item];
+		}
+
+		$html = $this->fetchWorkshopSearchHtml($appId, $query, $limit * 2);
+		if ($html === null) {
+			return [];
+		}
+
+		return $this->extractWorkshopItemsFromHtml($html, $limit);
+	}
+
 	private function sanitizeInterval(?int $minutes): int
 	{
 		if ($minutes === null || $minutes <= 0) {
@@ -617,6 +658,8 @@ class SteamWorkshopService
 			$item['label'] = trim((string)($item['label'] ?? ''));
 			$item['enabled'] = !empty($item['enabled']);
 			$item['source'] = $item['source'] ?? 'manual';
+			$item['author'] = trim((string)($item['author'] ?? ''));
+			$item['preview_url'] = trim((string)($item['preview_url'] ?? ''));
 			return $item;
 		}, $config['workshop_items']);
 
@@ -735,6 +778,7 @@ class SteamWorkshopService
 			file_put_contents($this->adapterMapFile, json_encode([], JSON_PRETTY_PRINT));
 		}
 	}
+
 	public function gameSupportsWorkshop($serverXml): bool
 	{
 		if (!($serverXml instanceof SimpleXMLElement)) {
@@ -776,6 +820,218 @@ class SteamWorkshopService
 		}
 
 		return $candidate;
+	}
+
+	private function loadServerConfigXml(string $gameKey): ?SimpleXMLElement
+	{
+		$gameKey = $this->sanitizeGameKey($gameKey);
+		if ($gameKey === '') {
+			return null;
+		}
+
+		$directPath = sprintf('%s/%s.xml', $this->serverConfigDir, $gameKey);
+		if (is_file($directPath)) {
+			$xml = @simplexml_load_file($directPath);
+			if ($xml !== false) {
+				return $xml;
+			}
+		}
+
+		foreach (glob($this->serverConfigDir . '/*.xml') as $file) {
+			$xml = @simplexml_load_file($file);
+			if ($xml === false) {
+				continue;
+			}
+			$configuredKey = isset($xml->game_key) ? $this->sanitizeGameKey((string)$xml->game_key) : '';
+			if ($configuredKey === $gameKey) {
+				return $xml;
+			}
+		}
+
+		return null;
+	}
+
+	private function parseSelectedItemsJson(string $json): array
+	{
+		if ($json === '') {
+			return [];
+		}
+
+		$decoded = json_decode($json, true);
+		if (!is_array($decoded)) {
+			return [];
+		}
+
+		$result = [];
+		foreach ($decoded as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$id = preg_replace('/[^0-9]/', '', (string)($item['id'] ?? ''));
+			if ($id === '') {
+				continue;
+			}
+			$label = trim((string)($item['label'] ?? ''));
+			if ($label === '') {
+				$label = '@' . $id;
+			}
+			$result[$id] = [
+				'id' => $id,
+				'label' => $label,
+				'author' => trim((string)($item['author'] ?? '')),
+				'preview_url' => trim((string)($item['preview_url'] ?? '')),
+				'enabled' => isset($item['enabled']) ? (bool)$item['enabled'] : true,
+				'source' => trim((string)($item['source'] ?? 'search')),
+			];
+		}
+
+		return array_values($result);
+	}
+
+	private function serializeWorkshopItems(array $items): string
+	{
+		$lines = [];
+		foreach ($items as $item) {
+			$id = preg_replace('/[^0-9]/', '', (string)($item['id'] ?? ''));
+			if ($id === '') {
+				continue;
+			}
+			$label = trim((string)($item['label'] ?? ''));
+			if ($label === '') {
+				$label = '@' . $id;
+			}
+			$lines[] = $id . ',' . $label;
+		}
+
+		return implode(PHP_EOL, $lines);
+	}
+
+	private function fetchWorkshopSearchHtml(string $appId, string $query, int $pageSize): ?string
+	{
+		$params = http_build_query([
+			'appid' => $appId,
+			'searchtext' => $query,
+			'numperpage' => max(5, $pageSize),
+			'format' => 'json',
+			'browsesort' => 'textsearch',
+		]);
+		$url = 'https://steamcommunity.com/workshop/browse/?' . $params;
+		$response = $this->httpRequest($url);
+		if ($response === null) {
+			return null;
+		}
+
+		$data = json_decode($response, true);
+		if (is_array($data) && isset($data['html'])) {
+			return (string)$data['html'];
+		}
+
+		return $response;
+	}
+
+	private function extractWorkshopItemsFromHtml(string $html, int $limit): array
+	{
+		libxml_use_internal_errors(true);
+		$doc = new DOMDocument();
+		$doc->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+		libxml_clear_errors();
+		$xpath = new DOMXPath($doc);
+		$nodes = $xpath->query('//*[@data-publishedfileid]');
+		$results = [];
+
+		foreach ($nodes as $node) {
+			if (!($node instanceof DOMElement)) {
+				continue;
+			}
+			$id = $node->getAttribute('data-publishedfileid');
+			if ($id === '') {
+				continue;
+			}
+
+			$titleNode = $xpath->query('.//*[contains(@class,"workshopItemTitle")]', $node)->item(0);
+			$authorNode = $xpath->query('.//*[contains(@class,"workshopItemAuthorName")]', $node)->item(0);
+			$imgNode = $xpath->query('.//img[contains(@class,"workshopItemPreviewImage") or contains(@class,"workshopItemPreviewImageMain")]', $node)->item(0);
+
+			$results[$id] = [
+				'id' => $id,
+				'label' => trim($titleNode instanceof DOMNode ? $titleNode->textContent : ('@' . $id)),
+				'author' => trim($authorNode instanceof DOMNode ? $authorNode->textContent : ''),
+				'preview_url' => $imgNode instanceof DOMElement ? (string)$imgNode->getAttribute('src') : '',
+				'enabled' => true,
+				'source' => 'search',
+			];
+
+			if (count($results) >= $limit) {
+				break;
+			}
+		}
+
+		return array_values($results);
+	}
+
+	private function fetchWorkshopItemById(string $id): ?array
+	{
+		$postData = http_build_query([
+			'itemcount' => 1,
+			'publishedfileids[0]' => $id,
+		]);
+		$response = $this->httpRequest('https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/', $postData);
+		if ($response === null) {
+			return null;
+		}
+
+		$data = json_decode($response, true);
+		$details = $data['response']['publishedfiledetails'][0] ?? null;
+		if (!is_array($details) || (int)($details['result'] ?? 0) !== 1) {
+			return null;
+		}
+
+		$title = trim((string)($details['title'] ?? ''));
+		if ($title === '') {
+			$title = '@' . $id;
+		}
+
+		return [
+			'id' => $id,
+			'label' => $title,
+			'author' => (string)($details['creator'] ?? ''),
+			'preview_url' => (string)($details['preview_url'] ?? ''),
+			'enabled' => true,
+			'source' => 'search',
+		];
+	}
+
+	private function httpRequest(string $url, ?string $postFields = null): ?string
+	{
+		if (function_exists('curl_init')) {
+			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+			curl_setopt($ch, CURLOPT_USERAGENT, 'GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)');
+			if ($postFields !== null) {
+				curl_setopt($ch, CURLOPT_POST, true);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+			}
+			$response = curl_exec($ch);
+			curl_close($ch);
+			return is_string($response) ? $response : null;
+		}
+
+		$contextOptions = [
+			'http' => [
+				'method' => $postFields !== null ? 'POST' : 'GET',
+				'timeout' => 10,
+				'header' => "User-Agent: GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)\r\n" . ($postFields !== null ? "Content-Type: application/x-www-form-urlencoded\r\n" : ''),
+			],
+		];
+		if ($postFields !== null) {
+			$contextOptions['http']['content'] = $postFields;
+		}
+		$context = stream_context_create($contextOptions);
+		$result = @file_get_contents($url, false, $context);
+
+		return $result === false ? null : $result;
 	}
 
 	private function buildWorkshopGroupKey(string $appId): string

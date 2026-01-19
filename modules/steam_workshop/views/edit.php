@@ -15,6 +15,7 @@ $homeId = (int)$home['home_id'];
     <form method="post" action="?m=steam_workshop&amp;p=main&amp;action=save" class="sw-form">
         <input type="hidden" name="home_id" value="<?php echo $homeId; ?>" />
         <?php $formConfig = $config; include __DIR__ . '/partials/form_fields.php'; ?>
+        <?php include __DIR__ . '/partials/mod_picker.php'; ?>
         <div class="sw-form__actions">
             <button class="btn primary" type="submit"><?php echo htmlspecialchars($lang['button_save']); ?></button>
             <a class="btn" href="?m=steam_workshop&amp;p=main"><?php echo htmlspecialchars($lang['button_cancel']); ?></a>

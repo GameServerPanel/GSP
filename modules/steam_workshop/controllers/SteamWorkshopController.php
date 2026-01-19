@@ -22,7 +22,13 @@ class SteamWorkshopController
         $isAdmin = $db->isAdmin($userId);
         $action = $_GET['action'] ?? 'index';
 
+        if ($action === 'search') {
+            $this->handleSearch($userId, $isAdmin);
+            return;
+        }
+
         echo '<link rel="stylesheet" type="text/css" href="modules/steam_workshop/steam_workshop.css" />';
+        echo '<script src="modules/steam_workshop/steam_workshop.js" defer></script>';
 
         if ($action === 'save' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->handleSave($userId, $isAdmin);
@@ -115,6 +121,41 @@ class SteamWorkshopController
             'adapterOptions' => $this->service->getAdapterOptions(),
             'adapterLocked' => $adapterLocked,
         ]);
+    }
+
+    private function handleSearch(int $userId, bool $isAdmin): void
+    {
+        header('Content-Type: application/json');
+        $homeId = isset($_GET['home_id']) ? (int)$_GET['home_id'] : 0;
+        $query = trim((string)($_GET['q'] ?? ''));
+        if ($homeId <= 0) {
+            echo json_encode(['ok' => false, 'error' => $this->lang['error_missing_home'] ?? 'Home ID missing.']);
+            return;
+        }
+        if ($query === '') {
+            echo json_encode(['ok' => false, 'error' => $this->lang['error_missing_query'] ?? 'Enter a search term.']);
+            return;
+        }
+
+        $home = $this->service->getHome($homeId, $userId, $isAdmin);
+        if ($home === null) {
+            echo json_encode(['ok' => false, 'error' => $this->lang['error_home_not_found'] ?? 'Home not found.']);
+            return;
+        }
+
+        $gameKey = (string)($home['game_key'] ?? '');
+        if ($gameKey === '') {
+            echo json_encode(['ok' => false, 'error' => $this->lang['error_home_not_found'] ?? 'Home not found.']);
+            return;
+        }
+
+        $results = $this->service->searchWorkshopItems($gameKey, $query);
+        if (empty($results)) {
+            echo json_encode(['ok' => true, 'results' => [], 'empty' => true]);
+            return;
+        }
+
+        echo json_encode(['ok' => true, 'results' => $results]);
     }
 
     private function applyGameAdapterOverride(array $home, array &$config): bool

@@ -1,1 +1,2 @@
 - Auto-detect which server configs actually support Steam Workshop before showing adapter controls.
+- Allow players/admins to reorder selected Workshop mods in the new picker UI so load order matches game expectations.
