@@ -44,19 +44,7 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
 
     <input type="hidden" name="workshop[staging_dir]" value="<?php echo $stagingDir; ?>" />
 
-    <?php if ($isAdmin): ?>
-        <label>
-            <span><?php echo htmlspecialchars($lang['label_install_strategy']); ?></span>
-            <select name="workshop[install_strategy]">
-                <option value="copy" <?php echo $installStrategy === 'copy' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_copy']); ?></option>
-                <option value="symlink" <?php echo $installStrategy === 'symlink' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_symlink']); ?></option>
-                <option value="staging" <?php echo $installStrategy === 'staging' ? 'selected' : ''; ?>><?php echo htmlspecialchars($lang['install_staging']); ?></option>
-            </select>
-        </label>
-    <?php endif; ?>
-    <?php if (!$isAdmin): ?>
-        <input type="hidden" name="workshop[install_strategy]" value="<?php echo htmlspecialchars($installStrategy); ?>" />
-    <?php endif; ?>
+    <input type="hidden" name="workshop[install_strategy]" value="<?php echo htmlspecialchars($installStrategy); ?>" />
 
     <label>
         <span><?php echo htmlspecialchars($lang['label_on_update_action']); ?></span>
