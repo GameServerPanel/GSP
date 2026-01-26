@@ -128,6 +128,8 @@ class SteamWorkshopController
         header('Content-Type: application/json');
         $homeId = isset($_GET['home_id']) ? (int)$_GET['home_id'] : 0;
         $query = trim((string)($_GET['q'] ?? ''));
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = isset($_GET['per_page']) ? (int)$_GET['per_page'] : 12;
         if ($homeId <= 0) {
             echo json_encode(['ok' => false, 'error' => $this->lang['error_missing_home'] ?? 'Home ID missing.']);
             return;
@@ -149,13 +151,22 @@ class SteamWorkshopController
             return;
         }
 
-        $results = $this->service->searchWorkshopItems($gameKey, $query);
-        if (empty($results)) {
-            echo json_encode(['ok' => true, 'results' => [], 'empty' => true]);
+        $payload = $this->service->searchWorkshopItems($gameKey, $query, $perPage, $page);
+        if ($payload['error'] !== null) {
+            echo json_encode(['ok' => false, 'error' => $payload['error']]);
             return;
         }
 
-        echo json_encode(['ok' => true, 'results' => $results]);
+        $response = [
+            'ok' => true,
+            'results' => $payload['results'],
+            'pagination' => $payload['pagination'],
+        ];
+        if (empty($payload['results'])) {
+            $response['empty'] = true;
+        }
+
+        echo json_encode($response);
     }
 
     private function applyGameAdapterOverride(array $home, array &$config): bool

@@ -12,6 +12,9 @@ class SteamWorkshopService
 	private string $adapterMapFile;
 	private string $gameAdapterDir;
 	private string $serverConfigDir;
+	private string $logDir;
+	private string $apiLogFile;
+	private string $steamCmdLogDir;
 
 	public function __construct(OGPDatabase $db)
 	{
@@ -23,13 +26,14 @@ class SteamWorkshopService
 		$this->serverConfigDir = defined('SERVER_CONFIG_LOCATION')
 			? SERVER_CONFIG_LOCATION
 			: __DIR__ . '/../../config_games/server_configs';
+		$this->logDir = __DIR__ . '/../logs';
+		$this->steamCmdLogDir = $this->logDir . '/steamcmd';
+		$this->apiLogFile = $this->logDir . '/steam_api.log';
 
-		if (!is_dir($this->configDir)) {
-			mkdir($this->configDir, 0775, true);
-		}
-
-		if (!is_dir($this->gameAdapterDir)) {
-			mkdir($this->gameAdapterDir, 0775, true);
+		foreach ([$this->configDir, $this->gameAdapterDir, $this->logDir, $this->steamCmdLogDir] as $dir) {
+			if (!is_dir($dir)) {
+				mkdir($dir, 0775, true);
+			}
 		}
 
 		$this->ensureDataFiles();
@@ -208,6 +212,44 @@ class SteamWorkshopService
 		$appId = $adapter['steam_app_id'] ?? ($config['steam_app_id'] ?? '');
 
 		return ['+login', $loginUser, '+workshop_download_item', $appId, $workshopId, 'validate'];
+	}
+
+	/**
+	 * Example usage:
+	 * $service->installWorkshopItem('/opt/steamcmd/steamcmd.sh', '221100', '1234567890');
+	 */
+	public function installWorkshopItem(string $steamCmdPath, string $appId, string $workshopId, ?string $username = null, ?string $password = null, ?string $logFile = null): array
+	{
+		$logPath = $logFile ?? sprintf('%s/%s-%s-%s.log', $this->steamCmdLogDir, $appId, $workshopId, date('Ymd_His'));
+		$appId = trim($appId);
+		$workshopId = preg_replace('/[^0-9]/', '', $workshopId);
+
+		if ($steamCmdPath === '' || !is_file($steamCmdPath)) {
+			$message = sprintf('SteamCMD binary not found at %s', $steamCmdPath);
+			$this->appendLog($logPath, $message);
+			return ['success' => false, 'error' => $message, 'log_file' => $logPath, 'attempts' => []];
+		}
+
+		$attempts = [];
+		$logins = [['user' => 'anonymous', 'password' => null]];
+		if ($username !== null && $username !== '') {
+			$logins[] = ['user' => $username, 'password' => $password];
+		}
+
+		foreach ($logins as $credentials) {
+			$this->appendLog($logPath, sprintf('SteamCMD download start app=%s workshop=%s login=%s', $appId, $workshopId, $credentials['user']));
+			$result = $this->runSteamCmdDownload($steamCmdPath, $appId, $workshopId, $credentials['user'], $credentials['password']);
+			$this->appendSteamCmdOutput($logPath, $result['output']);
+			$this->appendLog($logPath, sprintf('SteamCMD exit code %d for login %s', $result['exit_code'], $credentials['user']));
+			$attempts[] = ['user' => $credentials['user'], 'exit_code' => $result['exit_code']];
+			if ($result['exit_code'] === 0) {
+				return ['success' => true, 'log_file' => $logPath, 'attempts' => $attempts];
+			}
+		}
+
+		$message = 'All SteamCMD login attempts failed.';
+		$this->appendLog($logPath, $message);
+		return ['success' => false, 'error' => $message, 'log_file' => $logPath, 'attempts' => $attempts];
 	}
 
 	public function getAdapterOptions(): array
@@ -584,29 +626,96 @@ class SteamWorkshopService
 		return $this->parseSteamAppIdFromConfig($xml);
 	}
 
-	public function searchWorkshopItems(string $gameKey, string $query, int $limit = 12): array
+	/**
+	 * Example usage:
+	 * $service->searchWorkshopItems('dayz', 'weapon', 12, 1);
+	 */
+	public function searchWorkshopItems(string $gameKey, string $query, int $perPage = 12, int $page = 1): array
 	{
 		$query = trim($query);
+		$payload = [
+			'results' => [],
+			'pagination' => [
+				'page' => max(1, $page),
+				'per_page' => max(1, min(100, $perPage)),
+				'total' => 0,
+				'has_more' => false,
+			],
+			'error' => null,
+		];
+
 		if ($query === '') {
-			return [];
+			$payload['error'] = 'Enter a Workshop ID or keyword.';
+			return $payload;
 		}
 
 		$appId = $this->getSteamAppIdForGameKey($gameKey);
 		if ($appId === null) {
-			return [];
+			$payload['error'] = 'Workshop search is not configured for this game.';
+			$this->logApiFailure(sprintf('Missing Steam AppID for game key %s during search.', $gameKey));
+			return $payload;
 		}
 
 		if (ctype_digit($query)) {
 			$item = $this->fetchWorkshopItemById($query);
-			return $item === null ? [] : [$item];
+			if ($item !== null) {
+				$payload['results'][] = $item;
+				$payload['pagination']['total'] = 1;
+			}
+			return $payload;
 		}
 
-		$html = $this->fetchWorkshopSearchHtml($appId, $query, $limit * 2);
-		if ($html === null) {
-			return [];
+		$postFields = [
+			'query_type' => 0,
+			'page' => $payload['pagination']['page'],
+			'numperpage' => $payload['pagination']['per_page'],
+			'appid' => $appId,
+			'search_text' => $query,
+			'return_details' => true,
+			'return_metadata' => false,
+		];
+
+		$response = $this->executeSteamApiRequest('https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/', $postFields);
+		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
+			$reason = $response['error'] ?? ('HTTP ' . $response['http_code']);
+			$this->logApiFailure(sprintf('Steam API search failed (app=%s query="%s" page=%d): %s', $appId, $query, $payload['pagination']['page'], $reason));
+			$payload['error'] = 'Unable to contact the Steam Workshop.';
+			return $payload;
 		}
 
-		return $this->extractWorkshopItemsFromHtml($html, $limit);
+		$data = json_decode((string)$response['body'], true);
+		if (!is_array($data) || !isset($data['response'])) {
+			$this->logApiFailure(sprintf('Steam API search returned invalid payload (app=%s query="%s")', $appId, $query));
+			$payload['error'] = 'Unable to contact the Steam Workshop.';
+			return $payload;
+		}
+		$details = $data['response']['publishedfiledetails'] ?? [];
+		$total = (int)($data['response']['total'] ?? count($details));
+
+		foreach ($details as $item) {
+			$id = isset($item['publishedfileid']) ? preg_replace('/[^0-9]/', '', (string)$item['publishedfileid']) : '';
+			if ($id === '') {
+				continue;
+			}
+			$title = isset($item['title']) ? trim((string)$item['title']) : '';
+			if ($title === '') {
+				$title = '@' . $id;
+			}
+			$payload['results'][] = [
+				'id' => $id,
+				'label' => $title,
+				'author' => isset($item['creator']) ? (string)$item['creator'] : '',
+				'preview_url' => isset($item['preview_url']) ? (string)$item['preview_url'] : '',
+				'time_updated' => isset($item['time_updated']) ? (int)$item['time_updated'] : null,
+				'subscriptions' => isset($item['subscriptions']) ? (int)$item['subscriptions'] : 0,
+				'source' => 'search',
+			];
+		}
+
+		$payload['pagination']['total'] = $total;
+		$payload['pagination']['has_more'] = ($payload['pagination']['page'] * $payload['pagination']['per_page']) < $total;
+
+		return $payload;
 	}
 
 	private function sanitizeInterval(?int $minutes): int
@@ -777,6 +886,10 @@ class SteamWorkshopService
 		if (!is_file($this->adapterMapFile)) {
 			file_put_contents($this->adapterMapFile, json_encode([], JSON_PRETTY_PRINT));
 		}
+
+		if (!is_file($this->apiLogFile)) {
+			touch($this->apiLogFile);
+		}
 	}
 
 	public function gameSupportsWorkshop($serverXml): bool
@@ -906,81 +1019,20 @@ class SteamWorkshopService
 		return implode(PHP_EOL, $lines);
 	}
 
-	private function fetchWorkshopSearchHtml(string $appId, string $query, int $pageSize): ?string
-	{
-		$params = http_build_query([
-			'appid' => $appId,
-			'searchtext' => $query,
-			'numperpage' => max(5, $pageSize),
-			'format' => 'json',
-			'browsesort' => 'textsearch',
-		]);
-		$url = 'https://steamcommunity.com/workshop/browse/?' . $params;
-		$response = $this->httpRequest($url);
-		if ($response === null) {
-			return null;
-		}
-
-		$data = json_decode($response, true);
-		if (is_array($data) && isset($data['html'])) {
-			return (string)$data['html'];
-		}
-
-		return $response;
-	}
-
-	private function extractWorkshopItemsFromHtml(string $html, int $limit): array
-	{
-		libxml_use_internal_errors(true);
-		$doc = new DOMDocument();
-		$doc->loadHTML('<?xml encoding="utf-8" ?>' . $html);
-		libxml_clear_errors();
-		$xpath = new DOMXPath($doc);
-		$nodes = $xpath->query('//*[@data-publishedfileid]');
-		$results = [];
-
-		foreach ($nodes as $node) {
-			if (!($node instanceof DOMElement)) {
-				continue;
-			}
-			$id = $node->getAttribute('data-publishedfileid');
-			if ($id === '') {
-				continue;
-			}
-
-			$titleNode = $xpath->query('.//*[contains(@class,"workshopItemTitle")]', $node)->item(0);
-			$authorNode = $xpath->query('.//*[contains(@class,"workshopItemAuthorName")]', $node)->item(0);
-			$imgNode = $xpath->query('.//img[contains(@class,"workshopItemPreviewImage") or contains(@class,"workshopItemPreviewImageMain")]', $node)->item(0);
-
-			$results[$id] = [
-				'id' => $id,
-				'label' => trim($titleNode instanceof DOMNode ? $titleNode->textContent : ('@' . $id)),
-				'author' => trim($authorNode instanceof DOMNode ? $authorNode->textContent : ''),
-				'preview_url' => $imgNode instanceof DOMElement ? (string)$imgNode->getAttribute('src') : '',
-				'enabled' => true,
-				'source' => 'search',
-			];
-
-			if (count($results) >= $limit) {
-				break;
-			}
-		}
-
-		return array_values($results);
-	}
 
 	private function fetchWorkshopItemById(string $id): ?array
 	{
-		$postData = http_build_query([
+		$response = $this->executeSteamApiRequest('https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/', [
 			'itemcount' => 1,
 			'publishedfileids[0]' => $id,
 		]);
-		$response = $this->httpRequest('https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/', $postData);
-		if ($response === null) {
+		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
+			$reason = $response['error'] ?? ('HTTP ' . $response['http_code']);
+			$this->logApiFailure(sprintf('Steam API detail lookup failed (id=%s): %s', $id, $reason));
 			return null;
 		}
 
-		$data = json_decode($response, true);
+		$data = json_decode((string)$response['body'], true);
 		$details = $data['response']['publishedfiledetails'][0] ?? null;
 		if (!is_array($details) || (int)($details['result'] ?? 0) !== 1) {
 			return null;
@@ -1001,38 +1053,86 @@ class SteamWorkshopService
 		];
 	}
 
-	private function httpRequest(string $url, ?string $postFields = null): ?string
+	private function executeSteamApiRequest(string $url, array $fields): array
 	{
-		if (function_exists('curl_init')) {
-			$ch = curl_init($url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-			curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-			curl_setopt($ch, CURLOPT_USERAGENT, 'GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)');
-			if ($postFields !== null) {
-				curl_setopt($ch, CURLOPT_POST, true);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-			}
-			$response = curl_exec($ch);
-			curl_close($ch);
-			return is_string($response) ? $response : null;
+		if (!function_exists('curl_init')) {
+			return ['body' => null, 'http_code' => 0, 'error' => 'PHP cURL extension is required'];
 		}
 
-		$contextOptions = [
-			'http' => [
-				'method' => $postFields !== null ? 'POST' : 'GET',
-				'timeout' => 10,
-				'header' => "User-Agent: GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)\r\n" . ($postFields !== null ? "Content-Type: application/x-www-form-urlencoded\r\n" : ''),
-			],
-		];
-		if ($postFields !== null) {
-			$contextOptions['http']['content'] = $postFields;
+		$ch = curl_init($url);
+		if ($ch === false) {
+			return ['body' => null, 'http_code' => 0, 'error' => 'Unable to initialize cURL'];
 		}
-		$context = stream_context_create($contextOptions);
-		$result = @file_get_contents($url, false, $context);
 
-		return $result === false ? null : $result;
+		curl_setopt_array($ch, [
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_POST => true,
+			CURLOPT_POSTFIELDS => http_build_query($fields, '', '&'),
+			CURLOPT_TIMEOUT => 15,
+			CURLOPT_USERAGENT => 'GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)',
+			CURLOPT_HTTPHEADER => ['Accept: application/json', 'Content-Type: application/x-www-form-urlencoded'],
+		]);
+
+		$body = curl_exec($ch);
+		$error = curl_errno($ch) ? curl_error($ch) : null;
+		$status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		return ['body' => $error === null ? $body : null, 'http_code' => $status, 'error' => $error];
 	}
+
+	private function runSteamCmdDownload(string $steamCmdPath, string $appId, string $workshopId, string $username, ?string $password): array
+	{
+		$command = [$steamCmdPath, '+login', $username];
+		if ($username !== 'anonymous' && $password !== null && $password !== '') {
+			$command[] = $password;
+		}
+		$command = array_merge($command, ['+workshop_download_item', $appId, $workshopId, 'validate', '+quit']);
+
+		$descriptorSpec = [
+			0 => ['pipe', 'r'],
+			1 => ['pipe', 'w'],
+			2 => ['pipe', 'w'],
+		];
+		$process = proc_open($command, $descriptorSpec, $pipes);
+		if (!is_resource($process)) {
+			return ['exit_code' => 1, 'output' => ['Unable to start steamcmd process.']];
+		}
+
+		fclose($pipes[0]);
+		$stdout = stream_get_contents($pipes[1]) ?: '';
+		$stderr = stream_get_contents($pipes[2]) ?: '';
+		fclose($pipes[1]);
+		fclose($pipes[2]);
+		$exitCode = (int)proc_close($process);
+		$combined = trim($stdout . PHP_EOL . $stderr);
+		$lines = $combined === '' ? [] : preg_split('/\r\n|\r|\n/', $combined);
+
+		return ['exit_code' => $exitCode, 'output' => is_array($lines) ? $lines : []];
+	}
+
+	private function appendLog(string $file, string $message): void
+	{
+		$dir = dirname($file);
+		if (!is_dir($dir)) {
+			mkdir($dir, 0775, true);
+		}
+		file_put_contents($file, sprintf('[%s] %s%s', date('Y-m-d H:i:s'), $message, PHP_EOL), FILE_APPEND);
+	}
+
+	private function appendSteamCmdOutput(string $logFile, array $lines): void
+	{
+		if (empty($lines)) {
+			return;
+		}
+		file_put_contents($logFile, implode(PHP_EOL, $lines) . PHP_EOL, FILE_APPEND);
+	}
+
+	private function logApiFailure(string $message): void
+	{
+		$this->appendLog($this->apiLogFile, $message);
+	}
+
 
 	private function buildWorkshopGroupKey(string $appId): string
 	{

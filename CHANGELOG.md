@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-01-25
+- Replaced the Steam Workshop search backend with the official Steam Web API (QueryFiles) so searches are anonymous, paginated, and no longer depend on fragile HTML scraping.
+- Added detailed Steam API failure logging plus structured JSON responses that expose pagination metadata to the UI.
+- Introduced a reusable SteamCMD installer helper that downloads Workshop items with anonymous login, falls back to authenticated credentials, and captures all stdout/stderr in per-run log files.
+- Documented the new search and install helpers to clarify expected usage from both the panel UI and CLI tooling.
+
 ## 2026-01-17
 - Added per-game Steam Workshop adapter management with CRUD UI and automatic mapping helpers.
 - Added workshop capability helpers and monitor button gating so only supported SteamCMD homes expose the Steam Workshop shortcut.
