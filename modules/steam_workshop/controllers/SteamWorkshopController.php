@@ -157,15 +157,29 @@ class SteamWorkshopController
                 'ok' => false,
                 'error' => $payload['error'],
                 'request' => $payload['request'],
+                'status' => sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s',
+                    (string)($payload['request']['url'] ?? ''),
+                    http_build_query($payload['request']['params'] ?? [], '', '&'),
+                    (string)($payload['request']['http_code'] ?? ''),
+                    (string)($payload['request']['transport_error'] ?? 'none')
+                ),
             ]);
             return;
         }
+
+        $requestSummary = sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s',
+            (string)($payload['request']['url'] ?? ''),
+            http_build_query($payload['request']['params'] ?? [], '', '&'),
+            (string)($payload['request']['http_code'] ?? ''),
+            (string)($payload['request']['transport_error'] ?? 'none')
+        );
 
         $response = [
             'ok' => true,
             'results' => $payload['results'],
             'pagination' => $payload['pagination'],
             'request' => $payload['request'],
+            'status' => $requestSummary,
         ];
         if (empty($payload['results'])) {
             $response['empty'] = true;

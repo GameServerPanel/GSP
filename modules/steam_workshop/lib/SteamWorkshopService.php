@@ -686,6 +686,7 @@ class SteamWorkshopService
 		$payload['request']['params'] = $response['fields'];
 		$payload['request']['http_code'] = $response['http_code'];
 		$payload['request']['transport_error'] = $response['error'];
+ 		$payload['request']['summary'] = $this->formatRequestSummary($payload['request']);
 
 		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
 			$reason = $response['error'] !== null ? $response['error'] : 'HTTP ' . $response['http_code'];
@@ -1090,6 +1091,15 @@ class SteamWorkshopService
 		curl_close($ch);
 
 		return ['body' => $error === null ? $body : null, 'http_code' => $status, 'error' => $error, 'url' => $url, 'fields' => $fields];
+	}
+
+	private function formatRequestSummary(array $request): string
+	{
+		$url = (string)($request['url'] ?? '');
+		$params = http_build_query($request['params'] ?? [], '', '&');
+		$http = (string)($request['http_code'] ?? '');
+		$error = (string)($request['transport_error'] ?? 'none');
+		return sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s', $url, $params, $http, $error);
 	}
 
 	private function runSteamCmdDownload(string $steamCmdPath, string $appId, string $workshopId, string $username, ?string $password): array
