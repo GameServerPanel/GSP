@@ -153,7 +153,11 @@ class SteamWorkshopController
 
         $payload = $this->service->searchWorkshopItems($gameKey, $query, $perPage, $page);
         if ($payload['error'] !== null) {
-            echo json_encode(['ok' => false, 'error' => $payload['error']]);
+            echo json_encode([
+                'ok' => false,
+                'error' => $payload['error'],
+                'request' => $payload['request'],
+            ]);
             return;
         }
 
@@ -161,6 +165,7 @@ class SteamWorkshopController
             'ok' => true,
             'results' => $payload['results'],
             'pagination' => $payload['pagination'],
+            'request' => $payload['request'],
         ];
         if (empty($payload['results'])) {
             $response['empty'] = true;

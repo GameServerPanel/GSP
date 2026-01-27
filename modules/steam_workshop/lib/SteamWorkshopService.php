@@ -642,6 +642,12 @@ class SteamWorkshopService
 				'has_more' => false,
 			],
 			'error' => null,
+			'request' => [
+				'url' => null,
+				'params' => [],
+				'http_code' => null,
+				'transport_error' => null,
+			],
 		];
 
 		if ($query === '') {
@@ -676,17 +682,22 @@ class SteamWorkshopService
 		];
 
 		$response = $this->executeSteamApiRequest('https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/', $postFields);
+		$payload['request']['url'] = $response['url'];
+		$payload['request']['params'] = $response['fields'];
+		$payload['request']['http_code'] = $response['http_code'];
+		$payload['request']['transport_error'] = $response['error'];
+
 		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
-			$reason = $response['error'] ?? ('HTTP ' . $response['http_code']);
+			$reason = $response['error'] !== null ? $response['error'] : 'HTTP ' . $response['http_code'];
 			$this->logApiFailure(sprintf('Steam API search failed (app=%s query="%s" page=%d): %s', $appId, $query, $payload['pagination']['page'], $reason));
-			$payload['error'] = 'Unable to contact the Steam Workshop.';
+			$payload['error'] = sprintf('Steam API request failed (%s). URL: %s Params: %s', $reason, $response['url'], http_build_query($response['fields'], '', '&'));
 			return $payload;
 		}
 
 		$data = json_decode((string)$response['body'], true);
 		if (!is_array($data) || !isset($data['response'])) {
 			$this->logApiFailure(sprintf('Steam API search returned invalid payload (app=%s query="%s")', $appId, $query));
-			$payload['error'] = 'Unable to contact the Steam Workshop.';
+			$payload['error'] = sprintf('Steam API returned invalid data. URL: %s Params: %s', $response['url'], http_build_query($response['fields'], '', '&'));
 			return $payload;
 		}
 		$details = $data['response']['publishedfiledetails'] ?? [];
@@ -1056,12 +1067,12 @@ class SteamWorkshopService
 	private function executeSteamApiRequest(string $url, array $fields): array
 	{
 		if (!function_exists('curl_init')) {
-			return ['body' => null, 'http_code' => 0, 'error' => 'PHP cURL extension is required'];
+			return ['body' => null, 'http_code' => 0, 'error' => 'PHP cURL extension is required', 'url' => $url, 'fields' => $fields];
 		}
 
 		$ch = curl_init($url);
 		if ($ch === false) {
-			return ['body' => null, 'http_code' => 0, 'error' => 'Unable to initialize cURL'];
+			return ['body' => null, 'http_code' => 0, 'error' => 'Unable to initialize cURL', 'url' => $url, 'fields' => $fields];
 		}
 
 		curl_setopt_array($ch, [
@@ -1078,7 +1089,7 @@ class SteamWorkshopService
 		$status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
 
-		return ['body' => $error === null ? $body : null, 'http_code' => $status, 'error' => $error];
+		return ['body' => $error === null ? $body : null, 'http_code' => $status, 'error' => $error, 'url' => $url, 'fields' => $fields];
 	}
 
 	private function runSteamCmdDownload(string $steamCmdPath, string $appId, string $workshopId, string $username, ?string $password): array
