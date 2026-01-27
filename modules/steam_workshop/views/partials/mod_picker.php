@@ -58,6 +58,16 @@ $langAttrs = [
         <button type="button" class="btn secondary js-sw-search-button"><?php echo htmlspecialchars($lang['mod_picker_search_button'] ?? 'Search'); ?></button>
     </div>
 
+    <div class="sw-picker__request-row">
+        <span class="sw-picker__request-label"><?php echo htmlspecialchars($lang['mod_picker_request_label'] ?? 'Submitting request'); ?></span>
+        <small class="sw-picker__request-hint"><?php echo htmlspecialchars($lang['mod_picker_request_hint'] ?? 'Exact URL preview. The field below mirrors your search text.'); ?></small>
+        <div class="sw-picker__request-line">
+            <?php $baseRequest = $endpoint . '&q='; ?>
+            <code class="sw-picker__request-summary js-sw-request-summary" data-base="<?php echo htmlspecialchars($baseRequest, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($baseRequest, ENT_QUOTES, 'UTF-8'); ?></code>
+            <input type="text" class="sw-picker__request-input js-sw-request-input" value="" readonly aria-label="<?php echo htmlspecialchars($lang['mod_picker_request_input_label'] ?? 'Workshop search text preview'); ?>" />
+        </div>
+    </div>
+
     <div class="sw-picker__status js-sw-picker-status" role="status" aria-live="polite"></div>
 
     <div class="sw-picker__selected">

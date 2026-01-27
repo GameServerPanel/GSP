@@ -392,6 +392,47 @@
 	overflow-x: auto;
 }
 
+.sw-picker__request-row {
+	margin-top: 0.75rem;
+}
+
+.sw-picker__request-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 0.15rem;
+}
+
+.sw-picker__request-hint {
+	display: block;
+	margin-bottom: 0.35rem;
+	color: #6b6b6b;
+}
+
+.sw-picker__request-line {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
+	align-items: center;
+	font-family: Consolas, 'Courier New', monospace;
+}
+
+.sw-picker__request-summary {
+	padding: 0.2rem 0.4rem;
+	background: #f6f6f6;
+	border-radius: 4px;
+	border: 1px solid #e0e0e0;
+}
+
+.sw-picker__request-input {
+	flex: 1;
+	min-width: 160px;
+	padding: 0.25rem 0.4rem;
+	border: 1px solid #ced4da;
+	border-radius: 4px;
+	font-family: inherit;
+	background: #fff;
+}
+
 .sw-picker__action {
 	padding: 0.25rem 0.5rem;
 	border-radius: 4px;

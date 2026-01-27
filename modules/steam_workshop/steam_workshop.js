@@ -21,12 +21,16 @@
             this.searchForm = root.querySelector('.js-sw-search-form');
             this.searchInput = root.querySelector('.js-sw-search-input');
             this.searchButton = root.querySelector('.js-sw-search-button');
+            this.requestInput = root.querySelector('.js-sw-request-input');
+            this.requestSummary = root.querySelector('.js-sw-request-summary');
+            this.requestSummaryBase = this.requestSummary ? (this.requestSummary.getAttribute('data-base') || '') : '';
             this.state = {
                 selected: this.readInitialSelection(),
             };
             this.lastResults = [];
             this.bindEvents();
             this.renderSelected();
+            this.updateRequestPreview();
         }
         Picker.prototype.readInitialSelection = function () {
             if (!this.selectedInput) {
@@ -71,6 +75,11 @@
                         event.preventDefault();
                         _this.performSearch();
                     }
+                });
+            }
+            if (this.searchInput) {
+                this.searchInput.addEventListener('input', function () {
+                    _this.updateRequestPreview();
                 });
             }
             if (this.selectedList) {
@@ -126,6 +135,7 @@
                 return;
             }
             var term = this.searchInput.value.trim();
+            this.updateRequestPreview();
             if (!term) {
                 this.setStatus(this.lang.query, 'error');
                 return;
@@ -220,6 +230,18 @@
             for (var _i = 0, results_1 = results; _i < results_1.length; _i++) {
                 var item = results_1[_i];
                 _loop_1(item);
+            }
+        };
+        Picker.prototype.updateRequestPreview = function () {
+            if (this.requestInput && this.searchInput) {
+                this.requestInput.value = this.searchInput.value;
+            }
+            if (this.requestSummary) {
+                var encoded = '';
+                if (this.searchInput && this.searchInput.value.trim() !== '') {
+                    encoded = encodeURIComponent(this.searchInput.value.trim());
+                }
+                this.requestSummary.textContent = (this.requestSummaryBase || '') + encoded;
             }
         };
         Picker.prototype.isSelected = function (id) {
