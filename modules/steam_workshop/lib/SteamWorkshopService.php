@@ -5,6 +5,7 @@ class SteamWorkshopService
 {
 	private const MIN_INTERVAL = 15;
 	private const MAX_INTERVAL = 360;
+	private const STEAM_WORKSHOP_DETAIL_URL = 'https://steamcommunity.com/sharedfiles/filedetails/';
 
 	private OGPDatabase $db;
 	private string $configDir;
@@ -714,16 +715,16 @@ class SteamWorkshopService
 
 	private function fetchWorkshopItemByScrape(string $id): array
 	{
-		$id = preg_replace('/[^0-9]/', '', $id);
+		$sanitizedId = preg_replace('/[^0-9]/', '', $id);
 		$request = [
 			'backend' => 'scraper_http',
-			'url' => 'https://steamcommunity.com/sharedfiles/filedetails/',
-			'params' => ['id' => $id],
+			'url' => self::STEAM_WORKSHOP_DETAIL_URL,
+			'params' => ['id' => $sanitizedId],
 			'http_code' => null,
 			'transport_error' => null,
 		];
 
-		if ($id === '') {
+		if ($sanitizedId === '') {
 			$request['summary'] = $this->formatRequestSummary($request);
 			return ['item' => null, 'request' => $request, 'error' => 'Invalid Workshop ID.'];
 		}
@@ -745,12 +746,12 @@ class SteamWorkshopService
 
 		$title = $this->parseWorkshopTitle((string)$response['body']);
 		if ($title === '') {
-			$title = '@' . $id;
+			$title = '@' . $sanitizedId;
 		}
 
 		return [
 			'item' => [
-				'id' => $id,
+				'id' => $sanitizedId,
 				'label' => $title,
 				'author' => '',
 				'preview_url' => '',
@@ -960,7 +961,7 @@ class SteamWorkshopService
 
 		$results = [];
 		foreach ($sliceIds as $id) {
-			$detailResponse = $this->httpGet('https://steamcommunity.com/sharedfiles/filedetails/', ['id' => $id], $this->getScraperUserAgent());
+			$detailResponse = $this->httpGet(self::STEAM_WORKSHOP_DETAIL_URL, ['id' => $id], $this->getScraperUserAgent());
 			$title = '';
 			if ($detailResponse['error'] === null && $detailResponse['http_code'] >= 200 && $detailResponse['http_code'] < 300 && $detailResponse['body'] !== null) {
 				$title = $this->parseWorkshopTitle((string)$detailResponse['body']);

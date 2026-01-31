@@ -15,7 +15,7 @@ if ($scriptPath[0] !== '/') {
 }
 $endpoint = sprintf('%s?m=steam_workshop&p=main&action=search&home_id=%d', $scriptPath, $homeId);
 $steamBase = 'https://steamcommunity.com/workshop/browse/?appid=';
-$steamAppId = isset($appId) && $appId !== '' ? $appId : '0';
+$steamAppIdParam = $appId ?? '';
 $initialItems = [];
 foreach ($config['workshop_items'] ?? [] as $item) {
     if (!is_array($item)) {
@@ -46,7 +46,7 @@ $langAttrs = [
     'sync' => $lang['mod_picker_toggle_label'] ?? 'Sync',
 ];
 ?>
-<div class="sw-picker" id="<?php echo $pickerId; ?>" data-endpoint="<?php echo htmlspecialchars($endpoint, ENT_QUOTES, 'UTF-8'); ?>"
+    <div class="sw-picker" id="<?php echo $pickerId; ?>" data-endpoint="<?php echo htmlspecialchars($endpoint, ENT_QUOTES, 'UTF-8'); ?>" data-detail-base="https://steamcommunity.com/sharedfiles/filedetails/?id="
     <?php foreach ($langAttrs as $key => $value): ?>data-lang-<?php echo $key; ?>="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>" <?php endforeach; ?>>
     <div class="sw-picker__header">
         <h4><?php echo htmlspecialchars($lang['mod_picker_heading'] ?? 'Workshop library'); ?></h4>
@@ -65,7 +65,7 @@ $langAttrs = [
         <span class="sw-picker__request-label"><?php echo htmlspecialchars($lang['mod_picker_request_label'] ?? 'Submitting request'); ?></span>
         <small class="sw-picker__request-hint"><?php echo htmlspecialchars($lang['mod_picker_request_hint'] ?? 'Exact URL preview. The field below mirrors your search text.'); ?></small>
         <div class="sw-picker__request-line">
-            <?php $baseRequest = $steamBase . $steamAppId . '&browsesort=textsearch&section=readytouseitems&searchtext='; ?>
+            <?php $baseRequest = $steamAppIdParam !== '' ? $steamBase . $steamAppIdParam . '&browsesort=textsearch&section=readytouseitems&searchtext=' : ''; ?>
             <code class="sw-picker__request-summary js-sw-request-summary" data-base="<?php echo htmlspecialchars($baseRequest, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($baseRequest, ENT_QUOTES, 'UTF-8'); ?></code>
             <input type="text" class="sw-picker__request-input js-sw-request-input" value="" readonly aria-label="<?php echo htmlspecialchars($lang['mod_picker_request_input_label'] ?? 'Workshop search text preview'); ?>" />
         </div>

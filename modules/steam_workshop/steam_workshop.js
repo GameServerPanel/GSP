@@ -5,6 +5,7 @@
         function Picker(root) {
             this.root = root;
             this.endpoint = root.getAttribute('data-endpoint') || '';
+            this.detailBase = root.getAttribute('data-detail-base') || 'https://steamcommunity.com/sharedfiles/filedetails/?id=';
             this.lang = {
                 add: root.getAttribute('data-lang-add') || 'Add',
                 remove: root.getAttribute('data-lang-remove') || 'Remove',
@@ -260,9 +261,10 @@
                 this.requestSummary.textContent = base;
                 return;
             }
-            var isId = /^\d+$/.test(term);
-            if (isId) {
-                this.requestSummary.textContent = 'https://steamcommunity.com/sharedfiles/filedetails/?id=' + encodeURIComponent(term);
+            // Numeric-only terms are treated as Workshop item IDs and link to detail pages instead of search.
+            var isWorkshopId = /^\d+$/.test(term);
+            if (isWorkshopId) {
+                this.requestSummary.textContent = this.detailBase + encodeURIComponent(term);
                 return;
             }
             this.requestSummary.textContent = base + encodeURIComponent(term);
