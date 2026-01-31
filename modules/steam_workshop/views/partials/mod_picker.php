@@ -4,6 +4,7 @@ declare(strict_types=1);
 /** @var array $config */
 /** @var array $home */
 /** @var int $homeId */
+/** @var string|null $appId */
 $homeId = (int)($home['home_id'] ?? 0);
 $scriptPath = (string)($_SERVER['PHP_SELF'] ?? '/index.php');
 if ($scriptPath === '') {
@@ -13,6 +14,8 @@ if ($scriptPath[0] !== '/') {
     $scriptPath = '/' . ltrim($scriptPath, '/');
 }
 $endpoint = sprintf('%s?m=steam_workshop&p=main&action=search&home_id=%d', $scriptPath, $homeId);
+$steamBase = 'https://steamcommunity.com/workshop/browse/?appid=';
+$steamAppId = isset($appId) && $appId !== '' ? $appId : '0';
 $initialItems = [];
 foreach ($config['workshop_items'] ?? [] as $item) {
     if (!is_array($item)) {
@@ -62,7 +65,7 @@ $langAttrs = [
         <span class="sw-picker__request-label"><?php echo htmlspecialchars($lang['mod_picker_request_label'] ?? 'Submitting request'); ?></span>
         <small class="sw-picker__request-hint"><?php echo htmlspecialchars($lang['mod_picker_request_hint'] ?? 'Exact URL preview. The field below mirrors your search text.'); ?></small>
         <div class="sw-picker__request-line">
-            <?php $baseRequest = $endpoint . '&q='; ?>
+            <?php $baseRequest = $steamBase . $steamAppId . '&browsesort=textsearch&section=readytouseitems&searchtext='; ?>
             <code class="sw-picker__request-summary js-sw-request-summary" data-base="<?php echo htmlspecialchars($baseRequest, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($baseRequest, ENT_QUOTES, 'UTF-8'); ?></code>
             <input type="text" class="sw-picker__request-input js-sw-request-input" value="" readonly aria-label="<?php echo htmlspecialchars($lang['mod_picker_request_input_label'] ?? 'Workshop search text preview'); ?>" />
         </div>

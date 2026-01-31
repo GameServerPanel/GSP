@@ -241,16 +241,31 @@
             }
         };
         Picker.prototype.updateRequestPreview = function () {
-            if (this.requestInput && this.searchInput) {
-                this.requestInput.value = this.searchInput.value;
+            if (!this.searchInput) {
+                return;
             }
-            if (this.requestSummary) {
-                var encoded = '';
-                if (this.searchInput && this.searchInput.value.trim() !== '') {
-                    encoded = encodeURIComponent(this.searchInput.value.trim());
-                }
-                this.requestSummary.textContent = (this.requestSummaryBase || '') + encoded;
+            var term = this.searchInput.value.trim();
+            if (this.requestInput) {
+                this.requestInput.value = term;
             }
+            if (!this.requestSummary) {
+                return;
+            }
+            var base = this.requestSummaryBase || '';
+            if (!base) {
+                this.requestSummary.textContent = '';
+                return;
+            }
+            if (!term) {
+                this.requestSummary.textContent = base;
+                return;
+            }
+            var isId = /^\d+$/.test(term);
+            if (isId) {
+                this.requestSummary.textContent = 'https://steamcommunity.com/sharedfiles/filedetails/?id=' + encodeURIComponent(term);
+                return;
+            }
+            this.requestSummary.textContent = base + encodeURIComponent(term);
         };
         Picker.prototype.isSelected = function (id) {
             return this.state.selected.some(function (item) { return item.id === id; });

@@ -682,125 +682,84 @@ class SteamWorkshopService
 		}
 
 		if (ctype_digit($query)) {
-			$item = $this->fetchWorkshopItemById($query);
-			if ($item !== null) {
-				$payload['results'][] = $item;
+			$detail = $this->fetchWorkshopItemByScrape($query);
+			$payload['request'] = $detail['request'];
+			if ($detail['error'] !== null) {
+				$payload['error'] = $detail['error'];
+				return $payload;
+			}
+			if ($detail['item'] !== null) {
+				$payload['results'][] = $detail['item'];
 				$payload['pagination']['total'] = 1;
 			}
 			return $payload;
 		}
 
-		$postFields = [
-			'query_type' => 0,
-			'page' => $payload['pagination']['page'],
-			'numperpage' => $payload['pagination']['per_page'],
-			'appid' => $appId,
-			'search_text' => $query,
-			'return_details' => true,
-			'return_metadata' => false,
-		];
-
-		$response = $this->executeSteamApiRequest('https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/', $postFields);
-		$requestContext = [
-			'backend' => 'api',
-			'url' => $response['url'],
-			'params' => $response['fields'],
-			'http_code' => $response['http_code'],
-			'transport_error' => $response['error'],
-		];
-		$requestContext['summary'] = $this->formatRequestSummary($requestContext);
-		$requestAttempts = [$requestContext];
-		$payload['request'] = $requestContext;
-
-		$apiFailed = false;
-		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
-			$apiFailed = true;
-			$reason = $response['error'] !== null ? $response['error'] : 'HTTP ' . $response['http_code'];
-			$this->logApiFailure(sprintf('Steam API search failed (app=%s query="%s" page=%d): %s', $appId, $query, $payload['pagination']['page'], $reason));
-			$payload['error'] = sprintf('Steam API request failed (%s). URL: %s Params: %s', $reason, $response['url'], http_build_query($response['fields'], '', '&'));
+		$scrapeResult = $this->scrapeWorkshopItems($appId, $query, $payload['pagination']['per_page'], $payload['pagination']['page']);
+		$payload['request'] = $scrapeResult['request'];
+		if (!empty($scrapeResult['attempts'])) {
+			$payload['request']['attempts'] = $scrapeResult['attempts'];
+		}
+		if ($scrapeResult['success']) {
+			$payload['results'] = $scrapeResult['results'];
+			$payload['pagination']['total'] = $scrapeResult['total'];
+			$payload['pagination']['has_more'] = $scrapeResult['has_more'];
 		} else {
-			$data = json_decode((string)$response['body'], true);
-			if (!is_array($data) || !isset($data['response'])) {
-				$apiFailed = true;
-				$this->logApiFailure(sprintf('Steam API search returned invalid payload (app=%s query="%s")', $appId, $query));
-				$payload['error'] = sprintf('Steam API returned invalid data. URL: %s Params: %s', $response['url'], http_build_query($response['fields'], '', '&'));
-			} else {
-				$details = $data['response']['publishedfiledetails'] ?? [];
-				$total = (int)($data['response']['total'] ?? count($details));
-
-				foreach ($details as $item) {
-					$id = isset($item['publishedfileid']) ? preg_replace('/[^0-9]/', '', (string)$item['publishedfileid']) : '';
-					if ($id === '') {
-						continue;
-					}
-					$title = isset($item['title']) ? trim((string)$item['title']) : '';
-					if ($title === '') {
-						$title = '@' . $id;
-					}
-					$payload['results'][] = [
-						'id' => $id,
-						'label' => $title,
-						'author' => isset($item['creator']) ? (string)$item['creator'] : '',
-						'preview_url' => isset($item['preview_url']) ? (string)$item['preview_url'] : '',
-						'time_updated' => isset($item['time_updated']) ? (int)$item['time_updated'] : null,
-						'subscriptions' => isset($item['subscriptions']) ? (int)$item['subscriptions'] : 0,
-						'source' => 'search',
-					];
-				}
-
-				$payload['pagination']['total'] = $total;
-				$payload['pagination']['has_more'] = ($payload['pagination']['page'] * $payload['pagination']['per_page']) < $total;
-			}
+			$payload['error'] = $scrapeResult['error'] ?? 'Steam Workshop scrape failed.';
+			$this->logApiFailure(sprintf('Steam Workshop scrape failed (app=%s query="%s" page=%d): %s', $appId, $query, $payload['pagination']['page'], $payload['error']));
 		}
-
-		if ($this->shouldAttemptScraper($query, $payload)) {
-			$scrapeResult = $this->scrapeWorkshopItems($appId, $query, $payload['pagination']['per_page'], $payload['pagination']['page']);
-			$scrapeContext = $scrapeResult['request'];
-			$attemptContexts = $scrapeResult['attempts'] ?? [$scrapeContext];
-			foreach ($attemptContexts as $attemptContext) {
-				$requestAttempts[] = $attemptContext;
-			}
-			if ($scrapeResult['success'] && !empty($scrapeResult['results'])) {
-				$payload['results'] = $scrapeResult['results'];
-				$payload['pagination']['total'] = $scrapeResult['total'];
-				$payload['pagination']['has_more'] = $scrapeResult['has_more'];
-				$payload['error'] = null;
-				$payload['request'] = $scrapeContext;
-			} elseif (!$scrapeResult['success']) {
-				$fallbackError = $scrapeResult['error'] ?? 'Steam Workshop scrape failed.';
-				if ($payload['error'] === null) {
-					$payload['error'] = $fallbackError;
-				} else {
-					$payload['error'] .= ' Scraper fallback failed: ' . $fallbackError;
-				}
-			}
-		}
-
-		$payload['request']['attempts'] = $requestAttempts;
 
 		return $payload;
 	}
 
-	private function shouldAttemptScraper(string $query, array $payload): bool
+	private function fetchWorkshopItemByScrape(string $id): array
 	{
-		if (ctype_digit($query)) {
-			return false;
-		}
-		if (!$this->hasAnyScraperTransport()) {
-			return false;
-		}
+		$id = preg_replace('/[^0-9]/', '', $id);
+		$request = [
+			'backend' => 'scraper_http',
+			'url' => 'https://steamcommunity.com/sharedfiles/filedetails/',
+			'params' => ['id' => $id],
+			'http_code' => null,
+			'transport_error' => null,
+		];
 
-		$hasResults = !empty($payload['results']);
-		return $payload['error'] !== null || $hasResults === false;
-	}
-
-	private function hasAnyScraperTransport(): bool
-	{
-		if ($this->isScraperAvailable()) {
-			return true;
+		if ($id === '') {
+			$request['summary'] = $this->formatRequestSummary($request);
+			return ['item' => null, 'request' => $request, 'error' => 'Invalid Workshop ID.'];
 		}
 
-		return function_exists('curl_init');
+		$response = $this->httpGet($request['url'], $request['params'], $this->getScraperUserAgent());
+		$request['url'] = $response['url'] ?? $request['url'];
+		$request['http_code'] = $response['http_code'];
+		$request['transport_error'] = $response['error'];
+		$request['summary'] = $this->formatRequestSummary($request);
+
+		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300 || $response['body'] === null) {
+			$reason = $response['error'] !== null ? $response['error'] : 'HTTP ' . $response['http_code'];
+			return [
+				'item' => null,
+				'request' => $request,
+				'error' => 'Steam Community detail request failed: ' . $reason,
+			];
+		}
+
+		$title = $this->parseWorkshopTitle((string)$response['body']);
+		if ($title === '') {
+			$title = '@' . $id;
+		}
+
+		return [
+			'item' => [
+				'id' => $id,
+				'label' => $title,
+				'author' => '',
+				'preview_url' => '',
+				'enabled' => true,
+				'source' => 'search',
+			],
+			'request' => $request,
+			'error' => null,
+		];
 	}
 
 	private function scrapeWorkshopItems(string $appId, string $query, int $perPage, int $page): array
@@ -1395,67 +1354,6 @@ class SteamWorkshopService
 		return implode(PHP_EOL, $lines);
 	}
 
-
-	private function fetchWorkshopItemById(string $id): ?array
-	{
-		$response = $this->executeSteamApiRequest('https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/', [
-			'itemcount' => 1,
-			'publishedfileids[0]' => $id,
-		]);
-		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
-			$reason = $response['error'] ?? ('HTTP ' . $response['http_code']);
-			$this->logApiFailure(sprintf('Steam API detail lookup failed (id=%s): %s', $id, $reason));
-			return null;
-		}
-
-		$data = json_decode((string)$response['body'], true);
-		$details = $data['response']['publishedfiledetails'][0] ?? null;
-		if (!is_array($details) || (int)($details['result'] ?? 0) !== 1) {
-			return null;
-		}
-
-		$title = trim((string)($details['title'] ?? ''));
-		if ($title === '') {
-			$title = '@' . $id;
-		}
-
-		return [
-			'id' => $id,
-			'label' => $title,
-			'author' => (string)($details['creator'] ?? ''),
-			'preview_url' => (string)($details['preview_url'] ?? ''),
-			'enabled' => true,
-			'source' => 'search',
-		];
-	}
-
-	private function executeSteamApiRequest(string $url, array $fields): array
-	{
-		if (!function_exists('curl_init')) {
-			return ['body' => null, 'http_code' => 0, 'error' => 'PHP cURL extension is required', 'url' => $url, 'fields' => $fields];
-		}
-
-		$ch = curl_init($url);
-		if ($ch === false) {
-			return ['body' => null, 'http_code' => 0, 'error' => 'Unable to initialize cURL', 'url' => $url, 'fields' => $fields];
-		}
-
-		curl_setopt_array($ch, [
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_POST => true,
-			CURLOPT_POSTFIELDS => http_build_query($fields, '', '&'),
-			CURLOPT_TIMEOUT => 15,
-			CURLOPT_USERAGENT => 'GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)',
-			CURLOPT_HTTPHEADER => ['Accept: application/json', 'Content-Type: application/x-www-form-urlencoded'],
-		]);
-
-		$body = curl_exec($ch);
-		$error = curl_errno($ch) ? curl_error($ch) : null;
-		$status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
-
-		return ['body' => $error === null ? $body : null, 'http_code' => $status, 'error' => $error, 'url' => $url, 'fields' => $fields];
-	}
 
 	private function httpGet(string $url, array $params = [], ?string $userAgent = null): array
 	{

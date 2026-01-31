@@ -10,7 +10,10 @@ function exec_ogp_module(): void
 {
     global $db;
 
-    echo '<h2>' . get_lang('steam_workshop') . '</h2>';
+    $action = $_GET['action'] ?? '';
+    if ($action !== 'search') {
+        echo '<h2>' . get_lang('steam_workshop') . '</h2>';
+    }
 
     $controller = new SteamWorkshopController($db);
     $controller->handle();
