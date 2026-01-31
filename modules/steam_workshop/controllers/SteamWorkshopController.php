@@ -27,6 +27,11 @@ class SteamWorkshopController
             return;
         }
 
+        if ($action === 'monitor_search') {
+            $this->handleMonitorSearch($userId, $isAdmin);
+            return;
+        }
+
         echo '<link rel="stylesheet" type="text/css" href="modules/steam_workshop/steam_workshop.css" />';
         echo '<script src="modules/steam_workshop/steam_workshop.js" defer></script>';
 
@@ -65,6 +70,57 @@ class SteamWorkshopController
         print_success($this->lang['message_config_saved'] ?? 'Workshop configuration saved.');
 
         $this->renderEdit($home, $config, $isAdmin, $adapterLocked);
+    }
+
+    private function handleMonitorSearch(int $userId, bool $isAdmin): void
+    {
+        $homeId = isset($_GET['home_id']) ? (int)$_GET['home_id'] : 0;
+        $query = trim((string)($_GET['q'] ?? ''));
+        $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+        $perPage = isset($_GET['per_page']) ? max(1, min(100, (int)$_GET['per_page'])) : 25;
+
+        $error = null;
+        $results = [];
+        $request = null;
+        $requestSummary = null;
+
+        if ($homeId <= 0) {
+            print_failure($this->lang['error_missing_home'] ?? 'Home ID missing.');
+            return;
+        }
+
+        $home = $this->service->getHome($homeId, $userId, $isAdmin);
+        if ($home === null) {
+            print_failure($this->lang['error_home_not_found'] ?? 'Home not found.');
+            return;
+        }
+
+        $gameKey = (string)($home['game_key'] ?? '');
+        $appId = $gameKey !== '' ? $this->service->getSteamAppIdForGameKey($gameKey) : null;
+
+        if ($query !== '' && $appId !== null) {
+            $payload = $this->service->searchWorkshopItems($gameKey, $query, $perPage, $page);
+            $results = $payload['results'];
+            $error = $payload['error'];
+            $request = $payload['request'];
+            $requestSummary = $payload['request']['summary'] ?? null;
+        } elseif ($query !== '' && $appId === null) {
+            $error = $this->lang['error_home_not_found'] ?? 'Workshop search is unavailable for this server.';
+        }
+
+        $this->render('monitor_search', [
+            'lang' => $this->lang,
+            'home' => $home,
+            'homeId' => $homeId,
+            'query' => $query,
+            'page' => $page,
+            'perPage' => $perPage,
+            'results' => $results,
+            'error' => $error,
+            'request' => $request,
+            'requestSummary' => $requestSummary,
+            'appId' => $appId,
+        ]);
     }
 
     private function handleEdit(int $userId, bool $isAdmin): void
