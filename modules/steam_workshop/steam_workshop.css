@@ -1,4 +1,5 @@
 #scrolling_checkbox{ 
+	#scrolling_checkbox{ 
 	border:2px solid #ccc;
 	width:500px;
 	display: inline-block;
@@ -6,6 +7,127 @@
 	overflow-y: scroll;
 	text-align:left;
 }
+
+	.sw-monitor {
+		margin-top: 1rem;
+	}
+
+	.sw-monitor__back {
+		text-decoration: none;
+		color: #0b5ed7;
+	}
+
+	.sw-monitor__card {
+		border: 1px solid #dcdcdc;
+		border-radius: 8px;
+		padding: 1rem;
+		background: #fff;
+	}
+
+	.sw-monitor__intro {
+		color: #555;
+		margin-top: 0.25rem;
+	}
+
+	.sw-monitor__meta {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		gap: 0.75rem;
+		margin: 1rem 0;
+	}
+
+	.sw-monitor__meta dt {
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.sw-monitor__meta dd {
+		margin: 0.15rem 0 0;
+	}
+
+	.sw-monitor__form {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.sw-monitor__form label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.sw-monitor__form input {
+		padding: 0.4rem;
+		border: 1px solid #c7c7c7;
+		border-radius: 4px;
+	}
+
+	.sw-monitor__form-row {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 0.75rem;
+	}
+
+	.sw-monitor__summary {
+		margin-top: 1rem;
+		background: #f7f9ff;
+		border: 1px solid #d0dae9;
+		border-radius: 6px;
+		padding: 0.75rem;
+	}
+
+	.sw-monitor__summary-text {
+		margin-top: 0.25rem;
+		font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+		word-break: break-all;
+	}
+
+	.sw-monitor__alert {
+		margin-top: 1rem;
+		border-radius: 6px;
+		padding: 0.75rem;
+	}
+
+	.sw-monitor__alert--error {
+		background: #fff5f4;
+		border: 1px solid #e66b5b;
+		color: #a33d30;
+	}
+
+	.sw-monitor__alert--info {
+		background: #f4f6f8;
+		border: 1px solid #d5dce3;
+		color: #4a5568;
+	}
+
+	.sw-monitor__results {
+		margin-top: 1.5rem;
+	}
+
+	.sw-monitor__hint {
+		color: #555;
+		margin: 0.25rem 0 0.75rem;
+	}
+
+	.sw-monitor__table-wrapper {
+		overflow-x: auto;
+	}
+
+	.sw-monitor__table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.sw-monitor__table th,
+	.sw-monitor__table td {
+		border: 1px solid #e3e3e3;
+		padding: 0.45rem;
+	}
+
+	.sw-monitor__table code {
+		font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+	}
 
 #uninstall_scrolling_checkbox{ 
 	border:2px solid #ccc;
