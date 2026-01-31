@@ -620,6 +620,20 @@ class SteamWorkshopService
 
 	public function getSteamAppIdForGameKey(string $gameKey): ?string
 	{
+		$gameKey = trim($gameKey);
+		if ($gameKey === '') {
+			return null;
+		}
+
+		$adapterKey = $this->getAdapterKeyForGame($gameKey);
+		if ($adapterKey !== null && $adapterKey !== '') {
+			$adapter = $this->getAdapterByKey($adapterKey);
+			$adapterAppId = isset($adapter['steam_app_id']) ? trim((string)$adapter['steam_app_id']) : '';
+			if ($adapterAppId !== '') {
+				return $adapterAppId;
+			}
+		}
+
 		$xml = $this->loadServerConfigXml($gameKey);
 		if ($xml === null) {
 			return null;
