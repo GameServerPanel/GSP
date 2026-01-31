@@ -109,17 +109,22 @@
                 });
             }
             if (this.resultsBody) {
-                this.resultsBody.addEventListener('click', function (event) {
+                this.resultsBody.addEventListener('change', function (event) {
                     var target = event.target;
-                    if (!(target instanceof HTMLElement)) {
+                    if (!(target instanceof HTMLInputElement)) {
                         return;
                     }
-                    if (target.matches('.js-sw-add')) {
+                    if (target.matches('.js-sw-result-toggle')) {
                         var payload = target.getAttribute('data-payload');
                         if (payload) {
                             try {
                                 var data = JSON.parse(payload);
-                                _this.addSelected(data);
+                                if (target.checked) {
+                                    _this.addSelected(data);
+                                }
+                                else {
+                                    _this.removeSelected(String(data.id));
+                                }
                             }
                             catch (err) {
                                 console.warn('Invalid payload', err);
@@ -208,15 +213,18 @@
                 };
                 var row = document.createElement('tr');
                 var selectCell = document.createElement('td');
-                var action = document.createElement('button');
-                action.type = 'button';
-                action.className = 'btn btn-xs sw-picker__action js-sw-add';
-                action.textContent = this_1.lang.add;
-                action.setAttribute('data-payload', JSON.stringify(normalized));
-                if (this_1.isSelected(normalized.id)) {
-                    action.disabled = true;
-                }
-                selectCell.appendChild(action);
+                var toggle = document.createElement('label');
+                toggle.className = 'sw-picker__result-toggle';
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'js-sw-result-toggle';
+                checkbox.setAttribute('data-payload', JSON.stringify(normalized));
+                checkbox.checked = this_1.isSelected(normalized.id);
+                toggle.appendChild(checkbox);
+                var toggleText = document.createElement('span');
+                toggleText.textContent = this_1.lang.add;
+                toggle.appendChild(toggleText);
+                selectCell.appendChild(toggle);
                 var titleCell = document.createElement('td');
                 titleCell.innerHTML = '<strong>' + this_1.escape(normalized.label) + '</strong><div class="sw-picker__result-meta">#' + this_1.escape(normalized.id) + '</div>';
                 var authorCell = document.createElement('td');
@@ -261,14 +269,12 @@
             });
             this.persist();
             this.renderSelected();
-            this.renderResults(this.lastResults || []);
         };
         Picker.prototype.removeSelected = function (id) {
             var next = this.state.selected.filter(function (item) { return item.id !== id; });
             this.state.selected = next;
             this.persist();
             this.renderSelected();
-            this.renderResults(this.lastResults || []);
         };
         Picker.prototype.toggleSelected = function (id, enabled) {
             var changed = false;

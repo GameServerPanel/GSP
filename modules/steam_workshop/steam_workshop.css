@@ -514,6 +514,12 @@
 	overflow-x: auto;
 }
 
+.sw-picker__results-hint {
+	margin: 0.35rem 0 0.6rem;
+	color: #555;
+	font-size: 0.9rem;
+}
+
 .sw-picker__request-row {
 	margin-top: 0.75rem;
 }
@@ -561,6 +567,17 @@
 	background: #0b5ed7;
 	border: 1px solid #0a58ca;
 	color: #fff;
+}
+
+.sw-picker__result-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: 0.85rem;
+}
+
+.sw-picker__result-toggle input {
+	width: auto;
 }
 
 .sw-picker__empty {

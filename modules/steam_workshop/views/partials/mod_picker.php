@@ -80,6 +80,7 @@ $langAttrs = [
 
     <div class="sw-picker__results">
         <h5><?php echo htmlspecialchars($lang['mod_picker_results_heading'] ?? 'Search results'); ?></h5>
+        <p class="sw-picker__results-hint"><?php echo htmlspecialchars($lang['mod_picker_results_hint'] ?? 'Check the mods you want to add.'); ?></p>
         <div class="sw-picker__results-table-wrapper">
             <table class="sw-picker__results-table">
                 <thead>
