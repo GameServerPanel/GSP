@@ -152,27 +152,22 @@ class SteamWorkshopController
         }
 
         $payload = $this->service->searchWorkshopItems($gameKey, $query, $perPage, $page);
-        if ($payload['error'] !== null) {
-            echo json_encode([
-                'ok' => false,
-                'error' => $payload['error'],
-                'request' => $payload['request'],
-                'status' => sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s',
-                    (string)($payload['request']['url'] ?? ''),
-                    http_build_query($payload['request']['params'] ?? [], '', '&'),
-                    (string)($payload['request']['http_code'] ?? ''),
-                    (string)($payload['request']['transport_error'] ?? 'none')
-                ),
-            ]);
-            return;
-        }
-
-        $requestSummary = sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s',
+        $requestSummary = $payload['request']['summary'] ?? sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s',
             (string)($payload['request']['url'] ?? ''),
             http_build_query($payload['request']['params'] ?? [], '', '&'),
             (string)($payload['request']['http_code'] ?? ''),
             (string)($payload['request']['transport_error'] ?? 'none')
         );
+
+        if ($payload['error'] !== null) {
+            echo json_encode([
+                'ok' => false,
+                'error' => $payload['error'],
+                'request' => $payload['request'],
+                'status' => $requestSummary,
+            ]);
+            return;
+        }
 
         $response = [
             'ok' => true,

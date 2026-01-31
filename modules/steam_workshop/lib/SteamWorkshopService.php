@@ -15,6 +15,7 @@ class SteamWorkshopService
 	private string $logDir;
 	private string $apiLogFile;
 	private string $steamCmdLogDir;
+	private string $scraperScript;
 
 	public function __construct(OGPDatabase $db)
 	{
@@ -29,6 +30,7 @@ class SteamWorkshopService
 		$this->logDir = __DIR__ . '/../logs';
 		$this->steamCmdLogDir = $this->logDir . '/steamcmd';
 		$this->apiLogFile = $this->logDir . '/steam_api.log';
+		$this->scraperScript = __DIR__ . '/../bin/workshop_scrape.sh';
 
 		foreach ([$this->configDir, $this->gameAdapterDir, $this->logDir, $this->steamCmdLogDir] as $dir) {
 			if (!is_dir($dir)) {
@@ -643,10 +645,13 @@ class SteamWorkshopService
 			],
 			'error' => null,
 			'request' => [
+				'backend' => 'api',
 				'url' => null,
 				'params' => [],
 				'http_code' => null,
 				'transport_error' => null,
+				'summary' => null,
+				'attempts' => [],
 			],
 		];
 
@@ -682,52 +687,223 @@ class SteamWorkshopService
 		];
 
 		$response = $this->executeSteamApiRequest('https://api.steampowered.com/IPublishedFileService/QueryFiles/v1/', $postFields);
-		$payload['request']['url'] = $response['url'];
-		$payload['request']['params'] = $response['fields'];
-		$payload['request']['http_code'] = $response['http_code'];
-		$payload['request']['transport_error'] = $response['error'];
- 		$payload['request']['summary'] = $this->formatRequestSummary($payload['request']);
+		$requestContext = [
+			'backend' => 'api',
+			'url' => $response['url'],
+			'params' => $response['fields'],
+			'http_code' => $response['http_code'],
+			'transport_error' => $response['error'],
+		];
+		$requestContext['summary'] = $this->formatRequestSummary($requestContext);
+		$requestAttempts = [$requestContext];
+		$payload['request'] = $requestContext;
 
+		$apiFailed = false;
 		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300) {
+			$apiFailed = true;
 			$reason = $response['error'] !== null ? $response['error'] : 'HTTP ' . $response['http_code'];
 			$this->logApiFailure(sprintf('Steam API search failed (app=%s query="%s" page=%d): %s', $appId, $query, $payload['pagination']['page'], $reason));
 			$payload['error'] = sprintf('Steam API request failed (%s). URL: %s Params: %s', $reason, $response['url'], http_build_query($response['fields'], '', '&'));
-			return $payload;
+		} else {
+			$data = json_decode((string)$response['body'], true);
+			if (!is_array($data) || !isset($data['response'])) {
+				$apiFailed = true;
+				$this->logApiFailure(sprintf('Steam API search returned invalid payload (app=%s query="%s")', $appId, $query));
+				$payload['error'] = sprintf('Steam API returned invalid data. URL: %s Params: %s', $response['url'], http_build_query($response['fields'], '', '&'));
+			} else {
+				$details = $data['response']['publishedfiledetails'] ?? [];
+				$total = (int)($data['response']['total'] ?? count($details));
+
+				foreach ($details as $item) {
+					$id = isset($item['publishedfileid']) ? preg_replace('/[^0-9]/', '', (string)$item['publishedfileid']) : '';
+					if ($id === '') {
+						continue;
+					}
+					$title = isset($item['title']) ? trim((string)$item['title']) : '';
+					if ($title === '') {
+						$title = '@' . $id;
+					}
+					$payload['results'][] = [
+						'id' => $id,
+						'label' => $title,
+						'author' => isset($item['creator']) ? (string)$item['creator'] : '',
+						'preview_url' => isset($item['preview_url']) ? (string)$item['preview_url'] : '',
+						'time_updated' => isset($item['time_updated']) ? (int)$item['time_updated'] : null,
+						'subscriptions' => isset($item['subscriptions']) ? (int)$item['subscriptions'] : 0,
+						'source' => 'search',
+					];
+				}
+
+				$payload['pagination']['total'] = $total;
+				$payload['pagination']['has_more'] = ($payload['pagination']['page'] * $payload['pagination']['per_page']) < $total;
+			}
 		}
 
-		$data = json_decode((string)$response['body'], true);
-		if (!is_array($data) || !isset($data['response'])) {
-			$this->logApiFailure(sprintf('Steam API search returned invalid payload (app=%s query="%s")', $appId, $query));
-			$payload['error'] = sprintf('Steam API returned invalid data. URL: %s Params: %s', $response['url'], http_build_query($response['fields'], '', '&'));
-			return $payload;
+		if ($this->shouldAttemptScraper($query, $payload)) {
+			$scrapeResult = $this->scrapeWorkshopItems($appId, $query, $payload['pagination']['per_page'], $payload['pagination']['page']);
+			$scrapeContext = $scrapeResult['request'];
+			$requestAttempts[] = $scrapeContext;
+			if ($scrapeResult['success'] && !empty($scrapeResult['results'])) {
+				$payload['results'] = $scrapeResult['results'];
+				$payload['pagination']['total'] = $scrapeResult['total'];
+				$payload['pagination']['has_more'] = $scrapeResult['has_more'];
+				$payload['error'] = null;
+				$payload['request'] = $scrapeContext;
+			} elseif (!$scrapeResult['success']) {
+				$fallbackError = $scrapeResult['error'] ?? 'Steam Workshop scrape failed.';
+				if ($payload['error'] === null) {
+					$payload['error'] = $fallbackError;
+				} else {
+					$payload['error'] .= ' Scraper fallback failed: ' . $fallbackError;
+				}
+			}
 		}
-		$details = $data['response']['publishedfiledetails'] ?? [];
-		$total = (int)($data['response']['total'] ?? count($details));
 
-		foreach ($details as $item) {
-			$id = isset($item['publishedfileid']) ? preg_replace('/[^0-9]/', '', (string)$item['publishedfileid']) : '';
-			if ($id === '') {
-				continue;
-			}
-			$title = isset($item['title']) ? trim((string)$item['title']) : '';
-			if ($title === '') {
-				$title = '@' . $id;
-			}
-			$payload['results'][] = [
-				'id' => $id,
-				'label' => $title,
-				'author' => isset($item['creator']) ? (string)$item['creator'] : '',
-				'preview_url' => isset($item['preview_url']) ? (string)$item['preview_url'] : '',
-				'time_updated' => isset($item['time_updated']) ? (int)$item['time_updated'] : null,
-				'subscriptions' => isset($item['subscriptions']) ? (int)$item['subscriptions'] : 0,
-				'source' => 'search',
+		$payload['request']['attempts'] = $requestAttempts;
+
+		return $payload;
+	}
+
+	private function shouldAttemptScraper(string $query, array $payload): bool
+	{
+		if (ctype_digit($query)) {
+			return false;
+		}
+		if (!$this->isScraperAvailable()) {
+			return false;
+		}
+
+		$hasResults = !empty($payload['results']);
+		return $payload['error'] !== null || $hasResults === false;
+	}
+
+	private function scrapeWorkshopItems(string $appId, string $query, int $perPage, int $page): array
+	{
+		$params = [
+			'appid' => $appId,
+			'searchtext' => $query,
+			'page' => $page,
+			'limit' => $perPage,
+		];
+		$request = [
+			'backend' => 'scraper',
+			'url' => 'https://steamcommunity.com/workshop/browse/',
+			'params' => $params,
+			'http_code' => null,
+			'transport_error' => null,
+			'command' => null,
+			'exit_code' => null,
+			'stderr' => null,
+		];
+
+		if (!$this->isScraperAvailable()) {
+			$request['summary'] = $this->formatRequestSummary($request);
+			return [
+				'success' => false,
+				'error' => 'Workshop scraper helper is not available.',
+				'results' => [],
+				'total' => 0,
+				'has_more' => false,
+				'request' => $request,
 			];
 		}
 
-		$payload['pagination']['total'] = $total;
-		$payload['pagination']['has_more'] = ($payload['pagination']['page'] * $payload['pagination']['per_page']) < $total;
+		$queryArg = $this->sanitizeScraperQuery($query);
+		$command = sprintf(
+			'bash %s %s %s %s %s',
+			escapeshellarg($this->scraperScript),
+			escapeshellarg($appId),
+			escapeshellarg($queryArg),
+			escapeshellarg((string)$page),
+			escapeshellarg((string)$perPage)
+		);
+		$request['command'] = $command;
 
-		return $payload;
+		$descriptorSpec = [
+			0 => ['pipe', 'r'],
+			1 => ['pipe', 'w'],
+			2 => ['pipe', 'w'],
+		];
+		$process = proc_open($command, $descriptorSpec, $pipes);
+		if (!is_resource($process)) {
+			$request['summary'] = $this->formatRequestSummary($request);
+			return [
+				'success' => false,
+				'error' => 'Unable to start Workshop scraper helper.',
+				'results' => [],
+				'total' => 0,
+				'has_more' => false,
+				'request' => $request,
+			];
+		}
+
+		fclose($pipes[0]);
+		$stdout = stream_get_contents($pipes[1]) ?: '';
+		$stderr = stream_get_contents($pipes[2]) ?: '';
+		fclose($pipes[1]);
+		fclose($pipes[2]);
+		$exitCode = (int)proc_close($process);
+		$request['exit_code'] = $exitCode;
+		$request['stderr'] = trim($stderr);
+
+		$results = [];
+		$lines = preg_split('/\r\n|\r|\n/', trim($stdout));
+		if (is_array($lines)) {
+			foreach ($lines as $line) {
+				if ($line === '') {
+					continue;
+				}
+				$parts = explode("\t", $line, 2);
+				$id = preg_replace('/[^0-9]/', '', $parts[0] ?? '');
+				if ($id === '') {
+					continue;
+				}
+				$title = isset($parts[1]) ? trim($parts[1]) : '';
+				if ($title === '') {
+					$title = '@' . $id;
+				}
+				$results[] = [
+					'id' => $id,
+					'label' => $title,
+					'author' => '',
+					'preview_url' => '',
+					'time_updated' => null,
+					'subscriptions' => 0,
+					'source' => 'scraper',
+				];
+				if (count($results) >= $perPage) {
+					break;
+				}
+			}
+		}
+
+		$request['summary'] = $this->formatRequestSummary($request);
+		$success = ($exitCode === 0);
+		$errorMessage = $success ? null : ($request['stderr'] !== '' ? $request['stderr'] : 'Scraper exited with code ' . $exitCode);
+
+		return [
+			'success' => $success,
+			'error' => $errorMessage,
+			'results' => $results,
+			'total' => count($results),
+			'has_more' => count($results) >= $perPage,
+			'request' => $request,
+		];
+	}
+
+	private function isScraperAvailable(): bool
+	{
+		return function_exists('proc_open') && is_file($this->scraperScript) && is_readable($this->scraperScript);
+	}
+
+	private function sanitizeScraperQuery(string $query): string
+	{
+		$query = preg_replace('/[\r\n\t]+/', ' ', $query);
+		$query = trim((string)$query);
+		if (function_exists('mb_substr')) {
+			return mb_substr($query, 0, 200);
+		}
+		return substr($query, 0, 200);
 	}
 
 	private function sanitizeInterval(?int $minutes): int
@@ -1095,11 +1271,22 @@ class SteamWorkshopService
 
 	private function formatRequestSummary(array $request): string
 	{
-		$url = (string)($request['url'] ?? '');
+		$backend = strtolower((string)($request['backend'] ?? 'api'));
 		$params = http_build_query($request['params'] ?? [], '', '&');
+		if ($backend === 'scraper') {
+			$command = (string)($request['command'] ?? '');
+			$exit = (string)($request['exit_code'] ?? '');
+			$stderr = trim((string)($request['stderr'] ?? 'none'));
+			if ($stderr === '') {
+				$stderr = 'none';
+			}
+			return sprintf('SCRAPER => COMMAND => %s | PARAMS => %s | EXIT => %s | STDERR => %s', $command, $params, $exit, $stderr);
+		}
+
+		$url = (string)($request['url'] ?? '');
 		$http = (string)($request['http_code'] ?? '');
 		$error = (string)($request['transport_error'] ?? 'none');
-		return sprintf('REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s', $url, $params, $http, $error);
+		return sprintf('API REQUEST => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s', $url, $params, $http, $error);
 	}
 
 	private function runSteamCmdDownload(string $steamCmdPath, string $appId, string $workshopId, string $username, ?string $password): array
