@@ -742,7 +742,10 @@ class SteamWorkshopService
 		if ($this->shouldAttemptScraper($query, $payload)) {
 			$scrapeResult = $this->scrapeWorkshopItems($appId, $query, $payload['pagination']['per_page'], $payload['pagination']['page']);
 			$scrapeContext = $scrapeResult['request'];
-			$requestAttempts[] = $scrapeContext;
+			$attemptContexts = $scrapeResult['attempts'] ?? [$scrapeContext];
+			foreach ($attemptContexts as $attemptContext) {
+				$requestAttempts[] = $attemptContext;
+			}
 			if ($scrapeResult['success'] && !empty($scrapeResult['results'])) {
 				$payload['results'] = $scrapeResult['results'];
 				$payload['pagination']['total'] = $scrapeResult['total'];
@@ -769,7 +772,7 @@ class SteamWorkshopService
 		if (ctype_digit($query)) {
 			return false;
 		}
-		if (!$this->isScraperAvailable()) {
+		if (!$this->hasAnyScraperTransport()) {
 			return false;
 		}
 
@@ -777,7 +780,46 @@ class SteamWorkshopService
 		return $payload['error'] !== null || $hasResults === false;
 	}
 
+	private function hasAnyScraperTransport(): bool
+	{
+		if ($this->isScraperAvailable()) {
+			return true;
+		}
+
+		return function_exists('curl_init');
+	}
+
 	private function scrapeWorkshopItems(string $appId, string $query, int $perPage, int $page): array
+	{
+		$attempts = [];
+		$shellError = null;
+
+		if ($this->isScraperAvailable()) {
+			$shellResult = $this->runShellScraper($appId, $query, $perPage, $page);
+			$attempts[] = $shellResult['request'];
+			if ($shellResult['success'] && !empty($shellResult['results'])) {
+				$shellResult['attempts'] = $attempts;
+				return $shellResult;
+			}
+			$shellError = $shellResult['error'] ?? null;
+		} else {
+			$shellError = $this->isWindowsPlatform()
+				? 'Shell scraper helper is disabled on Windows hosts.'
+				: 'Workshop scraper helper script is missing or unreadable.';
+			$attempts[] = $this->buildShellUnavailableContext($shellError);
+		}
+
+		$httpResult = $this->scrapeWorkshopItemsHttp($appId, $query, $perPage, $page);
+		$attempts[] = $httpResult['request'];
+		if ($shellError !== null && !$httpResult['success']) {
+			$httpResult['error'] = trim(($httpResult['error'] ?? '') . ' | Shell: ' . $shellError);
+		}
+		$httpResult['attempts'] = $attempts;
+
+		return $httpResult;
+	}
+
+	private function runShellScraper(string $appId, string $query, int $perPage, int $page): array
 	{
 		$params = [
 			'appid' => $appId,
@@ -891,9 +933,120 @@ class SteamWorkshopService
 		];
 	}
 
+	private function scrapeWorkshopItemsHttp(string $appId, string $query, int $perPage, int $page): array
+	{
+		$perPage = max(1, $perPage);
+		$params = [
+			'appid' => $appId,
+			'browsesort' => 'textsearch',
+			'section' => 'readytouseitems',
+			'searchtext' => $this->sanitizeScraperQuery($query),
+			'p' => $page,
+		];
+		$request = [
+			'backend' => 'scraper_http',
+			'url' => 'https://steamcommunity.com/workshop/browse/',
+			'params' => $params,
+			'http_code' => null,
+			'transport_error' => null,
+		];
+
+		$response = $this->httpGet($request['url'], $params, $this->getScraperUserAgent());
+		$request['url'] = $response['url'] ?? $request['url'];
+		$request['http_code'] = $response['http_code'];
+		$request['transport_error'] = $response['error'];
+
+		if ($response['error'] !== null || $response['http_code'] < 200 || $response['http_code'] >= 300 || $response['body'] === null) {
+			$request['summary'] = $this->formatRequestSummary($request);
+			$reason = $response['error'] !== null ? $response['error'] : 'HTTP ' . $response['http_code'];
+			return [
+				'success' => false,
+				'error' => 'Steam Community browse request failed: ' . $reason,
+				'results' => [],
+				'total' => 0,
+				'has_more' => false,
+				'request' => $request,
+			];
+		}
+
+		$html = (string)$response['body'];
+		$matches = [];
+		preg_match_all('/sharedfiles\/filedetails\/\?id=([0-9]+)/i', $html, $matches);
+		$rawIds = $matches[1] ?? [];
+		$uniqueIds = [];
+		foreach ($rawIds as $rawId) {
+			$id = preg_replace('/[^0-9]/', '', (string)$rawId);
+			if ($id === '' || isset($uniqueIds[$id])) {
+				continue;
+			}
+			$uniqueIds[$id] = true;
+		}
+		$orderedIds = array_keys($uniqueIds);
+		$hasMore = count($orderedIds) > $perPage;
+		$sliceIds = array_slice($orderedIds, 0, $perPage);
+
+		$results = [];
+		foreach ($sliceIds as $id) {
+			$detailResponse = $this->httpGet('https://steamcommunity.com/sharedfiles/filedetails/', ['id' => $id], $this->getScraperUserAgent());
+			$title = '';
+			if ($detailResponse['error'] === null && $detailResponse['http_code'] >= 200 && $detailResponse['http_code'] < 300 && $detailResponse['body'] !== null) {
+				$title = $this->parseWorkshopTitle((string)$detailResponse['body']);
+			}
+			if ($title === '') {
+				$title = '@' . $id;
+			}
+
+			$results[] = [
+				'id' => $id,
+				'label' => $title,
+				'author' => '',
+				'preview_url' => '',
+				'time_updated' => null,
+				'subscriptions' => 0,
+				'source' => 'scraper_http',
+			];
+		}
+
+		$request['summary'] = $this->formatRequestSummary($request);
+
+		return [
+			'success' => true,
+			'error' => null,
+			'results' => $results,
+			'total' => count($results),
+			'has_more' => $hasMore,
+			'request' => $request,
+		];
+	}
+
+	private function buildShellUnavailableContext(string $message): array
+	{
+		$context = [
+			'backend' => 'scraper',
+			'url' => 'https://steamcommunity.com/workshop/browse/',
+			'params' => [],
+			'http_code' => null,
+			'transport_error' => $message,
+			'command' => '[unavailable]',
+			'exit_code' => null,
+			'stderr' => $message,
+		];
+		$context['summary'] = $this->formatRequestSummary($context);
+		return $context;
+	}
+
 	private function isScraperAvailable(): bool
 	{
+		if ($this->isWindowsPlatform()) {
+			return false;
+		}
+
 		return function_exists('proc_open') && is_file($this->scraperScript) && is_readable($this->scraperScript);
+	}
+
+	private function isWindowsPlatform(): bool
+	{
+		return DIRECTORY_SEPARATOR === '\\';
 	}
 
 	private function sanitizeScraperQuery(string $query): string
@@ -904,6 +1057,27 @@ class SteamWorkshopService
 			return mb_substr($query, 0, 200);
 		}
 		return substr($query, 0, 200);
+	}
+
+	private function getScraperUserAgent(): string
+	{
+		return 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36';
+	}
+
+	private function parseWorkshopTitle(string $html): string
+	{
+		if (preg_match('/<title>(.*?)<\/title>/is', $html, $matches)) {
+			$title = html_entity_decode(trim($matches[1]), ENT_QUOTES, 'UTF-8');
+			if ($title !== '') {
+				$clean = preg_replace('/ - Steam (Community|Workshop).*$/i', '', $title);
+				if (is_string($clean)) {
+					$clean = trim($clean);
+				}
+				return $clean !== '' ? $clean : $title;
+			}
+		}
+
+		return '';
 	}
 
 	private function sanitizeInterval(?int $minutes): int
@@ -1269,6 +1443,42 @@ class SteamWorkshopService
 		return ['body' => $error === null ? $body : null, 'http_code' => $status, 'error' => $error, 'url' => $url, 'fields' => $fields];
 	}
 
+	private function httpGet(string $url, array $params = [], ?string $userAgent = null): array
+	{
+		if (!function_exists('curl_init')) {
+			return ['body' => null, 'http_code' => 0, 'error' => 'PHP cURL extension is required', 'url' => $url, 'params' => $params];
+		}
+
+		$queryString = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+		$fullUrl = $queryString === '' ? $url : $url . (strpos($url, '?') === false ? '?' : '&') . $queryString;
+		$ch = curl_init($fullUrl);
+		if ($ch === false) {
+			return ['body' => null, 'http_code' => 0, 'error' => 'Unable to initialize cURL', 'url' => $fullUrl, 'params' => $params];
+		}
+
+		curl_setopt_array($ch, [
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_TIMEOUT => 20,
+			CURLOPT_ENCODING => '',
+			CURLOPT_USERAGENT => $userAgent ?? 'GSP-Workshop/1.0 (+https://github.com/GameServerPanel/GSP)',
+			CURLOPT_HTTPHEADER => ['Accept: text/html,application/xhtml+xml;q=0.9,*/*;q=0.8'],
+		]);
+
+		$body = curl_exec($ch);
+		$error = curl_errno($ch) ? curl_error($ch) : null;
+		$status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+
+		return [
+			'body' => $error === null ? $body : null,
+			'http_code' => $status,
+			'error' => $error,
+			'url' => $fullUrl,
+			'params' => $params,
+		];
+	}
+
 	private function formatRequestSummary(array $request): string
 	{
 		$backend = strtolower((string)($request['backend'] ?? 'api'));
@@ -1281,6 +1491,11 @@ class SteamWorkshopService
 				$stderr = 'none';
 			}
 			return sprintf('SCRAPER => COMMAND => %s | PARAMS => %s | EXIT => %s | STDERR => %s', $command, $params, $exit, $stderr);
+		} elseif ($backend === 'scraper_http') {
+			$url = (string)($request['url'] ?? '');
+			$http = (string)($request['http_code'] ?? '');
+			$error = (string)($request['transport_error'] ?? 'none');
+			return sprintf('SCRAPER_HTTP => URL => %s | PARAMS => %s | HTTP => %s | TRANSPORT => %s', $url, $params, $http, $error);
 		}
 
 		$url = (string)($request['url'] ?? '');

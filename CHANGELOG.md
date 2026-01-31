@@ -2,6 +2,7 @@
 
 ## 2026-01-31
 - Added a hardened Workshop scraping helper (the same HTML workflow we validated manually) and wired it into the Steam Workshop service as a fallback whenever the official API errors out or returns empty data.
+- Added a native PHP HTTP scraper fallback (auto-selected when bash/proc_open is unavailable, e.g., on Windows XAMPP installs) so the Game Monitor search stops showing “Unable to contact the Steam Workshop” when the API dies but the HTML workflow still works.
 - Surface scraper vs API attempts (including shell commands, exit codes, and stderr) in the JSON response so the Game Monitor can show exactly which backend produced the results.
 - Bundled the reusable `workshop_scrape.sh` bash helper inside the module so future diagnostics can be run server-side without re-copying the ad-hoc script.
 
