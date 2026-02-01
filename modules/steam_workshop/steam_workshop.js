@@ -5,6 +5,7 @@
         function Picker(root) {
             this.root = root;
             this.endpoint = root.getAttribute('data-endpoint') || '';
+            this.detailBase = root.getAttribute('data-detail-base') || 'https://steamcommunity.com/sharedfiles/filedetails/?id=';
             this.lang = {
                 add: root.getAttribute('data-lang-add') || 'Add',
                 remove: root.getAttribute('data-lang-remove') || 'Remove',
@@ -241,16 +242,32 @@
             }
         };
         Picker.prototype.updateRequestPreview = function () {
-            if (this.requestInput && this.searchInput) {
-                this.requestInput.value = this.searchInput.value;
+            if (!this.searchInput) {
+                return;
             }
-            if (this.requestSummary) {
-                var encoded = '';
-                if (this.searchInput && this.searchInput.value.trim() !== '') {
-                    encoded = encodeURIComponent(this.searchInput.value.trim());
-                }
-                this.requestSummary.textContent = (this.requestSummaryBase || '') + encoded;
+            var term = this.searchInput.value.trim();
+            if (this.requestInput) {
+                this.requestInput.value = term;
             }
+            if (!this.requestSummary) {
+                return;
+            }
+            var base = this.requestSummaryBase || '';
+            if (!base) {
+                this.requestSummary.textContent = '';
+                return;
+            }
+            if (!term) {
+                this.requestSummary.textContent = base;
+                return;
+            }
+            // Numeric-only terms are treated as Workshop item IDs and link to detail pages instead of search.
+            var isWorkshopId = /^\d+$/.test(term);
+            if (isWorkshopId) {
+                this.requestSummary.textContent = this.detailBase + encodeURIComponent(term);
+                return;
+            }
+            this.requestSummary.textContent = base + encodeURIComponent(term);
         };
         Picker.prototype.isSelected = function (id) {
             return this.state.selected.some(function (item) { return item.id === id; });

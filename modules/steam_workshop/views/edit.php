@@ -4,6 +4,7 @@ declare(strict_types=1);
 /** @var array $config */
 /** @var array $lang */
 /** @var array $adapterOptions */
+/** @var string|null $appId */
 $homeName = htmlspecialchars($home['home_name'] ?? ('#' . $home['home_id']));
 $homeId = (int)$home['home_id'];
 ?>

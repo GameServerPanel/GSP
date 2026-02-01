@@ -169,6 +169,8 @@ class SteamWorkshopController
 
     private function renderEdit(array $home, array $config, bool $isAdmin, bool $adapterLocked): void
     {
+        $gameKey = (string)($home['game_key'] ?? '');
+        $appId = $gameKey !== '' ? $this->service->getSteamAppIdForGameKey($gameKey) : null;
         $this->render('edit', [
             'lang' => $this->lang,
             'home' => $home,
@@ -176,6 +178,7 @@ class SteamWorkshopController
             'isAdmin' => $isAdmin,
             'adapterOptions' => $this->service->getAdapterOptions(),
             'adapterLocked' => $adapterLocked,
+            'appId' => $appId,
         ]);
     }
 

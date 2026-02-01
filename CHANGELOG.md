@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-01-31
+- Rebuilt the Steam Workshop picker search to rely solely on Steam Community scraping (matching the working curl flow) and updated the request preview to show the actual Steam URL instead of a local panel endpoint.
 - Added adapter AppID lookup for Workshop search so the picker can query Steam even when the server XML lacks a clear default installer entry.
 - Switched Workshop picker results to checkbox selection, letting customers toggle multiple mods directly from the search list.
 - Added a hardened Workshop scraping helper (the same HTML workflow we validated manually) and wired it into the Steam Workshop service as a fallback whenever the official API errors out or returns empty data.

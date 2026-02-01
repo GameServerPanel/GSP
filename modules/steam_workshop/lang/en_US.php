@@ -85,7 +85,7 @@ return [
     'mod_picker_status_need_query' => 'Enter a Workshop ID or keyword before searching.',
     'mod_picker_toggle_label' => 'Sync',
     'mod_picker_request_label' => 'Submitting request',
-    'mod_picker_request_hint' => 'Exact URL preview. The input shows the text that will be submitted.',
+    'mod_picker_request_hint' => 'Exact Steam URL preview. The input shows the text that will be submitted.',
     'mod_picker_request_input_label' => 'Workshop query preview',
     'error_game_key_required' => 'Select a valid game key before editing the adapter.',
     'error_adapter_delete_failed' => 'Adapter could not be deleted.',
