@@ -60,10 +60,11 @@
       <section class="gsw-locations" aria-label="Current locations">
         <h2>Current Locations</h2>
         <ul class="gsw-locations-list">
-          <li><strong>East USA</strong></li>
-          <li><strong>Central USA</strong></li>
-          <li><strong>West USA</strong></li>
-          <li><strong>Western Europe</strong></li>
+          <li><strong>Los Angeles, USA</strong> – la-game-1.iaregamer.com</li>
+          <li><strong>Kansas City, USA</strong> – kc-game-2.iaregamer.com</li>
+          <li><strong>Dallas, USA</strong> – dal-game-1.iaregamer.com</li>
+          <li><strong>New York City, USA</strong> – nyc-game-1.iaregamer.com</li>
+          <li><strong>Dublin, Ireland</strong> – dub-game-1.iaregamer.com</li>
         </ul>
       </section>
 
