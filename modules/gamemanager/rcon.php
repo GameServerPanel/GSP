@@ -88,7 +88,7 @@ elseif(isset($_POST['base64_command']))
 }
 
 $presets = $db->getRconPresets($home_info['home_cfg_id'],$home_info['mods'][$mod_id]['mod_cfg_id']);
-if(is_array($presets) && $presets > 0)
+if(is_array($presets) && (is_array($presets) ? count($presets) : 0) > 0)
 {
 	echo '<form action="" method="post">'.
 		  get_lang("rcon_presets") . ':

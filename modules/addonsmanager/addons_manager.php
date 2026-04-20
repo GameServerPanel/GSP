@@ -358,7 +358,7 @@ function exec_ogp_module() {
 	foreach($groups as $group)
 		$group_names[$group['group_id']] = $group['group_name'];
 	
-	if (isset($result) and is_array($result) and $result > 0)
+	if (isset($result) and is_array($result) and (is_array($result) ? count($result) : 0) > 0)
 	{
 		foreach($result as $row)
 		{
