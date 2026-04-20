@@ -59,6 +59,9 @@ function exec_ogp_module() {
 	{
 		$home_info = $db->getUserGameHome($user_id,$home_id);
 		$groups = $db->getUsersGroups($_SESSION['user_id']);
+		if (!is_array($groups)) {
+			$groups = [];
+		}
 		$query_groups .= " AND (";
 		foreach($groups as $group)
 			$query_groups .= "group_id=".$group['group_id']." OR ";
@@ -86,6 +89,9 @@ function exec_ogp_module() {
         $addon_id = (int)$_REQUEST['addon_id'];
 		
 		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
+		if (!is_array($addons_rows)) {
+			$addons_rows = [];
+		}
 
 		if (!$addons_rows) {
 			print_failure(get_lang('invalid_addon'));
@@ -105,6 +111,9 @@ function exec_ogp_module() {
 			$check_passed = FALSE;
 			$address_at_post = $ip.":".$port;
 			$ip_ports = $db->getHomeIpPorts($home_info['home_id']);
+			if (!is_array($ip_ports)) {
+				$ip_ports = [];
+			}
 			foreach($ip_ports as $ip_port);
 			{
 				$address_owned = $ip_port['ip'].":".$ip_port['port'];
@@ -234,7 +243,7 @@ function exec_ogp_module() {
     elseif( $addon_type != "" )
     {
 
-    	if (!in_array($addon_type, $addon_types)) {
+    	if (!(is_array($addon_types) && in_array($addon_type, $addon_types))) {
     		print_failure(get_lang('invalid_addon_type'));
     		$view->refresh('?m=addonsmanager&p=user_addons&home_id='. $home_id .'&mod_id='. $mod_id .'&ip='. $ip .'&port='.$port);
 
@@ -261,6 +270,9 @@ function exec_ogp_module() {
 			<select name="addon_id">
 			<?php
 			$addons = $db->resultQuery("SELECT addon_id, name FROM OGP_DB_PREFIXaddons WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . " ORDER BY name ASC");
+			if (!is_array($addons)) {
+				$addons = [];
+			}
 			foreach($addons as $addon) 
 			{
 			?>

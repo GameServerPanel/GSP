@@ -79,14 +79,16 @@ if(isset($_POST['command']) and !is_array($_POST['command']))
 	$_POST['command'] = array( '0' => stripcslashes($_POST['command']) );
 elseif(isset($_POST['base64_command']))
 {
-	foreach($_POST['base64_command'] as $key => $command)
-	{
-		$_POST['command'][$key] = isset($_POST['input']) ?  str_replace("%input%", $_POST['input'], base64_decode($command)) : base64_decode($command);
+	if (is_array($_POST['base64_command'])) {
+		foreach($_POST['base64_command'] as $key => $command)
+		{
+			$_POST['command'][$key] = isset($_POST['input']) ?  str_replace("%input%", $_POST['input'], base64_decode($command)) : base64_decode($command);
+		}
 	}
 }
 
 $presets = $db->getRconPresets($home_info['home_cfg_id'],$home_info['mods'][$mod_id]['mod_cfg_id']);
-if($presets > 0)
+if(is_array($presets) && (is_array($presets) ? count($presets) : 0) > 0)
 {
 	echo '<form action="" method="post">'.
 		  get_lang("rcon_presets") . ':
@@ -124,16 +126,22 @@ if($presets > 0)
 if(isset($_POST['remote_send_rcon_command']))
 {
 	$response = "";
-	foreach($_POST['command'] as $command)
-	{
-		$ret = send_command($command, $remote, $server_xml, $home_info, $home_id, $ip, $port );
-		if(!$ret)
+	if (is_array($_POST['command'])) {
+		foreach($_POST['command'] as $command)
 		{
-			$response = FALSE;
-			break;
+			$ret = send_command($command, $remote, $server_xml, $home_info, $home_id, $ip, $port );
+			if(!$ret)
+			{
+				$response = FALSE;
+				break;
+			}
+			else
+				$response .= $ret;
 		}
-		else
-			$response .= $ret;
+	}
+	else
+	{
+		$response = FALSE;
 	}
 	if($response)
 	{

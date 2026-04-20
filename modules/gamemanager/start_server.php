@@ -71,6 +71,9 @@ function exec_ogp_module()
 	$home_id = $home_info['home_id'];
 	
 	$ip_info = $db->getHomeIpPorts($home_id);
+	if (!is_array($ip_info)) {
+		$ip_info = [];
+	}
 	
 	foreach ( $ip_info as $ip_ports_row )
 
@@ -259,4 +262,3 @@ function exec_ogp_module()
 	return;
 }
 ?>
-

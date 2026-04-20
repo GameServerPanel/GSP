@@ -27,6 +27,9 @@ function do_progress($kbytes,$rsyncPath)
 	$mbytes = round($kbytes / 1024, 2);
 	
 	$sizes = file("modules/gamemanager/sizes.list", FILE_IGNORE_NEW_LINES)or print_failure("Can't open sizes.list");
+	if (!is_array($sizes)) {
+		$sizes = [];
+	}
 	
 	# Adds a backslash on each slash so it can be used as patern at preg_match
 	$rsyncPath = addcslashes($rsyncPath,"/");
@@ -365,7 +368,7 @@ function exec_ogp_module() {
 			}
 		}
 		$master_server_home_id = $db->getMasterServer( $home_info['remote_server_id'], $home_info['home_cfg_id'] );
-		if ( in_array($rs_gname, $sync_list) ) 
+		if ( is_array($sync_list) && in_array($rs_gname, $sync_list) ) 
 		{
 			echo "<form action='?m=gamemanager&amp;p=rsync_install' method='post'>
 				 <table class='center'>
@@ -412,4 +415,3 @@ function exec_ogp_module() {
 	}
 }
 ?>
-

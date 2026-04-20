@@ -73,6 +73,9 @@ function exec_ogp_module() {
 	if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
 	{
 		$addons_rows = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXaddons WHERE addon_id=".(int)$_POST['addon_id']);
+		if (!is_array($addons_rows)) {
+			$addons_rows = [];
+		}
 		$addon_info = $addons_rows[0];
 		$name = isset($addon_info['name']) ? $addon_info['name'] : "";
 		$url = isset($addon_info['url']) ? $addon_info['url'] : "";
@@ -135,6 +138,9 @@ function exec_ogp_module() {
 				<select name='home_cfg_id'>
 		<?php
 		$game_cfgs = $db->getGameCfgs();
+		if (!is_array($game_cfgs)) {
+			$game_cfgs = [];
+		}
 		echo "<option style='background:black;color:white;' value=''>".get_lang('linux_games')."</option>\n";
 		
 		foreach ( $game_cfgs as $row )
@@ -186,6 +192,9 @@ function exec_ogp_module() {
 				<option value="0"><?php print_lang('all_groups'); ?></option>
 		<?php
 		$groups = $db->getGroupList();
+		if (!is_array($groups)) {
+			$groups = [];
+		}
 		foreach($groups as $group)
 		{
 			$selected = (isset($group_id) AND $group['group_id'] == $group_id) ? 'selected=selected' : '';
@@ -315,7 +324,7 @@ function exec_ogp_module() {
 	}
 	
 	$home_cfg_id = !empty($_GET['home_cfg_id']) && (int)$_GET['home_cfg_id'] > 0 ? (int)$_GET['home_cfg_id'] : 0;
-	$addon_type = !empty($_GET['addon_type']) && in_array($_GET['addon_type'], $addon_types) ? $_GET['addon_type'] : "";
+	$addon_type = !empty($_GET['addon_type']) && is_array($addon_types) && in_array($_GET['addon_type'], $addon_types) ? $_GET['addon_type'] : "";
 	$group_id = isset($_GET['group_id']) && is_numeric($_GET['group_id']) ? (int)$_GET['group_id'] : 0;
 	
 	if ( isset($_GET['show']) )
@@ -339,6 +348,9 @@ function exec_ogp_module() {
 		$group_id = $group_id == '0' ? $group_id." OR group_id IS NULL" : $group_id;
 		$result = $db->resultQuery("SELECT DISTINCT addon_id, name, game_name, url, path, group_id FROM OGP_DB_PREFIXaddons NATURAL JOIN OGP_DB_PREFIXconfig_homes WHERE group_id=".$group_id);
 	}
+	if (isset($result) && !is_array($result)) {
+		$result = [];
+	}
 	?>	
 	<table class="center">
 	<?php
@@ -346,7 +358,7 @@ function exec_ogp_module() {
 	foreach($groups as $group)
 		$group_names[$group['group_id']] = $group['group_name'];
 	
-	if (isset($result) and $result > 0)
+	if (isset($result) and is_array($result) and (is_array($result) ? count($result) : 0) > 0)
 	{
 		foreach($result as $row)
 		{
