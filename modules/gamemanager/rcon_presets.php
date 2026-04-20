@@ -106,7 +106,7 @@ function exec_ogp_module() {
 <br>
 <?php
 		$presets = $db->getRconPresets($home_cfg_id,$mod_cfg_id);
-		if($presets > 0)
+		if(is_array($presets) && $presets > 0)
 		{
 		
 			echo "<h2>".get_lang("edit_presets")."</h2>";

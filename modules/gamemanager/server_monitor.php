@@ -67,23 +67,28 @@ function renderParam($param, $last_param, $param_access_enabled, $home_id)
 		
 		// Get homes
 		$homes = $db->getHomesFor($dbTypeHomesStr, $_SESSION['user_id']);
+		if (!is_array($homes)) {
+			$homes = [];
+		}
 		
 		// Move current home_id home_path to the front of the array so that it is selected by default if no other option has been selected.
 		$homes = customShift($homes, "home_id", $home_id);
 		
 		$inputElementString = "<select $idString name='params[" . $param['key'] . "{DEPENDS:$paramType}]'" . $disabledString . ">";
-		foreach($homes as $home){
-			if($home["home_path"][strlen($home["home_path"])-1] != "/"){
-				$home["home_path"] = $home["home_path"] . "/";
+		if (is_array($homes)) {
+			foreach($homes as $home){
+				if($home["home_path"][strlen($home["home_path"])-1] != "/"){
+					$home["home_path"] = $home["home_path"] . "/";
+				}
+				
+				if(stripos($paramValue, $home["home_path"]) !== false){
+					$selectedString = "selected='selected'";
+					$selectedHome = $home["home_path"];
+				}else{
+					$selectedString = "";
+				}
+				$inputElementString .= '<option value="' . $home["home_path"] . '" ' . $selectedString . '>' . $home["home_path"] . '</option>';
 			}
-			
-			if(stripos($paramValue, $home["home_path"]) !== false){
-				$selectedString = "selected='selected'";
-				$selectedHome = $home["home_path"];
-			}else{
-				$selectedString = "";
-			}
-			$inputElementString .= '<option value="' . $home["home_path"] . '" ' . $selectedString . '>' . $home["home_path"] . '</option>';
 		}
 		$inputElementString .="</select>";
 		if($paramType == "other_game_server_path_additional"){
@@ -206,6 +211,12 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 				 get_lang("assign_game_homes") ."</a></p>";
 		}
 		return;
+	}
+	if (!is_array($server_homes)) {
+		$server_homes = [];
+	}
+	if (!is_array($show_games_type)) {
+		$show_games_type = [];
 	}
 	?>
 		<form action="home.php" style="float:right;">
@@ -378,7 +389,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 
 			$groupusers = $db->getGroupUsersByHomeId($server_home['home_id']);
 			$groupsus = "";
-			if($groupusers)
+			if(is_array($groupusers))
 			{
 				foreach($groupusers as $groupu)
 				{
@@ -391,7 +402,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 
 			$owners = $db->getUsersByHomeId($server_home['home_id']);
 			$other_owners = "";
-			if($owners)
+			if(is_array($owners))
 			{
 				foreach($owners as $owner)
 				{

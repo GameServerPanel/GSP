@@ -264,12 +264,15 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 			return FALSE;
 		else
 		{
-			$firewall_settings = $db->getFirewallSettings($home_info['remote_server_id']);
-			if ($firewall_settings['status'] == "enable")
-			{
-				$ip_ports = $db->getHomeIpPorts($home_info['home_id']);
-				foreach ($ip_ports as $ip_port)
+				$firewall_settings = $db->getFirewallSettings($home_info['remote_server_id']);
+				if ($firewall_settings['status'] == "enable")
 				{
+					$ip_ports = $db->getHomeIpPorts($home_info['home_id']);
+					if (!is_array($ip_ports)) {
+						$ip_ports = [];
+					}
+					foreach ($ip_ports as $ip_port)
+					{
 					if ($server_xml->protocol == "gameq")
 					{
 						$query_port = get_query_port($server_xml, $ip_port['port']);
@@ -298,9 +301,11 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 		// Do text replacements in cfg file
 		if( $server_xml->replace_texts )
 		{
-			foreach($home_info['mods'][$mod_id] as $key => $value)
-			{
-				$home_info[$key] = $value;
+			if (is_array($home_info['mods'][$mod_id])) {
+				foreach($home_info['mods'][$mod_id] as $key => $value)
+				{
+					$home_info[$key] = $value;
+				}
 			}
 			$server_home = $home_info;
 			if(	isset($server_xml->lgsl_query_name) )
@@ -362,9 +367,11 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 		// Do text replacements in cfg file
 		if( $server_xml->replace_texts )
 		{
-			foreach($home_info['mods'][$mod_id] as $key => $value)
-			{
-				$home_info[$key] = $value;
+			if (is_array($home_info['mods'][$mod_id])) {
+				foreach($home_info['mods'][$mod_id] as $key => $value)
+				{
+					$home_info[$key] = $value;
+				}
 			}
 			$server_home = $home_info;
 			if(	isset($server_xml->lgsl_query_name) )
@@ -417,12 +424,15 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 			return FALSE;
 		else
 		{
-			$firewall_settings = $db->getFirewallSettings($home_info['remote_server_id']);
-			if ($firewall_settings['status'] == "enable")
-			{
-				$ip_ports = $db->getHomeIpPorts($home_info['home_id']);
-				foreach ($ip_ports as $ip_port)
+				$firewall_settings = $db->getFirewallSettings($home_info['remote_server_id']);
+				if ($firewall_settings['status'] == "enable")
 				{
+					$ip_ports = $db->getHomeIpPorts($home_info['home_id']);
+					if (!is_array($ip_ports)) {
+						$ip_ports = [];
+					}
+					foreach ($ip_ports as $ip_port)
+					{
 					if ($server_xml->protocol == "gameq")
 					{
 						$query_port = get_query_port($server_xml, $ip_port['port']);
@@ -453,19 +463,27 @@ function get_monitor_buttons($server_home, $server_xml)
 {
 	global $db;
 	$buttons = array();
-	foreach($db->getInstalledModules() as $installed_module)
+	$installed_modules = $db->getInstalledModules();
+	if (!is_array($installed_modules)) {
+		$installed_modules = [];
+	}
+	foreach($installed_modules as $installed_module)
 	{
 		$buttons_file = "modules/$installed_module[folder]/monitor_buttons.php";
 		if(file_exists($buttons_file))
 		{
 			require($buttons_file);
-			$buttons = array_merge($buttons, $module_buttons);
+			if (is_array($module_buttons)) {
+				$buttons = array_merge($buttons, $module_buttons);
+			}
 			unset($module_buttons);
 		}
 	}
 	$buttons_html = "";
-	foreach($buttons as $button)
+	if (is_array($buttons)) {
+		foreach($buttons as $button)
 		$buttons_html .= $button."\n";
+	}
 	return $buttons_html;
 }
 ?>

@@ -110,6 +110,9 @@ function exec_ogp_module() {
 			if ($firewall_settings['status'] == "enable")
 			{
 				$ip_ports = $db->getHomeIpPorts($home_id);
+				if (!is_array($ip_ports)) {
+					$ip_ports = [];
+				}
 				foreach ($ip_ports as $ip_port)
 				{
 					if ($server_xml->protocol == "gameq")
@@ -142,6 +145,9 @@ function exec_ogp_module() {
 				if ($firewall_settings['status'] == "enable")
 				{
 					$ip_ports = $db->getHomeIpPorts($home_id);
+					if (!is_array($ip_ports)) {
+						$ip_ports = [];
+					}
 					foreach ($ip_ports as $ip_port)
 					{
 						if ($server_xml->protocol == "gameq")

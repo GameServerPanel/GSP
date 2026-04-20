@@ -40,9 +40,11 @@ function exec_ogp_module() {
 	else
 		$home_info = $db->getUserGameHome($user_id,$home_id);
 	
-	foreach($home_info['mods'][$mod_id] as $key => $value)
-	{
-		$home_info[$key] = $value;
+	if (is_array($home_info['mods'][$mod_id])) {
+		foreach($home_info['mods'][$mod_id] as $key => $value)
+		{
+			$home_info[$key] = $value;
+		}
 	}
 
 	require_once('includes/lib_remote.php');
