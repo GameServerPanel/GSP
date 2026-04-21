@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-04-21
+- Moved Discord webhook behavior to panel-managed settings (`ogp_settings`) with reusable helper functions and toggle support for orders, server events, and admin events.
+- Removed hardcoded Discord webhook URLs from login, role-change, support-ticket, and billing provisioning flows.
+- Refactored billing PayPal runtime to read mode, credentials, currency, webhook ID, and return/cancel URLs from panel settings instead of hardcoded values.
+- Added panel settings UI fields for Discord and PayPal configuration using the existing Settings module storage pattern.
+
 ## 2026-01-31
 - Rebuilt the Steam Workshop picker search to rely solely on Steam Community scraping (matching the working curl flow) and updated the request preview to show the actual Steam URL instead of a local panel endpoint.
 - Added adapter AppID lookup for Workshop search so the picker can query Steam even when the server XML lacks a clear default installer entry.

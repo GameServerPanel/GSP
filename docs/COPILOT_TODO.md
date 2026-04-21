@@ -3,3 +3,4 @@
 - Surface pagination controls in the Workshop picker so users can request additional batches from the new Steam Web API search endpoint.
 - Add an admin-facing toggle that makes it clear when the HTML scraper fallback is in use and lets staff force API-only mode if Valve ever objects.
 - Add Workshop result preview thumbnails and author links in the picker for easier browsing.
+- Add localized translations for the newly introduced Discord/PayPal panel setting labels beyond English.

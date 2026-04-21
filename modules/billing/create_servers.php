@@ -384,8 +384,6 @@ function exec_ogp_module()
 					
         $db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
-	}
-	
 	// Show results and redirect
 	if ($provisioned_count > 0) {
 		echo "<div class='success'>";
@@ -417,6 +415,5 @@ function exec_ogp_module()
 	);
 }
 ?>
-
 
 
