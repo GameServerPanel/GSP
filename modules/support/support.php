@@ -48,16 +48,8 @@ function exec_ogp_module() {
 
 
 // URL FROM DISCORD WEBHOOK SETUP
-$webhook = "https://discordapp.com/api/webhooks/710275918274363412/g5Tr-EUdEnLfFryOlscxJ6FuPiSJuE6EMKRYmh9UGMiqTUxU5-y9CQrBlDJW7znr0Tol";
-$msg = json_decode('
-{
-    "username":"I Are Gamer",
-    "content":"SUPPORT TICKET CREATED: Login with the userid and password http://privateemail.com" 
-
-}
-', true);
-
-discordmsg($msg, $webhook);
+$msg = "SUPPORT TICKET CREATED: Login with the userid and password http://privateemail.com";
+ogp_send_discord_notification($settings, $msg, 'notify_server_events');
 //end discord
 
 		$content = get_lang_f('support_email_content', $user['users_login'], $email, $gameserver, $message);				

@@ -39,7 +39,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   </ul>
 
   <h3>Sandbox account (testing)</h3>
-  <p>Use PayPal sandbox credentials when testing payments. Set your sandbox <code>client_id</code> and <code>client_secret</code> in the runtime config that the payment handlers use (for this site those are in the respective files under <code>_website/api/</code> or in a central config if you moved credentials).</p>
+  <p>Use PayPal sandbox credentials when testing payments. Configure all PayPal fields in the panel settings page (<code>home.php?m=settings</code>) so billing endpoints read values from <code>ogp_settings</code>.</p>
   <ul>
     <li>Create a sandbox business account at <a href="https://developer.paypal.com">PayPal Developer</a> and obtain a sandbox client ID/secret.</li>
     <li>Update the payment handler config and restart the webserver if required.</li>

@@ -77,6 +77,73 @@ function discordmsg($msg, $webhook) {
   }
 }
 
+function ogp_setting_is_enabled($value, $default = false)
+{
+	if ($value === null || $value === '') return $default;
+	if (is_bool($value)) return $value;
+	$value = strtolower(trim((string)$value));
+	return in_array($value, array('1', 'true', 'yes', 'on'), true);
+}
+
+function ogp_get_discord_settings($settings = array())
+{
+	$settings = is_array($settings) ? $settings : array();
+	$legacy_webhook = isset($settings['webhookurl']) ? trim((string)$settings['webhookurl']) : '';
+	$webhook = isset($settings['discord_webhook_url']) ? trim((string)$settings['discord_webhook_url']) : '';
+	if ($webhook === '' && $legacy_webhook !== '') {
+		$webhook = $legacy_webhook;
+	}
+
+	$has_explicit_flag = array_key_exists('discord_enabled', $settings);
+	$enabled_default = $legacy_webhook !== '';
+
+	return array(
+		'enabled' => ogp_setting_is_enabled($has_explicit_flag ? $settings['discord_enabled'] : null, $enabled_default),
+		'webhook_url' => $webhook,
+		'username' => isset($settings['discord_username']) ? trim((string)$settings['discord_username']) : '',
+		'avatar_url' => isset($settings['discord_avatar_url']) ? trim((string)$settings['discord_avatar_url']) : '',
+		'notify_orders' => ogp_setting_is_enabled(isset($settings['discord_notify_orders']) ? $settings['discord_notify_orders'] : null, true),
+		'notify_server_events' => ogp_setting_is_enabled(isset($settings['discord_notify_server_events']) ? $settings['discord_notify_server_events'] : null, true),
+		'notify_admin_events' => ogp_setting_is_enabled(isset($settings['discord_notify_admin_events']) ? $settings['discord_notify_admin_events'] : null, true),
+	);
+}
+
+function ogp_send_discord_notification($settings, $message, $toggle = '')
+{
+	$discord = ogp_get_discord_settings($settings);
+	if (!$discord['enabled'] || $discord['webhook_url'] === '') {
+		return false;
+	}
+
+	if ($toggle !== '' && isset($discord[$toggle]) && !$discord[$toggle]) {
+		return false;
+	}
+
+	if (!function_exists('curl_init')) {
+		error_log('OGP Discord webhook skipped: PHP curl extension is not loaded.');
+		return false;
+	}
+
+	$payload = array('content' => (string)$message);
+	if ($discord['username'] !== '') {
+		$payload['username'] = $discord['username'];
+	}
+	if ($discord['avatar_url'] !== '') {
+		$payload['avatar_url'] = $discord['avatar_url'];
+	}
+
+	$ch = curl_init($discord['webhook_url']);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt($ch, CURLOPT_HEADER, 0);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	$response = curl_exec($ch);
+	curl_close($ch);
+	return $response;
+}
+
 
 //read_expire() converts a time stamp to a human readable form
 //Used as a count down to when the user's account expires
@@ -1131,4 +1198,3 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 	return false;
 }
 ?>
-

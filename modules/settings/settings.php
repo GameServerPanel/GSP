@@ -72,7 +72,27 @@ function exec_ogp_module()
 			"use_authorized_hosts" => $_REQUEST['use_authorized_hosts'],
 			"allow_setting_cpu_affinity" => $_REQUEST['allow_setting_cpu_affinity'],
 			"regex_invalid_file_name_chars" => addslashes($_REQUEST['regex_invalid_file_name_chars']),
-			"login_ban_time" => $_REQUEST['login_ban_time']
+			"login_ban_time" => $_REQUEST['login_ban_time'],
+			"discord_enabled" => $_REQUEST['discord_enabled'],
+			"discord_webhook_url" => $_REQUEST['discord_webhook_url'],
+			"discord_username" => $_REQUEST['discord_username'],
+			"discord_avatar_url" => $_REQUEST['discord_avatar_url'],
+			"discord_notify_orders" => $_REQUEST['discord_notify_orders'],
+			"discord_notify_server_events" => $_REQUEST['discord_notify_server_events'],
+			"discord_notify_admin_events" => $_REQUEST['discord_notify_admin_events'],
+			"paypal_enabled" => $_REQUEST['paypal_enabled'],
+			"paypal_mode" => $_REQUEST['paypal_mode'],
+			"paypal_client_id" => $_REQUEST['paypal_client_id'],
+			"paypal_client_secret" => $_REQUEST['paypal_client_secret'],
+			"paypal_sandbox_client_id" => $_REQUEST['paypal_sandbox_client_id'],
+			"paypal_sandbox_client_secret" => $_REQUEST['paypal_sandbox_client_secret'],
+			"paypal_live_client_id" => $_REQUEST['paypal_live_client_id'],
+			"paypal_live_client_secret" => $_REQUEST['paypal_live_client_secret'],
+			"paypal_email" => $_REQUEST['paypal_email'],
+			"paypal_currency" => $_REQUEST['paypal_currency'],
+			"paypal_webhook_id" => $_REQUEST['paypal_webhook_id'],
+			"paypal_return_url" => $_REQUEST['paypal_return_url'],
+			"paypal_cancel_url" => $_REQUEST['paypal_cancel_url']
 		);
 		
 		$db->setSettings($settings);
@@ -191,6 +211,29 @@ function exec_ogp_module()
 	
 	// Add regex setting for file manager
 	$ft->add_field('string','regex_invalid_file_name_chars',(@empty($row['regex_invalid_file_name_chars']) ? htmlentities('/[\^\$\*\+\?\(\)\[\{\\\\\\|\]!@#%&=~`,\\\'<>"}\s]/i', ENT_COMPAT | ENT_HTML401 | ENT_QUOTES) : htmlentities(@$row['regex_invalid_file_name_chars'], ENT_COMPAT | ENT_HTML401 | ENT_QUOTES)));
+
+	$ft->add_field('on_off','discord_enabled', isset($row['discord_enabled']) ? $row['discord_enabled'] : '0');
+	$ft->add_field('string','discord_webhook_url',@$row['discord_webhook_url']);
+	$ft->add_field('string','discord_username',@$row['discord_username']);
+	$ft->add_field('string','discord_avatar_url',@$row['discord_avatar_url']);
+	$ft->add_field('on_off','discord_notify_orders', isset($row['discord_notify_orders']) ? $row['discord_notify_orders'] : '1');
+	$ft->add_field('on_off','discord_notify_server_events', isset($row['discord_notify_server_events']) ? $row['discord_notify_server_events'] : '1');
+	$ft->add_field('on_off','discord_notify_admin_events', isset($row['discord_notify_admin_events']) ? $row['discord_notify_admin_events'] : '1');
+
+	$ft->add_field('on_off','paypal_enabled', isset($row['paypal_enabled']) ? $row['paypal_enabled'] : '0');
+	$ft->add_custom_field('paypal_mode',
+		create_drop_box_from_array(array('sandbox' => 'Sandbox', 'live' => 'Live'),"paypal_mode",isset($row['paypal_mode']) && !empty($row['paypal_mode']) ? $row['paypal_mode'] : 'sandbox',false));
+	$ft->add_field('string','paypal_client_id',@$row['paypal_client_id']);
+	$ft->add_field('password','paypal_client_secret',@$row['paypal_client_secret']);
+	$ft->add_field('string','paypal_sandbox_client_id',@$row['paypal_sandbox_client_id']);
+	$ft->add_field('password','paypal_sandbox_client_secret',@$row['paypal_sandbox_client_secret']);
+	$ft->add_field('string','paypal_live_client_id',@$row['paypal_live_client_id']);
+	$ft->add_field('password','paypal_live_client_secret',@$row['paypal_live_client_secret']);
+	$ft->add_field('string','paypal_email',@$row['paypal_email']);
+	$ft->add_field('string','paypal_currency',isset($row['paypal_currency']) && !empty($row['paypal_currency']) ? $row['paypal_currency'] : 'USD');
+	$ft->add_field('string','paypal_webhook_id',@$row['paypal_webhook_id']);
+	$ft->add_field('string','paypal_return_url',@$row['paypal_return_url']);
+	$ft->add_field('string','paypal_cancel_url',@$row['paypal_cancel_url']);
 	
 	// Add option to reset game server order to default
 	$ft->add_field('checkbox','reset_game_server_order','0');	

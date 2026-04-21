@@ -6,6 +6,7 @@
  */
 
 require_once(__DIR__ . '/../includes/config_loader.php');
+require_once(__DIR__ . '/../includes/runtime_settings.php');
 
 // Prevent any output before JSON
 ob_start();
@@ -50,10 +51,16 @@ if (!$paypal_order_id) {
 log_payment('REQUEST_START', ['order_id' => $paypal_order_id]);
 
 // PayPal API configuration
-$sandbox = true;
-$client_id = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
-$client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0';
-$api = $sandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+$paypalSettings = billing_get_paypal_settings();
+$client_id = $paypalSettings['client_id'];
+$client_secret = $paypalSettings['client_secret'];
+$api = $paypalSettings['api_base'];
+if (!billing_paypal_is_ready($paypalSettings)) {
+    log_payment('PAYPAL_NOT_CONFIGURED', ['enabled' => $paypalSettings['enabled'] ?? false]);
+    ob_clean();
+    echo json_encode(['error' => 'paypal_not_configured', 'request_id' => $requestId]);
+    exit;
+}
 
 // Get OAuth token
 $ch = curl_init("$api/v1/oauth2/token");
@@ -365,5 +372,4 @@ echo json_encode([
     'orders_renewed' => $renewedOrders,
     'provisioned' => $autoProvisionResult['provisioned_count'] ?? 0
 ]);
-
 

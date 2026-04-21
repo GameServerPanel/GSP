@@ -143,6 +143,46 @@ define('OGP_LANG_trusted_host_or_proxy_addresses_or_cidr', "Trusted Hosts or Pro
 define('OGP_LANG_trusted_forwarded_ip_addresses_or_cidr', "Trusted Forwarded IPs (IPv4/IPv6 Addresses or CIDR)");
 define('OGP_LANG_reset_game_server_order', "Reset Game Server Ordering");
 define('OGP_LANG_reset_game_server_order_info', "Resets game server ordering back to the default of using the server ID");
+define('OGP_LANG_discord_enabled', "Enable Discord Notifications");
+define('OGP_LANG_discord_enabled_info', "Enable or disable Discord webhook notifications globally.");
+define('OGP_LANG_discord_webhook_url', "Discord Webhook URL");
+define('OGP_LANG_discord_webhook_url_info', "Discord channel webhook endpoint used for panel notifications.");
+define('OGP_LANG_discord_username', "Discord Webhook Username");
+define('OGP_LANG_discord_username_info', "Optional username override for webhook messages.");
+define('OGP_LANG_discord_avatar_url', "Discord Webhook Avatar URL");
+define('OGP_LANG_discord_avatar_url_info', "Optional avatar URL override for webhook messages.");
+define('OGP_LANG_discord_notify_orders', "Discord Notify: Orders");
+define('OGP_LANG_discord_notify_orders_info', "Send Discord notifications for order/payment events.");
+define('OGP_LANG_discord_notify_server_events', "Discord Notify: Server Events");
+define('OGP_LANG_discord_notify_server_events_info', "Send Discord notifications for server provisioning/renewal/ticket events.");
+define('OGP_LANG_discord_notify_admin_events', "Discord Notify: Admin Events");
+define('OGP_LANG_discord_notify_admin_events_info', "Send Discord notifications for admin security and role-change events.");
+define('OGP_LANG_paypal_enabled', "Enable PayPal");
+define('OGP_LANG_paypal_enabled_info', "Enable or disable PayPal checkout and webhook processing.");
+define('OGP_LANG_paypal_mode', "PayPal Mode");
+define('OGP_LANG_paypal_mode_info', "Select sandbox for testing or live for production.");
+define('OGP_LANG_paypal_client_id', "PayPal Default Client ID");
+define('OGP_LANG_paypal_client_id_info', "Fallback client ID used when mode-specific IDs are not set.");
+define('OGP_LANG_paypal_client_secret', "PayPal Default Client Secret");
+define('OGP_LANG_paypal_client_secret_info', "Fallback client secret used when mode-specific secrets are not set.");
+define('OGP_LANG_paypal_sandbox_client_id', "PayPal Sandbox Client ID");
+define('OGP_LANG_paypal_sandbox_client_id_info', "Sandbox REST app client ID from PayPal Developer.");
+define('OGP_LANG_paypal_sandbox_client_secret', "PayPal Sandbox Client Secret");
+define('OGP_LANG_paypal_sandbox_client_secret_info', "Sandbox REST app client secret from PayPal Developer.");
+define('OGP_LANG_paypal_live_client_id', "PayPal Live Client ID");
+define('OGP_LANG_paypal_live_client_id_info', "Live REST app client ID from PayPal Developer.");
+define('OGP_LANG_paypal_live_client_secret', "PayPal Live Client Secret");
+define('OGP_LANG_paypal_live_client_secret_info', "Live REST app client secret from PayPal Developer.");
+define('OGP_LANG_paypal_email', "PayPal Merchant Email");
+define('OGP_LANG_paypal_email_info', "Optional merchant email used for payment records and reconciliation.");
+define('OGP_LANG_paypal_currency', "PayPal Currency");
+define('OGP_LANG_paypal_currency_info', "Default currency code used by checkout (for example: USD).");
+define('OGP_LANG_paypal_webhook_id', "PayPal Webhook ID");
+define('OGP_LANG_paypal_webhook_id_info', "Webhook ID used for PayPal signature verification.");
+define('OGP_LANG_paypal_return_url', "PayPal Return URL");
+define('OGP_LANG_paypal_return_url_info', "Optional return URL used after successful approval.");
+define('OGP_LANG_paypal_cancel_url', "PayPal Cancel URL");
+define('OGP_LANG_paypal_cancel_url_info', "Optional cancel URL used when checkout is canceled.");
 
 
 ?>

@@ -13,6 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // Load configuration
 require_once(__DIR__ . '/bootstrap.php');
+require_once(__DIR__ . '/includes/runtime_settings.php');
 
 // Variables from config.inc.php (helps IDEs understand scope)
 /** @var string $db_host Database host */
@@ -251,8 +252,11 @@ if ($applied_coupon && $coupon_discount_percent > 0) {
 $final_amount = $total_amount - $discount_amount;
 
 // PayPal configuration
-$sandbox = true;
-$client_id = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
+$paypal_settings = billing_get_paypal_settings();
+$client_id = $paypal_settings['client_id'];
+$paypal_currency = $paypal_settings['currency'];
+$paypal_enabled = !empty($paypal_settings['enabled']);
+$paypal_ready = billing_paypal_is_ready($paypal_settings);
 
 // Prepare PayPal items
 $paypal_items = [];
@@ -264,7 +268,7 @@ foreach ($invoices as $inv) {
         'description' => $inv['description'] ?? '',
         'quantity' => $qty,
         'unit_amount' => [
-            'currency_code' => 'USD',
+            'currency_code' => $paypal_currency,
             'value' => number_format(floatval($inv['amount']) / $qty, 2, '.', '')
         ]
     ];
@@ -507,8 +511,8 @@ $siteBase = $protocol . $host;
     <!-- Favicon -->
     <link rel="icon" href="images/logo-sm.png" type="image/png">
     <link rel="apple-touch-icon" href="images/logo-sm.png">
-    <?php if (!$cart_empty): ?>
-    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=USD&intent=capture"></script>
+    <?php if (!$cart_empty && $paypal_ready): ?>
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=<?php echo urlencode($paypal_currency); ?>&intent=capture"></script>
     <?php endif; ?>
 </head>
 <body>
@@ -623,9 +627,14 @@ $siteBase = $protocol . $host;
             <div class="checkout-section">
                 <h3>Checkout with PayPal</h3>
                 <p>Click the button below to complete your purchase securely through PayPal.</p>
-                
-                <div id="paypal-button-container"></div>
-                <div id="status-message" class="status-message"></div>
+                <?php if (!$paypal_enabled): ?>
+                    <div class="alert alert-error">PayPal checkout is currently disabled by the administrator.</div>
+                <?php elseif (!$paypal_ready): ?>
+                    <div class="alert alert-error">PayPal checkout is not configured yet. Please contact support.</div>
+                <?php else: ?>
+                    <div id="paypal-button-container"></div>
+                    <div id="status-message" class="status-message"></div>
+                <?php endif; ?>
                 
                 <div class="action-buttons">
                     <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
@@ -633,6 +642,7 @@ $siteBase = $protocol . $host;
                 </div>
             </div>
 
+            <?php if ($paypal_ready): ?>
             <script>
                 function setStatus(msg) {
                     const statusDiv = document.getElementById('status-message');
@@ -646,17 +656,17 @@ $siteBase = $protocol . $host;
                         return actions.order.create({
                             purchase_units: [{
                                 amount: {
-                                    currency_code: 'USD',
+                                    currency_code: '<?php echo htmlspecialchars($paypal_currency); ?>',
                                     value: '<?php echo number_format($final_amount, 2, '.', ''); ?>',
                                     breakdown: {
                                         item_total: {
-                                            currency_code: 'USD',
+                                            currency_code: '<?php echo htmlspecialchars($paypal_currency); ?>',
                                             value: '<?php echo number_format($total_amount, 2, '.', ''); ?>'
                                         }
                                         <?php if ($discount_amount > 0): ?>
                                         ,
                                         discount: {
-                                            currency_code: 'USD',
+                                            currency_code: '<?php echo htmlspecialchars($paypal_currency); ?>',
                                             value: '<?php echo number_format($discount_amount, 2, '.', ''); ?>'
                                         }
                                         <?php endif; ?>
@@ -708,10 +718,11 @@ $siteBase = $protocol . $host;
                     
                     onCancel: function(data) {
                         setStatus('Payment cancelled');
-                        window.location.href = '/payment_cancel.php';
+                        window.location.href = '<?php echo htmlspecialchars($paypal_settings['cancel_url']); ?>';
                     }
                 }).render('#paypal-button-container');
             </script>
+            <?php endif; ?>
                 <script>
                     // Remove invoice via AJAX and perform a partial reload of the cart container
                     function removeInvoice(invoiceId) {
@@ -760,4 +771,3 @@ $siteBase = $protocol . $host;
     <?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
-

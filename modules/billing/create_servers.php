@@ -146,21 +146,8 @@ function exec_ogp_module()
   //WEBHOOK Discord======================================================================================= 
                
     
-               $webhookurl = $settings['webhookurl'];
-             
                $msg = "The ". $home_name ." server ID #". $home_id . " has just been renewed.";
-               $json_data = array ('content'=>"$msg");
-               $make_json = json_encode($json_data);
-               $ch = curl_init( $webhookurl );
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-               curl_setopt( $ch, CURLOPT_POST, 1);
-               curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-               curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-               curl_setopt( $ch, CURLOPT_HEADER, 0);
-               curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-               $response = curl_exec( $ch );
-               //If you need to debug, or find out why you can't send message uncomment line below, and execute script.
-               //echo $response;
+               ogp_send_discord_notification($settings, $msg, 'notify_server_events');
                //end WEBHOOK Discord
 
 			}
@@ -310,24 +297,8 @@ function exec_ogp_module()
 
 					  
 	//WEBHOOK Discord======================================================================================= 
-               
-               $webhookurl = "https://discord.com/api/webhooks/710275918274363412/g5Tr-EUdEnLfFryOlscxJ6FuPiSJuE6EMKRYmh9UGMiqTUxU5-y9CQrBlDJW7znr0Tol";
-	       //$settings['webhookurl'];
-
-             
                $msg = "A new server, ". $home_name ." ID #". $home_id . ", has just been created.";
-               $json_data = array ('content'=>"$msg");
-               $make_json = json_encode($json_data);
-               $ch = curl_init( $webhookurl );
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-               curl_setopt( $ch, CURLOPT_POST, 1);
-               curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-               curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-               curl_setopt( $ch, CURLOPT_HEADER, 0);
-               curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-               $response = curl_exec( $ch );
-               //If you need to debug, or find out why you can't send message uncomment line below, and execute script.
-               //echo $response;
+               ogp_send_discord_notification($settings, $msg, 'notify_server_events');
                //end WEBHOOK Discord
 				}
 				// END EMAIL
@@ -446,7 +417,6 @@ function exec_ogp_module()
 	);
 }
 ?>
-
 
 
 

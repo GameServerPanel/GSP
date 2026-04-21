@@ -1,16 +1,21 @@
 <?php
 require_once(__DIR__ . '/includes/config_loader.php');
+require_once(__DIR__ . '/includes/runtime_settings.php');
 if (is_file(__DIR__ . '/includes/log.php')) require_once(__DIR__ . '/includes/log.php');
 
+$paypalSettings = billing_get_paypal_settings();
+$dataDir = rtrim(
+  (defined('SITE_DATA_DIR') ? SITE_DATA_DIR : '') ?: ($SITE_DATA_DIR ?? ''),
+  DIRECTORY_SEPARATOR
+);
+
 $config = [
-  'sandbox'       => true,
-  'client_id'     => 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c',
-  'client_secret' => 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0',
-  'webhook_id'    => '6N620673281740730',
-  'data_dir'      => rtrim(
-    (defined('SITE_DATA_DIR') ? SITE_DATA_DIR : '') ?: ($SITE_DATA_DIR ?? ''),
-    DIRECTORY_SEPARATOR
-  ),
+  'sandbox'       => !empty($paypalSettings['sandbox']),
+  'enabled'       => !empty($paypalSettings['enabled']),
+  'client_id'     => $paypalSettings['client_id'],
+  'client_secret' => $paypalSettings['client_secret'],
+  'webhook_id'    => $paypalSettings['webhook_id'],
+  'data_dir'      => $dataDir,
   'log_file'      => __DIR__ . '/data/webhook.log',
 ];
 
@@ -23,6 +28,12 @@ function api_base(){global $config; return $config['sandbox'] ? 'https://api-m.s
 
 http_response_code(200);
 @mkdir($config['data_dir'], 0775, true);
+
+if (empty($config['enabled']) || empty($config['client_id']) || empty($config['client_secret']) || empty($config['webhook_id'])) {
+  if (function_exists('site_log_warn')) site_log_warn('paypal_webhook_not_configured', ['enabled' => $config['enabled']]);
+  else log_line("PAYPAL_WEBHOOK_NOT_CONFIGURED");
+  exit;
+}
 
 $raw = file_get_contents('php://input');
 $headers = array_change_key_case(getallheaders() ?: [], CASE_UPPER);

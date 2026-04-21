@@ -9,10 +9,12 @@ ini_set('display_errors', '0');
 error_reporting(E_ALL);
 
 require_once(__DIR__ . '/../includes/config_loader.php');
+require_once(__DIR__ . '/../includes/runtime_settings.php');
 // create_order for PayPal — adapted to run from _website/api
-$sandbox       = true; // flip to false for Live
-$client_id     = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
-$client_secret = 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0';
+$paypalSettings = billing_get_paypal_settings();
+$sandbox = !empty($paypalSettings['sandbox']);
+$client_id = $paypalSettings['client_id'];
+$client_secret = $paypalSettings['client_secret'];
 
 // Setup comprehensive logging
 $logDir = __DIR__ . '/../logs';
@@ -62,7 +64,7 @@ if (!$in) {
 }
 
 $amount_in    = $in['amount'] ?? '0.00';
-$currency     = $in['currency'] ?? 'USD';
+$currency     = $in['currency'] ?? $paypalSettings['currency'];
 $invoice_id   = $in['invoice_id'] ?? null;
 $custom_id    = $in['custom_id'] ?? null;
 $description  = $in['description'] ?? 'Order';
@@ -96,13 +98,20 @@ if ($items) {
   ]);
 }
 
-$api = $sandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+$api = $paypalSettings['api_base'];
 create_order_log('PAYPAL_API_CONFIG', [
     'sandbox_mode' => $sandbox,
     'api_base' => $api,
     'has_client_id' => !empty($client_id),
     'has_client_secret' => !empty($client_secret)
 ]);
+
+if (!billing_paypal_is_ready($paypalSettings)) {
+    create_order_log('PAYPAL_NOT_CONFIGURED', ['enabled' => $paypalSettings['enabled'] ?? false]);
+    http_response_code(503);
+    echo json_encode(['error' => 'paypal_not_configured', 'request_id' => $requestId]);
+    exit;
+}
 
 // Step 1: Get OAuth token
 create_order_log('OAUTH_REQUEST_START', ['endpoint' => "$api/v1/oauth2/token"]);
@@ -154,7 +163,7 @@ if (!$access) {
 create_order_log('OAUTH_SUCCESS', ['token_length' => strlen($access)]);
 
 // Update site base URL to exclude 'modules/billing'
-$siteBaseUrl = 'http://gameservers.world';
+$siteBaseUrl = $paypalSettings['site_base'];
 
 create_order_log('URL_PROCESSING_BEFORE', [
     'return_url' => $return_url,
@@ -163,11 +172,15 @@ create_order_log('URL_PROCESSING_BEFORE', [
 ]);
 
 // Ensure return_url and cancel_url are absolute URLs (relative to site root)
-if (strpos($return_url, 'http') !== 0) {
-    $return_url = $siteBaseUrl . '/' . ltrim($return_url, '/');
+if (empty($return_url)) {
+    $return_url = $paypalSettings['return_url'];
+} elseif (strpos($return_url, 'http') !== 0) {
+    $return_url = billing_absolute_url($return_url, $siteBaseUrl);
 }
-if (strpos($cancel_url, 'http') !== 0) {
-    $cancel_url = $siteBaseUrl . '/' . ltrim($cancel_url, '/');
+if (empty($cancel_url)) {
+    $cancel_url = $paypalSettings['cancel_url'];
+} elseif (strpos($cancel_url, 'http') !== 0) {
+    $cancel_url = billing_absolute_url($cancel_url, $siteBaseUrl);
 }
 
 create_order_log('URL_PROCESSING_AFTER', [
