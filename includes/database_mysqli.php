@@ -289,7 +289,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		return $results;
 	}
 	
-	public function get_user_count((array)$search_field) {
+	public function get_user_count($search_field) {
 		$search_field = $this->realEscapeSingle($search_field);
 		
 		$sql = "SELECT COUNT(1) AS total FROM ".$this->table_prefix."users ";
@@ -310,7 +310,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		return $this->listQuery($query);
 	}
 	
-	public function get_group_count((array)$search_field){
+	public function get_group_count($search_field){
 		$search_field = $this->realEscapeSingle($search_field);
 		
 		$sql = "SELECT COUNT(1) AS total FROM ".$this->table_prefix."user_group_info ";
@@ -3392,7 +3392,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$this->query("INSERT INTO OGP_DB_PREFIXlogger (date, user_id, ip, message) VALUE (FROM_UNIXTIME(UNIX_TIMESTAMP(), '%d-%m-%Y %H:%i:%s'), $user_id, '$client_ip', '$message');");
 	}
 
-	public function get_logger_count((array)$search_field) {
+	public function get_logger_count($search_field) {
 		$search_field = $this->realEscapeSingle($search_field);
 		
 		$sql = "SELECT COUNT(1) AS total FROM ".$this->table_prefix."logger ";

@@ -131,7 +131,7 @@ function exec_ogp_module() {
     }
     echo '</table><br>';
 
-	$count_users = $db->get_user_count((array)$search_field);
+	$count_users = $db->get_user_count($search_field);
 	
 	if(isset($_GET['search']) && !empty($_GET['search'])){
 	$uri = '?m=user_admin&search='.$_GET['search'].'&limit='.$limit_user.'&page=';

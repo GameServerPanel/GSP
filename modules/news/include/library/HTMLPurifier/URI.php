@@ -105,7 +105,7 @@ class HTMLPurifier_URI
      * @param HTMLPurifier_Context $context
      * @return bool True if validation/filtering succeeds, false if failure
      */
-    public function validate($config, is_numeric($context) ? (int)$context : strtotime($context))
+    public function validate($config, $context)
     {
         // ABNF definitions from RFC 3986
         $chars_sub_delims = '!$&\'()*+,;=';

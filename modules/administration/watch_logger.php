@@ -139,7 +139,7 @@ function exec_ogp_module() {
 	echo "</tbody>\n";
 	echo "<tfoot style='border:1px solid grey;'></tfoot>\n";
 	echo "</table>\n";
-	$count_logs = $db->get_logger_count((array)$search_field);
+	$count_logs = $db->get_logger_count($search_field);
 	
 	if (isset($_GET['search']) && !empty($_GET['search'])) {
 		$uri = '?m=administration&p=watch_logger&search='.$_GET['search'].'&limit='.$l.'&page=';
@@ -149,4 +149,3 @@ function exec_ogp_module() {
 	echo paginationPages($count_logs[0]['total'], $p, $l, $uri, 3, 'watchLogger');
 }
 ?>
-

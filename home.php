@@ -170,7 +170,7 @@ function ogpHome()
 			{
 				if(isset($settings['check_expiry_by']) and $settings['check_expiry_by'] == "once_logged_in")
 				{
-					if($db->check_expire_date($_SESSION['user_id'], is_numeric($server_home['home_id']) ? (int)$server_home['home_id'] : strtotime($server_home['home_id'])))
+					if($db->check_expire_date($_SESSION['user_id'], $server_home['home_id']))
 						continue;
 				}
 				$servers_by_game_name["$server_home[game_name]"][] = $server_home;

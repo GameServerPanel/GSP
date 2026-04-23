@@ -149,7 +149,7 @@ function exec_ogp_module() {
     echo "</table>";
 	
 	if ($db->isAdmin($_SESSION['user_id']))
-	$count_groups = $db->get_group_count((array)$search_field);
+	$count_groups = $db->get_group_count($search_field);
 	else
 	$count_groups = $db->getUserGroupList_count($_SESSION['user_id'],$search_field);
 
