@@ -763,7 +763,16 @@ function exec_ogp_module()
 	if ( $isAdmin )
 	{
 		$master_server_home_id = $db->getMasterServer( $home_info['remote_server_id'], $home_info['home_cfg_id'] );
-		$expiration_date = !empty($home_info['server_expiration_date']) ? date( "d/m/Y H:i:s", $home_info['server_expiration_date'] ) : '';
+		$server_expiration_ts = isset($home_info['server_expiration_date']) ? trim((string)$home_info['server_expiration_date']) : '';
+		if ( $server_expiration_ts === '' or $server_expiration_ts === 'X' )
+		{
+			$expiration_date = '';
+		}
+		else
+		{
+			$expiration_timestamp = is_numeric($server_expiration_ts) ? (int)$server_expiration_ts : strtotime($server_expiration_ts);
+			$expiration_date = $expiration_timestamp !== FALSE ? date( "d/m/Y H:i:s", $expiration_timestamp ) : '';
+		}
 		
 		if( $master_server_home_id != FALSE AND $master_server_home_id == $home_id )
 			$checked = 'checked ="checked"';
@@ -891,7 +900,7 @@ function exec_ogp_module()
 						echo "<table class='center'><tr><td align='$align'>".$assigned_rows['ip'].":".$assigned_rows['port'].
 							 " <a href='?m=user_games&p=edit&home_id=$home_id&delete_ip&ip=".
 							 $assigned_rows['ip_id']."&port=".$assigned_rows['port'].
-							 "'>[ ". delete ." ]</a></td>\n".
+							 "'>[ ". get_lang("delete") ." ]</a></td>\n".
 							 $force_mod.
 							 "</tr>\n</table>\n";
 					}
