@@ -90,14 +90,14 @@ function exec_ogp_module() {
     echo "<th class='subuserColumn'>".get_lang('subusers')."</th></tr>";
 
     $i = 0;
-    foreach ( $result as $row )
+    foreach ((array)$result as $row)
     {
 		// Show user's parent
 		$ownedBy = "";
 		if(!is_null($row['users_parent'])){
 			$ownedBy = $row['users_parent'];
 			$parentInfo = $db->getUserById($ownedBy);
-			if(is_array($parentInfo) && array_key_exists("user_expires", $parentInfo) && $parentInfo['user_expires'] != "X"){
+			if(is_array($parentInfo) && array_key_exists("user_expires", (array)$parentInfo) && $parentInfo['user_expires'] != "X"){
 				$row['user_expires'] = $parentInfo['user_expires'];
 			}
 		}
@@ -131,7 +131,7 @@ function exec_ogp_module() {
     }
     echo '</table><br>';
 
-	$count_users = $db->get_user_count($search_field);
+	$count_users = $db->get_user_count((array)$search_field);
 	
 	if(isset($_GET['search']) && !empty($_GET['search'])){
 	$uri = '?m=user_admin&search='.$_GET['search'].'&limit='.$limit_user.'&page=';

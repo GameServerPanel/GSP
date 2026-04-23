@@ -48,7 +48,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
         </tr>
       </thead>
       <tbody>
-      <?php foreach ($records as $r): ?>
+      <?php foreach ((array)$records as $r): ?>
         <tr>
           <td><?php echo h($r['invoice'] ?? ($r['custom'] ?? 'NO-ID')); ?></td>
           <td><?php echo h(($r['currency'] ?? '') . ' ' . number_format((float)($r['amount'] ?? 0),2)); ?></td>

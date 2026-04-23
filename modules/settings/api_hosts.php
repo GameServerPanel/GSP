@@ -49,7 +49,7 @@ function exec_ogp_module()
 			$hosts_list = file_get_contents($hosts_file);
 			$hosts = preg_split("/[\r\n]+/", $hosts_list);
 			$new_hosts = array();
-			foreach($hosts as $host)
+			foreach ((array)$hosts as $host)
 			{
 				$host = trim($host);
 				if($host == '')
@@ -82,7 +82,7 @@ function exec_ogp_module()
 			$hosts_list = file_get_contents($hosts_file);
 			$hosts = preg_split("/[\r\n]+/", $hosts_list);
 			
-			foreach($hosts as $host)
+			foreach ((array)$hosts as $host)
 			{
 				$host = trim($host);
 				if($host == '' or in_array($host, $new_hosts))
@@ -127,7 +127,7 @@ function exec_ogp_module()
 		$authorized_hosts[] = $ip;
 	
 	$remote_servers = $db->getRemoteServers();
-	foreach($remote_servers as $remote_server)
+	foreach ((array)$remote_servers as $remote_server)
 	{
 		$ip = getHostByName($remote_server['agent_ip']);
 		if(filter_var($ip, FILTER_VALIDATE_IP))
@@ -136,7 +136,7 @@ function exec_ogp_module()
 	}
 	
 	echo "<h4>".get_lang('default_trusted_hosts')."</h4>\n<br>\n<div align='center'>\n";
-	foreach($authorized_hosts as $authorized_host)
+	foreach ((array)$authorized_hosts as $authorized_host)
 	{
 		echo $authorized_host."<br>\n";
 	}
@@ -149,7 +149,7 @@ function exec_ogp_module()
 		$hosts = array_filter($hosts);
 		if(!empty($hosts))
 		{
-			foreach($hosts as $host)
+			foreach ((array)$hosts as $host)
 			{
 				$host = trim($host);
 				if($host == '')
@@ -176,7 +176,7 @@ function exec_ogp_module()
 		$fwd_hosts = array_filter($fwd_hosts);
 		if(!empty($fwd_hosts))
 		{
-			foreach($fwd_hosts as $fwd_host)
+			foreach ((array)$fwd_hosts as $fwd_host)
 			{
 				$fwd_host = trim($fwd_host);
 				if($fwd_host == '')

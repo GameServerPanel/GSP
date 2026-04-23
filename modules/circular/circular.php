@@ -43,7 +43,7 @@ function exec_ogp_module()
 	{
 		if(isset($_POST['circulars_ids']) and is_array($_POST['circulars_ids']) and !empty($_POST['circulars_ids']))
 		{
-			foreach($_POST['circulars_ids'] as $circular_id)
+			foreach ((array)$_POST['circulars_ids'] as $circular_id)
 			{
 				remove_circular($circular_id, true);
 			}
@@ -67,7 +67,7 @@ function exec_ogp_module()
 				 "<th>".get_lang('users_not_read_circular')."</th>".
 				 "<th>".get_lang('date')."</th></thead>\n";
 			
-			foreach($circulars as $key => $circular)
+			foreach ((array)$circulars as $key => $circular)
 			{
 				$users_not_readed = get_usernames_not_read_circular($circular['circular_id']);
 				$users_not_readed = $users_not_readed ? $users_not_readed: "";
@@ -104,7 +104,7 @@ function exec_ogp_module()
 		 '<td><select id="select_admins" multiple>'."\n";
 	if(!empty($users))
 	{
-		foreach($users as $user)
+		foreach ((array)$users as $user)
 		{
 			if($user['users_role'] == 'admin')
 				echo '<option value="'.$user['user_id'].'">'.$user['users_login'].'</option>'."\n";
@@ -114,7 +114,7 @@ function exec_ogp_module()
 		 '<td><select id="select_users" multiple>'."\n";
 	if(!empty($users))
 	{
-		foreach($users as $user)
+		foreach ((array)$users as $user)
 		{
 			if($user['users_role'] == 'user')
 				echo '<option value="'.$user['user_id'].'">'.$user['users_login'].'</option>'."\n";
@@ -125,7 +125,7 @@ function exec_ogp_module()
 	$groups = $db->getGroupList();
 	if(!empty($groups))
 	{
-		foreach($groups as $group)
+		foreach ((array)$groups as $group)
 		{
 			if($db->listUsersInGroup($group['group_id']))
 				echo '<option value="'.$group['group_id'].'">'.$group['group_name'].'</option>';
@@ -136,7 +136,7 @@ function exec_ogp_module()
 		echo '<td><select id="select_subusers_of_users" multiple>'."\n";
 		if(!empty($users))
 		{
-			foreach($users as $user)
+			foreach ((array)$users as $user)
 			{
 				$sub_users_ids = $db->getUsersSubUsersIds($user['user_id']);
 				if($user['users_role'] == 'user' and $sub_users_ids)	

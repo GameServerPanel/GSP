@@ -20,7 +20,7 @@
   <div style='text-align:center'>
     <table style='margin:auto' cellpadding='4' cellspacing='2'>";
 
-    foreach ($server_list as $server)
+    foreach ((array)$server_list as $server)
     {
       $misc   = lgsl_server_misc($server);
       $server = lgsl_server_html($server);

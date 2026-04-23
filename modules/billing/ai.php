@@ -135,7 +135,7 @@ function normalize_messages($messages) {
     if (empty($messages['data']) || !is_array($messages['data'])) return $out;
 
     // The API returns newest first by default if not specifying; we request 'asc' in fetch.
-    foreach ($messages['data'] as $m) {
+    foreach ((array)$messages['data'] as $m) {
         $role = $m['role'] ?? '';
         if (!in_array($role, ['user', 'assistant', 'system'], true)) continue;
 
@@ -143,14 +143,14 @@ function normalize_messages($messages) {
 
         $all_text = [];
         $refs = [];
-        foreach ($m['content'] as $part) {
+        foreach ((array)$m['content'] as $part) {
             if (($part['type'] ?? '') === 'text' && !empty($part['text']['value'])) {
                 $all_text[] = $part['text']['value'];
 
                 // Parse annotations for citations (file_citation)
                 $anns = $part['text']['annotations'] ?? [];
                 if (is_array($anns)) {
-                    foreach ($anns as $ann) {
+                    foreach ((array)$anns as $ann) {
                         if (($ann['type'] ?? '') === 'file_citation' && !empty($ann['file_citation']['file_id'])) {
                             $fid = $ann['file_citation']['file_id'];
                             $page = null;
@@ -263,7 +263,7 @@ include(__DIR__ . '/includes/menu.php');
 
   <?php if (!empty($history) && is_array($history)): ?>
     <div style="margin-top:16px; padding:10px; border:1px solid #ccc; border-radius:8px;">
-      <?php foreach ($history as $msg):
+      <?php foreach ((array)$history as $msg):
         // Label mapping: user => Question, assistant => Answer, system => (optional)
         $role = $msg['role'] ?? 'assistant';
         if ($role === 'user') $label = 'Question';
@@ -280,7 +280,7 @@ include(__DIR__ . '/includes/menu.php');
             <div style="margin-top:6px; font-size:12px;">
               <em>References:</em>
               <ul style="margin:6px 0 0 18px; padding:0;">
-                <?php foreach ($refs as $r): 
+                <?php foreach ((array)$refs as $r): 
                   $fname = $r['filename'] ?? 'file';
                   $page  = $r['page'] ?? 'n/a';
                   // If you have your own document links, replace '#' with a real URL.

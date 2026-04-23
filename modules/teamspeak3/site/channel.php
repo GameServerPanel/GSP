@@ -27,7 +27,7 @@ if(isset($_POST['delete']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($channel_delete['errors']); $i++)
+		for($i=0; $i+1==count((array)$channel_delete['errors']); $i++)
 			{
 			$error .= $channel_delete['errors'][$i]."<br />";
 			}

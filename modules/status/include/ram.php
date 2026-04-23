@@ -29,7 +29,7 @@ if ($os == "windows") {
 	{
 		$wmiq = new COM("Winmgmts://");
 		$ossq = $wmiq->execquery("SELECT * FROM Win32_OperatingSystem");
-		foreach ($ossq as $osq) {
+		foreach ((array)$ossq as $osq) {
 			$total = $osq->TotalVisibleMemorySize * 1024;
 			$free = $osq->FreePhysicalMemory * 1024;
 		}

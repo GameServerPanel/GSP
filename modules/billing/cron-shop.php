@@ -62,7 +62,7 @@ $today = time();
 $invoice_date = strtotime('+ 7 days'); // Create invoice 7 days before expiration
 $suspend_date = $today; // Suspend immediately when overdue
 $removal_date = strtotime('- 7 days'); // Remove 7 days after suspension
-$rundate = date('Y-m-d H:i:s', $today);
+$rundate = date('Y-m-d H:i:s', is_numeric($today) ? (int)$today : strtotime($today));
 
 $db->logger("BILLING-CRON: Server lifecycle automation running at " . $rundate);
 
@@ -85,7 +85,7 @@ $upcoming_expirations = $db->resultQuery("
 ");
 
 if (is_array($upcoming_expirations)) {
-    foreach ($upcoming_expirations as $order) {
+    foreach ((array)$upcoming_expirations as $order) {
         $user_id = $order['user_id'];
         $order_id = $order['order_id'];
         $home_id = $order['home_id'];
@@ -158,7 +158,7 @@ $servers_to_suspend = $db->resultQuery("
 ");
 
 if (is_array($servers_to_suspend)) {
-    foreach ($servers_to_suspend as $order) {
+    foreach ((array)$servers_to_suspend as $order) {
         $user_id = $order['user_id'];
         $home_id = $order['home_id'];
         $order_id = $order['order_id'];
@@ -185,7 +185,7 @@ if (is_array($servers_to_suspend)) {
         $control_type = isset($server_xml->control_protocol_type) ? $server_xml->control_protocol_type : "";
         $addresses = $db->getHomeIpPorts($home_id);
         
-        foreach ($addresses as $address) {
+        foreach ((array)$addresses as $address) {
             $remote->remote_stop_server($home_id, $address['ip'], $address['port'], 
                                        $server_xml->control_protocol, $home_info['control_password'], 
                                        $control_type, $home_info['home_path']);
@@ -234,7 +234,7 @@ $servers_to_delete = $db->resultQuery("
 ");
 
 if (is_array($servers_to_delete)) {
-    foreach ($servers_to_delete as $order) {
+    foreach ((array)$servers_to_delete as $order) {
         $user_id = $order['user_id'];
         $home_id = $order['home_id'];
         $order_id = $order['order_id'];
@@ -305,7 +305,7 @@ if (!is_array($user_homes))
 }
 else
 {
-        foreach($user_homes as $user_home)
+        foreach ((array)$user_homes as $user_home)
         {
 
                 // Developer note:
@@ -358,7 +358,7 @@ if (!is_array($user_homes))
 }
 else
 {
-        foreach($user_homes as $user_home)
+        foreach ((array)$user_homes as $user_home)
         {
                 $user_id = $user_home['user_id'];
                 $home_id = $user_home['home_id'];
@@ -371,7 +371,7 @@ else
                 $server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
                 if(isset($server_xml->control_protocol_type))$control_type = $server_xml->control_protocol_type; else $control_type = "";
                 $addresses = $db->getHomeIpPorts($home_id);
-                foreach($addresses as $address)
+                foreach ((array)$addresses as $address)
                 {
                         $remote->remote_stop_server($home_id,$address['ip'],$address['port'],$server_xml->control_protocol,$home_info['control_password'],$control_type,$home_info['home_path']);
                 }
@@ -412,7 +412,7 @@ if (!is_array($user_homes))
 }
 else
 {
-        foreach($user_homes as $user_home)
+        foreach ((array)$user_homes as $user_home)
         {
                 $user_id = $user_home['user_id'];
                 $home_id = $user_home['home_id'];

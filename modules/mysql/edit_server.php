@@ -68,7 +68,7 @@ function exec_ogp_module() {
 		
 	$homes_array[0] = get_lang('select_game_server');
 	
-	foreach($server_homes as $server_home)
+	foreach ((array)$server_homes as $server_home)
 	{
 		$homes_array["$server_home[home_id]"] = "(ID ".$server_home['home_id'].") ".$server_home['home_name'];
 	}
@@ -150,7 +150,7 @@ function exec_ogp_module() {
 								$queries = array("CREATE DATABASE IF NOT EXISTS `".$mysql_db['db_name']."`;",
 												 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$mysql_db['db_passwd']."';",
 												 "FLUSH PRIVILEGES;");
-								foreach( $queries as $query )
+								foreach ((array)$queries as $query)
 								{
 									@$return = mysqli_query($link, $query);
 									if(!$return)
@@ -176,7 +176,7 @@ function exec_ogp_module() {
 								$queries = array("CREATE DATABASE IF NOT EXISTS `".$mysql_db['db_name']."`;",
 												 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$mysql_db['db_passwd']."';",
 												 "FLUSH PRIVILEGES;");
-								foreach( $queries as $query )
+								foreach ((array)$queries as $query)
 								{
 									@$return = mysql_query($query);
 									if(!$return)
@@ -221,7 +221,7 @@ function exec_ogp_module() {
 				{
 					$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
 									 "DROP USER '".$mysql_db['db_user']."'@'%';");
-					foreach( $queries as $query )
+					foreach ((array)$queries as $query)
 					{
 						@$return = mysqli_query($link, $query);
 						if(!$return)
@@ -239,7 +239,7 @@ function exec_ogp_module() {
 				{
 					$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
 									 "DROP USER '".$mysql_db['db_user']."'@'%';");
-					foreach( $queries as $query )
+					foreach ((array)$queries as $query)
 					{
 						@$return = mysql_query($query);
 						if(!$return)
@@ -309,7 +309,7 @@ function exec_ogp_module() {
 							$queries = array("DROP USER '".$mysql_db['db_user']."'@'%';",
 											 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
 											 "FLUSH PRIVILEGES;");
-							foreach( $queries as $query )
+							foreach ((array)$queries as $query)
 							{
 								@$return = mysqli_query($link, $query);
 								if(!$return)
@@ -328,7 +328,7 @@ function exec_ogp_module() {
 							$queries = array("DROP USER '".$mysql_db['db_user']."'@'%';",
 											 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
 											 "FLUSH PRIVILEGES;");
-							foreach( $queries as $query )
+							foreach ((array)$queries as $query)
 							{
 								@$return = mysql_query($query);
 								if(!$return)
@@ -376,7 +376,7 @@ function exec_ogp_module() {
 								$queries = array("GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
 												 "FLUSH PRIVILEGES;");
 												 
-							foreach( $queries as $query )
+							foreach ((array)$queries as $query)
 							{
 								@$return = mysqli_query($link, $query);
 								if(!$return)
@@ -399,7 +399,7 @@ function exec_ogp_module() {
 								$queries = array("GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
 												 "FLUSH PRIVILEGES;");
 												 
-							foreach( $queries as $query )
+							foreach ((array)$queries as $query)
 							{
 								@$return = mysql_query($query);
 								if(!$return)
@@ -439,7 +439,7 @@ function exec_ogp_module() {
             $mysql_dbs = $modDb->getMysqlServerDBs($mysql_server_id);
 			if(!empty($mysql_dbs))
 			{
-				foreach($mysql_dbs as $mysql_db)
+				foreach ((array)$mysql_dbs as $mysql_db)
 				{		
 					if($mysql_server['remote_server_id'] != "0")
 					{
@@ -462,7 +462,7 @@ function exec_ogp_module() {
 							{
 								$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
 												 "DROP USER '".$mysql_db['db_user']."'@'%';");
-								foreach( $queries as $query )
+								foreach ((array)$queries as $query)
 								{
 									@$return = mysqli_query($query);
 									if(!$return)
@@ -479,7 +479,7 @@ function exec_ogp_module() {
 							{
 								$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
 												 "DROP USER '".$mysql_db['db_user']."'@'%';");
-								foreach( $queries as $query )
+								foreach ((array)$queries as $query)
 								{
 									@$return = mysql_query($query);
 									if(!$return)
@@ -504,7 +504,7 @@ function exec_ogp_module() {
 	
     else if ( isset($_POST['save_settings']) )
     {
-        foreach ($_POST as $name => $value)
+        foreach ((array)$_POST as $name => $value)
 		{
 			$get[$name] = trim($value);
 		}
@@ -537,7 +537,7 @@ function exec_ogp_module() {
 		$servers = $db->getRemoteServers();
 		
 		$conn_method[0] = get_lang('direct_connection');
-		foreach ( $servers as $server_row )
+		foreach ((array)$servers as $server_row)
 		{
 			$id = $server_row['remote_server_id'];
 			$name = get_lang_f('connection_through_remote_server_named',$server_row['remote_server_name']);
@@ -568,7 +568,7 @@ function exec_ogp_module() {
         {
 			echo "<h4>".get_lang('edit_dbs')."</h4>";
 
-			foreach ( $mysql_server_dbs as $mysql_db )
+			foreach ((array)$mysql_server_dbs as $mysql_db)
 			{
 				$home_info = $db->getGameHomeWithoutMods($mysql_db['home_id']);
 				$db_array["$mysql_db[db_id]"] = $mysql_db['db_name']." (".$home_info['home_name'].")";

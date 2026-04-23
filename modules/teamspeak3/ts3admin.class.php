@@ -284,7 +284,7 @@ class ts3admin {
 	function channelAddPerm($cid, $permissions) {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		
-		if(count($permissions) > 0) {
+		if(count((array)$permissions) > 0) {
 			//Permissions given
 			
 			//Errorcollector
@@ -294,12 +294,12 @@ class ts3admin {
 			$permissions = array_chunk($permissions, 50, true);
 			
 			//Action for each splitted part of permission
-			foreach($permissions as $permission_part)
+			foreach ((array)$permissions as $permission_part)
 			{
 				//Create command_string for each command that we could use implode later
 				$command_string = array();
 				
-				foreach($permission_part as $key => $value)
+				foreach ((array)$permission_part as $key => $value)
 				{
 					$command_string[] = (is_numeric($key) ? "permid=" : "permsid=").$this->escapeText($key).' permvalue='.$value;
 				}
@@ -308,14 +308,14 @@ class ts3admin {
 				
 				if(!$result['success'])
 				{
-					foreach($result['errors'] as $error)
+					foreach ((array)$result['errors'] as $error)
 					{
 						$errors[] = $error;
 					}
 				}
 			}
 			
-			if(count($errors) == 0)
+			if(count((array)$errors) == 0)
 			{
 				return $this->generateOutput(true, array(), true);
 			}else{
@@ -352,7 +352,7 @@ class ts3admin {
 	function channelClientAddPerm($cid, $cldbid, $permissions) {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		
-		if(count($permissions) > 0) {
+		if(count((array)$permissions) > 0) {
 			//Permissions given
 				
 			//Errorcollector
@@ -362,12 +362,12 @@ class ts3admin {
 			$permissions = array_chunk($permissions, 50, true);
 				
 			//Action for each splitted part of permission
-			foreach($permissions as $permission_part)
+			foreach ((array)$permissions as $permission_part)
 			{
 				//Create command_string for each command that we could use implode later
 				$command_string = array();
 		
-				foreach($permission_part as $key => $value)
+				foreach ((array)$permission_part as $key => $value)
 				{
 					$command_string[] = (is_numeric($key) ? "permid=" : "permsid=").$this->escapeText($key).' permvalue='.$value;
 				}
@@ -376,14 +376,14 @@ class ts3admin {
 		
 				if(!$result['success'])
 				{
-					foreach($result['errors'] as $error)
+					foreach ((array)$result['errors'] as $error)
 					{
 						$errors[] = $error;
 					}
 				}
 			}
 				
-			if(count($errors) == 0)
+			if(count((array)$errors) == 0)
 			{
 				return $this->generateOutput(true, array(), true);
 			}else{
@@ -422,7 +422,7 @@ class ts3admin {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		$permissionArray = array();
 		
-		if(count($permissionIds) > 0) {
+		if(count((array)$permissionIds) > 0) {
 			foreach($permissionIds AS $value) {
 				$permissionArray[] = is_numeric($value) ? 'permid='.$value : 'permsid='.$value;
 			}
@@ -499,7 +499,7 @@ class ts3admin {
 		
 		$propertiesString = '';
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			$propertiesString .= ' '.$key.'='.$this->escapeText($value);
 		}
 		
@@ -545,7 +545,7 @@ class ts3admin {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		$permissionArray = array();
 		
-		if(count($permissions) > 0) {
+		if(count((array)$permissions) > 0) {
 			foreach($permissions AS $value) {
 				$permissionArray[] = (is_numeric($value) ? 'permid=' : 'permsid=').$value;
 			}
@@ -580,7 +580,7 @@ class ts3admin {
 		
 		$settingsString = '';
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			$settingsString .= ' '.$key.'='.$this->escapeText($value);
 		}
 
@@ -664,7 +664,7 @@ class ts3admin {
 	function channelGroupAddPerm($cgid, $permissions) {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		
-		if(count($permissions) > 0) {
+		if(count((array)$permissions) > 0) {
 			//Permissions given
 		
 			//Errorcollector
@@ -674,12 +674,12 @@ class ts3admin {
 			$permissions = array_chunk($permissions, 50, true);
 		
 			//Action for each splitted part of permission
-			foreach($permissions as $permission_part)
+			foreach ((array)$permissions as $permission_part)
 			{
 				//Create command_string for each command that we could use implode later
 				$command_string = array();
 		
-				foreach($permission_part as $key => $value)
+				foreach ((array)$permission_part as $key => $value)
 				{
 					$command_string[] = (is_numeric($key) ? "permid=" : "permsid=").$this->escapeText($key).' permvalue='.$value;
 				}
@@ -688,14 +688,14 @@ class ts3admin {
 		
 				if(!$result['success'])
 				{
-					foreach($result['errors'] as $error)
+					foreach ((array)$result['errors'] as $error)
 					{
 						$errors[] = $error;
 					}
 				}
 			}
 		
-			if(count($errors) == 0) {
+			if(count((array)$errors) == 0) {
 				return $this->generateOutput(true, array(), true);
 			}else{
 				return $this->generateOutput(false, $errors, false);
@@ -807,7 +807,7 @@ class ts3admin {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		$permissionArray = array();
 		
-		if(count($permissionIds) > 0) {
+		if(count((array)$permissionIds) > 0) {
 			foreach($permissionIds AS $value) {
 				$permissionArray[] = (is_numeric($value) ? 'permid=' : 'permsid=').$value;
 			}
@@ -1065,7 +1065,7 @@ class ts3admin {
 	function clientAddPerm($cldbid, $permissions) {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		
-		if(count($permissions) > 0) {
+		if(count((array)$permissions) > 0) {
 			//Permissions given
 				
 			//Errorcollector
@@ -1075,12 +1075,12 @@ class ts3admin {
 			$permissions = array_chunk($permissions, 50, true);
 				
 			//Action for each splitted part of permission
-			foreach($permissions as $permission_part)
+			foreach ((array)$permissions as $permission_part)
 			{
 				//Create command_string for each command that we could use implode later
 				$command_string = array();
 		
-				foreach($permission_part as $key => $value)
+				foreach ((array)$permission_part as $key => $value)
 				{
 					$command_string[] = (is_numeric($key) ? "permid=" : "permsid=").$this->escapeText($key).' permvalue='.$value;
 				}
@@ -1089,14 +1089,14 @@ class ts3admin {
 		
 				if(!$result['success'])
 				{
-					foreach($result['errors'] as $error)
+					foreach ((array)$result['errors'] as $error)
 					{
 						$errors[] = $error;
 					}
 				}
 			}
 				
-			if(count($errors) == 0)
+			if(count((array)$errors) == 0)
 			{
 				return $this->generateOutput(true, array(), true);
 			}else{
@@ -1148,7 +1148,7 @@ class ts3admin {
 		
 		$settingsString = '';
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			$settingsString .= ' '.$key.'='.$this->escapeText($value);
 		}
 		
@@ -1275,7 +1275,7 @@ class ts3admin {
 		
 		$permissionArray = array();
 		
-		if(count($permissionIds) > 0) {
+		if(count((array)$permissionIds) > 0) {
 			foreach($permissionIds AS $value) {
 				$permissionArray[] = (is_numeric($value) ? 'permid=' : 'permsid=').$value;
 			}
@@ -1310,7 +1310,7 @@ class ts3admin {
 		
 		$settingsString = '';
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			$settingsString .= ' '.$key.'='.$this->escapeText($value);
 		}
 		
@@ -1711,7 +1711,7 @@ class ts3admin {
 	function clientUpdate($data) {
 		$settingsString = '';
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			$settingsString .= ' '.$key.'='.$this->escapeText($value);
 		}
 		
@@ -1870,7 +1870,7 @@ class ts3admin {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		$fileArray = array();
 		
-		if(count($files) > 0) {
+		if(count((array)$files) > 0) {
 			foreach($files AS $file) {
 				$fileArray[] = 'name='.$this->escapeText($file);
 			}
@@ -1941,7 +1941,7 @@ class ts3admin {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		$fileArray = array();
 		
-		if(count($files) > 0) {
+		if(count((array)$files) > 0) {
 			foreach($files AS $file) {
 				$fileArray[] = 'name='.$this->escapeText($file);
 			}
@@ -2220,10 +2220,10 @@ class ts3admin {
   * @return     boolean success
   */
 	function instanceEdit($data) {
-		if(count($data) > 0) {
+		if(count((array)$data) > 0) {
 			$settingsString = '';
 			
-			foreach($data as $key => $val) {
+			foreach ((array)$data as $key => $val) {
 				$settingsString .= ' '.$key.'='.$this->escapeText($val);
 			}
 			return $this->getData('boolean', 'instanceedit '.$settingsString);
@@ -2385,7 +2385,7 @@ class ts3admin {
 	function permIdGetByName($permsids) {
 		$permissionArray = array();
 		
-		if(count($permsids) > 0) {
+		if(count((array)$permsids) > 0) {
 			foreach($permsids AS $value) {
 				$permissionArray[] = 'permsid='.$value;
 			}
@@ -2495,7 +2495,7 @@ class ts3admin {
 			
 			$gc = 1;
 			
-			foreach($response as $field) {
+			foreach ((array)$response as $field) {
 				if(isset($field['group_id_end'])) {
 					$groups[] = array('num' => $gc, 'group_id_end' => $field['group_id_end']);
 					$gc++;
@@ -2506,7 +2506,7 @@ class ts3admin {
 			
 			$counter = 0;
 			
-			for($i = 0; $i < count($groups); $i++) {
+			for($i = 0; $i < count((array)$groups); $i++) {
 				$rounds = $groups[$i]['group_id_end'] - $counter;
 				$groups[$i]['pcount'] = $rounds;
 				for($j = 0; $j < $rounds; $j++) {
@@ -2653,10 +2653,10 @@ class ts3admin {
 	function serverCreate($data = array()) {
 		$settingsString = '';
 		
-		if(count($data) == 0) {	$data['virtualserver_name'] = 'Teamspeak 3 Server'; }
+		if(count((array)$data) == 0) {	$data['virtualserver_name'] = 'Teamspeak 3 Server'; }
 		
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			if(!empty($value)) { $settingsString .= ' '.$key.'='.$this->escapeText($value); }
 		}
 		
@@ -2701,7 +2701,7 @@ class ts3admin {
 		
 		$settingsString = '';
 		
-		foreach($data as $key => $value) {
+		foreach ((array)$data as $key => $value) {
 			$settingsString .= ' '.$key.'='.$this->escapeText($value);
 		}
 		
@@ -2770,7 +2770,7 @@ class ts3admin {
 	function serverGroupAddPerm($sgid, $permissions) {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		
-		if(count($permissions) > 0) {
+		if(count((array)$permissions) > 0) {
 			//Permissions given
 				
 			//Errorcollector
@@ -2780,12 +2780,12 @@ class ts3admin {
 			$permissions = array_chunk($permissions, 50, true);
 				
 			//Action for each splitted part of permission
-			foreach($permissions as $permission_part)
+			foreach ((array)$permissions as $permission_part)
 			{
 				//Create command_string for each command that we could use implode later
 				$command_string = array();
 		
-				foreach($permission_part as $key => $value)
+				foreach ((array)$permission_part as $key => $value)
 				{
 					$command_string[] = (is_numeric($key) ? "permid=" : "permsid=").$this->escapeText($key).' permvalue='.$value[0].' permskip='.$value[1].' permnegated='.$value[2];
 				}
@@ -2794,14 +2794,14 @@ class ts3admin {
 		
 				if(!$result['success'])
 				{
-					foreach($result['errors'] as $error)
+					foreach ((array)$result['errors'] as $error)
 					{
 						$errors[] = $error;
 					}
 				}
 			}
 				
-			if(count($errors) == 0)
+			if(count((array)$errors) == 0)
 			{
 				return $this->generateOutput(true, array(), true);
 			}else{
@@ -2819,19 +2819,19 @@ class ts3admin {
         $error = false;
         $results = array();
         
-        if(count($permissions) > 0) {
+        if(count((array)$permissions) > 0) {
      		$new = array();
  
     		$i = 0;
     		$k = 0;
-    		foreach($permissions as $ke => $va) {
+    		foreach ((array)$permissions as $ke => $va) {
         		if($i > 149){ $i = 0; $k++; }else{ $i++; }
         		$new[$k][$ke] = $va;
     		}
     		
-    		foreach($new as $perms) {
+    		foreach ((array)$new as $perms) {
     			$permissionArray = array();
-    			foreach($perms as $key => $value) {
+    			foreach ((array)$perms as $key => $value) {
     				$permissionArray[] = 'permid='.$key.' permvalue='.$value[0].' permskip='.$value[1].' permnegated='.$value[2];
     			}
 				$result = $this->getData('boolean', 'servergroupaddperm sgid='.$sgid.' '.implode('|', $permissionArray));
@@ -2841,9 +2841,9 @@ class ts3admin {
     		
     		if($error) {
     			$returnErrors = array();
-    			foreach($results as $errorResult) {
-    				if(count($errorResult['errors']) > 0) {
-    					foreach($errorResult['errors'] as $errorResultError) {
+    			foreach ((array)$results as $errorResult) {
+    				if(count((array)$errorResult['errors']) > 0) {
+    					foreach ((array)$errorResult['errors'] as $errorResultError) {
     						$returnErrors[] = $errorResultError;
     					}
     				}
@@ -2969,7 +2969,7 @@ class ts3admin {
 		if(!$this->runtime['selected']) { return $this->checkSelected(); }
 		$permissionArray = array();
 		
-		if(count($permissionIds) > 0) {
+		if(count((array)$permissionIds) > 0) {
 			foreach($permissionIds AS $value) {
 				$permissionArray[] = is_numeric($value) ? 'permid='.$value : 'permsid='.$this->escapeText($value);
 			}
@@ -3474,10 +3474,10 @@ class ts3admin {
 		
 		if(!empty($description)) { $description = ' tokendescription=' . $this->escapeText($description); }
 
-		if(count($customFieldSet)) {
+		if(count((array)$customFieldSet)) {
 			$settingsString = array();
 		
-			foreach($customFieldSet as $key => $value) {
+			foreach ((array)$customFieldSet as $key => $value) {
 				$settingsString[] = 'ident='.$this->escapeText($key).' value='.$this->escapeText($value);
 			}
 			
@@ -3939,9 +3939,9 @@ class ts3admin {
 		
 		$splittedCommand = str_split($command, 1024);
 		
-		$splittedCommand[(count($splittedCommand) - 1)] .= "\n";
+		$splittedCommand[(count((array)$splittedCommand) - 1)] .= "\n";
 		
-		foreach($splittedCommand as $commandPart) {
+		foreach ((array)$splittedCommand as $commandPart) {
 			fputs($this->runtime['socket'], $commandPart);
 		}
 
@@ -3958,7 +3958,7 @@ class ts3admin {
 
 		if(strpos($data, 'error id=0 msg=ok') === false) {
 			$splittedResponse = explode('error id=', $data);
-			$chooseEnd = count($splittedResponse) - 1;
+			$chooseEnd = count((array)$splittedResponse) - 1;
 			
 			$cutIdAndMsg = explode(' msg=', $splittedResponse[$chooseEnd]);
 			
@@ -4012,16 +4012,16 @@ class ts3admin {
 				
 				$output = array();
 				
-				foreach($datasets as $dataset) {
+				foreach ((array)$datasets as $dataset) {
 					$dataset = explode('=', $dataset);
 					
-					if(count($dataset) > 2) {
-						for($i = 2; $i < count($dataset); $i++) {
+					if(count((array)$dataset) > 2) {
+						for($i = 2; $i < count((array)$dataset); $i++) {
 							$dataset[1] .= '='.$dataset[$i];
 						}
 						$output[$this->unEscapeText($dataset[0])] = $this->unEscapeText($dataset[1]);
 					}else{
-						if(count($dataset) == 1) {
+						if(count((array)$dataset) == 1) {
 							$output[$this->unEscapeText($dataset[0])] = '';
 						}else{
 							$output[$this->unEscapeText($dataset[0])] = $this->unEscapeText($dataset[1]);
@@ -4037,20 +4037,20 @@ class ts3admin {
 				
 				$output = array();
 				
-				foreach($datasets as $datablock) {
+				foreach ((array)$datasets as $datablock) {
 					$datablock = explode(' ', $datablock);
 					
 					$tmpArray = array();
 					
-					foreach($datablock as $dataset) {
+					foreach ((array)$datablock as $dataset) {
 						$dataset = explode('=', $dataset);
-						if(count($dataset) > 2) {
-							for($i = 2; $i < count($dataset); $i++) {
+						if(count((array)$dataset) > 2) {
+							for($i = 2; $i < count((array)$dataset); $i++) {
 								$dataset[1] .= '='.$dataset[$i];
 							}
 							$tmpArray[$this->unEscapeText($dataset[0])] = $this->unEscapeText($dataset[1]);
 						}else{
-							if(count($dataset) == 1) {
+							if(count((array)$dataset) == 1) {
 								$tmpArray[$this->unEscapeText($dataset[0])] = '';
 							}else{
 								$tmpArray[$this->unEscapeText($dataset[0])] = $this->unEscapeText($dataset[1]);
@@ -4096,7 +4096,7 @@ class ts3admin {
  */
 	private function ftSendData($data) {
 		$data = str_split($data, 4096);
-		foreach($data as $dat) {
+		foreach ((array)$data as $dat) {
 			fputs($this->runtime['fileSocket'], $dat);
 		}
 	}

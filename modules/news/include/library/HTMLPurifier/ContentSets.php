@@ -42,7 +42,7 @@ class HTMLPurifier_ContentSets
         }
         // populate content_sets based on module hints
         // sorry, no way of overloading
-        foreach ($modules as $module) {
+        foreach ((array)$modules as $module) {
             foreach ($module->content_sets as $key => $value) {
                 $temp = $this->convertToLookup($value);
                 if (isset($this->lookup[$key])) {
@@ -58,7 +58,7 @@ class HTMLPurifier_ContentSets
             $old_lookup = $this->lookup;
             foreach ($this->lookup as $i => $set) {
                 $add = array();
-                foreach ($set as $element => $x) {
+                foreach ((array)$set as $element => $x) {
                     if (isset($this->lookup[$element])) {
                         $add += $this->lookup[$element];
                         unset($this->lookup[$i][$element]);
@@ -160,7 +160,7 @@ class HTMLPurifier_ContentSets
     {
         $array = explode('|', str_replace(' ', '', $string));
         $ret = array();
-        foreach ($array as $k) {
+        foreach ((array)$array as $k) {
             $ret[$k] = true;
         }
         return $ret;

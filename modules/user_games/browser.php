@@ -116,7 +116,7 @@ function exec_ogp_module()
 		{
 			$dirlist['directorys'] = array_orderby($dirlist['directorys'], 'filename', SORT_ASC);
 			$i = 0;
-			foreach($dirlist['directorys'] as $directory)
+			foreach ((array)$dirlist['directorys'] as $directory)
 			{
 				echo "<tr>\n".
 					 "<td class='folder' align=left data-item='$i' >".

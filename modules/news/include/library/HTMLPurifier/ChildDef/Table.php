@@ -90,7 +90,7 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
 
         $ws_accum =& $initial_ws;
 
-        foreach ($children as $node) {
+        foreach ((array)$children as $node) {
             if ($node instanceof HTMLPurifier_Node_Comment) {
                 $ws_accum[] = $node;
                 continue;
@@ -189,7 +189,7 @@ class HTMLPurifier_ChildDef_Table extends HTMLPurifier_ChildDef
             // we have to shuffle tr into tbody
             $current_tr_tbody = null;
 
-            foreach($content as $node) {
+            foreach ((array)$content as $node) {
                 switch ($node->name) {
                 case 'tbody':
                     $current_tr_tbody = null;

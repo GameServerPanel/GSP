@@ -390,7 +390,7 @@ class HTMLPurifier_Config
     private function _listify($lookup)
     {
         $list = array();
-        foreach ($lookup as $name => $b) {
+        foreach ((array)$lookup as $name => $b) {
             $list[] = $name;
         }
         return implode(', ', $list);
@@ -681,14 +681,14 @@ class HTMLPurifier_Config
         if ($this->isFinalized('Cannot load directives after finalization')) {
             return;
         }
-        foreach ($config_array as $key => $value) {
+        foreach ((array)$config_array as $key => $value) {
             $key = str_replace('_', '.', $key);
             if (strpos($key, '.') !== false) {
                 $this->set($key, $value);
             } else {
                 $namespace = $key;
                 $namespace_values = $value;
-                foreach ($namespace_values as $directive => $value2) {
+                foreach ((array)$namespace_values as $directive => $value2) {
                     $this->set($namespace .'.'. $directive, $value2);
                 }
             }
@@ -717,7 +717,7 @@ class HTMLPurifier_Config
             $allowed_ns = array();
             $allowed_directives = array();
             $blacklisted_directives = array();
-            foreach ($allowed as $ns_or_directive) {
+            foreach ((array)$allowed as $ns_or_directive) {
                 if (strpos($ns_or_directive, '.') !== false) {
                     // directive
                     if ($ns_or_directive[0] == '-') {
@@ -807,7 +807,7 @@ class HTMLPurifier_Config
 
         $allowed = HTMLPurifier_Config::getAllowedDirectivesForForm($allowed, $schema);
         $ret = array();
-        foreach ($allowed as $key) {
+        foreach ((array)$allowed as $key) {
             list($ns, $directive) = $key;
             $skey = "$ns.$directive";
             if (!empty($array["Null_$skey"])) {
@@ -888,7 +888,7 @@ class HTMLPurifier_Config
         if ($this->chatty) {
             $trace = debug_backtrace();
             // zip(tail(trace), trace) -- but PHP is not Haskell har har
-            for ($i = 0, $c = count($trace); $i < $c - 1; $i++) {
+            for ($i = 0, $c = count((array)$trace); $i < $c - 1; $i++) {
                 // XXX this is not correct on some versions of HTML Purifier
                 if ($trace[$i + 1]['class'] === 'HTMLPurifier_Config') {
                     continue;

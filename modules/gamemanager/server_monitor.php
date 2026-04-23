@@ -76,7 +76,7 @@ function renderParam($param, $last_param, $param_access_enabled, $home_id)
 		
 		$inputElementString = "<select $idString name='params[" . $param['key'] . "{DEPENDS:$paramType}]'" . $disabledString . ">";
 		if (is_array($homes)) {
-			foreach($homes as $home){
+			foreach ((array)$homes as $home){
 				if($home["home_path"][strlen($home["home_path"])-1] != "/"){
 					$home["home_path"] = $home["home_path"] . "/";
 				}
@@ -227,7 +227,7 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 			<input type="submit" value="<?php echo get_lang('search'); ?>" />
 		</form>
 	<?php
-	foreach($_POST as $key => $value)
+	foreach ((array)$_POST as $key => $value)
 	{
 		if( preg_match( "/^action/", $key ) )
 		{
@@ -303,7 +303,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			  $post_port ) = explode( "-", $_GET['home_id-mod_id-ip-port'] );
 	
 	$j = 1;
-	foreach( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		if( ( $show_all or isset($_GET['home_cfg_id']) ) AND ( !isset($server_home['ip']) or !isset($server_home['mod_id']) ) ){
 			$j++;
@@ -391,7 +391,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			$groupsus = "";
 			if(is_array($groupusers))
 			{
-				foreach($groupusers as $groupu)
+				foreach ((array)$groupusers as $groupu)
 				{
 					if($groupu['user_id'] == $server_home['user_id_main'])
 						continue;
@@ -404,7 +404,7 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			$other_owners = "";
 			if(is_array($owners))
 			{
-				foreach($owners as $owner)
+				foreach ((array)$owners as $owner)
 				{
 					if($owner['user_id'] == $server_home['user_id_main'])
 						continue;

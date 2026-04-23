@@ -11,7 +11,7 @@ function get_cart_count() {
         return 0;
     }
     $count = 0;
-    foreach ($_SESSION['cart'] as $item) {
+    foreach ((array)$_SESSION['cart'] as $item) {
         if (is_array($item) && isset($item['quantity'])) {
             $count += (int) $item['quantity'];
         } else {

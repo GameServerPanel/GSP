@@ -35,7 +35,7 @@ abstract class OGPDatabase {
     
     public function generateMySQLInClause($arrayOfInputs){
 		$inClause = "IN ('";
-		for($i = 0; $i < count($arrayOfInputs); $i++){
+		for($i = 0; $i < count((array)$arrayOfInputs); $i++){
 			if($i == 0){
 				$inClause .= $this->realEscapeSingle($arrayOfInputs[$i]);
 			}else{

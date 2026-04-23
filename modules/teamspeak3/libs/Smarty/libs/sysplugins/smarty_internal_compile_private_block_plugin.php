@@ -32,7 +32,7 @@ class Smarty_Internal_Compile_Private_Block_Plugin extends Smarty_Internal_Compi
             $_attr = $this->_get_attributes($args); 
             // convert attributes into parameter array string
             $_paramsArray = array();
-            foreach ($_attr as $_key => $_value) {
+            foreach ((array)$_attr as $_key => $_value) {
                 if (is_int($_key)) {
                     $_paramsArray[] = "$_key=>$_value";
                 } else {

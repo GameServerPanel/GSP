@@ -156,7 +156,7 @@ class GameQ_Protocols_Bf4 extends GameQ_Protocols_Bf3
     	}
 
     	// Count the number of words and figure out the highest index.
-    	$words_total = count($words)-1;
+    	$words_total = count((array)$words)-1;
 
     	// The number of player info points
     	$num_tags = $words[1];

@@ -108,7 +108,7 @@ class HTMLPurifier_AttrDef_URI_Host extends HTMLPurifier_AttrDef
             $parts = explode('.', $string);
             try {
                 $new_parts = array();
-                foreach ($parts as $part) {
+                foreach ((array)$parts as $part) {
                     $encodable = false;
                     for ($i = 0, $c = strlen($part); $i < $c; $i++) {
                         if (ord($part[$i]) > 0x7a) {

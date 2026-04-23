@@ -245,7 +245,7 @@ class GameQ_Protocols_Gamespy2 extends GameQ_Protocols
         // Get the values
         while ($buf->getLength() > 4)
         {
-            foreach ($varnames as $varname)
+            foreach ((array)$varnames as $varname)
             {
                 $result->addSub($type, $varname, $buf->readString());
             }

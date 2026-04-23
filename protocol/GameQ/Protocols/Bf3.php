@@ -167,7 +167,7 @@ class Bf3 extends Protocol
         unset($buffer, $sequence_id_last, $sequence_id);
 
         // Iterate over the combined packets and do some work
-        foreach ($processed as $sequence_id => $data) {
+        foreach ((array)$processed as $sequence_id => $data) {
             // Create a new buffer
             $buffer = new Buffer($data);
 
@@ -338,7 +338,7 @@ class Bf3 extends Protocol
         // Iterate over the index until we run out of players
         for ($i = 0, $x = $numTags + 3; $i < $playerCount; $i++, $x += $numTags) {
             // Loop over the player tags and extract the info for that tag
-            foreach ($tags as $index => $tag) {
+            foreach ((array)$tags as $index => $tag) {
                 $result->addPlayer($tag, $items[($x + $index)]);
             }
         }

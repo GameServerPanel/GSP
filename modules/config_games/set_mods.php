@@ -92,7 +92,7 @@ function exec_ogp_module() {
 	$template = "";
 	if ($mods)
 	{
-		foreach($mods as $mod)
+		foreach ((array)$mods as $mod)
 		{
 			$template .= " ";
 			$template .= $mod['mod_name'];

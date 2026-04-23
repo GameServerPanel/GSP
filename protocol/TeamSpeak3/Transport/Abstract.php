@@ -65,22 +65,22 @@ abstract class TeamSpeak3_Transport_Abstract
    */
   public function __construct(array $config)
   {
-    if(!array_key_exists("host", $config))
+    if(!array_key_exists("host", (array)$config))
     {
       throw new TeamSpeak3_Transport_Exception("config must have a key for 'host' which specifies the server host name");
     }
 
-    if(!array_key_exists("port", $config))
+    if(!array_key_exists("port", (array)$config))
     {
       throw new TeamSpeak3_Transport_Exception("config must have a key for 'port' which specifies the server port number");
     }
 
-    if(!array_key_exists("timeout", $config))
+    if(!array_key_exists("timeout", (array)$config))
     {
       $config["timeout"] = 10;
     }
 
-    if(!array_key_exists("blocking", $config))
+    if(!array_key_exists("blocking", (array)$config))
     {
       $config["blocking"] = 1;
     }

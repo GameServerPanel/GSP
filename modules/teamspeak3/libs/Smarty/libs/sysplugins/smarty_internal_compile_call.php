@@ -43,7 +43,7 @@ class Smarty_Internal_Compile_Call extends Smarty_Internal_CompileBase {
             $_nocache = 'false';
         } 
         $_paramsArray = array();
-        foreach ($_attr as $_key => $_value) {
+        foreach ((array)$_attr as $_key => $_value) {
             if (is_int($_key)) {
                 $_paramsArray[] = "$_key=>$_value";
             } else {

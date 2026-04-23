@@ -125,7 +125,7 @@ class HTMLPurifier_Language
         $sep      = $this->getMessage('Item separator');
         $sep_last = $this->getMessage('Item separator last');
         $ret = '';
-        for ($i = 0, $c = count($array); $i < $c; $i++) {
+        for ($i = 0, $c = count((array)$array); $i < $c; $i++) {
             if ($i == 0) {
             } elseif ($i + 1 < $c) {
                 $ret .= $sep;
@@ -156,7 +156,7 @@ class HTMLPurifier_Language
         $raw = $this->messages[$key];
         $subst = array();
         $generator = false;
-        foreach ($args as $i => $value) {
+        foreach ((array)$args as $i => $value) {
             if (is_object($value)) {
                 if ($value instanceof HTMLPurifier_Token) {
                     // factor this out some time

@@ -202,7 +202,7 @@ function get_start_cmd($user_info,$remote,$server_xml,$home_info,$mod_id,$ip,$po
 	{
 		foreach($server_xml->server_params->param as $param)
 		{						
-			foreach ($last_param as $paramKey => $paramValue)
+			foreach ((array)$last_param as $paramKey => $paramValue)
 			{
 				if (!isset($paramValue))
 					$paramValue = (string)$param->default;
@@ -237,7 +237,7 @@ function get_start_cmd($user_info,$remote,$server_xml,$home_info,$mod_id,$ip,$po
 	
 	$extra_param_access_enabled = preg_match("/e/",$home_info['access_rights']) > 0 ? TRUE:FALSE;
 			
-	if ( array_key_exists('extra', $last_param) && $extra_param_access_enabled )
+	if ( array_key_exists('extra', (array)$last_param) && $extra_param_access_enabled )
 		$extra_default = $last_param['extra'];
 	else
 		$extra_default = $home_info['mods'][$mod_id]['extra_params'];
@@ -327,7 +327,7 @@ function test_rsync_response($address)
 function get_faster_rsync($rsync_sites)
 {
 	$faster = "NONE";
-	foreach($rsync_sites as $site)
+	foreach ((array)$rsync_sites as $site)
 	{
 		list($url,$name) = explode('|', $site);
 		$current_time = test_rsync_response($url);
@@ -446,7 +446,7 @@ function ipv6_compress($ip)
 	if (preg_match_all('/(?:^|:)(?:0(?::|$))+/', $ip_parts[0], $matches, PREG_OFFSET_CAPTURE)) {
 		$max = 0;
 		$pos = null;
-		foreach ($matches[0] as $match) {
+		foreach ((array)$matches[0] as $match) {
 			if (strlen($match[0]) > $max) {
 				$max = strlen($match[0]);
 				$pos = $match[1];
@@ -481,7 +481,7 @@ function is_authorized()
 		$authorized_hosts['address']['ipv6'][] = $ip;
 	
 	$remote_servers = $db->getRemoteServers();
-	foreach($remote_servers as $remote_server)
+	foreach ((array)$remote_servers as $remote_server)
 	{
 		$ip = getHostByName($remote_server['agent_ip']);
 		if(is_valid_ipv4($ip) and !in_array($ip, $authorized_hosts['address']['ipv4']))
@@ -495,7 +495,7 @@ function is_authorized()
 	{
 		$hosts_list = file_get_contents($api_hosts_file);
 		$hosts = preg_split("/[\r\n]+/", $hosts_list);
-		foreach($hosts as $host)
+		foreach ((array)$hosts as $host)
 		{
 			$host = trim($host);
 			
@@ -561,7 +561,7 @@ function is_authorized()
 			{
 				$fwd_hosts_list = file_get_contents($api_fwd_hosts_file);
 				$fwd_hosts = preg_split("/[\r\n]+/", $fwd_hosts_list);
-				foreach($fwd_hosts as $fwd_host)
+				foreach ((array)$fwd_hosts as $fwd_host)
 				{
 					$fwd_host = trim($fwd_host);
 					

@@ -236,7 +236,7 @@ class GameQ_Buffer
     {
         // Get position of delimiters
         $pos = array();
-        foreach ($delims as $delim) {
+        foreach ((array)$delims as $delim) {
             if ($p = strpos($this->data, $delim, min($this->index, $this->length))) {
                 $pos[] = $p;
             }

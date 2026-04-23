@@ -41,7 +41,7 @@ function exec_ogp_module()
 		&& !empty($_POST['gameserver_ip']) && !empty($_POST['gameserver_port']) && !empty($_POST['amx_mod_perms'])
 		&& !empty($_POST['amx_login_type']) && (!empty($_POST['amx_Steamid']) || !empty($_POST['amx_Nickname']) && !empty($_POST['amx_Password']))){
 				
-			foreach($servers as $server){
+			foreach ((array)$servers as $server){
 				// Try to check if hidden form values have been manually edited. If not, process.
 				if($server['remote_server_id'] == $_POST['remote_server_id'] && $server['home_id'] == $_POST['amx_gameserver_id']
 				&& $server['game_name'] == $_POST['gameserver_name'] && $server['ip'] == $_POST['gameserver_ip'] && $server['port'] == $_POST['gameserver_port']){	
@@ -146,7 +146,7 @@ function exec_ogp_module()
 		}
 	}else{
 		$return = array();
-		for($x = 0; $x < count($servers); ++$x){
+		for($x = 0; $x < count((array)$servers); ++$x){
 			$return[] = array(
 				'remote_server_id'		=>	$servers[$x]['remote_server_id'],
 				'ip'					=>	$servers[$x]['ip'],

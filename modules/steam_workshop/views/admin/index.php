@@ -33,7 +33,7 @@ declare(strict_types=1);
                         <td colspan="5"><?php echo htmlspecialchars($lang['admin_no_game_keys'] ?? 'No Steam Workshop-enabled game definitions were detected.'); ?></td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($gameRows as $row): ?>
+                    <?php foreach ((array)$gameRows as $row): ?>
                         <?php
                             $groupKey = $row['group_key'];
                             $primaryKey = $row['primary_game_key'];
@@ -56,7 +56,7 @@ declare(strict_types=1);
                                         <?php endif; ?>
                                     </div>
                                     <div class="sw-game-variants">
-                                        <?php foreach ($row['game_keys'] as $variantKey): ?>
+                                        <?php foreach ((array)$row['game_keys'] as $variantKey): ?>
                                             <span class="sw-chip"><?php echo htmlspecialchars($variantKey); ?></span>
                                         <?php endforeach; ?>
                                     </div>
@@ -66,7 +66,7 @@ declare(strict_types=1);
                             <td>
                                 <select form="sw-mapping-form" name="mapping[<?php echo htmlspecialchars($groupKey); ?>]">
                                     <option value="">--</option>
-                                    <?php foreach ($adapterOptions as $key => $label): ?>
+                                    <?php foreach ((array)$adapterOptions as $key => $label): ?>
                                         <option value="<?php echo htmlspecialchars($key); ?>" <?php echo ($selectValue === $key) ? 'selected' : ''; ?>>
                                             <?php echo htmlspecialchars($label); ?>
                                         </option>
@@ -172,7 +172,7 @@ declare(strict_types=1);
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($adapters as $adapter): ?>
+            <?php foreach ((array)$adapters as $adapter): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($adapter['key']); ?></td>
                     <td><?php echo htmlspecialchars($adapter['name']); ?></td>

@@ -106,12 +106,12 @@ function exec_ogp_module() {
 <br>
 <?php
 		$presets = $db->getRconPresets($home_cfg_id,$mod_cfg_id);
-		if(is_array($presets) && (is_array($presets) ? count($presets) : 0) > 0)
+		if(is_array($presets) && (is_array($presets) ? count((array)$presets) : 0) > 0)
 		{
 		
 			echo "<h2>".get_lang("edit_presets")."</h2>";
 			echo "<table>";
-			foreach ($presets as $preset)
+			foreach ((array)$presets as $preset)
 			{
 				?>
  <tr>

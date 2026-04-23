@@ -57,7 +57,7 @@ function exec_ogp_module()
     $installed_modules = array();
 
     $i = 0;
-    foreach ( $modules as $row )
+    foreach ((array)$modules as $row)
     {
 		$html = "";
 		$coreModule = true;
@@ -102,7 +102,7 @@ function exec_ogp_module()
     print "<h3>".get_lang('modules_available_for_install')."</h3>";
 
     echo "<table class='center'><tr class='first_row'><td>".get_lang('module_folder')."</td><td></td></tr>";
-    foreach ( $not_installed as $available_module )
+    foreach ((array)$not_installed as $available_module)
     {
         echo "<tr><td>".$available_module."</td><td>";
         echo "<a href='?m=modulemanager&amp;p=add&amp;module=".$available_module."'>";

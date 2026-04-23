@@ -63,7 +63,7 @@ function exec_ogp_module()
 				// Linux 64 bits + wine
 				if( preg_match("/Linux/", $os) AND preg_match("/64/", $os) AND preg_match("/wine/", $os) )
 				{
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/linux/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name'];
@@ -71,7 +71,7 @@ function exec_ogp_module()
 						echo "</option>\n";
 					}
 					echo "<option style='background:black;color:white;' value=''>". get_lang("wine_games") .":</option>\n";
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/win/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name'];
@@ -82,7 +82,7 @@ function exec_ogp_module()
 				// Linux 64 bits
 				elseif( preg_match("/Linux/", $os) AND preg_match("/64/", $os) )
 				{
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/linux/", $row['game_key']))
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name'];
@@ -93,13 +93,13 @@ function exec_ogp_module()
 				// Linux 32 bits + wine
 				elseif( preg_match("/Linux/", $os) AND preg_match("/wine/", $os) )
 				{ 
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/linux32/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name']."</option>\n";
 					}
 					echo "<option style='background:black;color:white;' value=''>". get_lang("wine_games") ."</option>\n";
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/win32/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name']."</option>\n";
@@ -108,7 +108,7 @@ function exec_ogp_module()
 				// Linux 32 bits
 				elseif( preg_match("/Linux/", $os) )
 				{ 
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/linux32/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name']."</option>\n";
@@ -117,7 +117,7 @@ function exec_ogp_module()
 				// Windows 64 bits (CYGWIN)
 				elseif( preg_match("/CYGWIN/", $os) AND preg_match("/64/", $os))
 				{
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/win/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name'];
@@ -128,7 +128,7 @@ function exec_ogp_module()
 				// Windows 32 bits (CYGWIN)
 				elseif( preg_match("/CYGWIN/", $os))
 				{
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						if ( preg_match("/win32/", $row['game_key']) )
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name']."</option>\n";
@@ -136,7 +136,7 @@ function exec_ogp_module()
 				}
 				elseif ( $os == "Unknown OS" )
 				{
-					foreach ( $game_cfgs as $row )
+					foreach ((array)$game_cfgs as $row)
 					{
 						echo "<option value='".$row['home_cfg_id']."'>".$row['game_name'];
 						if ( preg_match("/64/", $row['game_key']) ) echo " (64 bit)";
@@ -202,7 +202,7 @@ function exec_ogp_module()
 				if(!empty($ranges))
 				{
 					echo "<table>\n";
-					foreach($ranges as $range)
+					foreach ((array)$ranges as $range)
 					{
 						if($range['home_cfg_id'] != "0")
 							$cfg_info = $db->getGameCfg($range['home_cfg_id']);
@@ -221,7 +221,7 @@ function exec_ogp_module()
 						$used_ports = array();
 						if(!empty($game_homes))
 						{
-							foreach($game_homes as $game_home)
+							foreach ((array)$game_homes as $game_home)
 							{
 								$used_ports[] = $game_home['port'];
 							}
@@ -229,7 +229,7 @@ function exec_ogp_module()
 						
 						if(!empty($used_ports))
 						{
-							foreach($used_ports as $used_port)
+							foreach ((array)$used_ports as $used_port)
 							{
 								if(in_array($used_port,$usable_range_ports))
 									$available_ports_amount--;
@@ -274,7 +274,7 @@ function exec_ogp_module()
 				{
 					echo "<table class='center'>";
 					echo "<tr><th>". get_lang("home_id") ."</th><th>". get_lang("home_path") ."</th><th>". get_lang("game_type") ."</th><th>". get_lang("server_name") ."</th><th>". get_lang("port") ."</th></tr>";
-					foreach($game_homes as $game_home)
+					foreach ((array)$game_homes as $game_home)
 					{
 						echo "<tr><td>".$game_home['home_id']."</td><td>".$game_home['home_path']."</td><td>".$game_home['game_name']."</td><td>".htmlentities($game_home['home_name'])."</td><td>".$game_home['port']."</td></tr>";
 					}

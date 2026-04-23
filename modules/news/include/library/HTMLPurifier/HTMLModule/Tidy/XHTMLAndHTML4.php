@@ -80,7 +80,7 @@ class HTMLPurifier_HTMLModule_Tidy_XHTMLAndHTML4 extends HTMLPurifier_HTMLModule
         // {{{
         $align_lookup = array();
         $align_values = array('left', 'right', 'center', 'justify');
-        foreach ($align_values as $v) {
+        foreach ((array)$align_values as $v) {
             $align_lookup[$v] = "text-align:$v;";
         }
         // }}}

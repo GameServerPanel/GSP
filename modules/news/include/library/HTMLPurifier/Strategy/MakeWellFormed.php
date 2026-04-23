@@ -102,7 +102,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
         $def_injectors = $definition->info_injector;
         $custom_injectors = $injectors['Custom'];
         unset($injectors['Custom']); // special case
-        foreach ($injectors as $injector => $b) {
+        foreach ((array)$injectors as $injector => $b) {
             // XXX: Fix with a legitimate lookup table of enabled filters
             if (strpos($injector, '.') !== false) {
                 continue;
@@ -113,11 +113,11 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
             }
             $this->injectors[] = new $injector;
         }
-        foreach ($def_injectors as $injector) {
+        foreach ((array)$def_injectors as $injector) {
             // assumed to be objects
             $this->injectors[] = $injector;
         }
-        foreach ($custom_injectors as $injector) {
+        foreach ((array)$custom_injectors as $injector) {
             if (!$injector) {
                 continue;
             }
@@ -475,7 +475,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
             }
 
             // do errors, in REVERSE $j order: a,b,c with </a></b></c>
-            $c = count($skipped_tags);
+            $c = count((array)$skipped_tags);
             if ($e) {
                 for ($j = $c - 1; $j > 0; $j--) {
                     // notice we exclude $j == 0, i.e. the current ending tag, from
@@ -576,7 +576,7 @@ class HTMLPurifier_Strategy_MakeWellFormed extends HTMLPurifier_Strategy
             //  Also, mark the newly inserted tokens as having come from
             //  $injector.
             $oldskip = isset($old[0]) ? $old[0]->skip : array();
-            foreach ($token as $object) {
+            foreach ((array)$token as $object) {
                 $object->skip = $oldskip;
                 $object->skip[$injector] = true;
             }

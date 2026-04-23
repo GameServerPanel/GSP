@@ -74,7 +74,7 @@ class LuminousScanners
     );
     if (!is_array($language_name))
       $language_name = array($language_name);
-    foreach($language_name as $l) {
+    foreach ((array)$language_name as $l) {
       $this->lookup_table[$l] = $insert;
       if (!$dummy)
         $this->AddDescription($lang_description, $l);
@@ -94,7 +94,7 @@ class LuminousScanners
   {
     foreach($this->descriptions as &$d)
     {
-      foreach($d as $k=>$l)
+      foreach ((array)$d as $k=>$l)
       {
         if($l === $language_name)
           unset($d[$k]);
@@ -112,7 +112,7 @@ class LuminousScanners
   {
     if (is_array($language_name))
     {
-      foreach($language_name as $l)
+      foreach ((array)$language_name as $l)
       {
         unset($this->lookup_table[$l]);
         $this->UnsetDescription($l);
@@ -160,7 +160,7 @@ class LuminousScanners
     if (!isset($this->resolved_dependencies[$language_name]))
     {
       $this->resolved_dependencies[$language_name] = true;    
-      foreach($g['dependencies'] as $d)
+      foreach ((array)$g['dependencies'] as $d)
       {
         $this->GetScannerArray($d, $default);
       }    

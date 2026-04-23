@@ -261,7 +261,7 @@ class HTMLPurifier_HTMLModule
             $list = func_get_args();
         }
         $ret = array();
-        foreach ($list as $value) {
+        foreach ((array)$list as $value) {
             if (is_null($value)) {
                 continue;
             }

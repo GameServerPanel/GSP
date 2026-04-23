@@ -71,7 +71,7 @@ class LuminousStringSearch
     
     $r = $matches_[0][1];
     // strip the offsets from the match_groups
-    foreach($matches_ as $i=>&$v)
+    foreach ((array)$matches_ as $i=>&$v)
       $v = $v[0];
 
     $this->cache[$search] = array($r, $matches_);

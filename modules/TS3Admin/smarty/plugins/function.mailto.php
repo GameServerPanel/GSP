@@ -65,7 +65,7 @@ function smarty_function_mailto($params, &$smarty)
     $search = array('%40', '%2C');
     $replace  = array('@', ',');
     $mail_parms = array();
-    foreach ($params as $var=>$value) {
+    foreach ((array)$params as $var=>$value) {
         switch ($var) {
             case 'cc':
             case 'bcc':
@@ -88,7 +88,7 @@ function smarty_function_mailto($params, &$smarty)
     }
 
     $mail_parm_vals = '';
-    for ($i=0; $i<count($mail_parms); $i++) {
+    for ($i=0; $i<count((array)$mail_parms); $i++) {
         $mail_parm_vals .= (0==$i) ? '?' : '&';
         $mail_parm_vals .= $mail_parms[$i];
     }

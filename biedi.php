@@ -5,7 +5,7 @@
 		$arrayElements = explode(";", $tagsList);
 		echo "Contains ".sizeof($arrayElements)." elements<br>-----------------<br><br>";
 		$counter = 0;
-		foreach($arrayElements as $vehicle)
+		foreach ((array)$arrayElements as $vehicle)
 		{
 			$vehicleValues = explode(",", $vehicle);			
 			echo"
@@ -33,7 +33,7 @@
 		$arrayElements = explode(";", $tagsList);
 		echo "Contains ".sizeof($arrayElements)." elements<br>-----------------<br><br>";
 		$counter = 0;
-		foreach($arrayElements as $vehicle)
+		foreach ((array)$arrayElements as $vehicle)
 		{
 			$vehicleValues = explode(",", $vehicle);			
 			echo"
@@ -51,7 +51,7 @@
 		$tagsList=$_POST['tags_list'];
 		$arrayElements = explode(";", $tagsList);
 		$counter = 0;
-		foreach($arrayElements as $vehicle)
+		foreach ((array)$arrayElements as $vehicle)
 		{
 			$vehicleValues = explode(",", $vehicle);
 			$step1 = str_replace('[', '',$vehicleValues[0]);

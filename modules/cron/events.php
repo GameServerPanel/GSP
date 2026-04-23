@@ -76,7 +76,7 @@ function exec_ogp_module()
 				   get_lang('refresh_interval').
 				   ':<select name="setInterval" onchange="this.form.submit();">';
 		
-		foreach ($intervals as $interval => $value )
+		foreach ((array)$intervals as $interval => $value )
 		{
 			$selected = "";
 			if ( isset( $_GET['setInterval'] ) AND $_GET['setInterval'] == $value )

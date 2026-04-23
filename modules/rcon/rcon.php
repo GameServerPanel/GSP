@@ -41,7 +41,7 @@ function exec_ogp_module()
 	$i = 0;
 	$i2 = 0;
 	$colspan = "";
-	foreach ( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$server_home['home_cfg_file']);
 		$remote = new OGPRemoteLibrary($server_home['agent_ip'],$server_home['agent_port'],$server_home['encryption_key'],$server_home['timeout']);
@@ -51,7 +51,7 @@ function exec_ogp_module()
 		{
 
 			$i2++;
-			if ( count( $server_homes ) == $i2 )
+			if ( count((array)$server_homes) == $i2 )
 			{
 				$i = 0;
 			}
@@ -81,7 +81,7 @@ function exec_ogp_module()
 	if(isset($_POST['remote_send_rcon_command']) AND $_POST['rcon_command'] != "" )
 	{
 		$rconCommand = $_POST['rcon_command'];
-		foreach($_POST as $key => $value)
+		foreach ((array)$_POST as $key => $value)
 		{
 			$return = "";
 			if( preg_match( "/^action/", $key ) )

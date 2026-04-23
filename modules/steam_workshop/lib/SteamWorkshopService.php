@@ -131,7 +131,7 @@ class SteamWorkshopService
 		$root->appendChild($doc->createElement('rawDefinition', $config['raw_definition']));
 
 		$modsNode = $doc->createElement('mods');
-		foreach ($config['workshop_items'] as $item) {
+		foreach ((array)$config['workshop_items'] as $item) {
 			$mod = $doc->createElement('mod');
 			$mod->setAttribute('id', (string)$item['id']);
 			$mod->setAttribute('label', (string)$item['label']);
@@ -181,7 +181,7 @@ class SteamWorkshopService
 
 		$items = [];
 		$lines = preg_split('/\r\n|\r|\n/', $raw);
-		foreach ($lines as $line) {
+		foreach ((array)$lines as $line) {
 			$line = trim($line);
 			if ($line === '') {
 				continue;
@@ -239,7 +239,7 @@ class SteamWorkshopService
 			$logins[] = ['user' => $username, 'password' => $password];
 		}
 
-		foreach ($logins as $credentials) {
+		foreach ((array)$logins as $credentials) {
 			$this->appendLog($logPath, sprintf('SteamCMD download start app=%s workshop=%s login=%s', $appId, $workshopId, $credentials['user']));
 			$result = $this->runSteamCmdDownload($steamCmdPath, $appId, $workshopId, $credentials['user'], $credentials['password']);
 			$this->appendSteamCmdOutput($logPath, $result['output']);
@@ -339,7 +339,7 @@ class SteamWorkshopService
 	{
 		$sanitized = [];
 		$options = $this->getAdapterOptions();
-		foreach ($mappings as $gameKey => $adapterKey) {
+		foreach ((array)$mappings as $gameKey => $adapterKey) {
 			$gameKey = trim((string)$gameKey);
 			$adapterKey = $this->sanitizeAdapterKey((string)$adapterKey);
 			if ($gameKey === '' || !isset($options[$adapterKey])) {
@@ -391,7 +391,7 @@ class SteamWorkshopService
 		}
 
 		$result = [];
-		foreach ($decoded as $gameKey => $adapterKey) {
+		foreach ((array)$decoded as $gameKey => $adapterKey) {
 			if (!is_string($gameKey) || !is_string($adapterKey)) {
 				continue;
 			}
@@ -595,7 +595,7 @@ class SteamWorkshopService
 			$groups[$groupKey]['game_keys'][] = $gameKey;
 		}
 
-		foreach ($groups as &$group) {
+		foreach ((array)$groups as &$group) {
 			$group['game_keys'] = array_values(array_unique($group['game_keys']));
 			sort($group['game_keys']);
 			$group['primary_game_key'] = $group['game_keys'][0];
@@ -865,7 +865,7 @@ class SteamWorkshopService
 		$results = [];
 		$lines = preg_split('/\r\n|\r|\n/', trim($stdout));
 		if (is_array($lines)) {
-			foreach ($lines as $line) {
+			foreach ((array)$lines as $line) {
 				if ($line === '') {
 					continue;
 				}
@@ -887,7 +887,7 @@ class SteamWorkshopService
 					'subscriptions' => 0,
 					'source' => 'scraper',
 				];
-				if (count($results) >= $perPage) {
+				if (count((array)$results) >= $perPage) {
 					break;
 				}
 			}
@@ -901,8 +901,8 @@ class SteamWorkshopService
 			'success' => $success,
 			'error' => $errorMessage,
 			'results' => $results,
-			'total' => count($results),
-			'has_more' => count($results) >= $perPage,
+			'total' => count((array)$results),
+			'has_more' => count((array)$results) >= $perPage,
 			'request' => $request,
 		];
 	}
@@ -948,7 +948,7 @@ class SteamWorkshopService
 		preg_match_all('/sharedfiles\/filedetails\/\?id=([0-9]+)/i', $html, $matches);
 		$rawIds = $matches[1] ?? [];
 		$uniqueIds = [];
-		foreach ($rawIds as $rawId) {
+		foreach ((array)$rawIds as $rawId) {
 			$id = preg_replace('/[^0-9]/', '', (string)$rawId);
 			if ($id === '' || isset($uniqueIds[$id])) {
 				continue;
@@ -956,11 +956,11 @@ class SteamWorkshopService
 			$uniqueIds[$id] = true;
 		}
 		$orderedIds = array_keys($uniqueIds);
-		$hasMore = count($orderedIds) > $perPage;
+		$hasMore = count((array)$orderedIds) > $perPage;
 		$sliceIds = array_slice($orderedIds, 0, $perPage);
 
 		$results = [];
-		foreach ($sliceIds as $id) {
+		foreach ((array)$sliceIds as $id) {
 			$detailResponse = $this->httpGet(self::STEAM_WORKSHOP_DETAIL_URL, ['id' => $id], $this->getScraperUserAgent());
 			$title = '';
 			if ($detailResponse['error'] === null && $detailResponse['http_code'] >= 200 && $detailResponse['http_code'] < 300 && $detailResponse['body'] !== null) {
@@ -987,7 +987,7 @@ class SteamWorkshopService
 			'success' => true,
 			'error' => null,
 			'results' => $results,
-			'total' => count($results),
+			'total' => count((array)$results),
 			'has_more' => $hasMore,
 			'request' => $request,
 		];
@@ -1071,7 +1071,7 @@ class SteamWorkshopService
 		}
 
 		$adapters = $this->getAdapterOptions();
-		if (array_key_exists($key, $adapters)) {
+		if (array_key_exists($key, (array)$adapters)) {
 			return $key;
 		}
 
@@ -1213,7 +1213,7 @@ class SteamWorkshopService
 			dirname($this->adapterMapFile),
 		];
 
-		foreach ($directories as $dir) {
+		foreach ((array)$directories as $dir) {
 			if (!is_dir($dir)) {
 				mkdir($dir, 0775, true);
 			}
@@ -1312,7 +1312,7 @@ class SteamWorkshopService
 		}
 
 		$result = [];
-		foreach ($decoded as $item) {
+		foreach ((array)$decoded as $item) {
 			if (!is_array($item)) {
 				continue;
 			}
@@ -1340,7 +1340,7 @@ class SteamWorkshopService
 	private function serializeWorkshopItems(array $items): string
 	{
 		$lines = [];
-		foreach ($items as $item) {
+		foreach ((array)$items as $item) {
 			$id = preg_replace('/[^0-9]/', '', (string)($item['id'] ?? ''));
 			if ($id === '') {
 				continue;

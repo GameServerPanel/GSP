@@ -31,7 +31,7 @@ function exec_ogp_module()
 	global $db;
 	$home_info = $db->getGameHome($home_id);
 
-	if ( array_key_exists($mod_id, $home_info['mods']) ) 
+	if ( array_key_exists($mod_id, (array)$home_info['mods']) ) 
 	{
 		echo "<h2>".get_lang('cmds_for')." \"".htmlentities($home_info['home_name'])."\" [Mod:".$home_info['mods'][$mod_id]['mod_name']."]</h2>";
 		$server_xml = read_server_config(SERVER_CONFIG_LOCATION.$home_info['home_cfg_file']);

@@ -81,7 +81,7 @@ class SiteManager
 		
 		$pattern = "/{(\w+)}/i";
 		preg_match_all($pattern, $this->TemplateHTML, $items_found);
-		foreach($items_found[1] as $item_found)
+		foreach ((array)$items_found[1] as $item_found)
 		{
 			
 			if(isset($this->texts[$item_found]))
@@ -132,11 +132,11 @@ class SiteManager
 	{
 		$tmp = '<?php exit;?>';
 		$tmp.="\n\n";
-		foreach($options as $section => $values){
+		foreach ((array)$options as $section => $values){
 			$tmp .= "[$section]\n";
-			foreach($values as $key => $val){
+			foreach ((array)$values as $key => $val){
 				if(is_array($val)){
-					foreach($val as $k =>$v){
+					foreach ((array)$val as $k =>$v){
 						$tmp .= "{$key}[$k] = \"$v\"\n";
 					}
 				}
@@ -164,7 +164,7 @@ class SiteManager
 		$arrWords = explode(" ",$strTitle);
 		$iWCounter = 1; 
 		
-		foreach($arrWords as $strWord) 
+		foreach ((array)$arrWords as $strWord) 
 		{ 
 			if($strWord == "") { continue; }  
 			
@@ -190,7 +190,7 @@ class SiteManager
 		 $retval = $string;    
 		$array = explode(" ", $string);
 	  
-		if (count($array)<=$wordsreturned)
+		if (count((array)$array)<=$wordsreturned)
 		{
 			$retval = $string;
 		}

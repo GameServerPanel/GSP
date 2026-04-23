@@ -72,7 +72,7 @@ if (!$db) {
         mysqli_free_result($result);
     }
 
-    $cart_empty = (count($invoices) === 0);
+    $cart_empty = (count((array)$invoices) === 0);
 }
 
 // Handle coupon application
@@ -120,9 +120,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_coupon'])) {
                 $game_valid = true;
                 if ($coupon['game_filter_type'] === 'specific_games' && !empty($coupon['game_filter_list'])) {
                     $allowed_games = json_decode($coupon['game_filter_list'], true);
-                    if (is_array($allowed_games) && count($allowed_games) > 0) {
+                    if (is_array($allowed_games) && count((array)$allowed_games) > 0) {
                         $has_valid_game = false;
-                        foreach ($invoices as $inv) {
+                        foreach ((array)$invoices as $inv) {
                             $inv_game_key = isset($inv['game_key']) ? $inv['game_key'] : null;
                             if ($inv_game_key !== null && in_array($inv_game_key, $allowed_games)) {
                                 $has_valid_game = true;
@@ -256,7 +256,7 @@ $client_id = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_
 
 // Prepare PayPal items
 $paypal_items = [];
-foreach ($invoices as $inv) {
+foreach ((array)$invoices as $inv) {
     $game_display = !empty($inv['game_name']) ? $inv['game_name'] : 'Game Server';
     $qty = max(1, intval($inv['qty']));
     $paypal_items[] = [
@@ -550,7 +550,7 @@ $siteBase = $protocol . $host;
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($invoices as $inv): ?>
+                    <?php foreach ((array)$invoices as $inv): ?>
                     <tr>
                         <td>
                             <div class="game-name"><?php echo htmlspecialchars($inv['game_name'] ?? 'Game Server'); ?></div>

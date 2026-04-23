@@ -32,7 +32,7 @@ function exec_ogp_module()
 	echo "<tr>\n";
 	$menus = $db->getMenusForGroup('admin');
 	
-	foreach ($menus as $key => $row) {
+	foreach ((array)$menus as $key => $row) {
 	if ( !empty( $row['subpage'] ) )
 		$name[$key]  = $row['subpage'];
 	else
@@ -44,7 +44,7 @@ function exec_ogp_module()
 	array_multisort($translation, $name, SORT_DESC, $menus);
 				
 	$td = 0;
-	foreach ( $menus as $menu )
+	foreach ((array)$menus as $menu)
 	{
 		$module = $menu['module'];
 		if ( !empty( $menu['subpage'] ) )
@@ -159,7 +159,7 @@ function exec_ogp_module()
 	$td2 = 0;
 	if($external_links != 0)
 	{
-		foreach ( $external_links as $external_link )
+		foreach ((array)$external_links as $external_link)
 		{
 			
 			$url = $external_link['url'];
@@ -185,7 +185,7 @@ function exec_ogp_module()
 		
 	if ( isset( $_POST['changeOrder'] ) )
 	{
-		foreach($_POST as $key => $value)
+		foreach ((array)$_POST as $key => $value)
 		{
 			if( preg_match( "/^change_button/", $key ) )
 			{
@@ -205,7 +205,7 @@ function exec_ogp_module()
 	$menus = $db->getMenusForGroup('user');
 	
 	$pos = 0;
-	foreach ( $menus as $menu )
+	foreach ((array)$menus as $menu)
 	{
 		$module = $menu['module'];
 		if ( !empty( $menu['subpage'] ) )

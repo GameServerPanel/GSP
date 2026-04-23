@@ -104,7 +104,7 @@ abstract class LuminousFormatter {
     $num_lines = 1;
 
     $num_open = 0;
-    foreach($line_split as $l) {
+    foreach ((array)$line_split as $l) {
 
       $l0 = $l[0];
       if ($l0 === '<') {

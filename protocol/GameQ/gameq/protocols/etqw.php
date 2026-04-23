@@ -78,7 +78,7 @@ class GameQ_Protocols_Etqw extends GameQ_Protocols
 	protected function preProcess_status($packets)
 	{
 		// Should only be one packet
-		if (count($packets) > 1)
+		if (count((array)$packets) > 1)
 		{
 			throw new GameQ_ProtocolsException('Enemy Territor: Quake Wars status has more than 1 packet');
 		}

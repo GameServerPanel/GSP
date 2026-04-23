@@ -144,7 +144,7 @@ function exec_ogp_module()
 				if($response['status'] == '200')
 				{
 					$users_table = "<table class='users_list'><theader><td>ID</td><td>Name</td><td>Group</td></theader>";
-					foreach($response['users'] as $user)
+					foreach ((array)$response['users'] as $user)
 						$users_table .= "<tr><td class='user_id'>".$user['id']."</td><td class='user_name'>".$user['name']."</td><td class='user_group'>".$user['group']."</td></tr>";
 					$users_table .= "</table>";
 					echo $users_table;
@@ -218,7 +218,7 @@ function exec_ogp_module()
 					$response = getResponse($ip, $port, '/v2/users/update/', $params);
 					if($response['status'] == '200')
 					{
-						foreach($response as $key => $resp)
+						foreach ((array)$response as $key => $resp)
 						{
 							if($key == "status")
 								continue;

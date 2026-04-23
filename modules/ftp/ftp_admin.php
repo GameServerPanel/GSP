@@ -54,7 +54,7 @@ function exec_ogp_module()
 		$ftp_accounts_list = $remote->ftp_mgr("list");
 		$ftp_accounts = explode("\n",$ftp_accounts_list);
 		$user_exists = FALSE;
-		foreach($ftp_accounts as $ftp_account)
+		foreach ((array)$ftp_accounts as $ftp_account)
 		{
 			if( $ftp_account != "" )
 			{
@@ -97,7 +97,7 @@ function exec_ogp_module()
 		$remote = new OGPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
 		$ftp_login = strip_real_escape_string($_POST['ftp_login']);
 		$settings = "";
-		foreach($_POST as $key => $value)
+		foreach ((array)$_POST as $key => $value)
 		{
 			if ($key != "edit_ftp_user" and $key != "ftp_login" and $key != "remote_server_id")
 			{
@@ -118,7 +118,7 @@ function exec_ogp_module()
 			<table class='center' style='width:100%' ><tr>
 			<td>". get_lang("remote_server") ." <select style='width:250px' name='remote_server_id' >";
 
-		foreach ( $servers as $server_row )
+		foreach ((array)$servers as $server_row)
 		{
 			$display_ip = checkDisplayPublicIP($server_row['display_public_ip'],$server_row['agent_ip']);
 			echo "<option value='" . $server_row['remote_server_id'] . "' >" . $server_row['remote_server_name'] . " (" . $display_ip . ":" . $server_row['agent_port'] . ")</option>";
@@ -144,7 +144,7 @@ function exec_ogp_module()
 				</thead> 
 				<tbody>
 	<?php		
-		foreach ( $servers as $server_row )
+		foreach ((array)$servers as $server_row)
 		{
 			$display_ip = checkDisplayPublicIP($server_row['display_public_ip'],$server_row['agent_ip']);
 			$remote = new OGPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
@@ -157,7 +157,7 @@ function exec_ogp_module()
 			{			
 				$ftp_accounts_list = $remote->ftp_mgr("list");
 				$ftp_accounts = explode("\n", $ftp_accounts_list);
-				foreach($ftp_accounts as $ftp_account)
+				foreach ((array)$ftp_accounts as $ftp_account)
 				{
 					if( !empty($ftp_account))
 					{
@@ -175,7 +175,7 @@ function exec_ogp_module()
 						
 						$ftp_account_detail_list = explode("\n",$account_details);
 											
-						foreach($ftp_account_detail_list as $detail_line)
+						foreach ((array)$ftp_account_detail_list as $detail_line)
 						{
 							if( !empty($detail_line))
 							{
@@ -193,7 +193,7 @@ function exec_ogp_module()
 									$value_parts = explode(" ", $value);
 									if(is_numeric($value_parts[0]))
 									{
-										if(count($value_parts) > 1)
+										if(count((array)$value_parts) > 1)
 										{
 											$value = array_shift($value_parts);
 											$advert = implode(" ", $value_parts);
@@ -210,7 +210,7 @@ function exec_ogp_module()
 										}
 									}
 								}
-								if ($key == "Allowed local  IPs" or $key == "ul_ratio" or $key == "ForceSsl" or ( count($ftp_account_detail_list) == 4 and $key == "Directory" ) )
+								if ($key == "Allowed local  IPs" or $key == "ul_ratio" or $key == "ForceSsl" or ( count((array)$ftp_account_detail_list) == 4 and $key == "Directory" ) )
 									echo "</table>\n</td><td>\n<table>\n";
 								if ($key == "Directory" )
 									$value = str_replace( "/./", "", $value );

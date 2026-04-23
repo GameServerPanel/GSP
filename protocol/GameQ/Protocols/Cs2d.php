@@ -131,7 +131,7 @@ class Cs2d extends Protocol
             $responses = explode(substr($this->packets[$packet], 2), $buffer->getData());
 
             // Try to rebuild the second packet to the same as if it was sent as two separate responses
-            $responses[1] = $this->packets[$packet] . ((count($responses) === 2) ? $responses[1] : "");
+            $responses[1] = $this->packets[$packet] . ((count((array)$responses) === 2) ? $responses[1] : "");
 
             unset($buffer);
         } else {
@@ -142,7 +142,7 @@ class Cs2d extends Protocol
         $packets = [];
 
         // We need to pre-sort these for split packets so we can do extra work where needed
-        foreach ($responses as $response) {
+        foreach ((array)$responses as $response) {
             $buffer = new Buffer($response);
 
             // Pull out the header
@@ -157,7 +157,7 @@ class Cs2d extends Protocol
         $results = [];
 
         // Now let's iterate and process
-        foreach ($packets as $header => $packetGroup) {
+        foreach ((array)$packets as $header => $packetGroup) {
             // Figure out which packet response this is
             if (!array_key_exists($header, $this->responses)) {
                 throw new Exception(__METHOD__ . " response type '" . bin2hex($header) . "' is not valid");

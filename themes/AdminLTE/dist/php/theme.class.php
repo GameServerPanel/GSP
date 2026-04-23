@@ -425,7 +425,7 @@ class Theme
 		$getGameServer = $this->getGameServer($filterUserId);
 		if($getGameServer)
 		{
-			foreach($getGameServer as $key => $val)
+			foreach ((array)$getGameServer as $key => $val)
 			{
 				$allServers .= $this->buildServerBox($val);
 			}

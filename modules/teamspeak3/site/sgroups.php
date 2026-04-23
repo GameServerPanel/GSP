@@ -30,7 +30,7 @@ if(isset($_POST['sendname']))
 			}
 			else
 			{
-			for($i=0; $i+1==count($sgroup_rename['errors']); $i++)
+			for($i=0; $i+1==count((array)$sgroup_rename['errors']); $i++)
 				{
 				$error .= $sgroup_rename['errors'][$i]."<br />";
 				}
@@ -50,7 +50,7 @@ if(isset($_POST['delgroup']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($sgroup_delete['errors']); $i++)
+		for($i=0; $i+1==count((array)$sgroup_delete['errors']); $i++)
 			{
 			$error .= $sgroup_delete['errors'][$i]."<br />";
 			}

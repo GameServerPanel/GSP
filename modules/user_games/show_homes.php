@@ -78,7 +78,7 @@ function exec_ogp_module()
 		<th>".get_lang('actions')."</th></tr>";
 	$i = 0;
 	// sort($game_homes);
-	foreach( $game_homes as $row )
+	foreach ((array)$game_homes as $row)
 	{
 		$display_ip = checkDisplayPublicIP($row['display_public_ip'], (isset($row['ip']) and $row['ip'] != $row['agent_ip']) ? $row['ip'] : $row['agent_ip']);
 
@@ -88,7 +88,7 @@ function exec_ogp_module()
 			 "<td class='tdh'>$row[game_name] $os_arch</td><td>$row[home_path]<br><div class='size' id='".$row["home_id"].
 			 "' style='cursor:pointer;' >[".get_lang('get_size')."]</div></td><td class='tdh'>";
 		echo empty($row['home_name']) ? get_lang('not_available') : htmlentities($row['home_name']);
-		$expiration_date = $row['server_expiration_date'] == "X" ? "X" : date('d/m/Y H:i:s', $row['server_expiration_date']);
+		$expiration_date = $row['server_expiration_date'] == "X" ? "X" : date('d/m/Y H:i:s', is_numeric($row['server_expiration_date']) ? (int)$row['server_expiration_date'] : strtotime($row['server_expiration_date']));
 		echo "</td><td>".$expiration_date."</td><td>
 			<a href='?m=user_games&amp;p=del&amp;home_id=$row[home_id]'>[".get_lang('delete')."]</a>
 			<a href='?m=user_games&amp;p=edit&amp;home_id=$row[home_id]'>[".get_lang('edit')."]</a>

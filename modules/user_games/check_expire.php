@@ -28,9 +28,9 @@ function exec_ogp_module()
 	$expired_servers = $db->resultQuery("SELECT home_name, home_id, server_expiration_date FROM OGP_DB_PREFIXserver_homes WHERE server_expiration_date NOT LIKE 'X' AND server_expiration_date <= ".time().";");
 	if($expired_servers)
 	{
-		foreach($expired_servers as $expired_server)
+		foreach ((array)$expired_servers as $expired_server)
 		{
-			$db->logger(date('d/m/Y H:i:s', $expired_server['server_expiration_date'])." : SERVER EXPIRED: HOME ID:$expired_server[home_id] ($expired_server[home_name])");
+			$db->logger(date('d/m/Y H:i:s', is_numeric($expired_server['server_expiration_date']) ? (int)$expired_server['server_expiration_date'] : strtotime($expired_server['server_expiration_date']))." : SERVER EXPIRED: HOME ID:$expired_server[home_id] ($expired_server[home_name])");
 			$db->check_expire_date(0, $expired_server['home_id'], array('server'));
 		}
 	}
@@ -38,9 +38,9 @@ function exec_ogp_module()
 	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM OGP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date <= ".time().";");
 	if($expired_users)
 	{
-		foreach($expired_users as $expired_user)
+		foreach ((array)$expired_users as $expired_user)
 		{
-			$db->logger(date('d/m/Y H:i:s', $expired_user['user_expiration_date'])." : USER ASSIGNATION EXPIRED : HOME ID:$expired_user[home_id] TO USER ID:$expired_user[user_id]");
+			$db->logger(date('d/m/Y H:i:s', is_numeric($expired_user['user_expiration_date']) ? (int)$expired_user['user_expiration_date'] : strtotime($expired_user['user_expiration_date']))." : USER ASSIGNATION EXPIRED : HOME ID:$expired_user[home_id] TO USER ID:$expired_user[user_id]");
 			$db->check_expire_date($expired_user['user_id'], $expired_user['home_id'], array('user'));
 		}
 	}
@@ -53,9 +53,9 @@ function exec_ogp_module()
 										 WHERE g.user_group_expiration_date NOT LIKE 'X' AND g.user_group_expiration_date <= ".time()." GROUP BY g.home_id;");
 	if($expired_groups)
 	{
-		foreach($expired_groups as $expired_group)
+		foreach ((array)$expired_groups as $expired_group)
 		{
-			$db->logger(date('d/m/Y H:i:s', $expired_group['user_group_expiration_date'])." : GROUP ASSIGNATION EXPIRED : HOME ID:$expired_group[home_id] TO GROUP ID:$expired_group[group_id]");
+			$db->logger(date('d/m/Y H:i:s', is_numeric($expired_group['user_group_expiration_date']) ? (int)$expired_group['user_group_expiration_date'] : strtotime($expired_group['user_group_expiration_date']))." : GROUP ASSIGNATION EXPIRED : HOME ID:$expired_group[home_id] TO GROUP ID:$expired_group[group_id]");
 			$db->check_expire_date($expired_group['user_id'], $expired_group['home_id'], array('user_group'));
 		}
 	}

@@ -88,7 +88,7 @@ class HTMLPurifier_AttrDef_CSS_BackgroundPosition extends HTMLPurifier_AttrDef
             'center' => 'c'
         );
 
-        foreach ($bits as $bit) {
+        foreach ((array)$bits as $bit) {
             if ($bit === '') {
                 continue;
             }
@@ -135,7 +135,7 @@ class HTMLPurifier_AttrDef_CSS_BackgroundPosition extends HTMLPurifier_AttrDef
         } elseif ($keywords['ch']) {
             $ret[] = $keywords['ch'];
             $keywords['cv'] = false; // prevent re-use: center = center center
-        } elseif (count($measures)) {
+        } elseif (count((array)$measures)) {
             $ret[] = array_shift($measures);
         }
 
@@ -143,7 +143,7 @@ class HTMLPurifier_AttrDef_CSS_BackgroundPosition extends HTMLPurifier_AttrDef
             $ret[] = $keywords['v'];
         } elseif ($keywords['cv']) {
             $ret[] = $keywords['cv'];
-        } elseif (count($measures)) {
+        } elseif (count((array)$measures)) {
             $ret[] = array_shift($measures);
         }
 

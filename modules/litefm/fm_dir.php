@@ -201,7 +201,7 @@ function exec_ogp_module()
 		if( isset($_SESSION['fm_files_'.$home_id]) and !empty($_SESSION['fm_files_'.$home_id]) )
 		{
 			$files = "";
-			foreach($_POST['items'] as $item)
+			foreach ((array)$_POST['items'] as $item)
 			{
 				if(isset($_SESSION['fm_files_'.$home_id][$item]))
 				{
@@ -223,7 +223,7 @@ function exec_ogp_module()
 	{
 		if( isset($_SESSION['fm_files_'.$home_id]) and !empty($_SESSION['fm_files_'.$home_id]) )
 		{
-			foreach($_POST['items'] as $i => $item)
+			foreach ((array)$_POST['items'] as $i => $item)
 			{
 				if(isset($_SESSION['fm_files_'.$home_id][$item]))
 				{
@@ -248,7 +248,7 @@ function exec_ogp_module()
 		{
 			if($remote->rfile_exists($destination))
 			{
-				foreach($_POST['items'] as $item)
+				foreach ((array)$_POST['items'] as $item)
 				{
 					if(isset($_SESSION['fm_files_'.$home_id][$item]))
 					{
@@ -270,7 +270,7 @@ function exec_ogp_module()
 		{
 			if($remote->rfile_exists($destination))
 			{
-				foreach($_POST['items'] as $item)
+				foreach ((array)$_POST['items'] as $item)
 				{
 					if(isset($_SESSION['fm_files_'.$home_id][$item]))
 					{
@@ -288,7 +288,7 @@ function exec_ogp_module()
 	{
 		$files_w_path = '';
 		$items = '';
-		foreach($_POST['items'] as $item)
+		foreach ((array)$_POST['items'] as $item)
 		{
 			if(isset($_SESSION['fm_files_'.$home_id][$item]))
 			{
@@ -310,7 +310,7 @@ function exec_ogp_module()
 		$destination = clean_path($home_cfg['home_path']. "/" . $selected_path);
 		if($remote->rfile_exists($destination))
 		{
-			foreach($_POST['items'] as $item)
+			foreach ((array)$_POST['items'] as $item)
 			{
 				if(isset($_SESSION['fm_files_'.$home_id][$item]))
 				{
@@ -338,7 +338,7 @@ function exec_ogp_module()
 		$message = $_POST['message'];
 		$dest_email = $_POST['dest_email'];
 		$items = '';
-		foreach($_POST['items'] as $item)
+		foreach ((array)$_POST['items'] as $item)
 		{
 			if(isset($_SESSION['fm_files_'.$home_id][$item]))
 			{
@@ -413,7 +413,7 @@ function exec_ogp_module()
 				 get_lang_f('currently_viewing',$show_path)."</h3></td>".
 				 "</tr></table>\n";
 			echo "<div class='file-operations' >\n";
-			foreach($fo_keys as $key)
+			foreach ((array)$fo_keys as $key)
 			{
 				if($fo[$key] == "1")
 					echo "<div class='operations-button' id='$key'><img src='" . check_theme_image("modules/litefm/action-images/$key.gif") . "' /><div>&nbsp;".get_lang($key)."</div></div>\n";
@@ -459,7 +459,7 @@ function exec_ogp_module()
 				if(isset($dirlist['directorys']) and is_array($dirlist['directorys']))
 				{
 					$dirlist['directorys'] = array_orderby($dirlist['directorys'], 'filename', SORT_ASC);
-					foreach($dirlist['directorys'] as $directory)
+					foreach ((array)$dirlist['directorys'] as $directory)
 					{
 						$directory['filename'] = removeInvalidFileNameCharacters($directory['filename']);
 						
@@ -483,7 +483,7 @@ function exec_ogp_module()
 				if(isset($dirlist['files']) and is_array($dirlist['files']))
 				{
 					$dirlist['files'] = array_orderby($dirlist['files'], 'filename', SORT_ASC);
-					foreach($dirlist['files'] as $file)
+					foreach ((array)$dirlist['files'] as $file)
 					{
 						$file['filename'] = removeInvalidFileNameCharacters($file['filename']);
 						
@@ -528,7 +528,7 @@ function exec_ogp_module()
 				if(isset($dirlist['binarys']) and is_array($dirlist['binarys']))
 				{
 					$dirlist['binarys'] = array_orderby($dirlist['binarys'], 'filename', SORT_ASC);
-					foreach($dirlist['binarys'] as $binary)
+					foreach ((array)$dirlist['binarys'] as $binary)
 					{
 						$binary['filename'] = removeInvalidFileNameCharacters($binary['filename']);
 						

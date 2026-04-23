@@ -112,7 +112,7 @@ $global_comparison_lang_files = array();
 $gclf_tmp = glob($COMPARISON_LANG."/*.php");
 
 // Remove the directory from filename.
-foreach ( $gclf_tmp as $tmp )
+foreach ((array)$gclf_tmp as $tmp)
 {
 	$array_tmp = explode("/",$tmp);
 	array_push($global_comparison_lang_files,$array_tmp[1]);
@@ -120,7 +120,7 @@ foreach ( $gclf_tmp as $tmp )
 
 $gclf_tmp = glob($COMPARISON_LANG."/modules/*.php");
 
-foreach ( $gclf_tmp as $tmp )
+foreach ((array)$gclf_tmp as $tmp)
 {
 	$array_tmp = explode("/",$tmp);
 	array_push($global_comparison_lang_files,"modules/".$array_tmp[2]);
@@ -129,7 +129,7 @@ foreach ( $gclf_tmp as $tmp )
 $locale_files = makefilelist("./", ".|..|.svn", true, "folders");
 
 echo "<ul id='lang_list'>";
-foreach ($locale_files as $lang_name)
+foreach ((array)$locale_files as $lang_name)
 {
 	echo "<li><a href='#$lang_name'>$lang_name</a></li>\n";
 }
@@ -144,13 +144,13 @@ if ( isset($_SESSION['users_login']) )
 	{
 		if( !empty( $_POST ) )
 		{
-			foreach ($locale_files as $lang_name)
+			foreach ((array)$locale_files as $lang_name)
 			{
 				if ( $lang_name == $COMPARISON_LANG ) continue;
 				
 				$lang_ok = true;
 
-				foreach ( $global_comparison_lang_files as $glf )
+				foreach ((array)$global_comparison_lang_files as $glf)
 				{
 					$file = $lang_name."/".$glf;
 					if( isset( $_POST[str_replace(".", "_", $file)] ) )
@@ -158,7 +158,7 @@ if ( isset($_SESSION['users_login']) )
 						echo "<h2>".$lang_name."</h2>\n";
 						echo $file."\n Values Added.";
 						$add_values = '<?php '."\n";
-						foreach ( $_POST as $var => $value )
+						foreach ((array)$_POST as $var => $value )
 						{
 							if( $var != str_replace(".", "_", $file) )
 								$add_values .= 'define(\''.$var.'\', "'.$value.'");'."\n";
@@ -175,7 +175,7 @@ if ( isset($_SESSION['users_login']) )
 }
 
 $current_url = curPageURL();
-foreach ($global_comparison_lang_files as $glf)
+foreach ((array)$global_comparison_lang_files as $glf)
 {
 	$file = $COMPARISON_LANG."/".$glf;
 	$contents = file_get_contents($current_url.'?file='.$file);
@@ -184,7 +184,7 @@ foreach ($global_comparison_lang_files as $glf)
 
 
 // Check every lang.
-foreach ($locale_files as $lang_name)
+foreach ((array)$locale_files as $lang_name)
 {
 	if ( $lang_name == $COMPARISON_LANG ) continue;
 
@@ -192,7 +192,7 @@ foreach ($locale_files as $lang_name)
 
 	$lang_ok = true;
 
-	foreach ( $global_comparison_lang_files as $glf )
+	foreach ((array)$global_comparison_lang_files as $glf)
 	{
 		$file = $lang_name."/".$glf;
 		if ( !is_file($file) )
@@ -224,7 +224,7 @@ foreach ($locale_files as $lang_name)
 		{
 			echo "<div class='missing_lang'><h4>Missing lang vars:</h4>\n";
 			echo "<br>";
-			foreach ( $missing_lang_vars as $var => $value )
+			foreach ((array)$missing_lang_vars as $var => $value )
 			{
 				echo "<label for='$var' >$var</label><br><textarea id='$var' name='$var'>".$lang[$glf][$var]."</textarea><br>\n";
 			}
@@ -238,7 +238,7 @@ foreach ($locale_files as $lang_name)
 		{
 			echo "<div class='extra_lang'><h4>Extra lang vars:</h4>\n";
 			echo "<ul>";
-			foreach ( $extra_lang_vars as $var => $value )
+			foreach ((array)$extra_lang_vars as $var => $value )
 			{
 				echo "<li>$var</li>";
 			}

@@ -75,7 +75,7 @@ function money_fmt($value, $currency) {
         <?php
           $currency = $details['currency'] ?? ($items[0]['unit_amount']['currency_code'] ?? '');
           $grand  = 0.00;
-          foreach ($items as $it) {
+          foreach ((array)$items as $it) {
             $name = $it['name'] ?? '';
             $sku  = $it['sku'] ?? '';
             $qty  = isset($it['quantity']) ? (int)$it['quantity'] : 1;

@@ -147,7 +147,7 @@ class Gta5m extends Protocol
         // No longer needed
         unset($buffer);
 
-        $itemCount = count($data);
+        $itemCount = count((array)$data);
 
         // Now lets loop the array
         for ($x = 0; $x < $itemCount; $x += 2) {

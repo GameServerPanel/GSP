@@ -139,7 +139,7 @@ if(function_exists($function))
 			output(array("status" => "400", "message" => "BAD REQUEST - CANT FIND FUNCTION ARGS"), $function);
 		elseif(!(($func_req == "token/test" and isset($request[1])) OR ($func_req == "token/create" and isset($request[1]) and isset($request[2]))))
 		{
-			foreach($function_args as $arg => $mandatory)
+			foreach ((array)$function_args as $arg => $mandatory)
 			{
 				if($mandatory and !isset($_POST["$arg"]))
 				{
@@ -162,7 +162,7 @@ else
 
 function output($result, $function){
 	if($function == "api_setting"){
-		if(is_array($result) && array_key_exists("status", $result) && $result["status"] != 200){
+		if(is_array($result) && array_key_exists("status", (array)$result) && $result["status"] != 200){
 			outputPlainText("-1");
 		}else{
 			outputPlainText($result);
@@ -187,7 +187,7 @@ function outputPlainText($result){
 
 function isValidTimeStamp($timestamp)//https://stackoverflow.com/questions/2524680/check-whether-the-string-is-a-unix-timestamp
 {
-    if(is_numeric($timestamp) and strtotime(date('d-m-Y H:i:s',$timestamp)) === (int)$timestamp)
+    if(is_numeric($timestamp) and strtotime(date('d-m-Y H:i:s', is_numeric($timestamp) ? (int)$timestamp : strtotime($timestamp))) === (int)$timestamp)
         return true;
 	return false;
 }
@@ -335,7 +335,7 @@ function api_server()
 		$remote_server_id = $_POST['remote_server_id'];
 		$ip = $_POST['ip'];
 		$ip_infos = $db->getRemoteServerIPs($remote_server_id);
-		foreach($ip_infos as $ip_info)
+		foreach ((array)$ip_infos as $ip_info)
 		{
 			if($ip_info['ip'] == $ip)
 			{
@@ -359,7 +359,7 @@ function api_server()
 		$old_ip = $_POST['old_ip'];
 		$new_ip = $_POST['new_ip'];
 		$ip_infos = $db->getRemoteServerIPs($remote_server_id);
-		foreach($ip_infos as $ip_info)
+		foreach ((array)$ip_infos as $ip_info)
 		{
 			if($ip_info['ip'] == $old_ip)
 			{
@@ -397,12 +397,12 @@ function api_user_games()
 			return array("status" => $status, "message" => $message);
 		}
 		$games = $db->getGameCfgs();
-		foreach($games as $key => $game)
+		foreach ((array)$games as $key => $game)
 		{
 			$games[$key]['mods'] = $db->getCfgMods($game['home_cfg_id']);
 			preg_match("/^([a-z0-9_-]+)_(linux|win)(32|64)?$/i",$game['game_key'],$matches);
 			
-			if(count($matches) == 4)
+			if(count((array)$matches) == 4)
 				list($game_key, $game_clean, $os, $arch) = $matches;
 			else
 			{
@@ -440,12 +440,12 @@ function api_user_games()
 		$nice = $_POST['nice'];
 		
 		$homeForUser = $user_info['users_login'];
-		if(array_key_exists('custom_user_login_homepath', $_POST) && !empty($_POST['custom_user_login_homepath'])){
+		if(array_key_exists('custom_user_login_homepath', (array)$_POST) && !empty($_POST['custom_user_login_homepath'])){
 			$homeForUser = $_POST['custom_user_login_homepath'];
 		}
 		
 		$assignGameServerToUserId = $user_info['user_id'];
-		if(array_key_exists('assign_to_username', $_POST) && !empty($_POST['assign_to_username'])){
+		if(array_key_exists('assign_to_username', (array)$_POST) && !empty($_POST['assign_to_username'])){
 			$assignToAccountUser = $_POST['assign_to_username'];
 			$userInfo = $db->getUser($assignToAccountUser);
 			if($userInfo){
@@ -467,7 +467,7 @@ function api_user_games()
 			return array("status" => '306', "message" => "No game mods found for home_cfg_id #" . $home_cfg_id . ".");
 		else
 		{
-			foreach($cfg_mods as $cfg_mod)
+			foreach ((array)$cfg_mods as $cfg_mod)
 			{
 				if($cfg_mod['mod_cfg_id'] == $mod_cfg_id)
 				{
@@ -564,7 +564,7 @@ function api_user_games()
 		$nice = $_POST['nice'];
 		
 		$homeForUser = $user_info['users_login'];
-		if(array_key_exists('custom_user_login_homepath', $_POST) && !empty($_POST['custom_user_login_homepath'])){
+		if(array_key_exists('custom_user_login_homepath', (array)$_POST) && !empty($_POST['custom_user_login_homepath'])){
 			$homeForUser = $_POST['custom_user_login_homepath'];
 		}
 				
@@ -573,7 +573,7 @@ function api_user_games()
 			return array("status" => '315', "message" => "There is no game home with home_id #" . $home_id . ".");
 			
 		$assignGameServerToUserId = $game_home['user_id_main'];
-		if(array_key_exists('assign_to_username', $_POST) && !empty($_POST['assign_to_username'])){
+		if(array_key_exists('assign_to_username', (array)$_POST) && !empty($_POST['assign_to_username'])){
 			$assignToAccountUser = $_POST['assign_to_username'];
 			$userInfo = $db->getUser($assignToAccountUser);
 			if($userInfo){
@@ -627,7 +627,7 @@ function api_user_games()
 			return array("status" => '312', "message" => "The given IP:Port is already in use.");
 		}
 		
-		foreach ($game_home['mods'] as $mod_info)
+		foreach ((array)$game_home['mods'] as $mod_info)
 			if($db->addModToGameHome($clone_home_id, $mod_info['mod_cfg_id']) !== FALSE)
 				$db->updateGameModParams($slots, $mod_info['extra_params'], $affinity, $nice, $clone_home_id, $mod_info['mod_cfg_id']);
 		
@@ -650,7 +650,7 @@ function api_user_games()
 	if($request[0] == "set_expiration")
 	{
 		$home_id = $_POST['home_id'];
-		$date = date('d/m/Y H:i:s', $_POST['timestamp']);
+		$date = date('d/m/Y H:i:s', is_numeric($_POST['timestamp']) ? (int)$_POST['timestamp'] : strtotime($_POST['timestamp']));
 		
 		if($db->updateExpirationDate($home_id, $date, 'server') === TRUE)
 		{
@@ -825,7 +825,7 @@ function api_user_admin()
 			else
 			{
 				if($date != 'X')
-					$date = date('d/m/Y H:i:s', $_POST['timestamp']);
+					$date = date('d/m/Y H:i:s', is_numeric($_POST['timestamp']) ? (int)$_POST['timestamp'] : strtotime($_POST['timestamp']));
 				
 				if ( $db->assignHomeTo('user', $account['user_id'], $home_id, $access_rights) === TRUE )
 				{
@@ -885,7 +885,7 @@ function api_gamemanager_admin()
 	{
 		if($isAdmin){
 			$data = json_decode(file_get_contents('php://input'), true);
-			if(array_key_exists("order", $data) && is_array($data["order"])){
+			if(array_key_exists("order", (array)$data) && is_array($data["order"])){
 				$updatedOrder = $db->saveGameServerOrder($data["order"]);
 				if($updatedOrder){
 					$status = "200";
@@ -928,7 +928,7 @@ function api_gamemanager()
 	
 	if($mod_key != '')
 	{
-		foreach($home_info['mods'] as $home_mod)
+		foreach ((array)$home_info['mods'] as $home_mod)
 		{
 			if($mod_key == $home_mod['mod_key'])
 			{
@@ -1523,7 +1523,7 @@ function api_addonsmanager()
 		
 		if($mod_key != '')
 		{
-			foreach($home_info['mods'] as $home_mod)
+			foreach ((array)$home_info['mods'] as $home_mod)
 			{
 				if($mod_key == $home_mod['mod_key'])
 				{
@@ -1540,7 +1540,7 @@ function api_addonsmanager()
 		{
 			$groups = $db->getUsersGroups($user_info['user_id']);
 			$query_groups .= " AND (";
-			foreach($groups as $group)
+			foreach ((array)$groups as $group)
 				$query_groups .= "group_id=".$group['group_id']." OR ";
 			$query_groups .= "group_id=0 OR group_id IS NULL)";
 		}
@@ -1645,7 +1645,7 @@ function api_steam_workshop()
 						
 			if($mod_key != '')
 			{
-				foreach($home_info['mods'] as $home_mod)
+				foreach ((array)$home_info['mods'] as $home_mod)
 				{
 					if($mod_key == $home_mod['mod_key'])
 					{
@@ -1680,7 +1680,7 @@ function api_steam_workshop()
 			
 			$mod_id_array = explode(',', $mods_list);
 
-			foreach($mod_id_array as $workshop_mod_id)
+			foreach ((array)$mod_id_array as $workshop_mod_id)
 			{
 				$exist = false;
 				foreach($xml->mods->mod as $mod)
@@ -1752,7 +1752,7 @@ function api_steam_workshop()
 			$filename_list = "";
 			if($download_method == "steamapi")
 			{
-				foreach($mod_id_array as $workshop_mod_id)
+				foreach ((array)$mod_id_array as $workshop_mod_id)
 				{
 					foreach($xml->mods->mod as $mod)
 					{
@@ -1800,7 +1800,7 @@ function api_setting()
 	if($request[0] == "get")
 	{
 		$setting = $_POST['setting_name'];
-		if(array_key_exists($setting, $settings)){
+		if(array_key_exists($setting, (array)$settings)){
 			$status = "200";
 			$message = $settings[$setting];
 			

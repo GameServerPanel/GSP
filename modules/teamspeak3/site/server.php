@@ -70,7 +70,7 @@ if(isset($_POST['sendmsg']))
 	$gm=$ts3->gm($_POST['msgtoall']);
 	if($gm['success']===false)
 		{
-		for($i=0; $i+1==count($gm['errors']); $i++)
+		for($i=0; $i+1==count((array)$gm['errors']); $i++)
 			{
 			$error .= $gm['errors'][$i];
 			}
@@ -96,7 +96,7 @@ if(isset($_POST['massaction']))
 					$autostart_edit=$ts3->serverEdit(array('virtualserver_autostart'=>$value['auto']));
 					if($autostart_edit['success']===false)
 						{
-						for($i=0; $i+1==count($autostart_edit['errors']); $i++)
+						for($i=0; $i+1==count((array)$autostart_edit['errors']); $i++)
 							{
 							$error .= $autostart_edit['errors'][$i]."<br />";
 							}
@@ -110,7 +110,7 @@ if(isset($_POST['massaction']))
 			$server_start=$ts3->serverStart($key);
 			if($server_start['success']===false)
 				{
-				for($i=0; $i+1==count($server_start['errors']); $i++)
+				for($i=0; $i+1==count((array)$server_start['errors']); $i++)
 					{
 					$error .= $server_start['errors'][$i]."<br />";
 					}
@@ -126,7 +126,7 @@ if(isset($_POST['massaction']))
 			$server_stop=$ts3->serverStop($key);
 			if($server_stop['success']===false)
 				{
-				for($i=0; $i+1==count($server_stop['errors']); $i++)
+				for($i=0; $i+1==count((array)$server_stop['errors']); $i++)
 					{
 					$error .= $server_stop['errors'][$i]."<br />";
 					}
@@ -142,7 +142,7 @@ if(isset($_POST['massaction']))
 			$server_delete=$ts3->serverDelete($key);
 			if($server_delete['success']===false)
 				{
-				for($i=0; $i+1==count($server_delete['errors']); $i++)
+				for($i=0; $i+1==count((array)$server_delete['errors']); $i++)
 					{
 					$error .= $server_delete['errors'][$i]."<br />";
 					}
@@ -183,7 +183,7 @@ if(!empty($serverlist))
 	
 $smarty->assign("sortby", $sortby);
 $smarty->assign("sorttype", $sorttype);
-$smarty->assign("serverstats", sprintf($lang['serverstats'], count($serverlist), $allslots, $allusedslots));
+$smarty->assign("serverstats", sprintf($lang['serverstats'], count((array)$serverlist), $allslots, $allusedslots));
 $smarty->assign("serverlist", $serverlist);
 $smarty->assign("error", $error);
 $smarty->assign("noerror", $noerror);

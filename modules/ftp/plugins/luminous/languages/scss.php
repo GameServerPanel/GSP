@@ -136,7 +136,7 @@ class LuminousSASSParser {
     function next_sequence($sequence, $ignore=array()) {
         $i = $this->index+1;
         $len = count($this->tokens);
-        $seq_len = count($sequence);
+        $seq_len = count((array)$sequence);
         $seq = 0;
         $seq_start = 0;
         while ($i<$len) {

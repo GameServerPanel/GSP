@@ -39,7 +39,7 @@ function dsi_render_table($ip, $port, $url = false, $use_table = TRUE, $use_rows
 	$output = "";
 	if($use_table) $output .= "\n<table class='center' >\n";
 	$image_td_align = $img_only ? "center" : "left";
-	foreach($types as $type)
+	foreach ((array)$types as $type)
 	{
 		if($use_rows)	$output .=	"\t<tr>\n";
 		if(!$img_only)	$output .=	"\t\t<td align='right' width=30px >\n".

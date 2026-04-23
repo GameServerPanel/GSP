@@ -22,7 +22,7 @@ $input_separator = "A";
 # value of the text control submitted for spell-checking
 function print_textinputs_var() {
 	global $textinputs;
-	foreach( $textinputs as $key=>$val ) {
+	foreach ((array)$textinputs as $key=>$val ) {
 		# $val = str_replace( "'", "%27", $val );
 		echo "textinputs[$key] = decodeURIComponent(\"" . $val . "\");\n";
 	}
@@ -43,10 +43,10 @@ function print_words_elem( $word, $index, $text_input_idx ) {
 # set an element of the JavaScript 'suggs' array to a list of suggestions
 function print_suggs_elem( $suggs, $index, $text_input_idx ) {
 	echo "suggs[$text_input_idx][$index] = [";
-	foreach( $suggs as $key=>$val ) {
+	foreach ((array)$suggs as $key=>$val ) {
 		if( $val ) {
 			echo "'" . escape_quote( $val ) . "'";
-			if ( $key+1 < count( $suggs )) {
+			if ( $key+1 < count((array)$suggs)) {
 				echo ", ";
 			}
 		}
@@ -80,7 +80,7 @@ function print_checker_results() {
 
 	# open temp file, add the submitted text.
 	if( $fh = fopen( $tempfile, 'w' )) {
-		for( $i = 0; $i < count( $textinputs ); $i++ ) {
+		for( $i = 0; $i < count((array)$textinputs); $i++ ) {
 			$text = urldecode( $textinputs[$i] );
 
 			// Strip all tags for the text. (by FredCK - #339 / #681)
@@ -90,7 +90,7 @@ function print_checker_results() {
 			fwrite ( $fh, "%\n" ); # exit terse mode
 			fwrite ( $fh, "^$input_separator\n" );
 			fwrite ( $fh, "!\n" ); # enter terse mode
-			foreach( $lines as $key=>$value ) {
+			foreach ((array)$lines as $key=>$value ) {
 				# use carat on each line to escape possible aspell commands
 				fwrite( $fh, "^$value\n" );
 			}
@@ -104,7 +104,7 @@ function print_checker_results() {
 			$index = 0;
 			$text_input_index = -1;
 			# parse each line of aspell return
-			foreach( $linesout as $key=>$val ) {
+			foreach ((array)$linesout as $key=>$val ) {
 				$chardesc = substr( $val, 0, 1 );
 				# if '&', then not in dictionary but has suggestions
 				# if '#', then not in dictionary and no suggestions

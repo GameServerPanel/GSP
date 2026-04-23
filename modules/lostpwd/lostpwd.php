@@ -120,7 +120,7 @@ function exec_ogp_module() {
 						<td colspan=2 >';
 			// Print errors if there are any
 			if(isset($errors) && is_array($errors)){
-				foreach($errors as $error){
+				foreach ((array)$errors as $error){
 					echo '<p style="color: red;">' . $error . '</p>';
 				}
 			}

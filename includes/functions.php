@@ -222,7 +222,7 @@ function create_home_selector($module, $subpage, $server_homes) {
 	}
 	else
 	{
-		foreach ($server_homes as $key => $row) {
+		foreach ((array)$server_homes as $key => $row) {
 			$home_name[$key] = $row['home_name'];
 			$home_id[$key] = $row['home_id'];
 			$mod_id[$key] = $row['home_id'];
@@ -237,7 +237,7 @@ function create_home_selector($module, $subpage, $server_homes) {
 		if( $subpage ) echo "<input type='hidden' name='p' value='".$subpage."' />\n";
 		echo "<select onchange=".'"this.form.submit()"'." name='home_id'>\n";
 		echo "<option></option>\n";
-		foreach ( $server_homes as $server_home )
+		foreach ((array)$server_homes as $server_home)
 		{
 			if( isset( $_GET['home_id'] ) and $_GET['home_id'] == $server_home['home_id'] )
 				$selected = 'selected="selected"';
@@ -263,14 +263,14 @@ function create_home_selector_address($module, $subpage, $server_homes, $extra_i
 	if( $subpage ) echo "<input type='hidden' name='p' value='".$subpage."' />\n";
 	if($extra_inputs)
 	{
-		foreach($extra_inputs as $input)
+		foreach ((array)$extra_inputs as $input)
 		{
 			echo "<input type='$input[type]' name='$input[name]' value='$input[value]' />\n";
 		}
 	}
 	echo "<select onchange=\"this.form.submit();\" name='home_id-mod_id-ip-port'>\n";
 	echo "<option></option>\n";
-	foreach ($server_homes as $key => $row) {
+	foreach ((array)$server_homes as $key => $row) {
 		if( !isset($row['ip']) or !isset($row['mod_id']) )
 		{
 			unset($server_homes[$key]);
@@ -284,7 +284,7 @@ function create_home_selector_address($module, $subpage, $server_homes, $extra_i
 	}
 	array_multisort($home_name, $ip, $port, $mod_id, 
 					$home_id, SORT_DESC, $server_homes);
-	foreach ( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		$display_ip = checkDisplayPublicIP($server_home['display_public_ip'],$server_home['ip'] != $server_home['agent_ip'] ? $server_home['ip'] : $server_home['agent_ip']);
 
@@ -314,7 +314,7 @@ function create_home_selector_game_type($module, $subpage, $server_homes) {
 		 "<option>".get_lang('game_type')."</option>\n";
 	
 	$servers_by_game_name = array();
-	foreach( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		if( !isset($server_home['ip']) or !isset($server_home['mod_id']) )
 			continue;
@@ -322,7 +322,7 @@ function create_home_selector_game_type($module, $subpage, $server_homes) {
 	}
 	ksort($servers_by_game_name);
 	
-	foreach( $servers_by_game_name as $game_name => $home_cfg_id )
+	foreach ((array)$servers_by_game_name as $game_name => $home_cfg_id )
 	{
 		$selected = (isset($_GET['home_cfg_id']) and $_GET['home_cfg_id'] == $home_cfg_id) ? 'selected="selected"' : "";
 		echo "<option value='". $home_cfg_id . "' $selected >" . $game_name . "</option>\n";
@@ -395,7 +395,7 @@ function mymail($email_address, $subject, $message, $panel_settings, $user_to_pa
 		{
 			$mail->AddAddress($panel_email);
 			$user_to_panel = is_bool($user_to_panel) ? "" : $user_to_panel; // True boolean or user name string
-			foreach ( $email_addresses as $address ) 
+			foreach ((array)$email_addresses as $address) 
 			{
 				$mail->SetFrom($address,$user_to_panel);
 				$mail->AddReplyTo($address,$user_to_panel);
@@ -403,7 +403,7 @@ function mymail($email_address, $subject, $message, $panel_settings, $user_to_pa
 		}
 		else // panel to user
 		{
-			foreach ( $email_addresses as $address ) 
+			foreach ((array)$email_addresses as $address) 
 			{
 				$mail->AddAddress($address);
 			}
@@ -541,7 +541,7 @@ function clean_server_param_value($value, $cli_allow_chars) {
 	}
 	$find = array();
 	$repl = array();
-	foreach($escape_chars as $char)
+	foreach ((array)$escape_chars as $char)
 	{
 		$find[] = '%'.preg_quote($char).'%';
 		$char = $char == '\\' ? preg_quote('\\\\') : $char;
@@ -563,12 +563,12 @@ function array_orderby()
 {
 	$args = func_get_args();
 	$data = array_shift($args);
-	foreach ($args as $n => $field)
+	foreach ((array)$args as $n => $field)
 	{
 		if (is_string($field))
 		{
 			$tmp = array();
-			foreach ($data as $key => $row)
+			foreach ((array)$data as $key => $row)
 				$tmp[$key] = $row[$field];
 			$args[$n] = $tmp;
 		}
@@ -613,7 +613,7 @@ function get_game_selector($os, $game_cfgs, $home_cfg_id = FALSE)
 	}
 	
 	$selector = "";
-	foreach ( $game_cfgs as $row )
+	foreach ((array)$game_cfgs as $row)
 	{
 		if ( preg_match($os_match, $row['game_key'], $matches) )
 		{ 
@@ -715,7 +715,7 @@ function isValidIP($ip){
 function isPrivateIp($ip){
 	if(is_array($ip)) {
 		$ret=false;
-		foreach($ip as $i)
+		foreach ((array)$ip as $i)
 			$ret=$ret or isPrivateIp($i);
 		return $ret;
 	}
@@ -798,7 +798,7 @@ function checkDisplayPublicIP($display_public_ip,$internal_ip){
 	if(filter_var($display_public_ip, FILTER_VALIDATE_IP)){
 		return $display_public_ip;
 	}else{
-		if(!array_key_exists($display_public_ip, $_SESSION['gethostbyname_cache'])){
+		if(!array_key_exists($display_public_ip, (array)$_SESSION['gethostbyname_cache'])){
 			$_SESSION['gethostbyname_cache'][$display_public_ip] = array();
 			$dns_check = dns_get_record($display_public_ip, DNS_A);
 			$ipcheck = isset($dns_check[0]['ip']) ? $dns_check[0]['ip'] : $internal_ip;
@@ -851,7 +851,7 @@ function preg_replace_nth($pattern, $replacement, $subject, $nth=1) {
 
 // https://stackoverflow.com/questions/12559878/multidimensional-array-find-item-and-move-to-the-top
 function customShift($array, $keyToMoveOn, $valueToMoveOn){
-    foreach($array as $key => $val){
+    foreach ((array)$array as $key => $val){
         if($val[$keyToMoveOn] == $valueToMoveOn){
             unset($array[$key]); 
             array_unshift($array, $val); 
@@ -878,7 +878,7 @@ function getURLParam($param, $url){
 
 function utf8ize($d, $htmlEntities = true) {
     if (is_array($d)) {
-        foreach ($d as $k => $v) {
+        foreach ((array)$d as $k => $v) {
             $d[$k] = utf8ize($v, $htmlEntities);
         }
     } else if (is_string ($d)) {
@@ -939,7 +939,7 @@ function updateAllPanelModules(){
 
 		$modules = $db->getInstalledModules();
 		// update module manager first
-		foreach ( $modules as $row )
+		foreach ((array)$modules as $row)
 		{
 			if($row['folder'] == 'modulemanager')
 			{
@@ -948,7 +948,7 @@ function updateAllPanelModules(){
 			}
 		}
 		
-		foreach ( $modules as $row )
+		foreach ((array)$modules as $row)
 		{
 			if($row['folder'] == 'modulemanager')//already updated
 				continue;
@@ -1034,7 +1034,7 @@ function getQueryPortOverridesForGame($protocol, $ip, $port, $defaultQueryPort){
 function removeInvalidFileNameCharacters($string){
 	global $settings;
 	$pattern = '/[\^\$\*\+\?\(\)\[\{\\\|\]!@#%&=~`,\'<>"}\s]/i';
-	if(is_array($settings) && array_key_exists("regex_invalid_file_name_chars", $settings) && !empty($settings["regex_invalid_file_name_chars"])){
+	if(is_array($settings) && array_key_exists("regex_invalid_file_name_chars", (array)$settings) && !empty($settings["regex_invalid_file_name_chars"])){
 		$pattern = $settings["regex_invalid_file_name_chars"];
 	}
 	$string = preg_replace($pattern, '', $string);
@@ -1060,8 +1060,8 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 	
 		$dbsToDelete = $modDb->getMysqlDBsbyHomeId($home_id);
 	
-		if(is_array($dbsToDelete) && count($dbsToDelete)){
-			foreach($dbsToDelete as $dbToDel){
+		if(is_array($dbsToDelete) && count((array)$dbsToDelete)){
+			foreach ((array)$dbsToDelete as $dbToDel){
 				$mysql_db = $dbToDel;
 				if($mysql_db['remote_server_id'] != "0")
 				{
@@ -1084,7 +1084,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 						{
 							$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
 											 "DROP USER '".$mysql_db['db_user']."'@'%';");
-							foreach( $queries as $query )
+							foreach ((array)$queries as $query)
 							{
 								@$return = mysqli_query($link, $query);
 								if(!$return)
@@ -1102,7 +1102,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 						{
 							$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
 											 "DROP USER '".$mysql_db['db_user']."'@'%';");
-							foreach( $queries as $query )
+							foreach ((array)$queries as $query)
 							{
 								@$return = mysql_query($query);
 								if(!$return)
@@ -1120,7 +1120,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 				}
 			}
 			
-			if($dbDeletedCount == count($dbsToDelete)){
+			if($dbDeletedCount == count((array)$dbsToDelete)){
 				return true;
 			}else if($dbDeletedCount > 0){
 				return 'partial';

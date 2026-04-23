@@ -92,7 +92,7 @@ function IsHtmlExtension( $ext, $htmlExtensions )
 		return false ;
 	}
 	$lcaseHtmlExtensions = array() ;
-	foreach ( $htmlExtensions as $key => $val )
+	foreach ((array)$htmlExtensions as $key => $val )
 	{
 		$lcaseHtmlExtensions[$key] = strtolower( $val ) ;
 	}
@@ -137,7 +137,7 @@ function DetectHtml( $filePath )
 
 	$tags = array( '<body', '<head', '<html', '<img', '<pre', '<script', '<table', '<title' ) ;
 
-	foreach( $tags as $tag )
+	foreach ((array)$tags as $tag)
 	{
 		if( false !== strpos( $chunk, $tag ) )
 		{

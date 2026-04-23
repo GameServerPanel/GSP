@@ -55,7 +55,7 @@ function exec_ogp_module()
 		
 		$ip_ports = $db->getHomeIpPorts($server_home['home_id']);
 		$is_address_assigned = false;
-		foreach($ip_ports as $ip_port)
+		foreach ((array)$ip_ports as $ip_port)
 		{
 			if($ip_port['ip'] == $ip and $ip_port['port'] == $port)
 			{
@@ -98,7 +98,7 @@ function exec_ogp_module()
 		$aliases = $aliases === -1 ? array() : $aliases;
 		if( isset( $_POST['create'] ) )
 		{
-			if(!array_key_exists($alias , $aliases))
+			if(!array_key_exists($alias, (array)$aliases))
 			{
 				$home = clean_path($server_home['home_path']."/".clean_string($_POST['path']));
 				$alias = clean_string($_POST['alias']);

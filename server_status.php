@@ -79,7 +79,7 @@ function ping_host($host, $timeout = 5) {
         
         if ($result === 0) {
             // Extract ping time from output
-            foreach ($output as $line) {
+            foreach ((array)$output as $line) {
                 if (preg_match('/time[<=]([0-9.]+)\s*ms/i', $line, $matches)) {
                     return floatval($matches[1]);
                 }
@@ -224,7 +224,7 @@ $servers = $db->getRemoteServers();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($servers as $server): 
+                    <?php foreach ((array)$servers as $server): 
                         $server_ip = gethostbyname($server['agent_ip']);
                         $hostname = get_hostname($server_ip);
                         

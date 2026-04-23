@@ -41,7 +41,7 @@ function exec_ogp_module()
 		if(!empty($_POST['gameserver_id']) && !empty($_POST['remote_server_id']) && !empty($_POST['gameserver_name'])
 		&& !empty($_POST['gameserver_ip']) && !empty($_POST['gameserver_port']) && !empty($_POST['addSteamid']) && !empty($_POST['sourcemod_perms'])){
 				
-			foreach($servers as $server){
+			foreach ((array)$servers as $server){
 				// Try to check if hidden form values have been manually edited. If not, process.
 				if($server['remote_server_id'] == $_POST['remote_server_id'] && $server['home_id'] == $_POST['gameserver_id']
 				&& $server['game_name'] == $_POST['gameserver_name'] && $server['ip'] == $_POST['gameserver_ip'] && $server['port'] == $_POST['gameserver_port']){	
@@ -129,7 +129,7 @@ function exec_ogp_module()
 		}
 	}else{
 		$return = array();
-		for($x = 0; $x < count($servers); ++$x){
+		for($x = 0; $x < count((array)$servers); ++$x){
 			$return[] = array(
 				'remote_server_id'		=>	$servers[$x]['remote_server_id'],
 				'ip'					=>	$servers[$x]['ip'],

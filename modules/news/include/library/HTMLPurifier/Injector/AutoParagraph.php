@@ -216,7 +216,7 @@ class HTMLPurifier_Injector_AutoParagraph extends HTMLPurifier_Injector
         $needs_start = false;
         $needs_end = false;
 
-        $c = count($raw_paragraphs);
+        $c = count((array)$raw_paragraphs);
         if ($c == 1) {
             // There were no double-newlines, abort quickly. In theory this
             // should never happen.
@@ -269,7 +269,7 @@ class HTMLPurifier_Injector_AutoParagraph extends HTMLPurifier_Injector
         }
 
         // Append the paragraphs onto the result
-        foreach ($paragraphs as $par) {
+        foreach ((array)$paragraphs as $par) {
             $result[] = new HTMLPurifier_Token_Text($par);
             $result[] = new HTMLPurifier_Token_End('p');
             $result[] = new HTMLPurifier_Token_Text("\n\n");

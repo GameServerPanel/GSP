@@ -47,7 +47,7 @@ $langAttrs = [
 ];
 ?>
     <div class="sw-picker" id="<?php echo $pickerId; ?>" data-endpoint="<?php echo htmlspecialchars($endpoint, ENT_QUOTES, 'UTF-8'); ?>" data-detail-base="https://steamcommunity.com/sharedfiles/filedetails/?id="
-    <?php foreach ($langAttrs as $key => $value): ?>data-lang-<?php echo $key; ?>="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>" <?php endforeach; ?>>
+    <?php foreach ((array)$langAttrs as $key => $value): ?>data-lang-<?php echo $key; ?>="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>" <?php endforeach; ?>>
     <div class="sw-picker__header">
         <h4><?php echo htmlspecialchars($lang['mod_picker_heading'] ?? 'Workshop library'); ?></h4>
         <p class="sw-picker__hint"><?php echo htmlspecialchars($lang['mod_picker_hint'] ?? 'Search by Workshop ID or keyword to add mods.'); ?></p>

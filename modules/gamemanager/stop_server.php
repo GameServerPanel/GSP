@@ -113,7 +113,7 @@ function exec_ogp_module() {
 				if (!is_array($ip_ports)) {
 					$ip_ports = [];
 				}
-				foreach ($ip_ports as $ip_port)
+				foreach ((array)$ip_ports as $ip_port)
 				{
 					if ($server_xml->protocol == "gameq")
 					{
@@ -148,7 +148,7 @@ function exec_ogp_module() {
 					if (!is_array($ip_ports)) {
 						$ip_ports = [];
 					}
-					foreach ($ip_ports as $ip_port)
+					foreach ((array)$ip_ports as $ip_port)
 					{
 						if ($server_xml->protocol == "gameq")
 						{

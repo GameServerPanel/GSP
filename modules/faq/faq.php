@@ -121,7 +121,7 @@ function exec_ogp_module()
 		
 	
 	$entries = array();
-	foreach($items as $index => $item)
+	foreach ((array)$items as $index => $item)
 	{
 		$category = $item['category'][0];
 		$entries[$category][$index]['title'] = $item['title'][0];
@@ -129,11 +129,11 @@ function exec_ogp_module()
 	}
 	$categories = "";
 	$accordion_entries = "<div id=\"accordion\">\n";
-	foreach($entries as $category_name => $category_entries)
+	foreach ((array)$entries as $category_name => $category_entries)
 	{
 		$categories .= "<li class='faqblock'><a class='faqcategory' href=\"#$category_name\">$category_name</a></li>";
 		$accordion_entries .= "<div class=\"category\" id=\"$category_name\"><img class='headerimage' src='modules/faq/faqlower.png'>$category_name</div>";
-		foreach($category_entries as $index => $item)
+		foreach ((array)$category_entries as $index => $item)
 		{
 			$accordion_entries .=  "\t<div class=\"accordion-toggle\">".
 									"$item[title]</div>\n".

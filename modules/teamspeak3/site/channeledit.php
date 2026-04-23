@@ -29,7 +29,7 @@ if(isset($_POST['editchannelname']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($channel_edit['errors']); $i++)
+		for($i=0; $i+1==count((array)$channel_edit['errors']); $i++)
 			{
 			$error .= $channel_edit['errors'][$i]."<br />";
 			}
@@ -67,7 +67,7 @@ if(isset($_POST['editchannel']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($channel_edit['errors']); $i++)
+		for($i=0; $i+1==count((array)$channel_edit['errors']); $i++)
 			{
 			$error .= $channel_edit['errors'][$i]."<br />";
 			}
@@ -84,7 +84,7 @@ if(isset($_POST['editpw']))
 			}
 			else
 			{
-			for($i=0; $i+1==count($channel_edit['errors']); $i++)
+			for($i=0; $i+1==count((array)$channel_edit['errors']); $i++)
 				{
 				$error .= $channel_edit['errors'][$i]."<br />";
 				}
@@ -100,7 +100,7 @@ if(isset($_POST['movechan']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($channel_move['errors']); $i++)
+		for($i=0; $i+1==count((array)$channel_move['errors']); $i++)
 			{
 			$error .= $channel_move['errors'][$i]."<br />";
 			}

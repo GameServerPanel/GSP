@@ -204,7 +204,7 @@ class GameQ
     {
 
         // Loop through all the servers and add them
-        foreach ($servers as $server_info) {
+        foreach ((array)$servers as $server_info) {
             $this->addServer($server_info);
         }
 
@@ -230,7 +230,7 @@ class GameQ
         }
 
         // Iterate over the file(s) and add them
-        foreach ($files as $file) {
+        foreach ((array)$files as $file) {
             // Check to make sure the file exists and we can read it
             if (!file_exists($file) || !is_readable($file)) {
                 continue;
@@ -442,7 +442,7 @@ class GameQ
             );
 
             // Iterate over the challenge responses
-            foreach ($responses as $socket_id => $response) {
+            foreach ((array)$responses as $socket_id => $response) {
                 // Back out the server_id we need to update the challenge response for
                 $server_id = $sockets[$socket_id]['server_id'];
 
@@ -484,7 +484,7 @@ class GameQ
             // Get all the non-challenge packets we need to send
             $packets = $server->protocol()->getPacket('!' . Protocol::PACKET_CHALLENGE);
 
-            if (count($packets) == 0) {
+            if (count((array)$packets) == 0) {
                 // Skip nothing else to do for some reason.
                 continue;
             }
@@ -505,7 +505,7 @@ class GameQ
 
             try {
                 // Iterate over all the packets we need to send
-                foreach ($packets as $packet_data) {
+                foreach ((array)$packets as $packet_data) {
                     // Now write the packet to the socket.
                     $socket->write($packet_data);
 
@@ -540,7 +540,7 @@ class GameQ
         );
 
         // Iterate over the responses
-        foreach ($responses as $socket_id => $response) {
+        foreach ((array)$responses as $socket_id => $response) {
             // Back out the server_id
             $server_id = $sockets[$socket_id]['server_id'];
 
@@ -555,7 +555,7 @@ class GameQ
         }
 
         // Now we need to close all of the sockets
-        foreach ($sockets as $socketInfo) {
+        foreach ((array)$sockets as $socketInfo) {
             /* @var $socket \GameQ\Query\Core */
             $socket = $socketInfo['socket'];
 
@@ -594,7 +594,7 @@ class GameQ
             $results = $server->protocol()->processResponse();
 
             // Check for online before we do anything else
-            $results['gq_online'] = (count($results) > 0);
+            $results['gq_online'] = (count((array)$results) > 0);
         } catch (ProtocolException $e) {
             // Check to see if we are in debug, if so bubble up the exception
             if ($this->debug) {

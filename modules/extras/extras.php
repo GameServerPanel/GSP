@@ -76,7 +76,7 @@ function installUpdate($info, $base_dir, $current_blacklist = array())
 	
 	$result = extractZip( $temp_dwl, $temp_dir . DIRECTORY_SEPARATOR, $info['remove_path'] );
 		
-	if ( is_array($result['extracted_files']) and count($result['extracted_files']) > 0 )
+	if ( is_array($result['extracted_files']) and count((array)$result['extracted_files']) > 0 )
 	{
 		$nfo_file = DATA_PATH . str_replace(' ','_',$info['title']) . ".nfo";
 		$install_nfo = $info['timestamp']."\n$nfo_file\n";
@@ -85,7 +85,7 @@ function installUpdate($info, $base_dir, $current_blacklist = array())
 		// Also determines if the file is writable
 		$filelist = array();
 		$i = 0;
-		foreach( $result['extracted_files'] as $file )
+		foreach ((array)$result['extracted_files'] as $file)
 		{
 			if( DIRECTORY_SEPARATOR == '\\')
 				$filename = str_replace('/', '\\', $file['filename']);
@@ -236,7 +236,7 @@ function exec_ogp_module()
 	if($blacklisted_files !== FALSE)
 	{
 		$current_blacklist = array();
-		foreach($blacklisted_files as $blacklisted_file)
+		foreach ((array)$blacklisted_files as $blacklisted_file)
 		{
 			$current_blacklist[] = $blacklisted_file['file_path'];
 		}			
@@ -289,7 +289,7 @@ function exec_ogp_module()
 		
 		$installed = rglob('*/*/install.nfo');
 		
-		foreach($installed as $nfo)
+		foreach ((array)$installed as $nfo)
 		{
 			$nfo_new = preg_replace('#^([m|t]{1})(odule|heme){1}s/([^?/]+)/install.nfo#','\3',$nfo);
 			#echo $nfo_new.'<br>';
@@ -358,7 +358,7 @@ function exec_ogp_module()
 				
 				// Delete lang files too
 				$langDirs = array_filter(glob('lang/*'), 'is_dir');
-				foreach($langDirs as $langDir){
+				foreach ((array)$langDirs as $langDir){
 					if($langDir != ".." && $langDir != "."){
 						$langDirPath = $langDir . "/modules/" . strtolower($folderToDelete) . ".php";
 						if(file_exists($langDirPath)){
@@ -391,7 +391,7 @@ function exec_ogp_module()
 	$m = 0;
 	$t = 0;
 
-	foreach($repos_info_array as $key => $repository)
+	foreach ((array)$repos_info_array as $key => $repository)
 	{
 		if(preg_match('/^(OGP-Website|OGP-Agent-Linux|OGP-Agent-Windows)$/',$repository['name']))
 			continue;
@@ -481,13 +481,13 @@ function exec_ogp_module()
 			echo get_lang_f('temp_folder_not_writable', $tmpdir);
 			return;
 		}
-		foreach($_POST as $key => $value)
+		foreach ((array)$_POST as $key => $value)
 		{
 			if($key == 'update')continue;
 
 			if($key == 'module')
 			{
-				foreach($value as $m)
+				foreach ((array)$value as $m)
 				{
 					if(installUpdate($modules[$m], $baseDir, $current_blacklist))
 					{
@@ -503,14 +503,14 @@ function exec_ogp_module()
 			}
 			if($key == 'theme')
 			{
-				foreach($value as $t)
+				foreach ((array)$value as $t)
 					installUpdate($themes[$t], $baseDir, $current_blacklist);
 			}
 		}
 		
 		if(isset($_POST['module']))
 		{
-			foreach ( $installed_modules as $installed_module )
+			foreach ((array)$installed_modules as $installed_module)
 			{
 				if(in_array($installed_module['folder'],$uMF))
 				{
@@ -533,18 +533,18 @@ function exec_ogp_module()
 		 "<div class=\"dragbox-content\" >";
 
 	if (!empty($moduleErrors['modules'])) {
-		foreach($moduleErrors['modules'] as $module) {
+		foreach ((array)$moduleErrors['modules'] as $module) {
 			echo '<input type="checkbox" disabled><b>',$module,'</b> - <b style="color:red;">Unable to retrieve XML data.</b><br>';
 		}
 	}
 	
-	foreach ( $installed_modules as $installed_module )
+	foreach ((array)$installed_modules as $installed_module)
 	{
 		$folder = $installed_module['folder'];
 		$installed_modules_by_folder[$folder] = $installed_module['id'];
 	}
 	
-	foreach($modules as $key => $module)
+	foreach ((array)$modules as $key => $module)
 	{
 		$local_repo_file = DATA_PATH . $module['reponame'] . '.atom';
 		$install_nfo = DATA_PATH . str_replace(' ','_',$module['title']) . ".nfo";
@@ -552,7 +552,7 @@ function exec_ogp_module()
 		$is_old = $on_disk && (strtotime('+1 hour', filemtime($local_repo_file)) <= time());
 		//echo $install_nfo;
 		$folder = str_replace(' ','_',strtolower($module['title']));
-		$installed = array_key_exists($folder,$installed_modules_by_folder);
+		$installed = array_key_exists($folder, (array)$installed_modules_by_folder);
 		
 		$installed_str = $on_disk ? $installed ? "<a class='uninstall' style='color:blue;' data-module-folder='$folder' data-module-id='".
 												 $installed_modules_by_folder[$folder]."' href='#uninstall_$folder' >".get_lang("uninstall")."</a>" : 
@@ -585,12 +585,12 @@ function exec_ogp_module()
 		 "<div class=\"dragbox-content\" >";
 
 	if (!empty($moduleErrors['themes'])) {
-		foreach($moduleErrors['themes'] as $theme) {
+		foreach ((array)$moduleErrors['themes'] as $theme) {
 			echo '<input type="checkbox" disabled><b>',$theme,'</b> - <b style="color:red;">Unable to retrieve XML data.</b><br>';
 		}
 	}
 
-	foreach($themes as $key => $theme)
+	foreach ((array)$themes as $key => $theme)
 	{
 		$local_repo_file = DATA_PATH . $theme['reponame'] . '.atom';
 		$install_nfo = DATA_PATH . str_replace(' ','_',$theme['title']) . ".nfo";

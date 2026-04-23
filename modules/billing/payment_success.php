@@ -182,7 +182,7 @@ if ($db && $user_id > 0) {
             </ul>
         </div>
 
-        <?php if (count($orders) > 0): ?>
+        <?php if (count((array)$orders) > 0): ?>
         <h2>Your Orders</h2>
         <table class="orders-table">
             <thead>
@@ -196,7 +196,7 @@ if ($db && $user_id > 0) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($orders as $order): ?>
+                <?php foreach ((array)$orders as $order): ?>
                 <tr>
                     <td>#<?php echo htmlspecialchars($order['order_id']); ?></td>
                     <td><?php echo htmlspecialchars($order['home_name']); ?></td>

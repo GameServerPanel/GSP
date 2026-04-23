@@ -65,13 +65,13 @@ class HTMLPurifier_AttrDef_CSS_Font extends HTMLPurifier_AttrDef
         $stage_1 = array('font-style', 'font-variant', 'font-weight');
         $final = ''; // output
 
-        for ($i = 0, $size = count($bits); $i < $size; $i++) {
+        for ($i = 0, $size = count((array)$bits); $i < $size; $i++) {
             if ($bits[$i] === '') {
                 continue;
             }
             switch ($stage) {
                 case 0: // attempting to catch font-style, font-variant or font-weight
-                    foreach ($stage_1 as $validator_name) {
+                    foreach ((array)$stage_1 as $validator_name) {
                         if (isset($caught[$validator_name])) {
                             continue;
                         }
@@ -87,7 +87,7 @@ class HTMLPurifier_AttrDef_CSS_Font extends HTMLPurifier_AttrDef
                         }
                     }
                     // all three caught, continue on
-                    if (count($caught) >= 3) {
+                    if (count((array)$caught) >= 3) {
                         $stage = 1;
                     }
                     if ($r !== false) {

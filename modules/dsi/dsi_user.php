@@ -67,7 +67,7 @@ function exec_ogp_module(){
 	
 	echo "<br /><br />";
 	
-	foreach( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		if( $server_home['home_id'] == $home_id and
 			$server_home['mod_id']  == $mod_id and

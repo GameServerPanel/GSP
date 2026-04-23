@@ -86,7 +86,7 @@ class HTMLPurifier_Context
      */
     public function loadArray($context_array)
     {
-        foreach ($context_array as $key => $discard) {
+        foreach ((array)$context_array as $key => $discard) {
             $this->register($key, $context_array[$key]);
         }
     }

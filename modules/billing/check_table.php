@@ -62,7 +62,7 @@ if (mysqli_num_rows($last_result) > 0) {
     
     while ($row = mysqli_fetch_assoc($last_result)) {
         echo "<tr>";
-        foreach ($row as $val) {
+        foreach ((array)$row as $val) {
             echo "<td>" . htmlspecialchars($val ?? 'NULL') . "</td>";
         }
         echo "</tr>\n";

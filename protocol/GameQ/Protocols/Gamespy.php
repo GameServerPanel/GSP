@@ -138,10 +138,10 @@ class Gamespy extends Protocol
         $numPlayers = 0;
         $numTeams = 0;
 
-        $itemCount = count($data);
+        $itemCount = count((array)$data);
 
         // Check to make sure we have more than 1 item in the array before trying to loop
-        if (count($data) > 1) {
+        if (count((array)$data) > 1) {
             // Now lets loop the array since we have items
             for ($x = 0; $x < $itemCount; $x += 2) {
                 // Set some local vars

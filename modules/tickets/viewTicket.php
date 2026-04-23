@@ -148,7 +148,7 @@ function exec_ogp_module()
 
     if (!empty($ticketData['messages'])) {
         echo '<div class="replyContainer">';
-        foreach ($ticketData['messages'] as $message) {
+        foreach ((array)$ticketData['messages'] as $message) {
             echo ticketMessage($message, $uid, $isAdmin, $attachmentSettings['ratings_enabled']);
         }
         echo '</div>';

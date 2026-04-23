@@ -147,8 +147,8 @@ class HTMLPurifier_Printer
             return 'None';
         }
         $ret = '';
-        $i = count($array);
-        foreach ($array as $value) {
+        $i = count((array)$array);
+        foreach ((array)$array as $value) {
             $i--;
             $ret .= $value;
             if ($i > 0 && !($polite && $i == 1)) {

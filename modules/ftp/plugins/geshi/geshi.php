@@ -455,7 +455,7 @@ class GeSHi {
                 '{LANGUAGE}' => $this->language,
                 '{PATH}' => $this->language_path
             );
-            foreach ($debug_tpl_vars as $tpl => $var) {
+            foreach ((array)$debug_tpl_vars as $tpl => $var) {
                 $msg = str_replace($tpl, $var, $msg);
             }
             return "<br /><strong>GeSHi Error:</strong> $msg (code $this->error)<br />";
@@ -1077,7 +1077,7 @@ class GeSHi {
         $flag = $flag ? true : false;
         foreach ($this->lexic_permissions as $key => $value) {
             if (is_array($value)) {
-                foreach ($value as $k => $v) {
+                foreach ((array)$value as $k => $v) {
                     $this->lexic_permissions[$key][$k] = $flag;
                 }
             }
@@ -1101,7 +1101,7 @@ class GeSHi {
      * @todo static?
      */
     function get_language_name_from_extension( $extension, $lookup = array() ) {
-        if ( !is_array($lookup) || !count($lookup)) {
+        if ( !is_array($lookup) || !count((array)$lookup)) {
             $lookup = array(
                 'actionscript' => array('as'),
                 'ada' => array('a', 'ada', 'adb', 'ads'),
@@ -1143,8 +1143,8 @@ class GeSHi {
             );
         }
 
-        foreach ($lookup as $lang => $extensions) {
-            foreach ($extensions as $ext) {
+        foreach ((array)$lookup as $lang => $extensions) {
+            foreach ((array)$extensions as $ext) {
                 if ($ext == $extension) {
                     return $lang;
                 }
@@ -1369,7 +1369,7 @@ class GeSHi {
      */
     function highlight_lines_extra($lines, $style = null) {
         if (is_array($lines)) {
-            foreach ($lines as $line) {
+            foreach ((array)$lines as $line) {
                 $this->highlight_lines_extra(line, $style);
             }
         }
@@ -1508,7 +1508,7 @@ class GeSHi {
                 $char = substr($code, $i, 1);
                 if (!$HIGHLIGHTING_ON) {
                     foreach ($this->language_data['SCRIPT_DELIMITERS'] as $key => $delimiters) {
-                        foreach ($delimiters as $open => $close) {
+                        foreach ((array)$delimiters as $open => $close) {
                             // Get the next little bit for this opening string
                             $check = substr($code, $i, strlen($open));
                             // If it matches...
@@ -1528,7 +1528,7 @@ class GeSHi {
                 }
                 else {
                     foreach ($this->language_data['SCRIPT_DELIMITERS'] as $key => $delimiters) {
-                        foreach ($delimiters as $open => $close) {
+                        foreach ((array)$delimiters as $open => $close) {
                             if ($open == $HIGHLIGHTING_ON) {
                                 // Found the closing tag
                                 break(2);
@@ -1564,14 +1564,14 @@ class GeSHi {
         // Now we go through each part. We know that even-indexed parts are
         // code that shouldn't be highlighted, and odd-indexed parts should
         // be highlighted
-        foreach ($parts as $key => $data) {
+        foreach ((array)$parts as $key => $data) {
             $part = $data[1];
             // If this block should be highlighted...
             if ($key % 2) {
                 if ($this->strict_mode) {
                     // Find the class key for this block of code
                     foreach ($this->language_data['SCRIPT_DELIMITERS'] as $script_key => $script_data) {
-                        foreach ($script_data as $open => $close) {
+                        foreach ((array)$script_data as $open => $close) {
                             if ($data[0] == $open) {
                                 break(2);
                             }
@@ -1951,7 +1951,7 @@ class GeSHi {
         if (false !== strpos($result, "\t")) {
             $lines = explode("\n", $result);
 			$tab_width = $this->get_real_tab_width();
-            foreach ($lines as $key => $line) {
+            foreach ((array)$lines as $key => $line) {
                 if (false === strpos($line, "\t")) {
                     $lines[$key] = $line;
                     continue;
@@ -2160,7 +2160,7 @@ class GeSHi {
         if (preg_match('#[a-zA-Z]{2,}#', $stuff_to_parse)) {
             foreach ($this->language_data['KEYWORDS'] as $k => $keywordset) {
                 if ($this->lexic_permissions['KEYWORDS'][$k]) {
-                    foreach ($keywordset as $keyword) {
+                    foreach ((array)$keywordset as $keyword) {
                         $keyword = preg_quote($keyword, '/');
                         //
                         // This replacement checks the word is on it's own (except if brackets etc
@@ -2280,7 +2280,7 @@ class GeSHi {
             $symbol_data = $symbol_preg = array();
             foreach($this->language_data['SYMBOLS'] as $key => $symbols) {
                 if(is_array($symbols)) {
-                    foreach($symbols as $sym) {
+                    foreach ((array)$symbols as $sym) {
                         if(!isset($symbol_data[$sym])) {
                             $symbol_data[GeSHi::hsc($sym)] = $key;
                             $symbol_preg[] = preg_quote(GeSHi::hsc($sym), '/');
@@ -2302,8 +2302,8 @@ class GeSHi {
             preg_match_all("/(?:" . $sym_search . ")+/", $stuff_to_parse, $matches_in_stuff, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
             //Match anything that is a highlighted block ...
             preg_match_all("/<\|(?:<DOT>|[^>])+>(?:(?!\|>).*?)\|>|<\/a>/", $stuff_to_parse, $highlighted_in_stuff, PREG_OFFSET_CAPTURE);
-            foreach($matches_in_stuff as $stuff_match_id => $stuff_match_data) {
-                foreach($highlighted_in_stuff[0] as $highlight_id => $highlight_data) {
+            foreach ((array)$matches_in_stuff as $stuff_match_id => $stuff_match_data) {
+                foreach ((array)$highlighted_in_stuff[0] as $highlight_id => $highlight_data) {
                     //Do a range check of the found highlight identifier and the OOP match ...
                     if(($highlight_data[1] <= $stuff_match_data[0][1]) &&
                         ($highlight_data[1] + strlen($highlight_data[0]) >= $stuff_match_data[0][1] + strlen($stuff_match_data[0][0])))
@@ -2316,17 +2316,17 @@ class GeSHi {
             }
             //Rebuild the matches array to be ordered by offset ...
             $symbol_offsets = array();
-            foreach($matches_in_stuff as $stuff_match_data) {
+            foreach ((array)$matches_in_stuff as $stuff_match_data) {
                 $symbol_offsets[$stuff_match_data[0][1]] = $stuff_match_data[0][0];
             }
             krsort($symbol_offsets);
             //Perform the actual replacements ...
-            foreach($symbol_offsets as $symbol_offset => $symbol_match) {
+            foreach ((array)$symbol_offsets as $symbol_offset => $symbol_match) {
                 $symbol_hl = "";
                 $old_sym = -1;
                 //Split the current stuff to replace into its atomic symbols ...
                 preg_match_all("/$sym_search/", $symbol_match, $sym_match_syms, PREG_PATTERN_ORDER);
-                foreach($sym_match_syms[0] as $sym_ms) {
+                foreach ((array)$sym_match_syms[0] as $sym_ms) {
                     //Check if consequtive symbols belong to the same group to save output ...
                     if (isset($symbol_data[$sym_ms]) && ($symbol_data[$sym_ms] != $old_sym)) {
                         if(-1 != $old_sym) {
@@ -2510,7 +2510,7 @@ class GeSHi {
             $i = 0;
 
             // Foreach line...
-            foreach ($code as $line) {
+            foreach ((array)$code as $line) {
                 //Reset the attributes for a new line ...
                 $attrs = array();
 
@@ -2574,7 +2574,7 @@ class GeSHi {
 
                 // Add in the line surrounded by appropriate list HTML
                 $attr_string = '';
-                foreach ($attrs as $key => $attr) {
+                foreach ((array)$attrs as $key => $attr) {
                     $attr_string .= ' ' . $key . '="' . implode(' ', $attr) . '"';
                 }
                 $parsed_code .= "<li$attr_string>$start$line$end</li>$ls";
@@ -2586,7 +2586,7 @@ class GeSHi {
             $code = explode("\n", $parsed_code);
             $parsed_code = '';
             $i = 0;
-            foreach ($code as $line) {
+            foreach ((array)$code as $line) {
                 // Make lines have at least one space in them if they're empty
                 // BenBE: Checking emptiness using trim instead of relying on blanks
                 if ('' == trim($line)) {

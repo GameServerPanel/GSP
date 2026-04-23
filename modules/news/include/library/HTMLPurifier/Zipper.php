@@ -148,7 +148,7 @@ class HTMLPurifier_Zipper
             $r = $this->delete();
         }
         // insert
-        for ($i = count($replacement)-1; $i >= 0; $i--) {
+        for ($i = count((array)$replacement)-1; $i >= 0; $i--) {
             $this->insertAfter($r);
             $r = $replacement[$i];
         }

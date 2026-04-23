@@ -74,7 +74,7 @@ function exec_ogp_module() {
 	$text_color = ImageColorAllocate($im,225,225,225);
 	$text_font = "includes/fonts/TIMES_SQ.TTF";
 	$i = 40;
-	foreach ($stats_lines_array as $stats_line)
+	foreach ((array)$stats_lines_array as $stats_line)
 	{
 		pretty_text_ttf($im,11,0,5,$i,$text_color,$text_font,utf8_decode($stats_line), true); // Servername
 		$i = $i+20;

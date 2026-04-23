@@ -27,7 +27,7 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
             <small><?php echo htmlspecialchars($lang['adapter_locked_note'] ?? 'This adapter is managed by the administrator.'); ?></small>
         <?php else: ?>
             <select name="workshop[adapter_key]">
-                <?php foreach ($adapterOptions as $key => $label): ?>
+                <?php foreach ((array)$adapterOptions as $key => $label): ?>
                     <option value="<?php echo htmlspecialchars($key); ?>" <?php echo $formConfig['adapter_key'] === $key ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($label); ?>
                     </option>

@@ -32,7 +32,7 @@ function getDocCategories($docsDir) {
     
     $folders = array_diff(scandir($docsDir), ['.', '..']);
     
-    foreach ($folders as $folder) {
+    foreach ((array)$folders as $folder) {
         $folderPath = $docsDir . '/' . $folder;
         
         // Skip if not a directory
@@ -96,7 +96,7 @@ $categories = getDocCategories($docsDir);
 
 // Group by category
 $grouped = [];
-foreach ($categories as $cat) {
+foreach ((array)$categories as $cat) {
     $category = $cat['category'];
     if (!isset($grouped[$category])) {
         $grouped[$category] = [];
@@ -387,20 +387,20 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
                 <!-- Navigation Links -->
                 <div class="nav-links">
                     <h3>Jump to Section:</h3>
-                    <?php foreach ($grouped as $category => $docs): ?>
+                    <?php foreach ((array)$grouped as $category => $docs): ?>
                         <a href="#<?php echo htmlspecialchars($category); ?>">
                             <?php echo htmlspecialchars($categoryLabels[$category] ?? ucfirst($category)); ?>
-                            (<?php echo count($docs); ?>)
+                            (<?php echo count((array)$docs); ?>)
                         </a>
                     <?php endforeach; ?>
                 </div>
                 
-                <?php foreach ($grouped as $category => $docs): ?>
+                <?php foreach ((array)$grouped as $category => $docs): ?>
                     <div class="category-section" id="<?php echo htmlspecialchars($category); ?>">
                         <h2 class="category-title"><?php echo htmlspecialchars($categoryLabels[$category] ?? ucfirst($category)); ?></h2>
                         
                         <div class="docs-grid">
-                            <?php foreach ($docs as $doc): ?>
+                            <?php foreach ((array)$docs as $doc): ?>
                                 <a href="docs.php?action=view&doc=<?php echo urlencode($doc['folder']); ?>" class="doc-card">
                                     <div class="doc-icon-wrapper">
                                         <?php if (!empty($doc['icon'])): ?>

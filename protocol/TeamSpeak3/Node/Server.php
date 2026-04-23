@@ -101,7 +101,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
 
       $this->channelList = array();
 
-      foreach($channels as $cid => $channel)
+      foreach ((array)$channels as $cid => $channel)
       {
         $this->channelList[$cid] = new TeamSpeak3_Node_Channel($this, $channel);
       }
@@ -477,7 +477,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
   public function channelFileList($cid, $cpw = "", $path = "/", $recursive = FALSE)
   {
     $files = $this->execute("ftgetfilelist", array("cid" => $cid, "cpw" => $cpw, "path" => $path))->toArray();
-    $count = count($files);
+    $count = count((array)$files);
 
     for($i = 0; $i < $count; $i++)
     {
@@ -648,7 +648,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
 
       $this->clientList = array();
 
-      foreach($clients as $clid => $client)
+      foreach ((array)$clients as $clid => $client)
       {
         if($this->getParent()->getExcludeQueryClients() && $client["client_type"]) continue;
 
@@ -1101,7 +1101,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
       $this->serverGroupRename($tsgid, $name);
     }
 
-    return count($sgid) ? $sgid["sgid"] : intval($tsgid);
+    return count((array)$sgid) ? $sgid["sgid"] : intval($tsgid);
   }
 
   /**
@@ -1322,7 +1322,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
         $grant = null;
       }
 
-      foreach($perms as $permsid => $perm)
+      foreach ((array)$perms as $permsid => $perm)
       {
         if(in_array($permsid, array_keys($profiles[$sgid])))
         {
@@ -1429,7 +1429,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
       $this->channelGroupRename($tcgid, $name);
     }
 
-    return count($cgid) ? $cgid["cgid"] : intval($tcgid);
+    return count((array)$cgid) ? $cgid["cgid"] : intval($tcgid);
   }
 
   /**
@@ -1585,7 +1585,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
 
     if($resolve)
     {
-      foreach($result as $k => $v)
+      foreach ((array)$result as $k => $v)
       {
         $result[$k] = array_merge($v, $this->clientInfoDb($v["cldbid"]));
       }
@@ -1620,7 +1620,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
   {
     $assignments = $this->permissionFind($permid);
 
-    foreach($assignments as $assignment)
+    foreach ((array)$assignments as $assignment)
     {
       switch($assignment["t"])
       {
@@ -1649,7 +1649,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
       }
     }
 
-    return count($assignments);
+    return count((array)$assignments);
   }
 
   /**
@@ -1669,7 +1669,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
   {
     $upload = $this->execute("ftinitupload", array("clientftfid" => $clientftfid, "cid" => $cid, "name" => $name, "cpw" => $cpw, "size" => $size, "overwrite" => $overwrite, "resume" => $resume))->toList();
 
-    if(array_key_exists("status", $upload) && $upload["status"] != 0x00)
+    if(array_key_exists("status", (array)$upload) && $upload["status"] != 0x00)
     {
       throw new TeamSpeak3_Adapter_ServerQuery_Exception($upload["msg"], $upload["status"]);
     }
@@ -1677,7 +1677,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
     $upload["cid"]  = $cid;
     $upload["file"] = $name;
 
-    if(!array_key_exists("ip", $upload) || $upload["ip"]->startsWith("0.0.0.0"))
+    if(!array_key_exists("ip", (array)$upload) || $upload["ip"]->startsWith("0.0.0.0"))
     {
       $upload["ip"]   = $this->getParent()->getAdapterHost();
       $upload["host"] = $upload["ip"];
@@ -1708,7 +1708,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
   {
     $download = $this->execute("ftinitdownload", array("clientftfid" => $clientftfid, "cid" => $cid, "name" => $name, "cpw" => $cpw, "seekpos" => $seekpos))->toList();
 
-    if(array_key_exists("status", $download) && $download["status"] != 0x00)
+    if(array_key_exists("status", (array)$download) && $download["status"] != 0x00)
     {
       throw new TeamSpeak3_Adapter_ServerQuery_Exception($download["msg"], $download["status"]);
     }
@@ -1716,7 +1716,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
     $download["cid"]  = $cid;
     $download["file"] = $name;
 
-    if(!array_key_exists("ip", $download) || $download["ip"]->startsWith("0.0.0.0"))
+    if(!array_key_exists("ip", (array)$download) || $download["ip"]->startsWith("0.0.0.0"))
     {
       $download["ip"]   = $this->getParent()->getAdapterHost();
       $download["host"] = $download["ip"];
@@ -1984,7 +1984,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
 
     if($resolve)
     {
-      foreach($tokens as $token => $array)
+      foreach ((array)$tokens as $token => $array)
       {
         $func = $array["token_type"] ? "channelGroupGetById" : "serverGroupGetById";
 
@@ -2242,7 +2242,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
     
     if($resolve)
     {
-      foreach($passwords as $password => $array)
+      foreach ((array)$passwords as $password => $array)
       {
         try
         {
@@ -2380,7 +2380,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
   {
     $this->execute("clientupdate", $properties);
 
-    foreach($properties as $ident => $value)
+    foreach ((array)$properties as $ident => $value)
     {
       $this->whoamiSet($ident, $value);
     }
@@ -2514,7 +2514,7 @@ class TeamSpeak3_Node_Server extends TeamSpeak3_Node_Abstract
    */
   protected static function sortFileList(array $a, array $b)
   {
-    if(!array_key_exists("src", $a) || !array_key_exists("src", $b) || !array_key_exists("type", $a) || !array_key_exists("type", $b))
+    if(!array_key_exists("src", (array)$a) || !array_key_exists("src", (array)$b) || !array_key_exists("type", (array)$a) || !array_key_exists("type", (array)$b))
     {
       return 0;
 

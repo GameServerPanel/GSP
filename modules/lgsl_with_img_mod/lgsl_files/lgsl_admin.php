@@ -49,7 +49,7 @@
     {
       // LOAD SERVER CACHE INTO MEMORY
       $results = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl`");
-      foreach($results as $row)
+      foreach ((array)$results as $row)
       {
         $servers["{$row['type']}:{$row['ip']}:{$row['q_port']}"] = array($row['status'], $row['cache'], $row['cache_time']);
       }
@@ -63,7 +63,7 @@
     {
       $form_lines = preg_split('/\r?\n|\r|(\\\r)?\\\n|\\\r/', $_POST['form_list']);
 
-      foreach ($form_lines as $form_key => $form_line)
+      foreach ((array)$form_lines as $form_key => $form_line)
       {
         list($_POST['form_type']    [$form_key],
              $_POST['form_ip']      [$form_key],
@@ -76,7 +76,7 @@
       }
     }
 
-    foreach ($_POST['form_type'] as $form_key => $not_used)
+    foreach ((array)$_POST['form_type'] as $form_key => $not_used)
     {
       // COMMENTS LEFT IN THEIR NATIVE ENCODING WITH JUST HTML SPECIAL CHARACTERS CONVERTED
       $_POST['form_comment'][$form_key] = lgsl_htmlspecialchars($_POST['form_comment'][$form_key]);
@@ -119,7 +119,7 @@
   {
     $server_list = lgsl_query_cached_all("s");
 
-    foreach ($server_list as $server)
+    foreach ((array)$server_list as $server)
     {
       if (!$server['b']['status']) { continue; }
 
@@ -163,7 +163,7 @@
 //---------------------------------------------------------+
         $result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` ORDER BY `id` ASC");
 
-        foreach($result as $row)
+        foreach ((array)$result as $row)
         {
           $output .=
           lgsl_string_html(str_pad($row['type'],     15, " ")).":".
@@ -219,7 +219,7 @@
 
       $result = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXlgsl` ORDER BY `id` ASC");
 
-      foreach($result as $row)
+      foreach ((array)$result as $row)
       {
         $id = $row['id']; // ID USED AS [] ONLY RETURNS TICKED CHECKBOXES
 
@@ -231,7 +231,7 @@
           <td>
             <select name='form_type[{$id}]'>";
 //---------------------------------------------------------+
-            foreach ($lgsl_type_list as $type => $description)
+            foreach ((array)$lgsl_type_list as $type => $description)
             {
               $output .= "
               <option ".($type == $row['type'] ? "selected='selected'" : "")." value='{$type}'>{$description}</option>";
@@ -253,7 +253,7 @@
           <td>
             <select name='form_zone[$id]'>";
 //---------------------------------------------------------+
-            foreach ($zone_list as $zone)
+            foreach ((array)$zone_list as $zone)
             {
               $output .= "
               <option ".($zone == $row['zone'] ? "selected='selected'" : "")." value='{$zone}'>{$zone}</option>";
@@ -284,7 +284,7 @@
           <td>
             <select name='form_type[{$id}]'>";
 //---------------------------------------------------------+
-            foreach ($lgsl_type_list as $type => $description)
+            foreach ((array)$lgsl_type_list as $type => $description)
             {
               $output .= "
               <option ".($type == $last_type ? "selected='selected'" : "")." value='{$type}'>{$description}</option>";
@@ -300,7 +300,7 @@
           <td>
             <select name='form_zone[{$id}]'>";
 //---------------------------------------------------------+
-            foreach ($zone_list as $zone)
+            foreach ((array)$zone_list as $zone)
             {
               $output .= "
               <option value='{$zone}'>{$zone}</option>";

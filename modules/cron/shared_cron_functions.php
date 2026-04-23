@@ -26,7 +26,7 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 	global $db;
 	$remote_servers_offline = array();
 	$jobsArray = array();
-	foreach( $remote_servers as $rhost_id => $remote_server )
+	foreach ((array)$remote_servers as $rhost_id => $remote_server )
 	{
 		$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 		if($remote->status_chk() != 1)
@@ -39,7 +39,7 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 			$jobs = $remote->scheduler_list_tasks();
 			if($jobs != -1)
 			{
-				foreach($jobs as $jobId => $job)
+				foreach ((array)$jobs as $jobId => $job)
 				{
 					list($minute,$hour,$dayOfTheMonth,$month,$dayOfTheWeek,$command) = explode(" ", $job, 6);
 					if(preg_match('/'.preg_quote('wget -qO- "','/').'([^"]+)'.preg_quote('" --no-check-certificate > /dev/null 2>&1','/').'/', $command))
@@ -102,11 +102,11 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 function updateCronJobTokens($old_token, $token){
 	global $db;
 	$remote_servers = $db->getRemoteServers();
-	foreach($remote_servers as $remote_server)
+	foreach ((array)$remote_servers as $remote_server)
 	{
 		$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 		$jobs = $remote->scheduler_list_tasks();
-		foreach($jobs as $job_id => $job)
+		foreach ((array)$jobs as $job_id => $job)
 		{
 			if(strstr($job, $old_token))
 			{
@@ -122,11 +122,11 @@ function deleteJobsByHomeServerID($home_id){
 	$homeInfo = $db->getGameHome($home_id, true);
 	if($homeInfo){
 		$remote_servers = $db->getRemoteServers();
-		foreach($remote_servers as $remote_server)
+		foreach ((array)$remote_servers as $remote_server)
 		{
 			$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 			$jobs = $remote->scheduler_list_tasks();
-			foreach($jobs as $job_id => $job)
+			foreach ((array)$jobs as $job_id => $job)
 			{
 				if(strstr($job, "homeid=" . $home_id))
 				{
@@ -138,7 +138,7 @@ function deleteJobsByHomeServerID($home_id){
 		}
 	}
 	
-	if(is_array($jobIdsToDel) && count($jobIdsToDel) > 0){
+	if(is_array($jobIdsToDel) && count((array)$jobIdsToDel) > 0){
 		// Only make one call
 		$remote->scheduler_del_task(implode(",", $jobIdsToDel));
 	}
@@ -153,7 +153,7 @@ function get_action_selector($action = false, $server_homes = false, $homeid_ip_
 			$server_actions[] = 'steam_auto_update';
 	}
 	$select_action = '<select name="action" style="width: 100%;">';
-	foreach($server_actions as $server_action)
+	foreach ((array)$server_actions as $server_action)
 	{
 		$selected = ($action and $action == $server_action) ? 'selected="selected"' : '';
 		$select_action .= '<option value="'.$server_action.'" '.$selected.'>'.get_lang($server_action).'</option>';
@@ -166,7 +166,7 @@ function get_server_selector($server_homes, $homeid_ip_port = FALSE, $onchange =
 	$select_game = "<select style='text-overflow: ellipsis; width: 100%;' name='homeid_ip_port' $onchange_this_form_submit>\n";
 	if($server_homes != FALSE)
 	{
-		foreach ( $server_homes as $server_home )
+		foreach ((array)$server_homes as $server_home)
 		{
 			$selected = ($homeid_ip_port and ($homeid_ip_port == $server_home['home_id']."_".$server_home['ip']."_".$server_home['port'] || trim($homeid_ip_port) == trim($server_home['home_id']))) ? 'selected="selected"' : '';
 			$select_game .= "<option value='". $server_home['home_id'] . "_" . $server_home['ip'] .
@@ -186,7 +186,7 @@ function get_remote_server_selector($r_servers, $remote_servers_offline, $remote
 	$onchange_this_form_submit = $onchange ? 'onchange="this.form.submit();"' : '';
 	$select_rserver = "<select id='r_server_id' style='width: 100%;' name='r_server_id' $onchange_this_form_submit>\n";
 	if($first_empty) $select_rserver .= '<option></option>';
-	foreach ( $r_servers as $r_server )
+	foreach ((array)$r_servers as $r_server)
 	{
 		$selected = ($remote_server_id and $remote_server_id == $r_server['remote_server_id']) ? 'selected="selected"' : '';
 		$offline = isset($remote_servers_offline[$r_server['remote_server_id']]) ? ' (' . offline . ')' : '';
@@ -201,7 +201,7 @@ function checkCronInput($min, $hour, $day, $month, $dayOfWeek) {
     
     $args = func_get_args();
     
-    foreach ($args as $k => $arg) {
+    foreach ((array)$args as $k => $arg) {
         if (strlen($arg) == 0 || strpbrk($arg, $blacklist) || preg_match('/\\s/', $arg)) {
             $returns[$k] = false;
         }
@@ -231,13 +231,13 @@ function updateCronJobsToNewApi()
 		$regex = '/'.preg_quote('action=','/').'([a-zA-Z]+)'.preg_quote('&homeid=','/').'([0-9]+)'.preg_quote('&controlpass=','/').'([^"]+)/';
 		$token = $db->getApiToken($_SESSION['user_id']);
 		$mod_key = '';
-		foreach($remote_servers as $remote_server)
+		foreach ((array)$remote_servers as $remote_server)
 		{
 			$remote = new OGPRemoteLibrary($remote_server['agent_ip'], $remote_server['agent_port'], $remote_server['encryption_key'], $remote_server['timeout']);
 			$jobs = $remote->scheduler_list_tasks();
 			if(!is_array($jobs))
 				continue;
-			foreach($jobs as $job_id => $job)
+			foreach ((array)$jobs as $job_id => $job)
 			{
 				if(preg_match($regex, $job, $matches))
 				{

@@ -117,7 +117,7 @@
     <table cellpadding='4' cellspacing='2' style='margin:auto'>
       <tr style='".lgsl_bg(FALSE)."'>";
 
-      foreach ($fields as $field)
+      foreach ((array)$fields as $field)
       {
         $field = ucfirst($field);
         $output .= "
@@ -127,12 +127,12 @@
       $output .= "
       </tr>";
 
-      foreach ($server['p'] as $player_key => $player)
+      foreach ((array)$server['p'] as $player_key => $player)
       {
         $output .= "
         <tr style='".lgsl_bg()."'>";
 
-        foreach ($fields as $field)
+        foreach ((array)$fields as $field)
         {
           $output .= "<td> {$player[$field]} </td>";
         }
@@ -176,7 +176,7 @@
         <td> <b>{$lgsl_config['text']['ehv']}</b> </td>
       </tr>";
 
-    foreach ($server['e'] as $field => $value)
+    foreach ((array)$server['e'] as $field => $value)
     {
       $color = lgsl_bg();
 

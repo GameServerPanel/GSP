@@ -108,12 +108,12 @@ class Server
     {
 
         // Check for server type
-        if (!array_key_exists(self::SERVER_TYPE, $server_info) || empty($server_info[self::SERVER_TYPE])) {
+        if (!array_key_exists(self::SERVER_TYPE, (array)$server_info) || empty($server_info[self::SERVER_TYPE])) {
             throw new Exception("Missing server info key '" . self::SERVER_TYPE . "'!");
         }
 
         // Check for server host
-        if (!array_key_exists(self::SERVER_HOST, $server_info) || empty($server_info[self::SERVER_HOST])) {
+        if (!array_key_exists(self::SERVER_HOST, (array)$server_info) || empty($server_info[self::SERVER_HOST])) {
             throw new Exception("Missing server info key '" . self::SERVER_HOST . "'!");
         }
 
@@ -121,7 +121,7 @@ class Server
         $this->checkAndSetIpPort($server_info[self::SERVER_HOST]);
 
         // Check for server id
-        if (array_key_exists(self::SERVER_ID, $server_info) && !empty($server_info[self::SERVER_ID])) {
+        if (array_key_exists(self::SERVER_ID, (array)$server_info) && !empty($server_info[self::SERVER_ID])) {
             // Set the server id
             $this->id = $server_info[self::SERVER_ID];
         } else {
@@ -130,7 +130,7 @@ class Server
         }
 
         // Check and set server options
-        if (array_key_exists(self::SERVER_OPTIONS, $server_info)) {
+        if (array_key_exists(self::SERVER_OPTIONS, (array)$server_info)) {
             // Set the options
             $this->options = $server_info[self::SERVER_OPTIONS];
         }

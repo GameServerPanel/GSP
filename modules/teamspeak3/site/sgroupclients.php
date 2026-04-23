@@ -27,7 +27,7 @@ if(isset($_POST['kickclient']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($sgroup_del_client['errors']); $i++)
+		for($i=0; $i+1==count((array)$sgroup_del_client['errors']); $i++)
 			{
 			$error .= $sgroup_del_client['errors'][$i]."<br />";
 			}
@@ -42,7 +42,7 @@ if(isset($_POST['addclient']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($sgroup_add_client['errors']); $i++)
+		for($i=0; $i+1==count((array)$sgroup_add_client['errors']); $i++)
 			{
 			$error .= $sgroup_add_client['errors'][$i]."<br />";
 			}

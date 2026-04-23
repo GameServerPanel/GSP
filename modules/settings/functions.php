@@ -32,7 +32,7 @@ function get_theme_html_str( $selected, $add_empty = FALSE )
     {
         $retval .= "<option value='' selected=selected >-</option>";
     }
-    foreach ( $themes as $theme )
+    foreach ((array)$themes as $theme)
     {
         $retval .= "<option value='$theme'";
         if ( $theme === $selected )

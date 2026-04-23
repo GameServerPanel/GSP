@@ -21,7 +21,7 @@ $rows = $db->query("
 ")->fetchAll();
 
 $out = [];
-foreach ($rows as $r) {
+foreach ((array)$rows as $r) {
   $up = ($now - (int)$r['last_seen']) <= $grace;
   $out[] = [
     'host_id'   => $r['host_id'],

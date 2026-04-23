@@ -610,7 +610,7 @@ abstract class GameQ_Protocols_Core
 		}
 
 		// Now add some default stuff
-		$results['gq_online'] = (count($results) > 0);
+		$results['gq_online'] = (count((array)$results) > 0);
 		$results['gq_address'] = $this->ip;
 		$results['gq_port'] = $this->port;
 		$results['gq_protocol'] = $this->protocol;

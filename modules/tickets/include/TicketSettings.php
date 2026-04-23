@@ -17,7 +17,7 @@ class TicketSettings
             $in = '';
             $query .= ' WHERE setting_name IN (';
 
-            foreach ($setting as $setting_name) {
+            foreach ((array)$setting as $setting_name) {
                 $in .= "'". $setting_name ."', ";
             }
 
@@ -33,7 +33,7 @@ class TicketSettings
 
     public function set($settings)
     {
-        foreach ($settings as $setting_name => $setting_value) {
+        foreach ((array)$settings as $setting_name => $setting_value) {
             $query = $this->buildQueryString($setting_name, $setting_value);
             $this->db->query($query);
         }
@@ -58,7 +58,7 @@ class TicketSettings
     {
         $newArr = array();
 
-        foreach ($arr as $k) {
+        foreach ((array)$arr as $k) {
             $newArr[$k['setting_name']] = $k['setting_value'];
         }
 

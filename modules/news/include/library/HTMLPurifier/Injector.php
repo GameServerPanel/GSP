@@ -130,7 +130,7 @@ abstract class HTMLPurifier_Injector
             if (!is_array($attributes)) {
                 continue;
             }
-            foreach ($attributes as $name) {
+            foreach ((array)$attributes as $name) {
                 if (!isset($def->info[$element]->attr[$name])) {
                     return "$element.$name";
                 }

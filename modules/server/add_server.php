@@ -89,7 +89,7 @@ function exec_ogp_module() {
 		else
 		{
 			print_success( get_lang("found_ips") ." (".implode(",",$iplist).") ". get_lang("for_remote_server") );
-			foreach ( $iplist as $remote_ip )
+			foreach ((array)$iplist as $remote_ip)
 			{
 				$remote_ip = trim($remote_ip);
 				if ( empty($remote_ip) )

@@ -36,7 +36,7 @@ class HTMLPurifier_AttrDef_CSS_Border extends HTMLPurifier_AttrDef
         $bits = explode(' ', $string);
         $done = array(); // segments we've finished
         $ret = ''; // return value
-        foreach ($bits as $bit) {
+        foreach ((array)$bits as $bit) {
             foreach ($this->info as $propname => $validator) {
                 if (isset($done[$propname])) {
                     continue;

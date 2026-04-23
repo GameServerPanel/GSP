@@ -65,7 +65,7 @@ function exec_ogp_module()
 	if ( isset( $_REQUEST['group_id'] ) && !$isAdmin )
 	{
 		$result = $db->getUserGroupList($_SESSION['user_id']);
-		foreach ( $result as $row ) #loop through the groups
+		foreach ((array)$result as $row) #loop through the groups
 		{
 			if ( $row['group_id'] == $_REQUEST['group_id'] )
 			{
@@ -95,14 +95,14 @@ function exec_ogp_module()
 			if($isAdmin)
 				$access_right_flags = implode('',$_POST['flags']);
 			
-			foreach($_POST['home_ids'] as $i => $home_id)
+			foreach ((array)$_POST['home_ids'] as $i => $home_id)
 			{
 				if(!$isAdmin)
 				{
 					$home_info = $db->getUserGameHome($_SESSION['user_id'],$home_id);
 					$access_rights = $home_info['access_rights'];
 					$flags = $_POST['flags'];
-					foreach($flags as $i => $flag)
+					foreach ((array)$flags as $i => $flag)
 					{
 						if(!strstr($access_rights, $flag))
 							unset($flags[$i]);
@@ -137,7 +137,7 @@ function exec_ogp_module()
 	{
 		$access_rights = "";
 
-		foreach ($selections as $selection => $flag)
+		foreach ((array)$selections as $selection => $flag)
 		{
 			if (isset($_REQUEST[$selection]))
 				$access_rights .= $flag;
@@ -154,7 +154,7 @@ function exec_ogp_module()
 			}
 			else
 			{
-				foreach ($selections as $selection => $flag)
+				foreach ((array)$selections as $selection => $flag)
 				{
 					if (isset($_REQUEST[$selection]))
 					{
@@ -218,7 +218,7 @@ function exec_ogp_module()
 		echo "<table class='center'><tr><td align='right'><label for='home_id'>".get_lang("select_home").":</label></td>";
 		echo '<td align="left"><select id="home_id" name="home_id" onchange="this.form.submit();">';
 		echo "<option></option>\n";
-		foreach ( $available_homes as $home )
+		foreach ((array)$available_homes as $home)
 		{
 			if( isset($_POST['home_id']) && $_POST['home_id'] == $home['home_id'])
 				$selected="selected='selected'";
@@ -243,7 +243,7 @@ function exec_ogp_module()
 				$home_info = $db->getUserGameHome($_SESSION['user_id'],$_POST['home_id']);
 				$access_rights = $home_info['access_rights'];
 			}
-			foreach ( $selections as $selection => $flag)
+			foreach ((array)$selections as $selection => $flag)
 			{
 				echo create_selection($selection,$flag,$access_rights);
 			}
@@ -283,11 +283,11 @@ function exec_ogp_module()
 			<th>".get_lang("game_home_name")."</th><th>".get_lang("access_rights")."</th>
 			<th>".get_lang("assign_expiration_date")."</th>
 			<th>".get_lang("actions")."</th></tr>";
-		foreach( $game_homes as $row )
+		foreach ((array)$game_homes as $row)
 		{
 			$access_rights = empty($row['access_rights']) ? "-" : $row['access_rights'];
 			$type = $id_type == "group" ? "user_group_expiration_date" : "user_expiration_date";
-			$expiration = $row[$type] == "X" ? "X" : date('d/m/Y H:i:s', $row[$type]);
+			$expiration = $row[$type] == "X" ? "X" : date('d/m/Y H:i:s', is_numeric($row[$type]) ? (int)$row[$type] : strtotime($row[$type]));
 			echo "<tr><td><input type=checkbox class='change_access_rights' data-home_id='$row[home_id]' >$row[home_id]</td>
 				<td>".$row['agent_ip']." (Agent)</td>
 				<td>$row[game_name]</td>
@@ -305,7 +305,7 @@ function exec_ogp_module()
 		echo "</table>";
 		echo "<button id=\"change_access_rights_submit\" onclick=\"change_access_rights('".trim($id_type)."', '".trim($assign_id),"')\">".get_lang('change_access_rights_for_selected_servers')."</button>\n".
 			 "<div id='dialog' ";
-		foreach ( $selections as $selection => $flag)
+		foreach ((array)$selections as $selection => $flag)
 		{
 			echo "data-$flag=\"$selection\" ";
 		}

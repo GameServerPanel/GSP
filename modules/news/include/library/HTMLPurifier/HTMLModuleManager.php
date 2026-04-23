@@ -242,7 +242,7 @@ class HTMLPurifier_HTMLModuleManager
         $special_cases = $config->get('HTML.CoreModules');
 
         if (is_array($lookup)) {
-            foreach ($modules as $k => $m) {
+            foreach ((array)$modules as $k => $m) {
                 if (isset($special_cases[$m])) {
                     continue;
                 }
@@ -283,7 +283,7 @@ class HTMLPurifier_HTMLModuleManager
         // merge in custom modules
         $modules = array_merge($modules, $this->userModules);
 
-        foreach ($modules as $module) {
+        foreach ((array)$modules as $module) {
             $this->processModule($module);
             $this->modules[$module]->setup($config);
         }
@@ -364,7 +364,7 @@ class HTMLPurifier_HTMLModuleManager
 
         // remove dud elements, this happens when an element that
         // appeared to be safe actually wasn't
-        foreach ($elements as $n => $v) {
+        foreach ((array)$elements as $n => $v) {
             if ($v === false) {
                 unset($elements[$n]);
             }

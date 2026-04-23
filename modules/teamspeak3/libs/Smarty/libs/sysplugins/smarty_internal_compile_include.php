@@ -137,7 +137,7 @@ class Smarty_Internal_Compile_Include extends Smarty_Internal_CompileBase {
         if (!empty($_attr)) {
             if ($_parent_scope == SMARTY_LOCAL_SCOPE) {
                 // create variables
-                foreach ($_attr as $_key => $_value) {
+                foreach ((array)$_attr as $_key => $_value) {
                     $_output .= "\$_template->assign('$_key',$_value);";
                 } 
             } else {

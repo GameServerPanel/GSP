@@ -519,7 +519,7 @@ class TeamSpeak3_Helper_Uri
 
     parse_str($this->query, $queryArray);
 
-    return array_key_exists($key, $queryArray) ? TRUE : FALSE;
+    return array_key_exists($key, (array)$queryArray) ? TRUE : FALSE;
   }
 
   /**
@@ -535,7 +535,7 @@ class TeamSpeak3_Helper_Uri
 
     parse_str(rawurldecode($this->query), $queryArray);
 
-    if(array_key_exists($key, $queryArray))
+    if(array_key_exists($key, (array)$queryArray))
     {
       $val = $queryArray[$key];
 
@@ -616,7 +616,7 @@ class TeamSpeak3_Helper_Uri
    */
   public static function getUserParam($key, $default = null)
   {
-    return (array_key_exists($key, $_REQUEST) && !empty($_REQUEST[$key])) ? self::stripslashesRecursive($_REQUEST[$key]) : $default;
+    return (array_key_exists($key, (array)$_REQUEST) && !empty($_REQUEST[$key])) ? self::stripslashesRecursive($_REQUEST[$key]) : $default;
   }
 
   /**
@@ -628,7 +628,7 @@ class TeamSpeak3_Helper_Uri
    */
   public static function getHostParam($key, $default = null)
   {
-    return (array_key_exists($key, $_SERVER) && !empty($_SERVER[$key])) ? $_SERVER[$key] : $default;
+    return (array_key_exists($key, (array)$_SERVER) && !empty($_SERVER[$key])) ? $_SERVER[$key] : $default;
   }
 
   /**
@@ -640,7 +640,7 @@ class TeamSpeak3_Helper_Uri
    */
   public static function getSessParam($key, $default = null)
   {
-    return (array_key_exists($key, $_SESSION) && !empty($_SESSION[$key])) ? $_SESSION[$key] : $default;
+    return (array_key_exists($key, (array)$_SESSION) && !empty($_SESSION[$key])) ? $_SESSION[$key] : $default;
   }
 
   /**
@@ -710,7 +710,7 @@ class TeamSpeak3_Helper_Uri
       return stripslashes(strval($var));
     }
 
-    foreach($var as $key => $val)
+    foreach ((array)$var as $key => $val)
     {
       $var[$key] = (is_array($val)) ? stripslashesRecursive($val) : stripslashes(strval($val));
     }

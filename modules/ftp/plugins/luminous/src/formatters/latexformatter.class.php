@@ -116,7 +116,7 @@ EOF;
     
     if ($this->wrap_length > 0)  {
       $str = '';
-      foreach($lines as $i=>$l) {
+      foreach ((array)$lines as $i=>$l) {
         $this->wrap_line($l, $this->wrap_length);
         $str .= $l;
       }
@@ -132,7 +132,7 @@ EOF;
         return "{\\\textbackslash}";
       return "\\\" . $matches[0];');
     
-    foreach($str_ as $s_) {
+    foreach ((array)$str_ as $s_) {
       if ($s_[0] === '<') {
         $s_ = preg_replace('%</[^>]+>%', '}', $s_);
         $s_ = preg_replace_callback('%<([^>]+)>%', $f1
@@ -167,7 +167,7 @@ EOF;
     // NOTE: p being a reference is probably going to necessitate a lot of
     // copying to pass through all these preg_* and str* calls.
     // consider rewriting.
-    foreach($pieces as $k=>&$p)  {
+    foreach ((array)$pieces as $k=>&$p)  {
       if (preg_match('/^\\\lms/', $p))
         $stack[] = "" . $p;
       elseif(preg_match('/^(\\\\\\\\)*\}/', $p)) {
@@ -178,7 +178,7 @@ EOF;
       elseif(strpos($p, "\n") !== false)  {
         $before = "";
         $after = "";
-        foreach($stack as $st_) {
+        foreach ((array)$stack as $st_) {
           $before .= $st_;
           $after .= '}';
         }

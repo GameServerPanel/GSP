@@ -126,7 +126,7 @@ class Ut3 extends Gamespy3
     protected function deleteResult(array &$result, array $array)
     {
 
-        foreach ($array as $key) {
+        foreach ((array)$array as $key) {
             unset($result[$key]);
         }
     }

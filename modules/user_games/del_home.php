@@ -35,7 +35,7 @@ function logHandling($home_id, $action = 'delete', &$remote){
 		$remote->exec('tar czf screenlogs/home_log_backup_'.$home_id.'.tar.gz '.implode(' ', array_keys($files)));
 	}
 	
-	foreach($files as $file => $type){
+	foreach ((array)$files as $file => $type){
 		if($remote->rfile_exists($file)){
 			if($type == 'file'){
 				$remote->exec('rm '.$file);
@@ -131,7 +131,7 @@ function exec_ogp_module() {
 			$assigned = $db->getHomeIpPorts($home_id);
 			if( !empty($assigned) )
 			{
-				foreach($assigned as $address)
+				foreach ((array)$assigned as $address)
 				{
 					if($remote->rfile_exists( "startups/".$address['ip']."-".$address['port'] ) === 1)
 					{

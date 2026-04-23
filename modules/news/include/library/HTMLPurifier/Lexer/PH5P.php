@@ -1850,7 +1850,7 @@ class HTML5TreeConstructer
             is already present on the top element of the stack of open elements.
             If it is not, add the attribute and its corresponding value to that
             element. */
-            foreach ($token['attr'] as $attr) {
+            foreach ((array)$token['attr'] as $attr) {
                 if (!$this->stack[0]->hasAttribute($attr['name'])) {
                     $this->stack[0]->setAttribute($attr['name'], $attr['value']);
                 }
@@ -2231,7 +2231,7 @@ class HTML5TreeConstructer
                             add the attribute and its corresponding value to that
                             element. */
                         } else {
-                            foreach ($token['attr'] as $attr) {
+                            foreach ((array)$token['attr'] as $attr) {
                                 if (!$this->stack[1]->hasAttribute($attr['name'])) {
                                     $this->stack[1]->setAttribute($attr['name'], $attr['value']);
                                 }
@@ -4408,7 +4408,7 @@ class HTML5TreeConstructer
 
         $el = $this->dom->createElement($token['name']);
 
-        foreach ($token['attr'] as $attr) {
+        foreach ((array)$token['attr'] as $attr) {
             if (!$el->hasAttribute($attr['name'])) {
                 $el->setAttribute($attr['name'], $attr['value']);
             }
@@ -4466,7 +4466,7 @@ class HTML5TreeConstructer
     private function elementInScope($el, $table = false)
     {
         if (is_array($el)) {
-            foreach ($el as $element) {
+            foreach ((array)$el as $element) {
                 if ($this->elementInScope($element, $table)) {
                     return true;
                 }

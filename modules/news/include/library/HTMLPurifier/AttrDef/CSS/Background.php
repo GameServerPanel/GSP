@@ -56,11 +56,11 @@ class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
 
         $i = 0; // number of catches
 
-        foreach ($bits as $bit) {
+        foreach ((array)$bits as $bit) {
             if ($bit === '') {
                 continue;
             }
-            foreach ($caught as $key => $status) {
+            foreach ((array)$caught as $key => $status) {
                 if ($key != 'position') {
                     if ($status !== false) {
                         continue;
@@ -94,7 +94,7 @@ class HTMLPurifier_AttrDef_CSS_Background extends HTMLPurifier_AttrDef
         }
 
         $ret = array();
-        foreach ($caught as $value) {
+        foreach ((array)$caught as $value) {
             if ($value === false) {
                 continue;
             }

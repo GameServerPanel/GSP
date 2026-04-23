@@ -140,7 +140,7 @@ $game_options = [];
 $games_dir = __DIR__ . '/../../config_games/server_configs/';
 if (is_dir($games_dir)) {
     $files = scandir($games_dir);
-    foreach ($files as $file) {
+    foreach ((array)$files as $file) {
         if (pathinfo($file, PATHINFO_EXTENSION) === 'xml' && strpos($file, '.bak') === false) {
             $game_key = str_replace('.xml', '', $file);
             $game_options[] = $game_key;
@@ -265,7 +265,7 @@ include(__DIR__ . '/includes/menu.php');
     <div id="game_filter_list_container" class="form-group" style="display:none;">
       <label>Select Games</label>
       <div class="game-checkboxes">
-        <?php foreach ($game_options as $game): ?>
+        <?php foreach ((array)$game_options as $game): ?>
           <label>
             <input type="checkbox" name="game_filter_list[]" value="<?php echo h($game); ?>">
             <?php echo h($game); ?>
@@ -325,7 +325,7 @@ include(__DIR__ . '/includes/menu.php');
               <?php if ($coupon['game_filter_type'] === 'all_games'): ?>
                 All Games
               <?php else: ?>
-                <?php echo count($games_filtered); ?> specific games
+                <?php echo count((array)$games_filtered); ?> specific games
               <?php endif; ?>
             </td>
             <td>
@@ -397,7 +397,7 @@ include(__DIR__ . '/includes/menu.php');
                 <div class="form-group" style="display:<?php echo $coupon['game_filter_type'] === 'specific_games' ? 'block' : 'none'; ?>;">
                   <label>Select Games</label>
                   <div class="game-checkboxes">
-                    <?php foreach ($game_options as $game): ?>
+                    <?php foreach ((array)$game_options as $game): ?>
                       <label>
                         <input type="checkbox" name="game_filter_list[]" value="<?php echo h($game); ?>"
                           <?php echo in_array($game, $games_filtered) ? 'checked' : ''; ?>>

@@ -31,7 +31,7 @@ function exec_ogp_module()
 	if(isset($_POST['unban']))
 	{
 		unset($_POST['unban']);
-		foreach($_POST as $name => $ip)
+		foreach ((array)$_POST as $name => $ip)
 		{
 			$ip = $db->real_escape_string($ip);
 			$db->query("DELETE FROM `OGP_DB_PREFIXban_list` WHERE client_ip = '$ip';");
@@ -42,11 +42,11 @@ function exec_ogp_module()
 	$ban_table = '';
 	if($ban_list)
 	{
-		foreach($ban_list as $ban)
+		foreach ((array)$ban_list as $ban)
 		{
 			if($ban['logging_attempts'] >= $settings["login_attempts_before_banned"])
 			{
-				$ban_table .= "<tr><td><input type=checkbox name='".$ban_qty."' value='".$ban['client_ip']."' /></td><td>".$ban['client_ip']."</td><td>".date("r",$ban['banned_until'])."</td></tr>\n";
+				$ban_table .= "<tr><td><input type=checkbox name='".$ban_qty."' value='".$ban['client_ip']."' /></td><td>".$ban['client_ip']."</td><td>".date("r", is_numeric($ban['banned_until']) ? (int)$ban['banned_until'] : strtotime($ban['banned_until']))."</td></tr>\n";
 				$ban_qty++;
 			}
 			else

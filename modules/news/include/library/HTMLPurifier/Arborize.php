@@ -13,7 +13,7 @@ class HTMLPurifier_Arborize
         $definition = $config->getHTMLDefinition();
         $parent = new HTMLPurifier_Token_Start($definition->info_parent);
         $stack = array($parent->toNode());
-        foreach ($tokens as $token) {
+        foreach ((array)$tokens as $token) {
             $token->skip = null; // [MUT]
             $token->carryover = null; // [MUT]
             if ($token instanceof HTMLPurifier_Token_End) {
@@ -27,12 +27,12 @@ class HTMLPurifier_Arborize
                 continue;
             }
             $node = $token->toNode();
-            $stack[count($stack)-1]->children[] = $node;
+            $stack[count((array)$stack)-1]->children[] = $node;
             if ($token instanceof HTMLPurifier_Token_Start) {
                 $stack[] = $node;
             }
         }
-        //assert(count($stack) == 1);
+        //assert(count((array)$stack) == 1);
         return $stack[0];
     }
 

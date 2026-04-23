@@ -176,7 +176,7 @@ class TeamSpeak3_Adapter_ServerQuery extends TeamSpeak3_Adapter_Abstract
     $args = array();
     $cells = array();
 
-    foreach($params as $ident => $value)
+    foreach ((array)$params as $ident => $value)
     {
       $ident = is_numeric($ident) ? "" : strtolower($ident) . TeamSpeak3::SEPARATOR_PAIR;
 
@@ -184,7 +184,7 @@ class TeamSpeak3_Adapter_ServerQuery extends TeamSpeak3_Adapter_Abstract
       {
         $value = array_values($value);
 
-        for($i = 0; $i < count($value); $i++)
+        for($i = 0; $i < count((array)$value); $i++)
         {
           if($value[$i] === null) continue;
           elseif($value[$i] === FALSE) $value[$i] = 0x00;
@@ -207,8 +207,8 @@ class TeamSpeak3_Adapter_ServerQuery extends TeamSpeak3_Adapter_Abstract
 
     foreach(array_keys($cells) as $ident) $cells[$ident] = implode(TeamSpeak3::SEPARATOR_CELL, $cells[$ident]);
 
-    if(count($args)) $cmd .= " " . implode(TeamSpeak3::SEPARATOR_CELL, $args);
-    if(count($cells)) $cmd .= " " . implode(TeamSpeak3::SEPARATOR_LIST, $cells);
+    if(count((array)$args)) $cmd .= " " . implode(TeamSpeak3::SEPARATOR_CELL, $args);
+    if(count((array)$cells)) $cmd .= " " . implode(TeamSpeak3::SEPARATOR_LIST, $cells);
 
     return trim($cmd);
   }

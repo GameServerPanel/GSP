@@ -196,7 +196,7 @@ usort($invoices, function($a, $b) {
 
 // Organize invoices by status
 $invoices_by_status = [];
-foreach ($invoices as $inv) {
+foreach ((array)$invoices as $inv) {
     $status = strtolower($inv['status'] ?? 'pending');
     if (!isset($invoices_by_status[$status])) {
         $invoices_by_status[$status] = [];
@@ -355,11 +355,11 @@ $status_config = [
     
     <!-- Invoices Section - Organized by Status -->
     <?php if (!empty($invoices_by_status)): ?>
-        <?php foreach ($status_config as $status_key => $status_info): ?>
+        <?php foreach ((array)$status_config as $status_key => $status_info): ?>
             <?php if (isset($invoices_by_status[$status_key]) && !empty($invoices_by_status[$status_key])): ?>
                 <div class="account-section">
                     <h2><?php echo htmlspecialchars($status_info['label']); ?></h2>
-                    <?php foreach ($invoices_by_status[$status_key] as $invoice): ?>
+                    <?php foreach ((array)$invoices_by_status[$status_key] as $invoice): ?>
                         <div class="invoice-item">
                             <div>
                                 <div class="invoice-id">Invoice #<?php echo htmlspecialchars($invoice['invoice'] ?? $invoice['custom'] ?? 'N/A'); ?></div>

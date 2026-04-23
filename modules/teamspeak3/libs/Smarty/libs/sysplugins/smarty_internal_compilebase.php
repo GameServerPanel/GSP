@@ -37,14 +37,14 @@ abstract class Smarty_Internal_CompileBase
     { 
         // check if all required attributes present
         foreach ($this->required_attributes as $attr) {
-            if (!array_key_exists($attr, $args)) {
+            if (!array_key_exists($attr, (array)$args)) {
                 $this->compiler->trigger_template_error("missing \"" . $attr . "\" attribute");
             } 
         } 
         // check for unallowed attributes
         if ($this->optional_attributes != array('_any')) {
             $tmp_array = array_merge($this->required_attributes, $this->optional_attributes);
-            foreach ($args as $key => $dummy) {
+            foreach ((array)$args as $key => $dummy) {
                  if (!in_array($key, $tmp_array) && $key !== 0) {
                    $this->compiler->trigger_template_error("unexpected \"" . $key . "\" attribute");
                 } 

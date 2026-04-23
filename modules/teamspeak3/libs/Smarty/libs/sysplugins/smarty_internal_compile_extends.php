@@ -47,7 +47,7 @@ class Smarty_Internal_Compile_Extends extends Smarty_Internal_CompileBase {
             $this->compiler->trigger_template_error('unmatched {block} {/block} pairs');
         } 
         preg_match_all("!{$this->_ldl}block\s(.+?){$this->_rdl}|{$this->_ldl}/block(.*?){$this->_rdl}!", $_content, $_result, PREG_OFFSET_CAPTURE);
-        $_result_count = count($_result[0]);
+        $_result_count = count((array)$_result[0]);
         $_start = 0;
         while ($_start < $_result_count) {
             $_end = 0;

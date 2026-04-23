@@ -20,7 +20,7 @@ function exec_ogp_module()
 		$action = $_POST['bulk_action'];
 		$selected = $_POST['selected_orders'];
 		
-		foreach ($selected as $order_id) {
+		foreach ((array)$selected as $order_id) {
 			$order_id = $db->realEscapeSingle($order_id);
 			
 			switch ($action) {
@@ -41,7 +41,7 @@ function exec_ogp_module()
 			}
 		}
 		
-		echo "<div class='success'><p>Bulk action completed for ".count($selected)." order(s).</p></div>";
+		echo "<div class='success'><p>Bulk action completed for ".count((array)$selected)." order(s).</p></div>";
 	}
 	
 	// Get filter parameters
@@ -125,7 +125,7 @@ function exec_ogp_module()
 	echo "<th>Actions</th>";
 	echo "</tr></thead><tbody>";
 	
-	foreach ($orders as $order) {
+	foreach ((array)$orders as $order) {
 		$status_class = '';
 		switch ($order['status']) {
 			case 'paid': $status_class = 'label-warning'; break;
@@ -191,7 +191,7 @@ function exec_ogp_module()
 	echo "<table class='tablesorter' style='width: auto;'>";
 	echo "<thead><tr><th>Status</th><th>Count</th><th>Total Value</th></tr></thead><tbody>";
 	
-	foreach ($stats as $stat) {
+	foreach ((array)$stats as $stat) {
 		echo "<tr>";
 		echo "<td>".$stat['status']."</td>";
 		echo "<td>".$stat['count']."</td>";

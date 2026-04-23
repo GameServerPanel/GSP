@@ -77,11 +77,11 @@ if(isset($server_home['control_password']) && $server_home['control_password'] !
 				$ts3['ip'] = $cfg["host"];
 				$ts3['port'] = $cfg["voice"];
 				$clients = $ts3_ServerInstance->clientList();
-				$ts3['players'] = count($clients);
+				$ts3['players'] = count((array)$clients);
 				if( $ts3['players'] >= 1 )
 				{
 					$i=0;
-					foreach($clients as $key => $value)
+					foreach ((array)$clients as $key => $value)
 					{
 						/* $playerarray[$i]= */ 
 						$ts3['playersList'][$i]['name'] = trim($value);

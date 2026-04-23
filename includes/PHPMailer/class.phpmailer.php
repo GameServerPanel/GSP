@@ -961,7 +961,7 @@ class PHPMailer
         if ($useimap and function_exists('imap_rfc822_parse_adrlist')) {
             //Use this built-in parser if it's available
             $list = imap_rfc822_parse_adrlist($addrstr, '');
-            foreach ($list as $address) {
+            foreach ((array)$list as $address) {
                 if ($address->host != '.SYNTAX-ERROR.') {
                     if ($this->validateAddress($address->mailbox . '@' . $address->host)) {
                         $addresses[] = array(
@@ -974,7 +974,7 @@ class PHPMailer
         } else {
             //Use this simpler parser
             $list = explode(',', $addrstr);
-            foreach ($list as $address) {
+            foreach ((array)$list as $address) {
                 $address = trim($address);
                 //Is there a separate name part?
                 if (strpos($address, '<') === false) {
@@ -1491,8 +1491,8 @@ class PHPMailer
             ini_set('sendmail_from', $this->Sender);
         }
         $result = false;
-        if ($this->SingleTo and count($toArr) > 1) {
-            foreach ($toArr as $toAddr) {
+        if ($this->SingleTo and count((array)$toArr) > 1) {
+            foreach ((array)$toArr as $toAddr) {
                 $result = $this->mailPassthru($toAddr, $this->Subject, $body, $header, $params);
                 $this->doCallback($result, array($toAddr), $this->cc, $this->bcc, $this->Subject, $body, $this->From);
             }
@@ -1552,7 +1552,7 @@ class PHPMailer
 
         // Attempt to send to all recipients
         foreach (array($this->to, $this->cc, $this->bcc) as $togroup) {
-            foreach ($togroup as $to) {
+            foreach ((array)$togroup as $to) {
                 if (!$this->smtp->recipient($to[0])) {
                     $error = $this->smtp->getError();
                     $bad_rcpt[] = array('to' => $to[0], 'error' => $error['detail']);
@@ -1565,7 +1565,7 @@ class PHPMailer
         }
 
         // Only send the DATA command if we have viable recipients
-        if ((count($this->all_recipients) > count($bad_rcpt)) and !$this->smtp->data($header . $body)) {
+        if ((count($this->all_recipients) > count((array)$bad_rcpt)) and !$this->smtp->data($header . $body)) {
             throw new phpmailerException($this->lang('data_not_accepted'), self::STOP_CRITICAL);
         }
         if ($this->SMTPKeepAlive) {
@@ -1575,9 +1575,9 @@ class PHPMailer
             $this->smtp->close();
         }
         //Create error message for any bad addresses
-        if (count($bad_rcpt) > 0) {
+        if (count((array)$bad_rcpt) > 0) {
             $errstr = '';
-            foreach ($bad_rcpt as $bad) {
+            foreach ((array)$bad_rcpt as $bad) {
                 $errstr .= $bad['to'] . ': ' . $bad['error'];
             }
             throw new phpmailerException(
@@ -1620,7 +1620,7 @@ class PHPMailer
         $hosts = explode(';', $this->Host);
         $lastexception = null;
 
-        foreach ($hosts as $hostentry) {
+        foreach ((array)$hosts as $hostentry) {
             $hostinfo = array();
             if (!preg_match(
                 '/^((ssl|tls):\/\/)*([a-zA-Z0-9\.-]*|\[[a-fA-F0-9:]+\]):?([0-9]*)$/',
@@ -1823,7 +1823,7 @@ class PHPMailer
     public function addrAppend($type, $addr)
     {
         $addresses = array();
-        foreach ($addr as $address) {
+        foreach ((array)$addr as $address) {
             $addresses[] = $this->addrFormat($address);
         }
         return $type . ': ' . implode(', ', $addresses) . $this->LE;
@@ -1881,11 +1881,11 @@ class PHPMailer
         $lines = explode($this->LE, $message);
         //Message will be rebuilt in here
         $message = '';
-        foreach ($lines as $line) {
+        foreach ((array)$lines as $line) {
             $words = explode(' ', $line);
             $buf = '';
             $firstword = true;
-            foreach ($words as $word) {
+            foreach ((array)$words as $word) {
                 if ($qp_mode and (strlen($word) > $length)) {
                     $space_left = $length - strlen($buf) - $crlflen;
                     if (!$firstword) {
@@ -2592,7 +2592,7 @@ class PHPMailer
                 $type = $attachment[4];
                 $disposition = $attachment[6];
                 $cid = $attachment[7];
-                if ($disposition == 'inline' && array_key_exists($cid, $cidUniq)) {
+                if ($disposition == 'inline' && array_key_exists($cid, (array)$cidUniq)) {
                     continue;
                 }
                 $cidUniq[$cid] = true;
@@ -3150,7 +3150,7 @@ class PHPMailer
     public function clearQueuedAddresses($kind)
     {
         $RecipientsQueue = $this->RecipientsQueue;
-        foreach ($RecipientsQueue as $address => $params) {
+        foreach ((array)$RecipientsQueue as $address => $params) {
             if ($params[0] == $kind) {
                 unset($this->RecipientsQueue[$address]);
             }
@@ -3289,7 +3289,7 @@ class PHPMailer
         $result = 'localhost.localdomain';
         if (!empty($this->Hostname)) {
             $result = $this->Hostname;
-        } elseif (isset($_SERVER) and array_key_exists('SERVER_NAME', $_SERVER) and !empty($_SERVER['SERVER_NAME'])) {
+        } elseif (isset($_SERVER) and array_key_exists('SERVER_NAME', (array)$_SERVER) and !empty($_SERVER['SERVER_NAME'])) {
             $result = $_SERVER['SERVER_NAME'];
         } elseif (function_exists('gethostname') && gethostname() !== false) {
             $result = gethostname();
@@ -3400,12 +3400,12 @@ class PHPMailer
     public function msgHTML($message, $basedir = '', $advanced = false)
     {
         preg_match_all('/(src|background)=["\'](.*)["\']/Ui', $message, $images);
-        if (array_key_exists(2, $images)) {
+        if (array_key_exists(2, (array)$images)) {
             if (strlen($basedir) > 1 && substr($basedir, -1) != '/') {
                 // Ensure $basedir has a trailing /
                 $basedir .= '/';
             }
-            foreach ($images[2] as $imgindex => $url) {
+            foreach ((array)$images[2] as $imgindex => $url) {
                 // Convert data URIs into embedded images
                 if (preg_match('#^data:(image[^;,]*)(;base64)?,#', $url, $match)) {
                     $data = substr($url, strpos($url, ','));
@@ -3652,16 +3652,16 @@ class PHPMailer
         $ret = array('dirname' => '', 'basename' => '', 'extension' => '', 'filename' => '');
         $pathinfo = array();
         if (preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $path, $pathinfo)) {
-            if (array_key_exists(1, $pathinfo)) {
+            if (array_key_exists(1, (array)$pathinfo)) {
                 $ret['dirname'] = $pathinfo[1];
             }
-            if (array_key_exists(2, $pathinfo)) {
+            if (array_key_exists(2, (array)$pathinfo)) {
                 $ret['basename'] = $pathinfo[2];
             }
-            if (array_key_exists(5, $pathinfo)) {
+            if (array_key_exists(5, (array)$pathinfo)) {
                 $ret['extension'] = $pathinfo[5];
             }
-            if (array_key_exists(3, $pathinfo)) {
+            if (array_key_exists(3, (array)$pathinfo)) {
                 $ret['filename'] = $pathinfo[3];
             }
         }
@@ -3827,7 +3827,7 @@ class PHPMailer
     {
         $signHeader = preg_replace('/\r\n\s+/', ' ', $signHeader);
         $lines = explode("\r\n", $signHeader);
-        foreach ($lines as $key => $line) {
+        foreach ((array)$lines as $key => $line) {
             list($heading, $value) = explode(':', $line, 2);
             $heading = strtolower($heading);
             $value = preg_replace('/\s{2,}/', ' ', $value); // Compress useless spaces
@@ -3878,7 +3878,7 @@ class PHPMailer
         $to_header = '';
         $date_header = '';
         $current = '';
-        foreach ($headers as $header) {
+        foreach ((array)$headers as $header) {
             if (strpos($header, 'From:') === 0) {
                 $from_header = $header;
                 $current = 'from_header';

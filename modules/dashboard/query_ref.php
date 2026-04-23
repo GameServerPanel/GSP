@@ -28,7 +28,7 @@ function print_player_list_ogp_dashboard($player_list,$players,$playersmax,$game
 			"<tr><td style='text-align:left;'>".
 			$gamename." [".$players.'/'.$playersmax."] ".
 			get_lang('players').":</td>\n</tr>";
-	foreach( $player_list as $player )
+	foreach ((array)$player_list as $player)
 	{
 		$data .= "<tr><td style='text-align:center;color:#".rand(0,5).rand(0,5).rand(0,5).";' >".$player['name']."</td></tr>";
     }

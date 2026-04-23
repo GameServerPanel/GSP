@@ -61,7 +61,7 @@ while($clientdblist=$ts3->getElement('data', $ts3->clientDbList($start_while, $d
 		}
 	$start_while=$start_while+$duration_while;
 	}
-$totalclients=count($clientstatuslist);
+$totalclients=count((array)$clientstatuslist);
 
 
 

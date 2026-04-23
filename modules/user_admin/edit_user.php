@@ -53,7 +53,7 @@ function exec_ogp_module() {
 	if ( $isAdmin )
 	{
 		$users = $db->getUserList();
-		foreach ( $users as $user )
+		foreach ((array)$users as $user)
 		{
 			if ( $db->isAdmin($user['user_id']) )
 			{
@@ -275,11 +275,11 @@ function exec_ogp_module() {
 		//echo "Timediff is $timediff<br>";
 		if(read_expire($timediff) !== 'X')
 		{
-			$exday =  date("j", $timediff);
-			$exyear =  date("Y", $timediff);
-			$exmonth =  date("m", $timediff);
-			$exhour =  date("H", $timediff);
-			$exmin =  date("i", $timediff);
+			$exday =  date("j", is_numeric($timediff) ? (int)$timediff : strtotime($timediff));
+			$exyear =  date("Y", is_numeric($timediff) ? (int)$timediff : strtotime($timediff));
+			$exmonth =  date("m", is_numeric($timediff) ? (int)$timediff : strtotime($timediff));
+			$exhour =  date("H", is_numeric($timediff) ? (int)$timediff : strtotime($timediff));
+			$exmin =  date("i", is_numeric($timediff) ? (int)$timediff : strtotime($timediff));
 		}
 		else
 		{
@@ -293,7 +293,7 @@ function exec_ogp_module() {
 		$minutes = range(0,59);
 		$pad_length = 2;
 
-		foreach ($minutes as &$minute)
+		foreach ((array)$minutes as &$minute)
 		{
 			$minute = str_pad($minute, $pad_length, "0", STR_PAD_LEFT);
 		}

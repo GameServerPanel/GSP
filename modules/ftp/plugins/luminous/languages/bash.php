@@ -146,7 +146,7 @@ class LuminousBashScanner extends LuminousScanner {
         $this->record($m[2], 'VARIABLE');
 
       }
-      elseif (($this->interpolated && count($stack) === 1 &&
+      elseif (($this->interpolated && count((array)$stack) === 1 &&
         $this->scan('/(?<=\s|^)\#.*?(?=[)]|$)/m'))
         || $this->scan('/(?<=\s|^)\#.*/')) {
         $this->record($this->match(), 'COMMENT');

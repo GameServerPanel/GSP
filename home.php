@@ -103,7 +103,7 @@ function heading()
         // Use parent expiration date for subusers
 		if(!is_null($info['users_parent']) && is_numeric($info['users_parent'])){
 			$parentInfo = $db->getUserById($info['users_parent']);
-			if(is_array($parentInfo) && array_key_exists("user_expires", $parentInfo) && $parentInfo['user_expires'] != "X"){
+			if(is_array($parentInfo) && array_key_exists("user_expires", (array)$parentInfo) && $parentInfo['user_expires'] != "X"){
 				$info['user_expires'] = $parentInfo['user_expires'];
 			}
 		}
@@ -166,11 +166,11 @@ function ogpHome()
 		if(!empty($server_homes))
 		{
 			$servers_by_game_name = array();
-			foreach( $server_homes as $server_home )
+			foreach ((array)$server_homes as $server_home)
 			{
 				if(isset($settings['check_expiry_by']) and $settings['check_expiry_by'] == "once_logged_in")
 				{
-					if($db->check_expire_date($_SESSION['user_id'], $server_home['home_id']))
+					if($db->check_expire_date($_SESSION['user_id'], is_numeric($server_home['home_id']) ? (int)$server_home['home_id'] : strtotime($server_home['home_id'])))
 						continue;
 				}
 				$servers_by_game_name["$server_home[game_name]"][] = $server_home;
@@ -178,7 +178,7 @@ function ogpHome()
 			ksort($servers_by_game_name);
 			$game_homes_list = "<ul id='submenu_0' >\n";
 			require_once("modules/config_games/server_config_parser.php");
-			foreach( $servers_by_game_name as $game_name => $server_homes )
+			foreach ((array)$servers_by_game_name as $game_name => $server_homes )
 			{
 				$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$server_homes[0]['home_cfg_file']);
 				$mod = $server_homes[0]['mod_key'];
@@ -201,7 +201,7 @@ function ogpHome()
 				
 				$game_homes_list .= "<li>\n<a href='?m=gamemanager&p=game_monitor&home_cfg_id=".$server_homes[0]['home_cfg_id'].
 									"'><span data-icon_path='$icon_path'>$game_name</span></a>\n<ul id='submenu_1' >\n";
-				foreach($server_homes as $server_home)
+				foreach ((array)$server_homes as $server_home)
 				{
 					$button_name = htmlentities($server_home['home_name']);
 					if( ! preg_match("/none/i", $server_home['mod_name']) ) 
@@ -223,7 +223,7 @@ function ogpHome()
 			<ul>
 			<?php
 			$menus = $db->getMenusForGroup('user');
-			foreach ( $menus as $menu )
+			foreach ((array)$menus as $menu)
 			{
 				$module = $menu['module'];
 				if ( !empty( $menu['subpage'] ) )
@@ -261,7 +261,7 @@ function ogpHome()
 				$TotalSelected = false;
 				$menus = $db->getMenusForGroup('admin');
 				
-				foreach ($menus as $key => $row) {
+				foreach ((array)$menus as $key => $row) {
 					if ( !empty( $row['subpage'] ) )
 						$name[$key]  = $row['subpage'];
 					else
@@ -271,7 +271,7 @@ function ogpHome()
 				}
 				array_multisort($translation, $name, SORT_DESC, $menus);
 				
-				foreach ( $menus as $menu )
+				foreach ((array)$menus as $menu)
 				{
 					$module = $menu['module'];
 					if ( !empty( $menu['subpage'] ) )

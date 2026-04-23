@@ -69,7 +69,7 @@ class HTMLPurifier_ChildDef_StrictBlockquote extends HTMLPurifier_ChildDef_Requi
         $block_wrap = false;
         $ret = array();
 
-        foreach ($result as $node) {
+        foreach ((array)$result as $node) {
             if ($block_wrap === false) {
                 if (($node instanceof HTMLPurifier_Node_Text && !$node->is_whitespace) ||
                     ($node instanceof HTMLPurifier_Node_Element && !isset($this->elements[$node->name]))) {

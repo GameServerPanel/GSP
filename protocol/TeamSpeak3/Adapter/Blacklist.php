@@ -109,7 +109,7 @@ class TeamSpeak3_Adapter_Blacklist extends TeamSpeak3_Adapter_Abstract
     $repl = $this->getTransport()->read(1);
     $this->getTransport()->disconnect();
 
-    if(!count($repl))
+    if(!count((array)$repl))
     {
       return FALSE;
     }

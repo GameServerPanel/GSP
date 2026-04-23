@@ -71,7 +71,7 @@ function exec_ogp_module()
 		$access_rights = "";
 		
 		$ftp = FALSE;
-		foreach ($selections as $selection => $flag)
+		foreach ((array)$selections as $selection => $flag)
 		{
 			if (isset($_REQUEST[$selection]))
 			{
@@ -89,7 +89,7 @@ function exec_ogp_module()
 		}
 		else
 		{
-			foreach ( $game_cfgs as $row )
+			foreach ((array)$game_cfgs as $row)
 			{
 				if($row['home_cfg_id'] == $home_cfg_id){
 					 $server_name = $row['game_name'];
@@ -98,11 +98,11 @@ function exec_ogp_module()
 					 $readable_game_key = strtolower($readable_game_key);
 				}
 			}
-			foreach ( $remote_servers as $server )
+			foreach ((array)$remote_servers as $server)
 			{
 				if($server['remote_server_id'] == $rserver_id) $ogp_user = $server['ogp_user'];
 			}
-			foreach ( $users as $user )
+			foreach ((array)$users as $user)
 			{
 				if($user['user_id'] == $web_user_id) $web_user = $user['users_login'];
 			}
@@ -170,7 +170,7 @@ function exec_ogp_module()
 		echo "<table class='center'>";
 		echo "<tr><td  class='right'>".get_lang('game_server')."</td><td class='left'><select onchange=".'"this.form.submit()"'." name='rserver_id'>\n";
 		echo "<option>".get_lang('select_remote_server')."</option>\n";
-		foreach ( $remote_servers as $server )
+		foreach ((array)$remote_servers as $server)
 		{
 			echo "<option value='".$server['remote_server_id']."'>".
 				$server['remote_server_name']." (".$server['agent_ip'].")</option>\n";
@@ -204,7 +204,7 @@ function exec_ogp_module()
 			<td class='left'><select name='web_user_id'>";
 		$users = $db->getUserList();
 		
-		foreach ( $users as $user ){
+		foreach ((array)$users as $user){
 			// Only users and admins can be assigned homes... not subusers
 			if(is_null($user['users_parent'])){
 				echo "<option value='".$user['user_id']."'>".$user['users_login']."</option>\n";
@@ -214,7 +214,7 @@ function exec_ogp_module()
 		// Select permisions
 		echo "<tr><td class='right'>".get_lang('access_rights').":</td>
 			<td class='left'>";
-		foreach ( $selections as $selection => $flag)
+		foreach ((array)$selections as $selection => $flag)
 		{
 			echo create_selection($selection,$flag);
 		}

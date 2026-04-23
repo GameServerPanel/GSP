@@ -3006,7 +3006,7 @@ function htmlEncode2($string) {
 
 // --------------
 // This function HTML-encodes a string with *htmlspecialchars* to print it on a page.
-// Only some special characters are encoded, otherwise special characters (e.g. é) appear encoded (&eacute).
+// Only some special characters are encoded, otherwise special characters (e.g. ) appear encoded (&eacute).
 // --------------
 
 	$isocode = __("iso-8859-1");
@@ -3377,7 +3377,7 @@ $AttmFiles ... array containing the filenames to attach like array("file1","file
 
 // Attachments
 	if($AttmFiles){
-		foreach($AttmFiles as $AttmFile){
+		foreach ((array)$AttmFiles as $AttmFile){
 //			$patharray = explode ("/", $AttmFile); 
 //			$FileName=$patharray[sizeof($patharray)-1];
 			$FileName = "RequestedFile.zip";

@@ -84,7 +84,7 @@ class rss_php {
         if(!$valueBlock) {
             $valueBlock = $this->document;
         }
-        foreach($valueBlock as $valueName => $values) {
+        foreach ((array)$valueBlock as $valueName => $values) {
                 if(isset($values['value'])) {
                     $values = $values['value'];
                 }
@@ -99,7 +99,7 @@ class rss_php {
     
     private function extractDOM($nodeList,$parentNodeName=false) {
         $itemCounter = 0;
-        foreach($nodeList as $values) {
+        foreach ((array)$nodeList as $values) {
             if(substr($values->nodeName,0,1) != '#') {
                 if($values->nodeName == 'item') {
                     $nodeName = $values->nodeName.':'.$itemCounter;

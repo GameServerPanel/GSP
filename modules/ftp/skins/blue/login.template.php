@@ -15,7 +15,7 @@
 $home_id = $_GET['home_id'];
 $user_homes = $_SESSION['user_homes'];
 $isAdmin = $_SESSION['isAdmin'];
-foreach($user_homes as $ftp_info)
+foreach ((array)$user_homes as $ftp_info)
 {
 	if($ftp_info['home_id'] == $home_id OR !$home_id)
 	{

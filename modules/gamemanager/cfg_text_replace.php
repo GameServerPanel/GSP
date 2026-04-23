@@ -52,7 +52,7 @@ $replace_texts = $server_xml->replace_texts->text;
 $replace_id = 0;
 if($replace_texts)
 {
-	foreach ($replace_texts as $text => $array )
+	foreach ((array)$replace_texts as $text => $array )
 	{
 		$param = (string)$array['key'];
 		
@@ -64,7 +64,7 @@ if($replace_texts)
 		
 		$replacements[$replace_id]['info_param'] = $info_param;
 		
-		foreach ($array as $key => $value )
+		foreach ((array)$array as $key => $value )
 		{
 			if ($key == "default")
 				$replacements[$replace_id]['default'] = (string)$value;
@@ -85,9 +85,9 @@ $custom_fields = json_decode($db->getCustomFields($server_home["home_id"]), True
 $fields = $server_xml->custom_fields->field;
 if($fields)
 {
-	foreach ($fields as $text => $array )
+	foreach ((array)$fields as $text => $array )
 	{
-		foreach ($array as $key => $value )
+		foreach ((array)$array as $key => $value )
 		{			
 			if ($key == "default_value")
 			{
@@ -111,7 +111,7 @@ if($fields)
 	}
 }
 
-foreach($replacements as $key => $replacement)
+foreach ((array)$replacements as $key => $replacement)
 {	
 	$filepath = $replacement['filepath'];
 	$file_replacements[$filepath][$key] = $replacement;
@@ -124,7 +124,7 @@ echo "</xmp>"; */
 require_once('includes/lib_remote.php');
 $remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 
-foreach($file_replacements as $filepath => $replacements)
+foreach ((array)$file_replacements as $filepath => $replacements)
 {
 	$file_info =  $remote->remote_readfile($server_home['home_path']."/$filepath",$file_content);
 		
@@ -134,7 +134,7 @@ foreach($file_replacements as $filepath => $replacements)
 		$file_info = "";
 	}
 	
-	foreach($replacements as $replacement)
+	foreach ((array)$replacements as $replacement)
 	{	
 		$info_param = $replacement['info_param'];
 		$default = $replacement['default'];

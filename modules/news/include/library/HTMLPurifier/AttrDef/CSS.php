@@ -68,7 +68,7 @@ class HTMLPurifier_AttrDef_CSS extends HTMLPurifier_AttrDef
         $property = false;
         $context->register('CurrentCSSProperty', $property);
 
-        foreach ($declarations as $declaration) {
+        foreach ((array)$declarations as $declaration) {
             if (!$declaration) {
                 continue;
             }
@@ -123,7 +123,7 @@ class HTMLPurifier_AttrDef_CSS extends HTMLPurifier_AttrDef
         // slightly inefficient, but it's the only way of getting rid of
         // duplicates. Perhaps config to optimize it, but not now.
 
-        foreach ($propvalues as $prop => $value) {
+        foreach ((array)$propvalues as $prop => $value) {
             $new_declarations .= "$prop:$value;";
         }
 

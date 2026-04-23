@@ -66,7 +66,7 @@ class HTMLPurifier_AttrDef_CSS_FontFamily extends HTMLPurifier_AttrDef
         // assume that no font names contain commas in them
         $fonts = explode(',', $string);
         $final = '';
-        foreach ($fonts as $font) {
+        foreach ((array)$fonts as $font) {
             $font = trim($font);
             if ($font === '') {
                 continue;

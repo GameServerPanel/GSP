@@ -10,7 +10,7 @@ $mod_date = array();
 echo "$dbname<br>";
 $mods = mods($dbname);
 
-for($i=0; $i<count($mods); $i++){
+for($i=0; $i<count((array)$mods); $i++){
 	$url = "https://steamcommunity.com/sharedfiles/filedetails/changelog/$mods[$i]";
 	$text = scrape_mod_url($url);
 	$mod_date += ["$mods[$i]"=>substr(trim($text),8)];

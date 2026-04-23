@@ -165,7 +165,7 @@ try
 									<option>&nbsp;</option>";
 							   
 			$users = $db->getUserList();
-			foreach ( $users as $user )
+			foreach ((array)$users as $user)
 			{
 				$add_remove_virtual .= "<option value='".$user['user_id']."'>".$user['users_login']."</option>\n";
 			}	
@@ -178,7 +178,7 @@ try
 			if($ts3vservers != 0)
 			{
 				$ts3vuserlist = "<b>TeamSpeak 3</b><br>";
-				foreach($ts3vservers as $ts3vserver)
+				foreach ((array)$ts3vservers as $ts3vserver)
 				{
 					$ts3vuser = $db->getUserById($ts3vserver['user_id']);
 					

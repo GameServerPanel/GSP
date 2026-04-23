@@ -91,7 +91,7 @@ function smarty_function_cycle($params, &$smarty)
     }
 
     if($advance) {
-        if ( $cycle_vars[$name]['index'] >= count($cycle_array) -1 ) {
+        if ( $cycle_vars[$name]['index'] >= count((array)$cycle_array) -1 ) {
             $cycle_vars[$name]['index'] = 0;
         } else {
             $cycle_vars[$name]['index']++;

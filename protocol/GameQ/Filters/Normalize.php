@@ -61,9 +61,9 @@ class Normalize extends Base
         $result = array_merge($result, $this->check('general', $result));
 
         // Do player information
-        if (isset($result['players']) && count($result['players']) > 0) {
+        if (isset($result['players']) && count((array)$result['players']) > 0) {
             // Iterate
-            foreach ($result['players'] as $key => $player) {
+            foreach ((array)$result['players'] as $key => $player) {
                 $result['players'][$key] = array_merge($player, $this->check('player', $player));
             }
         } else {
@@ -71,9 +71,9 @@ class Normalize extends Base
         }
 
         // Do team information
-        if (isset($result['teams']) && count($result['teams']) > 0) {
+        if (isset($result['teams']) && count((array)$result['teams']) > 0) {
             // Iterate
-            foreach ($result['teams'] as $key => $team) {
+            foreach ((array)$result['teams'] as $key => $team) {
                 $result['teams'][$key] = array_merge($team, $this->check('team', $team));
             }
         } else {
@@ -111,15 +111,15 @@ class Normalize extends Base
 
                 if (is_array($raw)) {
                     // Iterate over the raw property we want to use
-                    foreach ($raw as $check) {
-                        if (array_key_exists($check, $data)) {
+                    foreach ((array)$raw as $check) {
+                        if (array_key_exists($check, (array)$data)) {
                             $value = $data[$check];
                             break;
                         }
                     }
                 } else {
                     // String
-                    if (array_key_exists($raw, $data)) {
+                    if (array_key_exists($raw, (array)$data)) {
                         $value = $data[$raw];
                     }
                 }

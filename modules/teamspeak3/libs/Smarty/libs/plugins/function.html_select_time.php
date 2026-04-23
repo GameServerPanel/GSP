@@ -51,7 +51,7 @@ function smarty_function_html_select_time($params, $smarty, $template)
     $second_extra = null;
     $meridian_extra = null;
 
-    foreach ($params as $_key => $_value) {
+    foreach ((array)$params as $_key => $_value) {
         switch ($_key) {
             case 'prefix':
             case 'time':
@@ -89,7 +89,7 @@ function smarty_function_html_select_time($params, $smarty, $template)
     if ($display_hours) {
         $hours = $use_24_hours ? range(0, 23) : range(1, 12);
         $hour_fmt = $use_24_hours ? '%H' : '%I';
-        for ($i = 0, $for_max = count($hours); $i < $for_max; $i++)
+        for ($i = 0, $for_max = count((array)$hours); $i < $for_max; $i++)
         $hours[$i] = sprintf('%02d', $hours[$i]);
         $html_result .= '<select name=';
         if (null !== $field_array) {
@@ -114,7 +114,7 @@ function smarty_function_html_select_time($params, $smarty, $template)
 
     if ($display_minutes) {
         $all_minutes = range(0, 59);
-        for ($i = 0, $for_max = count($all_minutes); $i < $for_max; $i += $minute_interval)
+        for ($i = 0, $for_max = count((array)$all_minutes); $i < $for_max; $i += $minute_interval)
         $minutes[] = sprintf('%02d', $all_minutes[$i]);
         $selected = intval(floor(strftime('%M', $time) / $minute_interval) * $minute_interval);
         $html_result .= '<select name=';
@@ -141,7 +141,7 @@ function smarty_function_html_select_time($params, $smarty, $template)
 
     if ($display_seconds) {
         $all_seconds = range(0, 59);
-        for ($i = 0, $for_max = count($all_seconds); $i < $for_max; $i += $second_interval)
+        for ($i = 0, $for_max = count((array)$all_seconds); $i < $for_max; $i += $second_interval)
         $seconds[] = sprintf('%02d', $all_seconds[$i]);
         $selected = intval(floor(strftime('%S', $time) / $second_interval) * $second_interval);
         $html_result .= '<select name=';

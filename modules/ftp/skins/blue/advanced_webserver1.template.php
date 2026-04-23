@@ -96,7 +96,7 @@
 
 		<li>
 <?php 	echo __("Getting the raw list of directories and files: "); ?><br />
-<?php 	for($i=0; $i<count($parsedlist); $i++) {
+<?php 	for($i=0; $i<count((array)$parsedlist); $i++) {
 			echo "<u>Line $i</u><br />\n";
 			print_r($parsedlist[$i]);
 			echo "<br />";

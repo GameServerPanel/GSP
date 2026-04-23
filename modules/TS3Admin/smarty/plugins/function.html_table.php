@@ -65,7 +65,7 @@ function smarty_function_html_table($params, &$smarty)
         return;
     }
 
-    foreach ($params as $_key=>$_value) {
+    foreach ((array)$params as $_key=>$_value) {
         switch ($_key) {
             case 'loop':
                 $$_key = (array)$_value;
@@ -74,10 +74,10 @@ function smarty_function_html_table($params, &$smarty)
             case 'cols':
                 if (is_array($_value) && !empty($_value)) {
                     $cols = $_value;
-                    $cols_count = count($_value);
+                    $cols_count = count((array)$_value);
                 } elseif (!is_numeric($_value) && is_string($_value) && !empty($_value)) {
                     $cols = explode(',', $_value);
-                    $cols_count = count($cols);
+                    $cols_count = count((array)$cols);
                 } elseif (!empty($_value)) {
                     $cols_count = (int)$_value;
                 } else {
@@ -106,7 +106,7 @@ function smarty_function_html_table($params, &$smarty)
         }
     }
 
-    $loop_count = count($loop);
+    $loop_count = count((array)$loop);
     if (empty($params['rows'])) {
         /* no rows specified */
         $rows = ceil($loop_count/$cols_count);
@@ -165,7 +165,7 @@ function smarty_function_html_table_cycle($name, $var, $no) {
     if(!is_array($var)) {
         $ret = $var;
     } else {
-        $ret = $var[$no % count($var)];
+        $ret = $var[$no % count((array)$var)];
     }
     
     return ($ret) ? ' '.$ret : '';

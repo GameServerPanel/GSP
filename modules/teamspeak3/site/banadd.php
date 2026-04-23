@@ -40,7 +40,7 @@ if (isset($_POST['addban']))
 			}
 			else
 			{
-			for($i=0; $i+1==count($ban_add['errors']); $i++)
+			for($i=0; $i+1==count((array)$ban_add['errors']); $i++)
 				{
 				$error .= $ban_add['errors'][$i]."<br />";
 				}

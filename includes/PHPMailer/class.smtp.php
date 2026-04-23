@@ -669,7 +669,7 @@ class SMTP
             $in_headers = true;
         }
 
-        foreach ($lines as $line) {
+        foreach ((array)$lines as $line) {
             $lines_out = array();
             if ($in_headers and $line == '') {
                 $in_headers = false;
@@ -700,7 +700,7 @@ class SMTP
             $lines_out[] = $line;
 
             //Send the lines to the server
-            foreach ($lines_out as $line_out) {
+            foreach ((array)$lines_out as $line_out) {
                 //RFC2821 section 4.5.2
                 if (!empty($line_out) and $line_out[0] == '.') {
                     $line_out = '.' . $line_out;
@@ -768,7 +768,7 @@ class SMTP
         $this->server_caps = array();
         $lines = explode("\n", $this->helo_rply);
 
-        foreach ($lines as $n => $s) {
+        foreach ((array)$lines as $n => $s) {
             //First 4 chars contain response code followed by - or space
             $s = trim(substr($s, 4));
             if (empty($s)) {
@@ -895,7 +895,7 @@ class SMTP
         $matches = array();
         if (preg_match("/^([0-9]{3})[ -](?:([0-9]\\.[0-9]\\.[0-9]) )?/", $this->last_reply, $matches)) {
             $code = $matches[1];
-            $code_ex = (count($matches) > 2 ? $matches[2] : null);
+            $code_ex = (count((array)$matches) > 2 ? $matches[2] : null);
             // Cut off error code from each response line
             $detail = preg_replace(
                 "/{$code}[ -]" .

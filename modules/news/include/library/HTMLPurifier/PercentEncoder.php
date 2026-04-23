@@ -84,7 +84,7 @@ class HTMLPurifier_PercentEncoder
         }
         $parts = explode('%', $string);
         $ret = array_shift($parts);
-        foreach ($parts as $part) {
+        foreach ((array)$parts as $part) {
             $length = strlen($part);
             if ($length < 2) {
                 $ret .= '%25' . $part;

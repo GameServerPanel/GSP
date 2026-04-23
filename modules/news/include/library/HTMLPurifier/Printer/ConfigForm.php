@@ -105,7 +105,7 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
 
         $allowed = HTMLPurifier_Config::getAllowedDirectivesForForm($allowed, $config->def);
         $all = array();
-        foreach ($allowed as $key) {
+        foreach ((array)$allowed as $key) {
             list($ns, $directive) = $key;
             $all[$ns][$directive] = $config->get($ns . '.' . $directive);
         }
@@ -118,7 +118,7 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
         $ret .= $this->element('th', 'Value', array('class' => 'hp-value'));
         $ret .= $this->end('tr');
         $ret .= $this->end('thead');
-        foreach ($all as $ns => $directives) {
+        foreach ((array)$all as $ns => $directives) {
             $ret .= $this->renderNamespace($ns, $directives);
         }
         if ($render_controls) {
@@ -150,7 +150,7 @@ class HTMLPurifier_Printer_ConfigForm extends HTMLPurifier_Printer
         $ret .= $this->end('tr');
         $ret .= $this->end('tbody');
         $ret .= $this->start('tbody');
-        foreach ($directives as $directive => $value) {
+        foreach ((array)$directives as $directive => $value) {
             $ret .= $this->start('tr');
             $ret .= $this->start('th');
             if ($this->docURL) {
@@ -317,7 +317,7 @@ class HTMLPurifier_Printer_ConfigForm_default extends HTMLPurifier_Printer
                 case HTMLPurifier_VarParser::LOOKUP:
                     $array = $value;
                     $value = array();
-                    foreach ($array as $val => $b) {
+                    foreach ((array)$array as $val => $b) {
                         $value[] = $val;
                     }
                     //TODO does this need a break?
@@ -326,7 +326,7 @@ class HTMLPurifier_Printer_ConfigForm_default extends HTMLPurifier_Printer
                     break;
                 case HTMLPurifier_VarParser::HASH:
                     $nvalue = '';
-                    foreach ($value as $i => $v) {
+                    foreach ((array)$value as $i => $v) {
                         if (is_array($v)) {
                             // HACK
                             $v = implode(";", $v);

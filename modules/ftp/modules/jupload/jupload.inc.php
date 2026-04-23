@@ -36,7 +36,7 @@ function net2ftp_module_sendHttpHeaders() {
 
 // Code for old file jupload applet (jupload version 0.86)
 //		$file_counter = 0;
-//		foreach($_FILES as $tagname=>$object) {
+//		foreach ((array)$_FILES as $tagname=>$object) {
 //			if ($object['name'] != "") {
 //				$file_counter = $file_counter + 1;
 //				$uploadedFilesArray["$file_counter"]["name"]               = $object['name'];
@@ -55,7 +55,7 @@ function net2ftp_module_sendHttpHeaders() {
 
 // Code for new file jupload applet (jupload version 5.0.8)
 		$file_counter = 0;
-		foreach($_FILES as $tagname=>$object) {
+		foreach ((array)$_FILES as $tagname=>$object) {
 			if ($object['name'] != "") {
 				$file_counter = $file_counter + 1;
 				$uploadedFilesArray["$file_counter"]["name"]               = $object['name'];

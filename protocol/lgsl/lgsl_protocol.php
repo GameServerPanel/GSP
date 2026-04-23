@@ -879,7 +879,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		array_pop($part);				// REMOVE FOOTER WHICH IS EITHER NULL OR "\challenge\"
 		$item = explode("\\", $part[1]); // SPLIT PART INTO ITEMS
 
-		foreach ($item as $item_key => $data_key)
+		foreach ((array)$item as $item_key => $data_key)
 		{
 			if (!($item_key % 2)) { continue; } // SKIP EVEN KEYS
 
@@ -895,7 +895,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		if (isset($server['e']['gamename'])) { $server['s']['game'] = $server['e']['gamename']; }
 		if (isset($server['e']['mapname']))  { $server['s']['map']  = $server['e']['mapname']; }
 
-		$server['s']['players'] = empty($part['2']) ? 0 : count($part) - 2;
+		$server['s']['players'] = empty($part['2']) ? 0 : count((array)$part) - 2;
 
 		if (isset($server['e']['maxclients']))	{ $server['s']['playersmax'] = $server['e']['maxclients']; }	// QUAKE 2
 		if (isset($server['e']['sv_maxclients'])) { $server['s']['playersmax'] = $server['e']['sv_maxclients']; }
@@ -936,13 +936,13 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 	//---------------------------------------------------------+
 
-		foreach ($part as $player_key => $data)
+		foreach ((array)$part as $player_key => $data)
 		{
 			if (!$data) { continue; }
 
 			preg_match($pattern, $data, $match);
 
-			foreach ($fields as $match_key => $field_name)
+			foreach ((array)$fields as $match_key => $field_name)
 			{
 				if (isset($match[$match_key])) { $server['p'][$player_key][$field_name] = trim($match[$match_key]); }
 			}
@@ -1060,7 +1060,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			// OPERATION FLASHPOINT BUG: 'GHOST' PLAYERS IN UN-USED 'TEAM' FIELD
 			if ($server['b']['type'] == "flashpoint")
 			{
-				foreach ($server['p'] as $key => $value)
+				foreach ((array)$server['p'] as $key => $value)
 				{
 					unset($server['p'][$key]['team']);
 				}
@@ -1069,7 +1069,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			// AVP2 BUG: PLAYER NUMBER PREFIXED TO NAMES
 			if ($server['b']['type'] == "avp2")
 			{
-				foreach ($server['p'] as $key => $value)
+				foreach ((array)$server['p'] as $key => $value)
 				{
 					$server['p'][$key]['name'] = preg_replace("/[0-9]+~/", "", $server['p'][$key]['name']);
 				}
@@ -1078,7 +1078,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			// CHANGE TEAM NUMBERS TO TEAM NAMES IF POSSIBLE
 			if (isset($server['t'][0]['name']))
 			{
-				foreach ($server['p'] as $key => $value)
+				foreach ((array)$server['p'] as $key => $value)
 				{
 					$team_key = $server['p'][$key]['team'] - 1;
 					$server['p'][$key]['team'] = $server['t'][$team_key]['name'];
@@ -1147,7 +1147,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		$item = explode("\xB6", $buffer);
 
-		foreach ($item as $data_value)
+		foreach ((array)$item as $data_value)
 		{
 			$tmp = explode(" ", $data_value, 2);
 			$data_key = isset($lgsl_ravenshield_key[$tmp[0]]) ? $lgsl_ravenshield_key[$tmp[0]] : $tmp[0]; // CONVERT TO DESCRIPTIVE KEYS
@@ -1173,7 +1173,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		$player_ping  = isset($server['e']['players_ping'])  ? explode("/", substr($server['e']['players_ping'],  1)) : array(); unset($server['e']['players_ping']);
 		$player_score = isset($server['e']['players_score']) ? explode("/", substr($server['e']['players_score'], 1)) : array(); unset($server['e']['players_score']);
 
-		foreach ($player_name as $key => $name)
+		foreach ((array)$player_name as $key => $name)
 		{
 			$server['p'][$key]['name']  = $player_name[$key];
 			$server['p'][$key]['time']  = $player_time[$key];
@@ -1255,7 +1255,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		$buffer = array();
 
-		foreach ($packet_temp as $packet)
+		foreach ((array)$packet_temp as $packet)
 		{
 			if	 ($packet_type == 1) { $packet_order = 0; }
 			elseif ($packet_type == 2) { $packet_order = ord($packet[8]) >> 4; $packet = substr($packet, 9);  } // ( INDEX IS UPPER NIBBLE OF BYTE )
@@ -1441,7 +1441,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 	//---------------------------------------------------------+
 	//  PROCESS AND SORT PACKETS
 
-		foreach ($buffer as $key => $packet)
+		foreach ((array)$buffer as $key => $packet)
 		{
 			$packet = substr($packet, 0, -1); // REMOVE END NULL FOR JOINING
 
@@ -1484,7 +1484,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		}
 
 		$lgsl_conversion = array("name"=>"hostname", "game"=>"gamename", "map"=>"mapname", "players"=>"numplayers", "playersmax"=>"maxplayers", "password"=>"password");
-		foreach ($lgsl_conversion as $s => $e) { if (isset($server['e'][$e])) { $server['s'][$s] = $server['e'][$e]; unset($server['e'][$e]); } } // LGSL STANDARD
+		foreach ((array)$lgsl_conversion as $s => $e) { if (isset($server['e'][$e])) { $server['s'][$s] = $server['e'][$e]; unset($server['e'][$e]); } } // LGSL STANDARD
 
 		if ($server['b']['type'] == "bf2" || $server['b']['type'] == "bf2142") { $server['s']['map'] = ucwords(str_replace("_", " ", $server['s']['map'])); } // MAP NAME CONSISTENCY
 
@@ -1511,7 +1511,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			$value_list = lgsl_cut_string($buffer, 0, "\x00\x00");
 			$value_list = explode("\x00", $value_list);
 
-			foreach ($value_list as $key => $value)
+			foreach ((array)$value_list as $key => $value)
 			{
 			$server['p'][$key][$field] = $value;
 			}
@@ -1535,7 +1535,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			$value_list = lgsl_cut_string($buffer, 0, "\x00\x00");
 			$value_list = explode("\x00", $value_list);
 
-			foreach ($value_list as $key => $value)
+			foreach ((array)$value_list as $key => $value)
 			{
 			$server['t'][$key][$field] = $value;
 			}
@@ -1546,7 +1546,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		if ($server['p'] && isset($server['t'][0]['name']) && $server['t'][0]['name'] != "Team")
 		{
-			foreach ($server['p'] as $key => $value)
+			foreach ((array)$server['p'] as $key => $value)
 			{
 			if (empty($server['p'][$key]['team'])) { continue; }
 
@@ -1585,7 +1585,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		$item = explode("\\", $part[0]);
 
-		foreach ($item as $item_key => $data_key)
+		foreach ((array)$item as $item_key => $data_key)
 		{
 			if ($item_key % 2) { continue; } // SKIP ODD KEYS
 
@@ -1597,7 +1597,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		array_shift($part); // REMOVE SETTINGS
 
-		foreach ($part as $key => $data)
+		foreach ((array)$part as $key => $data)
 		{
 			preg_match("/(.*) (.*) (.*) (.*) \"(.*)\" \"(.*)\" (.*) (.*)/s", $data, $match); // GREEDY MATCH FOR SKINS
 
@@ -1616,7 +1616,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		$server['s']['game']	   = $server['e']['*gamedir'];
 		$server['s']['name']	   = $server['e']['hostname'];
 		$server['s']['map']		= $server['e']['map'];
-		$server['s']['players']	= $server['p'] ? count($server['p']) : 0;
+		$server['s']['players']	= $server['p'] ? count((array)$server['p']) : 0;
 		$server['s']['playersmax'] = $server['e']['maxclients'];
 		$server['s']['password']   = isset($server['e']['needpass']) && $server['e']['needpass'] > 0 && $server['e']['needpass'] < 4 ? 1 : 0;
 
@@ -1676,7 +1676,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			elseif ($server['b']['type'] == "painkiller") { $field_list = array("name", "",	 "skin",  "score", "ping", ""	); }
 			elseif ($server['b']['type'] == "soldat")	 { $field_list = array("name", "team", "",	  "score", "ping", "time"); }
 
-			foreach ($field_list as $item_key)
+			foreach ((array)$field_list as $item_key)
 			{
 				$item_value = lgsl_cut_pascal($buffer, 1, -1);
 
@@ -1721,7 +1721,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 			$item = explode("\x00", $buffer);
 
-			foreach ($item as $item_key => $data_key)
+			foreach ((array)$item as $item_key => $data_key)
 			{
 				if ($item_key % 2) { continue; } // SKIP EVEN KEYS
 
@@ -1774,12 +1774,12 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			$item	   = explode("\x00",$buffer[1]);				// SPLIT UP ITEMS
 
 			$item_position = 0;
-			$item_total	= count($item);
+			$item_total	= count((array)$item);
 			$player_key	= 0;
 
 			do
 			{
-				foreach ($field_list as $field)
+				foreach ((array)$field_list as $field)
 				{
 					$server['p'][$player_key][$field] = $item[$item_position];
 
@@ -1936,7 +1936,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		$server['s']['game']	   = $server['e']['gamename'];
 		$server['s']['name']	   = $server['e']['si_name'];
 		$server['s']['map']		= $server['e']['si_map'];
-		$server['s']['players']	= $server['p'] ? count($server['p']) : 0;
+		$server['s']['players']	= $server['p'] ? count((array)$server['p']) : 0;
 		$server['s']['playersmax'] = $server['e']['si_maxplayers'];
 
 		if ($server['b']['type'] == "wolf2009" || $server['b']['type'] == "quakewars")
@@ -1988,7 +1988,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		"p1073741827" => "description",
 		"p1073741828" => "mutators_custom");
 
-		foreach ($lgsl_ut3_key as $old => $new)
+		foreach ((array)$lgsl_ut3_key as $old => $new)
 		{
 			if (!isset($server['e'][$old])) { continue; }
 			$server['e'][$new] = $server['e'][$old];
@@ -2841,7 +2841,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		$team_field = "?".lgsl_cut_pascal($buffer);
 		$team_field = explode("\t", $team_field);
 
-		foreach ($team_field as $key => $value)
+		foreach ((array)$team_field as $key => $value)
 		{
 			$value = substr($value, 1);
 			$value = strtolower($value);
@@ -2853,7 +2853,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		$player_field = "?".lgsl_cut_pascal($buffer);
 		$player_field = explode("\t", $player_field);
 
-		foreach ($player_field as $key => $value)
+		foreach ((array)$player_field as $key => $value)
 		{
 			$value = substr($value, 1);
 			$value = strtolower($value);
@@ -2878,7 +2878,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			$team_info = str_replace("%t", $team_name, $team_info);
 			$team_info = explode("\t", $team_info);
 
-			foreach ($team_info as $key => $value)
+			foreach ((array)$team_info as $key => $value)
 			{
 			$field = $team_field[$key];
 			$value = trim($value);
@@ -2905,7 +2905,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			$player_info = str_replace(array("%p","%l","%t","%n"), $player_bits, $player_info);
 			$player_info = explode("\t", $player_info);
 
-			foreach ($player_info as $key => $value)
+			foreach ((array)$player_info as $key => $value)
 			{
 			$field = $player_field[$key];
 			$value = trim($value);
@@ -3248,7 +3248,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 	//---------------------------------------------------------+
 
-		foreach ($raw['attributeNames'] as $key => $field)
+		foreach ((array)$raw['attributeNames'] as $key => $field)
 		{
 			$field = strtolower($field);
 
@@ -3276,7 +3276,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		}
 
 		$lgsl_conversion = array("gamename"=>"name","mapname"=>"map","playercount"=>"players","maxplayers"=>"playersmax","flagpassword"=>"password");
-		foreach ($lgsl_conversion as $e => $s) { $server['s'][$s] = $server['e'][$e]; unset($server['ea'][$e]); } // LGSL STANDARD
+		foreach ((array)$lgsl_conversion as $e => $s) { $server['s'][$s] = $server['e'][$e]; unset($server['ea'][$e]); } // LGSL STANDARD
 		$server['s']['playersmax'] += intval($server['e']['maxspectators']); // ADD SPECTATOR SLOTS TO MAX PLAYERS
 
 	//---------------------------------------------------------+
@@ -3336,7 +3336,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		while ($packet_binary)
 		{
-			foreach ($huffman_table as $ascii => $huffman_binary)
+			foreach ((array)$huffman_table as $ascii => $huffman_binary)
 			{
 				$huffman_length = strlen($huffman_binary);
 
@@ -3726,7 +3726,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 			for ($i=0; $i<$player_total; $i++)
 			{
-				foreach ($field_list as $field)
+				foreach ((array)$field_list as $field)
 				{
 					$value = lgsl_cut_pascal($buffer, 4, 0, 1);
 
@@ -3898,7 +3898,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 			for ($i=0; $i<$player_total; $i++)
 			{
-				foreach ($field_list as $field)
+				foreach ((array)$field_list as $field)
 				{
 					$value = lgsl_cut_pascal($buffer, 4, 0, 1);
 					switch ($field)
@@ -3955,12 +3955,12 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			// Get the channels array
 			$channels = $murmur->get_channels();
 
-			if(count($users) > 0)
+			if(count((array)$users) > 0)
 			{
-			$server['s']['players'] = count($users);
+			$server['s']['players'] = count((array)$users);
 			
 			$i=0;
-			foreach($users as $user)
+			foreach ((array)$users as $user)
 			{
 				$server['p'][$i]['name']	= $user['name'];
 				$server['p'][$i]['score']	= $user['idlesecs'];
@@ -3998,7 +3998,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		curl_close($ch);
 				//Parser
 		preg_match_all("(<tr><td style=\"vertical-align:top;\">(.*)</tr>)siU", $result, $matches);
-		foreach ( $matches[1] as $servers ) 
+		foreach ((array)$matches[1] as $servers) 
 		{
 			if (preg_match("/$ip:$port/",$servers))
 			{
@@ -4033,12 +4033,12 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 				//players list
 				preg_match_all("(<td style=\"vertical-align:top;font-size:0.9em;\"><span style=\"color:#888888;\">(.*)</td>)siU", $servers, $playerslist);
 				$players_array[0] = "";
-				foreach ( $playerslist[1] as $player_row ) 
+				foreach ((array)$playerslist[1] as $player_row) 
 				{
 					preg_match_all("(</span>(.*) <)siU", $player_row, $player_name);
 					$i = 0;
 					
-					foreach ( $player_name[1] as $player ) 
+					foreach ((array)$player_name[1] as $player) 
 					{
 						trim($player);
 						$server['p'][$i]['name'] = $player;
@@ -4074,13 +4074,13 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			preg_match_all("(\| INFO\|(.*)\\n)siU", $data, $matches);
 			$matches = array_reverse($matches);
 			$rows = "";
-			foreach ( $matches[1] as $info_row ) 
+			foreach ((array)$matches[1] as $info_row) 
 			{
 			$rows .= $info_row;
 			$info_row = $info_row."INFO<br>";
 			if (preg_match_all("(servername:(.*)INFO)siU", $info_row, $info))
 			{
-				foreach ( $info[1] as $value ) 
+				foreach ((array)$info[1] as $value) 
 				{
 					$value = trim($value);
 					$remote->remote_writefile($home_info['home_path'].'/servername.txt',$value);
@@ -4090,7 +4090,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			}
 			if (preg_match_all("(terrain:(.*)INFO)siU", $info_row, $info))
 			{
-				foreach ( $info[1] as $value ) 
+				foreach ((array)$info[1] as $value) 
 				{
 					$value = trim($value);
 					$remote->remote_writefile($home_info['home_path'].'/terrain.txt',$value);
@@ -4099,7 +4099,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			}
 			if (preg_match_all("(maxclients:(.*)INFO)siU", $info_row, $info))
 			{
-				foreach ( $info[1] as $value ) 
+				foreach ((array)$info[1] as $value) 
 				{
 					$value = trim($value);
 					$remote->remote_writefile($home_info['home_path'].'/maxclients.txt',$value);
@@ -4127,7 +4127,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			if (preg_match_all("(FO\|(.*)\|.IN)siU", $info_row, $info))
 			{
 				$i = 0;
-				foreach ( $info[1] as $value ) 
+				foreach ((array)$info[1] as $value) 
 				{
 					$value = trim($value);
 					$value = str_replace('|', "", $value);
@@ -4201,7 +4201,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 		{
 			$settings = explode("\n", $data);
 			$i = 0;
-			foreach ( $settings as $setting ) 
+			foreach ((array)$settings as $setting) 
 			{
 				$setting = trim($setting);
 				$setting = explode(":", $setting);
@@ -4274,7 +4274,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 			if( $server_data['players'] > 0)
 			{
 				$i=0;
-				foreach($users as $user)
+				foreach ((array)$users as $user)
 				{
 					$server['p'][$i]['name']  = $user;
 					$i++;
@@ -4329,7 +4329,7 @@ if (!function_exists('lgsl_version')) { // START OF DOUBLE LOAD PROTECTION
 
 		$data = explode('\\', $buffer);
 
-		for ($i = 0; $i < count($data); $i += 2) {
+		for ($i = 0; $i < count((array)$data); $i += 2) {
 			if ($data[$i] == 'sv_maxclients') {
 				$server['s']['playersmax'] = $data[$i + 1];
 			}

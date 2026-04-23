@@ -41,7 +41,7 @@ class GameQ_Protocols_Warsow extends GameQ_Protocols_Quake3
 		array_pop($players);
 
 		// Add total number of players
-		$result->add('num_players', count($players));
+		$result->add('num_players', count((array)$players));
 
 		// Loop the players
 		foreach($players AS $player_info)

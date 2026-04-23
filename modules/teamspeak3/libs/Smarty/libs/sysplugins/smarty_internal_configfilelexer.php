@@ -91,7 +91,7 @@ class Smarty_Internal_Configfilelexer
             if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
-                if (!count($yymatches)) {
+                if (!count((array)$yymatches)) {
                     throw new Exception('Error: lexing failed because a rule matched' .
                         'an empty string.  Input "' . substr($this->data,
                         $this->counter, 5) . '... state START');
@@ -198,7 +198,7 @@ class Smarty_Internal_Configfilelexer
             if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
-                if (!count($yymatches)) {
+                if (!count((array)$yymatches)) {
                     throw new Exception('Error: lexing failed because a rule matched' .
                         'an empty string.  Input "' . substr($this->data,
                         $this->counter, 5) . '... state VALUE');
@@ -319,7 +319,7 @@ class Smarty_Internal_Configfilelexer
             if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
-                if (!count($yymatches)) {
+                if (!count((array)$yymatches)) {
                     throw new Exception('Error: lexing failed because a rule matched' .
                         'an empty string.  Input "' . substr($this->data,
                         $this->counter, 5) . '... state NAKED_STRING_VALUE');
@@ -388,7 +388,7 @@ class Smarty_Internal_Configfilelexer
             if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
-                if (!count($yymatches)) {
+                if (!count((array)$yymatches)) {
                     throw new Exception('Error: lexing failed because a rule matched' .
                         'an empty string.  Input "' . substr($this->data,
                         $this->counter, 5) . '... state COMMENT');
@@ -466,7 +466,7 @@ class Smarty_Internal_Configfilelexer
             if (preg_match($yy_global_pattern, substr($this->data, $this->counter), $yymatches)) {
                 $yysubmatches = $yymatches;
                 $yymatches = array_filter($yymatches, 'strlen'); // remove empty sub-patterns
-                if (!count($yymatches)) {
+                if (!count((array)$yymatches)) {
                     throw new Exception('Error: lexing failed because a rule matched' .
                         'an empty string.  Input "' . substr($this->data,
                         $this->counter, 5) . '... state SECTION');

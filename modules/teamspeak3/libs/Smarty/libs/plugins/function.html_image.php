@@ -49,7 +49,7 @@ function smarty_function_html_image($params, $smarty, $template)
     $path_prefix = '';
     $server_vars = ($smarty->request_use_auto_globals) ? $_SERVER : $GLOBALS['HTTP_SERVER_VARS'];
     $basedir = isset($server_vars['DOCUMENT_ROOT']) ? $server_vars['DOCUMENT_ROOT'] : '';
-    foreach($params as $_key => $_val) {
+    foreach ((array)$params as $_key => $_val) {
         switch ($_key) {
             case 'file':
             case 'height':

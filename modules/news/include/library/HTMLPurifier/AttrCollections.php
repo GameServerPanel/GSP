@@ -28,12 +28,12 @@ class HTMLPurifier_AttrCollections
     public function doConstruct($attr_types, $modules)
     {
         // load extensions from the modules
-        foreach ($modules as $module) {
+        foreach ((array)$modules as $module) {
             foreach ($module->attr_collections as $coll_i => $coll) {
                 if (!isset($this->info[$coll_i])) {
                     $this->info[$coll_i] = array();
                 }
-                foreach ($coll as $attr_i => $attr) {
+                foreach ((array)$coll as $attr_i => $attr) {
                     if ($attr_i === 0 && isset($this->info[$coll_i][$attr_i])) {
                         // merge in includes
                         $this->info[$coll_i][$attr_i] = array_merge(
@@ -103,7 +103,7 @@ class HTMLPurifier_AttrCollections
         // skip duplicates
         $processed = array();
 
-        foreach ($attr as $def_i => $def) {
+        foreach ((array)$attr as $def_i => $def) {
             // skip inclusions
             if ($def_i === 0) {
                 continue;

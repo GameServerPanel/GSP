@@ -31,7 +31,7 @@ function exec_ogp_module()
 	$userRole = $userInfo['users_role'];
 	$commands = array();
 	
-	foreach($availableCommands as $command){
+	foreach ((array)$availableCommands as $command){
 		if($userRole == 'admin' && $command['admin'] === true){
 			$commands[] = '<option value="'.$command['title'].'">'.get_lang($command['title']).'</option>';
 		}

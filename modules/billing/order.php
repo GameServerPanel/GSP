@@ -75,7 +75,7 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 		return;
 	}
 	
-	foreach ($services as $key => $row) {
+	foreach ((array)$services as $key => $row) {
 		$service_ids[$key] = $row['service_id'];
 		$home_cfg_id[$key] = $row['home_cfg_id'];
 		$mod_cfg_id[$key] = $row['mod_cfg_id'];
@@ -97,7 +97,7 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 ?>	
 <div class="clearfix">
 	<?php
-	foreach($services as $row)
+	foreach ((array)$services as $row)
 	{ 
 	if(!isset($_REQUEST['service_id']))
 		{
@@ -196,11 +196,11 @@ if ($row['price_monthly'] == 0.0) {
 			//get the out of stock into an array and see if the rsID is in that array
 			$available_server = false;
 			//loop through each of the assigned servers and see if its disabled
-			foreach($rsiArray as $rsi)
+			foreach ((array)$rsiArray as $rsi)
 			{
 				$query = "SELECT * FROM {$table_prefix}remote_servers WHERE remote_server_id = ".$rsi;
 				$result = $db->query($query);
-				foreach($result as $rs)
+				foreach ((array)$result as $rs)
 				{
 							
 					$rsID =$rs['remote_server_id'];

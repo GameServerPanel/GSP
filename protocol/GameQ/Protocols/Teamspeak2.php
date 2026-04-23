@@ -167,7 +167,7 @@ class Teamspeak2 extends Protocol
         $result = new Result();
 
         // Now we need to iterate over the sections and off load the processing
-        foreach ($sections as $section) {
+        foreach ((array)$sections as $section) {
             // Grab a snip of the data so we can figure out what it is
             $check = substr($section, 0, 7);
 
@@ -247,7 +247,7 @@ class Teamspeak2 extends Protocol
             // Explode and merge the data with the columns, then parse
             $data = array_combine($columns, explode("\t", $row, 9));
 
-            foreach ($data as $key => $value) {
+            foreach ((array)$data as $key => $value) {
                 // Now add the data to the result
                 $result->addTeam($key, utf8_encode($value));
             }
@@ -279,7 +279,7 @@ class Teamspeak2 extends Protocol
             // Explode and merge the data with the columns, then parse
             $data = array_combine($columns, explode("\t", $row, 16));
 
-            foreach ($data as $key => $value) {
+            foreach ((array)$data as $key => $value) {
                 // Now add the data to the result
                 $result->addPlayer($key, utf8_encode($value));
             }

@@ -33,7 +33,7 @@ class Smarty_Internal_Compile_Function extends Smarty_Internal_CompileBase {
         $_name = trim($_attr['name'], "'\"");
         unset($_attr['name']);
         $compiler->template->properties['function'][$_name]['parameter'] = array();
-        foreach ($_attr as $_key => $_data) {
+        foreach ((array)$_attr as $_key => $_data) {
             $compiler->template->properties['function'][$_name]['parameter'][$_key] = $_data;
         } 
         $compiler->smarty->template_functions[$_name]['parameter'] = $compiler->template->properties['function'][$_name]['parameter'];
@@ -78,7 +78,7 @@ class Smarty_Internal_Compile_Functionclose extends Smarty_Internal_CompileBase 
         if (!empty($compiler->template->required_plugins['compiled'])) {
             $plugins_string = '<?php ';
             foreach($compiler->template->required_plugins['compiled'] as $tmp) {
-                foreach($tmp as $data) {
+                foreach ((array)$tmp as $data) {
                     $plugins_string .= "if (!is_callable('{$data['function']}')) include '{$data['file']}';\n";
                 } 
             } 
@@ -87,7 +87,7 @@ class Smarty_Internal_Compile_Functionclose extends Smarty_Internal_CompileBase 
         if (!empty($compiler->template->required_plugins['nocache'])) {
             $plugins_string .= "<?php echo '/*%%SmartyNocache:{$compiler->template->properties['nocache_hash']}%%*/<?php ";
             foreach($compiler->template->required_plugins['nocache'] as $tmp) {
-                foreach($tmp as $data) {
+                foreach ((array)$tmp as $data) {
                     $plugins_string .= "if (!is_callable(\'{$data['function']}\')) include \'{$data['file']}\';\n";
                 } 
             } 

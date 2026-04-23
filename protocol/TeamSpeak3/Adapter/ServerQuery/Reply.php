@@ -112,7 +112,7 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
 
     if(!func_num_args())
     {
-      for($i = 0; $i < count($list); $i++) $list[$i]->unescape();
+      for($i = 0; $i < count((array)$list); $i++) $list[$i]->unescape();
     }
 
     return $list;
@@ -133,7 +133,7 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
 
       if(!func_num_args())
       {
-        for($i = 0; $i < count($pairs); $i++) $pairs[$i]->unescape();
+        for($i = 0; $i < count((array)$pairs); $i++) $pairs[$i]->unescape();
       }
 
       $table[] = $pairs;
@@ -152,11 +152,11 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
     $array = array();
     $table = $this->toTable(1);
 
-    for($i = 0; $i < count($table); $i++)
+    for($i = 0; $i < count((array)$table); $i++)
     {
-      foreach($table[$i] as $pair)
+      foreach ((array)$table[$i] as $pair)
       {
-        if(!count($pair))
+        if(!count((array)$pair))
         {
           continue;
         }
@@ -189,7 +189,7 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
     $nodes = (func_num_args() > 1) ? $this->toArray(1) : $this->toArray();
     $array = array();
 
-    foreach($nodes as $node)
+    foreach ((array)$nodes as $node)
     {
       if(isset($node[$ident]))
       {
@@ -213,7 +213,7 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
   {
     $array = func_num_args() ? $this->toArray(1) : $this->toArray();
 
-    if(count($array) == 1)
+    if(count((array)$array) == 1)
     {
       return array_shift($array);
     }
@@ -230,7 +230,7 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
   {
     $array = (func_num_args() > 1) ? $this->toArray(1) : $this->toArray();
 
-    for($i = 0; $i < count($array); $i++)
+    for($i = 0; $i < count((array)$array); $i++)
     {
       $array[$i] = (object) $array[$i];
     }
@@ -325,7 +325,7 @@ class TeamSpeak3_Adapter_ServerQuery_Reply
    */
   protected function fetchReply($rpl)
   {
-    foreach($rpl as $key => $val)
+    foreach ((array)$rpl as $key => $val)
     {
       if($val->startsWith(TeamSpeak3::TS3_MOTD_PREFIX) || $val->startsWith(TeamSpeak3::TEA_MOTD_PREFIX) || (defined("CUSTOM_MOTD_PREFIX") && $val->startsWith(CUSTOM_MOTD_PREFIX)))
       {

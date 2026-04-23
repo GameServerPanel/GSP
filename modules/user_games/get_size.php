@@ -2,7 +2,7 @@
 function numbersFormatting($bytes){
 	$si_prefix = array( 'B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB' );
     $base = 1024;
-    $class = min((int)log($bytes , $base) , count($si_prefix) - 1);
+    $class = min((int)log($bytes , $base) , count((array)$si_prefix) - 1);
     return sprintf('%1.2f' , $bytes / pow($base,$class)) . ' ' . $si_prefix[$class];
 }
 
@@ -40,7 +40,7 @@ function exec_ogp_module()
 	{
 		$game_homes = $db->getGameHomes();
 		$total_size = 0;
-		foreach($game_homes as $game_home)
+		foreach ((array)$game_homes as $game_home)
 		{
 			$remote = new OGPRemoteLibrary($game_home['agent_ip'], $game_home['agent_port'], $game_home['encryption_key'], $game_home['timeout']);
 			$r = $remote->rfile_exists($game_home['home_path']);

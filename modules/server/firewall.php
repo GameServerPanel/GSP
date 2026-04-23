@@ -55,7 +55,7 @@ function exec_ogp_module() {
 			if(is_array($addresses))
 			{
 				$trimed_addresses = array();
-				foreach($addresses as $key => $address)
+				foreach ((array)$addresses as $key => $address)
 				{
 					$address = trim($address);
 					if(strpos($address,':'))
@@ -80,7 +80,7 @@ function exec_ogp_module() {
 		if(is_array($addresses))
 		{
 			$trimed_addresses = array();
-			foreach($addresses as $key => $address)
+			foreach ((array)$addresses as $key => $address)
 			{
 				$address = trim($address);
 				if(strpos($address,':'))
@@ -126,7 +126,7 @@ function exec_ogp_module() {
 				if(is_array($addresses))
 				{
 					$trimed_addresses = array();
-					foreach($addresses as $key => $address)
+					foreach ((array)$addresses as $key => $address)
 					{
 						$address = trim($address);
 						if(strpos($address,':'))

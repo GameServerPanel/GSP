@@ -21,7 +21,7 @@ class HTMLPurifier_AttrDef_Lang extends HTMLPurifier_AttrDef
         }
 
         $subtags = explode('-', $string);
-        $num_subtags = count($subtags);
+        $num_subtags = count((array)$subtags);
 
         if ($num_subtags == 0) { // sanity check
             return false;

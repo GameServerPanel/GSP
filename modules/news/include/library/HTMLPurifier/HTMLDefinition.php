@@ -306,7 +306,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                 unset($allowed_elements[$name]);
             }
             // emit errors
-            foreach ($allowed_elements as $element => $d) {
+            foreach ((array)$allowed_elements as $element => $d) {
                 $element = htmlspecialchars($element); // PHP doesn't escape errors, be careful!
                 trigger_error("Element '$element' is not supported $support", E_USER_WARNING);
             }
@@ -322,7 +322,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
             foreach ($this->info_global_attr as $attr => $x) {
                 $keys = array($attr, "*@$attr", "*.$attr");
                 $delete = true;
-                foreach ($keys as $key) {
+                foreach ((array)$keys as $key) {
                     if ($delete && isset($allowed_attributes[$key])) {
                         $delete = false;
                     }
@@ -339,7 +339,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                 foreach ($info->attr as $attr => $x) {
                     $keys = array("$tag@$attr", $attr, "*@$attr", "$tag.$attr", "*.$attr");
                     $delete = true;
-                    foreach ($keys as $key) {
+                    foreach ((array)$keys as $key) {
                         if ($delete && isset($allowed_attributes[$key])) {
                             $delete = false;
                         }
@@ -360,9 +360,9 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                 }
             }
             // emit errors
-            foreach ($allowed_attributes_mutable as $elattr => $d) {
+            foreach ((array)$allowed_attributes_mutable as $elattr => $d) {
                 $bits = preg_split('/[.@]/', $elattr, 2);
-                $c = count($bits);
+                $c = count((array)$bits);
                 switch ($c) {
                     case 2:
                         if ($bits[0] !== '*') {
@@ -421,7 +421,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
                 }
             }
         }
-        foreach ($forbidden_attributes as $key => $v) {
+        foreach ((array)$forbidden_attributes as $key => $v) {
             if (strlen($key) < 2) {
                 continue;
             }
@@ -463,7 +463,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
         $attributes = array();
 
         $chunks = preg_split('/(,|[\n\r]+)/', $list);
-        foreach ($chunks as $chunk) {
+        foreach ((array)$chunks as $chunk) {
             if (empty($chunk)) {
                 continue;
             }
@@ -482,7 +482,7 @@ class HTMLPurifier_HTMLDefinition extends HTMLPurifier_Definition
             }
             $attr = substr($attr, 0, strlen($attr) - 1); // remove trailing ]
             $attr = explode('|', $attr);
-            foreach ($attr as $key) {
+            foreach ((array)$attr as $key) {
                 $attributes["$element.$key"] = true;
             }
         }

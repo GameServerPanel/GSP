@@ -100,7 +100,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
         } 
         if (isset($_index[1])) {
             array_shift($_index);
-            foreach ($_index as $_ind) {
+            foreach ((array)$_index as $_ind) {
                 $compiled_ref = $compiled_ref . "[$_ind]";
             } 
         } 

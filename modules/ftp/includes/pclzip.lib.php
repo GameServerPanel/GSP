@@ -371,7 +371,7 @@
     
     // ----- Reformat the string list
     if (sizeof($v_string_list) != 0) {
-      foreach ($v_string_list as $v_string) {
+      foreach ((array)$v_string_list as $v_string) {
         if ($v_string != '') {
           $v_att_list[][PCLZIP_ATT_FILE_NAME] = $v_string;
         }
@@ -389,7 +389,7 @@
              ,PCLZIP_ATT_FILE_CONTENT => 'optional'
              ,PCLZIP_ATT_FILE_COMMENT => 'optional'
 						);
-    foreach ($v_att_list as $v_entry) {
+    foreach ((array)$v_att_list as $v_entry) {
       $v_result = $this->privFileDescrParseAtt($v_entry,
                                                $v_filedescr_list[],
                                                $v_options,
@@ -558,7 +558,7 @@
     
     // ----- Reformat the string list
     if (sizeof($v_string_list) != 0) {
-      foreach ($v_string_list as $v_string) {
+      foreach ((array)$v_string_list as $v_string) {
         $v_att_list[][PCLZIP_ATT_FILE_NAME] = $v_string;
       }
     }
@@ -572,7 +572,7 @@
              ,PCLZIP_ATT_FILE_CONTENT => 'optional'
              ,PCLZIP_ATT_FILE_COMMENT => 'optional'
 						);
-    foreach ($v_att_list as $v_entry) {
+    foreach ((array)$v_att_list as $v_entry) {
       $v_result = $this->privFileDescrParseAtt($v_entry,
                                                $v_filedescr_list[],
                                                $v_options,
@@ -1872,7 +1872,7 @@
     $v_result=1;
     
     // ----- For each file in the list check the attributes
-    foreach ($p_file_list as $v_key => $v_value) {
+    foreach ((array)$p_file_list as $v_key => $v_value) {
     
       // ----- Check if the option is supported
       if (!isset($v_requested_options[$v_key])) {

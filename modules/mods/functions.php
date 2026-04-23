@@ -8,7 +8,7 @@ function scrape_mod_url($url) {
 
 function parse_date($mod_date){
 	$mod_update = array();
-	foreach ($mod_date as $key => $value) {
+	foreach ((array)$mod_date as $key => $value) {
 		$mDate = $mod_date[$key];
 		$mDate = explode(" ",$mDate);
 		$month = $mDate[0];

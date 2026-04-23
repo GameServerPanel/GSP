@@ -473,7 +473,7 @@ class Scanner {
     $matches = null;
     $name = null;
     $m;
-    foreach($patterns as $name_=>$p) {
+    foreach ((array)$patterns as $name_=>$p) {
       $index = $this->ss->match($p, $this->index, $m);
       if ($index === false) continue;
       if ($next === -1 || $index < $next) {
@@ -500,7 +500,7 @@ class Scanner {
   function get_next($patterns) {
     $next = -1;
     $matches = null;
-    foreach($patterns as $p) {
+    foreach ((array)$patterns as $p) {
       $m;
       $index = $this->ss->match($p, $this->index, $m);
       if ($index === false) continue;
@@ -524,7 +524,7 @@ class Scanner {
   function get_next_strpos($patterns) {
     $next = -1;
     $match = null;
-    foreach($patterns as $p) {
+    foreach ((array)$patterns as $p) {
       $index = strpos($this->src, $p, $this->index);
       if ($index === false) continue;
       if ($next === -1 || $index < $next) {
@@ -802,7 +802,7 @@ class LuminousScanner extends Scanner {
    * @internal
    */
   protected function rule_mapper_filter($tokens) {
-    foreach($tokens as &$t) {
+    foreach ((array)$tokens as &$t) {
       if (array_key_exists($t[0], $this->rule_tag_map))
         $t[0] = $this->rule_tag_map[$t[0]];
     }
@@ -884,7 +884,7 @@ class LuminousScanner extends Scanner {
    */
   public function remove_filter($name) {
     foreach($this->filters as $token=>$filters) {
-      foreach($filters as $k=>$f) {
+      foreach ((array)$filters as $k=>$f) {
         if ($f[0] === $name) unset($this->filters[$token][$k]);
       }
     }
@@ -1057,7 +1057,7 @@ class LuminousScanner extends Scanner {
    */
   function add_identifier_mapping($name, $matches) {
     $array = array();
-    foreach($matches as $m) {
+    foreach ((array)$matches as $m) {
       if (!$this->case_sensitive) $m = strtolower($m);
       $array[$m] = true;
     }
@@ -1825,7 +1825,7 @@ class LuminousStatefulScanner extends LuminousSimpleScanner {
    */
   protected function collapse_token_tree($node) {
     $text = '';
-    foreach($node['children'] as $c) {
+    foreach ((array)$node['children'] as $c) {
       if (is_string($c)) $text .= LuminousUtils::escape_string($c);
       else $text .= $this->collapse_token_tree($c);
     }

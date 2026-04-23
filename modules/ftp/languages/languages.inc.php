@@ -156,7 +156,7 @@ function includeLanguageFile() {
 	$languageArray = getLanguageArray();
 
 // If language exists, include the language file
-	if (array_key_exists($net2ftp_globals["language"], $languageArray) == true) { 
+	if (array_key_exists($net2ftp_globals["language"], (array)$languageArray) == true) { 
 		$languageFile = glueDirectories($net2ftp_globals["application_languagesdir"], $languageArray[$net2ftp_globals["language"]]["file"]);
 		require_once($languageFile); 
 	}
@@ -217,7 +217,7 @@ function __() {
 // -------------------------------------------------------------------------
 
 // Check if the message with that $messagename exists
-	if (@array_key_exists($messagename, $net2ftp_messages)) { $string_with_percents = $net2ftp_messages[$messagename]; }
+	if (@array_key_exists($messagename, (array)$net2ftp_messages)) { $string_with_percents = $net2ftp_messages[$messagename]; }
 	else { return "MESSAGE NOT FOUND $messagename"; }
 
 	$sprintf_argument = "\$translated_string = sprintf(\$string_with_percents";

@@ -82,7 +82,7 @@ function exec_ogp_module() {
 	if( isset( $_POST['log_id'] ) ){
 		$db->del_logger_log($_POST['log_id']);
 		$newLogs = array();
-		foreach($logs as $log){
+		foreach ((array)$logs as $log){
 			if($log['log_id'] != $_POST['log_id']){
 				$newLogs[] = $log;
 			}
@@ -97,7 +97,7 @@ function exec_ogp_module() {
 	
 	if($logs)
 	{
-		foreach($logs as $log)
+		foreach ((array)$logs as $log)
 		{
 			$user = $db->getUserById($log['user_id']);
 			$when = $log['date'];
@@ -126,7 +126,7 @@ function exec_ogp_module() {
 				 "<table>\n";
 				 
 			$show_values = array( "users_login", "users_lang", "users_role", "users_email", "user_expires");
-			foreach($user as $key => $value)
+			foreach ((array)$user as $key => $value)
 			{
 				if( in_array( $key, $show_values ) )
 					echo "<tr><td>".str_replace("_", "", substr($key,5))."</td><td>$value</td></tr>\n";
@@ -139,7 +139,7 @@ function exec_ogp_module() {
 	echo "</tbody>\n";
 	echo "<tfoot style='border:1px solid grey;'></tfoot>\n";
 	echo "</table>\n";
-	$count_logs = $db->get_logger_count($search_field);
+	$count_logs = $db->get_logger_count((array)$search_field);
 	
 	if (isset($_GET['search']) && !empty($_GET['search'])) {
 		$uri = '?m=administration&p=watch_logger&search='.$_GET['search'].'&limit='.$l.'&page=';

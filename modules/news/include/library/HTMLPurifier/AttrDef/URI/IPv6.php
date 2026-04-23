@@ -48,7 +48,7 @@ class HTMLPurifier_AttrDef_URI_IPv6 extends HTMLPurifier_AttrDef_URI_IPv4
 
         //      compression check
         $aIP = explode('::', $aIP);
-        $c = count($aIP);
+        $c = count((array)$aIP);
         if ($c > 2) {
             return false;
         } elseif ($c == 2) {
@@ -56,28 +56,28 @@ class HTMLPurifier_AttrDef_URI_IPv6 extends HTMLPurifier_AttrDef_URI_IPv4
             $first = explode(':', $first);
             $second = explode(':', $second);
 
-            if (count($first) + count($second) > 8) {
+            if (count((array)$first) + count((array)$second) > 8) {
                 return false;
             }
 
-            while (count($first) < 8) {
+            while (count((array)$first) < 8) {
                 array_push($first, '0');
             }
 
-            array_splice($first, 8 - count($second), 8, $second);
+            array_splice($first, 8 - count((array)$second), 8, $second);
             $aIP = $first;
             unset($first, $second);
         } else {
             $aIP = explode(':', $aIP[0]);
         }
-        $c = count($aIP);
+        $c = count((array)$aIP);
 
         if ($c != 8) {
             return false;
         }
 
         //      All the pieces should be 16-bit hex strings. Are they?
-        foreach ($aIP as $piece) {
+        foreach ((array)$aIP as $piece) {
             if (!preg_match('#^[0-9a-fA-F]{4}$#s', sprintf('%04s', $piece))) {
                 return false;
             }

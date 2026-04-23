@@ -63,7 +63,7 @@ class HTMLPurifier_AttrDef_URI extends HTMLPurifier_AttrDef
         do {
 
             // generic validation
-            $result = $uri->validate($config, $context);
+            $result = $uri->validate($config, is_numeric($context) ? (int)$context : strtotime($context));
             if (!$result) {
                 break;
             }

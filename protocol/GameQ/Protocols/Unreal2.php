@@ -127,7 +127,7 @@ class Unreal2 extends Protocol
         $results = [];
 
         // Now let's iterate and process
-        foreach ($packets as $header => $packetGroup) {
+        foreach ((array)$packets as $header => $packetGroup) {
             // Figure out which packet response this is
             if (!array_key_exists($header, $this->responses)) {
                 throw new Exception(__METHOD__ . " response type '" . bin2hex($header) . "' is not valid");

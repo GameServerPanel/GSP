@@ -15,7 +15,7 @@ echo '<th style="text-align:left;padding:6px;border-bottom:1px solid #ccc">Statu
 echo '<th style="text-align:right;padding:6px;border-bottom:1px solid #ccc">CPU %</th>';
 echo '<th style="text-align:right;padding:6px;border-bottom:1px solid #ccc">MEM %</th></tr>';
 
-foreach ($hosts as $h) {
+foreach ((array)$hosts as $h) {
   $color = $h['status']==='UP' ? '#16a34a' : '#dc2626';
   $cpu = is_null($h['cpu_pct']) ? '—' : number_format($h['cpu_pct'],1);
   $mem = is_null($h['mem_pct']) ? '—' : number_format($h['mem_pct'],1);

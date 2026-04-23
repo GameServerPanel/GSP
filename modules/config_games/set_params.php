@@ -97,7 +97,7 @@ function exec_ogp_module() {
 	if ($params)
 	{
 		$template = "";
-		foreach($params as $param)
+		foreach ((array)$params as $param)
 		{
 			$template .= $param['param_key'];
 		}

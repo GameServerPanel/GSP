@@ -157,7 +157,7 @@ class HTMLPurifier_ElementDef
             if ($k === 0) {
                 // merge in the includes
                 // sorry, no way to override an include
-                foreach ($v as $v2) {
+                foreach ((array)$v as $v2) {
                     $this->attr[0][] = $v2;
                 }
                 continue;
@@ -201,7 +201,7 @@ class HTMLPurifier_ElementDef
      */
     private function _mergeAssocArray(&$a1, $a2)
     {
-        foreach ($a2 as $k => $v) {
+        foreach ((array)$a2 as $k => $v) {
             if ($v === false) {
                 if (isset($a1[$k])) {
                     unset($a1[$k]);

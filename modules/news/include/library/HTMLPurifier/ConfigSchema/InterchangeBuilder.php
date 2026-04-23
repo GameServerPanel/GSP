@@ -54,7 +54,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
         closedir($dh);
 
         sort($files);
-        foreach ($files as $file) {
+        foreach ((array)$files as $file) {
             $this->buildFile($interchange, $dir . '/' . $file);
         }
         return $interchange;
@@ -88,7 +88,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
             throw new HTMLPurifier_ConfigSchema_Exception('Hash does not have any ID');
         }
         if (strpos($hash['ID'], '.') === false) {
-            if (count($hash) == 2 && isset($hash['DESCRIPTION'])) {
+            if (count((array)$hash) == 2 && isset($hash['DESCRIPTION'])) {
                 $hash->offsetGet('DESCRIPTION'); // prevent complaining
             } else {
                 throw new HTMLPurifier_ConfigSchema_Exception('All directives must have a namespace');
@@ -149,7 +149,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
         if (isset($hash['ALIASES'])) {
             $raw_aliases = trim($hash->offsetGet('ALIASES'));
             $aliases = preg_split('/\s*,\s*/', $raw_aliases);
-            foreach ($aliases as $alias) {
+            foreach ((array)$aliases as $alias) {
                 $directive->aliases[] = $this->id($alias);
             }
         }
@@ -190,7 +190,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
     protected function lookup($array)
     {
         $ret = array();
-        foreach ($array as $val) {
+        foreach ((array)$array as $val) {
             $ret[$val] = true;
         }
         return $ret;
@@ -215,7 +215,7 @@ class HTMLPurifier_ConfigSchema_InterchangeBuilder
     protected function _findUnused($hash)
     {
         $accessed = $hash->getAccessed();
-        foreach ($hash as $k => $v) {
+        foreach ((array)$hash as $k => $v) {
             if (!isset($accessed[$k])) {
                 trigger_error("String hash key '$k' not used by builder", E_USER_NOTICE);
             }

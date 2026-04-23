@@ -76,14 +76,14 @@ create_order_log('PARSED_INPUT', [
     'currency' => $currency,
     'invoice_id' => $invoice_id,
     'custom_id' => $custom_id,
-    'items_count' => $items ? count($items) : 0,
-    'line_invoices_count' => $line_invoices ? count($line_invoices) : 0
+    'items_count' => $items ? count((array)$items) : 0,
+    'line_invoices_count' => $line_invoices ? count((array)$line_invoices) : 0
 ]);
 
 $amount_value = number_format((float)$amount_in, 2, '.', '');
 if ($items) {
   $sum = 0.00;
-  foreach ($items as $it) {
+  foreach ((array)$items as $it) {
     $qty  = isset($it['quantity']) ? (int)$it['quantity'] : 1;
     $val  = isset($it['unit_amount']['value']) ? (float)$it['unit_amount']['value'] : 0.00;
     $sum += $qty * $val;

@@ -8,10 +8,10 @@ function print_player_list_gameq($player_list,$numplayers,$numplayersmax)
 	
     $data =  "<table class='player_monitor'>";
 	$data .= "<thead><tr>";
-	foreach($player_list as $id => $player)
+	foreach ((array)$player_list as $id => $player)
 	{
 		$maxcount = 0;
-		foreach($player as $td => $column)
+		foreach ((array)$player as $td => $column)
 		{
 			if($column != null)
 			{
@@ -43,7 +43,7 @@ function print_player_list_gameq($player_list,$numplayers,$numplayersmax)
 		}
 	}
 
-	foreach($player_list[$maxid] as $td => $column)
+	foreach ((array)$player_list[$maxid] as $td => $column)
 	{
 		if($column != "" )
 		{
@@ -54,9 +54,9 @@ function print_player_list_gameq($player_list,$numplayers,$numplayersmax)
 	}
 	$data .= "</tr></thead>";
 	$data .= "<tbody>";
-    foreach ( $player_list as $player ){
+    foreach ((array)$player_list as $player){
 		$data .= "<tr>";
-		foreach($player_list[$maxid] as $maxtd => $maxcolumn)
+		foreach ((array)$player_list[$maxid] as $maxtd => $maxcolumn)
 		{
 			if(isset($player[$maxtd]))
 				$data .= "<td>".htmlentities($player[$maxtd])."</td>";

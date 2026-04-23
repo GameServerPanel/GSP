@@ -56,7 +56,7 @@ if(isset($_REQUEST["keyword_search"])) {
  	$iTotResults = 0;
 	$listing_counter=sizeof($xml_results); 
 	
-	foreach ($xml_results as $listing)
+	foreach ((array)$xml_results as $listing)
 	{
 		$listing_counter--; 
   
@@ -130,7 +130,7 @@ if(isset($_REQUEST["keyword_search"])) {
 	<?php
 	$strSearchString = "";
 			
-	foreach ($_POST as $key=>$value) 
+	foreach ((array)$_POST as $key=>$value) 
 	{ 
 		if($key != "num"&&$value!="")
 		{
@@ -138,7 +138,7 @@ if(isset($_REQUEST["keyword_search"])) {
 		}
 	}
 	
-	foreach ($_GET as $key=>$value) 
+	foreach ((array)$_GET as $key=>$value) 
 	{ 
 		if($key != "num"&&$value!="")
 		{

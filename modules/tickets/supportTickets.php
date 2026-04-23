@@ -25,7 +25,7 @@ function exec_ogp_module()
     $isAdmin = $db->isAdmin($_SESSION['user_id']);
 
     $ticketOwner = (!$isAdmin ? $_SESSION['user_id'] : null);
-    $ticketCount = $ticket->count($ticketOwner);
+    $ticketCount = $ticket->count((array)$ticketOwner);
     $tickets = $ticket->tickets($ticketOwner, $page, $limit);
 
     echo '<h2>'.get_lang('support_tickets').'</h2>';
@@ -42,7 +42,7 @@ function exec_ogp_module()
         echo '<th>'.get_lang('ticket_updated').'</th>';
         echo '</tr>';
         
-        foreach ($tickets as $t) {
+        foreach ((array)$tickets as $t) {
             $date = new DateTime($t['last_updated']);
             echo '<tr class="ticketRow '.ticketCodeToName($t['status'], true).'">
                 <td><a href="?m=tickets&p=viewticket&tid='.$t['tid'].'&uid='.$t['uid'].'">'. htmlentities($t['subject']) .'</a></td>

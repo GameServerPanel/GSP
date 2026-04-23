@@ -39,7 +39,7 @@ function exec_ogp_module()
 		'admin_orders.php' => 'Admin order management'
 	);
 	
-	foreach ($pages as $file => $desc) {
+	foreach ((array)$pages as $file => $desc) {
 		$path = "modules/billing/".$file;
 		if (file_exists($path)) {
 			echo "<div class='success'>✓ $file - $desc</div>";
@@ -56,7 +56,7 @@ function exec_ogp_module()
 		'billing_invoices' => 'Payment records'
 	);
 	
-	foreach ($tables as $table => $desc) {
+	foreach ((array)$tables as $table => $desc) {
 		$result = $db->query("SHOW TABLES LIKE 'OGP_DB_PREFIX".$table."'");
 		if ($result && $db->num_rows($result) > 0) {
 			echo "<div class='success'>✓ $table - $desc</div>";
@@ -72,7 +72,7 @@ function exec_ogp_module()
 	if (!empty($stats)) {
 		echo "<table class='tablesorter'>";
 		echo "<thead><tr><th>Status</th><th>Count</th></tr></thead><tbody>";
-		foreach ($stats as $stat) {
+		foreach ((array)$stats as $stat) {
 			echo "<tr><td>".$stat['status']."</td><td>".$stat['count']."</td></tr>";
 		}
 		echo "</tbody></table>";

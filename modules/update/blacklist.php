@@ -72,7 +72,7 @@ function exec_ogp_module()
 	if($blacklisted_files !== FALSE)
 	{
 		$current_blacklist = array();
-		foreach($blacklisted_files as $blacklisted_file)
+		foreach ((array)$blacklisted_files as $blacklisted_file)
 		{
 			$current_blacklist[] = $blacklisted_file['file_path'];
 		}			
@@ -80,13 +80,13 @@ function exec_ogp_module()
 
 	if( isset( $_POST['save_to_blacklist'] ) )
 	{
-		foreach($_POST['blacklist'] as $file)
+		foreach ((array)$_POST['blacklist'] as $file)
 		{
 			$file = $db->real_escape_string($file);
 			$db->query("INSERT INTO `OGP_DB_PREFIXupdate_blacklist` SET file_path='$file';");
 		}
 		
-		foreach($_POST['folder_files'] as $file)
+		foreach ((array)$_POST['folder_files'] as $file)
 		{
 			if(in_array($file,$current_blacklist))
 			{
@@ -102,7 +102,7 @@ function exec_ogp_module()
 		if($blacklisted_files !== FALSE)
 		{
 			$current_blacklist = array();
-			foreach($blacklisted_files as $blacklisted_file)
+			foreach ((array)$blacklisted_files as $blacklisted_file)
 			{
 				$current_blacklist[] = $blacklisted_file['file_path'];
 			}			
@@ -198,7 +198,7 @@ function exec_ogp_module()
 		$x = 0;
 		$basedir_path = rtrim($_SERVER['DOCUMENT_ROOT'].dirname($_SERVER['SCRIPT_NAME']),DIRECTORY_SEPARATOR);
 		$preg_basedir_path = preg_quote($basedir_path,"/");
-		foreach( $dirlist as $item )
+		foreach ((array)$dirlist as $item)
 		{
 			# dirlist FM returns an array.  Each element has 5 fields separated by the | character
 			if($item == "." or $item == "..")
@@ -220,7 +220,7 @@ function exec_ogp_module()
 			$x++;
 		}
 		
-		foreach($directorys as $directory)
+		foreach ((array)$directorys as $directory)
 		{
 			echo "<tr>\n".
 				 "<td>".
@@ -232,7 +232,7 @@ function exec_ogp_module()
 		}
 		$i = 0;
 		$unchecked = array();
-		foreach($files as $file)
+		foreach ((array)$files as $file)
 		{
 			$checked = in_array($file['filepath'],$current_blacklist) ? "checked='checked'" : "";
 			echo "<tr>\n".

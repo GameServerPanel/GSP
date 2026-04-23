@@ -192,7 +192,7 @@ abstract class TeamSpeak3_Node_Abstract implements RecursiveIterator, ArrayAcces
 
     $iterator = new RecursiveIteratorIterator($this, RecursiveIteratorIterator::SELF_FIRST);
 
-    foreach($iterator as $node)
+    foreach ((array)$iterator as $node)
     {
       $siblings = array();
 
@@ -225,14 +225,14 @@ abstract class TeamSpeak3_Node_Abstract implements RecursiveIterator, ArrayAcces
   {
     if(!empty($rules))
     {
-      foreach($nodes as $node)
+      foreach ((array)$nodes as $node)
       {
         if(!$node instanceof TeamSpeak3_Node_Abstract) continue;
 
         $props = $node->getInfo(FALSE);
         $props = array_intersect_key($props, $rules);
 
-        foreach($props as $key => $val)
+        foreach ((array)$props as $key => $val)
         {
           if($val instanceof TeamSpeak3_Helper_String)
           {
@@ -273,7 +273,7 @@ abstract class TeamSpeak3_Node_Abstract implements RecursiveIterator, ArrayAcces
     {
       $info = $this->nodeInfo;
 
-      foreach($info as $key => $val)
+      foreach ((array)$info as $key => $val)
       {
         $key = TeamSpeak3_Helper_String::factory($key);
 

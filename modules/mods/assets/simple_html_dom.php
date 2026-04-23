@@ -197,7 +197,7 @@ class simple_html_dom_node
 			foreach ($this->_ as $k => $v) {
 				if (is_array($v)) {
 					$string .= "[$k]=>(";
-					foreach ($v as $k2 => $v2) {
+					foreach ((array)$v as $k2 => $v2) {
 						$string .= "[$k2]=>\"$v2\", ";
 					}
 					$string .= ')';
@@ -509,15 +509,15 @@ class simple_html_dom_node
 	function find($selector, $idx = null, $lowercase = false)
 	{
 		$selectors = $this->parse_selector($selector);
-		if (($count = count($selectors)) === 0) { return array(); }
+		if (($count = count((array)$selectors)) === 0) { return array(); }
 		$found_keys = array();
 
 		// find each selector
 		for ($c = 0; $c < $count; ++$c) {
 			// The change on the below line was documented on the sourceforge
 			// code tracker id 2788009
-			// used to be: if (($levle=count($selectors[0]))===0) return array();
-			if (($levle = count($selectors[$c])) === 0) { return array(); }
+			// used to be: if (($levle=count((array)$selectors[0]))===0) return array();
+			if (($levle = count((array)$selectors[$c])) === 0) { return array(); }
 			if (!isset($this->_[HDOM_INFO_BEGIN])) { return array(); }
 
 			$head = array($this->_[HDOM_INFO_BEGIN] => 1);
@@ -527,7 +527,7 @@ class simple_html_dom_node
 			for ($l = 0; $l < $levle; ++$l) {
 				$ret = array();
 
-				foreach ($head as $k => $v) {
+				foreach ((array)$head as $k => $v) {
 					$n = ($k === -1) ? $this->dom->root : $this->dom->nodes[$k];
 					//PaperG - Pass this optional parameter on to the seek function.
 					$n->seek($selectors[$c][$l], $ret, $cmd, $lowercase);
@@ -537,7 +537,7 @@ class simple_html_dom_node
 				$cmd = $selectors[$c][$l][4]; // Next Combinator
 			}
 
-			foreach ($head as $k => $v) {
+			foreach ((array)$head as $k => $v) {
 				if (!isset($found_keys[$k])) {
 					$found_keys[$k] = 1;
 				}
@@ -548,13 +548,13 @@ class simple_html_dom_node
 		ksort($found_keys);
 
 		$found = array();
-		foreach ($found_keys as $k => $v) {
+		foreach ((array)$found_keys as $k => $v) {
 			$found[] = $this->dom->nodes[$k];
 		}
 
 		// return nth-element or array
 		if (is_null($idx)) { return $found; }
-		elseif ($idx < 0) { $idx = count($found) + $idx; }
+		elseif ($idx < 0) { $idx = count((array)$found) + $idx; }
 		return (isset($found[$idx])) ? $found[$idx] : null;
 	}
 
@@ -601,7 +601,7 @@ class simple_html_dom_node
 		// Go throgh each element starting at this element until the end tag
 		// Note: If this element is a void tag, any previous void element is
 		// skipped.
-		foreach($nodes as $node) {
+		foreach ((array)$nodes as $node) {
 			$pass = true;
 
 			// Skip root nodes
@@ -648,7 +648,7 @@ class simple_html_dom_node
 						$node_classes = array_map('strtolower', $node_classes);
 					}
 
-					foreach($class as $c) {
+					foreach ((array)$class as $c) {
 						if(!in_array($c, $node_classes)) {
 							$pass = false;
 							break;
@@ -664,7 +664,7 @@ class simple_html_dom_node
 				&& $attributes !== ''
 				&& is_array($attributes)
 				&& !empty($attributes)) {
-					foreach($attributes as $a) {
+					foreach ((array)$attributes as $a) {
 						list (
 							$att_name,
 							$att_expr,
@@ -890,7 +890,7 @@ class simple_html_dom_node
 		$selectors = array();
 		$result = array();
 
-		foreach ($matches as $m) {
+		foreach ((array)$matches as $m) {
 			$m[0] = trim($m[0]);
 
 			// Skip NoOps
@@ -925,7 +925,7 @@ class simple_html_dom_node
 				// Replace element by array
 				$m[4] = array();
 
-				foreach($attributes as $att) {
+				foreach ((array)$attributes as $att) {
 					// Skip empty matches
 					if(trim($att[0]) === '') { continue; }
 
@@ -960,7 +960,7 @@ class simple_html_dom_node
 			}
 		}
 
-		if (count($result) > 0) { $selectors[] = $result; }
+		if (count((array)$result) > 0) { $selectors[] = $result; }
 		return $selectors;
 	}
 
@@ -1125,7 +1125,7 @@ class simple_html_dom_node
 				PREG_SET_ORDER
 			);
 
-			foreach ($matches as $match) {
+			foreach ((array)$matches as $match) {
 				$attributes[$match[1]] = $match[2];
 			}
 
@@ -1196,7 +1196,7 @@ class simple_html_dom_node
 		}
 
 		if (is_array($class)) {
-			foreach($class as $c) {
+			foreach ((array)$class as $c) {
 				if (isset($this->class)) {
 					if ($this->hasClass($c)) {
 						continue;

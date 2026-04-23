@@ -29,7 +29,7 @@ class HTMLPurifier_ChildDef_Required extends HTMLPurifier_ChildDef
         $keys = array_keys($elements);
         if ($keys == array_keys($keys)) {
             $elements = array_flip($elements);
-            foreach ($elements as $i => $x) {
+            foreach ((array)$elements as $i => $x) {
                 $elements[$i] = true;
                 if (empty($i)) {
                     unset($elements[$i]);

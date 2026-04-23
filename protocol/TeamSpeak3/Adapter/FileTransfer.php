@@ -141,7 +141,7 @@ class TeamSpeak3_Adapter_FileTransfer extends TeamSpeak3_Adapter_Abstract
     $size = intval($size);
     $pack = 4096;
 
-    TeamSpeak3_Helper_Signal::getInstance()->emit("filetransferDownloadStarted", $ftkey, count($buff), $size);
+    TeamSpeak3_Helper_Signal::getInstance()->emit("filetransferDownloadStarted", $ftkey, count((array)$buff), $size);
 
     for($seek = 0;$seek < $size;)
     {
@@ -152,16 +152,16 @@ class TeamSpeak3_Adapter_FileTransfer extends TeamSpeak3_Adapter_Abstract
 
       $buff->append($data);
 
-      TeamSpeak3_Helper_Signal::getInstance()->emit("filetransferDownloadProgress", $ftkey, count($buff), $size);
+      TeamSpeak3_Helper_Signal::getInstance()->emit("filetransferDownloadProgress", $ftkey, count((array)$buff), $size);
     }
 
     $this->getProfiler()->stop();
 
-    TeamSpeak3_Helper_Signal::getInstance()->emit("filetransferDownloadFinished", $ftkey, count($buff), $size);
+    TeamSpeak3_Helper_Signal::getInstance()->emit("filetransferDownloadFinished", $ftkey, count((array)$buff), $size);
 
     if(strlen($buff) != $size)
     {
-      throw new TeamSpeak3_Adapter_FileTransfer_Exception("incomplete file download (" . count($buff) . " of " . $size . " bytes)");
+      throw new TeamSpeak3_Adapter_FileTransfer_Exception("incomplete file download (" . count((array)$buff) . " of " . $size . " bytes)");
     }
 
     return $buff;

@@ -40,7 +40,7 @@ function exec_ogp_module()
 		$game_cfgs = $db->getGameCfgs();
 		$select_game = "<select onchange=".'"this.form.submit()"'." name='home_cfg_id' autofocus='autofocus'>\n".
 					     "<option value='0'>" . get_lang("games_without_specified_rules") . "</option>\n";
-		foreach ( $game_cfgs as $game_cfg )
+		foreach ((array)$game_cfgs as $game_cfg)
 		{
 			$selected = ( isset( $_GET['home_cfg_id'] ) and 
 						  $_GET['home_cfg_id'] == $game_cfg['home_cfg_id'] ) ?
@@ -108,7 +108,7 @@ function exec_ogp_module()
 			echo "<h3>".get_lang("current_access_rules")."</h3>\n";
 			echo "<table id='servermonitor' class='tablesorter' style='width: 100%;'>\n<thead><tr>".
 				 "<th class='header'>".get_lang("game_name")."</th><th class='header'>".get_lang("match_file_extension")."</th><th class='header'>".get_lang("match_client_ip")."</th></tr></thead>\n<tbody>";
-			foreach($all_rules as $rule)
+			foreach ((array)$all_rules as $rule)
 			{
 				if($rule['home_cfg_id'] != '0')
 				{
@@ -211,7 +211,7 @@ function exec_ogp_module()
 				 get_lang("select_remote_server").": ".
 				 "<select onchange=".'"this.form.submit()"'." name='remote_server_id'>\n".
 				 "<option></option>\n";
-			foreach ( $remote_servers as $server )
+			foreach ((array)$remote_servers as $server)
 			{
 				$selected = ( isset( $_GET['remote_server_id'] ) and 
 							  $server['remote_server_id'] == $_GET['remote_server_id'] ) ? 
@@ -275,7 +275,7 @@ function exec_ogp_module()
 						if( isset( $_POST['delete'] ) )
 						{
 							$response_del = $remote->fastdl_del_alias($_POST['aliases']);
-							foreach($_POST['aliases'] as $alias)
+							foreach ((array)$_POST['aliases'] as $alias)
 							{
 								if( $response_del != -1 and
 									$remote->rfile_exists($aliases[$alias]['home']) === 1 
@@ -291,7 +291,7 @@ function exec_ogp_module()
 							$address = ($fastdl_info['port'] == '80' OR ($fastdl_settings and $fastdl_settings['port_forwarded_to_80'] == '1')) ? 
 										$fastdl_info['ip'] : 
 										$fastdl_info['ip'].":".$fastdl_info['port'];
-							foreach( $aliases as $alias => $info )
+							foreach ((array)$aliases as $alias => $info )
 							{
 								echo "<input type=checkbox name='aliases[]' value='$alias'/>$alias".
 									 "( <a href='http://$address/$alias' target='_blank' ".
@@ -367,7 +367,7 @@ function exec_ogp_module()
 					$check = check_access_rules_entries();
 					if(!$check['ip_entry_fail'] and !$check['extension_entry_fail'])
 					{
-						if(!array_key_exists($alias , $aliases))
+						if(!array_key_exists($alias, (array)$aliases))
 						{
 							$home = clean_path($server_home['home_path']."/".clean_string($_POST['path']));
 							$alias = clean_string($_POST['alias']);

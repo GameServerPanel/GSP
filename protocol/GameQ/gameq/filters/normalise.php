@@ -90,12 +90,12 @@ class GameQ_Filters_Normalise extends GameQ_Filters
             // Don't rename the players array
             $result['players'] = $result['gq_players'];
 
-            foreach ($result['players'] as $key => $player)
+            foreach ((array)$result['players'] as $key => $player)
             {
                 $result['players'][$key] = array_merge($player, $this->normalize($player, 'player'));
             }
 
-			$result['gq_numplayers'] = count($result['players']);
+			$result['gq_numplayers'] = count((array)$result['players']);
         }
         else
 		{
@@ -108,12 +108,12 @@ class GameQ_Filters_Normalise extends GameQ_Filters
             // Don't rename the teams array
             $result['teams'] = $result['gq_teams'];
 
-            foreach ($result['teams'] as $key => $team)
+            foreach ((array)$result['teams'] as $key => $team)
             {
                 $result['teams'][$key] = array_merge($team, $this->normalize($team, 'team'));
             }
 
-			$result['gq_numteams'] = count($result['teams']);
+			$result['gq_numteams'] = count((array)$result['teams']);
         }
         else
 		{
@@ -153,12 +153,12 @@ class GameQ_Filters_Normalise extends GameQ_Filters
         // Create a new array, with all the specified variables
         $new = $this->fill($props);
 
-        foreach ($data as $var => $value)
+        foreach ((array)$data as $var => $value)
         {
             // normalize values
             $stripped = strtolower(str_replace('_', '', $var));
 
-            foreach ($props as $target => $sources)
+            foreach ((array)$props as $target => $sources)
             {
             	if ($target == $stripped or in_array($stripped, $sources))
             	{
@@ -183,7 +183,7 @@ class GameQ_Filters_Normalise extends GameQ_Filters
     {
         $data = array();
 
-        foreach ($vars as $target => $source)
+        foreach ((array)$vars as $target => $source)
         {
             $data['gq_' . $target] = $val;
         }

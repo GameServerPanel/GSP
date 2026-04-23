@@ -207,7 +207,7 @@ class TeamSpeak3_Node_Servergroup extends TeamSpeak3_Node_Abstract
    */
   public function message($msg)
   {
-    foreach($this as $client)
+    foreach ((array)$this as $client)
     {
       try
       {

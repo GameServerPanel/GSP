@@ -38,10 +38,10 @@ function exec_ogp_module() {
 		unset($_SESSION['REFER']);
 	}
     
-    if (isset($_SESSION['ERRMSG_ARR']) && is_array($_SESSION['ERRMSG_ARR']) && count($_SESSION['ERRMSG_ARR']) > 0) {
+    if (isset($_SESSION['ERRMSG_ARR']) && is_array($_SESSION['ERRMSG_ARR']) && count((array)$_SESSION['ERRMSG_ARR']) > 0) {
         $errmsg = '<table>';
         
-        foreach ($_SESSION['ERRMSG_ARR'] as $msg) {
+        foreach ((array)$_SESSION['ERRMSG_ARR'] as $msg) {
             $errmsg.= "<tr><td><img width='8px' src='images/offline.png'/></td><td style='text-align:left;color:red;'>" . $msg . '</td></tr>';
         }
         $errmsg.= '</table><br>';
@@ -109,9 +109,9 @@ function listAllSubUsers() {
     if (is_array($subusers)) {
         $htmlCode.= "<table style=\"margin-left: 1em;\"><tr><th>" . get_lang('your_subusers') . "</th><th></th></tr>";
         
-        if (count($subusers) > 0) {
+        if (count((array)$subusers) > 0) {
             
-            foreach ($subusers as $subuser) {
+            foreach ((array)$subusers as $subuser) {
                 $user_info = $db->getUserById($subuser);
                 $htmlCode.= '<tr><td>' . $user_info['users_login'] . '</td><td><form method="post"><input type="hidden" name="user_id" value="' . $subuser . '" /><input type="submit" value="Edit" name="editUser" /><input type="submit" value="Delete" name="delUser" /></form></td></tr>';
             }

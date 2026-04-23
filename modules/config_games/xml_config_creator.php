@@ -32,7 +32,7 @@ function exec_ogp_module()
 		require_once 'protocol/lgsl/lgsl_protocol.php';
 		$lgsl_type_list = lgsl_type_list();
 		asort($lgsl_type_list);
-		foreach ($lgsl_type_list as $type => $description) {
+		foreach ((array)$lgsl_type_list as $type => $description) {
 			$queryChoices[$type] = $description;
 		}
 		$queryLabel = 'LGSL Query Name';
@@ -58,7 +58,7 @@ function exec_ogp_module()
 		}
 		unset($dir);
 		ksort($protocols);
-		foreach ($protocols as $gameq => $info) {
+		foreach ((array)$protocols as $gameq => $info) {
 			$queryChoices[$gameq] = $info['name'];
 		}
 		$queryLabel = 'GameQ Query Name';
@@ -95,7 +95,7 @@ CSS;
 		'lgsl' => 'LGSL',
 		'gameq' => 'GameQ',
 	);
-	foreach ($protocolOptions as $value => $label) {
+	foreach ((array)$protocolOptions as $value => $label) {
 		$safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 		$safeLabel = htmlspecialchars($label, ENT_QUOTES, 'UTF-8');
 		$selected = ($selectedProtocol === $value) ? "selected='selected'" : '';
@@ -115,7 +115,7 @@ CSS;
 		$label = htmlspecialchars($queryLabel, ENT_QUOTES, 'UTF-8');
 		echo "<label for='query_name'>{$label}</label>";
 		echo "<select id='query_name' name='query_name'>";
-		foreach ($queryChoices as $value => $labelText) {
+		foreach ((array)$queryChoices as $value => $labelText) {
 			$safeValue = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 			$safeLabelText = htmlspecialchars($labelText, ENT_QUOTES, 'UTF-8');
 			echo "<option value='{$safeValue}'>{$safeLabelText}</option>";

@@ -42,7 +42,7 @@ function exec_ogp_module()
 
 	$home_info = $db->getGameHomeWithoutMods($home_id);
 	$servers_with_same_path = $db->getGameServersWithSamePath($home_info['remote_server_id'], $home_info['home_path']); 
-	$servers_with_same_path = (is_array($servers_with_same_path) ? count($servers_with_same_path) : 0);
+	$servers_with_same_path = (is_array($servers_with_same_path) ? count((array)$servers_with_same_path) : 0);
 	
 	$home_id = $home_info['home_id'];
 	$enabled_mods = $db->getHomeMods($home_id);
@@ -51,7 +51,7 @@ function exec_ogp_module()
 	{
 		if( !empty($enabled_mods) )
 		{
-			foreach ( $enabled_mods as $enabled_rows ) 
+			foreach ((array)$enabled_mods as $enabled_rows) 
 			{
 				$db->delGameMod($enabled_rows['mod_id']);
 			}
@@ -157,7 +157,7 @@ function exec_ogp_module()
 					$ftp_accounts_list = $remote->ftp_mgr("list");
 					$ftp_accounts = explode("\n",$ftp_accounts_list);
 
-					foreach($ftp_accounts as $ftp_account)
+					foreach ((array)$ftp_accounts as $ftp_account)
 					{
 						if( $ftp_account != "" )
 						{
@@ -252,7 +252,7 @@ function exec_ogp_module()
 					$host_online = TRUE;
 					$ftp_accounts_list = $remote->ftp_mgr("list");
 					$ftp_accounts = explode("\n",$ftp_accounts_list);
-					foreach($ftp_accounts as $ftp_account)
+					foreach ((array)$ftp_accounts as $ftp_account)
 					{
 						if( $ftp_account != "" )
 						{
@@ -364,7 +364,7 @@ function exec_ogp_module()
 				$host_online = TRUE;
 				$ftp_accounts_list = $remote->ftp_mgr("list");
 				$ftp_accounts = explode("\n",$ftp_accounts_list);
-				foreach($ftp_accounts as $ftp_account)
+				foreach ((array)$ftp_accounts as $ftp_account)
 				{
 					if( $ftp_account != "" )
 					{
@@ -422,7 +422,7 @@ function exec_ogp_module()
 				$home_groups = $db->getGroupsForHome($home_info['home_id']);
 				if( isset( $home_groups ) )
 				{
-					foreach($home_groups as $home_group)
+					foreach ((array)$home_groups as $home_group)
 					{
 						$db->unassignHomeFrom("group",$home_group['group_id'],$home_id);
 					}
@@ -455,7 +455,7 @@ function exec_ogp_module()
 				{
 					$home_info = $db->getGameHomeWithoutMods($home_id);
 					$servers_with_same_path = $db->getGameServersWithSamePath($home_info['remote_server_id'], $home_info['home_path']); 
-					$servers_with_same_path = (is_array($servers_with_same_path) ? count($servers_with_same_path) : 0);
+					$servers_with_same_path = (is_array($servers_with_same_path) ? count((array)$servers_with_same_path) : 0);
 					
 					$success_json = array('result' => 'success', 'info' => get_lang("successfully_changed_game_server"));
 					
@@ -562,7 +562,7 @@ function exec_ogp_module()
 				$cpuArray = explode(',', $_POST['cpus']);
 
 				// Check if a a valid core has been submitted. eg, the checkbox hasn't been manually edited.
-				foreach($cpuArray as $cpu)
+				foreach ((array)$cpuArray as $cpu)
 				{
 					if($cpu > $validCpus || !is_numeric($cpu))
 					{
@@ -585,7 +585,7 @@ function exec_ogp_module()
 				$result = 0;
 				$cores = explode(',', $cpus);
 
-				foreach ($cores as $core) {
+				foreach ((array)$cores as $core) {
 					$coreNum = intval($core);
 					$result |= (1 << $coreNum);
 				}
@@ -666,7 +666,7 @@ function exec_ogp_module()
 		$user = $db->getUserById($home_info['user_id_main']);
 		echo "<option value='".$home_info['user_id_main']."'>".$user['users_login']."</option>\n";
 		$users = $db->getUserList();
-		foreach ( $users as $user ){
+		foreach ((array)$users as $user){
 			// Only users and admins can be assigned homes... not subusers
 			if(is_null($user['users_parent'])){
 				if($home_info['user_id_main'] != $user['user_id']){
@@ -771,7 +771,7 @@ function exec_ogp_module()
 		else
 		{
 			$expiration_timestamp = is_numeric($server_expiration_ts) ? (int)$server_expiration_ts : strtotime($server_expiration_ts);
-			$expiration_date = $expiration_timestamp !== FALSE ? date( "d/m/Y H:i:s", $expiration_timestamp ) : '';
+			$expiration_date = $expiration_timestamp !== FALSE ? date("d/m/Y H:i:s", is_numeric($expiration_timestamp) ? (int)$expiration_timestamp : strtotime($expiration_timestamp)) : '';
 		}
 		
 		if( $master_server_home_id != FALSE AND $master_server_home_id == $home_id )
@@ -856,7 +856,7 @@ function exec_ogp_module()
 				echo "<input type='hidden' name='home_id' value=\"$home_id\" />\n";
 				echo  get_lang("ip") .":<select name='ip' onchange='this.form.submit();'>";
 
-				foreach($avail_ips as $value)
+				foreach ((array)$avail_ips as $value)
 				{
 					$selected = ( isset($_POST['ip']) and $_POST['ip'] == $value['ip_id'] ) ? "selected='selected'" : "";
 					echo "<option value='".$value['ip_id']."' $selected >".$value['ip']."</option>\n";
@@ -877,11 +877,11 @@ function exec_ogp_module()
 				}
 				else
 				{
-					foreach ( $assigned as $assigned_rows )
+					foreach ((array)$assigned as $assigned_rows)
 					{
 						$force_mod = "";
 						$align = "center";
-						if( !empty($enabled_mods) and count($enabled_mods) > 1 )
+						if( !empty($enabled_mods) and count((array)$enabled_mods) > 1 )
 						{
 							$force_mod .= "<td align='left'>\n".
 										  "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>\n".
@@ -889,7 +889,7 @@ function exec_ogp_module()
 										  "<input type='hidden' name='port' value=".$assigned_rows['port']." />".
 										  "<select name='force_mod_id' onchange='this.form.submit();'>".
 										  "<option value='0' >". get_lang("force_mod_on_this_address") ."</option>";
-							foreach($enabled_mods as $mod)
+							foreach ((array)$enabled_mods as $mod)
 							{
 								$selected = $mod['mod_id'] == $assigned_rows['force_mod_id'] ? "selected='selected'" : "";
 								$force_mod .= "<option value='".$mod['mod_id']."' $selected>".$mod['mod_name']."</option>";
@@ -920,7 +920,7 @@ function exec_ogp_module()
 	else
 	{
 		$assigned = $db->getHomeIpPorts($home_id);
-		if( !empty($assigned) and !empty($enabled_mods) and count($enabled_mods) > 1 )
+		if( !empty($assigned) and !empty($enabled_mods) and count((array)$enabled_mods) > 1 )
 		{
 			echo "<table class='center'>\n".
 				 "<tr>\n".
@@ -929,7 +929,7 @@ function exec_ogp_module()
 				 "</td>\n".
 				 "</tr>\n";
 			$force_mod = "";
-			foreach ( $assigned as $assigned_rows )
+			foreach ((array)$assigned as $assigned_rows)
 			{
 				$force_mod .= "<tr>\n<td align='right' style='width:50%' >".get_lang_f('switch_mod_for_address',$assigned_rows['ip'].":".$assigned_rows['port']).
 							  "</td>\n<td align='left' style='width:50%' >\n".
@@ -938,7 +938,7 @@ function exec_ogp_module()
 							  "<input type='hidden' name='port' value=".$assigned_rows['port']." />".
 							  "<select name='force_mod_id' onchange='this.form.submit();'>".
 							  "<option value='0' >". get_lang("force_mod_on_this_address") ."</option>";
-				foreach($enabled_mods as $mod)
+				foreach ((array)$enabled_mods as $mod)
 				{
 					$selected = $mod['mod_id'] == $assigned_rows['force_mod_id'] ? "selected='selected'" : "";
 					$force_mod .= "<option value='".$mod['mod_id']."' $selected>".$mod['mod_name']."</option>";

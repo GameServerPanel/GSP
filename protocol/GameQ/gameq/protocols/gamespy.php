@@ -88,7 +88,7 @@ class GameQ_Protocols_Gamespy extends GameQ_Protocols
     protected function preProcess($packets)
     {
     	// Only one packet so its in order
-    	if (count($packets) == 1)
+    	if (count((array)$packets) == 1)
     	{
     		return $packets[0];
     	}
@@ -97,7 +97,7 @@ class GameQ_Protocols_Gamespy extends GameQ_Protocols
         $packets_ordered = array();
 
         // Loop thru the packets
-        foreach ($packets as $packet)
+        foreach ((array)$packets as $packet)
         {
         	// Check to see if we had a preg_match error
         	if(preg_match("#^(.*)\\\\queryid\\\\([^\\\\]+)(\\\\|$)#", $packet, $matches) === FALSE)
@@ -173,7 +173,7 @@ class GameQ_Protocols_Gamespy extends GameQ_Protocols
     	$num_teams = 0;
 
     	// Now lets loop the array
-    	for($x=0;$x<count($data);$x+=2)
+    	for($x=0;$x<count((array)$data);$x+=2)
     	{
     		// Set some local vars
     		$key = $data[$x];
