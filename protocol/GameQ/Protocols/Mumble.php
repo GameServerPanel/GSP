@@ -133,7 +133,7 @@ class Mumble extends Protocol
         $result->add('dedicated', 1);
 
         // Let's iterate over the response items, there are a lot
-        foreach ($data as $key => $value) {
+        foreach ((array)$data as $key => $value) {
             // Ignore root for now, that is where all of the channel/player info is housed
             if (in_array($key, ['root'])) {
                 continue;
@@ -168,7 +168,7 @@ class Mumble extends Protocol
     {
 
         // Let's add all of the channel information
-        foreach ($data as $key => $value) {
+        foreach ((array)$data as $key => $value) {
             // We will handle these later
             if (in_array($key, ['channels', 'users'])) {
                 // skip
@@ -180,14 +180,14 @@ class Mumble extends Protocol
         }
 
         // Itereate over the users in this channel
-        foreach ($data['users'] as $user) {
-            foreach ($user as $key => $value) {
+        foreach ((array)$data['users'] as $user) {
+            foreach ((array)$user as $key => $value) {
                 $result->addPlayer($key, $value);
             }
         }
 
         // Offload more channels to parse
-        foreach ($data['channels'] as $channel) {
+        foreach ((array)$data['channels'] as $channel) {
             $this->processChannelsAndUsers($channel, $result);
         }
     }

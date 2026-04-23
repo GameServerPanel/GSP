@@ -25,7 +25,7 @@ function q($mysqli, $sql, $params=[]) {
   if(!$stmt){ throw new Exception($mysqli->error); }
   if(!empty($params)) {
     // infer types (all strings for simplicity)
-    $types = str_repeat('s', count($params));
+    $types = str_repeat('s', count((array)$params));
     $stmt->bind_param($types, ...$params);
   }
   $stmt->execute();
@@ -37,7 +37,7 @@ function q($mysqli, $sql, $params=[]) {
 function fmt_bytes($b) {
   if ($b===null) return '—';
   $u = ['B','KB','MB','GB','TB','PB']; $i=0;
-  while ($b>=1024 && $i<count($u)-1) { $b/=1024; $i++; }
+  while ($b>=1024 && $i<count((array)$u)-1) { $b/=1024; $i++; }
   return sprintf('%.1f %s', $b, $u[$i]);
 }
 function pct_class($p) {
@@ -120,7 +120,7 @@ try {
       (SELECT MAX(ts) FROM {$TABLE_PREFIX}machine_samples s WHERE s.machine_id=m.machine_id) AS last_ts
       FROM {$TABLE_PREFIX}machines m ORDER BY m.created_at DESC");
     echo '<div class="grid">';
-    foreach ($rows as $r) {
+    foreach ((array)$rows as $r) {
       // Get latest machine sample for this machine to show current status
       $latest_sample = q($mysqli, "SELECT cpu_pct, mem_used_pct, disk_used_pct, load1 FROM {$TABLE_PREFIX}machine_samples WHERE machine_id=? ORDER BY ts DESC LIMIT 1", [$r['machine_id']]);
       $sample = $latest_sample ? $latest_sample[0] : null;
@@ -154,7 +154,7 @@ try {
 
   // Windows
   $agg = [];
-  foreach($windows as $label=>$hours){
+  foreach ((array)$windows as $label=>$hours){
     $aggM = q($mysqli, "SELECT
               COUNT(*) n,
               AVG(cpu_pct) cpu_avg,
@@ -168,8 +168,8 @@ try {
             WHERE machine_id=? AND ts >= (NOW() - INTERVAL {$hours} HOUR)
             ORDER BY ts ASC", [$machine]);
     $net = ['avg_rx_Bps'=>null,'avg_tx_Bps'=>null,'avg_total_Bps'=>null,'avg_util_pct'=>null];
-    if (count($netRows)>=2) {
-      $first = $netRows[0]; $lastn = $netRows[count($netRows)-1];
+    if (count((array)$netRows)>=2) {
+      $first = $netRows[0]; $lastn = $netRows[count((array)$netRows)-1];
       $secs = max(1, strtotime($lastn['ts']) - strtotime($first['ts']));
       $rx_bps = ((int)$lastn['rx_bytes'] - (int)$first['rx_bytes']) / $secs;
       $tx_bps = ((int)$lastn['tx_bytes'] - (int)$first['tx_bytes']) / $secs;
@@ -243,7 +243,7 @@ try {
       </div>
     </div>
 
-    <?php foreach ($windows as $label=>$hours): $m=$agg[$label]['machine']; ?>
+    <?php foreach ((array)$windows as $label=>$hours): $m=$agg[$label]['machine']; ?>
       <div class="col-12 card">
         <div class="hdr">
           <h3>Window: <?= htmlspecialchars($label) ?></h3>
@@ -280,7 +280,7 @@ try {
               if (!$rows) {
                 echo '<tr><td colspan="6" class="small muted">No server samples in this window.</td></tr>';
               } else {
-                foreach ($rows as $s) {
+                foreach ((array)$rows as $s) {
                   $cpu = $s['cpu_avg']!==null ? (float)$s['cpu_avg'] : null;
                   $mem = $s['mem_avg']!==null ? (float)$s['mem_avg'] : null;
                   echo '<tr>';

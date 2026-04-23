@@ -425,7 +425,7 @@ class TeamSpeak3_Node_Host extends TeamSpeak3_Node_Abstract
 
       $this->serverList = array();
 
-      foreach($servers as $sid => $server)
+      foreach ((array)$servers as $sid => $server)
       {
         $this->serverList[$sid] = new TeamSpeak3_Node_Server($this, $server);
       }
@@ -931,7 +931,7 @@ class TeamSpeak3_Node_Host extends TeamSpeak3_Node_Abstract
   {
     $servers = $this->serverList();
 
-    foreach($servers as $server)
+    foreach ((array)$servers as $server)
     {
       $this->nodeList[] = $server;
     }
@@ -959,9 +959,9 @@ class TeamSpeak3_Node_Host extends TeamSpeak3_Node_Abstract
     $this->permissionEnds = array();
     $this->permissionList = array();
 
-    foreach($reply as $line)
+    foreach ((array)$reply as $line)
     {
-      if(array_key_exists("group_id_end", $line))
+      if(array_key_exists("group_id_end", (array)$line))
       {
         $this->permissionEnds[] = $line["group_id_end"];
       }

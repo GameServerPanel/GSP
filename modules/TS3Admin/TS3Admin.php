@@ -48,7 +48,7 @@ function exec_ogp_module()
 					 <td class='left'>
 					 <select onchange=".'"this.form.submit()"'." name='rserver_id'>
 					 <option></option>\n";
-				foreach ( $remote_servers as $server )
+				foreach ((array)$remote_servers as $server)
 				{
 					$display_ip = checkDisplayPublicIP($server['display_public_ip'],$server['ip'] != $server['agent_ip'] ? $server['ip'] : $server['agent_ip']);
 					echo "<option value='".$server['remote_server_id']."'>".
@@ -89,7 +89,7 @@ function exec_ogp_module()
 
 				if( isset( $_POST['vserver_id'] ) && !$isAdmin )
 				{
-					foreach($TS3_list as $TS3)
+					foreach ((array)$TS3_list as $TS3)
 					{
 						if($_POST['vserver_id'] == $TS3['vserver_id'])
 						{
@@ -113,7 +113,7 @@ function exec_ogp_module()
 				{
 					echo "<table><tr>";
 					$counter = 0;
-					foreach( $TS3_list as $TS3 )
+					foreach ((array)$TS3_list as $TS3)
 					{
 						$counter++;
 						echo "<td><form action='' method='POST'>

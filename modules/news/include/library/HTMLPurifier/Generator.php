@@ -88,7 +88,7 @@ class HTMLPurifier_Generator
 
         // Basic algorithm
         $html = '';
-        for ($i = 0, $size = count($tokens); $i < $size; $i++) {
+        for ($i = 0, $size = count((array)$tokens); $i < $size; $i++) {
             if ($this->_scriptFix && $tokens[$i]->name === 'script'
                 && $i + 2 < $size && $tokens[$i+2] instanceof HTMLPurifier_Token_End) {
                 // script special case
@@ -214,7 +214,7 @@ class HTMLPurifier_Generator
         if ($this->_sortAttr) {
             ksort($assoc_array_of_attributes);
         }
-        foreach ($assoc_array_of_attributes as $key => $value) {
+        foreach ((array)$assoc_array_of_attributes as $key => $value) {
             if (!$this->_xhtml) {
                 // Remove namespaced attributes
                 if (strpos($key, ':') !== false) {

@@ -78,14 +78,14 @@ class AdminWorkshopController
 
         $fanOut = [];
         $groupIndex = $this->indexGameGroups();
-        foreach ($payload as $groupKey => $adapterKey) {
+        foreach ((array)$payload as $groupKey => $adapterKey) {
             $groupKey = (string)$groupKey;
             $adapterKey = (string)$adapterKey;
             if (!isset($groupIndex[$groupKey])) {
                 continue;
             }
 
-            foreach ($groupIndex[$groupKey] as $gameKey) {
+            foreach ((array)$groupIndex[$groupKey] as $gameKey) {
                 $fanOut[$gameKey] = $adapterKey;
             }
         }
@@ -152,7 +152,7 @@ class AdminWorkshopController
             $override = ($this->adapterFormGameKey === $primaryKey) ? $this->adapterFormOverride : null;
 
             $mappingValues = [];
-            foreach ($group['game_keys'] as $gameKey) {
+            foreach ((array)$group['game_keys'] as $gameKey) {
                 if (isset($mappings[$gameKey]) && $mappings[$gameKey] !== '') {
                     $mappingValues[$mappings[$gameKey]] = true;
                 }
@@ -164,8 +164,8 @@ class AdminWorkshopController
                 'game_name' => $group['game_name'],
                 'game_keys' => $group['game_keys'],
                 'primary_game_key' => $primaryKey,
-                'mixed_mapping' => count($mappingValues) > 1,
-                'selected_adapter' => count($mappingValues) === 1 ? array_key_first($mappingValues) : '',
+                'mixed_mapping' => count((array)$mappingValues) > 1,
+                'selected_adapter' => count((array)$mappingValues) === 1 ? array_key_first($mappingValues) : '',
                 'exists' => $this->service->gameAdapterExists($primaryKey),
                 'adapter' => $this->service->getGameAdapter($primaryKey),
                 'updated_at' => $this->service->getGameAdapterUpdatedAt($primaryKey),
@@ -193,7 +193,7 @@ class AdminWorkshopController
                 continue;
             }
 
-            foreach ($group['game_keys'] as $gameKey) {
+            foreach ((array)$group['game_keys'] as $gameKey) {
                 $this->service->upsertAdapterMapping($gameKey, $primaryGameKey);
             }
             return;
@@ -209,7 +209,7 @@ class AdminWorkshopController
                 continue;
             }
 
-            foreach ($group['game_keys'] as $gameKey) {
+            foreach ((array)$group['game_keys'] as $gameKey) {
                 $this->service->removeAdapterMapping($gameKey, $primaryGameKey);
             }
             return;

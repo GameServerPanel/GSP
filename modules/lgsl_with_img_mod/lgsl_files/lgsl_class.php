@@ -259,7 +259,7 @@
     $result = $db->resultQuery("SELECT `id` FROM `OGP_DB_PREFIXlgsl` WHERE ".implode(" AND ", $where)." ORDER BY {$order}");
     $server_list  = array();
 
-    foreach($result as $row)
+    foreach ((array)$result as $row)
     {
       if (strpos($request, "c") === FALSE && lgsl_timer("check")) { $request .= "c"; }
 
@@ -270,7 +270,7 @@
 
       $server_list[] = $server;
 
-      if ($server_limit && count($server_list) >= $server_limit) { break; }
+      if ($server_limit && count((array)$server_list) >= $server_limit) { break; }
     }
 
     return $server_list;
@@ -284,7 +284,7 @@
 
     $total = array("players"=>0, "playersmax"=>0, "servers"=>0, "servers_online"=>0, "servers_offline"=>0);
 
-    foreach ($server_list as $server)
+    foreach ((array)$server_list as $server)
     {
       $total['players']    += $server['s']['players'];
       $total['playersmax'] += $server['s']['playersmax'];
@@ -413,7 +413,7 @@
     "images/icons/{$type}.gif",
     "images/icons/{$type}.png");
 
-    foreach ($path_list as $path)
+    foreach ((array)$path_list as $path)
     {
       if (file_exists($path)) { return $path; }
     }
@@ -540,9 +540,9 @@
 
     if (!is_array($server['p'])) { return $fields_list; }
 
-    foreach ($server['p'] as $player)
+    foreach ((array)$server['p'] as $player)
     {
-      foreach ($player as $field => $value)
+      foreach ((array)$player as $field => $value)
       {
         if ($value === "") { continue; }
         if (in_array($field, $fields_list)) { continue; }
@@ -676,7 +676,7 @@
 
     if (isset($server['p']) && $server['p'])
     {
-      foreach ($server['p'] as $player)
+      foreach ((array)$server['p'] as $player)
       {
         if (isset($player['name'])) { $test .= " {$player['name']} "; }
       }
@@ -695,7 +695,7 @@
 
     if (is_array($server))
     {
-      foreach ($server as $key => $value)
+      foreach ((array)$server as $key => $value)
       {
         $server[$key] = lgsl_charset_convert($value, $charset);
       }
@@ -712,7 +712,7 @@
 
   function lgsl_server_html($server, $word_wrap = 20)
   {
-    foreach ($server as $key => $value)
+    foreach ((array)$server as $key => $value)
     {
       $server[$key] = is_array($value) ? lgsl_server_html($value, $word_wrap) : lgsl_string_html($value, FALSE, $word_wrap);
     }
@@ -759,7 +759,7 @@
 
     $word_list = explode(" ", $string);
 
-    foreach ($word_list as $key => $word)
+    foreach ((array)$word_list as $key => $word)
     {
       $word_length = function_exists("mb_strlen") ? mb_strlen($word, "UTF-8") : strlen($word);
 

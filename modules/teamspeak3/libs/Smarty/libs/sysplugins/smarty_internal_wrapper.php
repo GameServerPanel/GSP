@@ -106,7 +106,7 @@ class Smarty_Internal_Wrapper {
            default:
              // convert foo_bar_baz to fooBarBaz style names
              $name_parts = explode('_',$name);
-             foreach($name_parts as $idx=>$part) {
+             foreach ((array)$name_parts as $idx=>$part) {
                 if($idx==0)
                   $name_parts[$idx] = strtolower($part);
                 else

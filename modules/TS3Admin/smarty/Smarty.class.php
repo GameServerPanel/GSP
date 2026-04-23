@@ -587,7 +587,7 @@ class Smarty
     function assign($tpl_var, $value = null)
     {
         if (is_array($tpl_var)){
-            foreach ($tpl_var as $key => $val) {
+            foreach ((array)$tpl_var as $key => $val) {
                 if ($key != '') {
                     $this->_tpl_vars[$key] = $val;
                 }
@@ -620,13 +620,13 @@ class Smarty
     {
         if (is_array($tpl_var)) {
             // $tpl_var is an array, ignore $value
-            foreach ($tpl_var as $_key => $_val) {
+            foreach ((array)$tpl_var as $_key => $_val) {
                 if ($_key != '') {
                     if(!@is_array($this->_tpl_vars[$_key])) {
                         settype($this->_tpl_vars[$_key],'array');
                     }
                     if($merge && is_array($_val)) {
-                        foreach($_val as $_mkey => $_mval) {
+                        foreach ((array)$_val as $_mkey => $_mval) {
                             $this->_tpl_vars[$_key][$_mkey] = $_mval;
                         }
                     } else {
@@ -640,7 +640,7 @@ class Smarty
                     settype($this->_tpl_vars[$tpl_var],'array');
                 }
                 if($merge && is_array($value)) {
-                    foreach($value as $_mkey => $_mval) {
+                    foreach ((array)$value as $_mkey => $_mval) {
                         $this->_tpl_vars[$tpl_var][$_mkey] = $_mval;
                     }
                 } else {
@@ -663,7 +663,7 @@ class Smarty
              settype($this->_tpl_vars[$tpl_var],'array');
             }
             if ($merge && is_array($value)) {
-                foreach($value as $_key => $_val) {
+                foreach ((array)$value as $_key => $_val) {
                     $this->_tpl_vars[$tpl_var][$_key] = &$value[$_key];
                 }
             } else {
@@ -681,7 +681,7 @@ class Smarty
     function clear_assign($tpl_var)
     {
         if (is_array($tpl_var))
-            foreach ($tpl_var as $curr_var)
+            foreach ((array)$tpl_var as $curr_var)
                 unset($this->_tpl_vars[$curr_var]);
         else
             unset($this->_tpl_vars[$tpl_var]);
@@ -813,11 +813,11 @@ class Smarty
      */
     function register_resource($type, $functions)
     {
-        if (count($functions)==4) {
+        if (count((array)$functions)==4) {
             $this->_plugins['resource'][$type] =
                 array($functions, false);
 
-        } elseif (count($functions)==5) {
+        } elseif (count((array)$functions)==5) {
             $this->_plugins['resource'][$type] =
                 array(array(array(&$functions[0], $functions[1])
                             ,array(&$functions[0], $functions[2])
@@ -1244,7 +1244,7 @@ class Smarty
         // load filters that are marked as autoload
         if (count($this->autoload_filters)) {
             foreach ($this->autoload_filters as $_filter_type => $_filters) {
-                foreach ($_filters as $_filter) {
+                foreach ((array)$_filters as $_filter) {
                     $this->load_filter($_filter_type, $_filter);
                 }
             }
@@ -1625,7 +1625,7 @@ class Smarty
         // split tpl_path by the first colon
         $_resource_name_parts = explode(':', $params['resource_name'], 2);
 
-        if (count($_resource_name_parts) == 1) {
+        if (count((array)$_resource_name_parts) == 1) {
             // no resource type given
             $params['resource_type'] = $this->default_resource_type;
             $params['resource_name'] = $_resource_name_parts[0];
@@ -1688,7 +1688,7 @@ class Smarty
             $this->_plugins['modifier'][$_modifier_name];
 
         $_var = $_args[0];
-        foreach ($_var as $_key => $_val) {
+        foreach ((array)$_var as $_key => $_val) {
             $_args[0] = $_val;
             $_var[$_key] = call_user_func_array($_func_name, $_args);
         }
@@ -1911,7 +1911,7 @@ class Smarty
         } else {
             /* add a reference to a new set of cache_attrs */
             $_cache_attrs[] = array();
-            return $_cache_attrs[count($_cache_attrs)-1];
+            return $_cache_attrs[count((array)$_cache_attrs)-1];
 
         }
 

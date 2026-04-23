@@ -115,7 +115,7 @@ function process_payment_record(array $record) {
 
     $processed_count = 0;
 
-    foreach ($invoices_to_process as $inv) {
+    foreach ((array)$invoices_to_process as $inv) {
         $invoice_id = intval($inv['invoice_id']);
         $order_id = intval($inv['order_id'] ?? 0);
         $user_id = intval($inv['user_id']);

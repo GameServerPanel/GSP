@@ -245,7 +245,7 @@ if( !isset( $_POST['start_server'] ) )
 		echo "</td></tr>\n";
 
 		//get last used param or get default
-		if (array_key_exists('extra', $last_param))
+		if (array_key_exists('extra', (array)$last_param))
 			$extra_default = $last_param['extra'];
 		else
 			$extra_default = $server_home['extra_params'];
@@ -454,7 +454,7 @@ elseif($server_home['home_id'] == $_POST['home_id'])
 				$paramKey = (string)$param['key'];
 				$paramType = (string)$param['type'];
 				// Get the last saved value of this param or its default value
-				if (array_key_exists($paramKey, $last_param))
+				if (array_key_exists($paramKey, (array)$last_param))
 					$savedValue = (string)$last_param[$paramKey];
 				
 				$lockedByAdmin = (property_exists($param, 'access') and $param->access == "admin" and !$isAdmin);
@@ -574,7 +574,7 @@ elseif($server_home['home_id'] == $_POST['home_id'])
 	{
 		// If user does not have access to modify extra params then we use
 		// the last param or default set by admins.
-		$extra = ($last_param !== NULL and array_key_exists('extra', $last_param) and (string)$last_param['extra'] != "") ? 
+		$extra = ($last_param !== NULL and array_key_exists('extra', (array)$last_param) and (string)$last_param['extra'] != "") ? 
 				  $last_param['extra'] : $server_home['extra_params'];
 		
 		$start_cmd .= " ".str_replace("\\\\", "\\", clean_server_param_value($extra, $server_xml->cli_allow_chars));
@@ -668,7 +668,7 @@ elseif($server_home['home_id'] == $_POST['home_id'])
 	if ($firewall_settings['status'] == "enable")
 	{
 		$ip_ports = $db->getHomeIpPorts($server_home['home_id']);
-		foreach ($ip_ports as $ip_port)
+		foreach ((array)$ip_ports as $ip_port)
 		{
 			if ($server_xml->protocol == "gameq")
 			{

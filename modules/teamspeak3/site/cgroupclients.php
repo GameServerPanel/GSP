@@ -26,7 +26,7 @@ if(isset($_POST['addclient']))
 		}
 		else
 		{
-			for($i=0; $i+1==count($setclient_cgroup['errors']); $i++)
+			for($i=0; $i+1==count((array)$setclient_cgroup['errors']); $i++)
 				{
 				$error .= $setclient_cgroup['errors'][$i]."<br />";
 				}
@@ -42,7 +42,7 @@ if(isset($_POST['switchgroup']))
 		}
 		else
 		{
-			for($i=0; $i+1==count($setclient_cgroup['errors']); $i++)
+			for($i=0; $i+1==count((array)$setclient_cgroup['errors']); $i++)
 				{
 				$error .= $setclient_cgroup['errors'][$i]."<br />";
 				}

@@ -49,7 +49,7 @@ class HTMLPurifier_AttrDef_CSS_Multiple extends HTMLPurifier_AttrDef
             return false;
         }
         $parts = explode(' ', $string); // parseCDATA replaced \r, \t and \n
-        $length = count($parts);
+        $length = count((array)$parts);
         $final = '';
         for ($i = 0, $num = 0; $i < $length && $num < $this->max; $i++) {
             if (ctype_space($parts[$i])) {

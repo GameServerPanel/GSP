@@ -57,7 +57,7 @@ function exec_ogp_module(){
 	else
 		return;
 					
-	foreach( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		if( $server_home['home_id'] == $home_id and
 			$server_home['mod_id']  == $mod_id and
@@ -101,7 +101,7 @@ function exec_ogp_module(){
 						if(isset($types))
 						{
 							include( DSI_BASEPATH.'includes/SimpleImage.php' );
-							foreach($types as $type)
+							foreach ((array)$types as $type)
 							{
 								if( file_exists(DSI_BASEPATH . "cache/$server_home[ip]_$server_home[port]-$type") )
 									unlink(DSI_BASEPATH . "cache/$server_home[ip]_$server_home[port]-$type");

@@ -35,7 +35,7 @@ function exec_ogp_module()
 	if ( isset($_REQUEST['update_settings']) )
 	{
 		$file_operations = array();
-		foreach($fo_keys as $key)
+		foreach ((array)$fo_keys as $key)
 		{
 			$file_operations[$key] = $_POST[$key];
 		}
@@ -56,7 +56,7 @@ function exec_ogp_module()
 	$ft = new FormTable();
 	$ft->start_form("?m=litefm&amp;p=litefm_settings", "post", "autocomplete=\"off\"");
 	$ft->start_table();
-	foreach($fo_keys as $key)
+	foreach ((array)$fo_keys as $key)
 	{
 		$ft->add_field('on_off',$key,$fo[$key]);
 	}

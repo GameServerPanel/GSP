@@ -39,7 +39,7 @@ function smarty_function_html_options($params, &$smarty)
     
     $extra = '';
     
-    foreach($params as $_key => $_val) {
+    foreach ((array)$params as $_key => $_val) {
         switch($_key) {
             case 'name':
                 $$_key = (string)$_val;
@@ -75,12 +75,12 @@ function smarty_function_html_options($params, &$smarty)
 
     if (isset($options)) {
         
-        foreach ($options as $_key=>$_val)
+        foreach ((array)$options as $_key=>$_val)
             $_html_result .= smarty_function_html_options_optoutput($_key, $_val, $selected);
 
     } else {
         
-        foreach ($values as $_i=>$_key) {
+        foreach ((array)$values as $_i=>$_key) {
             $_val = isset($output[$_i]) ? $output[$_i] : '';
             $_html_result .= smarty_function_html_options_optoutput($_key, $_val, $selected);
         }
@@ -110,7 +110,7 @@ function smarty_function_html_options_optoutput($key, $value, $selected) {
 
 function smarty_function_html_options_optgroup($key, $values, $selected) {
     $optgroup_html = '<optgroup label="' . smarty_function_escape_special_chars($key) . '">' . "\n";
-    foreach ($values as $key => $value) {
+    foreach ((array)$values as $key => $value) {
         $optgroup_html .= smarty_function_html_options_optoutput($key, $value, $selected);
     }
     $optgroup_html .= "</optgroup>\n";

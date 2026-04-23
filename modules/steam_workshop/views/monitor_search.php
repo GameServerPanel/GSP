@@ -92,7 +92,7 @@ $requestSummaryText = $requestSummary ?? '';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($results as $item): ?>
+                                <?php foreach ((array)$results as $item): ?>
                                     <?php
                                         $itemId = htmlspecialchars($item['id'] ?? '', ENT_QUOTES, 'UTF-8');
                                         $label = htmlspecialchars($item['label'] ?? ('@' . $itemId), ENT_QUOTES, 'UTF-8');

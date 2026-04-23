@@ -30,12 +30,12 @@ if($_SESSION['users_role'] != "admin")
 		$groups = [];
 	}
 	$query_groups .= " AND (";
-	foreach($groups as $group)
+	foreach ((array)$groups as $group)
 		$query_groups .= "group_id=".$group['group_id']." OR ";
 	$query_groups .= "group_id=0 OR group_id IS NULL)";
 }
 $addons = $db->resultQuery("SELECT addon_id FROM OGP_DB_PREFIXaddons WHERE home_cfg_id=".$server_home['home_cfg_id'].$query_groups);
-$addons_qty = is_array($addons) ? count($addons) : 0;
+$addons_qty = is_array($addons) ? count((array)$addons) : 0;
 if($addons and $addons_qty >= 1){
 	$module_buttons = array(
 		"<a class='monitorbutton' href='?m=addonsmanager&amp;p=user_addons&amp;home_id=".

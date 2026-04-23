@@ -122,7 +122,7 @@ function isPortValid($port)
 function cleanFilenames($file_array)
 {
     $retval = array();
-    foreach($file_array as $file_name)
+    foreach ((array)$file_array as $file_name)
     {
         if($file_name === "." && $file_name === "..")
             continue;
@@ -140,7 +140,7 @@ function clean_id_string($id_string)
 
 function get_first_existing_file($paths, $referrer = "", $agent = "")
 {
-    foreach ($paths as $path)
+    foreach ((array)$paths as $path)
     {
 		if(preg_match("/^http/", $path))
 		{
@@ -275,7 +275,7 @@ function updateGameConfigsPostInstall($clear_old = false){
 		$db->clearGameCfgs($clear_old);
 		$counter = 0;
 
-		foreach ( $files as $config_file )
+		foreach ((array)$files as $config_file)
 		{
 			$config = read_server_config($config_file);
 			if ( !$db->addGameCfg($config) )
@@ -285,7 +285,7 @@ function updateGameConfigsPostInstall($clear_old = false){
 			}
 		}
 		
-		if($counter == count($files)){
+		if($counter == count((array)$files)){
 			return false;
 		}
 		
@@ -321,7 +321,7 @@ function recursiveDelete($str) {
 			if($folder != ".." && $folder != "."){
 				$scan = glob($str . '/{,.}*', GLOB_BRACE);
 				if(isset($scan) && is_array($scan)){
-					foreach($scan as $index=>$path) {
+					foreach ((array)$scan as $index=>$path) {
 						recursiveDelete($path);
 					}
 				}
@@ -391,7 +391,7 @@ function removeOldGameConfigs(){ // Wrote this function in-case we rename config
 		'modules/config_games/server_configs/bukkit_win64.xml',
 	);
 	
-	foreach($oldConfigsToRemove as $config){
+	foreach ((array)$oldConfigsToRemove as $config){
 		recursiveDelete($config);
 	}	 
 }
@@ -402,7 +402,7 @@ function removeOldPanelFiles(){ // Should run post panel update to remove old fi
 		'protocol/GameQ/gameq'
 	);
 	
-	foreach($oldFiles as $file){
+	foreach ((array)$oldFiles as $file){
 		recursiveDelete($file);
 	}	
 }
@@ -424,7 +424,7 @@ function runPostUpdateOperations(){
 		removeOldPanelFiles();
 	}
 	
-	if(!array_key_exists("users_api_key", $_SESSION)){
+	if(!array_key_exists("users_api_key", (array)$_SESSION)){
 		$_SESSION['users_api_key'] = $db->getApiToken($_SESSION['user_id']);
 	}
 }
@@ -480,13 +480,13 @@ function getOGPLangConstantsJSON(){
 	$finalConsts = array();
 	
 	$consts = get_defined_constants(true);
-	foreach($consts["user"] as $key => $value){
+	foreach ((array)$consts["user"] as $key => $value){
 		if(startsWith($key, $OGPLangPre)){
 			$finalConsts[$key] = $value;
 		}
 	}
 	
-	if(count($finalConsts) > 0){
+	if(count((array)$finalConsts) > 0){
 		return json_encode(utf8ize($finalConsts));
 	}
 	

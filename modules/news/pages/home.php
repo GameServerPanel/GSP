@@ -130,7 +130,7 @@ function ValidateSubmit(form)
 				<?php
 				$image_ids = explode(",",$listing->images);
 				$has_image=false;
-				foreach($image_ids as $image_id)
+				foreach ((array)$image_ids as $image_id)
 				{
 					if(file_exists("modules/news/thumbnails/".$image_id.".jpg"))
 					{

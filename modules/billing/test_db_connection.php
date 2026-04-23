@@ -105,7 +105,7 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 $all_present = true;
-foreach ($required_columns as $col) {
+foreach ((array)$required_columns as $col) {
     if (in_array($col, $existing_columns)) {
         echo "<p class='success'>✓ Column '$col' exists</p>";
     } else {

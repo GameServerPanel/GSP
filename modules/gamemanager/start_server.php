@@ -46,7 +46,7 @@ function exec_ogp_module()
 
     $mod_id = $_REQUEST['mod_id'];
 
-    if ( !array_key_exists($mod_id,$home_info['mods']) )
+    if ( !array_key_exists($mod_id, (array)$home_info['mods']) )
     {
         print_failure("Unable to retrieve mod information from database.");
         return;
@@ -75,7 +75,7 @@ function exec_ogp_module()
 		$ip_info = [];
 	}
 	
-	foreach ( $ip_info as $ip_ports_row )
+	foreach ((array)$ip_info as $ip_ports_row)
 
 	{
 	

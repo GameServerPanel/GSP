@@ -19,7 +19,7 @@ $mods = $config['workshop_items'] ?? [];
                 </tr>
             </thead>
             <tbody>
-            <?php foreach ($mods as $mod): ?>
+            <?php foreach ((array)$mods as $mod): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($mod['id']); ?></td>
                     <td><?php echo htmlspecialchars($mod['label']); ?></td>

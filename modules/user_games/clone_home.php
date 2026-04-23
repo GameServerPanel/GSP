@@ -101,7 +101,7 @@ function exec_ogp_module()
 			}
 			else
 			{
-				foreach ( $enabled_mods as $enabled_rows )
+				foreach ((array)$enabled_mods as $enabled_rows)
 				{
 					if ( $db->addModToGameHome($clone_home_id,
 						$enabled_rows['mod_cfg_id']) === FALSE )
@@ -210,7 +210,7 @@ function exec_ogp_module()
 	$assigned = $db->getHomeIpPorts($home_id);
 	if( !empty($assigned) )
 	{
-		foreach ( $assigned as $assigned_rows )
+		foreach ((array)$assigned as $assigned_rows)
 		{
 			echo "<p>".$assigned_rows['ip'].":".$assigned_rows['port']."</p>\n";
 		}
@@ -232,7 +232,7 @@ function exec_ogp_module()
 		get_lang('cpu_affinity')."</td><td>".
 		get_lang('nice_level')."</td></tr>\n";
 
-	foreach ( $enabled_mods as $enabled_rows )
+	foreach ((array)$enabled_mods as $enabled_rows)
 	{
 		echo "<tr>";
 		echo "<td>".$enabled_rows['mod_name']."</td>";

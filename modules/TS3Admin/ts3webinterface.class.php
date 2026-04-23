@@ -33,7 +33,7 @@ function getAssignedServerUsers()
 	if($ts3vservers != FALSE)
 	{
 		$users_assigned = array();
-		foreach($ts3vservers as $ts3vserver)
+		foreach ((array)$ts3vservers as $ts3vserver)
 		{
 			if($ts3vserver['user_id'] != $_SESSION['user_id'])
 				$users_assigned[] = $ts3vserver['user_id'];
@@ -44,7 +44,7 @@ function getAssignedServerUsers()
 	$subusers_list = array();
 	if(is_array($subusers))
 	{
-		foreach($subusers as $subuser)
+		foreach ((array)$subusers as $subuser)
 		{
 			if(!in_array($subuser,$users_assigned))
 				$subusers_list[] = $db->getUserById($subuser);
@@ -56,7 +56,7 @@ function getAssignedServerUsers()
 	if(is_array($users_assigned))
 	{
 		$subusers_assigned_list = array();
-		foreach($users_assigned as $user_assigned)
+		foreach ((array)$users_assigned as $user_assigned)
 		{
 			if(in_array($user_assigned,$subusersb))
 				$subusers_assigned_list[] = $db->getUserById($user_assigned);
@@ -340,7 +340,7 @@ class TS3webinterface
 							$response = array('OK');
 							
 							if( !is_array($_POST['serverprop']) ) $_POST['serverprop'] = array($_POST['serverprop']);
-							for($i=0; $i<count($_POST['serverprop']); $i++)
+							for($i=0; $i<count((array)$_POST['serverprop']); $i++)
 							{
 								if( $_POST['serverprop'][$i] == 'virtualserver_uptime' )
 								{
@@ -730,7 +730,7 @@ class TS3webinterface
 					
 					$serverGroupList = $this->server->r_servergrouplist();
 					$serverGroupListNames = array();
-					for($i=0; $i<count($serverGroupList); $i++)
+					for($i=0; $i<count((array)$serverGroupList); $i++)
 					{
 						$serverGroupListNames[$serverGroupList[$i]['sgid']] = $serverGroupList[$i];
 					}
@@ -739,7 +739,7 @@ class TS3webinterface
 					
 					$channelGroupList = $this->server->r_channelgrouplist();
 					$channelGroupListNames = array();
-					for($i=0; $i<count($channelGroupList); $i++)
+					for($i=0; $i<count((array)$channelGroupList); $i++)
 					{
 						$channelGroupListNames[$channelGroupList[$i]['cgid']] = $channelGroupList[$i];
 					}
@@ -748,7 +748,7 @@ class TS3webinterface
 					
 					$channelList = $this->server->r_channellist();
 					$channelListNames = array();
-					for($i=0; $i<count($channelList); $i++)
+					for($i=0; $i<count((array)$channelList); $i++)
 					{
 						$channelListNames[$channelList[$i]['cid']] = $channelList[$i];
 					}
@@ -914,21 +914,21 @@ class TS3webinterface
 		$lastLevel = array();
 		
 		$cidConnection = array();
-		$channelNum = count($channels);
+		$channelNum = count((array)$channels);
 		for($i=0; $i<$channelNum; $i++)
 		{
 			$cidConnection[$channels[$i]['cid']] = $i;
 			
 			$channels[$i]['is_last_channel'] = false;
 			
-			/*if( $channels[$i]['pid'] != $pidStack[count($pidStack)-1] )
+			/*if( $channels[$i]['pid'] != $pidStack[count((array)$pidStack)-1] )
 			{
 				if( in_array($channels[$i]['pid'], $pidStack) )
 				{
 					do
 					{
 						array_pop($pidStack);
-					} while( in_array($channels[$i]['pid'], $pidStack) && count($pidStack) > 1 );
+					} while( in_array($channels[$i]['pid'], $pidStack) && count((array)$pidStack) > 1 );
 					//$pidStack[] = $channels[$i]['pid'];
 					$channels[$i]['is_last_channel'] = true;
 				}
@@ -937,7 +937,7 @@ class TS3webinterface
 					$pidStack[] = $channels[$i]['pid'];
 				}
 			}*/
-			//$channels[$i]['level'] = count($pidStack)-1;
+			//$channels[$i]['level'] = count((array)$pidStack)-1;
 			
 			if( $channels[$i]['pid'] == 0 ) $channels[$i]['level'] = 0;
 			else $channels[$i]['level'] = $channels[$cidConnection[$channels[$i]['pid']]]['level'] + 1;
@@ -949,7 +949,7 @@ class TS3webinterface
 			$lastLevel[$channels[$i]['level']] = $i;
 		}
 		
-		/*$reversedCounter = count($channels)-1;
+		/*$reversedCounter = count((array)$channels)-1;
 		do
 		{
 			
@@ -1051,7 +1051,7 @@ class TS3webinterface
 			}
 		}
 		
-		$clientNum = count($clients);
+		$clientNum = count((array)$clients);
 		for($i=0; $i<$clientNum; $i++)
 		{
 			if( $clients[$i]['client_input_hardware'] == '0' ) $clients[$i]['status_img'] = '16x16_hardware_input_muted';
@@ -1090,7 +1090,7 @@ class TS3webinterface
 		$channels = array();
 		$cidConnection = array();
 		
-		$channelNum = count($result);
+		$channelNum = count((array)$result);
 		for($i=0; $i<$channelNum; $i++ )
 		{
 			$cidConnection[$result[$i]['cid']] = $i;
@@ -1135,14 +1135,14 @@ class TS3webinterface
 
 		$cidConnection = array();
 		
-		$backupNum = count($backup);
+		$backupNum = count((array)$backup);
 
 		for($i=0; $i<$backupNum; $i++)
 		{
 			$tmpCreate = array();
 			
-			$channelPropNum = count($backup[$i]);
-			foreach($backup[$i] as $key => $value)
+			$channelPropNum = count((array)$backup[$i]);
+			foreach ((array)$backup[$i] as $key => $value)
 			{
 				if( $key == 'pid' || $key == 'channel_order' || $key == 'channel_name' ) continue;
 				
@@ -1210,7 +1210,7 @@ class TS3webinterface
 	{
 		if( $add != 0 ) $timeSeconds += $add;
 		
-		return date($format, $timeSeconds);
+		return date($format, is_numeric($timeSeconds) ? (int)$timeSeconds : strtotime($timeSeconds));
 	}
 	
 	public function convertByteToMB($num, $prec=2)

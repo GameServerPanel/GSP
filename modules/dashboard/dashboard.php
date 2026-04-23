@@ -73,7 +73,7 @@ function exec_ogp_module()
 	
 	// Recent News
     //$xml=simplexml_load_file("modules/news/data/listings.xml");
-	//$lastnews = count($xml)-1;
+	//$lastnews = count((array)$xml)-1;
 	//$title[2] = "Recent News";
 	//$content[2] = $xml->listing[$lastnews]->title;
 	//$href[2] = 'home.php?m=news&p=news';
@@ -110,9 +110,9 @@ function exec_ogp_module()
 		$colhtml[1] = '<div class="column one_fourth" id="column1" >';
 		$colhtml[2] = '<div class="column one_two" id="column2" >';
 		$colhtml[3] = '<div class="column one_fourth" id="column3" >';
-		foreach($widgets as $widget)
+		foreach ((array)$widgets as $widget)
 		{
-			if(array_key_exists($widget["widget_id"], $title)){
+			if(array_key_exists($widget["widget_id"], (array)$title)){
 				if( (!isset($settings['old_dashboard_behavior']) or $settings['old_dashboard_behavior'] == 0) AND $widget['widget_id'] == "3" )
 					continue;
 				$colhtml[$widget['column_id']] .= '<div class="dragbox bloc rounded" id="item'.$widget['widget_id'].'">'.
@@ -139,7 +139,7 @@ function exec_ogp_module()
 				$colhtml[$widget['column_id']] .= '</div></div>'; 
 			}
 		}
-		foreach($colhtml as $html )
+		foreach ((array)$colhtml as $html)
 			echo $html.'</div>';
 	}
 	
@@ -174,7 +174,7 @@ function exec_ogp_module()
 				<select name='remote_server_id' onchange=".'"this.form.submit()"'.">\n";
 		
 		$agents_ips = array();
-		foreach ( $servers as $server_row )
+		foreach ((array)$servers as $server_row)
 		{
 			$agents_ips[$server_row['remote_server_id']] = gethostbyname($server_row['agent_ip']);
 			if( !empty( $server_row['remote_server_id'] ) and !isset( $_GET['remote_server_id'] ) OR !empty( $server_row['remote_server_id'] ) and empty( $_GET['remote_server_id'] ) ) 

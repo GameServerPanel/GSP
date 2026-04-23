@@ -168,7 +168,7 @@ function net2ftp_module_printBody() {
 		$file_index         = 1;
 		$symlink_index      = 1;
 
-		for ($i=1; $i<=count($list["all"]); $i++) {
+		for ($i=1; $i<=count((array)$list["all"]); $i++) {
 
 			if     ($list["all"][$i]["dirorfile"] == "d")   { $list["all"][$i]["message"] = __("Set the permissions of directory <b>%1\$s</b> to: ", $list["all"][$i]["dirfilename"]) . "<br />\n"; }
 			elseif ($list["all"][$i]["dirorfile"] == "-")   { $list["all"][$i]["message"] = __("Set the permissions of file <b>%1\$s</b> to: ", $list["all"][$i]["dirfilename"]) . "<br />\n"; }
@@ -219,7 +219,7 @@ function net2ftp_module_printBody() {
 		$symlink_index      = 1;
 
 // Calculate the chmod octal
-		for ($i=1; $i<=count($list["all"]); $i++) {
+		for ($i=1; $i<=count((array)$list["all"]); $i++) {
 			if (isset($list["all"][$i]["owner_read"]) == false)    { $list["all"][$i]["owner_read"] = 0; }
 			if (isset($list["all"][$i]["owner_write"]) == false)   { $list["all"][$i]["owner_write"] = 0; }
 			if (isset($list["all"][$i]["owner_execute"]) == false) { $list["all"][$i]["owner_execute"] = 0; }

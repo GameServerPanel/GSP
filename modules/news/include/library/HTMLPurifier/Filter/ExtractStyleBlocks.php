@@ -103,7 +103,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         $this->_styleMatches = array(); // reset
         $context->register('StyleBlocks', $style_blocks); // $context must not be reused
         if ($this->_tidy) {
-            foreach ($style_blocks as &$style) {
+            foreach ((array)$style_blocks as &$style) {
                 $style = $this->cleanCSS($style, $config, $context);
             }
         }
@@ -146,7 +146,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
         foreach ($this->_tidy->css as $k => $decls) {
             // $decls are all CSS declarations inside an @ selector
             $new_decls = array();
-            foreach ($decls as $selector => $style) {
+            foreach ((array)$decls as $selector => $style) {
                 $selector = trim($selector);
                 if ($selector === '') {
                     continue;
@@ -215,7 +215,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                 // handle ruleset
                 $selectors = array_map('trim', explode(',', $selector));
                 $new_selectors = array();
-                foreach ($selectors as $sel) {
+                foreach ((array)$selectors as $sel) {
                     // split on +, > and spaces
                     $basic_selectors = preg_split('/\s*([+> ])\s*/', $sel, -1, PREG_SPLIT_DELIM_CAPTURE);
                     // even indices are chunks, odd indices are
@@ -223,7 +223,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                     $nsel = null;
                     $delim = null; // guaranteed to be non-null after
                     // two loop iterations
-                    for ($i = 0, $c = count($basic_selectors); $i < $c; $i++) {
+                    for ($i = 0, $c = count((array)$basic_selectors); $i < $c; $i++) {
                         $x = $basic_selectors[$i];
                         if ($i % 2) {
                             // delimiter
@@ -237,7 +237,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                             $components = preg_split('/([#.:])/', $x, -1, PREG_SPLIT_DELIM_CAPTURE);
                             $sdelim = null;
                             $nx = null;
-                            for ($j = 0, $cc = count($components); $j < $cc; $j++) {
+                            for ($j = 0, $cc = count((array)$components); $j < $cc; $j++) {
                                 $y = $components[$j];
                                 if ($j === 0) {
                                     if ($y === '*' || isset($html_definition->info[$y = strtolower($y)])) {
@@ -289,7 +289,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                     }
                     if ($nsel !== null) {
                         if (!empty($scopes)) {
-                            foreach ($scopes as $s) {
+                            foreach ((array)$scopes as $s) {
                                 $new_selectors[] = "$s $nsel";
                             }
                         } else {
@@ -301,7 +301,7 @@ class HTMLPurifier_Filter_ExtractStyleBlocks extends HTMLPurifier_Filter
                     continue;
                 }
                 $selector = implode(', ', $new_selectors);
-                foreach ($style as $name => $value) {
+                foreach ((array)$style as $name => $value) {
                     if (!isset($css_definition->info[$name])) {
                         unset($style[$name]);
                         continue;

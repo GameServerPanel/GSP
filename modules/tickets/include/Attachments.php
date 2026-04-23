@@ -123,7 +123,7 @@ class Attachments
     private function normalizeFiles($files)
     {
         $_files       = array();
-        $_files_count = count($files['name']);
+        $_files_count = count((array)$files['name']);
         $_files_keys  = array_keys($files);
 
         for ($i = 0; $i < $_files_count; $i++) {
@@ -131,7 +131,7 @@ class Attachments
                 continue;
             }
 
-            foreach ($_files_keys as $key) {
+            foreach ((array)$_files_keys as $key) {
                 $_files[$i][$key] = $files[$key][$i];
             }
         }

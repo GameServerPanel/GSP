@@ -186,7 +186,7 @@ class TeamSpeak3_Node_Channelgroup extends TeamSpeak3_Node_Abstract
    */
   public function message($msg)
   {
-    foreach($this as $client)
+    foreach ((array)$this as $client)
     {
       try
       {

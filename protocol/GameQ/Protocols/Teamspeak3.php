@@ -181,7 +181,7 @@ class Teamspeak3 extends Protocol
         $result = new Result();
 
         // Iterate over the sections and offload the parsing
-        foreach ($sections as $section) {
+        foreach ((array)$sections as $section) {
             // Grab a snip of the data so we can figure out what it is
             $check = substr(trim($section), 0, 4);
 
@@ -226,7 +226,7 @@ class Teamspeak3 extends Protocol
         $items = explode(' ', $data);
 
         // Iterate over the items
-        foreach ($items as $item) {
+        foreach ((array)$items as $item) {
             // Explode and make sure we always have 2 items in the array
             list($key, $value) = array_pad(explode('=', $item, 2), 2, '');
 
@@ -261,7 +261,7 @@ class Teamspeak3 extends Protocol
         $result->add('dedicated', 1);
 
         // Iterate over the properties
-        foreach ($properties as $key => $value) {
+        foreach ((array)$properties as $key => $value) {
             $result->add($key, $value);
         }
 
@@ -287,12 +287,12 @@ class Teamspeak3 extends Protocol
         $channels = explode('|', $data);
 
         // Iterate over the channels
-        foreach ($channels as $channel) {
+        foreach ((array)$channels as $channel) {
             // Offload the parsing for these values
             $properties = $this->processProperties($channel);
 
             // Iterate over the properties
-            foreach ($properties as $key => $value) {
+            foreach ((array)$properties as $key => $value) {
                 $result->addTeam($key, $value);
             }
         }
@@ -313,12 +313,12 @@ class Teamspeak3 extends Protocol
         $players = explode('|', $data);
 
         // Iterate over the channels
-        foreach ($players as $player) {
+        foreach ((array)$players as $player) {
             // Offload the parsing for these values
             $properties = $this->processProperties($player);
 
             // Iterate over the properties
-            foreach ($properties as $key => $value) {
+            foreach ((array)$properties as $key => $value) {
                 $result->addPlayer($key, $value);
             }
         }

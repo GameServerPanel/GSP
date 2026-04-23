@@ -32,7 +32,7 @@ if(isset($_POST['deltoken']))
 			}
 			else
 			{
-			for($i=0; $i+1==count($token_delete['errors']); $i++)
+			for($i=0; $i+1==count((array)$token_delete['errors']); $i++)
 				{
 				$error .= $token_delete['errors'][$i]."<br />";
 				}
@@ -63,7 +63,7 @@ if(isset($_POST['addtoken']))
 				}
 				else
 				{
-				for($i=0; $i+1==count($token_add['errors']); $i++)
+				for($i=0; $i+1==count((array)$token_add['errors']); $i++)
 					{
 					$error .= $token_add['errors'][$i]."<br />";
 					}

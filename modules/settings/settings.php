@@ -77,7 +77,7 @@ function exec_ogp_module()
 		
 		$db->setSettings($settings);
 		
-		if(array_key_exists("reset_game_server_order", $_REQUEST) && $_REQUEST["reset_game_server_order"] == 1){
+		if(array_key_exists("reset_game_server_order", (array)$_REQUEST) && $_REQUEST["reset_game_server_order"] == 1){
 			$db->resetGameServerOrder();
 		}
 		
@@ -175,7 +175,7 @@ function exec_ogp_module()
 	
 	$login_attempts_before_banned = (isset($row['login_attempts_before_banned']) and $row['login_attempts_before_banned'] != "" and is_numeric($row['login_attempts_before_banned']))? $row['login_attempts_before_banned'] : "6";
 	$ft->add_field('string','login_attempts_before_banned',$login_attempts_before_banned);
-	$ft->add_field('string','login_ban_time', array_key_exists("login_ban_time", $row) && !empty($row["login_ban_time"]) && is_numeric($row["login_ban_time"]) ? $row["login_ban_time"] : '');
+	$ft->add_field('string','login_ban_time', array_key_exists("login_ban_time", (array)$row) && !empty($row["login_ban_time"]) && is_numeric($row["login_ban_time"]) ? $row["login_ban_time"] : '');
 	
 	$ft->add_field('string','custom_github_update_username',@$row['custom_github_update_username']);
 	

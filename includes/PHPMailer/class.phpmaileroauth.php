@@ -104,7 +104,7 @@ class PHPMailerOAuth extends PHPMailer
         $hosts = explode(';', $this->Host);
         $lastexception = null;
 
-        foreach ($hosts as $hostentry) {
+        foreach ((array)$hosts as $hostentry) {
             $hostinfo = array();
             if (!preg_match('/^((ssl|tls):\/\/)*([a-zA-Z0-9\.-]*):?([0-9]*)$/', trim($hostentry), $hostinfo)) {
                 // Not a valid host entry

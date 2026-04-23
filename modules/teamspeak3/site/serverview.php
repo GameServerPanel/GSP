@@ -273,7 +273,7 @@ if(isset($_POST['sendkick']))
 	$client_kick=$ts3->clientKick($_POST['clid'], 'server', $_POST['kickmsg']);
 	if($client_kick['success']===false)
 		{
-		for($i=0; $i+1==count($client_kick['errors']); $i++)
+		for($i=0; $i+1==count((array)$client_kick['errors']); $i++)
 			{
 			$error .= $client_kick['errors'][$i]."<br />";
 			}
@@ -289,7 +289,7 @@ if(isset($_POST['sendban']))
 	$client_ban=$ts3->banClient($_POST['clid'], $_POST['bantime'], $_POST['banmsg']);
 	if($client_ban['success']===false)
 		{
-		for($i=0; $i+1==count($client_ban['errors']); $i++)
+		for($i=0; $i+1==count((array)$client_ban['errors']); $i++)
 			{
 			$error .= $client_ban['errors'][$i]."<br />";
 			}
@@ -305,7 +305,7 @@ if(isset($_POST['sendpoke']))
 	$client_poke=$ts3->clientPoke($_POST['clid'], $_POST['pokemsg']);
 	if($client_poke['success']===false)
 		{
-		for($i=0; $i+1==count($client_poke['errors']); $i++)
+		for($i=0; $i+1==count((array)$client_poke['errors']); $i++)
 			{
 			$error .= $client_poke['errors'][$i]."<br />";
 			}
@@ -321,7 +321,7 @@ if(isset($_POST['sendmove']))
 	$client_move=$ts3->clientMove($_POST['clid'], $_POST['cid']);
 	if($client_move['success']===false)
 		{
-		for($i=0; $i+1==count($client_move['errors']); $i++)
+		for($i=0; $i+1==count((array)$client_move['errors']); $i++)
 			{
 			$error .= $client_move['errors'][$i]."<br />";
 			}
@@ -338,7 +338,7 @@ if(isset($_POST['sendmsg']))
 	$send_message=$ts3->sendMessage('3', $_POST['sid'], $_POST['msgtoserver']);
 	if($send_message['success']===false)
 		{
-		for($i=0; $i+1==count($send_message['errors']); $i++)
+		for($i=0; $i+1==count((array)$send_message['errors']); $i++)
 			{
 			$error .= $send_message['errors'][$i]."<br />";
 			}
@@ -354,7 +354,7 @@ if(isset($_POST['start']))
 	$server_start=$ts3->serverStart($_POST['sid']);
 	if($server_start['success']===false)
 		{
-		for($i=0; $i+1==count($server_start['errors']); $i++)
+		for($i=0; $i+1==count((array)$server_start['errors']); $i++)
 			{
 			$error .= $server_start['errors'][$i]."<br />";
 			}
@@ -370,7 +370,7 @@ if(isset($_POST['stop']))
 	$server_stop=$ts3->serverStop($_POST['sid']);
 	if($server_stop['success']===false)
 		{
-		for($i=0; $i+1==count($server_stop['errors']); $i++)
+		for($i=0; $i+1==count((array)$server_stop['errors']); $i++)
 			{
 			$error .= $server_stop['errors'][$i]."<br />";
 			}

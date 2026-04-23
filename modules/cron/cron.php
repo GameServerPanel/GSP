@@ -35,14 +35,14 @@ function exec_ogp_module()
 		return 0;
 	}
 	
-	foreach( $homes as $home )
+	foreach ((array)$homes as $home)
 	{
 		$home['access_rights'] = "ufpet";
 		$id = $home['home_id']."_".$home['ip']."_".$home['port'];
 		$server_homes[$id] = $home;
 	}
 	
-	foreach($r_servers as $r_server)
+	foreach ((array)$r_servers as $r_server)
 	{
 		$id = $r_server['remote_server_id'];
 		$remote_servers[$id] = $r_server;
@@ -134,7 +134,7 @@ function exec_ogp_module()
 	$refresh = new refreshed();
 	if( isset($_POST['r_server_id']) )
 	{
-		foreach($server_homes as $key => $server_home)
+		foreach ((array)$server_homes as $key => $server_home)
 		{
 			if($server_home['remote_server_id'] == $_POST['r_server_id'])
 			{
@@ -265,7 +265,7 @@ function exec_ogp_module()
 	if ( !empty($remote_servers_offline) )
 	{
 		$offline_servers = server . " (" . offline . "):";
-		foreach($remote_servers_offline as $remote_server_offline)
+		foreach ((array)$remote_servers_offline as $remote_server_offline)
 		{
 			$offline_servers .= " " . $remote_server_offline['remote_server_name'] . ",";
 		}
@@ -310,12 +310,12 @@ function exec_ogp_module()
 	</tr>
 <?php
 		$user_jobs = "";
-		foreach( $jobsArray as $remote_server_id => $jobs )
+		foreach ((array)$jobsArray as $remote_server_id => $jobs )
 		{
-			foreach($jobs as $jobId => $job)
+			foreach ((array)$jobs as $jobId => $job)
 			{
 				if(isset($job['action'])){	
-					if(array_key_exists('home_id', $job) && array_key_exists('ip', $job) && array_key_exists('port', $job) && hasValue($job['home_id']) && hasValue($job['ip']) && hasValue($job['port'])){
+					if(array_key_exists('home_id', (array)$job) && array_key_exists('ip', (array)$job) && array_key_exists('port', (array)$job) && hasValue($job['home_id']) && hasValue($job['ip']) && hasValue($job['port'])){
 						$idStr = $job['home_id']."_".$job['ip']."_".$job['port'];				
 					}else{
 						$idStr = false;

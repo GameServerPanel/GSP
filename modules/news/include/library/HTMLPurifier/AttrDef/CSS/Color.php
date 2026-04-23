@@ -78,7 +78,7 @@ class HTMLPurifier_AttrDef_CSS_Color extends HTMLPurifier_AttrDef
             $values = trim(str_replace($function, '', $color), ' ()');
 
             $parts = explode(',', $values);
-            if (count($parts) !== $parameters_size) {
+            if (count((array)$parts) !== $parameters_size) {
                 return false;
             }
 
@@ -86,7 +86,7 @@ class HTMLPurifier_AttrDef_CSS_Color extends HTMLPurifier_AttrDef
             $new_parts = array();
             $i = 0;
 
-            foreach ($parts as $part) {
+            foreach ((array)$parts as $part) {
                 $i++;
                 $part = trim($part);
 
@@ -95,7 +95,7 @@ class HTMLPurifier_AttrDef_CSS_Color extends HTMLPurifier_AttrDef
                 }
 
                 // different check for alpha channel
-                if ($alpha_channel === true && $i === count($parts)) {
+                if ($alpha_channel === true && $i === count((array)$parts)) {
                     $result = $this->alpha->validate($part, $config, $context);
 
                     if ($result === false) {
@@ -112,7 +112,7 @@ class HTMLPurifier_AttrDef_CSS_Color extends HTMLPurifier_AttrDef
                     $current_type = 'integer';
                 }
 
-                if (!array_key_exists($current_type, $allowed_types[$i])) {
+                if (!array_key_exists($current_type, (array)$allowed_types[$i])) {
                     return false;
                 }
 

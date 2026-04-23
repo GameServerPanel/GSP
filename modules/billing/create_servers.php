@@ -69,7 +69,7 @@ function exec_ogp_module()
 		$provisioned_count = 0;
 		$failed_count = 0;
 		
-		foreach($orders as $order)
+		foreach ((array)$orders as $order)
 		{
 			$order_id = $order['order_id'];
 			$processed_orders[] = intval($order_id);
@@ -137,7 +137,7 @@ function exec_ogp_module()
 				  If you have any questions or requests, visit our website  or contact us directly in our Discord Server.";
 
       $mail = mymail($email, $subject, $message, $settings);
-	  $rundate = date('d/M/y G:i',$now);
+	  $rundate = date('d/M/y G:i', is_numeric($now) ? (int)$now : strtotime($now));
 
  if (!$mail)
       $db->logger( "Email FAILED - Server Renewed " . $home_id);
@@ -180,7 +180,7 @@ function exec_ogp_module()
 				//Add IP:Port Pair to the Game Home
 			//need to get the IP_ID for this remote server.
 				$result = $db->resultQuery("SELECT ip_id FROM OGP_DB_PREFIXremote_server_ips WHERE remote_server_id=".$ip);
-			    	foreach ($result as $rs)
+			    	foreach ((array)$result as $rs)
 			{
 				$ip_id = $rs['ip_id'];
 			}
@@ -303,7 +303,7 @@ function exec_ogp_module()
 								  You can login to the Game Panel and click on Game Monitor to see your server.  <br><br>
 								  Thank you!<br> ";
 					  $mail = mymail($email, $subject, $message, $settings);
-				  	  $rundate = date('d/M/y G:i',$now);
+				  	  $rundate = date('d/M/y G:i', is_numeric($now) ? (int)$now : strtotime($now));
 
 					  if (!$mail)
 						  $db->logger( "Email FAILED - Server Created " . $home_id);

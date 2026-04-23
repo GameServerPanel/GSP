@@ -12,9 +12,9 @@ function kses($string, $allowed_html, $allowed_protocols = null)
     $config = HTMLPurifier_Config::createDefault();
     $allowed_elements = array();
     $allowed_attributes = array();
-    foreach ($allowed_html as $element => $attributes) {
+    foreach ((array)$allowed_html as $element => $attributes) {
         $allowed_elements[$element] = true;
-        foreach ($attributes as $attribute => $x) {
+        foreach ((array)$attributes as $attribute => $x) {
             $allowed_attributes["$element.$attribute"] = true;
         }
     }

@@ -85,10 +85,10 @@ function exec_ogp_module()
 				$params = array('token' => $token);
 				$response = getResponse($ip, $port, '/v2/bans/list/', $params);
 				$bans_table = "<table>";
-				foreach($response['bans'] as $ban)
+				foreach ((array)$response['bans'] as $ban)
 				{
 					$bans_table .= "<tr>";
-					foreach($ban as $ban_key => $ban_value)
+					foreach ((array)$ban as $ban_key => $ban_value)
 						$bans_table .=  "<td><b>".strtoupper($ban_key)."</b>: ".$ban_value."</td>";
 					$bans_table .= "</tr>";
 				}
@@ -129,7 +129,7 @@ function exec_ogp_module()
 					if($response['status'] == '200')
 					{
 						$bans_table = "<table><tr>";
-						foreach($response as $ban_key => $ban_value)
+						foreach ((array)$response as $ban_key => $ban_value)
 							if($ban_key != 'status')
 								$bans_table .=  "<td><b>".strtoupper($ban_key)."</b>: ".$ban_value."</td>";
 						$bans_table .= "</tr></table>";

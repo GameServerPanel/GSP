@@ -32,7 +32,7 @@ function exec_ogp_module()
 	if ( !$db->isAdmin($_SESSION['user_id']) )
 	{
 		$result = $db->getUserGroupList($_SESSION['user_id']);
-		foreach ( $result as $row ) #loop through the groups
+		foreach ((array)$result as $row) #loop through the groups
 		{
 			if ( $row['group_id'] == $group_id )
 			{

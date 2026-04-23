@@ -43,8 +43,8 @@ function exec_ogp_module()
 	//DISABLE! ANNOYING
 	/*
 	$admins = $db->getAdmins();
-	if(is_array($admins) && count($admins) > 0){
-		foreach($admins as $admin){
+	if(is_array($admins) && count((array)$admins) > 0){
+		foreach ((array)$admins as $admin){
 			if($admin['user_receives_emails']){
 				$adminEmail = $admin['users_email'];
 				$adminEmailList .= $adminEmail . ',';

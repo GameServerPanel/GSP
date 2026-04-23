@@ -29,7 +29,7 @@ function exec_ogp_module()
 	$servers = array();
 	
 	if(is_array($remoteServers)){
-		foreach($remoteServers as $server){
+		foreach ((array)$remoteServers as $server){
 			$remote = new OGPRemoteLibrary($server['agent_ip'], $server['agent_port'], $server['encryption_key'], 1);
 			$status = (int)$remote->status_chk();
 			

@@ -46,7 +46,7 @@ class HTMLPurifier_Injector_Linkify extends HTMLPurifier_Injector
         // $i = index
         // $c = count
         // $l = is link
-        for ($i = 0, $c = count($bits), $l = false; $i < $c; $i++, $l = !$l) {
+        for ($i = 0, $c = count((array)$bits), $l = false; $i < $c; $i++, $l = !$l) {
             if (!$l) {
                 if ($bits[$i] === '') {
                     continue;

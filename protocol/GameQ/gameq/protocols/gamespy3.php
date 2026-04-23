@@ -115,7 +115,7 @@ class GameQ_Protocols_Gamespy3 extends GameQ_Protocols
     	$return = array();
 
     	// Get packet index, remove header
-        foreach ($packets as $index => $packet)
+        foreach ((array)$packets as $index => $packet)
         {
         	// Make new buffer
         	$buf = new GameQ_Buffer($packet);
@@ -138,7 +138,7 @@ class GameQ_Protocols_Gamespy3 extends GameQ_Protocols
         // Compare last var of current packet with first var of next packet
         // On a partial match, remove last var from current packet,
         // variable header from next packet
-        for ($i = 0, $x = count($return); $i < $x - 1; $i++)
+        for ($i = 0, $x = count((array)$return); $i < $x - 1; $i++)
         {
             // First packet
             $fst = substr($return[$i], 0, -1);
@@ -162,7 +162,7 @@ class GameQ_Protocols_Gamespy3 extends GameQ_Protocols
         }
 
         // Now let's loop the return and remove any dupe prefixes
-        for($x = 1; $x < count($return); $x++)
+        for($x = 1; $x < count((array)$return); $x++)
         {
         	$buf = new GameQ_Buffer($return[$x]);
 
@@ -223,7 +223,7 @@ class GameQ_Protocols_Gamespy3 extends GameQ_Protocols
 
 	protected function delete_result(&$result, $array)
     {
-        foreach($array as $key)
+        foreach ((array)$array as $key)
         {
         	unset($result[$key]);
         }
@@ -268,7 +268,7 @@ class GameQ_Protocols_Gamespy3 extends GameQ_Protocols
     	$item_type = '';
 
     	// Loop through all of the $data for information and pull it out into the result
-    	for($x=0; $x < count($data)-1; $x++)
+    	for($x=0; $x < count((array)$data)-1; $x++)
     	{
     		// Pull out the item
     		$item = $data[$x];
@@ -413,7 +413,7 @@ class GameQ_Protocols_Gamespy3 extends GameQ_Protocols
         print_r($items);
 
         // Loop through all of the items
-        for($x = 0; $x < count($items); $x += 2)
+        for($x = 0; $x < count((array)$items); $x += 2)
         {
             // $x is always the key for the item (i.e. player_, ping_, team_, score_, etc...)
             $item_type = rtrim($items[$x], '_,_t');

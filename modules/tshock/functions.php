@@ -5,7 +5,7 @@ function getResponse($ip, $port, $query, $params = array()){
 	if(!empty($params))
 	{
 		$api_request .= '?';
-		foreach($params as $param_key => $param_value)
+		foreach ((array)$params as $param_key => $param_value)
 			$api_request .= $param_key."=".urlencode($param_value)."&";
 	}
 	return json_decode(file_get_contents($api_request), True);

@@ -84,7 +84,7 @@ function smarty_function_html_select_date($params, &$smarty)
     $year_empty      = null;
     $extra_attrs     = '';
 
-    foreach ($params as $_key=>$_value) {
+    foreach ((array)$params as $_key=>$_value) {
         switch ($_key) {
             case 'prefix':
             case 'time':
@@ -135,7 +135,7 @@ function smarty_function_html_select_date($params, &$smarty)
 
     if (preg_match('!^-\d+$!', $time)) {
         // negative timestamp, use date()
-        $time = date('Y-m-d', $time);
+        $time = date('Y-m-d', is_numeric($time) ? (int)$time : strtotime($time));
     }
     // If $time is not in format yyyy-mm-dd
     if (preg_match('/^(\d{0,4}-\d{0,2}-\d{0,2})/', $time, $found)) {

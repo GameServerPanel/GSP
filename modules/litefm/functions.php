@@ -4,7 +4,7 @@ function return_bytes($val) {
 	$last = strtolower($val[strlen($val)-1]);
 	$val = str_replace($val[strlen($val)-1], '', $val);
 	switch($last) {
-		// El modificador 'G' está disponble desde PHP 5.1.0
+		// El modificador 'G' est disponble desde PHP 5.1.0
 		case 'g':
 			$val *= 1024;
 		case 'm':
@@ -67,7 +67,7 @@ function get_fo_settings($settings,$fo_keys)
 {
 	$fo = isset($settings['lfm_file_operations']) ? json_decode($settings['lfm_file_operations'],1) : array();
 	$fo_keys_obd = array("send_by_email"); // values "Off" By Default
-	foreach($fo_keys as $key)
+	foreach ((array)$fo_keys as $key)
 	{
 		if(in_array($key,$fo_keys_obd) and !isset($fo[$key]))
 			$fo[$key] = "0";

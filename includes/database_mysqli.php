@@ -138,7 +138,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if ( !$this->link ) return FALSE;
 		if ( !is_array($settings) ) return FALSE;
 
-		foreach ( $settings as $s_key => $s_value )
+		foreach ((array)$settings as $s_key => $s_value )
 		{
 			$query = sprintf('INSERT INTO `%1$ssettings` (`setting`,`value`)
 				VALUES(\'%2$s\', \'%3$s\') ON DUPLICATE KEY
@@ -436,7 +436,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		
 		$widgets = $this->resultQuery("SELECT * FROM `".$this->table_prefix."widgets`");
 		$query = "INSERT INTO `".$this->table_prefix."widgets_users` (`user_id`, `widget_id`, `column_id`, `sort_no`, `collapsed`, `title`) VALUES";
-		foreach($widgets as $widget){
+		foreach ((array)$widgets as $widget){
 			$query .= "(" . $user_id . ", " . $widget['id'] . ", " . $widget['column_id'] . ", " . $widget['sort_no'] . ", " . $widget['collapsed'] . ", '" . $widget['title'] . "'),";
 		}
 		$query = substr($query, 0, -1);
@@ -451,7 +451,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 	public function editUser($fields,$user_id){
 		$query = "UPDATE `".$this->table_prefix."users` SET ";
 		
-		foreach($fields as $key => $value)
+		foreach ((array)$fields as $key => $value)
 		{
 			if($value == "")
 				$query .= "`$key`=DEFAULT,";
@@ -529,7 +529,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 			"DELETE FROM `%suser_group_homes` WHERE `group_id` = %d",
 			"DELETE FROM `%suser_group_remote_servers` WHERE `group_id` = %d" );
 
-		foreach ($queries as $query_template)
+		foreach ((array)$queries as $query_template)
 		{
 			$query = sprintf($query_template,
 				$this->table_prefix,
@@ -619,11 +619,11 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$results = $this->listQuery($query);
 		
 		if($results !== false){
-			foreach($results as $result){
+			foreach ((array)$results as $result){
 				$ids[] = $result['user_id'];
 			}
 			
-			if(is_array($ids) && count($ids) > 0){
+			if(is_array($ids) && count((array)$ids) > 0){
 				return $ids;
 			}
 		}
@@ -668,7 +668,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$subusers = $this->getUsersSubUsersIds($user_id);
 		if( $subusers !== false )
 		{
-			foreach ($subusers as $subuser) {
+			foreach ((array)$subusers as $subuser) {
 				$this->delUser($subuser);
 			}
 		}
@@ -909,7 +909,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 			}
 		}
 		
-		if(isset($delVals) && is_array($delVals) && count($delVals) > 0){
+		if(isset($delVals) && is_array($delVals) && count((array)$delVals) > 0){
 			// Delete the invalid mods
 			$query = sprintf('DELETE FROM `%1$sconfig_mods` WHERE `home_cfg_id` = \'%2$s\' AND mod_key NOT %3$s;',
 					$this->table_prefix,
@@ -962,14 +962,14 @@ class OGPDatabaseMySQL extends OGPDatabase
 		
 		if(isset($oldModStructure) && is_array($oldModStructure) && isset($currentStructure) && is_array($currentStructure)){
 			
-			foreach($oldModStructure as $oldEntry){
+			foreach ((array)$oldModStructure as $oldEntry){
 				$oldModId = $oldEntry["mod_cfg_id"];
 				$oldCFGId = $oldEntry["home_cfg_id"];
 				$oldHomeId = $oldEntry["home_id"];
 								
 				$match = 0;
 				$cfgMatch = 0;
-				foreach($currentStructure as $newEntry){
+				foreach ((array)$currentStructure as $newEntry){
 					if($newEntry["game_key"] == $oldEntry["game_key"]){
 						// Update server home home_cfg_id
 						$cfgMatch++;
@@ -1080,7 +1080,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		}
 		
 		// Remove mods that have been renamed or deleted.
-		if(count($validMods) > 0){
+		if(count((array)$validMods) > 0){
 			$this->removeInvalidModCfgIDs($config_id, $validMods); 
 		}
 
@@ -1119,7 +1119,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$queries = array("DELETE FROM `%sconfig_mods` WHERE `home_cfg_id` = %d",
 						 "DELETE FROM `%sconfig_homes` WHERE `home_cfg_id` = %d");
 
-		foreach ( $queries as $query )
+		foreach ((array)$queries as $query)
 		{
 			$query = sprintf($query,$this->table_prefix,$home_cfg_id);
 			++$this->queries_;
@@ -1187,7 +1187,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if ( !$this->link ) return FALSE;
 		$keys = "";
 		$values = "";
-		foreach($fields as $key => $val)
+		foreach ((array)$fields as $key => $val)
 		{
 			$keys .= "`$key`,";
 			$values .= "'".$this->realEscapeSingle($val)."',";
@@ -1316,7 +1316,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 			(SELECT home_id FROM `%1$sserver_homes` WHERE remote_server_id = %2$d);',
 			"DELETE FROM `%sserver_homes` WHERE remote_server_id = %d;");
 
-		foreach ( $queries as $query )
+		foreach ((array)$queries as $query)
 		{
 			$query = sprintf($query,$this->table_prefix,$remote_server_id);
 			++$this->queries_;
@@ -1354,7 +1354,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 			(SELECT ip FROM `%1$sremote_server_ips` WHERE ip_id = %3$d);',
 			"UPDATE `%sremote_server_ips` SET ip='%s' WHERE ip_id = %d;");
 
-		foreach ( $queries as $query )
+		foreach ((array)$queries as $query)
 		{
 			$query = sprintf($query,$this->table_prefix,$ip,$ip_id);
 			++$this->queries_;
@@ -1382,7 +1382,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 			(SELECT ip FROM `%1$sremote_server_ips` WHERE ip_id = %2$d);',
 			"DELETE FROM `%sremote_server_ips` WHERE ip_id = %d;");
 
-		foreach ( $queries as $query )
+		foreach ((array)$queries as $query)
 		{
 			$query = sprintf($query,$this->table_prefix,$ip_id);
 			++$this->queries_;
@@ -1610,12 +1610,12 @@ class OGPDatabaseMySQL extends OGPDatabase
 			{
 				$user_expiration_dates = $this->listQuery($query2);
 				$user_group_expiration_dates = $this->listQuery($query3);
-				foreach($servers as $key => $server)
+				foreach ((array)$servers as $key => $server)
 				{
 					$servers[$key]['access_rights'] = $this->getFullAccessRightsString();
 					if($user_expiration_dates)
 					{
-						foreach($user_expiration_dates as $user_expiration_date)
+						foreach ((array)$user_expiration_dates as $user_expiration_date)
 						{
 							if($server['home_id'] == $user_expiration_date['home_id'])
 								$servers[$key]['user_expiration_date'] = $user_expiration_date['user_expiration_date'];
@@ -1623,7 +1623,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 					}
 					if($user_group_expiration_dates)
 					{
-						foreach($user_group_expiration_dates as $user_group_expiration_date)
+						foreach ((array)$user_group_expiration_dates as $user_group_expiration_date)
 						{
 							if($server['home_id'] == $user_group_expiration_date['home_id'])
 								$servers[$key]['user_group_expiration_date'] = $user_group_expiration_date['user_group_expiration_date'];
@@ -1989,12 +1989,12 @@ class OGPDatabaseMySQL extends OGPDatabase
 			{
 				$user_expiration_dates = $this->listQuery($query2);
 				$user_group_expiration_dates = $this->listQuery($query3);
-				foreach($servers as $key => $server)
+				foreach ((array)$servers as $key => $server)
 				{
 					$servers[$key]['access_rights'] = $this->getFullAccessRightsString();
 					if($user_expiration_dates)
 					{
-						foreach($user_expiration_dates as $user_expiration_date)
+						foreach ((array)$user_expiration_dates as $user_expiration_date)
 						{
 							if($server['home_id'] == $user_expiration_date['home_id'])
 								$servers[$key]['user_expiration_date'] = $user_expiration_date['user_expiration_date'];
@@ -2002,7 +2002,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 					}
 					if($user_group_expiration_dates)
 					{
-						foreach($user_group_expiration_dates as $user_group_expiration_date)
+						foreach ((array)$user_group_expiration_dates as $user_group_expiration_date)
 						{
 							if($server['home_id'] == $user_group_expiration_date['home_id'])
 								$servers[$key]['user_group_expiration_date'] = $user_group_expiration_date['user_group_expiration_date'];
@@ -2725,7 +2725,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 			(SELECT ip_id, port FROM `%shome_ip_ports` WHERE `home_id` = %d);',
 			"DELETE FROM `%shome_ip_ports` WHERE `home_id` = %d;");
 
-		foreach ( $queries as $query )
+		foreach ((array)$queries as $query)
 		{
 			$query = sprintf($query,$this->table_prefix,$home_id);
 			++$this->queries_;
@@ -3016,7 +3016,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		{
 			$gid = array();
 			$currentGroups = $this->getUsersGroups($user_id);
-			foreach($currentGroups as $group){
+			foreach ((array)$currentGroups as $group){
 				$gid[] = $group["group_id"];
 			}
 			
@@ -3028,7 +3028,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 							WHERE `user_id` = %3$d
 						)';
 						
-			if(count($gid)){
+			if(count((array)$gid)){
 				
 				$template .= ' OR `home_id` IN
 						(
@@ -3371,7 +3371,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$result = $this->listQuery($query);
 		
 		$position = 0;
-		foreach($result as $maching_mod )
+		foreach ((array)$result as $maching_mod)
 		{
 			if ( $maching_mod['home_id'] < $home_id )
 				$position = $position + 2;
@@ -3461,7 +3461,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if($ranges != FALSE)
 		{
 			$used_range_ports = array();
-			foreach($ranges as $range)
+			foreach ((array)$ranges as $range)
 			{
 				for($port = $range['start_port']; $port >= $range['start_port'] and $port <= $range['end_port']; $port++)
 				{
@@ -3475,7 +3475,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 				{
 					$range_ports[] = $port;
 				}
-				foreach($range_ports as $range_port)
+				foreach ((array)$range_ports as $range_port)
 				{
 					if(in_array($range_port,$used_range_ports))
 						return 2;
@@ -3526,7 +3526,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if($ranges != FALSE)
 		{
 			$used_range_ports = array();
-			foreach($ranges as $range)
+			foreach ((array)$ranges as $range)
 			{
 				if($range['range_id'] == $range_id)
 					continue;
@@ -3543,7 +3543,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 					$range_ports[] = $port;
 				}
 				
-				foreach($range_ports as $range_port)
+				foreach ((array)$range_ports as $range_port)
 				{
 					if(in_array($range_port,$used_range_ports))
 						return 2;
@@ -3583,7 +3583,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$used_ports = array();
 		if(!empty($home_used_ports))
 		{
-			foreach($home_used_ports as $home_used_port)
+			foreach ((array)$home_used_ports as $home_used_port)
 			{
 				$used_ports[] = $home_used_port['port'];
 			}
@@ -3730,7 +3730,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 	}
 	
 	public function check_expire_date($user_id, $home_id, $types = array('user', 'user_group', 'server')) {
-		foreach($types as $type)
+		foreach ((array)$types as $type)
 		{
 			switch ($type) {
 				case 'user':
@@ -3793,7 +3793,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 							$assigned = $this->getHomeIpPorts($home_id);
 							if( !empty($assigned) )
 							{
-								foreach($assigned as $address)
+								foreach ((array)$assigned as $address)
 								{
 									if($remote->rfile_exists( "startups/".$address['ip']."-".$address['port'] ) === 1)
 									{
@@ -3919,9 +3919,9 @@ class OGPDatabaseMySQL extends OGPDatabase
 	}
 	
 	public function saveGameServerOrder($order){
-		if(is_array($order) && count($order)){
+		if(is_array($order) && count((array)$order)){
 			$sql = "";
-			foreach($order as $homeOrder){
+			foreach ((array)$order as $homeOrder){
 				if(is_numeric($homeOrder["home_id"]) && is_numeric($homeOrder["order"])){
 					$sql .= sprintf("UPDATE %sserver_homes SET home_user_order='%d'
 						WHERE home_id = '%d';",

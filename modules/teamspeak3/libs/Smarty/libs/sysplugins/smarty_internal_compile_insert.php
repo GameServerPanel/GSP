@@ -94,7 +94,7 @@ class Smarty_Internal_Compile_Insert extends Smarty_Internal_CompileBase {
         unset($_attr['name'], $_attr['assign'], $_attr['script']); 
         // convert attributes into parameter array string
         $_paramsArray = array();
-        foreach ($_attr as $_key => $_value) {
+        foreach ((array)$_attr as $_key => $_value) {
             $_paramsArray[] = "'$_key' => $_value";
         } 
         $_params = 'array(' . implode(", ", $_paramsArray) . ')'; 

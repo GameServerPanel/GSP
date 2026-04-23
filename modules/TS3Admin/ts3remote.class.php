@@ -134,7 +134,7 @@ class TS3remote extends TS3lib
 	{
 		$vServerName = $this->escape($vServerName);
 		
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $this->escape($props[$i][0]).'='.$this->escape($props[$i][1]);
@@ -178,7 +178,7 @@ class TS3remote extends TS3lib
 		//$props = $this->escape($props);
 		//print_r($props);
 		
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $this->escape($props[$i][0]).'='.$this->escape($props[$i][1]);
@@ -370,7 +370,7 @@ class TS3remote extends TS3lib
 			$props = $this->escape($props);
 		}
 		
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $props[$i][0].'='.$props[$i][1];
@@ -387,7 +387,7 @@ class TS3remote extends TS3lib
 		$cid = $this->escape($cid);
 		$props = $this->escape($props);
 		
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $props[$i][0].'='.$props[$i][1];
@@ -417,7 +417,7 @@ class TS3remote extends TS3lib
 		$cid = $this->escape($cid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1].' '.$perms[$i][2].'='.$perms[$i][3];
@@ -432,7 +432,7 @@ class TS3remote extends TS3lib
 		$cid = $this->escape($cid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1];
@@ -475,7 +475,7 @@ class TS3remote extends TS3lib
 		$cgid = $this->escape($cgid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1].' '.$perms[$i][2].'='.$perms[$i][3];
@@ -490,7 +490,7 @@ class TS3remote extends TS3lib
 		$cgid = $this->escape($cgid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1];
@@ -555,7 +555,7 @@ class TS3remote extends TS3lib
 		$clid = $this->escape($clid);
 		$props = $this->escape($props);
 		
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $props[$i][0].'='.$props[$i][1];
@@ -582,7 +582,7 @@ class TS3remote extends TS3lib
 	{
 		$cldbid = $this->escape($cldbid);
 		
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $props[$i][0].'='.$props[$i][1];
@@ -636,7 +636,7 @@ class TS3remote extends TS3lib
 	
 	public function r_clientupdate($props)
 	{
-		$countProps = count($props);
+		$countProps = count((array)$props);
 		for($i=0; $i<$countProps; $i++)
 		{
 			$props[$i] = $this->escape($props[$i][0]).'='.$this->escape($props[$i][1]);
@@ -654,7 +654,7 @@ class TS3remote extends TS3lib
 		
 		if( is_array($clid) )
 		{
-			$countClid = count($clid);
+			$countClid = count((array)$clid);
 			for($i=0; $i<$countClid; $i++)
 			{
 				$clid[$i] = $clid[$i][0].'='.$clid[$i][1];
@@ -677,7 +677,7 @@ class TS3remote extends TS3lib
 		
 		if( is_array($clid) )
 		{
-			$countClid = count($clid);
+			$countClid = count((array)$clid);
 			for($i=0; $i<$countClid; $i++)
 			{
 				$clid[$i] = $clid[$i][0].'='.$clid[$i][1];
@@ -699,7 +699,7 @@ class TS3remote extends TS3lib
 		
 		if( is_array($clid) )
 		{
-			$countClid = count($clid);
+			$countClid = count((array)$clid);
 			for($i=0; $i<$countClid; $i++)
 			{
 				$clid[$i] = $clid[$i][0].'='.$clid[$i][1];
@@ -726,7 +726,7 @@ class TS3remote extends TS3lib
 		$cldbid = $this->escape($cldbid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1].' '.$perms[$i][2].'='.$perms[$i][3].' '.$perms[$i][4].'='.$perms[$i][5];
@@ -741,7 +741,7 @@ class TS3remote extends TS3lib
 		$cldbid = $this->escape($cldbid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1];
@@ -765,7 +765,7 @@ class TS3remote extends TS3lib
 		$cldbid = $this->escape($cldbid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1].' '.$perms[$i][2].'='.$perms[$i][3];
@@ -781,7 +781,7 @@ class TS3remote extends TS3lib
 		$cldbid = $this->escape($cldbid);
 		$perms = $this->escape($perms);
 		
-		$countPerms = count($perms);
+		$countPerms = count((array)$perms);
 		for($i=0; $i<$countPerms; $i++)
 		{
 			$perms[$i] = $perms[$i][0].'='.$perms[$i][1];

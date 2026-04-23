@@ -48,7 +48,7 @@ $attempted[] = $localConfig;
 
 $message = "GSP Billing module cannot find config.inc.php.\n";
 $message .= "Looked in:\n";
-foreach ($attempted as $path) {
+foreach ((array)$attempted as $path) {
     if (!$path) {
         continue;
     }

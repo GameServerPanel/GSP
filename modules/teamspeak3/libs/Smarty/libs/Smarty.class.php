@@ -437,7 +437,7 @@ class Smarty extends Smarty_Internal_Data {
         // fill data if present
         if (is_array($data)) {
             // set up variable values
-            foreach ($data as $_key => $_val) {
+            foreach ((array)$data as $_key => $_val) {
                 $tpl->tpl_vars[$_key] = new Smarty_variable($_val);
             } 
         } 
@@ -524,7 +524,7 @@ class Smarty extends Smarty_Internal_Data {
         $_plugin_name = strtolower($plugin_name);
         $_name_parts = explode('_', $_plugin_name, 3); 
         // class name must have three parts to be valid plugin
-        if (count($_name_parts) < 3 || $_name_parts[0] !== 'smarty') {
+        if (count((array)$_name_parts) < 3 || $_name_parts[0] !== 'smarty') {
             throw new SmartyException("plugin {$plugin_name} is not a valid name format");
             return false;
         } 

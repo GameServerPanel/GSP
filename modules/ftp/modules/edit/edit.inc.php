@@ -523,7 +523,7 @@ function printEncodingSelect($text_encoding) {
 		$textarea_encodings = getTextareaEncodingsArray();
 
 		echo "<select name=\"encodingSelect\" id=\"encodingSelect\" style=\"width: 100px;\">\n";
-		foreach($textarea_encodings as $value) {
+		foreach ((array)$textarea_encodings as $value) {
 			if(strcasecmp($value, $text_encoding) == 0) { $selected = "selected=\"selected\""; }
 			else                                        { $selected = ""; }
 			echo "<option value=\"$value\" $selected>$value</option>\n";

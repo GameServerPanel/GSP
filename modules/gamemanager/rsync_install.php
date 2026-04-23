@@ -38,7 +38,7 @@ function do_progress($kbytes,$rsyncPath)
 	$totalsize = 0;
 	
 	# loops all available sizes to work over a string instead of an array.
-	foreach($sizes as $key => $size)
+	foreach ((array)$sizes as $key => $size)
 	{
 		# If the rsync path matches the path at the string on the variable $size 
 		# then lists the path and the total size on separated variables 
@@ -83,10 +83,10 @@ function update_local_copies()
 		)
 	);
 				
-	foreach($update_files as $file_chk)
+	foreach ((array)$update_files as $file_chk)
 	{
 		#echo "Trying to update $file_chk<br>";
-		foreach($update_urls as $site)
+		foreach ((array)$update_urls as $site)
 		{
 			#echo "Trying $file_chk from $site<br>";
 			if(!is_writable("modules/gamemanager/$file_chk"))
@@ -251,7 +251,7 @@ function exec_ogp_module() {
 		else
 		{
 			$url_id = (isset($_POST['url_id']) && (int)$_POST['url_id'] > 0 ? (int)$_POST['url_id'] -1 : null);
-			if (!is_null($url_id) && array_key_exists($url_id, $rsync_sites)) {
+			if (!is_null($url_id) && array_key_exists($url_id, (array)$rsync_sites)) {
 				$urlArr = explode('|', $rsync_sites[$url_id]);
 				$url = $urlArr[0] . "/rsync_installer/$rs_gname/$os/";
 			} else {

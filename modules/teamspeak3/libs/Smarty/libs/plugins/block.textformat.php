@@ -47,7 +47,7 @@ function smarty_block_textformat($params, $content, $smarty, &$repeat, $template
     $wrap_cut = false;
     $assign = null;
 
-    foreach ($params as $_key => $_val) {
+    foreach ((array)$params as $_key => $_val) {
         switch ($_key) {
             case 'style':
             case 'indent_char':
@@ -78,7 +78,7 @@ function smarty_block_textformat($params, $content, $smarty, &$repeat, $template
     $_paragraphs = preg_split('![\r\n][\r\n]!', $content);
     $_output = '';
 
-    for($_x = 0, $_y = count($_paragraphs); $_x < $_y; $_x++) {
+    for($_x = 0, $_y = count((array)$_paragraphs); $_x < $_y; $_x++) {
         if ($_paragraphs[$_x] == '') {
             continue;
         } 

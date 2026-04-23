@@ -441,7 +441,7 @@ class HTMLPurifier_Encoder
             $ascii_fix = self::testEncodingSupportsASCII($encoding);
             if (!$escape && !empty($ascii_fix)) {
                 $clear_fix = array();
-                foreach ($ascii_fix as $utf8 => $native) {
+                foreach ((array)$ascii_fix as $utf8 => $native) {
                     $clear_fix[$utf8] = '';
                 }
                 $str = strtr($str, $clear_fix);

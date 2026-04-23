@@ -54,7 +54,7 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
         $add_fixes = $config->get('HTML.TidyAdd');
         $remove_fixes = $config->get('HTML.TidyRemove');
 
-        foreach ($fixes as $name => $fix) {
+        foreach ((array)$fixes as $name => $fix) {
             // needs to be refactored a little to implement globbing
             if (isset($remove_fixes[$name]) ||
                 (!isset($add_fixes[$name]) && !isset($fixes_lookup[$name]))) {
@@ -92,7 +92,7 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
             return array();
         }
         $ret = array();
-        foreach ($activated_levels as $level) {
+        foreach ((array)$activated_levels as $level) {
             foreach ($this->fixesForLevel[$level] as $fix) {
                 $ret[$fix] = true;
             }
@@ -128,7 +128,7 @@ class HTMLPurifier_HTMLModule_Tidy extends HTMLPurifier_HTMLModule
      */
     public function populate($fixes)
     {
-        foreach ($fixes as $name => $fix) {
+        foreach ((array)$fixes as $name => $fix) {
             // determine what the fix is for
             list($type, $params) = $this->getFixType($name);
             switch ($type) {

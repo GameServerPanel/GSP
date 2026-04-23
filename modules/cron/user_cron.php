@@ -42,7 +42,7 @@ function exec_ogp_module()
 		return 0;
 	}
 	
-	foreach( $homes as $home )
+	foreach ((array)$homes as $home)
 	{
 		$server_homes[$home['home_id']."_".$home['ip']."_".$home['port']] = $home;
 		$remote_servers[$home['remote_server_id']] = array( "agent_ip" => $home['agent_ip'],
@@ -224,13 +224,13 @@ You can read more on our <a href='http://wiki.iaregamer.com/doku.php?id=cron' ta
 	</tr>
 <?php
 		$user_jobs = "";
-		foreach( $jobsArray as $remote_server_id => $jobs )
+		foreach ((array)$jobsArray as $remote_server_id => $jobs )
 		{
-			foreach($jobs as $jobId => $job)
+			foreach ((array)$jobs as $jobId => $job)
 			{				
 				if(isset($job['action']))
 				{
-					if(array_key_exists('home_id', $job) && array_key_exists('ip', $job) && array_key_exists('port', $job) && hasValue($job['home_id']) && hasValue($job['ip']) && hasValue($job['port'])){
+					if(array_key_exists('home_id', (array)$job) && array_key_exists('ip', (array)$job) && array_key_exists('port', (array)$job) && hasValue($job['home_id']) && hasValue($job['ip']) && hasValue($job['port'])){
 						$uniqueStr = $job['home_id']."_".$job['ip']."_".$job['port'];
 					}else{
 						$uniqueStr = false;

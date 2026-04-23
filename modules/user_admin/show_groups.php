@@ -80,7 +80,7 @@ function exec_ogp_module() {
         get_lang('actions')."</td><td>".get_lang('group_name')."</td><td>".
         get_lang('users')."</td></tr>";
 
-    foreach ( $result as $row ) #loop through the groups
+    foreach ((array)$result as $row) #loop through the groups
     {
         $i++;
         echo "<tr class='tr$i'><td><a href='?m=user_games&amp;p=assign&amp;group_id=".$row['group_id']."'>[".
@@ -107,11 +107,11 @@ function exec_ogp_module() {
 
         if ( is_array($available_users) )
         {
-			if(count($available_users) > 0){
+			if(count((array)$available_users) > 0){
 				echo "<form action=\"?m=user_admin&amp;p=add_to_group\" method=\"post\">".
 					get_lang('add_user_to_group').
 					": <select name=\"user_to_add\">";
-				foreach ($available_users as $user_row )
+				foreach ((array)$available_users as $user_row)
 				{
 					echo "<option value=\"$user_row[user_id]\">" . htmlentities($user_row[users_login]) . "</option>";
 				}
@@ -135,7 +135,7 @@ function exec_ogp_module() {
         if (is_array($group_users))
         {
             echo "<ul>";
-            foreach ($group_users as $user_id)
+            foreach ((array)$group_users as $user_id)
             {
                 $user_info = $db->getUserById($user_id['user_id']);
                 echo "<li><a href='?m=user_admin&amp;p=del_from_group&amp;group_id=".

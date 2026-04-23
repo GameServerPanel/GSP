@@ -74,10 +74,10 @@
  	{
  		if(is_array($host))
  		{
- 			$this->host = array_key_exists('host', $host) ? $host['host'] : '';
- 			$this->port = array_key_exists('port', $host) ? $host['port'] : $port;
- 			$this->timeout = array_key_exists('timeout', $host) ? $host['timeout'] : $timeout;
- 			$this->format = array_key_exists('format', $host) ? $host['format'] : $format;
+ 			$this->host = array_key_exists('host', (array)$host) ? $host['host'] : '';
+ 			$this->port = array_key_exists('port', (array)$host) ? $host['port'] : $port;
+ 			$this->timeout = array_key_exists('timeout', (array)$host) ? $host['timeout'] : $timeout;
+ 			$this->format = array_key_exists('format', (array)$host) ? $host['format'] : $format;
  		}
  		else
  		{
@@ -340,7 +340,7 @@
 	private function _parse_channels($channels)
 	{
 		// We'll have to deal with the root channel separately
-		if(array_key_exists('root', $channels))
+		if(array_key_exists('root', (array)$channels))
 		{
 			if(count($channels['root']['users']) > 0)
 			{
@@ -356,13 +356,13 @@
 		}
 		else
 		{
-			if(count($channels) > 0)
+			if(count((array)$channels) > 0)
 			{
-				foreach($channels as $channel)
+				foreach ((array)$channels as $channel)
 				{
-					if(count($channel['users']) > 0)
+					if(count((array)$channel['users']) > 0)
 					{
-						foreach($channel['users'] as $user) $this->users[] = $user;
+						foreach ((array)$channel['users'] as $user) $this->users[] = $user;
 					}
 
 					if($channel['users'] > 0) unset($channel['users']);

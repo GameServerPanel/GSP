@@ -149,7 +149,7 @@ class Native extends Core
         $sockets_tmp = [];
 
         // Loop and pull out all the actual sockets we need to listen on
-        foreach ($sockets as $socket_id => $socket_data) {
+        foreach ((array)$sockets as $socket_id => $socket_data) {
             // Get the socket
             /* @var $socket \GameQ\Query\Core */
             $socket = $socket_data['socket'];
@@ -189,7 +189,7 @@ class Native extends Core
             }
 
             // Loop the sockets that received data back
-            foreach ($read as $socket) {
+            foreach ((array)$read as $socket) {
                 /* @var $socket resource */
 
                 // See if we have a response

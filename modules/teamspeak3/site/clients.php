@@ -90,7 +90,7 @@ if(isset($_POST['clientdel']))
 		else
 		{
 		echo "<tr><td colspan=\"4\" class=\"green1\">";
-		for($i=0; $i+1==count($client_delete['errors']); $i++)
+		for($i=0; $i+1==count((array)$client_delete['errors']); $i++)
 			{
 			echo $client_delete['errors'][$i]."<br />";
 			}
@@ -107,7 +107,7 @@ while($getclientdblist=$ts3->getElement('data', $ts3->clientDbList($start, $dura
 
 
 $clientlist=$ts3->getElement('data', $ts3->clientList());
-$countclients=count($clientdblist);
+$countclients=count((array)$clientdblist);
 
 $pages=$countclients/$duration;
 if(floor($pages)!=0)

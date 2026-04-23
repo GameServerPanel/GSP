@@ -162,14 +162,14 @@ function channel_backup_create($path, $channellist)
 		else
 		{
 		$count=1;
-		$count_chans=count($channellist);
+		$count_chans=count((array)$channellist);
 		foreach($channellist AS $key=>$value)
 			{
 			$settings='';
 			$count2=1;
 			foreach($value AS $key2=>$value2)
 				{
-				$count_settings=count($value);
+				$count_settings=count((array)$value);
 				$settings.=$key2."=".str_replace(' ', '\s',$value2);
 				if($count2!=$count_settings)
 					{
@@ -182,11 +182,11 @@ function channel_backup_create($path, $channellist)
 				{
 				$settings.="<perms>";
 				$count3=1;
-				$count_perms=count($channelperms['data']);
+				$count_perms=count((array)$channelperms['data']);
 				foreach($channelperms['data'] AS $key3=>$value3)
 					{
 					$count4=1;
-					$count_permsettings=count($value3);
+					$count_permsettings=count((array)$value3);
 					foreach($value3 AS $key4=>$value4)
 						{
 						if($key4!="cid")

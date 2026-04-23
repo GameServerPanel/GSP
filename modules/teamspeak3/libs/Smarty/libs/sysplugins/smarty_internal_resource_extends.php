@@ -55,7 +55,7 @@ class Smarty_Internal_Resource_Extends {
     {
         $sha1String = '';
         $_files = explode('|', $_template->resource_name);
-        foreach ($_files as $_file) {
+        foreach ((array)$_files as $_file) {
             $_filepath = $_template->buildTemplateFilepath ($_file);
             if ($_filepath !== false) {
                 if ($_template->security) {
@@ -92,7 +92,7 @@ class Smarty_Internal_Resource_Extends {
         $_files = array_reverse($this->allFilepaths);
     		$_first = reset($_files);
     		$_last = end($_files);
-        foreach ($_files as $_file => $_filepath) {
+        foreach ((array)$_files as $_file => $_filepath) {
         		if ($_filepath === false) {
             		throw new SmartyException("Unable to load template 'file : {$_file}'");
         		}
@@ -108,7 +108,7 @@ class Smarty_Internal_Resource_Extends {
                     $this->smarty->trigger_error("unmatched {block} {/block} pairs in file '$_filepath'");
                 } 
                 preg_match_all("!{$this->_ldl}block\s(.+?){$this->_rdl}|{$this->_ldl}/block(.*?){$this->_rdl}!", $_content, $_result, PREG_OFFSET_CAPTURE);
-                $_result_count = count($_result[0]);
+                $_result_count = count((array)$_result[0]);
                 $_start = 0;
                 while ($_start < $_result_count) {
                     $_end = 0;
@@ -211,7 +211,7 @@ class Smarty_Internal_Resource_Extends {
         if (substr($_compile_dir, -1) != DS) {
             $_compile_dir .= DS;
         } 
-        return $_compile_dir . $_filepath . '.' . $_template->resource_type . '.' . basename($_files[count($_files)-1]) . $_cache . '.php';
+        return $_compile_dir . $_filepath . '.' . $_template->resource_type . '.' . basename($_files[count((array)$_files)-1]) . $_cache . '.php';
     } 
 } 
 

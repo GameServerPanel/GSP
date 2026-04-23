@@ -123,7 +123,7 @@ class OGPView {
 		
 		// Set some useful variables
 		$javascript .= '<script type="text/javascript">';
-		if(array_key_exists("users_api_key", $_SESSION) && !empty($_SESSION['users_api_key'])){
+		if(array_key_exists("users_api_key", (array)$_SESSION) && !empty($_SESSION['users_api_key'])){
 			$javascript .= 'var userAPIKey = "' . $_SESSION['users_api_key'] . '";';
 		}
 		$javascript .= '</script>' . "\n";
@@ -151,7 +151,7 @@ class OGPView {
 				MODULES . "{$_GET['m']}/{$_GET['m']}.css"
 			);
 			
-			foreach($fc as $file_check){
+			foreach ((array)$fc as $file_check){
 				if(is_readable($file_check)){
 					$stylesheet .= "<link rel=\"stylesheet\" href=\"${file_check}\">\n";
 					break;
@@ -163,7 +163,7 @@ class OGPView {
 				$path . MODULES . "{$_GET['m']}/{$_GET['m']}.js"
 			);
 			
-			foreach($fc as $file_check){
+			foreach ((array)$fc as $file_check){
 				if(is_readable($file_check)){
 					$javascript .= "<script type=\"text/javascript\" src=\"${file_check}\"></script>\n";
 					break;

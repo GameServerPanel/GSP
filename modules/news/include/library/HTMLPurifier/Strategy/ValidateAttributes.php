@@ -21,7 +21,7 @@ class HTMLPurifier_Strategy_ValidateAttributes extends HTMLPurifier_Strategy
         $token = false;
         $context->register('CurrentToken', $token);
 
-        foreach ($tokens as $key => $token) {
+        foreach ((array)$tokens as $key => $token) {
 
             // only process tokens that have attributes,
             //   namely start and empty tags

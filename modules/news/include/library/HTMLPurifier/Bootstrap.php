@@ -89,7 +89,7 @@ class HTMLPurifier_Bootstrap
                 $buggy  = version_compare(PHP_VERSION, '5.2.11', '<');
                 $compat = version_compare(PHP_VERSION, '5.1.2', '<=') &&
                           version_compare(PHP_VERSION, '5.1.0', '>=');
-                foreach ($funcs as $func) {
+                foreach ((array)$funcs as $func) {
                     if ($buggy && is_array($func)) {
                         // :TRICKY: There are some compatibility issues and some
                         // places where we need to error out
@@ -113,7 +113,7 @@ class HTMLPurifier_Bootstrap
                     spl_autoload_unregister($func);
                 }
                 spl_autoload_register($autoload);
-                foreach ($funcs as $func) {
+                foreach ((array)$funcs as $func) {
                     spl_autoload_register($func);
                 }
             }

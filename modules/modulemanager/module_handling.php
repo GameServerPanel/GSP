@@ -54,11 +54,11 @@ function install_module($db, $module, $install_if_optional = TRUE)
         return 0;
         
     // Prerequisites checking
-    if(isset($module_prereqs) && is_array($module_prereqs) && count($module_prereqs)){
+    if(isset($module_prereqs) && is_array($module_prereqs) && count((array)$module_prereqs)){
 		$prereqPass = true;
 		$missingPrereqs = "";
 		$i = 0;
-		foreach($module_prereqs as $prereq){
+		foreach ((array)$module_prereqs as $prereq){
 			if(!preReqInstalled($prereq)){
 				if($i == 0){
 					$missingPrereqs .= $prereq["name"];
@@ -86,9 +86,9 @@ function install_module($db, $module, $install_if_optional = TRUE)
 
     if ( isset( $install_queries ) )
     {
-        foreach ( $install_queries as $key_db_version => $querys )
+        foreach ((array)$install_queries as $key_db_version => $querys )
         {
-			foreach ( $querys as $query )
+			foreach ((array)$querys as $query)
 			{
 				if ( $db->query($query) )
 					continue;
@@ -101,7 +101,7 @@ function install_module($db, $module, $install_if_optional = TRUE)
 	
     if ( isset($module_menus) && is_array($module_menus) )
     {
-        foreach( $module_menus as $menu )
+        foreach ((array)$module_menus as $menu)
         {
             $db->addModuleMenu($module_id,$menu['subpage'],$menu['group'],$menu['name']);
         }
@@ -110,7 +110,7 @@ function install_module($db, $module, $install_if_optional = TRUE)
 	$db->clearModuleAccessRights($module_id);
 	if(isset($module_access_rights) and is_array($module_access_rights) and !empty($module_access_rights))
 	{
-		foreach($module_access_rights as $flag => $description)
+		foreach ((array)$module_access_rights as $flag => $description)
 		{
 			$db->setModuleAccessRight($module_id, $flag, $description);
 		}
@@ -141,7 +141,7 @@ function uninstall_module($db, $module_id, $module, $adminOverride = false)
 		
 		if ( isset( $uninstall_queries ) )
 		{
-			foreach ( $uninstall_queries as $query )
+			foreach ((array)$uninstall_queries as $query)
 			{
 				if ( !$db->query($query) )
 				{
@@ -191,7 +191,7 @@ function update_module($db, $module_id, $module)
 		$db->delModuleMenu($module_id);
 		if ( isset($module_menus) && is_array($module_menus) )
 		{
-			foreach( $module_menus as $menu )
+			foreach ((array)$module_menus as $menu)
 			{
 				$db->addModuleMenu($module_id,$menu['subpage'],$menu['group'],$menu['name'],$pos);
 			}
@@ -205,7 +205,7 @@ function update_module($db, $module_id, $module)
 		{
 			if(isset($install_queries))
 			{
-				foreach ( $install_queries[$i+1] as $query )
+				foreach ((array)$install_queries[$i+1] as $query)
 				{
 					if ( $db->query($query) )
 						continue;
@@ -224,7 +224,7 @@ function update_module($db, $module_id, $module)
 	
 	if(isset($module_access_rights) and is_array($module_access_rights) and !empty($module_access_rights))
 	{
-		foreach($module_access_rights as $flag => $description)
+		foreach ((array)$module_access_rights as $flag => $description)
 		{
 			if(method_exists($db, "setModuleAccessRight")){
 				$db->setModuleAccessRight($module_id, $flag, $description);

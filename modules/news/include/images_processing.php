@@ -51,7 +51,7 @@ if(isset($_FILES))
 	
 	if(is_array($fdata['name']))
 	{
-		for($i=0;$i<count($fdata['name']);++$i)
+		for($i=0;$i<count((array)$fdata['name']);++$i)
 		{
 			if(trim($fdata['name'][$i])==""||trim($fdata['tmp_name'][$i])=="") continue;
 			
@@ -78,7 +78,7 @@ if(isset($files))
 	
 	$is_first_image = true;
 	
-	foreach ($files as $file) 
+	foreach ((array)$files as $file) 
 	{ 
 	
 		if(trim($file['tmp_name'])=="") continue;

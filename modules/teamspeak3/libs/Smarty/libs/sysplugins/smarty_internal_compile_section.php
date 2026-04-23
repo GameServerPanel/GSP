@@ -39,7 +39,7 @@ class Smarty_Internal_Compile_Section extends Smarty_Internal_CompileBase {
         $output .= "unset(\$_smarty_tpl->tpl_vars['smarty']->value['section'][$section_name]);\n";
         $section_props = "\$_smarty_tpl->tpl_vars['smarty']->value['section'][$section_name]";
 
-        foreach ($_attr as $attr_name => $attr_value) {
+        foreach ((array)$_attr as $attr_name => $attr_value) {
             switch ($attr_name) {
                 case 'loop':
                     $output .= "{$section_props}['loop'] = is_array(\$_loop=$attr_value) ? count(\$_loop) : max(0, (int)\$_loop); unset(\$_loop);\n";

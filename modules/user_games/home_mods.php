@@ -49,7 +49,7 @@ function exec_ogp_module()
 		}
 		
 		$game_mods = $db->getAvailableModsForGameHome($home_id);
-		foreach ( $game_mods as $game_mod )
+		foreach ((array)$game_mods as $game_mod)
 		{
 			if( preg_match("/^none$/i", $game_mod['mod_name']) )
 			{
@@ -81,7 +81,7 @@ function exec_ogp_module()
 			echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>\n";
 			echo "<input type='hidden' name='home_id' value=\"$home_id\" />\n";
 			echo "<p>". get_lang("available_mods") .": <select name='mod_cfg_id'>\n";
-			foreach ( $game_mods as $game_mod )
+			foreach ((array)$game_mods as $game_mod)
 			{
 				echo "<option value='".$game_mod['mod_cfg_id']."'>".$game_mod['mod_name']."</option>\n";
 			}
@@ -113,7 +113,7 @@ function exec_ogp_module()
 		echo "<td><b>". get_lang("extra_cmd_line_args") ."</b></td>".
 			 "<td><b>". get_lang("nice_level") ."</b></td><td></td>".
 			 "</tr>\n";
-		foreach ( $enabled_mods as $enabled_rows ) {
+		foreach ((array)$enabled_mods as $enabled_rows) {
 			echo "<tr id='mod_cfg_id_$enabled_rows[mod_cfg_id]'>".
 				 "<td><a href='?m=user_games&amp;p=edit&amp;mod_id=".$enabled_rows['mod_id'].
 				 "&amp;home_id=$home_id&amp;submit=delete_mod'>[ ". get_lang("remove_mod") ." ]</a><br>".
@@ -143,7 +143,7 @@ function exec_ogp_module()
 		
 		$game_mods = $db->getAvailableModsForGameHome($home_id);
 		$mods_available = 0;
-		foreach ( $game_mods as $game_mod )
+		foreach ((array)$game_mods as $game_mod)
 		{
 			if( !preg_match("/^none$/i", $game_mod['mod_name']) )
 			{
@@ -156,7 +156,7 @@ function exec_ogp_module()
 			echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>\n".
 				 "<input type='hidden' name='home_id' value=\"$home_id\" />\n".
 				 "<p>" . get_lang("available_mods") . ": <select name='mod_cfg_id'>\n";
-			foreach ( $game_mods as $game_mod )
+			foreach ((array)$game_mods as $game_mod)
 			{
 				echo "<option value='".$game_mod['mod_cfg_id']."'>".$game_mod['mod_name']."</option>\n";
 			}

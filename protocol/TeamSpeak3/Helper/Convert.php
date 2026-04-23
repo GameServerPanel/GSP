@@ -255,7 +255,7 @@ class TeamSpeak3_Helper_Convert
     $parts = explode("|", $entry, 5);
     $array = array();
 
-    if(count($parts) != 5)
+    if(count((array)$parts) != 5)
     {
       $array["timestamp"] = 0;
       $array["level"]     = TeamSpeak3::LOGLEVEL_ERROR;
@@ -324,7 +324,7 @@ class TeamSpeak3_Helper_Convert
 
     $buildno = $version->section("[", 1)->filterDigits()->toInt();
 
-    return ($buildno <= 15001) ? $version : $version->section("[")->append("(" . date($format, $buildno) . ")");
+    return ($buildno <= 15001) ? $version : $version->section("[")->append("(" . date($format, is_numeric($buildno) ? (int)$buildno : strtotime($buildno)) . ")");
   }
   
   /**
@@ -365,6 +365,6 @@ class TeamSpeak3_Helper_Convert
       6 => "image/x-ilbm",
     );
 
-    return $type[count($matches)-1];
+    return $type[count((array)$matches)-1];
   }
 }

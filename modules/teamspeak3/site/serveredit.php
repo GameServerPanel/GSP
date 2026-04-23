@@ -56,7 +56,7 @@ if(isset($_POST['editserver']))
 			
 			if($server_edit['success']===false)
 				{
-				for($i=0; $i+1==count($server_edit['errors']); $i++)
+				for($i=0; $i+1==count((array)$server_edit['errors']); $i++)
 					{
 					$err_msg .= $server_edit['errors'][$i]."<br />";
 					}
@@ -81,7 +81,7 @@ if(isset($_POST['editpw']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($server_edit['errors']); $i++)
+		for($i=0; $i+1==count((array)$server_edit['errors']); $i++)
 		{
 		$error .= $server_edit['errors'][$i]."<br />";
 		}

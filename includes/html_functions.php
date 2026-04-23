@@ -49,7 +49,7 @@ function create_drop_box_from_array_rsync($input_array, $listname, $current_valu
 {
     $count = 1;
     $retval = "<select id=\"$listname\" name=\"$listname\">\n";
-    foreach($input_array as $key => $value)
+    foreach ((array)$input_array as $key => $value)
     {
         $value = trim($value);
 		list($rsync_site,$location) = explode("|", $value);
@@ -84,7 +84,7 @@ function create_drop_box_from_array_rsync($input_array, $listname, $current_valu
 function create_drop_box_from_array($input_array,$listname,$current_value = "", $use_only_values = true)
 {
     $retval = "<select id=\"$listname\" name=\"$listname\" style=\"max-width:330px;\">\n";
-    foreach($input_array as $key => $value)
+    foreach ((array)$input_array as $key => $value)
     {
 		// Make sure we don't allow HTML or script
 		$key = trim(strip_tags($key));
@@ -120,7 +120,7 @@ function create_drop_box_from_passwd($input_array,$listname)
 {
     $retval = "<select name=\"$listname\">\n";
 
-    foreach($input_array as $line)
+    foreach ((array)$input_array as $line)
     {
         $line = trim($line);
         if ( empty($line) ) continue;
@@ -134,7 +134,7 @@ function create_drop_box_from_passwd($input_array,$listname)
 
 function get_user_uid_gid_from_passwd($input_array,$name)
 {
-    foreach($input_array as $line)
+    foreach ((array)$input_array as $line)
     {
         $line = trim($line);
         if ( empty($line) ) continue;

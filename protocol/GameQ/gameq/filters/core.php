@@ -34,7 +34,7 @@ abstract class GameQ_Filters_Core
     {
         if(is_array($params))
         {
-            foreach ($params as $key => $param)
+            foreach ((array)$params as $key => $param)
             {
                 $this->params[$key] = $param;
             }

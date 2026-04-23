@@ -159,13 +159,13 @@ function exec_ogp_module() {
 			
 			include_once('includes/lib_remote.php');
 			
-            foreach ( $remote_server_ips as $ip_row )
+            foreach ((array)$remote_server_ips as $ip_row)
             {
 				$servers_match_ip_id = $db->getIpPorts( $ip_row['ip_id'] );
 				$servers_running = FALSE;
 				if($servers_match_ip_id)
 				{
-					foreach ( $servers_match_ip_id as $home_info )
+					foreach ((array)$servers_match_ip_id as $home_info)
 					{
 						$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 						$screen_running = $remote->is_screen_running(OGP_SCREEN_TYPE_HOME,$home_info['home_id']) === 1;

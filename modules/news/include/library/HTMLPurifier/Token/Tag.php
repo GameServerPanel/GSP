@@ -42,7 +42,7 @@ abstract class HTMLPurifier_Token_Tag extends HTMLPurifier_Token
     public function __construct($name, $attr = array(), $line = null, $col = null, $armor = array())
     {
         $this->name = ctype_lower($name) ? $name : strtolower($name);
-        foreach ($attr as $key => $value) {
+        foreach ((array)$attr as $key => $value) {
             // normalization only necessary when key is not lowercase
             if (!ctype_lower($key)) {
                 $new_key = strtolower($key);

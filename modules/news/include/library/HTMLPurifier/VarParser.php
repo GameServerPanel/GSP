@@ -107,7 +107,7 @@ class HTMLPurifier_VarParser
                     break;
                 }
                 if ($type === self::LOOKUP) {
-                    foreach ($var as $k) {
+                    foreach ((array)$var as $k) {
                         if ($k !== true) {
                             $this->error('Lookup table contains value other than true');
                         }

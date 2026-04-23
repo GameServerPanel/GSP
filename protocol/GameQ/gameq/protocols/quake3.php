@@ -82,7 +82,7 @@ class GameQ_Protocols_Quake3 extends GameQ_Protocols
     protected function preProcess_status($packets)
     {
     	// Should only be one packet
-    	if (count($packets) > 1)
+    	if (count((array)$packets) > 1)
     	{
     		throw new GameQ_ProtocolsException('Quake 3 status has more than 1 packet');
     	}
@@ -176,7 +176,7 @@ class GameQ_Protocols_Quake3 extends GameQ_Protocols
 		array_pop($players);
 
 		// Add total number of players
-		$result->add('num_players', count($players));
+		$result->add('num_players', count((array)$players));
 
 		// Loop the players
 		foreach($players AS $player_info)

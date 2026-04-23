@@ -14,7 +14,7 @@ function billing_render_markdown($markdown)
     $html = '';
     $inCode = false;
     $inList = false;
-    foreach ($lines as $line) {
+    foreach ((array)$lines as $line) {
         $trim = trim($line);
         if ($trim === '```') {
             if ($inCode) {

@@ -31,7 +31,7 @@ if(isset($_POST['addgroup']))
 				}
 				else
 				{
-				for($i=0; $i+1==count($creategroup['errors']); $i++)
+				for($i=0; $i+1==count((array)$creategroup['errors']); $i++)
 					{
 					$error .= $creategroup['errors'][$i]."<br />";
 					}
@@ -46,7 +46,7 @@ if(isset($_POST['addgroup']))
 				}
 				else
 				{
-				for($i=0; $i+1==count($creategroup['errors']); $i++)
+				for($i=0; $i+1==count((array)$creategroup['errors']); $i++)
 					{
 					$error .= $creategroup['errors'][$i]."<br />";
 					}

@@ -57,7 +57,7 @@ function exec_ogp_module() {
     	
 	if(isset($_GET['add_mysql_server']))
 	{
-		foreach ($_GET as $name => $value)
+		foreach ((array)$_GET as $name => $value)
 		{
 			$get[$name] = trim($value);
 		}
@@ -84,7 +84,7 @@ function exec_ogp_module() {
 			$priv = $get;
 			$privilegies_str = "";
 			unset($priv['m'],$priv['p'],$priv['remote_server_id'],$priv['mysql_ip'],$priv['mysql_port'],$priv['mysql_root_passwd'],$priv['mysql_name'],$priv['privilegies'],$priv['add_mysql_server']);
-			foreach($priv as $name => $value)
+			foreach ((array)$priv as $name => $value)
 			{
 				$privilegies_str .= str_replace("_"," ",$name).", ";
 			}
@@ -114,7 +114,7 @@ function exec_ogp_module() {
 	$servers = $db->getRemoteServers();
 	
 	$conn_method[0] = get_lang('direct_connection');
-	foreach ( $servers as $server_row )
+	foreach ((array)$servers as $server_row)
     {
 		$id = $server_row['remote_server_id'];
 		$name = get_lang_f('connection_through_remote_server_named',$server_row['remote_server_name']);
@@ -169,7 +169,7 @@ function exec_ogp_module() {
 		</tr> 
 		</thead> 
 		<tbody> <?php
-    foreach ( $mysql_servers as $mysql_server )
+    foreach ((array)$mysql_servers as $mysql_server)
     {			
 		
 		if($mysql_server['remote_server_id'] != 0)
@@ -242,7 +242,7 @@ function exec_ogp_module() {
 		$mysql_server_dbs = $modDb->getMysqlServerDBs($mysql_server['mysql_server_id']);
         if ( !empty($mysql_server_dbs) )
         {
-			foreach ( $mysql_server_dbs as $mysql_db )
+			foreach ((array)$mysql_server_dbs as $mysql_db)
 			{
 				$databases .= $mysql_db['db_name']."<a href='?m=mysql&p=edit&mysql_server_id=".$mysql_server['mysql_server_id'].
 							  "&assign=true&db_id=".$mysql_db['db_id']."&edit_db_settings'>[".get_lang('edit')."]</a>\n".

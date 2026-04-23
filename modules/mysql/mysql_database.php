@@ -161,7 +161,7 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         $queries = array("DELETE FROM `%smysql_databases` WHERE mysql_server_id = %d;",
 						 "DELETE FROM `%smysql_servers` WHERE mysql_server_id = %d;");
 
-        foreach ( $queries as $query )
+        foreach ((array)$queries as $query)
         {
             $query = sprintf($query,$this->table_prefix,$mysql_server_id);
             ++$this->queries_;

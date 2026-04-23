@@ -13,7 +13,7 @@
 //   gzip tools and WinZip application.
 //
 // Description :
-//   See readme.txt (English & Français) and http://www.phpconcept.net
+//   See readme.txt (English & Franais) and http://www.phpconcept.net
 //
 // Warning :
 //   This library and the associated files are non commercial, non professional
@@ -405,7 +405,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
   //   $p_filelist, in the directory
   //   $p_path. The relative path of the archived files are keep and become
   //   relative to $p_path.
-  //   If a directory is spécified in the list, all the files from this directory
+  //   If a directory is spcified in the list, all the files from this directory
   //   will be extracted.
   //   If a file with the same name already exists it will be replaced.
   //   If the path to the file does not exist, it will be created.
@@ -1349,7 +1349,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
     }
 
     // ----- Loop on the files
-    for ($j=0; ($j<count($p_list)) && ($v_result==1); $j++)
+    for ($j=0; ($j<count((array)$p_list)) && ($v_result==1); $j++)
     {
       // ----- Recuperate the filename
       $p_filename = $p_list[$j];
@@ -2031,7 +2031,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
           // ----- Look if the extracted file is older
           else if (filemtime($v_header[filename]) > $v_header[mtime])
           {
-            TrFctMessage(__FILE__, __LINE__, 2, "Existing file '$v_header[filename]' is newer (".date("l dS of F Y h:i:s A", filemtime($v_header[filename])).") than the extracted file (".date("l dS of F Y h:i:s A", $v_header[mtime]).")");
+            TrFctMessage(__FILE__, __LINE__, 2, "Existing file '$v_header[filename]' is newer (".date("l dS of F Y h:i:s A", filemtime($v_header[filename])).") than the extracted file (".date("l dS of F Y h:i:s A", is_numeric($v_header[mtime]) ? (int)$v_header[mtime] : strtotime($v_header[mtime])).")");
 
             // ----- Change the file status
             $v_header[status] = "newer_exist";
@@ -2164,7 +2164,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
         else
           gzseek($v_tar, gztell($v_tar)+(ceil(($v_header[size]/512))*512));
 
-        TrFctMessage(__FILE__, __LINE__, 4, "Position après jump [".($p_tar_mode=="tar"?ftell($v_tar):gztell($v_tar))."]");
+        TrFctMessage(__FILE__, __LINE__, 4, "Position aprs jump [".($p_tar_mode=="tar"?ftell($v_tar):gztell($v_tar))."]");
       }
 
       if ($p_tar_mode == "tar")
@@ -2395,7 +2395,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
         else
           gzseek($v_tar, gztell($v_tar)+(ceil(($v_header[size]/512))*512));
 
-        TrFctMessage(__FILE__, __LINE__, 4, "Position après jump [".($p_tar_mode=="tar"?ftell($v_tar):gztell($v_tar))."]");
+        TrFctMessage(__FILE__, __LINE__, 4, "Position aprs jump [".($p_tar_mode=="tar"?ftell($v_tar):gztell($v_tar))."]");
       }
 
       if ($p_tar_mode == "tar")
@@ -2514,7 +2514,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
           // ----- Look if the extracted file is older
           else if (filemtime($v_header[filename]) > $v_header[mtime])
           {
-            TrFctMessage(__FILE__, __LINE__, 2, "Existing file '$v_header[filename]' is newer (".date("l dS of F Y h:i:s A", filemtime($v_header[filename])).") than the extracted file (".date("l dS of F Y h:i:s A", $v_header[mtime]).")");
+            TrFctMessage(__FILE__, __LINE__, 2, "Existing file '$v_header[filename]' is newer (".date("l dS of F Y h:i:s A", filemtime($v_header[filename])).") than the extracted file (".date("l dS of F Y h:i:s A", is_numeric($v_header[mtime]) ? (int)$v_header[mtime] : strtotime($v_header[mtime])).")");
 
             // ----- Change the file status
             $v_header[status] = "newer_exist";
@@ -2836,7 +2836,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
         else
           gzseek($v_tar, gztell($v_tar)+(ceil(($v_header[size]/512))*512));
 
-        TrFctMessage(__FILE__, __LINE__, 4, "Position après jump [".($p_tar_mode=="tar"?ftell($v_tar):gztell($v_tar))."]");
+        TrFctMessage(__FILE__, __LINE__, 4, "Position aprs jump [".($p_tar_mode=="tar"?ftell($v_tar):gztell($v_tar))."]");
       }
 
       // ----- Look for end of file
@@ -3058,7 +3058,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
         {
           TrFctMessage(__FILE__, __LINE__, 3, "File '$v_stored_list[$i]' is present in archive");
           TrFctMessage(__FILE__, __LINE__, 3, "File '$v_stored_list[$i]' mtime=".filemtime($p_file_list[$i])." ".date("l dS of F Y h:i:s A", filemtime($p_file_list[$i])));
-          TrFctMessage(__FILE__, __LINE__, 3, "Archived mtime=".$v_header[mtime]." ".date("l dS of F Y h:i:s A", $v_header[mtime]));
+          TrFctMessage(__FILE__, __LINE__, 3, "Archived mtime=".$v_header[mtime]." ".date("l dS of F Y h:i:s A", is_numeric($v_header[mtime]) ? (int)$v_header[mtime] : strtotime($v_header[mtime])));
 
           // ----- Store found informations
           $v_found_file = TRUE;
@@ -3372,7 +3372,7 @@ $g_pcltar_extension = substr(strrchr(basename(__FILE__), '.'), 1);
     $v_header[size] = OctDec(trim($v_data[size]));
     TrFctMessage(__FILE__, __LINE__, 2, "Size : '$v_header[size]'");
     $v_header[mtime] = OctDec(trim($v_data[mtime]));
-    TrFctMessage(__FILE__, __LINE__, 2, "Date : ".date("l dS of F Y h:i:s A", $v_header[mtime]));
+    TrFctMessage(__FILE__, __LINE__, 2, "Date : ".date("l dS of F Y h:i:s A", is_numeric($v_header[mtime]) ? (int)$v_header[mtime] : strtotime($v_header[mtime])));
     if (($v_header[typeflag] = $v_data[typeflag]) == "5")
     {
       $v_header[size] = 0;

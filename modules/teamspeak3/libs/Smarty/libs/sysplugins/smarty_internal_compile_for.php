@@ -48,7 +48,7 @@ class Smarty_Internal_Compile_For extends Smarty_Internal_CompileBase {
 
         $output = "<?php ";
         if (isset($_attr['ifexp'])) {
-            foreach ($_attr['start'] as $_statement) {
+            foreach ((array)$_attr['start'] as $_statement) {
                 $output .= " \$_smarty_tpl->tpl_vars[$_statement[var]] = new Smarty_Variable;";
                 $output .= " \$_smarty_tpl->tpl_vars[$_statement[var]]->value = $_statement[value];\n";
                 $compiler->local_var[$_statement['var']] = true;
@@ -131,7 +131,7 @@ class Smarty_Internal_Compile_Forclose extends Smarty_Internal_CompileBase {
 
         list($_open_tag, $this->compiler->nocache, $local_vars) = $this->_close_tag(array('for', 'forelse'));
 
-        foreach ($local_vars as $var) {
+        foreach ((array)$local_vars as $var) {
             unset($compiler->local_var[$var]);
         } 
         if ($_open_tag == 'forelse')

@@ -22,7 +22,7 @@
 function smarty_function_popup($params, &$smarty)
 {
     $append = '';
-    foreach ($params as $_key=>$_value) {
+    foreach ((array)$params as $_key=>$_value) {
         switch ($_key) {
             case 'text':
             case 'trigger':

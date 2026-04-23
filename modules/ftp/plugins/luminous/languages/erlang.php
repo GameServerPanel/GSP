@@ -57,7 +57,7 @@ class LuminousErlangScanner extends LuminousSimpleScanner {
 
   
   static function oo_stream_filter($tokens) {
-    $c = count($tokens)-1;
+    $c = count((array)$tokens)-1;
     for($i=0; $i<$c; $i++) {
       if ($tokens[$i][1] === ':') {
         if ($i > 0) {

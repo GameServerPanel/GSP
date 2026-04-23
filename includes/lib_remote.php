@@ -97,7 +97,7 @@ class OGPRemoteLibrary
 		$params_array = array();
 		$args = func_get_args();
 
-		foreach ($args as $arg)
+		foreach ((array)$args as $arg)
 		{
 			array_push($params_array,$this->encryptParam($arg));
 		}
@@ -193,7 +193,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line)."\n";
 			}
@@ -246,7 +246,7 @@ class OGPRemoteLibrary
 		{
 			$lines = explode('\n',$data_tmp);
 			
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line);
 			}
@@ -685,7 +685,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line);
 			}
@@ -781,7 +781,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line)."\n";
 			}
@@ -804,7 +804,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line);
 			}
@@ -827,7 +827,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line);
 			}
@@ -849,7 +849,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line);
 			}
@@ -870,7 +870,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$decoded_line = base64_decode($line);
 				if(!preg_match("/^[\s|\t]*$/", $decoded_line))
@@ -930,7 +930,7 @@ class OGPRemoteLibrary
 		$this->add_enc_chk($args);
 		$request = xmlrpc_encode_request("fastdl_get_aliases",$args);
 		$response = $this->sendRequest($request);
-		if(!is_array($response) or count($response) == 0)
+		if(!is_array($response) or count((array)$response) == 0)
 			return -1;
 		return $response;
 	}
@@ -948,7 +948,7 @@ class OGPRemoteLibrary
 		if(is_array($aliases))
 		{
 			$params_array = array();
-			foreach($aliases as $alias)
+			foreach ((array)$aliases as $alias)
 			{
 				$params_array[] = $this->encryptParam($alias);
 			}
@@ -1002,7 +1002,7 @@ class OGPRemoteLibrary
 		else
 		{
 			$data = array();
-			foreach ($response as $id => $task)
+			foreach ((array)$response as $id => $task)
 			{
 				$task = trim(base64_decode($task));
 				$data[$id] = $task;
@@ -1072,7 +1072,7 @@ class OGPRemoteLibrary
 		if (is_array($response) and !empty($response))
 		{
 			$data = array();
-			foreach ($response as $key => $value)
+			foreach ((array)$response as $key => $value)
 			{
 				$data[$key] = base64_decode($value);
 			}
@@ -1084,7 +1084,7 @@ class OGPRemoteLibrary
 		if ( $retval > 0 )
 		{
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				$data .= base64_decode($line);
 			}
@@ -1205,7 +1205,7 @@ class OGPRemoteLibrary
 		{
 			list($retval, $data_tmp) = explode(";", $response);
 			$lines = explode('\n',$data_tmp);
-			foreach ($lines as $line)
+			foreach ((array)$lines as $line)
 			{
 				@list($string_name, $mod_title) = explode(':', base64_decode($line), 2);
 				if($string_name != "" and $mod_title != "")

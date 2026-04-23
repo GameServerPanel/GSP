@@ -187,7 +187,7 @@ class HTMLPurifier_ErrorCollector
             if ($line == -1) {
                 continue;
             }
-            foreach ($col_array as $col => $struct) {
+            foreach ((array)$col_array as $col => $struct) {
                 $this->_renderStruct($ret, $struct, $line, $col);
             }
         }
@@ -233,7 +233,7 @@ class HTMLPurifier_ErrorCollector
             foreach ($current->children as $array) {
                 $context[] = $current;
                 $stack = array_merge($stack, array_reverse($array, true));
-                for ($i = count($array); $i > 0; $i--) {
+                for ($i = count((array)$array); $i > 0; $i--) {
                     $context_stack[] = $context;
                 }
             }

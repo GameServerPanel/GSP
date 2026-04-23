@@ -75,7 +75,7 @@ discordmsg($msg, $webhook);
 	echo "<h2>".get_lang('support')."</h2>";
 	echo '<center><form class="contactForm" name="contactForm" action="" method="post"><p style="font-size:12px;text-align:center;">'.get_lang('please_describe_your_issue_below').'</p>';
 	echo get_lang('select_server').":<br /><select name='gameserver' id='gameserver'>";
-	foreach($server_homes as $server_home)
+	foreach ((array)$server_homes as $server_home)
 	{
 		echo "<option value='".$server_home['home_name']."'>".$server_home['home_name']."</option>";
 	}

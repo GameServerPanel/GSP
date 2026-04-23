@@ -124,8 +124,8 @@ class Ticket
             return is_null($f['reply_id']);
         }));
         
-        foreach ($messages as $i => $message) {
-            foreach ($attachments as $k => $v) {
+        foreach ((array)$messages as $i => $message) {
+            foreach ((array)$attachments as $k => $v) {
 
                 if ($messages[$i]['reply_id'] == $v['reply_id']) {
                     $messages[$i]['attachments'][] = $v;
@@ -254,7 +254,7 @@ class Ticket
             return $return;
         }
 
-        foreach ($homes as $home) {
+        foreach ((array)$homes as $home) {
             $return[] = array('home_id' => $home['home_id'], 'home_name' => $home['home_name']);
         }
 

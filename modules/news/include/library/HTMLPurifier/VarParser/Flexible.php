@@ -70,13 +70,13 @@ class HTMLPurifier_VarParser_Flexible extends HTMLPurifier_VarParser
                         $var = preg_split('/(,|[\n\r]+)/', $var);
                     }
                     // remove spaces
-                    foreach ($var as $i => $j) {
+                    foreach ((array)$var as $i => $j) {
                         $var[$i] = trim($j);
                     }
                     if ($type === self::HASH) {
                         // key:value,key2:value2
                         $nvar = array();
-                        foreach ($var as $keypair) {
+                        foreach ((array)$var as $keypair) {
                             $c = explode(':', $keypair, 2);
                             if (!isset($c[1])) {
                                 continue;
@@ -95,7 +95,7 @@ class HTMLPurifier_VarParser_Flexible extends HTMLPurifier_VarParser
                         return $var;
                     } elseif ($type == self::LOOKUP) {
                         $new = array();
-                        foreach ($var as $key) {
+                        foreach ((array)$var as $key) {
                             $new[$key] = true;
                         }
                         return $new;
@@ -108,7 +108,7 @@ class HTMLPurifier_VarParser_Flexible extends HTMLPurifier_VarParser
                     return array_values($var);
                 }
                 if ($type === self::LOOKUP) {
-                    foreach ($var as $key => $value) {
+                    foreach ((array)$var as $key => $value) {
                         if ($value !== true) {
                             trigger_error(
                                 "Lookup array has non-true value at key '$key'; " .

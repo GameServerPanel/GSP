@@ -34,10 +34,10 @@ function exec_ogp_module()
 	
 	startSession();
 
-	if( isset($_SESSION['ERRMSG_ARR']) && is_array($_SESSION['ERRMSG_ARR']) && count($_SESSION['ERRMSG_ARR']) >0 ) 
+	if( isset($_SESSION['ERRMSG_ARR']) && is_array($_SESSION['ERRMSG_ARR']) && count((array)$_SESSION['ERRMSG_ARR']) >0 ) 
 		{
 		$errmsg = '<table>';
-		foreach($_SESSION['ERRMSG_ARR'] as $msg) 
+		foreach ((array)$_SESSION['ERRMSG_ARR'] as $msg) 
 			{
 			$errmsg .= "<tr><td><img width='8px' src='images/offline.png'/></td><td style='text-align:left;color:red;'>".$msg.'</td></tr>'; 
 			}

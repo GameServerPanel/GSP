@@ -187,7 +187,7 @@ see --help for help
     // user provided language
     $scanners = luminous::scanners();
     $valid_scanner = false;
-    foreach($scanners as $lang=>$codes) {
+    foreach ((array)$scanners as $lang=>$codes) {
       if (in_array($this->options['lang'], $codes)) {
         $valid_scanner = true;
         break;

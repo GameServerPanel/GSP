@@ -143,7 +143,7 @@ function exec_ogp_module() {
 		}
 		echo "<option style='background:black;color:white;' value=''>".get_lang('linux_games')."</option>\n";
 		
-		foreach ( $game_cfgs as $row )
+		foreach ((array)$game_cfgs as $row)
 		{
 			if ( preg_match("/linux/", $row['game_key']) )
 			{
@@ -154,7 +154,7 @@ function exec_ogp_module() {
 			}
 		}
 		echo "<option style='background:black;color:white;' value=''>".get_lang('windows_games')."</option>\n";
-		foreach ( $game_cfgs as $row )
+		foreach ((array)$game_cfgs as $row)
 		{
 			if ( preg_match("/win/", $row['game_key']) )
 			{
@@ -175,7 +175,7 @@ function exec_ogp_module() {
 				<td align="left">
 		<?php
 		$types = array( 'plugin', 'mappack', 'config' );
-		foreach($types as $type)
+		foreach ((array)$types as $type)
 		{
 			$checked = ( isset($addon_type) AND $type == $addon_type) ? 'checked' : '';
 			echo '<input type="radio" name="addon_type" value="'.$type.'" '.$checked.'>'.get_lang($type);
@@ -195,7 +195,7 @@ function exec_ogp_module() {
 		if (!is_array($groups)) {
 			$groups = [];
 		}
-		foreach($groups as $group)
+		foreach ((array)$groups as $group)
 		{
 			$selected = (isset($group_id) AND $group['group_id'] == $group_id) ? 'selected=selected' : '';
 			echo "<option value='".$group['group_id']."' $selected>".$group['group_name']."</option>\n";
@@ -241,7 +241,7 @@ function exec_ogp_module() {
 				<b><?php print_lang('game'); ?></b> <select name='home_cfg_id'>
 				<?php
 				echo "<option style='background:black;color:white;' value=''>".get_lang('linux_games')."</option>\n";
-				foreach ( $game_cfgs as $row )
+				foreach ((array)$game_cfgs as $row)
 				{
 					if ( preg_match("/linux/", $row['game_key']) )
 					{
@@ -255,7 +255,7 @@ function exec_ogp_module() {
 					}
 				}
 				echo "<option style='background:black;color:white;' value=''>".get_lang('windows_games')."</option>\n";
-				foreach ( $game_cfgs as $row )
+				foreach ((array)$game_cfgs as $row)
 				{
 						if(isset($_GET['home_cfg_id']) AND $row['home_cfg_id'] == $_GET['home_cfg_id']) 
 							$selected = "selected='selected'";
@@ -276,7 +276,7 @@ function exec_ogp_module() {
 				<?php
 					$option = '';
 
-					foreach ($addon_types as $k) {
+					foreach ((array)$addon_types as $k) {
 						$option .= '<option';
 
 						if (isset($_GET['addon_type']) && $_GET['addon_type'] == $k) {
@@ -294,7 +294,7 @@ function exec_ogp_module() {
 				<select name='group_id'>
 				<option value="0"><?php print_lang('all_groups'); ?></option>
 				<?php
-				foreach($groups as $group)
+				foreach ((array)$groups as $group)
 				{
 					$selected = (isset($_GET['group_id']) AND $group['group_id'] == $_GET['group_id']) ? 'selected=selected' : '';
 					echo "<option value='".$group['group_id']."' $selected>".$group['group_name']."</option>\n";
@@ -355,12 +355,12 @@ function exec_ogp_module() {
 	<table class="center">
 	<?php
 	$group_names = array();
-	foreach($groups as $group)
+	foreach ((array)$groups as $group)
 		$group_names[$group['group_id']] = $group['group_name'];
 	
-	if (isset($result) and is_array($result) and (is_array($result) ? count($result) : 0) > 0)
+	if (isset($result) and is_array($result) and (is_array($result) ? count((array)$result) : 0) > 0)
 	{
-		foreach($result as $row)
+		foreach ((array)$result as $row)
 		{
 		?>
 		<tr>

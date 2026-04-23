@@ -56,7 +56,7 @@ class HTMLPurifier_ChildDef_Custom extends HTMLPurifier_ChildDef
 
         // collect all elements into the $elements array
         preg_match_all("/$el/", $reg, $matches);
-        foreach ($matches[0] as $match) {
+        foreach ((array)$matches[0] as $match) {
             $this->elements[$match] = true;
         }
 
@@ -82,7 +82,7 @@ class HTMLPurifier_ChildDef_Custom extends HTMLPurifier_ChildDef
     {
         $list_of_children = '';
         $nesting = 0; // depth into the nest
-        foreach ($children as $node) {
+        foreach ((array)$children as $node) {
             if (!empty($node->is_whitespace)) {
                 continue;
             }

@@ -136,7 +136,7 @@ function ogpHome()
 	$locale_files = makefilelist("lang/", ".|..|.svn", true, "folders");
 	$lang_sel = "<select name='lang' onchange=\"this.form.submit();\" >\n".
 				"<option>-</option>\n";
-	for ($i=0;$i < count($locale_files);$i++) 
+	for ($i=0;$i < count((array)$locale_files);$i++) 
 	{
 		$selected = ( isset( $_GET['lang'] ) AND $_GET['lang'] != "-" AND $_GET['lang'] == $locale_files[$i] ) ? "selected='selected'" : "";
 		$lang_sel .= "<option $selected value='".$locale_files[$i]."' >".$locale_files[$i]."</option>\n";
@@ -159,7 +159,7 @@ function ogpHome()
 	$menus = $db->getMenusForGroup('guest');
 	if(!empty($menus))
 	{
-		foreach ( $menus as $menu )
+		foreach ((array)$menus as $menu)
 		{
 			$module = $menu['module'];
 			if ( !empty( $menu['subpage'] ) )
@@ -207,7 +207,7 @@ function ogpHome()
 		//tagged for future use...
 		/*
 			$postdata = "";
-			foreach($_POST as $key =>$value)
+			foreach ((array)$_POST as $key =>$value)
 				$postdata .= ",'$key': '$value'";
 			$postdata = substr($postdata,1);
 			$postdata = "{".$postdata."}";
@@ -343,14 +343,14 @@ function ogpHome()
 				$login_attempts++;
 				if( $login_attempts == $settings["login_attempts_before_banned"] )
 				{
-					$banned_until = time() + (array_key_exists("login_ban_time" , $settings) && !empty($settings["login_ban_time"]) && is_numeric($settings["login_ban_time"]) ? $settings["login_ban_time"] : 300); // Five minutes or user defined setting.
+					$banned_until = time() + (array_key_exists("login_ban_time", (array)$settings) && !empty($settings["login_ban_time"]) && is_numeric($settings["login_ban_time"]) ? $settings["login_ban_time"] : 300); // Five minutes or user defined setting.
 					
 					if( !$banlist_info )
 						$db->query("INSERT INTO `OGP_DB_PREFIXban_list` (`client_ip`) VALUES('$client_ip');");
 						
-					$db->logger( get_lang("bad_login") . " ( Banned until " . date("r", $banned_until) . " ) [ login: $_POST[ulogin], password: ******** ]" );
+					$db->logger( get_lang("bad_login") . " ( Banned until " . date("r", is_numeric($banned_until) ? (int)$banned_until : strtotime($banned_until)) . " ) [ login: $_POST[ulogin], password: ******** ]" );
 					$db->query("UPDATE `OGP_DB_PREFIXban_list` SET logging_attempts='$login_attempts', banned_until='$banned_until' WHERE client_ip='$client_ip';");
-					print_failure("Banned until " . date("r",$banned_until));
+					print_failure("Banned until " . date("r", is_numeric($banned_until) ? (int)$banned_until : strtotime($banned_until)));
 				}
 				else
 				{

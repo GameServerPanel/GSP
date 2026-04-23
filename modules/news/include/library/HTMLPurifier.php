@@ -181,7 +181,7 @@ class HTMLPurifier
         $custom_filters = $filter_flags['Custom'];
         unset($filter_flags['Custom']);
         $filters = array();
-        foreach ($filter_flags as $filter => $flag) {
+        foreach ((array)$filter_flags as $filter => $flag) {
             if (!$flag) {
                 continue;
             }
@@ -191,14 +191,14 @@ class HTMLPurifier
             $class = "HTMLPurifier_Filter_$filter";
             $filters[] = new $class;
         }
-        foreach ($custom_filters as $filter) {
+        foreach ((array)$custom_filters as $filter) {
             // maybe "HTMLPurifier_Filter_$filter", but be consistent with AutoFormat
             $filters[] = $filter;
         }
         $filters = array_merge($filters, $this->filters);
         // maybe prepare(), but later
 
-        for ($i = 0, $filter_size = count($filters); $i < $filter_size; $i++) {
+        for ($i = 0, $filter_size = count((array)$filters); $i < $filter_size; $i++) {
             $html = $filters[$i]->preFilter($html, $config, $context);
         }
 
@@ -240,7 +240,7 @@ class HTMLPurifier
     public function purifyArray($array_of_html, $config = null)
     {
         $context_array = array();
-        foreach ($array_of_html as $key => $html) {
+        foreach ((array)$array_of_html as $key => $html) {
             $array_of_html[$key] = $this->purify($html, $config);
             $context_array[$key] = $this->context;
         }

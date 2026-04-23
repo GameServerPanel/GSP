@@ -62,7 +62,7 @@ function fetch_agent_stats($remote) {
     'agent_status',
     'monitor_get_stats',
   ];
-  foreach ($methods as $m) {
+  foreach ((array)$methods as $m) {
     if (method_exists($remote, $m)) {
       $out = @call_user_func([$remote, $m]);
       if (is_array($out) && !empty($out)) return $out;
@@ -109,7 +109,7 @@ function normalize_stats($raw) {
       ['used'=>'hdd_used','total'=>'hdd_total'],
       ['used'=>'fs_used','total'=>'fs_total'],
     ];
-    foreach ($candidates as $pair) {
+    foreach ((array)$candidates as $pair) {
       $u = $raw[$pair['used']]  ?? null;
       $t = $raw[$pair['total']] ?? null;
       if (is_numeric($u) && is_numeric($t) && $t>0) { $disk = ((float)$u/(float)$t)*100.0; break; }
@@ -117,7 +117,7 @@ function normalize_stats($raw) {
     // if agent returns array of mounts, pick max %
     if ($disk === null && isset($raw['filesystems']) && is_array($raw['filesystems'])) {
       $mx = null;
-      foreach ($raw['filesystems'] as $fs) {
+      foreach ((array)$raw['filesystems'] as $fs) {
         if (isset($fs['used']) && isset($fs['total']) && $fs['total']>0) {
           $pct = ($fs['used']/$fs['total'])*100.0;
           if ($mx === null || $pct>$mx) $mx = $pct;

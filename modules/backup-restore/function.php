@@ -20,7 +20,7 @@ function topRow(){
 function bottomRow($latestDay,$backupPaths){
 	echo '<br><div>';
 	$latest = customSearch($latestDay,$backupPaths);
-	$length = count($backupPaths);
+	$length = count((array)$backupPaths);
 	for ($i = 0; $i < $length; $i++) {
 		$path = explode("/",$backupPaths[$i]);
 		$path1 = explode("-",$path[4]);
@@ -106,7 +106,7 @@ function backupNow($homeid){
 	echo '</form>';
 	echo '<div>';
 		echo '<textarea readonly id="backup" name="backup" rows="20" cols="30">';
-			foreach ($output as $line) { echo $line."\n";}
+			foreach ((array)$output as $line) { echo $line."\n";}
 		echo '</textarea>';
 	echo '</div></div></center>';
 
@@ -175,7 +175,7 @@ function restoreNow($homeid, $action){
 	echo '</form>';
 	echo '<div>';
 		echo '<textarea readonly id="backup" name="backup" rows="20" cols="30">';
-			foreach ($output as $line) { echo $line."\n";}
+			foreach ((array)$output as $line) { echo $line."\n";}
 		echo '</textarea>';
 	echo "</div>";
 	echo "</div></center>";
@@ -217,7 +217,7 @@ function serverINFO($serverid) {	// returns serverINFO Array
 	return $serverINFO;
 }
 function customSearch($keyword, $arrayToSearch){
-    foreach($arrayToSearch as $key => $arrayItem){
+    foreach ((array)$arrayToSearch as $key => $arrayItem){
         if( stristr($arrayItem, $keyword)){
             return $key;
         }

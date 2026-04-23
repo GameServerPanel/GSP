@@ -137,7 +137,7 @@ function exec_ogp_module()
 		if($blacklisted_files !== FALSE)
 		{
 			$current_blacklist = array();
-			foreach($blacklisted_files as $blacklisted_file)
+			foreach ((array)$blacklisted_files as $blacklisted_file)
 			{
 				$current_blacklist[] = $blacklisted_file['file_path'];
 			}			
@@ -146,14 +146,14 @@ function exec_ogp_module()
 		
 		include ( 'unzip.php' );     // array|false extractZip( string $zipFile, string $extract_path [, string $remove_path, array $blacklist, array $whitelist] )
 		$result = extractZip( $temp_dwl, $extract_path, $unwanted_path, '', '' );
-		if ( is_array( $result['extracted_files'] ) and count($result['extracted_files']) > 0 )
+		if ( is_array( $result['extracted_files'] ) and count((array)$result['extracted_files']) > 0 )
 		{
 			// Check file by file if already exists, if it matches, compares both files 
 			// looking for changes determining if the file needs to be updated.
 			// Also determines if the file is writable
 			$filelist = array();
 			$i = 0;
-			foreach( $result['extracted_files'] as $file )
+			foreach ((array)$result['extracted_files'] as $file)
 			{
 				$filename = str_replace( $unwanted_path, "" , $file['filename'] );				
 				$temp_file = $extract_path . DIRECTORY_SEPARATOR . $filename;
@@ -224,7 +224,7 @@ function exec_ogp_module()
 			$result = extractZip( $temp_dwl, preg_replace("/\/$/","",$baseDir), $unwanted_path, $blacklist, $filelist );
 			if( is_array( $result['ignored_files'] ) and !empty( $result['ignored_files'] ) )
 			{
-				print_failure(get_lang_f('ignored_files',count($result['ignored_files'])));
+				print_failure(get_lang_f('ignored_files',count((array)$result['ignored_files'])));
 				echo get_lang_f("not_updated_files_blacklisted", implode("<br>", $result['ignored_files']) );
 				echo "<br><br><br>";
 			}
@@ -265,7 +265,7 @@ function exec_ogp_module()
 
 				$modules = $db->getInstalledModules();
 				// update module manager first
-				foreach ( $modules as $row )
+				foreach ((array)$modules as $row)
 				{
 					if($row['folder'] == 'modulemanager')
 					{
@@ -274,7 +274,7 @@ function exec_ogp_module()
 					}
 				}
 				
-				foreach ( $modules as $row )
+				foreach ((array)$modules as $row)
 				{
 					if($row['folder'] == 'modulemanager')//already updated
 						continue;

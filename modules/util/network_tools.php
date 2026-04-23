@@ -50,7 +50,7 @@ function exec_ogp_module()
 		
 		// Loop over $availableCommands from util_config.php
 		// Assign a variable, $allowAccess based on the current user's role and if the config file states the user's role is allowed access to this command.
-		for($x = 0; $x < count($availableCommands); ++$x){
+		for($x = 0; $x < count((array)$availableCommands); ++$x){
 			if($availableCommands[$x]['title'] == $command){
 				$command = $availableCommands[$x][$os];
 				$allowAccess  = $availableCommands[$x][$userRole];

@@ -71,14 +71,14 @@ function ogpLang()
 
     $modules = preg_grep("/.*/",get_included_files());
 
-    foreach ($lang_modules as $lang_module)
+    foreach ((array)$lang_modules as $lang_module)
     {
         $lang_file = LANG_DIR."/modules/".$lang_module.".php";
         if ( is_file($lang_file) )
             array_push($files,$lang_file);
     }
 
-    foreach ($files as $file_name)
+    foreach ((array)$files as $file_name)
     {
         // Load the actual language files.
         include_once($file_name);

@@ -206,10 +206,10 @@ class Smarty_Internal_Register {
      */
     function resource($resource_type, $function_names)
     {
-        if (count($function_names) == 4) {
+        if (count((array)$function_names) == 4) {
             $this->smarty->_plugins['resource'][$resource_type] =
             array($function_names, false);
-        } elseif (count($function_names) == 5) {
+        } elseif (count((array)$function_names) == 5) {
             $this->smarty->_plugins['resource'][$resource_type] =
             array(array(array(&$function_names[0], $function_names[1]),
                     array(&$function_names[0], $function_names[2]),

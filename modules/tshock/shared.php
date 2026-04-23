@@ -18,7 +18,7 @@ if(!empty($home_cfg_ids))
 {
 	$server_homes = array();
 	$isAdmin = $db->isAdmin($_SESSION['user_id']);
-	foreach($home_cfg_ids as $home_cfg_id)
+	foreach ((array)$home_cfg_ids as $home_cfg_id)
 	{
 		if($isAdmin)
 			$server_homes = array_merge($server_homes, $db->getHomesFor_limit('admin', $_SESSION['user_id'], 1, 9999, $home_cfg_id,''));

@@ -490,7 +490,7 @@ class TeamSpeak3
     $path = self::getFilePath($namespace);
     $scan = scandir($path);
 
-    foreach($scan as $node)
+    foreach ((array)$scan as $node)
     {
       $file = TeamSpeak3_Helper_String::factory($node)->toLower();
 
@@ -686,7 +686,7 @@ class TeamSpeak3
  *   $arr_ClientList = $ts3_VirtualServer->clientList(array("client_platform" => "Android"));
  *
  *   // walk through list of clients
- *   foreach($arr_ClientList as $ts3_Client)
+ *   foreach ((array)$arr_ClientList as $ts3_Client)
  *   {
  *     echo $ts3_Client . " is using " . $ts3_Client["client_platform"] . "<br />\n";
  *   }
@@ -701,7 +701,7 @@ class TeamSpeak3
  *   $ts3_ServerInstance = TeamSpeak3::factory("serverquery://username:password@127.0.0.1:10011/");
  *
  *   // walk through list of virtual servers
- *   foreach($ts3_ServerInstance as $ts3_VirtualServer)
+ *   foreach ((array)$ts3_ServerInstance as $ts3_VirtualServer)
  *   {
  *     // modify the virtual servers hostbanner URL only using the ArrayAccess interface
  *     $ts3_VirtualServer["virtualserver_hostbanner_gfx_url"] = "http://www.example.com/banners/banner01_468x60.jpg";
@@ -742,7 +742,7 @@ class TeamSpeak3
  *   $ts3_ServerInstance = TeamSpeak3::factory("serverquery://username:password@127.0.0.1:10011/");
  *
  *   // walk through list of virtual servers
- *   foreach($ts3_ServerInstance as $ts3_VirtualServer)
+ *   foreach ((array)$ts3_ServerInstance as $ts3_VirtualServer)
  *   {
  *     // identify the most powerful group on the virtual server
  *     $ts3_ServerGroup = $ts3_VirtualServer->serverGroupIdentify();

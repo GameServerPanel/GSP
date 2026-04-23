@@ -42,7 +42,7 @@ function exec_ogp_module() {
 			$groups = [];
 		}
 		$query_groups .= " AND (";
-		foreach($groups as $group)
+		foreach ((array)$groups as $group)
 			$query_groups .= "group_id=".$group['group_id']." OR ";
 		$query_groups .= "group_id=0 OR group_id IS NULL)";
 	}
@@ -57,7 +57,7 @@ function exec_ogp_module() {
 									"NATURAL JOIN OGP_DB_PREFIXconfig_homes ".
 									"WHERE addon_type='plugin' ".
 									"AND home_cfg_id=".$home_cfg_id.$query_groups);
-		$plugins_qty = is_array($plugins) ? count($plugins) : 0;
+		$plugins_qty = is_array($plugins) ? count((array)$plugins) : 0;
 		if($plugins and $plugins_qty >= 1)
 			echo "<a href='?m=addonsmanager&amp;p=addons&amp;home_id=".$home_id.
 				 "&amp;mod_id=".$mod_id."&amp;addon_type=plugin&amp;ip=".$ip.
@@ -68,7 +68,7 @@ function exec_ogp_module() {
 									 "NATURAL JOIN OGP_DB_PREFIXconfig_homes ".
 									 "WHERE addon_type='mappack' ".
 									 "AND home_cfg_id=".$home_cfg_id.$query_groups);
-		$mappacks_qty = is_array($mappacks) ? count($mappacks) : 0;
+		$mappacks_qty = is_array($mappacks) ? count((array)$mappacks) : 0;
 		if($mappacks and $mappacks_qty >= 1){
 			echo "</td><td>";
 			echo "<a href='?m=addonsmanager&amp;p=addons&amp;home_id=".$home_id.
@@ -80,7 +80,7 @@ function exec_ogp_module() {
 									"NATURAL JOIN OGP_DB_PREFIXconfig_homes ".
 									"WHERE addon_type='config' ".
 									"AND home_cfg_id=".$home_cfg_id.$query_groups);
-		$configs_qty = is_array($configs) ? count($configs) : 0;
+		$configs_qty = is_array($configs) ? count((array)$configs) : 0;
 		if($configs and $configs_qty >= 1){
 			echo "</td><td>";
 			echo "<a href='?m=addonsmanager&amp;p=addons&amp;home_id=".$home_id.

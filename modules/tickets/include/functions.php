@@ -93,7 +93,7 @@ function ticketMessage($messageData, $uid, $loggedInAdmin = false, $ratingsEnabl
         $replyBox .= '<div class="left attachmentList">';
 
         $attachmentList = '';
-        foreach ($messageData['attachments'] as $attachment) {
+        foreach ((array)$messageData['attachments'] as $attachment) {
             $attachmentList .= '<a href="#" class="downloadAttachmentLink" data-id="'. $attachment['attachment_id'] .'" data-tid="'. $tid .'" data-uid="'. $uid .'">'. htmlentities($attachment['original_name']) .'</a>, ';
         }
 
@@ -116,7 +116,7 @@ function ticketErrors($errors = array(), $header = '')
     $return = '<div class="ticketErrorHolder">
     <p class="failure" id="errorHeader">'. $header .'</p>
     <ul class="ticketErrorList">';
-    foreach ($errors as $error) {
+    foreach ((array)$errors as $error) {
         $return .= '<li class="ticketError">' . $error . '</li>';
     }
     $return .= '</ul>
@@ -197,7 +197,7 @@ function splitExtensions($extensions, $delimiter = ',')
     $extArr = explode($delimiter, $extensions);
     $extList = '';
         
-    foreach ($extArr as $ext) {
+    foreach ((array)$extArr as $ext) {
         if (empty($ext)) {
             continue;
         }

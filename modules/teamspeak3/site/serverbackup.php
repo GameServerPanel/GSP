@@ -64,7 +64,7 @@ if(isset($_POST['deploy']))
 	$snapshot_deploy=$ts3->serverSnapshotDeploy($handler[0]);
 	if($snapshot_deploy['success']===false)
 		{
-		for($i=0; $i+1==count($snapshot_deploy['errors']); $i++)
+		for($i=0; $i+1==count((array)$snapshot_deploy['errors']); $i++)
 			{
 			echo $snapshot_deploy['errors'][$i]."<br />";
 			}
@@ -162,7 +162,7 @@ if(!empty($folder[1]))
 	rsort($folder[1]);
 	foreach($folder[1] AS $key=>$value)
 		{
-		$newdate=date("d-m-Y", $value);
+		$newdate=date("d-m-Y", is_numeric($value) ? (int)$value : strtotime($value));
 		$folder[1][$key]=$newdate;
 		}
 	}

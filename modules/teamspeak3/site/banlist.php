@@ -28,7 +28,7 @@ if (isset($_POST['unban']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($ban_delete['errors']); $i++)
+		for($i=0; $i+1==count((array)$ban_delete['errors']); $i++)
 			{
 			$error .= $ban_delete['errors'][$i]."<br />";
 			}

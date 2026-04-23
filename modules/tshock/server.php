@@ -170,7 +170,7 @@ function exec_ogp_module()
 					if($response['status'] == '200')
 					{
 						$response_table = "<pre>";
-						foreach($response['response'] as $line)
+						foreach ((array)$response['response'] as $line)
 							$response_table .= $line."<br>";
 						$response_table .= "</pre>";
 						echo $response_table;
@@ -265,7 +265,7 @@ function exec_ogp_module()
 					if($response['status'] == '200')
 					{
 						$rules_div = "<div><ul class='rules'>";
-						foreach($response['rules'] as $line)
+						foreach ((array)$response['rules'] as $line)
 							$rules_div .= "<li>".$line."</li>";
 						$rules_div .= "</ul></div>";
 						echo $rules_div;
@@ -305,19 +305,19 @@ function exec_ogp_module()
 					if($response['status'] == '200')
 					{
 						$status_table = "<table class='status'>";
-						foreach($response as $key => $value)
+						foreach ((array)$response as $key => $value)
 						{
 							if($key == "status")
 								continue;
 							if(is_array($value))
 							{
 								$status_table .= "<tr class='entry_t1'><td class='key'>".$key."</td><td><table class='status'>";
-								foreach($value as $v_key => $v_value)
+								foreach ((array)$value as $v_key => $v_value)
 								{
 									if(is_array($v_value))
 									{
 										$status_table .= "<tr><td class='key'>".$v_key."</td><td><table class='status'>";
-										foreach($v_value as $v_subkey => $v_subvalue)
+										foreach ((array)$v_value as $v_subkey => $v_subvalue)
 										{
 											$status_table .= "<tr class='entry_t2'><td class='key'>".$v_subkey."</td><td class='value'>".$v_subvalue."</td></tr>";
 										}

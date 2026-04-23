@@ -16,7 +16,7 @@ function get_true_boolean($bool)
 
 $request_string = "";
 
-foreach($_GET as $key => $val)
+foreach ((array)$_GET as $key => $val)
 {
 	if($key == "type") $key = "lgsl_type";
 	$request_string .= "&$key=$val";

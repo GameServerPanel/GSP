@@ -194,7 +194,7 @@ class LuminousOptions {
     if (!is_array($array)) {
       $array = array($nameOrArray => $value);
     }
-    foreach($array as $option => $value) {
+    foreach ((array)$array as $option => $value) {
       // for backwards compatibility we need to do this here
       $option = str_replace('-', '_', $option);
       $this->__set($option, $value);

@@ -90,7 +90,7 @@ class LuminousHTMLTemplates {
             $template = self::_strip_template_whitespace($template);
         }
     
-        foreach($variables as $search => $replace) {
+        foreach ((array)$variables as $search => $replace) {
             $template = str_replace("{" . $search . "}", $replace, $template);
         }
         return $template;
@@ -138,7 +138,7 @@ class LuminousFormatterHTML extends LuminousFormatter {
   private function lines_numberless($src) {
     $lines = array();
     $lines_original = explode("\n", $src);
-    foreach($lines_original as $line) {
+    foreach ((array)$lines_original as $line) {
       $l = $line;
       $num = $this->wrap_line($l, $this->wrap_length);
       // strip the newline if we're going to join it. Seems the easiest way to 
@@ -212,7 +212,7 @@ class LuminousFormatterHTML extends LuminousFormatter {
     preg_match_all("/<\/([^\s>]*).*?>/", $matches[0], $close_tags,
       PREG_SET_ORDER);
     
-    if (count($open_tags) != count($close_tags))
+    if (count((array)$open_tags) != count((array)$close_tags))
       return $matches[0];
     if (isset($open_tags[0]) 
       && trim($open_tags[0][1]) !== trim($close_tags[0][1])

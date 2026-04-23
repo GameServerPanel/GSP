@@ -14,7 +14,7 @@ $errors = [];
 
 $availableFiles = [];
 $directoryIterator = new DirectoryIterator($serverConfigDir);
-foreach ($directoryIterator as $fileInfo) {
+foreach ((array)$directoryIterator as $fileInfo) {
     if ($fileInfo->isFile() && strtolower($fileInfo->getExtension()) === 'xml') {
         $availableFiles[] = $fileInfo->getFilename();
     }
@@ -86,7 +86,7 @@ function billing_render_flash(array $items, string $cssClass): void {
         return;
     }
     echo '<div class="panel ' . $cssClass . '" style="margin-bottom:12px">';
-    foreach ($items as $item) {
+    foreach ((array)$items as $item) {
         echo '<div>' . $item . '</div>';
     }
     echo '</div>';
@@ -134,7 +134,7 @@ function billing_render_flash(array $items, string $cssClass): void {
             <?php if (!$availableFiles): ?>
                 <p style="color:#e5e7eb;">No XML files found.</p>
             <?php else: ?>
-                <?php foreach ($availableFiles as $fileName): ?>
+                <?php foreach ((array)$availableFiles as $fileName): ?>
                     <?php $isActive = ($fileName === $selectedFile); ?>
                     <a href="admin_xml_editor.php?file=<?php echo urlencode($fileName); ?>" class="<?php echo $isActive ? 'active' : ''; ?>"><?php echo htmlspecialchars($fileName, ENT_QUOTES, 'UTF-8'); ?></a>
                 <?php endforeach; ?>

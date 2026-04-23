@@ -117,9 +117,9 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
     }
 
     $attributes = $node->attributes();
-    if ($attributes && count($attributes) > 0) {
+    if ($attributes && count((array)$attributes) > 0) {
         $html .= "<div class='xml-node__attributes'><strong>Attributes</strong>";
-        foreach ($attributes as $attrName => $attrValue) {
+        foreach ((array)$attributes as $attrName => $attrValue) {
             $attrSafe = htmlspecialchars($attrName, ENT_QUOTES, 'UTF-8');
             $valSafe = htmlspecialchars((string)$attrValue, ENT_QUOTES, 'UTF-8');
             $html .= "<div class='attr-row'><span>{$attrSafe}</span><input type='text' name=\"nodes[{$safeNodeKey}][attributes][{$attrSafe}]\" value=\"{$valSafe}\" placeholder='Leave blank to remove'></div>";
@@ -166,7 +166,7 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
         return false;
     }
     $nodes = [];
-    foreach ($nodesPayload as $key => $data) {
+    foreach ((array)$nodesPayload as $key => $data) {
         $rawPath = isset($data['path']) ? (string)$data['path'] : (string)$key;
         $cleanPath = config_games_normalize_path($rawPath);
         if ($cleanPath === '') {
@@ -188,7 +188,7 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
     uksort($nodes, function ($a, $b) {
         return substr_count($b, '/') <=> substr_count($a, '/');
     });
-    foreach ($nodes as $path => $nodeData) {
+    foreach ((array)$nodes as $path => $nodeData) {
         $query = '/' . $path;
         $nodeList = @$xpath->query($query);
         if (!$nodeList || $nodeList->length === 0) {
@@ -203,7 +203,7 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
             continue;
         }
         $hasChildren = !empty($nodeData['has_children']);
-        if (array_key_exists('value', $nodeData)) {
+        if (array_key_exists('value', (array)$nodeData)) {
             $normalizedValue = config_games_normalize_newlines($nodeData['value']);
             while ($domNode->firstChild) {
                 $domNode->removeChild($domNode->firstChild);
@@ -217,7 +217,7 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
             }
         }
         if (isset($nodeData['attributes']) && is_array($nodeData['attributes'])) {
-            foreach ($nodeData['attributes'] as $attrName => $attrValue) {
+            foreach ((array)$nodeData['attributes'] as $attrName => $attrValue) {
                 $attrNameClean = preg_replace('/[^A-Za-z0-9_\\-:]/', '', (string)$attrName);
                 if ($attrNameClean === '') {
                     continue;
@@ -298,7 +298,7 @@ function exec_ogp_module() {
 
         $db->clearGameCfgs($clear_old);
 
-        foreach ( $files as $config_file )
+        foreach ((array)$files as $config_file)
         {
             $config = read_server_config($config_file);
             
@@ -342,7 +342,7 @@ function exec_ogp_module() {
 		  <td class='left'>\n
 		  <select name='home_cfg_id' onchange=".'"this.form.submit()"'.">\n
 		  <option style='background:black;color:white;' value=''>".get_lang('select_game')."</option>\n";	  
-	foreach ( $game_cfgs as $row )
+	foreach ((array)$game_cfgs as $row)
 	{
 		if ( preg_match( "/_win/", $row['game_key'] ) )
 			$os = "(Windows)";

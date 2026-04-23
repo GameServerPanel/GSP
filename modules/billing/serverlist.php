@@ -56,7 +56,7 @@ include(__DIR__ . '/includes/menu.php');
 
 <!-- Services container: clearfix to contain floated service cards so footer clears correctly -->
 <div class="clearfix container-wide">
-<?php foreach ($services as $row): ?>
+<?php foreach ((array)$services as $row): ?>
     <?php if (!isset($_REQUEST['service_id'])): ?>
         <!-- Service listing (all) -->
     <div class="float-left p-30-20">

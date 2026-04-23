@@ -130,17 +130,17 @@ function exec_ogp_module()
 
 	echo "<?xml version='1.0' encoding='UTF-8' ?>\r\n<server>\r\n";
 
-	foreach ($server as $a => $b)
+	foreach ((array)$server as $a => $b)
 	{
 		echo "<".lgsl_string_html($a, TRUE).">";
 
-		foreach ($b as $c => $d)
+		foreach ((array)$b as $c => $d)
 		{
 			if (is_array($d))
 			{
 				echo "<player>\r\n";
 
-				foreach ($d as $e => $f)
+				foreach ((array)$d as $e => $f)
 				{
 					echo "<".lgsl_string_html($e, TRUE).">".lgsl_string_html($f, TRUE)."</".lgsl_string_html($e, TRUE).">\r\n";
 				}

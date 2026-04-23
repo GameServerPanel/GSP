@@ -114,7 +114,7 @@ class ThemeDB
 		
 		if($returnData)
 		{
-			if(count($output)>=1)
+			if(count((array)$output)>=1)
 			{
 				return $output;
 			}
@@ -205,7 +205,7 @@ class ThemeDB
 		if($data)
 		{
 			$dataOut = array();
-			foreach($data as $setting)
+			foreach ((array)$data as $setting)
 			{
 				$dataOut[$setting['setting']] = $setting['value'];
 			}

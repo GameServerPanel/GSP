@@ -44,17 +44,17 @@ function smarty_modifier_date_format($string, $format = SMARTY_RESOURCE_DATE_FOR
             $_win_to = array('%m/%d/%y', '%b', "\n", '%I:%M:%S %p', '%H:%M', "\t", '%H:%M:%S');
             if (strpos($format, '%e') !== false) {
                 $_win_from[] = '%e';
-                $_win_to[] = sprintf('%\' 2d', date('j', $timestamp));
+                $_win_to[] = sprintf('%\' 2d', date('j', is_numeric($timestamp) ? (int)$timestamp : strtotime($timestamp)));
             } 
             if (strpos($format, '%l') !== false) {
                 $_win_from[] = '%l';
-                $_win_to[] = sprintf('%\' 2d', date('h', $timestamp));
+                $_win_to[] = sprintf('%\' 2d', date('h', is_numeric($timestamp) ? (int)$timestamp : strtotime($timestamp)));
             } 
             $format = str_replace($_win_from, $_win_to, $format);
         } 
         return strftime($format, $timestamp);
     } else {
-        return date($format, $timestamp);
+        return date($format, is_numeric($timestamp) ? (int)$timestamp : strtotime($timestamp));
     }
 } 
 

@@ -25,7 +25,7 @@
 function numbersFormatting($bytes){
 	$si_prefix = array( 'B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB' );
     $base = 1024;
-    $class = min((int)log($bytes , $base) , count($si_prefix) - 1);
+    $class = min((int)log($bytes , $base) , count((array)$si_prefix) - 1);
     return sprintf('%1.2f' , $bytes / pow($base,$class)) . ' ' . $si_prefix[$class];
 }
 
@@ -82,7 +82,7 @@ function exec_ogp_module()
 				   <h4>".get_lang('cpu_usage')."</h4>
 				   <div class=\"dragbox-content\">";
 			ksort($cores);
-			foreach($cores as $cpu => $percent)
+			foreach ((array)$cores as $cpu => $percent)
 			{		 
 				echo "<b>CPU" . $cpu . " ".get_lang('cpu_load').": " . $percent . " %</b><br>";
 				drawBarDiv($percent, "CPU" . $cpu);

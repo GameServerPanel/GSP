@@ -62,7 +62,7 @@ class Smarty_Internal_Utility {
         foreach((array)$this->smarty->template_dir as $_dir) {
             $_compileDirs = new RecursiveDirectoryIterator($_dir);
             $_compile = new RecursiveIteratorIterator($_compileDirs);
-            foreach ($_compile as $_fileinfo) {
+            foreach ((array)$_compile as $_fileinfo) {
                 if (strpos($_fileinfo, '.svn') !== false) continue;
                 $_file = $_fileinfo->getFilename();
                 if (!substr_compare($_file, $extention, - strlen($extention)) == 0) continue;
@@ -120,7 +120,7 @@ class Smarty_Internal_Utility {
         foreach((array)$this->smarty->config_dir as $_dir) {
             $_compileDirs = new RecursiveDirectoryIterator($_dir);
             $_compile = new RecursiveIteratorIterator($_compileDirs);
-            foreach ($_compile as $_fileinfo) {
+            foreach ((array)$_compile as $_fileinfo) {
                 if (strpos($_fileinfo, '.svn') !== false) continue;
                 $_file = $_fileinfo->getFilename();
                 if (!substr_compare($_file, $extention, - strlen($extention)) == 0) continue;
@@ -184,7 +184,7 @@ class Smarty_Internal_Utility {
         $_count = 0;
         $_compileDirs = new RecursiveDirectoryIterator($_dir);
         $_compile = new RecursiveIteratorIterator($_compileDirs, RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($_compile as $_file) {
+        foreach ((array)$_compile as $_file) {
             if (strpos($_file, '.svn') !== false) continue;
             if ($_file->isDir()) {
                 if (!$_compile->isDot()) {

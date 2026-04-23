@@ -25,7 +25,7 @@ if(isset($_POST['createserver']))
 	$token=$ts3->serverCreate($_POST['newsettings']);
 	if($token['success']===false)
 		{
-		for($i=0; $i+1==count($token['errors']); $i++)
+		for($i=0; $i+1==count((array)$token['errors']); $i++)
 			{
 			$error .= $token['errors'][$i]."<br />";
 			}

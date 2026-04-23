@@ -23,10 +23,10 @@
  */
 function create_drop_box_from_array_onchange($input_array,$listname,$current_value = "")
 {
-	$only_one = count($input_array) == 1;
+	$only_one = count((array)$input_array) == 1;
 	$disabled = $only_one? "disabled=disabled":"";
 	$retval = "<select id=\"$listname\" name=\"$listname\" style=\"max-width:330px;\" onchange=\"this.form.submit()\" $disabled>\n";
-    foreach($input_array as $key => $value)
+    foreach ((array)$input_array as $key => $value)
     {
 		// Make sure we don't allow HTML or script
 		$key = trim(strip_tags($key));
@@ -56,7 +56,7 @@ function get_mod_names_list($mods_list, $xml_mods)
 	$mod_names = "";
 	foreach(explode(',', $mods_list) as $workshop_mod_id)
 	{
-		foreach($xml_mods as $mod)
+		foreach ((array)$xml_mods as $mod)
 		{
 			if($mod['id'] == $workshop_mod_id)
 			{
@@ -137,7 +137,7 @@ function get_installed_mods($home_cfg, $remote, $xml)
 			$retval = $remote->get_workshop_mods_info($mod_info_array);
 			$current = explode($string_separator, $current_mods_string);
 			$installed_mods = array();
-			foreach($current as $c)
+			foreach ((array)$current as $c)
 			{
 				if($c != "")
 				{			
@@ -182,7 +182,7 @@ function remove_mod($home_cfg, $remote, $xml, $mod_string)
 		{
 			$current = explode($string_separator, $current_mods_string);
 			 
-			foreach($current as $index => $c)
+			foreach ((array)$current as $index => $c)
 			{
 				if(trim($c) == $mod_string)
 					unset($current[$index]);

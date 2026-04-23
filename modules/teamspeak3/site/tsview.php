@@ -158,8 +158,8 @@ function create_tree($pid, $place, $alldata, $sid, $showicons)
 								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green2 tooltip\'>".$lang['platform']."</td><td style=\'width:150px\' class=\'green2\'>".$u_value['client_platform']."</td></tr>";
 								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green1 tooltip\'>".$lang['talkpower']."</td><td style=\'width:150px\' class=\'green1\'>".$u_value['client_talk_power']."</td></tr>";
 								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green2 tooltip\'>".$lang['idle']."</td><td style=\'width:150px\' class=\'green2\'>".$ts3->convertSecondsToStrTime($u_value['client_idle_time']/1000)."</td></tr>";
-								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green1 tooltip\'>".$lang['lastonline']."</td><td style=\'width:150px\' class=\'green1\'>".date("d.m.Y", $u_value['client_lastconnected'])."</td></tr>";
-								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green2 tooltip\'>".$lang['created']."</td><td style=\'width:150px\' class=\'green2\'>".date("d.m.Y", $u_value['client_created'])."</td></tr>";
+								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green1 tooltip\'>".$lang['lastonline']."</td><td style=\'width:150px\' class=\'green1\'>".date("d.m.Y", is_numeric($u_value['client_lastconnected']) ? (int)$u_value['client_lastconnected'] : strtotime($u_value['client_lastconnected']))."</td></tr>";
+								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green2 tooltip\'>".$lang['created']."</td><td style=\'width:150px\' class=\'green2\'>".date("d.m.Y", is_numeric($u_value['client_created']) ? (int)$u_value['client_created'] : strtotime($u_value['client_created']))."</td></tr>";
 								$clientinfo .= "<tr><td style=\'width:150px\' class=\'green1 tooltip\'>".$lang['iconid']."</td><td style=\'width:150px\' class=\'green1\'>".$u_value['client_icon_id']."</td></tr>";
 								$clientinfo .= "</table>";
 								

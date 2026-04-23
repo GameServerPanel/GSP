@@ -48,7 +48,7 @@ if ($os == "windows")
 		
 		$cpu_num = '0';
 		
-		foreach ($cpus as $cpu)
+		foreach ((array)$cpus as $cpu)
 		{
 			$cpu_num = $cpu->NumberOfLogicalProcessors;
 		}
@@ -59,7 +59,7 @@ if ($os == "windows")
 		
 		$cpu_loop = 1;
 		
-		foreach($cpus_info as $cpu_info)
+		foreach ((array)$cpus_info as $cpu_info)
 		{
 			$cores[$cpu_loop] = 100 - $cpu_info->PercentIdleTime;
 			
@@ -97,7 +97,7 @@ elseif ($os == "linux")
 			$first = 1;
 
 			$cores = array();
-			foreach($lb as $line)
+			foreach ((array)$lb as $line)
 			{
 				if($first == 0)
 				{
@@ -125,12 +125,12 @@ elseif ($os == "linux")
 		/* compares two information snapshots and returns the cpu percentage */
 		function getCpuUsage($stat1, $stat2)
 		{
-			if( count($stat1) !== count($stat2) )
+			if( count((array)$stat1) !== count((array)$stat2) )
 			{
 				return False;
 			}
 
-			for( $i = 0; $i < count($stat1) ; $i++ )
+			for( $i = 0; $i < count((array)$stat1) ; $i++ )
 			{
 				$diff_idle[$i] = $stat2[$i]['idle'] - $stat1[$i]['idle'];
 				$diff_total[$i] = $stat2[$i]['total'] - $stat1[$i]['total'];

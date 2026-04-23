@@ -80,7 +80,7 @@ if(isset($_POST['command']) and !is_array($_POST['command']))
 elseif(isset($_POST['base64_command']))
 {
 	if (is_array($_POST['base64_command'])) {
-		foreach($_POST['base64_command'] as $key => $command)
+		foreach ((array)$_POST['base64_command'] as $key => $command)
 		{
 			$_POST['command'][$key] = isset($_POST['input']) ?  str_replace("%input%", $_POST['input'], base64_decode($command)) : base64_decode($command);
 		}
@@ -88,13 +88,13 @@ elseif(isset($_POST['base64_command']))
 }
 
 $presets = $db->getRconPresets($home_info['home_cfg_id'],$home_info['mods'][$mod_id]['mod_cfg_id']);
-if(is_array($presets) && (is_array($presets) ? count($presets) : 0) > 0)
+if(is_array($presets) && (is_array($presets) ? count((array)$presets) : 0) > 0)
 {
 	echo '<form action="" method="post">'.
 		  get_lang("rcon_presets") . ':
 		  <select onchange="this.form.submit()" name="command" >
 		  <option></option>\n';
-	foreach ($presets as $preset)
+	foreach ((array)$presets as $preset)
 	{
 		echo '<option value="'.$preset['command'].'" >'.$preset['name'].'</option>\n';
 	}
@@ -127,7 +127,7 @@ if(isset($_POST['remote_send_rcon_command']))
 {
 	$response = "";
 	if (is_array($_POST['command'])) {
-		foreach($_POST['command'] as $command)
+		foreach ((array)$_POST['command'] as $command)
 		{
 			$ret = send_command($command, $remote, $server_xml, $home_info, $home_id, $ip, $port );
 			if(!$ret)
@@ -170,7 +170,7 @@ if($server_xml->list_players_command)
 					$key = (string)$index['key'];
 					$name = (string)$index;
 					$infos[] = $name;
-					foreach($matches[$key] as $info)
+					foreach ((array)$matches[$key] as $info)
 					{
 						$data[$i][$name] = $info;
 						$i++;
@@ -201,7 +201,7 @@ if($server_xml->list_players_command)
 					$replaced_actions = array();
 					for($id = 0; $id < $i; $id++)
 					{
-						foreach($actions as $key => $action)
+						foreach ((array)$actions as $key => $action)
 						{
 							foreach($replacements[$key][1] as $index)
 							{
@@ -221,20 +221,20 @@ if($server_xml->list_players_command)
 				}					
 				$headers = array_merge( $infos, $commands );
 				$player_actions_table = "<table class='center'>\n<thead>\n<tr>";
-				foreach($headers as $name)
+				foreach ((array)$headers as $name)
 				{
 					$player_actions_table .= "<th>$name</th>";
 				}
 				
 				$player_actions_table .= "</tr>\n</thead>\n<tbody>\n";
-				foreach($data as $player)
+				foreach ((array)$data as $player)
 				{
 					$player_actions_table .= "<tr>\n";
-					foreach($infos as $info)
+					foreach ((array)$infos as $info)
 					{
 						$player_actions_table .= "<td>".htmlentities($player[$info])."</td>\n";
 					}
-					foreach($commands as $command)
+					foreach ((array)$commands as $command)
 					{
 						$actions = $player['commands'][$command]['actions'];
 						$type    = $player['commands'][$command]['type'];
@@ -246,21 +246,21 @@ if($server_xml->list_players_command)
 						$player_actions_table .= "<td>\n<form method='post'>\n";
 						if($type == 'hidden')
 						{
-							foreach($actions as $key => $action)
+							foreach ((array)$actions as $key => $action)
 								$player_actions_table .= "<input type='hidden' name='base64_command[$key]' value='$action'/>\n";
 						}
 						elseif($type == 'text')
 						{
-							foreach($actions as $key => $action)
+							foreach ((array)$actions as $key => $action)
 								$player_actions_table .= "<input type='hidden' name='base64_command[$key]' value='$action'/>\n";
 							$player_actions_table .= "<input type='text' name='input' value='$default'/>\n";
 						}
 						elseif($type == 'select')
 						{
-							foreach($actions as $key => $action)
+							foreach ((array)$actions as $key => $action)
 								$player_actions_table .= "<input type='hidden' name='base64_command[$key]' value='$action'/>\n";
 							$player_actions_table .= "<select name='input'>";
-							foreach($options as $key => $value)
+							foreach ((array)$options as $key => $value)
 							{
 								$player_actions_table .= "<option value='$value' >$key</option>";
 							}

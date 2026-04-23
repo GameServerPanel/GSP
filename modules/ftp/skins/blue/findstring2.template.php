@@ -4,7 +4,7 @@
 <input type="hidden" name="entry"     value="">
 
 <?php /* ----- No results are found ----- */ ?>
-<?php	if (count($result) == 0) { ?>
+<?php	if (count((array)$result) == 0) { ?>
 <?php		for ($i=0; $i<sizeof($net2ftp_output["findstring"]); $i++) { ?>
 			<?php echo $net2ftp_output["findstring"][$i]; ?><br />
 <?php		} // end for

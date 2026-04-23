@@ -48,7 +48,7 @@ class HTMLPurifier_IDAccumulator
      */
     public function load($array_of_ids)
     {
-        foreach ($array_of_ids as $id) {
+        foreach ((array)$array_of_ids as $id) {
             $this->ids[$id] = true;
         }
     }

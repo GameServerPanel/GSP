@@ -78,7 +78,7 @@ class HTMLPurifier_AttrValidator
 
         // iterate through all the attribute keypairs
         // Watch out for name collisions: $key has previously been used
-        foreach ($attr as $attr_key => $value) {
+        foreach ((array)$attr as $attr_key => $value) {
 
             // call the definition
             if (isset($defs[$attr_key])) {

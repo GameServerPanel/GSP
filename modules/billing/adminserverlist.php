@@ -48,7 +48,7 @@ function col_exists($db, $table, $col){
 function parse_id_list($s){
   $tokens = preg_split('/\s+/', trim((string)$s));
   $out = [];
-  foreach ($tokens as $t) {
+  foreach ((array)$tokens as $t) {
     if ($t === '') continue;
     if (preg_match('/^\d+$/', $t)) $out[] = (int)$t;
   }
@@ -73,7 +73,7 @@ if (isset($_POST['update_remote_servers'])) {
   $enabledIds = array_map('intval', $_POST['rs'] ?? []);
   $enabledSet = array_flip($enabledIds);
   $allIds = fetch_all_assoc($db, "SELECT remote_server_id FROM {$table_prefix}remote_servers");
-  foreach ($allIds as $row) {
+  foreach ((array)$allIds as $row) {
     $id = (int)$row['remote_server_id'];
     $e  = isset($enabledSet[$id]) ? 1 : 0;
     $db->query("UPDATE {$table_prefix}remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
@@ -134,7 +134,7 @@ if (isset($_POST['update_single']) && isset($_POST['service']) && is_array($_POS
 
 /* B2) BULK UPDATE (single button at bottom) */
 if (isset($_POST['bulk_update']) && !empty($_POST['service']) && is_array($_POST['service'])) {
-  foreach ($_POST['service'] as $sid => $svc) {
+  foreach ((array)$_POST['service'] as $sid => $svc) {
     update_service_row($db, $locationCol, (int)$sid, (array)$svc);
   }
   $flash[] = "All edited services have been updated.";
@@ -153,15 +153,15 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
 ?>
 
 <?php if ($flash): ?>
-  <div class="panel" style="margin-bottom:12px"><?php foreach($flash as $m) echo "<div>".h($m)."</div>"; ?></div>
-    <div class="panel mb-12"><?php foreach($flash as $m) echo "<div>".h($m)."</div>"; ?></div>
+  <div class="panel" style="margin-bottom:12px"><?php foreach ((array)$flash as $m) echo "<div>".h($m)."</div>"; ?></div>
+    <div class="panel mb-12"><?php foreach ((array)$flash as $m) echo "<div>".h($m)."</div>"; ?></div>
 <?php endif; ?>
 
 <h2>Enable/Disable Server Locations (Global)</h2>
 <form method="post" action="">
   <input type="hidden" name="update_remote_servers" value="1">
   <div style="display:flex;flex-wrap:wrap;gap:10px;">
-    <?php foreach ($remoteServers as $rs): ?>
+    <?php foreach ((array)$remoteServers as $rs): ?>
   <label class="loc-label min-w-240">
         <input type="checkbox" name="rs[]" value="<?php echo (int)$rs['remote_server_id']; ?>" <?php echo ((int)$rs['enabled']===1?'checked':''); ?>>
         <b><?php echo h($rs['remote_server_name']); ?></b>
@@ -199,7 +199,7 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
       </tr>
     </thead>
     <tbody>
-    <?php foreach ($services as $row): ?>
+    <?php foreach ((array)$services as $row): ?>
       <?php
         $sid      = (int)$row['service_id'];
         $selected = parse_id_list($row['locs'] ?? '');
@@ -277,7 +277,7 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
       <tr>
         <td colspan="8" style="border-bottom:1px solid #f0f0f0; padding:8px 6px; text-align:left;">
           <div class="locs-box" data-sid="<?php echo $sid; ?>" style="display:flex; flex-wrap:wrap; gap:8px;">
-            <?php foreach ($remoteServers as $rs): ?>
+            <?php foreach ((array)$remoteServers as $rs): ?>
               <?php
                 $rid = (int)$rs['remote_server_id'];
                 $isChecked = isset($selSet[$rid]);
@@ -317,7 +317,7 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
   <form method="post" action="" style="display:flex;gap:8px;align-items:center;">
     <input type="hidden" name="remove_service" value="1">
     <select name="service_id_remove">
-      <?php foreach ($services as $s): ?>
+      <?php foreach ((array)$services as $s): ?>
         <option value="<?php echo (int)$s['service_id']; ?>">
           <?php echo h($s['service_name']); ?> (ID: <?php echo (int)$s['service_id']; ?>)
         </option>

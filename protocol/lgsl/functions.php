@@ -4,7 +4,7 @@ function print_player_list($player_list,$players,$playersmax)
     $data =  "<table class='player_monitor' style='border:none;'><thead>";
     $data .= "<tr><th>".get_lang('player_name')."</th><th>".get_lang('score')."</th><th>".get_lang('time')."</th></tr>";
 	$data .= "</thead><tbody>";
-	foreach ($player_list as $key => $row) {
+	foreach ((array)$player_list as $key => $row) {
 		$name[$key] = $row['name'];
 		$score[$key] = $row['score'];
 		$time[$key] = $row['time'];
@@ -15,7 +15,7 @@ function print_player_list($player_list,$players,$playersmax)
 					$time,
 					$name, $player_list);
 	$i = 0;
-    foreach( $player_list as $player ){
+    foreach ((array)$player_list as $player){
 		$data .= "<tr";
 		if($i%2 == 0) $data .= 'class="odd"';
 		$data .="><td>".htmlentities(@$player['name'])."</td><td>".@$player['score']."</td><td>".@$player['time']."</td></tr>";

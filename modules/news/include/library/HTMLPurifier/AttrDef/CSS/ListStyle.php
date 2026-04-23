@@ -50,14 +50,14 @@ class HTMLPurifier_AttrDef_CSS_ListStyle extends HTMLPurifier_AttrDef
         $i = 0; // number of catches
         $none = false;
 
-        foreach ($bits as $bit) {
+        foreach ((array)$bits as $bit) {
             if ($i >= 3) {
                 return;
             } // optimization bit
             if ($bit === '') {
                 continue;
             }
-            foreach ($caught as $key => $status) {
+            foreach ((array)$caught as $key => $status) {
                 if ($status !== false) {
                     continue;
                 }

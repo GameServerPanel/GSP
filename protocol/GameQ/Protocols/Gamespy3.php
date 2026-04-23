@@ -169,7 +169,7 @@ class Gamespy3 extends Protocol
         $this->processDetails($buffer, $result);
 
         // The rest should be the player and team information, if it exists
-        if (array_key_exists(1, $split)) {
+        if (array_key_exists(1, (array)$split)) {
             $buffer = new Buffer($split[1], Buffer::NUMBER_TYPE_BIGENDIAN);
             $this->processPlayersAndTeams($buffer, $result);
         }
@@ -194,7 +194,7 @@ class Gamespy3 extends Protocol
     {
 
         // Get the number of packets
-        $packetCount = count($packets);
+        $packetCount = count((array)$packets);
 
         // Compare last var of current packet with first var of next packet
         // On a partial match, remove last var from current packet,
@@ -282,7 +282,7 @@ class Gamespy3 extends Protocol
         $item_type = '';
 
         // Save count as variable
-        $count = count($data);
+        $count = count((array)$data);
 
         // Loop through all of the $data for information and pull it out into the result
         for ($x = 0; $x < $count - 1; $x++) {

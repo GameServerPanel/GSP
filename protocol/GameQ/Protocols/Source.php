@@ -191,7 +191,7 @@ class Source extends Protocol
         unset($response, $packet_id, $buffer, $header);
 
         // Now that we have the packets sorted we need to iterate and process them
-        foreach ($packets as $packet_id => $packet) {
+        foreach ((array)$packets as $packet_id => $packet) {
             // We first need to off load split packets to combine them
             if (is_array($packet)) {
                 $buffer = new Buffer($this->processPackets($packet_id, $packet));
@@ -244,7 +244,7 @@ class Source extends Protocol
         $packs = [];
 
         // We have multiple packets so we need to get them and order them
-        foreach ($packets as $i => $packet) {
+        foreach ((array)$packets as $i => $packet) {
             // Make a buffer so we can read this info
             $buffer = new Buffer($packet);
 

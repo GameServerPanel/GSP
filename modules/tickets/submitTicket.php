@@ -140,7 +140,7 @@ function exec_ogp_module()
         <label>'.get_lang('ticket_service').'</label>
         <select name="ticket_service">';
 
-    foreach ($services as $service) {
+    foreach ((array)$services as $service) {
         echo '<option value="'.$service['home_id'].'" '.(isset($_SESSION['ticket']['ticket_service']) && $_SESSION['ticket']['ticket_service'] == $service['home_id'] ? 'selected' : '') .'>'.htmlentities($service['home_name']).'</option>';
     }
         

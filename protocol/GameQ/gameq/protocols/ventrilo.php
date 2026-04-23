@@ -196,7 +196,7 @@ class GameQ_Protocols_Ventrilo extends GameQ_Protocols
 
 
 			$key = 0;
-			for( $i = 1; $i <= count( $chars ); $i++ )
+			for( $i = 1; $i <= count((array)$chars); $i++ )
 			{
 				$chars[$i] -=  ( $table[$a2] + (( $i - 1 ) % 5 )) & 0xFF;
 				$a2 = ($a2 + $a1) & 0xFF;
@@ -221,7 +221,7 @@ class GameQ_Protocols_Ventrilo extends GameQ_Protocols
 				), $header_items);
 
 			// Check to make sure the number of packets match
-			if ($header_items['totpck'] != count($packets))
+			if ($header_items['totpck'] != count((array)$packets))
 			{
 				throw new GameQ_ProtocolsException(__METHOD__.": Too less packets recieved");
 			}
@@ -239,7 +239,7 @@ class GameQ_Protocols_Ventrilo extends GameQ_Protocols
 
 			$chars = unpack( "C*", substr ($packet, 20) );
 			$data = "";
-			for( $i = 1; $i <= count( $chars ); $i++ )
+			for( $i = 1; $i <= count((array)$chars); $i++ )
 			{
 				$chars[$i] -= ($table[$a2] + (( $i - 1 ) % 72 )) & 0xFF;
 				$a2 = ($a2 + $a1) & 0xFF;
@@ -372,7 +372,7 @@ class GameQ_Protocols_Ventrilo extends GameQ_Protocols
 	protected function channel($data, GameQ_Result &$result)
 	{
 		$items = explode (",", $data);
-		foreach ($items as $item)
+		foreach ((array)$items as $item)
 		{
 			$temp = explode("=", $item);
 			$key = strtolower($temp[0]);
@@ -391,7 +391,7 @@ class GameQ_Protocols_Ventrilo extends GameQ_Protocols
 	{
 		$items = explode(",", $data);
 
-		foreach ($items as $item)
+		foreach ((array)$items as $item)
 		{
 			$temp = explode("=", $item);
 			$key = strtolower($temp[0]);

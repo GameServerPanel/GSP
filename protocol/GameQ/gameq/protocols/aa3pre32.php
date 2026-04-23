@@ -107,7 +107,7 @@ class GameQ_Protocols_Aa3pre32 extends GameQ_Protocols
 	    }
 
 		// We only got one packet
-		if(count($packets) == 1)
+		if(count((array)$packets) == 1)
 		{
 			// @todo: Looking for example to test and verify
 
@@ -228,7 +228,7 @@ class GameQ_Protocols_Aa3pre32 extends GameQ_Protocols
 				{
 					$team = $value;
 				}
-				elseif ($matches[1] == 'TeamIndex' && !array_key_exists($value, $teams))
+				elseif ($matches[1] == 'TeamIndex' && !array_key_exists($value, (array)$teams))
 				{
 					$teams[$value] = $team;
 				}

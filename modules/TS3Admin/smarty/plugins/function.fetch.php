@@ -72,7 +72,7 @@ function smarty_function_fetch($params, &$smarty)
                     $pass = $uri_parts['pass'];
                 }
                 // loop through parameters, setup headers
-                foreach($params as $param_key => $param_value) {
+                foreach ((array)$params as $param_key => $param_value) {
                     switch($param_key) {
                         case "file":
                         case "assign":
@@ -168,7 +168,7 @@ function smarty_function_fetch($params, &$smarty)
                         fputs($fp, "Referer: $referer\r\n");
                     }
                     if(isset($extra_headers) && is_array($extra_headers)) {
-                        foreach($extra_headers as $curr_header) {
+                        foreach ((array)$extra_headers as $curr_header) {
                             fputs($fp, $curr_header."\r\n");
                         }
                     }

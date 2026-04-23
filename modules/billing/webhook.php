@@ -99,7 +99,7 @@ if (isset($res['purchase_units'][0]['items']) && is_array($res['purchase_units']
 if (!$items && $type === 'PAYMENT.CAPTURE.COMPLETED') {
   $orderId = $res['supplementary_data']['related_ids']['order_id'] ?? null;
   if (!$orderId && isset($res['links']) && is_array($res['links'])) {
-    foreach ($res['links'] as $lnk) {
+    foreach ((array)$res['links'] as $lnk) {
       if (!empty($lnk['href']) && !empty($lnk['rel']) && stripos($lnk['href'], '/v2/checkout/orders/') !== false) {
         $orderId = basename(parse_url($lnk['href'], PHP_URL_PATH));
         break;
@@ -157,7 +157,7 @@ if (in_array($type, ['PAYMENT.CAPTURE.COMPLETED','PAYMENT.SALE.COMPLETED'], true
   }
 }
 
-if (function_exists('site_log_info')) site_log_info('webhook_event',['type'=>$type,'invoice'=>($invoice ?: 'none'),'items_count'=>count($items),'status'=>$status]);
-else log_line("EVENT $type invoice=".($invoice ?: 'none')." items_count=".count($items)." status=$status");
+if (function_exists('site_log_info')) site_log_info('webhook_event',['type'=>$type,'invoice'=>($invoice ?: 'none'),'items_count'=>count((array)$items),'status'=>$status]);
+else log_line("EVENT $type invoice=".($invoice ?: 'none')." items_count=".count((array)$items)." status=$status");
 
 ?>

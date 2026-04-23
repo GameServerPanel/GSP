@@ -127,7 +127,7 @@ class Smarty_Internal_Configfileparser#line 79 "smarty_internal_configfileparser
         $ss = preg_split('/(\\\\.)/', $escaped_string, -1, PREG_SPLIT_DELIM_CAPTURE);
 
         $str = "";
-        foreach ($ss as $s) {
+        foreach ((array)$ss as $s) {
             if (strlen($s) === 2 && $s[0] === '\\') {
                 if (isset(self::$escapes_single[$s[1]])) {
                     $s = self::$escapes_single[$s[1]];
@@ -166,7 +166,7 @@ class Smarty_Internal_Configfileparser#line 79 "smarty_internal_configfileparser
         if (!isset($this->compiler->config_data['vars'])) {
         $this->compiler->config_data['vars'] = Array();
         }
-        foreach ($vars as $var) {
+        foreach ((array)$vars as $var) {
             $this->set_var($var, $this->compiler->config_data);
         }
     }
@@ -175,7 +175,7 @@ class Smarty_Internal_Configfileparser#line 79 "smarty_internal_configfileparser
         if (!isset($this->compiler->config_data['sections'][$section_name]['vars'])) {
             $this->compiler->config_data['sections'][$section_name]['vars'] = Array();
         }
-        foreach ($vars as $var) {
+        foreach ((array)$vars as $var) {
             $this->set_var($var, $this->compiler->config_data['sections'][$section_name]);
         }
     }

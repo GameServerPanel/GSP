@@ -45,7 +45,7 @@ if(isset($_POST['createchannel']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($channel_create['errors']); $i++)
+		for($i=0; $i+1==count((array)$channel_create['errors']); $i++)
 			{
 			$error .= $channel_create['errors'][$i]."<br />";
 			}

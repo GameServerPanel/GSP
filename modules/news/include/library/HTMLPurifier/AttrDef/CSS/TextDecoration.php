@@ -30,7 +30,7 @@ class HTMLPurifier_AttrDef_CSS_TextDecoration extends HTMLPurifier_AttrDef
 
         $parts = explode(' ', $string);
         $final = '';
-        foreach ($parts as $part) {
+        foreach ((array)$parts as $part) {
             if (isset($allowed_values[$part])) {
                 $final .= $part . ' ';
             }

@@ -92,12 +92,12 @@ class Crypt_XXTEA {
         } else {
             return PEAR::raiseError('The secret key must be a string or long integer array.');
         }
-        if (count($k) > 4) {
+        if (count((array)$k) > 4) {
             return PEAR::raiseError('The secret key cannot be more than 16 characters or 4 long values.');
-        } elseif (count($k) == 0) {
+        } elseif (count((array)$k) == 0) {
             return PEAR::raiseError('The secret key cannot be empty.');
-        } elseif (count($k) < 4) {
-            for ($i = count($k); $i < 4; $i++) {
+        } elseif (count((array)$k) < 4) {
+            for ($i = count((array)$k); $i < 4; $i++) {
                 $k[$i] = 0;
             }
         }
@@ -206,7 +206,7 @@ class Crypt_XXTEA {
      *                PEAR_Error on failure
      */
     function _encryptArray($v) {
-        $n = count($v) - 1;
+        $n = count((array)$v) - 1;
         $z = $v[$n];
         $y = $v[0];
         $q = floor(6 + 52 / ($n + 1));
@@ -264,7 +264,7 @@ class Crypt_XXTEA {
      *                PEAR_Error on failure
      */
     function _decryptArray($v) {
-        $n = count($v) - 1;
+        $n = count((array)$v) - 1;
         $z = $v[$n];
         $y = $v[0];
         $q = floor(6 + 52 / ($n + 1));
@@ -300,7 +300,7 @@ class Crypt_XXTEA {
      * @return string  the string
      */
     function _long2str($v, $w) {
-        $len = count($v);
+        $len = count((array)$v);
         $s = '';
         for ($i = 0; $i < $len; $i++) {
             $s .= pack('V', $v[$i]);

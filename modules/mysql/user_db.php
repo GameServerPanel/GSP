@@ -65,7 +65,7 @@ function exec_ogp_module() {
 	}
 
 	$db_array["0"] = get_lang('select_db');
-	foreach ( $home_dbs as $home_db )
+	foreach ((array)$home_dbs as $home_db)
 	{
 		$db_array["$home_db[db_id]"] = $home_db['db_name'];
 	}
@@ -263,7 +263,7 @@ function exec_ogp_module() {
 									$queries = array("DROP USER '".$mysql_db['db_user']."'@'%';",
 													 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
 													 "FLUSH PRIVILEGES;");
-									foreach( $queries as $query )
+									foreach ((array)$queries as $query)
 									{
 										@$return = mysqli_query($link, $query);
 										if(!$return)
@@ -282,7 +282,7 @@ function exec_ogp_module() {
 									$queries = array("DROP USER '".$mysql_db['db_user']."'@'%';",
 													 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
 													 "FLUSH PRIVILEGES;");
-									foreach( $queries as $query )
+									foreach ((array)$queries as $query)
 									{
 										@$return = mysql_query($query);
 										if(!$return)

@@ -203,12 +203,12 @@ class TS3lib
 			
 			$resultVarsSplitted = explode('|', trim($resultVars[0]));
 			
-			$count = count($resultVarsSplitted);
+			$count = count((array)$resultVarsSplitted);
 			for($i=0; $i<$count; $i++)
 			{
 				$resultVarsSplitted[$i] = explode(' ', $resultVarsSplitted[$i]);
 				
-				$countSub = count($resultVarsSplitted[$i]);
+				$countSub = count((array)$resultVarsSplitted[$i]);
 				for($t=0; $t<$countSub; $t++)
 				{
 					if( strpos($resultVarsSplitted[$i][$t], '=') === false )
@@ -220,7 +220,7 @@ class TS3lib
 				}
 			}
 			
-			//if( count($result) == 1 ) $result = $result[0];
+			//if( count((array)$result) == 1 ) $result = $result[0];
 			
 			return $result;
 		}
@@ -239,7 +239,7 @@ class TS3lib
 		
 		if( is_array($string) )
 		{
-			foreach($string as $key => $value )
+			foreach ((array)$string as $key => $value )
 			{
 				if( is_array($string[$key]) )
 				{
@@ -266,7 +266,7 @@ class TS3lib
 		
 		if( is_array($string) )
 		{
-			foreach($string as $key => $value )
+			foreach ((array)$string as $key => $value )
 			{
 				if( is_array($string[$key]) )
 				{
@@ -322,7 +322,7 @@ var_dump($result = $ts3->performResultless('clientmove clid=3 cid=56'));*/
 
 
 
-/*$param = "Test String fürs escapen|ziemlich X\\X normal/anders
+/*$param = "Test String frs escapen|ziemlich X\\X normal/anders
 oder nicht?\nder autor denkt nichts\nziemlich sinnlos ;)";
 
 echo $param.'

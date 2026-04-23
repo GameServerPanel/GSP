@@ -44,7 +44,7 @@ $insP = $db->prepare("
   INSERT INTO process_metrics(host_id, ts, server_id, pid, exe, cwd, cpu_cores, rss_bytes)
   VALUES (?,?,?,?,?,?,?,?)
 ");
-foreach ($procs as $p) {
+foreach ((array)$procs as $p) {
   $insP->execute([
     $host_id, $now,
     (string)($p['server_id'] ?? ''),

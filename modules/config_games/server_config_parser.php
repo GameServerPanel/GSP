@@ -72,7 +72,7 @@ if (!function_exists('ogp_format_libxml_errors')) {
 			return "No additional libxml details are available.";
 		}
 		$messages = array();
-		foreach ($errors as $error) {
+		foreach ((array)$errors as $error) {
 			$messages[] = trim($error->message) . " (Line {$error->line}, Column {$error->column})";
 		}
 		libxml_clear_errors();

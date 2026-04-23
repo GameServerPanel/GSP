@@ -99,7 +99,7 @@ function getUserServers($servers, $flags, $supportedGames){
 	$userRole = $userInfo['users_role'];
 	
 	if(!empty($servers)){
-		foreach($servers as $server){
+		foreach ((array)$servers as $server){
 			$gamehome = $db->getUserGameHome($_SESSION['user_id'], $server['home_id']);
 			
 			if(in_array($gamehome['game_name'], $supportedGames) === true){

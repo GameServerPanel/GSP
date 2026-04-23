@@ -28,7 +28,7 @@ class Smarty_Internal_Data {
     public function assign($tpl_var, $value = null, $nocache = false, $scope = SMARTY_LOCAL_SCOPE)
     {
         if (is_array($tpl_var)) {
-            foreach ($tpl_var as $_key => $_val) {
+            foreach ((array)$tpl_var as $_key => $_val) {
                 if ($_key != '') {
                     $this->tpl_vars[$_key] = new Smarty_variable($_val, $nocache, $scope);
                 } 
@@ -93,7 +93,7 @@ class Smarty_Internal_Data {
     {
         if (is_array($tpl_var)) {
             // $tpl_var is an array, ignore $value
-            foreach ($tpl_var as $_key => $_val) {
+            foreach ((array)$tpl_var as $_key => $_val) {
                 if ($_key != '') {
                     if (!isset($this->tpl_vars[$_key])) {
                         $tpl_var_inst = $this->getVariable($_key, null, true, false);
@@ -110,7 +110,7 @@ class Smarty_Internal_Data {
                         settype($this->tpl_vars[$_key]->value, 'array');
                     } 
                     if ($merge && is_array($_val)) {
-                        foreach($_val as $_mkey => $_mval) {
+                        foreach ((array)$_val as $_mkey => $_mval) {
                             $this->tpl_vars[$_key]->value[$_mkey] = $_mval;
                         } 
                     } else {
@@ -135,7 +135,7 @@ class Smarty_Internal_Data {
                     settype($this->tpl_vars[$tpl_var]->value, 'array');
                 } 
                 if ($merge && is_array($value)) {
-                    foreach($value as $_mkey => $_mval) {
+                    foreach ((array)$value as $_mkey => $_mval) {
                         $this->tpl_vars[$tpl_var]->value[$_mkey] = $_mval;
                     } 
                 } else {
@@ -162,7 +162,7 @@ class Smarty_Internal_Data {
                 settype($this->tpl_vars[$tpl_var]->value, 'array');
             } 
             if ($merge && is_array($value)) {
-                foreach($value as $_key => $_val) {
+                foreach ((array)$value as $_key => $_val) {
                     $this->tpl_vars[$tpl_var]->value[$_key] = &$value[$_key];
                 } 
             } else {
@@ -229,7 +229,7 @@ class Smarty_Internal_Data {
     public function clearAssign($tpl_var)
     {
         if (is_array($tpl_var)) {
-            foreach ($tpl_var as $curr_var) {
+            foreach ((array)$tpl_var as $curr_var) {
                 unset($this->tpl_vars[$curr_var]);
             } 
         } else {
@@ -403,7 +403,7 @@ class Smarty_Data extends Smarty_Internal_Data {
             $this->parent = $_parent;
         } elseif (is_array($_parent)) {
             // set up variable values
-            foreach ($_parent as $_key => $_val) {
+            foreach ((array)$_parent as $_key => $_val) {
                 $this->tpl_vars[$_key] = new Smarty_variable($_val);
             } 
         } elseif ($_parent != null) {

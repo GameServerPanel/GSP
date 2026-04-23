@@ -50,7 +50,7 @@ function exec_ogp_module(){
 		$show_all = FALSE;
 	}
 
-	$qty = count($server_homes);
+	$qty = count((array)$server_homes);
 	
 	$cols = 1;
 	
@@ -74,7 +74,7 @@ function exec_ogp_module(){
 						"<br>\n" : "";
 	$servers = 0;
 	$servers_running = 0;
-	foreach ( $server_homes as $server_home )
+	foreach ((array)$server_homes as $server_home)
 	{
 		$servers++;
 		

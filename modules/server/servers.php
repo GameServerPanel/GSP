@@ -64,7 +64,7 @@ function exec_ogp_module() {
 		</tr> 
 		</thead> 
 		<tbody> <?php
-	foreach ( $servers as $server_row )
+	foreach ((array)$servers as $server_row)
 	{
 		#check to see if the remote daeomns are up status_chk is found in lib_remote.php
 		$remote = new OGPRemoteLibrary($server_row['agent_ip'],$server_row['agent_port'],$server_row['encryption_key'],$server_row['timeout']);
@@ -130,7 +130,7 @@ function exec_ogp_module() {
 		}
 		else
 		{
-			foreach ( $remote_server_ips as $ip_row )
+			foreach ((array)$remote_server_ips as $ip_row)
 			{
 				$data .= $ip_row['ip']."<br>";
 			}

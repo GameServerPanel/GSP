@@ -27,7 +27,7 @@ if(isset($_POST['editinstance']))
 		else
 		{
 		$error .= $lang['editincomplete']."<br />";
-		for($i=0; $i+1==count($instance_edit['errors']); $i++)
+		for($i=0; $i+1==count((array)$instance_edit['errors']); $i++)
 			{
 			$error .= $instance_edit['errors'][$i]."<br />";
 			}
@@ -45,7 +45,7 @@ if(isset($_POST['editshowlist']))
 			$server_edit=$ts3->serverEdit($websetting);
 			if($server_edit['success']===false)
 				{
-				for($i=0; $i+1==count($instance_edit['errors']); $i++)
+				for($i=0; $i+1==count((array)$instance_edit['errors']); $i++)
 					{
 					$error .= $server_edit['errors'][$i]."<br />";
 					}

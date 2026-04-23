@@ -162,7 +162,7 @@ class _Luminous {
           throw new Exception('Luminous internal error: Settings is not an array');
       }
       $old_settings = clone $this->settings;
-      foreach($settings as $k=>$v) {
+      foreach ((array)$settings as $k=>$v) {
         $this->settings->set($k, $v);
       }
     }
@@ -551,7 +551,7 @@ abstract class luminous {
 
     $info = array(
       'lines' => $lines,
-      'num_lines' => count($lines),
+      'num_lines' => count((array)$lines),
       'trimmed' => trim($src),
       'shebang' => $shebang
     );

@@ -33,7 +33,7 @@ function get_usernames_not_read_circular($circular_id)
 	if($users)
 	{
 		$user_names = array();
-		foreach($users as $user)
+		foreach ((array)$users as $user)
 		{
 			$user_info = $db->getUserById($user['user_id']);
 			$user_names[] = $user_info['users_login'];
@@ -98,7 +98,7 @@ function send_to_user($user_id, $circular_id)
 function get_user_ids($type, $ids, &$user_ids)
 {
 	global $db;
-	foreach($ids as $id)
+	foreach ((array)$ids as $id)
 	{
 		if($type == 'admins' or $type == 'users')
 		{
@@ -110,7 +110,7 @@ function get_user_ids($type, $ids, &$user_ids)
 			$group_users = $db->listUsersInGroup($id);
 			if($group_users and !empty($group_users))
 			{
-				foreach($group_users as $user)
+				foreach ((array)$group_users as $user)
 				{
 					if(!in_array($user['user_id'], $user_ids))
 						$user_ids[] = $user['user_id'];
@@ -122,7 +122,7 @@ function get_user_ids($type, $ids, &$user_ids)
 			$sub_users_ids = $db->getUsersSubUsersIds($id);
 			if($sub_users_ids and !empty($sub_users_ids))
 			{
-				foreach($sub_users_ids as $user_id)
+				foreach ((array)$sub_users_ids as $user_id)
 				{
 					if(!in_array($user_id, $user_ids))
 						$user_ids[] = $user_id;
@@ -138,13 +138,13 @@ function send_circular($data)
 	$circular_id = $db->resultInsertId('circular', array('subject' => $data['subject'], 'message' => $data['message']));
 	$user_ids = array();
 	unset($data['subject'], $data['message']);
-	foreach($data as $type => $ids)
+	foreach ((array)$data as $type => $ids)
 	{
 		if(is_array($ids) and !empty($ids))
 			get_user_ids($type, $ids, $user_ids);
 	}
 	$failed_recipients = array();
-	foreach($user_ids as $user_id)
+	foreach ((array)$user_ids as $user_id)
 	{
 		if(!send_to_user($user_id, $circular_id))
 			$failed_recipients[] = $user_id;

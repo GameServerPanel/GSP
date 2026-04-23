@@ -168,7 +168,7 @@ if(isset($_GET['path']) AND $_GET['path']!="/" AND !empty($_GET['path']))
 	{ 
 	$cid=$_GET['cid'];
 	$splitpath=explode("/",$_GET['path']);
-	unset($splitpath[count($splitpath)-1]);
+	unset($splitpath[count((array)$splitpath)-1]);
 	$newpath=implode("/", $splitpath);
 	empty($newpath) ? $newpath="/":'';
 	$newpath=="/" ? $cid='':'';

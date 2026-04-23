@@ -28,7 +28,7 @@ if(isset($_POST['sendname']))
 			}
 			else
 			{
-			for($i=0; $i+1==count($cgroup_rename['errors']); $i++)
+			for($i=0; $i+1==count((array)$cgroup_rename['errors']); $i++)
 				{
 				$error .= $cgroup_rename['errors'][$i]."<br />";
 				}
@@ -49,7 +49,7 @@ if(isset($_POST['delgroup']))
 		}
 		else
 		{
-			for($i=0; $i+1==count($cgroup_delete['errors']); $i++)
+			for($i=0; $i+1==count((array)$cgroup_delete['errors']); $i++)
 				{
 				$error .= $cgroup_delete['errors'][$i]."<br />";
 				}

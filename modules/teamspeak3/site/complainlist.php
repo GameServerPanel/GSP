@@ -27,7 +27,7 @@ if(isset($_POST['delall']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($complain_delete_all['errors']); $i++)
+		for($i=0; $i+1==count((array)$complain_delete_all['errors']); $i++)
 			{
 			$error .= $complain_delete_all['errors'][$i]."<br />";
 			}
@@ -44,7 +44,7 @@ if(isset($_POST['delete']))
 		}
 		else
 		{
-		for($i=0; $i+1==count($complain_delete['errors']); $i++)
+		for($i=0; $i+1==count((array)$complain_delete['errors']); $i++)
 			{
 			$error .= $complain_delete['errors'][$i]."<br />";
 			}

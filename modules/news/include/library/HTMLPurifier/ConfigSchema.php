@@ -128,7 +128,7 @@ class HTMLPurifier_ConfigSchema
         if (!isset($this->info[$key]->aliases)) {
             $this->info[$key]->aliases = array();
         }
-        foreach ($aliases as $alias => $real) {
+        foreach ((array)$aliases as $alias => $real) {
             $this->info[$key]->aliases[$alias] = $real;
         }
     }

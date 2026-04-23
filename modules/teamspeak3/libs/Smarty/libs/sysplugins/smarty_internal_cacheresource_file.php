@@ -133,9 +133,9 @@ class Smarty_Internal_CacheResource_File {
         $_dir_length = strlen($_dir);
         if (isset($_cache_id)) {
             $_cache_id_parts = explode('|', $_cache_id);
-            $_cache_id_parts_count = count($_cache_id_parts);
+            $_cache_id_parts_count = count((array)$_cache_id_parts);
             if ($this->smarty->use_sub_dirs) {
-                foreach ($_cache_id_parts as $id_part) {
+                foreach ((array)$_cache_id_parts as $id_part) {
                     $_dir .= $id_part . DS;
                 } 
             } 
@@ -157,7 +157,7 @@ class Smarty_Internal_CacheResource_File {
         if (file_exists($_dir)) {
             $_cacheDirs = new RecursiveDirectoryIterator($_dir);
             $_cache = new RecursiveIteratorIterator($_cacheDirs, RecursiveIteratorIterator::CHILD_FIRST);
-            foreach ($_cache as $_file) {
+            foreach ((array)$_cache as $_file) {
                 if (strpos($_file, '.svn') !== false) continue; 
                 // directory ?
                 if ($_file->isDir()) {
@@ -167,7 +167,7 @@ class Smarty_Internal_CacheResource_File {
                     } 
                 } else {
                     $_parts = explode($_dir_sep, str_replace('\\', '/', substr((string)$_file, $_dir_length)));
-                    $_parts_count = count($_parts); 
+                    $_parts_count = count((array)$_parts); 
                     // check name
                     if (isset($resource_name)) {
                         if ($_parts[$_parts_count-1] != $_resourcename_parts) {

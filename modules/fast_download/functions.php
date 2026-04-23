@@ -16,7 +16,7 @@ function in_array_match($needle, $haystack) {
 	if (!is_array($haystack))
 		trigger_error('Argument 2 must be array');
 	$needle = "#".preg_quote($needle)."#";
-	foreach ($haystack as $value) {
+	foreach ((array)$haystack as $value) {
 		$match = preg_match($needle, $value);
 		if ($match === 1) {
 			return true;
@@ -30,7 +30,7 @@ function get_alias_by_home_path($home_path, $aliases) {
 		trigger_error('Argument 2 must be array');
 	$home_path = "#".preg_quote($home_path)."#";
 	$alias_info = false;
-	foreach ($aliases as $alias => $info) {
+	foreach ((array)$aliases as $alias => $info) {
 		if( preg_match($home_path, $info['home']) )
 		{
 			$alias_info = $aliases[$alias];
@@ -114,7 +114,7 @@ function check_access_rules_entries()
 	{
 		$entries = explode(",",$_POST['match_file_extension']);
 		$entries = array_unique(array_filter($entries));
-		foreach($entries as $key => $entry)
+		foreach ((array)$entries as $key => $entry)
 		{
 			$entry = trim($entry);
 			if(!preg_match("/^[a-z0-9]+$/i",$entry))
@@ -134,7 +134,7 @@ function check_access_rules_entries()
 	{
 		$entries = explode(",",$_POST['match_client_ip']);
 		$entries = array_unique(array_filter($entries));
-		foreach($entries as $key => $entry)
+		foreach ((array)$entries as $key => $entry)
 		{
 			$entry = trim($entry);
 			if( !preg_match('#(^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$|'.
@@ -169,7 +169,7 @@ function get_fastdl_settings($remote_server_id)
 								WHERE `remote_server_id`='".$db->realEscapeSingle($remote_server_id)."'");
 	if(!$result) return FALSE;
 	$results = array();
-	foreach($result as $row)
+	foreach ((array)$result as $row)
 	{
 		$results[$row['setting']] = $row['value'];
 	}
@@ -182,7 +182,7 @@ function set_fastdl_settings($remote_server_id, $settings)
 	global $db;
 	if( !is_numeric($remote_server_id) ) return FALSE;
 	if( !is_array($settings) ) return FALSE;
-	foreach ( $settings as $s_key => $s_value )
+	foreach ((array)$settings as $s_key => $s_value )
 	{
 		$query = 'INSERT INTO `'.OGP_DB_PREFIX.'fastdl_settings` (`remote_server_id`,`setting`,`value`)
 			VALUES(\''.$db->realEscapeSingle($remote_server_id).'\', \''.$db->realEscapeSingle($s_key).'\', \''.$db->realEscapeSingle($s_value).'\') ON DUPLICATE KEY

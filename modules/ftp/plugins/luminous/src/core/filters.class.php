@@ -96,7 +96,7 @@ class LuminousFilters {
       $start = "$lead<DOCTAG>$tag_char$tag</DOCTAG><DOCPROPERTY>";
       
       $j = 0;
-      $c = count($l);
+      $c = count((array)$l);
       for($i=0; $j<$len && $i<$c; $i++)
       {      
         $s = $l[$i];
@@ -268,7 +268,7 @@ class LuminousFilters {
    * This is a stream filter.
    */
   static function oo_stream_filter($tokens) {
-    $c = count($tokens);
+    $c = count((array)$tokens);
     for($i=0; $i<$c; $i++) {
       if ($tokens[$i][0] !== 'IDENT') continue;
       if ($i > 0) {

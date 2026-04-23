@@ -52,7 +52,7 @@ class HTMLPurifier_ChildDef_List extends HTMLPurifier_ChildDef
 
         $current_li = false;
 
-        foreach ($children as $node) {
+        foreach ((array)$children as $node) {
             if (!empty($node->is_whitespace)) {
                 $result[] = $node;
                 continue;

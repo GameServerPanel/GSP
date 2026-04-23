@@ -123,7 +123,7 @@ function exec_ogp_module() {
 		$_SESSION['mods'][1]['mod_installer_name'] = $key_name;
 	}
 	$mods = $_SESSION['mods'];
-	foreach($mods as $mod)
+	foreach ((array)$mods as $mod)
 	{
 		$template .= "
 	 <mod key='".$mod['mod_key']."'>
@@ -139,7 +139,7 @@ function exec_ogp_module() {
 		$template .= "
 	<server_params>";
 		$params = $_SESSION['params'];
-		foreach($params as $param)
+		foreach ((array)$params as $param)
 		{
 			$template .= "
 	 <param key='".$param['param_key']."' type='".$param['param_type']."'>

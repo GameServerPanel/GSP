@@ -28,7 +28,7 @@ if(isset($_GET['deletefile']))
 	$_GET['path']=="/" ? $_GET['cid']='':'';
 	if($isdelete['success']===false)
 		{
-		for($i=0; $i+1==count($isdelete['errors']); $i++)
+		for($i=0; $i+1==count((array)$isdelete['errors']); $i++)
 			{
 			$error .= $isdelete['errors'][$i]."<br />";
 			}
@@ -45,7 +45,7 @@ if(isset($_POST['createdir']))
 	$iscreate=$ts3->ftCreateDir($_REQUEST['cid'], $_GET['cpw'], $dirname);
 	if($iscreate['success']===false)
 		{
-		for($i=0; $i+1==count($iscreate['errors']); $i++)
+		for($i=0; $i+1==count((array)$iscreate['errors']); $i++)
 			{
 			$error .= $iscreate['errors'][$i]."<br />";
 			}
@@ -141,7 +141,7 @@ if(isset($_GET['path']) AND $_GET['path']!="/" AND !empty($_GET['path']))
 	{ 
 	$cid=$_GET['cid'];
 	$splitpath=explode("/",$_GET['path']);
-	unset($splitpath[count($splitpath)-1]);
+	unset($splitpath[count((array)$splitpath)-1]);
 	$newpath=implode("/", $splitpath);
 	empty($newpath) ? $newpath="/":'';
 	$newpath=="/" ? $cid='':'';

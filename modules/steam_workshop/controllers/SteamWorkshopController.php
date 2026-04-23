@@ -148,7 +148,7 @@ class SteamWorkshopController
     {
         $records = [];
         $homes = $this->service->listHomesForUser($userId, $isAdmin);
-        foreach ($homes as $home) {
+        foreach ((array)$homes as $home) {
             $config = $this->service->loadConfig((int)$home['home_id']);
             $this->applyGameAdapterOverride($home, $config);
             $adapter = $this->service->getAdapterByKey($config['adapter_key']);

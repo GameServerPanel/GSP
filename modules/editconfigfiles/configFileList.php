@@ -69,7 +69,7 @@ function exec_ogp_module()
 					<th>'.get_lang('actions').'</th>
 				</tr>';
         
-        foreach ($files as $file) {
+        foreach ((array)$files as $file) {
             echo '<tr>
 					<td>'. $file['name'] .'</td>
 					<td>'. ($file['description'] ?: '<i>'.get_lang('no_description').'</i>') .'</td>

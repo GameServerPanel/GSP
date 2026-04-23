@@ -241,16 +241,16 @@ class LuminousCSSParser {
     $css_ = array();
 
     // now cleanup the array, drop !important
-    foreach($css as $selector=>$rules) {
+    foreach ((array)$css as $selector=>$rules) {
       $rules_ = array();
-      foreach($rules as $prop=>$value) {
+      foreach ((array)$rules as $prop=>$value) {
         list($prop, $value) = self::format_property_value($prop, $value);
         $rules_[$prop] = $value;
       }
       // now split selector by comma
       $selectors = preg_split('/\s*,\s*/', $selector);
 
-      foreach($selectors as $s) {
+      foreach ((array)$selectors as $s) {
         // drop .luminous from the selector
         $s = preg_replace('/^\.luminous\s*/', '', $s);
         // now we assume that if something is in the form .classname then
@@ -329,7 +329,7 @@ class LuminousCSSParser {
     $css = array();
     // array of selectors => rules, where rules is an array itself of (property, value)
     // note this is going to get @font-face wrong, but we don't care about that.
-    for($i=0; $i<count($tokens); $i++) {
+    for($i=0; $i<count((array)$tokens); $i++) {
       list($tok, $content, ) = $tokens[$i];
       if ($tok === 'COMMENT') continue;
       if (!$block) {

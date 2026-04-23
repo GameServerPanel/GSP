@@ -195,10 +195,10 @@ function IsAllowedExt( $sExtension, $resourceType )
 	$arAllowed	= $Config['AllowedExtensions'][$resourceType] ;
 	$arDenied	= $Config['DeniedExtensions'][$resourceType] ;
 
-	if ( count($arAllowed) > 0 && !in_array( $sExtension, $arAllowed ) )
+	if ( count((array)$arAllowed) > 0 && !in_array( $sExtension, $arAllowed ) )
 		return false ;
 
-	if ( count($arDenied) > 0 && in_array( $sExtension, $arDenied ) )
+	if ( count((array)$arDenied) > 0 && in_array( $sExtension, $arDenied ) )
 		return false ;
 
 	return true ;

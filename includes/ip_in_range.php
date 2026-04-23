@@ -65,7 +65,7 @@ function ipv4_in_range($ip, $range) {
             // $netmask is a CIDR size block
             // fix the range argument
             $x = explode('.', $range);
-            while(count($x)<4) $x[] = '0';
+            while(count((array)$x)<4) $x[] = '0';
             list($a,$b,$c,$d) = $x;
             $range = sprintf("%u.%u.%u.%u", empty($a)?'0':$a, empty($b)?'0':$b,empty($c)?'0':$c,empty($d)?'0':$d);
             $range_dec = ip2long($range);
@@ -107,7 +107,7 @@ function ip2long6($ip) {
         
     $ip = explode(':', $ip);
     $r_ip = ''; 
-    foreach ($ip as $v) {
+    foreach ((array)$ip as $v) {
         $r_ip .= str_pad(base_convert($v, 16, 2), 16, 0, STR_PAD_LEFT); 
     } 
         
@@ -128,13 +128,13 @@ function get_ipv6_full($ip)
 
     // Pad out the shorthand entries.
     $main_ip_pieces = explode(":", $main_ip_piece);
-    foreach($main_ip_pieces as $key=>$val) {
+    foreach ((array)$main_ip_pieces as $key=>$val) {
         $main_ip_pieces[$key] = str_pad($main_ip_pieces[$key], 4, "0", STR_PAD_LEFT);
     }
 
     // Check to see if the last IP block (part after ::) is set
     $last_piece = "";
-    $size = count($main_ip_pieces);
+    $size = count((array)$main_ip_pieces);
     if (trim($last_ip_piece) != "") {
         $last_piece = str_pad($last_ip_piece, 4, "0", STR_PAD_LEFT);
     
@@ -175,7 +175,7 @@ function ipv6_in_range($ip, $range_ip)
 
     // Pad out the shorthand entries.
     $main_ip_pieces = explode(":", $main_ip_piece);
-    foreach($main_ip_pieces as $key=>$val) {
+    foreach ((array)$main_ip_pieces as $key=>$val) {
         $main_ip_pieces[$key] = str_pad($main_ip_pieces[$key], 4, "0", STR_PAD_LEFT);
     }
 
@@ -185,7 +185,7 @@ function ipv6_in_range($ip, $range_ip)
 
     // Check to see if the last IP block (part after ::) is set
     $last_piece = "";
-    $size = count($main_ip_pieces);
+    $size = count((array)$main_ip_pieces);
     if (trim($last_ip_piece) != "") {
         $last_piece = str_pad($last_ip_piece, 4, "0", STR_PAD_LEFT);
     

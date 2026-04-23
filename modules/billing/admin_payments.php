@@ -40,7 +40,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
         </tr>
       </thead>
       <tbody>
-      <?php foreach ($files as $f): $j = json_decode(file_get_contents($f), true) ?: []; ?>
+      <?php foreach ((array)$files as $f): $j = json_decode(file_get_contents($f), true) ?: []; ?>
         <tr>
           <td><?php echo h(basename($f)); ?></td>
           <td><?php echo h($j['invoice'] ?? ($j['custom'] ?? '')); ?></td>

@@ -95,7 +95,7 @@ class TeamSpeak3_Helper_String implements ArrayAccess, Iterator, Countable, Json
   {
     $args = array_reverse($args, TRUE);
 
-    foreach($args as $key => $val)
+    foreach ((array)$args as $key => $val)
     {
       $args[$char . $key] = $val;
       unset($args[$key]);
@@ -219,7 +219,7 @@ class TeamSpeak3_Helper_String implements ArrayAccess, Iterator, Countable, Json
   {
     $parts = explode($separator, $this->string, ($limit) ? intval($limit) : $this->count());
 
-    foreach($parts as $key => $val)
+    foreach ((array)$parts as $key => $val)
     {
       $parts[$key] = new self($val);
     }
@@ -265,7 +265,7 @@ class TeamSpeak3_Helper_String implements ArrayAccess, Iterator, Countable, Json
   {
     $sections = explode($separator, $this->string);
 
-    $total = count($sections);
+    $total = count((array)$sections);
     $first = intval($first);
     $last  = intval($last);
 
@@ -505,7 +505,7 @@ class TeamSpeak3_Helper_String implements ArrayAccess, Iterator, Countable, Json
   {
     $hex = "";
 
-    foreach($this as $char)
+    foreach ((array)$this as $char)
     {
       $hex .= $char->toHex();
     }
@@ -810,7 +810,7 @@ class TeamSpeak3_Helper_String implements ArrayAccess, Iterator, Countable, Json
       throw new TeamSpeak3_Helper_Exception("cannot call undefined function '" . $function . "' on this object");
     }
 
-    if(count($args))
+    if(count((array)$args))
     {
       if(($key = array_search($this, $args, TRUE)) !== FALSE)
       {

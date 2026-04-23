@@ -12,7 +12,7 @@ declare(strict_types=1);
         </div>
     <?php else: ?>
         <div class="sw-grid">
-            <?php foreach ($records as $record): ?>
+            <?php foreach ((array)$records as $record): ?>
                 <?php $currentRecord = $record; include __DIR__ . '/partials/server_card.php'; ?>
             <?php endforeach; ?>
         </div>

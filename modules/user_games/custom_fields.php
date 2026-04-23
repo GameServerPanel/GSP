@@ -131,7 +131,7 @@ function exec_ogp_module()
 			}
 			
 			$found = 0;
-			foreach ($save_field as $key => $value )
+			foreach ((array)$save_field as $key => $value )
 			{
 				if($key == (string)$field['key']){
 					$found++;
@@ -159,7 +159,7 @@ function exec_ogp_module()
 			}
 		}
 		
-		if(is_array($updatedSettings) && count($updatedSettings) > 0){
+		if(is_array($updatedSettings) && count((array)$updatedSettings) > 0){
 			$db->changeCustomFields($home_info['home_id'],json_encode($updatedSettings));
 		}else{
 			$db->changeCustomFields($home_info['home_id'],"");

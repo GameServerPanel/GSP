@@ -86,7 +86,7 @@ abstract class GameQ_Protocols_Unreal2 extends GameQ_Protocols
     protected function preProcess_details($packets=array())
     {
 		// Only one return so no need for work
-		if(count($packets) == 1)
+		if(count((array)$packets) == 1)
 		{
 			return substr($packets[0], 5);
 		}
@@ -143,7 +143,7 @@ abstract class GameQ_Protocols_Unreal2 extends GameQ_Protocols
 	protected function preProcess_rules($packets=array())
 	{
 		// Only one return so no need for work
-		if(count($packets) == 1)
+		if(count((array)$packets) == 1)
 		{
 			return substr($packets[0], 5);
 		}
@@ -207,7 +207,7 @@ abstract class GameQ_Protocols_Unreal2 extends GameQ_Protocols
 	protected function preProcess_players($packets=array())
 	{
 		// Only one return so no need for work
-		if(count($packets) == 1)
+		if(count((array)$packets) == 1)
 		{
 			return substr($packets[0], 5);
 		}

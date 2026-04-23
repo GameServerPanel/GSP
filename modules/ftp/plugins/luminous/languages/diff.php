@@ -121,7 +121,7 @@ class LuminousDiffScanner extends LuminousScanner {
         $verbatim_ = '';
         $types = array();
         $prefixes = array();
-        foreach($lines as $l) {
+        foreach ((array)$lines as $l) {
           if (!strlen($l) || $l[0] === ' ')
             $types[]= 'DIFF_UNCHANGED';
           elseif ($l[0] === '+' || $l[0] === '>')
@@ -146,8 +146,8 @@ class LuminousDiffScanner extends LuminousScanner {
           $tagged = $verbatim;
         }
         $exp = explode("\n", $tagged);
-        assert(count($exp) === count($prefixes));
-        foreach($exp as $i=>$v) {
+        assert(count((array)$exp) === count((array)$prefixes));
+        foreach ((array)$exp as $i=>$v) {
           $t = $types[$i];
           // if the sub-scanner escaped the line, we also need to escape the
           // prefix for consistency
@@ -158,7 +158,7 @@ class LuminousDiffScanner extends LuminousScanner {
             $text,
             $t,
             $escaped);
-          if ($i < count($exp)-1) $this->record("\n", null);
+          if ($i < count((array)$exp)-1) $this->record("\n", null);
         }
         if ($this->eol()) $this->record($this->get(), null);
         continue;

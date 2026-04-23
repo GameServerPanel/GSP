@@ -96,8 +96,8 @@ class Smarty_Internal_Compile_Blockclose extends Smarty_Internal_CompileBase {
                 $compiler->template->has_nocache_code = true;
             } 
             foreach($_tpl->required_plugins as $code => $tmp1) {
-                foreach($tmp1 as $name => $tmp) {
-                    foreach($tmp as $type => $data) {
+                foreach ((array)$tmp1 as $name => $tmp) {
+                    foreach ((array)$tmp as $type => $data) {
                         $compiler->template->required_plugins[$code][$name][$type] = $data;
                     } 
                 } 

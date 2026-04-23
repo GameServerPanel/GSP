@@ -25,7 +25,7 @@ function smarty_modifier_count_words($string)
     // count matches that contain alphanumerics
     $word_count = preg_grep('/[a-zA-Z0-9\\x80-\\xff]/', $split_array);
 
-    return count($word_count);
+    return count((array)$word_count);
 }
 
 /* vim: set expandtab: */

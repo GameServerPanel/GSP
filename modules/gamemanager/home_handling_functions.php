@@ -162,7 +162,7 @@ function get_start_cmd($remote,$server_xml,$home_info,$mod_id,$ip,$port,$db)
 	{
 		foreach($server_xml->server_params->param as $param)
 		{						
-			foreach ($last_param as $paramKey => $paramValue)
+			foreach ((array)$last_param as $paramKey => $paramValue)
 			{
 				if (!isset($paramValue))
 					$paramValue = (string)$param->default;
@@ -197,7 +197,7 @@ function get_start_cmd($remote,$server_xml,$home_info,$mod_id,$ip,$port,$db)
 	
 	$extra_param_access_enabled = preg_match("/e/",$home_info['access_rights']) > 0 ? TRUE:FALSE;
 			
-	if ( array_key_exists('extra', $last_param) && $extra_param_access_enabled )
+	if ( array_key_exists('extra', (array)$last_param) && $extra_param_access_enabled )
 		$extra_default = $last_param['extra'];
 	else
 		$extra_default = $home_info['mods'][$mod_id]['extra_params'];
@@ -271,7 +271,7 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 					if (!is_array($ip_ports)) {
 						$ip_ports = [];
 					}
-					foreach ($ip_ports as $ip_port)
+					foreach ((array)$ip_ports as $ip_port)
 					{
 					if ($server_xml->protocol == "gameq")
 					{
@@ -431,7 +431,7 @@ function exec_operation( $action, $home_id, $mod_id, $ip, $port, $override = fal
 					if (!is_array($ip_ports)) {
 						$ip_ports = [];
 					}
-					foreach ($ip_ports as $ip_port)
+					foreach ((array)$ip_ports as $ip_port)
 					{
 					if ($server_xml->protocol == "gameq")
 					{
@@ -467,7 +467,7 @@ function get_monitor_buttons($server_home, $server_xml)
 	if (!is_array($installed_modules)) {
 		$installed_modules = [];
 	}
-	foreach($installed_modules as $installed_module)
+	foreach ((array)$installed_modules as $installed_module)
 	{
 		$buttons_file = "modules/$installed_module[folder]/monitor_buttons.php";
 		if(file_exists($buttons_file))
@@ -481,7 +481,7 @@ function get_monitor_buttons($server_home, $server_xml)
 	}
 	$buttons_html = "";
 	if (is_array($buttons)) {
-		foreach($buttons as $button)
+		foreach ((array)$buttons as $button)
 		$buttons_html .= $button."\n";
 	}
 	return $buttons_html;

@@ -59,7 +59,7 @@ class Secondstohuman extends Base
     public function __construct(array $options = [])
     {
         // Check for passed keys
-        if (!array_key_exists(self::OPTION_TIMEKEYS, $options)) {
+        if (!array_key_exists(self::OPTION_TIMEKEYS, (array)$options)) {
             // Use default
             $options[self::OPTION_TIMEKEYS] = $this->timeKeysDefault;
         } else {
@@ -98,7 +98,7 @@ class Secondstohuman extends Base
     protected function iterate(array &$result)
     {
         // Iterate over the results
-        foreach ($result as $key => $value) {
+        foreach ((array)$result as $key => $value) {
             // Offload to itself if we have another array
             if (is_array($value)) {
                 // Iterate and update the result

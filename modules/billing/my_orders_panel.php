@@ -52,7 +52,7 @@ function exec_ogp_module()
 	echo "<th>Action</th>";
 	echo "</tr></thead><tbody>";
 	
-	foreach ($orders as $order) {
+	foreach ((array)$orders as $order) {
 		echo "<tr>";
 		echo "<td>".$order['order_id']."</td>";
 		echo "<td>".$order['home_name']."</td>";
@@ -75,11 +75,11 @@ function exec_ogp_module()
 	echo "</tbody></table>";
 	
 	// Provision all button
-	if (count($orders) > 1) {
+	if (count((array)$orders) > 1) {
 		echo "<div style='margin-top: 20px;'>";
 		echo "<form method='post' action='home.php?m=billing&p=provision_servers'>";
 		echo "<input type='hidden' name='provision_all' value='1'>";
-		echo "<button type='submit' class='btn btn-primary'>Provision All My Servers (".count($orders).")</button>";
+		echo "<button type='submit' class='btn btn-primary'>Provision All My Servers (".count((array)$orders).")</button>";
 		echo "</form>";
 		echo "</div>";
 	}

@@ -61,7 +61,7 @@ function getActivePlugins() {
 // -------------------------------------------------------------------------
 // Plugins to activate depending on other variables
 // -------------------------------------------------------------------------
-	if ($net2ftp_globals["state"] == "edit" && isset($textareaType) == true && $textareaType != "" && array_key_exists($textareaType, $pluginProperties) == true) {
+	if ($net2ftp_globals["state"] == "edit" && isset($textareaType) == true && $textareaType != "" && array_key_exists($textareaType, (array)$pluginProperties) == true) {
 		if ($pluginProperties[$textareaType]["use"] == "yes") { $activePlugins[$plugincounter] = $textareaType; $plugincounter++; } 
 	}
 

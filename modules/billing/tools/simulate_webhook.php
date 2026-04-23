@@ -34,6 +34,6 @@ echo "RESPONSE:\n" . $res . "\n";
 $dataDir = realpath(__DIR__ . '/../data');
 $files = glob($dataDir . '/*.json');
 echo "Files in data/ after run: \n";
-foreach ($files as $f) echo basename($f) . "\n";
+foreach ((array)$files as $f) echo basename($f) . "\n";
 
 ?>

@@ -667,7 +667,7 @@ class Ventrilo extends Protocol
         $playerFields = 7;
 
         // Iterate over the lines
-        foreach ($lines as $line) {
+        foreach ((array)$lines as $line) {
             // Trim all the outlying space
             $line = trim($line);
 
@@ -754,7 +754,7 @@ class Ventrilo extends Protocol
         // This will be returned
         $decrypted = [];
 
-        foreach ($packets as $packet) {
+        foreach ((array)$packets as $packet) {
             # Header :
             $header = substr($packet, 0, 20);
 
@@ -775,7 +775,7 @@ class Ventrilo extends Protocol
 
             $table = $this->head_encrypt_table;
 
-            $characterCount = count($chars);
+            $characterCount = count((array)$chars);
 
             $key = 0;
             for ($i = 1; $i <= $characterCount; $i++) {
@@ -801,7 +801,7 @@ class Ventrilo extends Protocol
             ], $header_items);
 
             // Check to make sure the number of packets match
-            if ($header_items['totpck'] != count($packets)) {
+            if ($header_items['totpck'] != count((array)$packets)) {
                 throw new Exception(__METHOD__ . ": Too few packets received");
             }
 
@@ -816,7 +816,7 @@ class Ventrilo extends Protocol
 
             $chars = unpack("C*", substr($packet, 20));
             $data = "";
-            $characterCount = count($chars);
+            $characterCount = count((array)$chars);
 
             for ($i = 1; $i <= $characterCount; $i++) {
                 $chars[$i] -= ($table[$a2] + (($i - 1) % 72)) & 0xFF;
@@ -845,7 +845,7 @@ class Ventrilo extends Protocol
         $items = explode(",", $data, $fieldCount);
 
         // Iterate over the items for this channel
-        foreach ($items as $item) {
+        foreach ((array)$items as $item) {
             // Split the key=value pair
             list($key, $value) = explode("=", $item, 2);
 
@@ -867,7 +867,7 @@ class Ventrilo extends Protocol
         $items = explode(",", $data, $fieldCount);
 
         // Iterate over the items for this player
-        foreach ($items as $item) {
+        foreach ((array)$items as $item) {
             // Split the key=value pair
             list($key, $value) = explode("=", $item, 2);
 

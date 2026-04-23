@@ -128,7 +128,7 @@ function exec_ogp_module()
 			if(isset($_POST['uninstall']) and isset($_POST['mod_string']))
 			{
 				$output = "";
-				foreach($_POST['mod_string'] as $mod_string)
+				foreach ((array)$_POST['mod_string'] as $mod_string)
 				{
 					$result = remove_mod($home_cfg, $remote, $xml, $mod_string);
 					if($result !== FALSE)
@@ -143,13 +143,13 @@ function exec_ogp_module()
 			{
 				$mods = get_installed_mods($home_cfg, $remote, $xml);
 				
-				if($mods and count($mods) > 0)
+				if($mods and count((array)$mods) > 0)
 				{
 					$ft = new FormTable();
 					$ft->start_form("?m=steam_workshop&p=uninstall&home_id-mod_id-ip-port=".$_GET['home_id-mod_id-ip-port'], "post", "autocomplete=\"off\"");
 					$ft->start_table();
 					echo '<tr><td><div id="uninstall_scrolling_checkbox">';
-					foreach($mods as $mod_id => $mod_name)
+					foreach ((array)$mods as $mod_id => $mod_name)
 						echo "<input type='checkbox' id='select_mod_$mod_id' name='mod_string[]' value='$mod_id'><label for='select_mod_$mod_id'>$mod_name</label><br>";
 					echo '</div></td></tr>';
 					$ft->end_table();

@@ -63,7 +63,7 @@ function exec_ogp_module() {
 			$groups = [];
 		}
 		$query_groups .= " AND (";
-		foreach($groups as $group)
+		foreach ((array)$groups as $group)
 			$query_groups .= "group_id=".$group['group_id']." OR ";
 		$query_groups .= "group_id=0 OR group_id IS NULL)";
 	}
@@ -114,7 +114,7 @@ function exec_ogp_module() {
 			if (!is_array($ip_ports)) {
 				$ip_ports = [];
 			}
-			foreach($ip_ports as $ip_port);
+			foreach ((array)$ip_ports as $ip_port);
 			{
 				$address_owned = $ip_port['ip'].":".$ip_port['port'];
 				if($address_owned == $address_at_post)
@@ -273,7 +273,7 @@ function exec_ogp_module() {
 			if (!is_array($addons)) {
 				$addons = [];
 			}
-			foreach($addons as $addon) 
+			foreach ((array)$addons as $addon) 
 			{
 			?>
 			<option value="<?php echo $addon['addon_id']; ?>"><?php echo $addon['name']; ?></option>
