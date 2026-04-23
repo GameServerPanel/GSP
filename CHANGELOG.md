@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-04-23
+- Applied a repository-wide PHP 8 compatibility sweep across PHP sources to harden array iteration/count/key checks, normalize `date()` timestamp casting, and quote bare `delete/edit/remove` string concatenations.
+
 ## 2026-01-31
 - Rebuilt the Steam Workshop picker search to rely solely on Steam Community scraping (matching the working curl flow) and updated the request preview to show the actual Steam URL instead of a local panel endpoint.
 - Added adapter AppID lookup for Workshop search so the picker can query Steam even when the server XML lacks a clear default installer entry.
