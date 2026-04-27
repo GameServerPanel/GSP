@@ -66,7 +66,7 @@ if (!function_exists('billing_panel_bootstrap')) {
             return null;
         }
 
-        $panelDb = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix);
+        $panelDb = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
         if (!($panelDb instanceof OGPDatabase)) {
             error_log('billing_panel_bootstrap: failed to connect to panel database');
             return null;

@@ -97,7 +97,7 @@ if(function_exists($function))
 	// API tokens table
 	define("API_TABLE", $table_prefix."api_tokens");
 	// Connect to the database server and select database.
-	$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix);
+	$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
 	$settings = $db->getSettings();
 	
 	if(!is_authorized())

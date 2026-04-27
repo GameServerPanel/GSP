@@ -39,7 +39,7 @@ define("CONFIG_FILE","includes/config.inc.php");
 
 require_once CONFIG_FILE;
 // Connect to the database server and select database.
-$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix);
+$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
 
 // Load languages.
 include_once("includes/lang.php");

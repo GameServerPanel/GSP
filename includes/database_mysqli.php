@@ -52,7 +52,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 	/// \return -11 When connection to database could not be established
 	/// \return -12 When database was not valid.
 	/// \return -99 When mysql php module is not available.
-	public function connect($db_host, $db_user, $db_pass, $db_name, $table_prefix = NULL) {
+	public function connect($db_host, $db_user, $db_pass, $db_name, $table_prefix = NULL, $db_port = NULL) {
 		if ( !extension_loaded("mysqli") )
 			return -99;
 
@@ -62,7 +62,9 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if ( $db_host === NULL )
 			return -1;
 
-		$this->link = mysqli_connect( $db_host, $db_user, $db_pass, $db_name );
+		// Use explicit port when provided; otherwise fall back to MySQL default (3306).
+		$port = ($db_port !== NULL && $db_port !== '') ? (int)$db_port : NULL;
+		$this->link = mysqli_connect( $db_host, $db_user, $db_pass, $db_name, $port );
 
 		if ( $this->link === FALSE )
 			return -11;
