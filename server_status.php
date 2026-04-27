@@ -41,7 +41,7 @@ require_once CONFIG_FILE;
 require_once('includes/lib_remote.php');
 
 // Connect to the database server and select database.
-$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix);
+$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
 
 // Load languages.
 include_once("includes/lang.php");

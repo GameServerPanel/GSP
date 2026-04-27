@@ -51,7 +51,7 @@ require_once("modules/config_games/server_config_parser.php");
 require_once("includes/lib_remote.php");
 require_once CONFIG_FILE;
 // Connect to the database server and select database.
-$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix);
+$db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
 
 $panel_settings = $db->getSettings();
 if( isset($panel_settings['time_zone']) && $panel_settings['time_zone'] != "" )

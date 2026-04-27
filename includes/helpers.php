@@ -45,7 +45,7 @@ if(file_exists(__DIR__ . "/lang.php")){
 /// \return the database object when the creation was successfull.
 /// \return FALSE if database type was invalid.
 /// \return negative value in case of error
-function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$table_prefix)
+function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$table_prefix,$db_port=NULL)
 {
     if ( $db_type == "mysql" )
     {
@@ -54,7 +54,7 @@ function createDatabaseConnection($db_type,$db_host,$db_user,$db_pass,$db_name,$
 		else
 			die("<p class='failure'>OGP requires the <a href='http://php.net/manual/en/book.mysqli.php' target='_blank'>mysqli PHP extension</a>. Please install it, and then try again.</p>");
         $database = new OGPDatabaseMysql();
-        $connect_value = $database->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
+        $connect_value = $database->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,$db_port);
         
         if ($connect_value === TRUE)
             return $database;
