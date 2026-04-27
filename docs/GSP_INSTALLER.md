@@ -88,7 +88,17 @@ If the database already contains tables prefixed with `ogp_`:
 
 This allows upgrading an existing OGP installation to GSP without losing data.
 
-### 8. Branding
+### 8. MD5 password hashing (legacy)
+
+The `OGPDatabaseMySQL::addUser()` method stores passwords using `MD5()`.
+This is legacy behaviour inherited from OGP and matches the existing panel
+login system. MD5 is cryptographically broken for new systems; however,
+changing the hashing scheme requires coordinated changes to the login code
+(`index.php`, `modules/register/`, etc.) and is outside the scope of the
+installer. Operators are strongly advised to audit and upgrade the hashing
+scheme in a follow-up change.
+
+### 9. Branding
 
 The installer title and default site settings reference **GSP – Game Server
 Panel** and **WDS** instead of "Open Game Panel".

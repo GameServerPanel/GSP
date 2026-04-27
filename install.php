@@ -26,7 +26,6 @@ define("MODULES", "modules/");
 
 // Strip Input Function, prevents HTML in unwanted places
 function stripinput($text) {
-    if (ini_get('magic_quotes_gpc')) $text = stripslashes($text);
     $search  = array("\"",  "'",     "\\",   '\"',    "\'",    "<",    ">",    "&nbsp;");
     $replace = array("&quot;", "&#39;", "&#92;", "&quot;", "&#39;", "&lt;", "&gt;", " ");
     $text = str_replace($search, $replace, $text);
@@ -153,7 +152,7 @@ function install() {
         echo "<tr><td>".get_lang('database_hostname').":</td>
             <td><input type='text' value='".htmlspecialchars(isset($db_host) ? $db_host : $default_host)."' name='db_host' class='textbox' /></td></tr>";
 
-        // Port (GSP addition)
+        // Port (GSP addition – no lang key needed; label is always in English for installer)
         echo "<tr><td>Database Port:</td>
             <td><input type='text' value='".htmlspecialchars(isset($db_port) ? $db_port : "3306")."' name='db_port' class='textbox' /></td></tr>";
 
@@ -295,10 +294,13 @@ function install() {
         $db->setSettings($site_settings);
 
         // --- Auto-create default admin user ---
+        // NOTE: The default password 'admin' is intentionally weak for first-boot convenience.
+        // The installer prominently warns the operator to change it. Passwords are stored as
+        // MD5 to match the existing panel login system (legacy behaviour).
         $existing_admin = $db->getUser('admin');
         if (!$existing_admin) {
             $db->addUser('admin', 'admin', 'admin', 'admin@localhost');
-            print_success("Default admin account created (username: <strong>admin</strong>, password: <strong>admin</strong>).");
+            print_success("Default admin account created (username: <strong>admin</strong>).");
         } else {
             echo "<p class='note'>Admin user already exists – skipped creation.</p>";
         }
@@ -307,7 +309,7 @@ function install() {
         updateGameConfigsPostInstall();
 
         echo "<p class='note' style='color:#c00; font-weight:bold;'>".get_lang('remove_install_and_secure_config')."</p>";
-        echo "<p class='note'><strong>Change the default admin password after your first login!</strong></p>";
+        echo "<p class='note' style='color:#c00; font-weight:bold;'>SECURITY: The default admin password is <strong>admin</strong>. Change it immediately after your first login at Admin &rarr; User Management.</p>";
         echo "<p class='note'><a href='index.php'>".get_lang('go_to_panel')."</a></p>";
         echo "</td></tr></table>\n";
         echo "</div>\n";
@@ -386,9 +388,14 @@ function gsp_migrate_tables($db, $table_prefix) {
 }
 
 /**
- * Helper to escape a table name for use in RENAME TABLE.
- * We can't use $db->realEscapeSingle() easily for identifiers here,
- * so we strip everything except alphanumeric and underscores.
+ * Sanitize a MySQL identifier (table name) for use in RENAME TABLE.
+ *
+ * Table names sourced from SHOW TABLES consist only of alphanumeric
+ * characters and underscores in standard installations. This function
+ * enforces that invariant by stripping any other characters, making the
+ * identifier safe to embed between backticks in a SQL statement.
+ * If a table name ever contained characters outside [a-zA-Z0-9_] it would
+ * simply be skipped rather than cause an injection.
  */
 function mysqli_real_escape_string_compat($identifier) {
     return preg_replace('/[^a-zA-Z0-9_]/', '', $identifier);
