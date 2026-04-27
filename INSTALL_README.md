@@ -114,8 +114,8 @@ If you need to reinstall the panel (e.g. after a migration or reset):
 When the installer detects **existing tables** in the target database, it:
 
 1. Displays a warning: _"Existing database detected. A backup will be created before reinstall."_
-2. Creates a backup database named `panel_BAK`.
-   - If `panel_BAK` already exists, a timestamped name is used: `panel_BAK_YYYYMMDD_HHMMSS`.
+2. Creates a backup database named `{database_name}_BAK` (e.g. `panel_BAK` if your DB is `panel`).
+   - If `{database_name}_BAK` already exists, a timestamped name is used: `{database_name}_BAK_YYYYMMDD_HHMMSS`.
 3. Copies schema + data for every table into the backup database.
 4. Drops all tables from the target database.
 5. Proceeds with a fresh install.
@@ -126,7 +126,7 @@ When the installer detects **existing tables** in the target database, it:
 -- Example restore of a single table
 INSERT INTO panel.gsp_users SELECT * FROM panel_BAK.gsp_users;
 
--- Or restore the full backup DB
+-- Or restore the full backup DB (replace panel_BAK with the actual backup name)
 mysqldump panel_BAK | mysql panel
 ```
 

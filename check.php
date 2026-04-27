@@ -125,7 +125,7 @@ $rows[] = [
     'section' => 'PHP Libraries',
     'name'    => 'PEAR',
     'status'  => $pear_path !== false ? 'ok' : 'warning',
-    'current' => $pear_path !== false ? h($pear_path) : 'Not found',
+    'current' => $pear_path !== false ? $pear_path : 'Not found',
     'fix'     => $pear_path !== false ? '' : 'sudo apt install php-pear -y',
     'notes'   => 'Used by some legacy OGP/GSP modules.',
 ];
@@ -233,24 +233,32 @@ if (function_exists('apache_get_modules')) {
 // ── Optional DB connectivity test ────────────────────────────────────────────
 $config_path = CHECK_BASE . '/includes/config.inc.php';
 if (is_readable($config_path)) {
-    // Extract only the variables we need without executing arbitrary code.
-    // We use a limited include inside an isolated function scope.
-    $db_host = $db_port = $db_user = $db_pass = $db_name = null;
-    (static function () use ($config_path, &$db_host, &$db_port, &$db_user, &$db_pass, &$db_name): void {
-        @include $config_path;
-    })();
+    // Extract credentials using regex instead of executing the config file,
+    // to avoid running arbitrary PHP code from the config.
+    $raw = file_get_contents($config_path);
+    $cfg = [];
+    foreach (['db_host', 'db_port', 'db_user', 'db_pass', 'db_name'] as $var) {
+        if ($raw !== false && preg_match('/\$' . $var . '\s*=\s*"([^"]*)"/', $raw, $m)) {
+            $cfg[$var] = $m[1];
+        }
+    }
 
-    if ($db_host !== null && $db_user !== null && $db_name !== null) {
-        $db_port_int = (int)($db_port ?? 3306);
-        $conn = @mysqli_connect($db_host, $db_user, $db_pass ?? '', $db_name, $db_port_int);
+    $db_host_cfg = $cfg['db_host'] ?? null;
+    $db_user_cfg = $cfg['db_user'] ?? null;
+    $db_pass_cfg = $cfg['db_pass'] ?? null;
+    $db_name_cfg = $cfg['db_name'] ?? null;
+    $db_port_cfg = isset($cfg['db_port']) ? (int)$cfg['db_port'] : 3306;
+
+    if ($db_host_cfg !== null && $db_user_cfg !== null && $db_name_cfg !== null) {
+        $conn = @mysqli_connect($db_host_cfg, $db_user_cfg, $db_pass_cfg ?? '', $db_name_cfg, $db_port_cfg);
         if ($conn) {
             $db_status  = 'ok';
-            $db_current = 'Connected to ' . h($db_host) . ':' . $db_port_int . ' / ' . h($db_name);
+            $db_current = 'Connected to ' . $db_host_cfg . ':' . $db_port_cfg . ' / ' . $db_name_cfg;
             $db_fix     = '';
             mysqli_close($conn);
         } else {
             $db_status  = 'warning';
-            $db_current = 'Connection failed — ' . h(mysqli_connect_error());
+            $db_current = 'Connection failed — ' . (mysqli_connect_error() ?? 'unknown error');
             $db_fix     = 'Check credentials in includes/config.inc.php';
         }
 
@@ -260,7 +268,7 @@ if (is_readable($config_path)) {
             'status'  => $db_status,
             'current' => $db_current,
             'fix'     => $db_fix,
-            'notes'   => 'Host: ' . h($db_host) . ' | Port: ' . $db_port_int . ' | DB: ' . h($db_name) . ' | User: ' . h($db_user ?? ''),
+            'notes'   => 'Host: ' . $db_host_cfg . ' | Port: ' . $db_port_cfg . ' | DB: ' . $db_name_cfg . ' | User: ' . $db_user_cfg,
         ];
     } else {
         $rows[] = [
@@ -361,6 +369,7 @@ foreach ($rows as $r) {
         .note-box { background: #1a2a1a; border: 1px solid #2e5a2e; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; color: #9ddd9d; font-size: 13px; }
         .note-box strong { color: #7ddb7d; }
         footer { text-align: center; color: #555; font-size: 11px; margin-top: 30px; }
+
     </style>
 </head>
 <body>
@@ -435,7 +444,7 @@ foreach ($rows as $r) {
                         <?= h($row['status']) ?>
                     </span>
                 </td>
-                <td class="td-current"><?= $row['current'] /* already escaped where built */ ?></td>
+                <td class="td-current"><?= h($row['current']) ?></td>
                 <td class="td-fix">
                     <?php if (!empty($row['fix'])): ?>
                         <?php if (strpos($row['fix'], "\n") !== false): ?>
@@ -469,7 +478,7 @@ sudo systemctl restart apache2'
         </tbody>
     </table>
 
-    <footer>GSP / WDS Dependency Checker — safe to run at any time &mdash; generated at <?= h(date('Y-m-d H:i:s')) ?> UTC</footer>
+    <footer>GSP / WDS Dependency Checker — safe to run at any time &mdash; generated at <?= h(gmdate('Y-m-d H:i:s')) ?> UTC</footer>
 </div>
 </body>
 </html>

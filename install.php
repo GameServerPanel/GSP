@@ -428,7 +428,7 @@ function gsp_backup_existing_db($db, $db_host, $db_user, $db_pass, $db_name, $db
     }
 
     $table_count = count($tables_result);
-    echo "<p class='note' style='color:#b35900;font-weight:bold;'>&#x26A0; Existing database detected ({$table_count} table(s)). Creating backup before reinstall&hellip;</p>";
+    echo "<p class='note' style='color:#b35900;font-weight:bold;'>&#x26A0; Existing database detected (" . htmlspecialchars((string)$table_count, ENT_QUOTES, 'UTF-8') . " table(s)). Creating backup before reinstall&hellip;</p>";
 
     // Determine backup DB name
     $backup_name = $db_name . '_BAK';
@@ -513,22 +513,38 @@ function gsp_disable_installer() {
  * To restore the installer:
  *   cp install.php.bak install.php
  *
- * Or via the button below (admin action — currently unprotected; remove this
- * file when you no longer need reinstall capability).
+ * Or via the button below (admin action — requires a one-time restore token).
  */
+session_start();
+
+// Generate a one-time CSRF token if not already set
+if (empty($_SESSION['gsp_restore_token'])) {
+    $_SESSION['gsp_restore_token'] = bin2hex(random_bytes(16));
+}
 
 if (isset($_POST['restore_installer'])) {
+    // Validate CSRF token
+    $submitted = $_POST['gsp_restore_token'] ?? '';
+    if (!hash_equals($_SESSION['gsp_restore_token'], $submitted)) {
+        http_response_code(403);
+        die('<p style="color:red">Invalid or expired restore token. Please reload the page and try again.</p>');
+    }
+
     $bak = __DIR__ . '/install.php.bak';
     if (!is_readable($bak)) {
         die('<p style="color:red">install.php.bak not found. Restore manually.</p>');
     }
     $content = file_get_contents($bak);
-    if (file_put_contents(__FILE__, $content) === false) {
+    if ($content === false || file_put_contents(__FILE__, $content) === false) {
         die('<p style="color:red">Could not overwrite install.php. Check file permissions.</p>');
     }
+    // Invalidate the token after use
+    unset($_SESSION['gsp_restore_token']);
     header('Location: install.php');
     exit;
 }
+
+$token = htmlspecialchars($_SESSION['gsp_restore_token'], ENT_QUOTES, 'UTF-8');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -552,6 +568,7 @@ code { background:#0d0d22; color:#aaf; padding:2px 8px; border-radius:4px; font-
     <p>The GSP installer has been disabled after a successful installation to prevent accidental re-runs.</p>
     <p>The original installer is preserved at <code>install.php.bak</code>.</p>
     <form method="post">
+        <input type="hidden" name="gsp_restore_token" value="<?= $token ?>">
         <button type="submit" name="restore_installer" class="btn" onclick="return confirm('Restore the full installer? Only do this if you intend to reinstall the panel.');">&#x21BA; Restore &amp; Re-run Installer</button>
     </form>
     <p class="note">
