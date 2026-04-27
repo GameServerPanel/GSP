@@ -122,9 +122,11 @@ function install() {
 
         echo "<div id=\"install-title\">GSP / WDS Panel Installer</div>";
         echo "<p>Welcome to the <strong>GSP (Game Server Panel)</strong> installer, maintained by WDS.</p>";
+        echo "<p style='margin:8px 0;'><a href='check.php' style='background:#1565c0;color:#fff;padding:6px 14px;border-radius:5px;text-decoration:none;font-weight:bold;'>&#x1F50D; Run Dependency Check</a></p>";
         echo "<p>GSP is a heavily customized fork of OGP. This installer will:</p>";
         echo "<ul>
             <li>Write <code>includes/config.inc.php</code> with your database credentials.</li>
+            <li>Back up any existing database before reinstalling.</li>
             <li>Optionally migrate any existing <code>ogp_</code> tables to your chosen prefix.</li>
             <li>Install all modules found in the <code>modules/</code> directory.</li>
             <li>Create a default admin account (<em>admin / admin</em>) if none exists.</li>
@@ -141,6 +143,7 @@ function install() {
             require_once "includes/config.inc.php";
 
         echo "<table class='install'><tr><td>\n";
+        echo "<p style='margin-bottom:10px;'><a href='check.php' style='background:#1565c0;color:#fff;padding:5px 12px;border-radius:5px;text-decoration:none;font-weight:bold;'>&#x1F50D; Run Dependency Check</a></p>";
         echo "<form name='setup' method='post' action='?step=2'>";
         echo "<table class='install'>\n";
         echo "<tr><td colspan='2'><div id=\"install-title\" style=\"margin-left:-21px; margin-top:-7px;\">".get_lang('database_settings')."</div></td></tr>";
@@ -239,6 +242,9 @@ function install() {
             return;
         }
 
+        // --- Detect existing database and back it up before reinstall ---
+        gsp_backup_existing_db($db, $db_host, $db_user, $db_pass, $db_name, $db_port);
+
         // --- Optional ogp_ → gsp_ migration ---
         gsp_migrate_tables($db, $table_prefix);
 
@@ -312,6 +318,9 @@ function install() {
         echo "<p class='note' style='color:#c00; font-weight:bold;'>SECURITY: The default admin password is <strong>admin</strong>. Change it immediately after your first login at Admin &rarr; User Management.</p>";
         echo "<p class='note'><a href='index.php'>".get_lang('go_to_panel')."</a></p>";
         echo "</td></tr></table>\n";
+
+        // --- Disable the installer by renaming install.php to install.php.bak ---
+        gsp_disable_installer();
         echo "</div>\n";
     }
 
@@ -399,6 +408,169 @@ function gsp_migrate_tables($db, $table_prefix) {
  */
 function mysqli_real_escape_string_compat($identifier) {
     return preg_replace('/[^a-zA-Z0-9_]/', '', $identifier);
+}
+
+/**
+ * Detect whether the target database already contains tables.
+ * If so, create a backup database (panel_BAK or panel_BAK_YYYYMMDD_HHMMSS)
+ * by copying schema + data, then drop all tables in the target database so
+ * the fresh install proceeds cleanly.
+ *
+ * The backup is performed entirely through the panel's own DB connection so
+ * no external mysqldump binary is required.
+ */
+function gsp_backup_existing_db($db, $db_host, $db_user, $db_pass, $db_name, $db_port) {
+    // Count tables in the target database
+    $tables_result = $db->resultQuery("SHOW TABLES");
+    if (!$tables_result || !is_array($tables_result) || count($tables_result) === 0) {
+        // Fresh database – nothing to back up
+        return;
+    }
+
+    $table_count = count($tables_result);
+    echo "<p class='note' style='color:#b35900;font-weight:bold;'>&#x26A0; Existing database detected ({$table_count} table(s)). Creating backup before reinstall&hellip;</p>";
+
+    // Determine backup DB name
+    $backup_name = $db_name . '_BAK';
+    $check_bak   = $db->resultQuery("SHOW DATABASES LIKE '" . mysqli_real_escape_string_compat($backup_name) . "'");
+    if ($check_bak && is_array($check_bak) && count($check_bak) > 0) {
+        $backup_name = $db_name . '_BAK_' . date('Ymd_His');
+    }
+
+    // Create backup database
+    $safe_backup = '`' . mysqli_real_escape_string_compat($backup_name) . '`';
+    $safe_src    = '`' . mysqli_real_escape_string_compat($db_name) . '`';
+
+    $created = $db->query("CREATE DATABASE IF NOT EXISTS {$safe_backup} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    if (!$created) {
+        echo "<p class='note' style='color:#900;'>Could not create backup database <code>" . htmlspecialchars($backup_name) . "</code>. Skipping backup (install will continue).</p>";
+        return;
+    }
+
+    // Copy each table: CREATE … SELECT
+    $copied  = 0;
+    $failed  = 0;
+    foreach ($tables_result as $row) {
+        $tbl      = array_values($row)[0];
+        $safe_tbl = '`' . mysqli_real_escape_string_compat($tbl) . '`';
+
+        // Copy structure
+        $ok1 = $db->query("CREATE TABLE {$safe_backup}.{$safe_tbl} LIKE {$safe_src}.{$safe_tbl}");
+        // Copy data
+        $ok2 = $ok1 && $db->query("INSERT INTO {$safe_backup}.{$safe_tbl} SELECT * FROM {$safe_src}.{$safe_tbl}");
+        if ($ok2) {
+            $copied++;
+        } else {
+            $failed++;
+        }
+    }
+
+    print_success("Backup created as <code>" . htmlspecialchars($backup_name) . "</code> — {$copied} table(s) copied" . ($failed > 0 ? ", {$failed} failed (non-fatal)" : "") . ".");
+
+    // Drop all tables in the target database so the fresh install is clean
+    $db->query("SET FOREIGN_KEY_CHECKS = 0");
+    foreach ($tables_result as $row) {
+        $tbl      = array_values($row)[0];
+        $safe_tbl = '`' . mysqli_real_escape_string_compat($tbl) . '`';
+        $db->query("DROP TABLE IF EXISTS {$safe_src}.{$safe_tbl}");
+    }
+    $db->query("SET FOREIGN_KEY_CHECKS = 1");
+
+    print_success("Target database cleared. Fresh install will proceed.");
+}
+
+/**
+ * After a successful install, rename install.php to install.php.bak and write
+ * a minimal bootstrap stub as the new install.php that prevents accidental
+ * re-runs while giving an admin an easy path to restore the real installer.
+ */
+function gsp_disable_installer() {
+    $self     = __FILE__;
+    $bak_path = dirname($self) . '/install.php.bak';
+
+    // Read the current file before we rename it
+    $installer_content = @file_get_contents($self);
+    if ($installer_content === false) {
+        echo "<p class='note' style='color:#900;'>Could not read install.php for backup — installer not renamed (non-fatal).</p>";
+        return;
+    }
+
+    // Write the backup copy
+    if (@file_put_contents($bak_path, $installer_content) === false) {
+        echo "<p class='note' style='color:#900;'>Could not write install.php.bak — installer not renamed (non-fatal).</p>";
+        return;
+    }
+
+    // Write the stub that replaces install.php
+    $stub = <<<'STUB'
+<?php
+/*
+ * GSP / WDS — Installer bootstrap stub
+ *
+ * The full installer has been moved to install.php.bak after a successful
+ * installation to prevent accidental re-runs.
+ *
+ * To restore the installer:
+ *   cp install.php.bak install.php
+ *
+ * Or via the button below (admin action — currently unprotected; remove this
+ * file when you no longer need reinstall capability).
+ */
+
+if (isset($_POST['restore_installer'])) {
+    $bak = __DIR__ . '/install.php.bak';
+    if (!is_readable($bak)) {
+        die('<p style="color:red">install.php.bak not found. Restore manually.</p>');
+    }
+    $content = file_get_contents($bak);
+    if (file_put_contents(__FILE__, $content) === false) {
+        die('<p style="color:red">Could not overwrite install.php. Check file permissions.</p>');
+    }
+    header('Location: install.php');
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GSP Installer — Disabled</title>
+<style>
+body { font-family: Arial, sans-serif; background:#1a1a2e; color:#e0e0e0; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+.box { background:#12122a; border:1px solid #2a2a5a; border-radius:10px; padding:40px 50px; max-width:480px; text-align:center; }
+h1 { color:#ffd84d; font-size:20px; margin-bottom:12px; }
+p  { color:#aaa; font-size:14px; margin:8px 0; }
+code { background:#0d0d22; color:#aaf; padding:2px 8px; border-radius:4px; font-size:13px; }
+.btn { display:inline-block; margin-top:18px; padding:10px 22px; background:#b35900; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:14px; font-weight:bold; }
+.btn:hover { background:#e07000; }
+.note { color:#888; font-size:12px; margin-top:14px; }
+</style>
+</head>
+<body>
+<div class="box">
+    <h1>&#x26A0; Installer Disabled</h1>
+    <p>The GSP installer has been disabled after a successful installation to prevent accidental re-runs.</p>
+    <p>The original installer is preserved at <code>install.php.bak</code>.</p>
+    <form method="post">
+        <button type="submit" name="restore_installer" class="btn" onclick="return confirm('Restore the full installer? Only do this if you intend to reinstall the panel.');">&#x21BA; Restore &amp; Re-run Installer</button>
+    </form>
+    <p class="note">
+        To restore manually:<br>
+        <code>cp install.php.bak install.php</code>
+    </p>
+    <p class="note"><a href="index.php" style="color:#7aaaf5;">Go to Panel</a></p>
+</div>
+</body>
+</html>
+STUB;
+
+    if (@file_put_contents($self, $stub) === false) {
+        echo "<p class='note' style='color:#900;'>Could not overwrite install.php with stub — installer not disabled (non-fatal). Delete or rename install.php manually.</p>";
+        return;
+    }
+
+    print_success("Installer disabled: <code>install.php</code> renamed to stub. Full installer preserved as <code>install.php.bak</code>.");
+    echo "<p class='note'>To re-enable the installer, click <em>Restore &amp; Re-run Installer</em> on the new <code>install.php</code> page, or run: <code>cp install.php.bak install.php</code></p>";
 }
 
 $view->printView();
