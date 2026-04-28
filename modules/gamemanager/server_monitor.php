@@ -32,6 +32,9 @@ require_once('includes/lib_remote.php');
 function renderParam($param, $last_param, $param_access_enabled, $home_id)
 {
 	global $db;
+	if (!is_array($last_param)) {
+		$last_param = [];
+	}
 	$isAdmin = $db->isAdmin($_SESSION['user_id']);
 	$attributesString = "";
 	foreach ($param->attribute as $attribute)
