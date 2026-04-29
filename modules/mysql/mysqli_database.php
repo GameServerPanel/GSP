@@ -41,11 +41,12 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 
         $this->table_prefix = $table_prefix;
 
-        /// \todo We might want to do other checks here as well?
         if ( $db_host === NULL )
             return -1;
 
-        $this->link = mysqli_connect($db_host, $db_user, $db_pass);
+        // Use the port from config.inc.php if provided (supports non-standard ports e.g. 3307)
+        $port = !empty($db_port) ? (int)$db_port : 3306;
+        $this->link = mysqli_connect($db_host, $db_user, $db_pass, $db_name, $port);
 
         if ( $this->link === FALSE )
             return -11;

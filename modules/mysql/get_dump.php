@@ -9,7 +9,7 @@ function exec_ogp_module() {
 
 	$modDb = new MySQLModuleDatabase();
 	require("includes/config.inc.php");
-	$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
+	$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 	
 	global $db;
 	
