@@ -28,7 +28,7 @@ define("XML_SCHEMA","modules/config_games/schema_server_config.xml");
 if (!function_exists('ogp_render_config_error')) {
 	function ogp_render_config_error($title, $details = "")
 	{
-		$log_message = "[OGP] $title" . (empty($details) ? "" : " Details: $details");
+		$log_message = "[GSP] $title" . (empty($details) ? "" : " Details: $details");
 		error_log($log_message);
 
 		if (PHP_SAPI === 'cli') {
@@ -41,7 +41,7 @@ if (!function_exists('ogp_render_config_error')) {
 		}
 
 		echo "<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:720px;margin:4rem auto;padding:2rem;border:1px solid #c0392b;border-radius:6px;background:#fff7f7;color:#333;\">";
-		echo "<h1 style=\"margin-top:0;color:#c0392b;\">Open Game Panel</h1>";
+		echo "<h1 style=\"margin-top:0;color:#c0392b;\">GSP</h1>";
 		echo "<h2 style=\"color:#c0392b;\">$title</h2>";
 		if (!empty($details)) {
 			echo "<p>" . nl2br(htmlspecialchars($details, ENT_QUOTES, 'UTF-8')) . "</p>";

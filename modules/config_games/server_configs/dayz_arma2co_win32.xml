@@ -70,18 +70,18 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
 mkdir -p ./cfg
 touch ./cfg/dayz_arma2co_win32.xml.txt
 
-wget http://files.iaregamer.com/gamefiles/arma2Addons.tar
-tar -xzvf arma2Addons.tar
+wget --progress=dot:giga http://files.iaregamer.com/gamefiles/arma2Addons.tar
+tar -xvf arma2Addons.tar
 rm -f arma2Addons.tar
 
-wget http://files.iaregamer.com/gamefiles/dayzmod1.9.0.tar
-tar -xzvf dayzmod1.9.0.tar
+wget --progress=dot:giga http://files.iaregamer.com/gamefiles/dayzmod1.9.0.tar
+tar -xvf dayzmod1.9.0.tar
 rm -f dayzmod1.9.0.tar
 
 
 #Create Database ---------------------------------------
 
-dbPass=$(</dev/urandom tr -dc _A-Z-a-z-0-9 | head -c8)
+dbPass=$(&lt;/dev/urandom tr -dc _A-Z-a-z-0-9 | head -c8)
 srvID=${PWD##*/}
 dbID=server_${srvID}
 
