@@ -882,10 +882,22 @@ function utf8ize($d, $htmlEntities = true) {
             $d[$k] = utf8ize($v, $htmlEntities);
         }
     } else if (is_string ($d)) {
-		if($htmlEntities){
-			$d = htmlentities($d);
+		if (function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
+			if (mb_detect_encoding($d, 'UTF-8', true) === false) {
+				$d = mb_convert_encoding($d, 'UTF-8');
+			}
+		} elseif (function_exists('iconv')) {
+			$converted = @iconv('ISO-8859-1', 'UTF-8//IGNORE', $d);
+			if ($converted !== false) {
+				$d = $converted;
+			}
 		}
-        return utf8_encode($d);
+
+		if($htmlEntities){
+			$d = htmlentities($d, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+		}
+
+        return $d;
     }
     return $d;
 }
@@ -1042,7 +1054,7 @@ function removeInvalidFileNameCharacters($string){
 }
 
 function deleteMysqlAddonDatabasesForGameServerHome($home_id){
-	global $db, $db_host, $db_user, $db_pass, $db_name, $table_prefix;
+	global $db, $db_host, $db_user, $db_pass, $db_name, $table_prefix, $db_port;
 	if ( function_exists('mysqli_connect') )
 		require_once("modules/mysql/mysqli_database.php");
 	else
@@ -1052,7 +1064,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 		
 	$modDb = new MySQLModuleDatabase();
 	require_once("includes/config.inc.php");
-	$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
+	$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 	
 	if(hasValue($home_id) && is_numeric($home_id)){
 	
@@ -1063,6 +1075,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 		if(is_array($dbsToDelete) && count((array)$dbsToDelete)){
 			foreach ((array)$dbsToDelete as $dbToDel){
 				$mysql_db = $dbToDel;
+				$mysql_admin_user = !empty($mysql_db['mysql_admin_user']) ? $mysql_db['mysql_admin_user'] : 'root';
 				if($mysql_db['remote_server_id'] != "0")
 				{
 					$remote_server = $db->getRemoteServer($mysql_db['remote_server_id']);
@@ -1070,7 +1083,7 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 					$host_stat = $remote->status_chk();
 					if($host_stat === 1 )
 					{
-						$remote->exec('mysql --host=localhost --port='.$mysql_db['mysql_port'].' -uroot -p'.$mysql_db['mysql_root_passwd'].
+						$remote->exec('mysql --host=localhost --port='.$mysql_db['mysql_port'].' -u'.$mysql_admin_user.' -p'.$mysql_db['mysql_root_passwd'].
 									  ' -e "DROP DATABASE '.$mysql_db['db_name'].";DROP USER '".$mysql_db['db_user']."'@'%';\"");
 					}
 				}
@@ -1078,7 +1091,14 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 				{
 					if( function_exists('mysqli_connect') )
 					{
-						@$link = mysqli_connect($mysql_db['mysql_ip'], 'root', $mysql_db['mysql_root_passwd'], "", $mysql_db['mysql_port']);
+						mysqli_report(MYSQLI_REPORT_OFF);
+						try {
+							$link = mysqli_connect($mysql_db['mysql_ip'], $mysql_admin_user, $mysql_db['mysql_root_passwd'], "", $mysql_db['mysql_port']);
+						} catch (Exception $e) {
+							$link = false;
+						} catch (Throwable $e) {
+							$link = false;
+						}
 						
 						if ( $link !== FALSE )
 						{
@@ -1091,12 +1111,12 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 									break;
 							}
 							mysqli_close($link);
-							$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
+							$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 						}
 					}
 					else
 					{
-						@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], 'root', $mysql_db['mysql_root_passwd']);
+						@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], $mysql_admin_user, $mysql_db['mysql_root_passwd']);
 						
 						if ( $link !== FALSE )
 						{
@@ -1109,12 +1129,12 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 									break;
 							}
 							mysql_close($link);
-							$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix);
+							$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 						}
 					}
 				}
 				
-				if ( $modDb->removeMysqlServerDB($db_id) !== FALSE )
+				if ( $modDb->removeMysqlServerDB($dbToDel['db_id']) !== FALSE )
 				{
 					$dbDeletedCount++;
 				}

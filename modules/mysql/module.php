@@ -37,7 +37,8 @@ $install_queries[0] = array(
 	`mysql_name` varchar(100) NOT NULL,
 	`mysql_ip` varchar(255) NOT NULL,
 	`mysql_port` int(11) NOT NULL,
-	`mysql_root_passwd` VARCHAR( 32 ) NULL,
+	`mysql_admin_user` varchar(64) NOT NULL default 'root',
+	`mysql_root_passwd` VARCHAR(255) NULL,
 	`privilegies_str` LONGTEXT NULL,
 	PRIMARY KEY  (`mysql_server_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",

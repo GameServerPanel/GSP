@@ -46,7 +46,14 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 
         // Use the port from config.inc.php if provided (supports non-standard ports e.g. 3307)
         $port = !empty($db_port) ? (int)$db_port : 3306;
-        $this->link = mysqli_connect($db_host, $db_user, $db_pass, $db_name, $port);
+        mysqli_report(MYSQLI_REPORT_OFF);
+        try {
+            $this->link = mysqli_connect($db_host, $db_user, $db_pass, $db_name, $port);
+        } catch (Exception $e) {
+            $this->link = false;
+        } catch (Throwable $e) {
+            $this->link = false;
+        }
 
         if ( $this->link === FALSE )
             return -11;
@@ -80,22 +87,25 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         return $results;
     }
 	
-	public function addMysqlServer($remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_root_passwd,$privilegies_str)
+    public function addMysqlServer($remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_admin_user,$mysql_root_passwd,$privilegies_str)
     {
         if ( empty($mysql_ip) )
             return false;
         else if ( empty($mysql_port) )
             return false;
+        else if ( empty($mysql_admin_user) )
+            return false;
 		else if ( empty($mysql_root_passwd) )
             return false;
 
-        $query = sprintf("INSERT INTO `%smysql_servers` (`remote_server_id`,`mysql_name`,`mysql_ip`,`mysql_port`,`mysql_root_passwd`,`privilegies_str`)
-            VALUES('%s','%s','%s','%s','%s','%s');",
+        $query = sprintf("INSERT INTO `%smysql_servers` (`remote_server_id`,`mysql_name`,`mysql_ip`,`mysql_port`,`mysql_admin_user`,`mysql_root_passwd`,`privilegies_str`)
+            VALUES('%s','%s','%s','%s','%s','%s','%s');",
                 $this->table_prefix,
 				mysqli_real_escape_string($this->link,$remote_server_id),
                 mysqli_real_escape_string($this->link,$mysql_name),
                 mysqli_real_escape_string($this->link,$mysql_ip),
 				mysqli_real_escape_string($this->link,$mysql_port),
+                mysqli_real_escape_string($this->link,$mysql_admin_user),
                 mysqli_real_escape_string($this->link,$mysql_root_passwd),
 				mysqli_real_escape_string($this->link,$privilegies_str));
         ++$this->queries_;
@@ -109,17 +119,18 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         return mysqli_insert_id($this->link);
     }
 	
-	public function editMysqlServer($mysql_server_id,$remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_root_passwd,$privilegies_str)
+    public function editMysqlServer($mysql_server_id,$remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_admin_user,$mysql_root_passwd,$privilegies_str)
     {
 		$query = sprintf("UPDATE `%smysql_servers` SET `remote_server_id` = '%s',
 				`mysql_name` = '%s', `mysql_ip` = '%s', `mysql_port` = '%s',
-				`mysql_root_passwd` = '%s', `privilegies_str` = '%s'
+                `mysql_admin_user` = '%s', `mysql_root_passwd` = '%s', `privilegies_str` = '%s'
 				WHERE `mysql_server_id` = %s;",
 				$this->table_prefix,
 				mysqli_real_escape_string($this->link,$remote_server_id),
 				mysqli_real_escape_string($this->link,$mysql_name),
 				mysqli_real_escape_string($this->link,$mysql_ip),
 				mysqli_real_escape_string($this->link,$mysql_port),
+                mysqli_real_escape_string($this->link,$mysql_admin_user),
 				mysqli_real_escape_string($this->link,$mysql_root_passwd),
 				mysqli_real_escape_string($this->link,$privilegies_str),
 				mysqli_real_escape_string($this->link,$mysql_server_id));

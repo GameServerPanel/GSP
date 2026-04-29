@@ -88,28 +88,29 @@ dbID=server_${srvID}
 # sed -i "s/dayz_dayzmod/${dbID}/g" 1.9.0_fresh.sql
 
 sed -i "s/Host = .*/Host = mysql.iaregamer.com/g" cfg/hiveext.ini
+sed -i "s/Port = .*/Port = 3307/g" cfg/hiveext.ini
 sed -i "s/Database = .*/Database = ${dbID}/g" cfg/hiveext.ini
 sed -i "s/Username = .*/Username = ${dbID}/g" cfg/hiveext.ini
 sed -i "s/Password = .*/Password = ${dbPass}/g" cfg/hiveext.ini
 
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "CREATE DATABASE IF NOT EXISTS ${dbID}"
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "GRANT ALL ON ${dbID}.* TO '${dbID}'@'localhost' IDENTIFIED BY '${dbPass}'"
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "GRANT ALL ON ${dbID}.* TO 'dayzhivemind'@'%' IDENTIFIED BY 'Pkloyn7yvpht!'"
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "GRANT ALL ON ${dbID}.* TO '${dbID}'@'%' IDENTIFIED BY '${dbPass}'"
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "FLUSH PRIVILEGES;"
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -D ${dbID} &lt; 1.9.0_fresh.sql
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "CREATE DATABASE IF NOT EXISTS ${dbID}"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "GRANT ALL ON ${dbID}.* TO '${dbID}'@'localhost' IDENTIFIED BY '${dbPass}'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "GRANT ALL ON ${dbID}.* TO 'dayzhivemind'@'%' IDENTIFIED BY 'Pkloyn7yvpht!'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "GRANT ALL ON ${dbID}.* TO '${dbID}'@'%' IDENTIFIED BY '${dbPass}'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "FLUSH PRIVILEGES;"
+mysql --force -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -D ${dbID} &lt; 1.9.0_fresh.sql
 
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "DELETE FROM panel.ogp_mysql_databases WHERE db_user = '${dbID}'"
-mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "INSERT INTO panel.ogp_mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled) VALUES (2,${srvID},'${dbID}','${dbPass}','${dbID}',1)"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "DELETE FROM panel.gsp_mysql_databases WHERE db_user = '${dbID}'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -P3307 -e "INSERT INTO panel.gsp_mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled) VALUES (2,${srvID},'${dbID}','${dbPass}','${dbID}',1)"
 
 # Create alsoRun.bat -----------------------------------
 
 printf '%s\r\n' \
 '@echo off' \
 'del /q "..\_alsoRun.pid" 2>nul' \
-'cd bec
+'cd bec' \
 'start "BEC" bec.exe --dsc --dec -f config.cfg' \
-'cd ..
+'cd ..' \
 'timeout /t 3 /nobreak >nul' \
 'for /f "tokens=2 delims==" %%P in ('"'"'wmic process where "ExecutablePath='"'"'%cd:\=\\%\\bec.exe'"'"'" get ProcessId /value ^| find "="'"'"') do >"..\_alsoRun.pid" echo %%P' \
 > _alsoRun.bat

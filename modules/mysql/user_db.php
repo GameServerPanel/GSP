@@ -37,6 +37,25 @@ if ( function_exists('mysqli_connect') )
 else
 	require_once("modules/mysql/mysql_database.php");
 
+function get_mysql_admin_user(array $mysql_server) {
+	return !empty($mysql_server['mysql_admin_user']) ? $mysql_server['mysql_admin_user'] : 'root';
+}
+
+function mysqli_connect_safe($host, $user, $pass, $db = "", $port = null) {
+	if (!function_exists('mysqli_connect')) {
+		return false;
+	}
+
+	mysqli_report(MYSQLI_REPORT_OFF);
+	try {
+		return mysqli_connect($host, $user, $pass, $db, $port);
+	} catch (Exception $e) {
+		return false;
+	} catch (Throwable $e) {
+		return false;
+	}
+}
+
 function exec_ogp_module() {
 
 	$modDb = new MySQLModuleDatabase();
@@ -95,7 +114,7 @@ function exec_ogp_module() {
 			$host_stat = $remote->status_chk();
 			if($host_stat === 1 )
 			{
-				$command = "mysql -h localhost -P ".$mysql_db['mysql_port']." -u root -p".$mysql_db['mysql_root_passwd'].' -e exit; echo $?';
+				$command = "mysql -h localhost -P ".$mysql_db['mysql_port']." -u ".get_mysql_admin_user($mysql_db)." -p".$mysql_db['mysql_root_passwd'].' -e exit; echo $?';
 				$test_mysql_conn = $remote->exec($command);
 
 				if($test_mysql_conn == 0)
@@ -113,7 +132,7 @@ function exec_ogp_module() {
 		{
 			if( function_exists('mysqli_connect') )
 			{
-				$link = mysqli_connect($mysql_db['mysql_ip'], $mysql_db['db_user'], $mysql_db['db_passwd'], $mysql_db['db_name'], $mysql_db['mysql_port']);
+				$link = mysqli_connect_safe($mysql_db['mysql_ip'], $mysql_db['db_user'], $mysql_db['db_passwd'], $mysql_db['db_name'], $mysql_db['mysql_port']);
 				if ( $link !== FALSE )
 				{
 					$server_online = TRUE;
@@ -248,7 +267,7 @@ function exec_ogp_module() {
 									   "GRANT ".$mysql_db['privilegies_str']." ON \\`".$mysql_db['db_name']."\\`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';".
 									   "FLUSH PRIVILEGES;";
 									
-								$command = "mysql --host=localhost --port=".$mysql_db['mysql_port']." -uroot -p".$mysql_db['mysql_root_passwd']." -e \"".$SQL."\"";
+								$command = "mysql --host=localhost --port=".$mysql_db['mysql_port']." -u".get_mysql_admin_user($mysql_db)." -p".$mysql_db['mysql_root_passwd']." -e \"".$SQL."\"";
 								$remote->exec($command);
 							}
 						}
@@ -256,7 +275,7 @@ function exec_ogp_module() {
 						{
 							if( function_exists('mysqli_connect') )
 							{
-								@$link = mysqli_connect($mysql_db['mysql_ip'], 'root', $mysql_db['mysql_root_passwd'], "", $mysql_db['mysql_port']);
+								$link = mysqli_connect_safe($mysql_db['mysql_ip'], get_mysql_admin_user($mysql_db), $mysql_db['mysql_root_passwd'], "", $mysql_db['mysql_port']);
 								
 								if ( $link !== FALSE )
 								{
@@ -275,7 +294,7 @@ function exec_ogp_module() {
 							}
 							else
 							{
-								@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], 'root', $mysql_db['mysql_root_passwd']);
+								@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], get_mysql_admin_user($mysql_db), $mysql_db['mysql_root_passwd']);
 								
 								if ( $link !== FALSE )
 								{

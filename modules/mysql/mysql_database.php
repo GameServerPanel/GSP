@@ -79,22 +79,25 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         return $results;
     }
 	
-	public function addMysqlServer($remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_root_passwd,$privilegies_str)
+    public function addMysqlServer($remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_admin_user,$mysql_root_passwd,$privilegies_str)
     {
         if ( empty($mysql_ip) )
             return false;
         else if ( empty($mysql_port) )
             return false;
+        else if ( empty($mysql_admin_user) )
+            return false;
 		else if ( empty($mysql_root_passwd) )
             return false;
 
-        $query = sprintf("INSERT INTO `%smysql_servers` (`remote_server_id`,`mysql_name`,`mysql_ip`,`mysql_port`,`mysql_root_passwd`,`privilegies_str`)
-            VALUES('%s','%s','%s','%s','%s','%s');",
+        $query = sprintf("INSERT INTO `%smysql_servers` (`remote_server_id`,`mysql_name`,`mysql_ip`,`mysql_port`,`mysql_admin_user`,`mysql_root_passwd`,`privilegies_str`)
+            VALUES('%s','%s','%s','%s','%s','%s','%s');",
                 $this->table_prefix,
 				mysql_real_escape_string($remote_server_id,$this->link),
                 mysql_real_escape_string($mysql_name,$this->link),
                 mysql_real_escape_string($mysql_ip,$this->link),
 				mysql_real_escape_string($mysql_port,$this->link),
+                mysql_real_escape_string($mysql_admin_user,$this->link),
                 mysql_real_escape_string($mysql_root_passwd,$this->link),
 				mysql_real_escape_string($privilegies_str,$this->link));
         ++$this->queries_;
@@ -108,17 +111,18 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         return mysql_insert_id($this->link);
     }
 	
-	public function editMysqlServer($mysql_server_id,$remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_root_passwd,$privilegies_str)
+    public function editMysqlServer($mysql_server_id,$remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_admin_user,$mysql_root_passwd,$privilegies_str)
     {
 		$query = sprintf("UPDATE `%smysql_servers` SET `remote_server_id` = '%s',
 				`mysql_name` = '%s', `mysql_ip` = '%s', `mysql_port` = '%s',
-				`mysql_root_passwd` = '%s', `privilegies_str` = '%s'
+                `mysql_admin_user` = '%s', `mysql_root_passwd` = '%s', `privilegies_str` = '%s'
 				WHERE `mysql_server_id` = %s;",
 				$this->table_prefix,
 				mysql_real_escape_string($remote_server_id,$this->link),
 				mysql_real_escape_string($mysql_name,$this->link),
 				mysql_real_escape_string($mysql_ip,$this->link),
 				mysql_real_escape_string($mysql_port,$this->link),
+                mysql_real_escape_string($mysql_admin_user,$this->link),
 				mysql_real_escape_string($mysql_root_passwd,$this->link),
 				mysql_real_escape_string($privilegies_str,$this->link),
 				mysql_real_escape_string($mysql_server_id,$this->link));
