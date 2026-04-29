@@ -35,7 +35,7 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         parent::__destruct();
     }
 	
-	public function connect($db_host, $db_user, $db_pass, $db_name, $table_prefix = NULL) {
+	public function connect($db_host, $db_user, $db_pass, $db_name, $table_prefix = NULL, $db_port = NULL) {
         if ( !extension_loaded("mysqli") )
             return -99;
 

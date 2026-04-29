@@ -3,16 +3,20 @@
  * GSP – Global Debug System
  * -------------------------
  * Loaded early in every request (after config.inc.php defines DEBUG_MODE).
- * Controlled by the DEBUG_MODE constant.  Set to false (or leave undefined)
- * in production to disable ALL output and keep standard error suppression.
  *
- * Activation:
- *   In includes/config.inc.php add:  define('DEBUG_MODE', true);
- *   In production set it to false or remove the line entirely.
+ * Constants (set in includes/config.inc.php):
+ *   DEBUG_MODE  – true/false master switch.
+ *   DEBUG_LEVEL – 0=off, 1=fatal only, 2=errors+warnings, 3=all (default 1)
+ *
+ * The panel Settings page exposes a "debug_level" dropdown that overrides
+ * DEBUG_LEVEL at runtime (applied in home.php after the DB is ready).
  */
 
 if (!defined('DEBUG_MODE')) {
     define('DEBUG_MODE', false);
+}
+if (!defined('DEBUG_LEVEL')) {
+    define('DEBUG_LEVEL', 1); // fatal errors only by default
 }
 
 if (!DEBUG_MODE) {
@@ -26,13 +30,51 @@ if (!DEBUG_MODE) {
 
 // ── Development mode ──────────────────────────────────────────────────────────
 
-error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 ini_set('log_errors', '1');
 
+// Apply the initial level from the constant; may be overridden from DB later.
+gsp_apply_debug_level(DEBUG_LEVEL);
+
 // Accumulated non-fatal errors collected by the custom handler
 $GLOBALS['_gsp_debug_errors'] = [];
+
+/**
+ * Apply an error-reporting level for GSP debug mode.
+ *
+ * Level map:
+ *   0 = off           – suppress everything
+ *   1 = fatal only    – E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR
+ *   2 = errors+warnings – adds E_WARNING, E_USER_ERROR, E_USER_WARNING
+ *   3 = all           – E_ALL
+ *
+ * Safe to call multiple times (e.g. once from config, once after DB load).
+ */
+function gsp_apply_debug_level(int $level): void
+{
+    switch ($level) {
+        case 0:
+            error_reporting(0);
+            ini_set('display_errors', '0');
+            break;
+        case 1:
+            error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR);
+            ini_set('display_errors', '1');
+            break;
+        case 2:
+            error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR
+                | E_RECOVERABLE_ERROR | E_WARNING | E_USER_ERROR | E_USER_WARNING);
+            ini_set('display_errors', '1');
+            break;
+        case 3:
+        default:
+            error_reporting(E_ALL);
+            ini_set('display_errors', '1');
+            break;
+    }
+}
+
 
 /**
  * Custom error handler – captures E_WARNING, E_NOTICE, E_DEPRECATED, etc.

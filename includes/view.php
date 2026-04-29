@@ -26,27 +26,29 @@ define("DEFAULT_REFRESH_TIME","2");
 
 class OGPView {
 
-    private $meta;
-    private $title;
+    private string $meta = '';
+    private string $title = 'Open Game Panel';
+    private string $header_code = '';
 
     private $refreshTime;
     private $refreshUrl;
 
+    public string $logo = 'home.php?m=dashboard&p=dashboard';
+    public string $bg_wrapper = '';
+    public string $charset = 'utf-8';
+    public string $time_zone = 'America/Chicago';
+
     function __construct() {
         ob_start();
-		$this->logo = "home.php?m=dashboard&p=dashboard";
-		$this->bg_wrapper = "";
-        $this->title = "Open Game Panel";
-		$this->charset = "utf-8";
         $this->refreshTime = DEFAULT_REFRESH_TIME;
     }
 
     function __destruct() {
 
     }
-
-	function menu(){}
 	
+	function menu(){}
+
     function printView($cleared = false, $dataType = "html") {
         global $db, $OGPLangPre;
 
@@ -134,9 +136,9 @@ class OGPView {
 			{
 				$global_js_file = 'js/' . MODULES . "{$m['folder']}_global.js";
 				if(is_readable($path . $global_js_file)) // Priority to the theme's js
-					$javascript .= "<script type=\"text/javascript\" src=\"${path}${global_js_file}\"></script>\n";
+					$javascript .= "<script type=\"text/javascript\" src=\"{$path}{$global_js_file}\"></script>\n";
 				elseif(is_readable($global_js_file))
-					$javascript .= "<script type=\"text/javascript\" src=\"${global_js_file}\"></script>\n";
+					$javascript .= "<script type=\"text/javascript\" src=\"{$global_js_file}\"></script>\n";
 			}
 		}
 		
@@ -145,15 +147,15 @@ class OGPView {
 		{
 			$subpage = (isset($_GET['p']) and !empty($_GET['p']))?$_GET['p']:$_GET['m'];
 			$fc = array(
-				$path . MODULES . "{$_GET['m']}/${subpage}.css",
+				$path . MODULES . "{$_GET['m']}/{$subpage}.css",
 				$path . MODULES . "{$_GET['m']}/{$_GET['m']}.css",
-				MODULES . "{$_GET['m']}/${subpage}.css",
+				MODULES . "{$_GET['m']}/{$subpage}.css",
 				MODULES . "{$_GET['m']}/{$_GET['m']}.css"
 			);
 			
 			foreach ((array)$fc as $file_check){
 				if(is_readable($file_check)){
-					$stylesheet .= "<link rel=\"stylesheet\" href=\"${file_check}\">\n";
+					$stylesheet .= "<link rel=\"stylesheet\" href=\"{$file_check}\">\n";
 					break;
 				}
 			}
@@ -165,7 +167,7 @@ class OGPView {
 			
 			foreach ((array)$fc as $file_check){
 				if(is_readable($file_check)){
-					$javascript .= "<script type=\"text/javascript\" src=\"${file_check}\"></script>\n";
+					$javascript .= "<script type=\"text/javascript\" src=\"{$file_check}\"></script>\n";
 					break;
 				}
 			}

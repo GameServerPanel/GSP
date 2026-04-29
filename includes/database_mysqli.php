@@ -2191,7 +2191,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		return $this->listQuery($query);
 	}
 	
-	public function getIpPorts_limit($ip_id = 0,$page_dashboardlist,$limit_dashboardlist) {
+	public function getIpPorts_limit($ip_id = 0, $page_dashboardlist = 1, $limit_dashboardlist = 25) {
 		$ip_id = $this->realEscapeSingle($ip_id);
 		$user_request_page = ($page_dashboardlist - 1) * $limit_dashboardlist;
 		

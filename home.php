@@ -59,6 +59,11 @@ $settings = $db->getSettings();
 @$GLOBALS['panel_language'] = $settings['panel_language'];
 ogpLang();
 
+// Apply debug level from panel settings (overrides the DEBUG_LEVEL constant)
+if (defined('DEBUG_MODE') && DEBUG_MODE && function_exists('gsp_apply_debug_level')) {
+    gsp_apply_debug_level((int)($settings['debug_level'] ?? DEBUG_LEVEL));
+}
+
 require_once("includes/view.php");
 $view = new OGPView();
 $view->setCharset(get_lang('lang_charset'));

@@ -76,7 +76,9 @@ function exec_ogp_module()
 			// Discord Integration
 			"discord_invite_url"     => $_REQUEST['discord_invite_url'],
 			"discord_webhook_main"   => $_REQUEST['discord_webhook_main'],
-			"discord_webhook_admin"  => $_REQUEST['discord_webhook_admin']
+			"discord_webhook_admin"  => $_REQUEST['discord_webhook_admin'],
+			// Debug
+			"debug_level"            => $_REQUEST['debug_level'] ?? '1'
 		);
 		
 		$db->setSettings($settings);
@@ -200,6 +202,16 @@ function exec_ogp_module()
 	$ft->add_field('string','discord_invite_url',@$row['discord_invite_url']);
 	$ft->add_field('string','discord_webhook_main',@$row['discord_webhook_main']);
 	$ft->add_field('string','discord_webhook_admin',@$row['discord_webhook_admin']);
+
+	// Debug level
+	$debug_level_options = array(
+		'0' => get_lang('debug_off'),
+		'1' => get_lang('debug_fatal_only'),
+		'2' => get_lang('debug_errors_warnings'),
+		'3' => get_lang('debug_all'),
+	);
+	$ft->add_custom_field('debug_level',
+		create_drop_box_from_array($debug_level_options, 'debug_level', @$row['debug_level'] ?? '1', false));
 
 	// Add option to reset game server order to default
 	$ft->add_field('checkbox','reset_game_server_order','0');	

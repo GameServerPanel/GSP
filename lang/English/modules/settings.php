@@ -145,4 +145,11 @@ define('OGP_LANG_reset_game_server_order', "Reset Game Server Ordering");
 define('OGP_LANG_reset_game_server_order_info', "Resets game server ordering back to the default of using the server ID");
 
 
+
+// Debug level
+define('OGP_LANG_debug_level', "Panel Debug Level");
+define('OGP_LANG_debug_off', "Off (production)");
+define('OGP_LANG_debug_fatal_only', "Fatal errors only (page-breaking)");
+define('OGP_LANG_debug_errors_warnings', "Errors & Warnings");
+define('OGP_LANG_debug_all', "All (verbose - E_ALL)");
 ?>
