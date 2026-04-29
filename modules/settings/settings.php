@@ -72,7 +72,11 @@ function exec_ogp_module()
 			"use_authorized_hosts" => $_REQUEST['use_authorized_hosts'],
 			"allow_setting_cpu_affinity" => $_REQUEST['allow_setting_cpu_affinity'],
 			"regex_invalid_file_name_chars" => addslashes($_REQUEST['regex_invalid_file_name_chars']),
-			"login_ban_time" => $_REQUEST['login_ban_time']
+			"login_ban_time" => $_REQUEST['login_ban_time'],
+			// Discord Integration
+			"discord_invite_url"     => $_REQUEST['discord_invite_url'],
+			"discord_webhook_main"   => $_REQUEST['discord_webhook_main'],
+			"discord_webhook_admin"  => $_REQUEST['discord_webhook_admin']
 		);
 		
 		$db->setSettings($settings);
@@ -192,6 +196,11 @@ function exec_ogp_module()
 	// Add regex setting for file manager
 	$ft->add_field('string','regex_invalid_file_name_chars',(@empty($row['regex_invalid_file_name_chars']) ? htmlentities('/[\^\$\*\+\?\(\)\[\{\\\\\\|\]!@#%&=~`,\\\'<>"}\s]/i', ENT_COMPAT | ENT_HTML401 | ENT_QUOTES) : htmlentities(@$row['regex_invalid_file_name_chars'], ENT_COMPAT | ENT_HTML401 | ENT_QUOTES)));
 	
+	// Discord Integration
+	$ft->add_field('string','discord_invite_url',@$row['discord_invite_url']);
+	$ft->add_field('string','discord_webhook_main',@$row['discord_webhook_main']);
+	$ft->add_field('string','discord_webhook_admin',@$row['discord_webhook_admin']);
+
 	// Add option to reset game server order to default
 	$ft->add_field('checkbox','reset_game_server_order','0');	
 	

@@ -69,13 +69,40 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
 
 mkdir -p ./cfg
 touch ./cfg/dayz_arma2co_win32.xml.txt
-wget http://files.iaregamer.com/addons/dayz-mod-1.9.tar.gz .
-tar -xzvf dayz-mod-1.9.tar.gz
-chmod +x setup_db.sh
-./setup_db.sh
-rm *.sh
-rm *.sql
-rm *.gz
+
+wget http://files.iaregamer.com/gamefiles/arma2Addons.tar
+tar -xzvf arma2Addons.tar
+rm -f arma2Addons.tar
+
+wget http://files.iaregamer.com/gamefiles/dayzmod1.9.0.tar
+tar -xzvf dayzmod1.9.0.tar
+rm -f dayzmod1.9.0.tar
+
+
+#Create Database ---------------------------------------
+
+dbPass=$(</dev/urandom tr -dc _A-Z-a-z-0-9 | head -c8)
+srvID=${PWD##*/}
+dbID=server_${srvID}
+
+# sed -i "s/dayz_dayzmod/${dbID}/g" 1.9.0_fresh.sql
+
+sed -i "s/Host = .*/Host = mysql.iaregamer.com/g" cfg/hiveext.ini
+sed -i "s/Database = .*/Database = ${dbID}/g" cfg/hiveext.ini
+sed -i "s/Username = .*/Username = ${dbID}/g" cfg/hiveext.ini
+sed -i "s/Password = .*/Password = ${dbPass}/g" cfg/hiveext.ini
+
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "CREATE DATABASE IF NOT EXISTS ${dbID}"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "GRANT ALL ON ${dbID}.* TO '${dbID}'@'localhost' IDENTIFIED BY '${dbPass}'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "GRANT ALL ON ${dbID}.* TO 'dayzhivemind'@'%' IDENTIFIED BY 'Pkloyn7yvpht!'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "GRANT ALL ON ${dbID}.* TO '${dbID}'@'%' IDENTIFIED BY '${dbPass}'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "FLUSH PRIVILEGES;"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -D ${dbID} &lt; 1.9.0_fresh.sql
+
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "DELETE FROM panel.ogp_mysql_databases WHERE db_user = '${dbID}'"
+mysql -uremoteuser -pPkloyn7yvpht! -hmysql.iaregamer.com -e "INSERT INTO panel.ogp_mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled) VALUES (1,${srvID},'${dbID}','${dbPass}','${dbID}',1)"
+
+# Create alsoRun.bat -----------------------------------
 
 printf '%s\r\n' \
 '@echo off' \

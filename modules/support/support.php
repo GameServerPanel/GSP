@@ -47,17 +47,16 @@ function exec_ogp_module() {
 	$db->logger( "TICKET SUBMITTED by " . $_SESSION['user_id']);
 
 
-// URL FROM DISCORD WEBHOOK SETUP
-$webhook = "https://discordapp.com/api/webhooks/710275918274363412/g5Tr-EUdEnLfFryOlscxJ6FuPiSJuE6EMKRYmh9UGMiqTUxU5-y9CQrBlDJW7znr0Tol";
-$msg = json_decode('
-{
-    "username":"I Are Gamer",
-    "content":"SUPPORT TICKET CREATED: Login with the userid and password http://privateemail.com" 
-
+// Post to Discord support webhook (configured in Admin > Settings)
+$webhook = !empty($settings['discord_webhook_main']) ? $settings['discord_webhook_main'] : '';
+if (!empty($webhook)) {
+	$panel_name = !empty($settings['panel_name']) ? $settings['panel_name'] : 'GSP';
+	$msg = array(
+		'username' => $panel_name,
+		'content'  => 'SUPPORT TICKET: [' . htmlspecialchars($subject, ENT_QUOTES) . '] from ' . htmlspecialchars($_SESSION['users_login'] ?? '', ENT_QUOTES),
+	);
+	discordmsg($msg, $webhook);
 }
-', true);
-
-discordmsg($msg, $webhook);
 //end discord
 
 		$content = get_lang_f('support_email_content', $user['users_login'], $email, $gameserver, $message);				
@@ -72,7 +71,20 @@ discordmsg($msg, $webhook);
 			<?php
 		}
 	} // End else
+	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />';
 	echo "<h2>".get_lang('support')."</h2>";
+	echo '
+	<div style="background:#5865F2;border-radius:8px;padding:14px 20px;margin:0 auto 20px auto;max-width:600px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.18);">
+		<i class="fa-brands fa-discord" style="font-size:2.4em;color:#fff;flex-shrink:0;"></i>
+		<div style="flex:1;">
+			<div style="color:#fff;font-size:1.1em;font-weight:bold;margin-bottom:4px;">Need help faster?</div>
+			<div style="color:#dde0ff;font-size:0.95em;">Join our Discord server and post in the support channel for quick assistance from our team and community.</div>
+		</div>
+		<a href="' . (!empty($settings['discord_invite_url']) ? htmlspecialchars($settings['discord_invite_url'], ENT_QUOTES) : 'https://discord.com') . '" target="_blank"
+		   style="background:#fff;color:#5865F2;font-weight:bold;padding:8px 18px;border-radius:6px;text-decoration:none;white-space:nowrap;font-size:0.97em;flex-shrink:0;">
+			<i class="fa-brands fa-discord"></i> Join Discord
+		</a>
+	</div>';
 	echo '<center><form class="contactForm" name="contactForm" action="" method="post"><p style="font-size:12px;text-align:center;">'.get_lang('please_describe_your_issue_below').'</p>';
 	echo get_lang('select_server').":<br /><select name='gameserver' id='gameserver'>";
 	foreach ((array)$server_homes as $server_home)

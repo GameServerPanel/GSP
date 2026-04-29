@@ -1,5 +1,8 @@
 # Ignore database configuration files with sensitive credentials
 modules/billing/includes/config.inc.php
+includes/config.inc.php
+status/api/config.php
+status_api_local.php
 
 # Ignore logs
 modules/billing/logs/*.log

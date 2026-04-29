@@ -55,12 +55,12 @@ function mods($dbname) {
 }
 
 function dbConnect($dbname){
-	$servername = "localhost";
-	$username = "localuser";
-	$password = "Pkloyn7yvpht!";
-	// Create connection
-	$conn = new mysqli($servername, $username, $password, $dbname);
-	if (!$conn) {die("Connection failed: " . mysqli_connect_error());}
+	$config = __DIR__ . '/../../includes/config.inc.php';
+	if (!file_exists($config)) { die("Database configuration not found."); }
+	require_once $config; // sets $db_host, $db_user, $db_pass
+	// Create connection — $dbname parameter overrides the DB name from config
+	$conn = new mysqli($db_host, $db_user, $db_pass, $dbname);
+	if (!$conn) { die("Connection failed: " . mysqli_connect_error()); }
 	return $conn;
 }
 

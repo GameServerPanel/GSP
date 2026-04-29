@@ -11,18 +11,13 @@ require_once __DIR__.'/includes/lib_remote.php'; // OGPRemoteLibrary
 require_once __DIR__.'/includes/classes/db.php'; // $db
 
 /* ========== CONFIG ========== */
-$PUBLIC_TOKEN = 'CHANGE_ME_LONG_RANDOM';    // set a random token and pass ?token=... from the website
-$CACHE_TTL    = 30;                         // seconds
-$LOCATION_MAP = [                           // optional: map hostnames/IPs to friendly names
-  'nyc.iaregamer.com' => 'NYC',
-  'kc.iaregamer.com'  => 'KC',
-  'kc2.iaregamer.com' => 'KC2',
-  'la.iaregamer.com'  => 'LA',
-  'france.iaregamer.com' => 'France',
-  'ireland.iaregamer.com' => 'Ireland',
-  'atl.iaregamer.com' => 'Atlanta',
-  'lab.iaregamer.com' => 'Lab',
-];
+$PUBLIC_TOKEN = 'CHANGE_ME_LONG_RANDOM'; // overridden in status_api_local.php
+$CACHE_TTL    = 30;                      // seconds
+$LOCATION_MAP = [];                      // hostname => friendly name; overridden in status_api_local.php
+// Load site-specific token + location map — this file is git-ignored (copy from status_api_local.php.example)
+$_local_cfg = __DIR__ . '/status_api_local.php';
+if (file_exists($_local_cfg)) { require $_local_cfg; }
+unset($_local_cfg);
 /* ============================ */
 
 if (!isset($_GET['token']) || $_GET['token'] !== $PUBLIC_TOKEN) {

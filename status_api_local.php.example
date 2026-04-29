@@ -1,0 +1,12 @@
+<?php
+// Copy this file to status_api_local.php and fill in real values.
+// status_api_local.php is git-ignored — never commit the real copy.
+
+// A long random string; pass as ?token=... from the website
+$PUBLIC_TOKEN = 'CHANGE_ME_LONG_RANDOM_STRING';
+
+// Optional: map OGP agent hostnames/IPs to friendly location names
+$LOCATION_MAP = [
+  'agent1.example.com' => 'Location 1',
+  'agent2.example.com' => 'Location 2',
+];

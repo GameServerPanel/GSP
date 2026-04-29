@@ -2,17 +2,12 @@
 // stats_aggregate.php — call: ?machine=HOSTNAME_OR_ID[&format=html]
 
 /********** CONFIG (panel DB) **********/
-$db = [
-  'host' => 'localhost',
-  'user' => 'localuser',
-  'pass' => 'Pkloyn7yvpht!',
-  'name' => 'panel'
-];
-$TABLE_PREFIX = 'gsp_';
+require_once __DIR__ . '/includes/config.inc.php'; // sets $db_host, $db_user, $db_pass, $db_name, $table_prefix
+$TABLE_PREFIX = $table_prefix ?? 'gsp_';
 $AUTO_REFRESH_SECONDS = 30; // set 0 to disable auto-refresh
 /***************************************/
 
-$mysqli = @new mysqli($db['host'], $db['user'], $db['pass'], $db['name']);
+$mysqli = @new mysqli($db_host, $db_user, $db_pass, $db_name);
 if ($mysqli->connect_errno) {
   http_response_code(500);
   echo "<pre>DB connect failed: " . htmlspecialchars($mysqli->connect_error) . "</pre>";
