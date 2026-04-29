@@ -53,6 +53,8 @@ $GLOBALS['_gsp_debug_errors'] = [];
  */
 function gsp_apply_debug_level(int $level): void
 {
+	$GLOBALS['_gsp_debug_level'] = $level;
+
     switch ($level) {
         case 0:
             error_reporting(0);
@@ -81,9 +83,19 @@ function gsp_apply_debug_level(int $level): void
  * Fatal errors (E_ERROR, E_PARSE …) are handled by the shutdown function.
  */
 set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline): bool {
+    $activeLevel = (int)($GLOBALS['_gsp_debug_level'] ?? DEBUG_LEVEL);
+
+    if ($activeLevel <= 1) {
+        return true;
+    }
+
+    if ($activeLevel === 2 && ($errno === E_DEPRECATED || $errno === E_USER_DEPRECATED || $errno === E_NOTICE || $errno === E_USER_NOTICE || $errno === E_STRICT)) {
+        return true;
+    }
+
     // Respect the @ operator (error suppression)
     if (!(error_reporting() & $errno)) {
-        return false;
+        return true;
     }
 
     $levels = [
@@ -107,8 +119,7 @@ set_error_handler(function (int $errno, string $errstr, string $errfile, int $er
         'line'    => $errline,
     ];
 
-    // Do NOT suppress the built-in handler (allows display_errors to also show inline)
-    return false;
+	return true;
 });
 
 /**

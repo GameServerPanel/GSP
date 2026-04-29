@@ -288,12 +288,12 @@ class OGPView {
         	$page = str_replace("%header_code%",$this->header_code,$page);
 			$page = str_replace("%charset%",$this->charset,$page);
         	$page = str_replace("%body%",$buffer,$page);
-			$page = str_replace("%top%",$top,$page);
-			$page = str_replace("%topbody%",$topbody,$page);
-			$page = str_replace("%botbody%",$botbody,$page);
-			$page = str_replace("%bottom%",$bottom,$page);
-			$page = str_replace("%footer%",$footer,$page);
-			$page = str_replace("%notifications%",@$notifications,$page);
+			$page = str_replace("%top%",(string)$top,$page);
+			$page = str_replace("%topbody%",(string)$topbody,$page);
+			$page = str_replace("%botbody%",(string)$botbody,$page);
+			$page = str_replace("%bottom%",(string)$bottom,$page);
+			$page = str_replace("%footer%",(string)($footer ?? ''),$page);
+			$page = str_replace("%notifications%",(string)($notifications ?? ''),$page);
 		}
 		
 		// Set the content-type header as this is needed by older browsers
