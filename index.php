@@ -22,8 +22,9 @@
  *
  */
  
-// Report all PHP errors
-error_reporting(E_ERROR);
+// Error reporting level is managed centrally by includes/debug.php,
+// which is loaded via includes/config.inc.php. DEBUG_MODE=true enables E_ALL
+// with a visual panel; DEBUG_MODE=false suppresses all output (production).
 
 // Path definitions
 define("IMAGES", "images/");

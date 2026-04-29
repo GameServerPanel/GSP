@@ -68,5 +68,5 @@ if ($seconds == 0) {
 	$seconds = "";
 }
 $indexuptime = $days . ' ' . $hours . ' ' . $minutes . ' ' . $seconds;
-$indexuptimesince = date('F jS, Y. h:i A', $upsince);
+$indexuptimesince = date('F jS, Y. h:i A', is_numeric($upsince) ? (int)$upsince : strtotime((string)$upsince));
 ?>

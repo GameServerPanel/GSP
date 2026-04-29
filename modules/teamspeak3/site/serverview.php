@@ -435,7 +435,7 @@ if(!empty($serverinfo))
 		}	
 		
 	$sversion=explode(' ', $serverinfo['virtualserver_version']);
-	$sversion2=date('d.m.Y H:i:s',str_replace(']', '', $sversion[2]));
+	$sversion2=date('d.m.Y H:i:s', (int)str_replace(']', '', $sversion[2]));
 	$serverinfo['virtualserver_version']=$sversion[0].' '.$sversion[1].' '.$sversion2.']';
 	
 	$serverinfo['virtualserver_welcomemessage']=parse_bbcode(str_replace('\r\n', '<br />', $serverinfo['virtualserver_welcomemessage']));
