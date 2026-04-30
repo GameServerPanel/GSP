@@ -249,8 +249,6 @@ foreach ((array)$file_replacements as $filepath => $replacements)
 			}
 		}
 	
-		if ( get_magic_quotes_gpc() )
-			$file_content=stripslashes($file_content);
 	}
 	//echo "<xmp>".$file_content."</xmp>";
 	$remote->remote_writefile($server_home['home_path'] . "/" . $filepath, $file_content);
