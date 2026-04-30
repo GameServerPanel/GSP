@@ -4,7 +4,7 @@
   <page key="mods" file="home_mods.php" access="user,admin" />
   <page key="edit" file="edit_home.php" access="admin,user,subuser" />
   <page key="del" file="del_home.php" access="admin" />
-  <page key="clone" file="clone_home.php" access="admin" />
+  <page key="migrate" file="migrate_home.php" access="admin" />
   <page key="default" file="show_homes.php" access="admin" />
   <page key="install_cmds" file="install_cmds.php" access="admin" />
   <page key="get_size" file="get_size.php" access="admin,user,subuser" />

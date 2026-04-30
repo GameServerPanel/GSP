@@ -20,6 +20,10 @@ function exec_ogp_module()
 {
 	global $db,$view,$settings;
 
+	// $now is used in multiple branches below — define it once here so it is
+	// always a string that date() / strtotime() can handle safely (PHP 8 fix).
+	$now = date('Y-m-d H:i:s');
+
 	$override = isset($GLOBALS['BILLING_PROVISION_OVERRIDE']) ? $GLOBALS['BILLING_PROVISION_OVERRIDE'] : null;
 	$user_id = isset($override['user_id']) ? intval($override['user_id']) : (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
 	$isAdmin = isset($override['is_admin']) ? (bool)$override['is_admin'] : $db->isAdmin($user_id);
@@ -80,7 +84,7 @@ function exec_ogp_module()
 			$ip = $order['ip'];
 			$max_players = $order['max_players'];
 			$user_id = $order['user_id'];
-			$extended = $order['extended'] == "1" ? TRUE : FALSE;
+			$extended = isset($order['extended']) && $order['extended'] == "1" ? TRUE : FALSE;
 			//Query service info	
 			$service = $db->resultQuery( "SELECT * 
 							   FROM OGP_DB_PREFIXbilling_services 
@@ -413,8 +417,6 @@ function exec_ogp_module()
 					
         $db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
-	}
-	
 	// Show results and redirect
 	if ($provisioned_count > 0) {
 		echo "<div class='success'>";
