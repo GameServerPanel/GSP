@@ -1,48 +1,10 @@
-<?php
-/*
- *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2018 The OGP Development Team
- *
- * http://www.opengamepanel.org/
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- *
- */
-// Module general information
-$module_title = "Steam Workshop";
-$module_version = "2.1";
-$db_version = 1;
-$module_required = TRUE;
-$module_menus = array(
-	array(
-		'subpage' => 'main',
-		'name'    => 'Steam Workshop',
-		'group'   => 'user'
-	),
-	array(
-		'subpage' => 'workshop_admin',
-		'name'    => 'Steam Workshop',
-		'group'   => 'admin'
-	)
-);
+-- GSP Steam Workshop – database-driven tables
+-- Run once against your panel database (replace `gsp_` with your table_prefix if different).
 
-// Database schema migration: create the three Workshop tables when not present.
-// Called by the panel module installer when db_version increments.
-$module_db_create = <<<'SQL'
-CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXworkshop_game_profiles` (
+-- -------------------------------------------------------
+-- Workshop game profiles (one row per supported game)
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `gsp_workshop_game_profiles` (
   `id`                    INT          NOT NULL AUTO_INCREMENT,
   `game_key`              VARCHAR(100) NOT NULL,
   `game_name`             VARCHAR(255) NOT NULL,
@@ -63,7 +25,10 @@ CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXworkshop_game_profiles` (
   UNIQUE KEY `uniq_game_key` (`game_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXworkshop_cache` (
+-- -------------------------------------------------------
+-- Per-agent workshop download cache
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `gsp_workshop_cache` (
   `id`               INT          NOT NULL AUTO_INCREMENT,
   `agent_id`         INT          NOT NULL,
   `os_type`          ENUM('linux','windows') NOT NULL DEFAULT 'linux',
@@ -79,7 +44,10 @@ CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXworkshop_cache` (
   UNIQUE KEY `uniq_agent_workshop` (`agent_id`, `workshop_app_id`, `workshop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXserver_workshop_mods` (
+-- -------------------------------------------------------
+-- Per-server installed Workshop mods
+-- -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `gsp_server_workshop_mods` (
   `id`               INT          NOT NULL AUTO_INCREMENT,
   `home_id`          INT          NOT NULL,
   `agent_id`         INT          NOT NULL,
@@ -95,4 +63,3 @@ CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXserver_workshop_mods` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_home_workshop` (`home_id`, `workshop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-SQL;
