@@ -94,7 +94,7 @@ class WorkshopInstaller
         if ($cacheEntry === null || ($cacheEntry['status'] ?? '') !== 'cached') {
             $log[] = 'Cache MISS – triggering SteamCMD download on agent.';
             $downloadResult = $this->triggerSteamCmdDownload(
-                $remote, $appId, $workshopId, $steamCmdPath, $cachePath, $log
+                $remote, $agentId, $appId, $workshopId, $steamCmdPath, $cachePath, $log
             );
 
             if (!$downloadResult) {
@@ -273,6 +273,7 @@ class WorkshopInstaller
      */
     private function triggerSteamCmdDownload(
         object $remote,
+        int $agentId,
         string $appId,
         string $workshopId,
         string $steamCmdPath,
@@ -292,13 +293,13 @@ class WorkshopInstaller
         ]);
 
         $log[] = "SteamCMD start: {$cmd}";
-        $this->writeLog("STEAMCMD START agent={$this->agentIdFromRemote($remote)} app={$appId} mod={$workshopId}");
+        $this->writeLog("STEAMCMD START agent={$agentId} app={$appId} mod={$workshopId}");
 
         $output = $remote->exec($cmd);
 
         if ($output === null) {
             $log[] = 'SteamCMD: no response from agent (command may still be running).';
-            $this->writeLog("STEAMCMD NO_RESPONSE app={$appId} mod={$workshopId}");
+            $this->writeLog("STEAMCMD NO_RESPONSE agent={$agentId} app={$appId} mod={$workshopId}");
             // Treat as unknown – check file existence
         } else {
             $log[] = 'SteamCMD output: ' . substr((string)$output, 0, 500);
@@ -307,11 +308,11 @@ class WorkshopInstaller
         // Verify the download succeeded by checking for the cache path on the agent
         $exists = $remote->rfile_exists($cachePath);
         if ($exists === 1) {
-            $this->writeLog("STEAMCMD SUCCESS app={$appId} mod={$workshopId} path={$cachePath}");
+            $this->writeLog("STEAMCMD SUCCESS agent={$agentId} app={$appId} mod={$workshopId} path={$cachePath}");
             return true;
         }
 
-        $this->writeLog("STEAMCMD FAILURE app={$appId} mod={$workshopId} path={$cachePath}");
+        $this->writeLog("STEAMCMD FAILURE agent={$agentId} app={$appId} mod={$workshopId} path={$cachePath}");
         return false;
     }
 
@@ -332,27 +333,33 @@ class WorkshopInstaller
         $log[]      = "Pre-start compare: cache={$cachePath} dest={$installPath} method={$copyMethod}";
 
         if ($copyMethod === 'rsync') {
+            // Dry-run: any output lines (beyond the exit sentinel) mean changes exist
             $cmd = sprintf(
-                'rsync -rcn --delete %s %s 2>/dev/null; echo "EXIT:$?"',
+                'rsync -rcn --delete %s %s 2>/dev/null; echo "RSYNC_EXIT:$?"',
                 escapeshellarg(rtrim($cachePath, '/') . '/'),
                 escapeshellarg(rtrim($installPath, '/') . '/')
             );
-            $out = (string)$remote->exec($cmd);
-            // If rsync dry-run produces file list output, changes exist
-            $hasChanges = preg_match('/\S/', preg_replace('/EXIT:\d+\s*$/', '', $out) ?? '') === 1;
-            return $hasChanges;
+            $out  = (string)$remote->exec($cmd);
+            // Strip the exit line, then check for any non-whitespace output
+            $body = preg_replace('/RSYNC_EXIT:\d+\s*$/', '', $out) ?? '';
+            return preg_match('/\S/', $body) === 1;
         }
 
         if ($copyMethod === 'robocopy') {
-            // Robocopy /L = list only, /MIR = mirror, /NJH /NJS = no headers
+            // List-only mode: robocopy exit code 0 = no differences, 1+ = changes or errors.
+            // Embed the exit code in output so we can read it back via exec().
             $cmd = sprintf(
-                'robocopy /L /MIR /NJH /NJS %s %s',
+                'robocopy /L /MIR /NJH /NJS %s %s; echo "ROBOCOPY_EXIT:$LASTEXITCODE"',
                 escapeshellarg($cachePath),
                 escapeshellarg($installPath)
             );
-            $out = (string)$remote->exec($cmd);
-            // Exit code 0 = no changes, 1+ = changes
-            return trim($out) !== '' && !preg_match('/\bNo new\b/i', $out);
+            $out  = (string)$remote->exec($cmd);
+            if (preg_match('/ROBOCOPY_EXIT:(\d+)/', $out, $m)) {
+                // 0 = no change; 1–7 = informational (changes found); 8+ = error
+                return (int)$m[1] !== 0;
+            }
+            // If we cannot determine, assume sync is needed
+            return true;
         }
 
         // custom_script: always sync
@@ -392,7 +399,7 @@ class WorkshopInstaller
             );
         } elseif ($copyMethod === 'robocopy') {
             $cmd = sprintf(
-                'robocopy /MIR /NJH /NJS %s %s; echo "ROBOCOPY EXIT:$LASTEXITCODE"',
+                'robocopy /MIR /NJH /NJS %s %s; echo "ROBOCOPY_EXIT:$LASTEXITCODE"',
                 escapeshellarg($cachePath),
                 escapeshellarg($installPath)
             );
@@ -419,17 +426,20 @@ class WorkshopInstaller
         $out = (string)$remote->exec($cmd);
         $log[] = 'Sync output: ' . substr($out, 0, 500);
 
-        // Check exit code hint embedded in output
-        if (preg_match('/EXIT:(\d+)/', $out, $m)) {
-            $code = (int)$m[1];
-            // robocopy exit codes 0..7 are success/info, 8+ are errors
-            if ($copyMethod === 'robocopy') {
-                $ok = $code < 8;
+        // Determine success from embedded exit code sentinel
+        if ($copyMethod === 'robocopy') {
+            if (preg_match('/ROBOCOPY_EXIT:(\d+)/', $out, $m)) {
+                // 0–7 = success/informational; 8+ = error
+                $ok = (int)$m[1] < 8;
             } else {
-                $ok = $code === 0;
+                $ok = true; // assume success if no code extracted
             }
         } else {
-            $ok = true; // assume success if no code
+            if (preg_match('/EXIT:(\d+)/', $out, $m)) {
+                $ok = (int)$m[1] === 0;
+            } else {
+                $ok = true;
+            }
         }
 
         if ($ok) {
@@ -469,12 +479,6 @@ class WorkshopInstaller
             return 'windows';
         }
         return 'linux';
-    }
-
-    private function agentIdFromRemote(object $remote): string
-    {
-        // OGPRemoteLibrary stores host/port; use reflection-free fallback
-        return 'unknown';
     }
 
     private function writeLog(string $message): void

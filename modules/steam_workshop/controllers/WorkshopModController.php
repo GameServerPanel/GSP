@@ -233,18 +233,25 @@ class WorkshopModController
         $enabled    = !empty($_POST['enabled']);
 
         if ($homeId <= 0 || $workshopId === '') {
-            $this->jsonResponse(['ok' => false, 'error' => 'Missing parameters.']);
+            print_failure($this->lang['error_missing_params'] ?? 'Missing parameters.');
+            $this->handleIndex($userId, $isAdmin);
             return;
         }
 
         $home = $this->getHome($homeId, $userId, $isAdmin);
         if ($home === null) {
-            $this->jsonResponse(['ok' => false, 'error' => 'Access denied.']);
+            print_failure($this->lang['error_home_not_found'] ?? 'Server not found.');
+            $this->handleIndex($userId, $isAdmin);
             return;
         }
 
         $ok = $this->repo->toggleMod($homeId, $workshopId, $enabled);
-        $this->jsonResponse(['ok' => $ok]);
+        if (!$ok) {
+            print_failure($this->lang['error_toggle_failed'] ?? 'Failed to update mod status.');
+        }
+
+        $_GET['home_id'] = $homeId;
+        $this->handleModsPage($userId, $isAdmin);
     }
 
     private function handleLoadOrder(int $userId, bool $isAdmin): void
@@ -254,18 +261,25 @@ class WorkshopModController
         $order      = (int)($_POST['load_order'] ?? 0);
 
         if ($homeId <= 0 || $workshopId === '') {
-            $this->jsonResponse(['ok' => false, 'error' => 'Missing parameters.']);
+            print_failure($this->lang['error_missing_params'] ?? 'Missing parameters.');
+            $this->handleIndex($userId, $isAdmin);
             return;
         }
 
         $home = $this->getHome($homeId, $userId, $isAdmin);
         if ($home === null) {
-            $this->jsonResponse(['ok' => false, 'error' => 'Access denied.']);
+            print_failure($this->lang['error_home_not_found'] ?? 'Server not found.');
+            $this->handleIndex($userId, $isAdmin);
             return;
         }
 
         $ok = $this->repo->updateLoadOrder($homeId, $workshopId, $order);
-        $this->jsonResponse(['ok' => $ok]);
+        if (!$ok) {
+            print_failure($this->lang['error_order_failed'] ?? 'Failed to update load order.');
+        }
+
+        $_GET['home_id'] = $homeId;
+        $this->handleModsPage($userId, $isAdmin);
     }
 
     private function handleSync(int $userId, bool $isAdmin): void
@@ -358,13 +372,6 @@ class WorkshopModController
     {
         extract($data);
         require __DIR__ . '/../views/' . $view . '.php';
-    }
-
-    /** @param array<string,mixed> $data */
-    private function jsonResponse(array $data): void
-    {
-        header('Content-Type: application/json');
-        echo json_encode($data);
     }
 
     private function loadLang(): array

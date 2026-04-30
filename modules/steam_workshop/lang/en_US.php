@@ -192,5 +192,7 @@ return [
     'error_missing_params'         => 'Missing required parameters.',
     'error_no_profile'             => 'No Workshop profile configured for this game.',
     'error_mod_not_found'          => 'Mod or profile not found.',
+    'error_toggle_failed'          => 'Failed to update mod status.',
+    'error_order_failed'           => 'Failed to update load order.',
 ];
 

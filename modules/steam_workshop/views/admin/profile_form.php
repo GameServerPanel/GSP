@@ -135,7 +135,7 @@ $tplVarNote  = $lang['profile_template_vars'] ?? 'Available: {home_id} {agent_id
             </label>
             <label class="sw-checkbox">
                 <input type="checkbox" name="enabled" value="1"
-                       <?php echo (!isset($profile['enabled']) || !empty($profile['enabled'])) ? 'checked' : ''; ?>>
+                       <?php echo ($profile['enabled'] ?? 1) ? 'checked' : ''; ?>>
                 <span><?php echo htmlspecialchars($lang['profile_label_enabled'] ?? 'Profile enabled'); ?></span>
             </label>
         </fieldset>

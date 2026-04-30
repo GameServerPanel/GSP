@@ -203,14 +203,14 @@ $baseAction = '?m=steam_workshop&p=main';
 <script>
 /* Simple toggle / order auto-submit for the mods table */
 document.addEventListener('DOMContentLoaded', function () {
-    // Toggle enable/disable via form submit
+    // Toggle enable/disable: submit the parent form immediately on change
     document.querySelectorAll('.js-ws-toggle').forEach(function (cb) {
         cb.addEventListener('change', function () {
             cb.closest('form').submit();
         });
     });
 
-    // Load order auto-submit on blur
+    // Load order: submit on change (blur triggers faster than enter on number inputs)
     document.querySelectorAll('.js-ws-order').forEach(function (inp) {
         inp.addEventListener('change', function () {
             inp.closest('form').submit();
