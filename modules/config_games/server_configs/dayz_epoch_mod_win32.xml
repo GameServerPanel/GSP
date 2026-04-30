@@ -72,8 +72,60 @@ wget http://files.iaregamer.com/addons/arma2Addons.tar.gz .
 wget http://files.iaregamer.com/addons/epochmod-1.0.7.1.tar.gz .
 tar -zxvf arma2Addons.tar.gz
 tar -zxvf epoch_mod.tar.gz
-chmod +x setup_db.sh
-./setup_db.sh
+
+#Create Database ---------------------------------------
+
+dbPass=$(&lt;/dev/urandom tr -dc _A-Z-a-z-0-9 | head -c8)
+srvID=${PWD##*/}
+dbID=server_${srvID}
+mysqlServerID=2
+
+# Panel DB connection (where gsp_mysql_servers / gsp_mysql_databases live)
+panelDB=panel
+panelPrefix=gsp_
+panelHost=mysql.iaregamer.com
+panelPort=3307
+panelUser=remoteuser
+panelPass=Pkloyn7yvpht!
+
+# Resolve target game DB server/profile from panel metadata (default: mysql_server_id=2 -> MySQL 5.7)
+mysqlProfile=$(mysql -N -B -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "SELECT mysql_ip,mysql_port,COALESCE(NULLIF(mysql_admin_user,''),'root'),mysql_root_passwd FROM ${panelDB}.${panelPrefix}mysql_servers WHERE mysql_server_id = ${mysqlServerID} LIMIT 1")
+
+if [ -z "${mysqlProfile}" ]; then
+   echo "ERROR: Could not resolve mysql server profile id ${mysqlServerID} from ${panelDB}.${panelPrefix}mysql_servers"
+   exit 1
+fi
+
+IFS=$'\t' read -r mysqlHost mysqlPort mysqlAdminUser mysqlAdminPass &lt;&lt;EOF
+${mysqlProfile}
+EOF
+
+mysqlPort=${mysqlPort:-3306}
+
+sed -i "s/dayzhivemind/${dbID}/g" epoch.sql
+
+sed -i "s/Host = .*/Host = ${mysqlHost}/g" cfg/hiveext.ini
+sed -i "s/Database = .*/Database = ${dbID}/g" cfg/hiveext.ini
+sed -i "s/Username = .*/Username = ${dbID}/g" cfg/hiveext.ini
+sed -i "s/Password = .*/Password = ${dbPass}/g" cfg/hiveext.ini
+sed -i "s/Port = .*/Port = ${mysqlPort}/g" cfg/hiveext.ini
+
+mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "CREATE DATABASE IF NOT EXISTS \`${dbID}\`"
+
+# MySQL 5.7/8 compatible user creation + grants
+mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "CREATE USER IF NOT EXISTS '${dbID}'@'localhost' IDENTIFIED BY '${dbPass}'"
+mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "CREATE USER IF NOT EXISTS '${dbID}'@'%' IDENTIFIED BY '${dbPass}'"
+mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "GRANT ALL ON \`${dbID}\`.* TO '${dbID}'@'localhost'"
+mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "GRANT ALL ON \`${dbID}\`.* TO '${dbID}'@'%'"
+mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "FLUSH PRIVILEGES;"
+
+# Import with compatibility flags for routines/events under binary logging
+mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; epoch.sql
+mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; add_events.sql
+mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; update1071.sql
+
+mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "DELETE FROM ${panelDB}.${panelPrefix}mysql_databases WHERE db_user = '${dbID}'"
+mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "INSERT INTO ${panelDB}.${panelPrefix}mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled, db_mysql_ip, db_mysql_port, db_admin_user, db_admin_passwd) VALUES (${mysqlServerID},${srvID},'${dbID}','${dbPass}','${dbID}',1,'${mysqlHost}','${mysqlPort}','${mysqlAdminUser}','${mysqlAdminPass}')"
 
 rm *.sh
 rm *.gz

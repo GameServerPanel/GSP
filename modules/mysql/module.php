@@ -52,6 +52,10 @@ $install_queries[0] = array(
 	`db_passwd` varchar(50) NOT NULL,
 	`db_name` varchar(50) NOT NULL,
 	`enabled` int(11) NOT NULL,
+	`db_mysql_ip` varchar(255) NULL,
+	`db_mysql_port` int(11) NULL,
+	`db_admin_user` varchar(64) NULL,
+	`db_admin_passwd` varchar(255) NULL,
 	PRIMARY KEY  (`db_id`),
 	UNIQUE KEY (`mysql_server_id`,`db_name`),
 	UNIQUE KEY (`mysql_server_id`,`db_user`)
