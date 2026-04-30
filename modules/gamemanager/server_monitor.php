@@ -164,7 +164,7 @@ function exec_ogp_module() {
 	$stats_players = 0;
 	$stats_maxplayers = 0;
 	
-$home_id = $_GET['home_id'];
+$home_id = $_GET['home_id'] ?? null;
 $home_info = $db->getGameHomeWithoutMods($home_id);
 
 	$home_page = (isset($_GET['page']) && (int)$_GET['page'] > 0) ? (int)$_GET['page'] : 1;
