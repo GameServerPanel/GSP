@@ -68,10 +68,10 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
 <post_install>
 mkdir -p ./cfg
 touch ./cfg/epochmod_win32.xml
-wget http://files.iaregamer.com/addons/arma2Addons.tar.gz .
-wget http://files.iaregamer.com/addons/epochmod-1.0.7.1.tar.gz .
-tar -zxvf arma2Addons.tar.gz
-tar -zxvf epoch_mod.tar.gz
+wget http://files.iaregamer.com/addons/arma2Addons.tar .
+wget http://files.iaregamer.com/addons/epochmod.tar .
+tar -xvf arma2Addons.tar
+tar -zxvf epochmod.tar
 
 #Create Database ---------------------------------------
 
@@ -120,12 +120,20 @@ mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "
 mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "FLUSH PRIVILEGES;"
 
 # Import with compatibility flags for routines/events under binary logging
-mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; epoch.sql
-mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; add_events.sql
-mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; update1071.sql
+# Keep stderr in a file to avoid flooding panel output with non-fatal import warnings.
+mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; epoch.sql 2> ./cfg/mysql_import_errors.log
+mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; add_events.sql 2>> ./cfg/mysql_import_errors.log
+mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; update1071.sql 2>> ./cfg/mysql_import_errors.log
 
 mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "DELETE FROM ${panelDB}.${panelPrefix}mysql_databases WHERE db_user = '${dbID}'"
-mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "INSERT INTO ${panelDB}.${panelPrefix}mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled, db_mysql_ip, db_mysql_port, db_admin_user, db_admin_passwd) VALUES (${mysqlServerID},${srvID},'${dbID}','${dbPass}','${dbID}',1,'${mysqlHost}','${mysqlPort}','${mysqlAdminUser}','${mysqlAdminPass}')"
+
+# Backward-compatible insert: new schema with snapshot columns OR legacy schema.
+hasSnapshotCols=$(mysql -N -B -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='${panelDB}' AND TABLE_NAME='${panelPrefix}mysql_databases' AND COLUMN_NAME IN ('db_mysql_ip','db_mysql_port','db_admin_user','db_admin_passwd')")
+if [ "${hasSnapshotCols}" = "4" ]; then
+   mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "INSERT INTO ${panelDB}.${panelPrefix}mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled, db_mysql_ip, db_mysql_port, db_admin_user, db_admin_passwd) VALUES (${mysqlServerID},${srvID},'${dbID}','${dbPass}','${dbID}',1,'${mysqlHost}','${mysqlPort}','${mysqlAdminUser}','${mysqlAdminPass}')"
+else
+   mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "INSERT INTO ${panelDB}.${panelPrefix}mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled) VALUES (${mysqlServerID},${srvID},'${dbID}','${dbPass}','${dbID}',1)"
+fi
 
 rm *.sh
 rm *.gz
