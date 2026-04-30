@@ -74,7 +74,7 @@ function exec_ogp_module()
 			if($path == clean_path($home_cfg['home_path']."/"))
 			{
 				print_failure(get_lang_f("dir_not_found",$path));
-				echo "<table class='center'><tr><td><a href='?m=gamemanager&amp;p=game_monitor&amp;home_id=".$home_cfg['home_id']."'><< ". back ."</a></td></tr></table>";
+				echo "<table class='center'><tr><td><a href='?m=gamemanager&amp;p=game_monitor&amp;home_id=".$home_cfg['home_id']."'><< ".get_lang('back')."</a></td></tr></table>";
 				return;
 			}
 		}
