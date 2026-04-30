@@ -52,7 +52,7 @@ $replace_texts = $server_xml->replace_texts->text;
 $replace_id = 0;
 if($replace_texts)
 {
-	foreach ((array)$replace_texts as $text => $array )
+	foreach ($replace_texts as $array )
 	{
 		$param = (string)$array['key'];
 		
@@ -85,7 +85,7 @@ $custom_fields = json_decode($db->getCustomFields($server_home["home_id"]), True
 $fields = $server_xml->custom_fields->field;
 if($fields)
 {
-	foreach ((array)$fields as $text => $array )
+	foreach ($fields as $array )
 	{
 		foreach ((array)$array as $key => $value )
 		{			
