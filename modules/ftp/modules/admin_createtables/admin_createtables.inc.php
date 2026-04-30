@@ -225,14 +225,14 @@ function net2ftp_module_printBody() {
 // ------------------------------------
 // Connect
 // ------------------------------------
-		$mydb = mysql_connect($dbserver2, $dbusername2, $dbpassword2);
+		$mydb = mysqli_connect($dbserver2, $dbusername2, $dbpassword2);
 		if ($mydb == false) { $net2ftp_output["admin_createtables"][] = __("The connection to the server <b>%1\$s</b> could not be set up. Please check the database settings you've entered.", $dbserver2_html) . "\n"; }
 
 // ------------------------------------
 // Select
 // ------------------------------------
 		if ($mydb != false) {
-			$mysql_select_db_result = mysql_select_db($dbname2);
+			$mysql_select_db_result = mysqli_select_db($mydb, $dbname2);
 			if ($mysql_select_db_result == false) { $net2ftp_output["admin_createtables"][] = __("Unable to select the database <b>%1\$s</b>.", $dbserver2_html) . "\n"; }
 		}
 
@@ -241,7 +241,7 @@ function net2ftp_module_printBody() {
 // ------------------------------------
 		if ($mydb != false && $mysql_select_db_result != false) {
 			for ($i=0; $i<sizeof($sqlquerypieces); $i++) {
-				$mysql_query_results[$i] = mysql_query($sqlquerypieces[$i]);
+				$mysql_query_results[$i] = mysqli_query($mydb, $sqlquerypieces[$i]);
 				if ($mysql_query_results[$i] == false) { $net2ftp_output["admin_createtables"][] = __("The SQL query nr <b>%1\$s</b> could not be executed.", $i+1) . "\n"; }
 				else                                   { $net2ftp_output["admin_createtables"][] = __("The SQL query nr <b>%1\$s</b> was executed successfully.", $i+1) . "\n"; }
 			}

@@ -160,7 +160,7 @@ function net2ftp_module_printBody() {
 // -------------------------------------------------------------------------
 // For each sample
 // -------------------------------------------------------------------------
-	while(list($sampleName, $sampleLines) = each($list_samples)) {
+	foreach ($list_samples as $sampleName => $sampleLines) {
 		$net2ftp_output["advanced_parsing"][] = "<span style=\"font-size: 120%; font-weight: bold;\">" . $sampleName . "</span><br />\n";
 // ------------------------------------
 // Input
@@ -179,9 +179,9 @@ function net2ftp_module_printBody() {
 
 // Scan the sample
 			$outputArray = ftp_scanline("", $sampleLines[$i]);
-			while(list($fieldName, $fieldValue) = each($outputArray)) {
+			foreach ($outputArray as $fieldName => $fieldValue) {
 				$net2ftp_output["advanced_parsing"][] = "Line $i: " . $fieldName . ": " . htmlEncode2($fieldValue) . "<br />\n";
-			} // end while
+			} // end foreach
 			$net2ftp_output["advanced_parsing"][] = "<br />\n";
 		}
 		$net2ftp_output["advanced_parsing"][] = "<br /><br />\n";

@@ -93,16 +93,16 @@ function logAccess() {
 // Add record to the database table
 // ----------------------------------------------
 			$sqlquery1 = "INSERT INTO net2ftp_log_access VALUES(null, '$date', '$time', '$REMOTE_ADDR_safe', '$REMOTE_PORT_safe', '$HTTP_USER_AGENT_safe', '$PHP_SELF_safe', '$consumption_datatransfer_safe', '$consumption_executiontime_safe', '$net2ftp_ftpserver_safe', '$net2ftp_username_safe', '$state_safe', '$state2_safe', '$screen_safe', '$directory_safe', '$entry_safe', '$HTTP_REFERER_safe')";
-			$result1 = mysql_query($sqlquery1);
+			$result1 = mysqli_query($mydb, $sqlquery1);
 			if ($result1 == false) { 
 				$errormessage = __("Unable to execute the SQL query.");
 				setErrorVars(false, $errormessage, debug_backtrace(), __FILE__, __LINE__);
 				return false;
 			}
 
-			$nrofrows1 = mysql_affected_rows($mydb);
+			$nrofrows1 = mysqli_affected_rows($mydb);
 
-			$net2ftp_globals["log_access_id"] = mysql_insert_id();
+			$net2ftp_globals["log_access_id"] = mysqli_insert_id($mydb);
 
 		} // end if use_database
 
@@ -256,7 +256,7 @@ function logError() {
 // Add record to the database table
 // ----------------------------------------------
 			$sqlquerystring = "INSERT INTO net2ftp_log_error VALUES('$date', '$time', '$net2ftp_ftpserver_safe', '$net2ftp_username_safe', '$errormessage', '$debug_backtrace', '$state_safe', '$state2_safe', '$directory_safe', '$REMOTE_ADDR_safe', '$REMOTE_PORT_safe', '$HTTP_USER_AGENT_safe')";
-			$result_mysql_query = mysql_query($sqlquerystring);
+			$result_mysql_query = mysqli_query($mydb, $sqlquerystring);
 			if ($result_mysql_query == false) { 
 				setErrorVars($net2ftp_result_original["success"], $net2ftp_result_original["errormessage"], $net2ftp_result_original["debug_backtrace"], $net2ftp_result_original["file"], $net2ftp_result_original["line"]);
 				return false; 
@@ -365,14 +365,14 @@ function getLogStatus() {
 // Get log rotation status
 // -------------------------------------------------------------------------
 	$sqlquery1 = "SELECT status FROM net2ftp_log_status WHERE month = '$currentmonth';";
-	$result1   = mysql_query("$sqlquery1") or die("Unable to execute SQL SELECT query (getLogStatus > sqlquery1) <br /> $sqlquery1");
-	$nrofrows1 = mysql_num_rows($result1);
+	$result1   = mysqli_query($mydb, "$sqlquery1") or die("Unable to execute SQL SELECT query (getLogStatus > sqlquery1) <br /> $sqlquery1");
+	$nrofrows1 = mysqli_num_rows($result1);
 
 	if     ($nrofrows1 == 0) { 
 		$logStatus = 1;
 	}
 	elseif ($nrofrows1 == 1) { 
-		$resultRow1 = mysql_fetch_row($result1); 
+		$resultRow1 = mysqli_fetch_row($result1); 
 		$logStatus  = $resultRow1[0];
 	}
 	else { 
@@ -434,25 +434,25 @@ function putLogStatus($logStatus) {
 // Put log rotation status
 // -------------------------------------------------------------------------
 	$sqlquery1 = "SELECT status, changelog FROM net2ftp_log_status WHERE month = '$currentmonth';";
-	$result1   = mysql_query("$sqlquery1");
-	$nrofrows1 = mysql_num_rows($result1);
+	$result1   = mysqli_query($mydb, "$sqlquery1");
+	$nrofrows1 = mysqli_num_rows($result1);
 
 	if ($nrofrows1 == 1) { 
-		$resultRow1 = mysql_fetch_row($result1); 
+		$resultRow1 = mysqli_fetch_row($result1); 
 		$logStatus_old  = $resultRow1[0];
 		$changelog_old  = $resultRow1[1];
 		$changelog_new  = $changelog_old . "From $logStatus_old to $logStatus on $datetime. ";
 		$sqlquery2 = "UPDATE net2ftp_log_status SET status = '" . $logStatus . "', changelog = '" . $changelog_new . "' WHERE month = '$currentmonth';";
-		$result2   = mysql_query("$sqlquery2");
-		$nrofrows2 = mysql_affected_rows($mydb);
+		$result2   = mysqli_query($mydb, "$sqlquery2");
+		$nrofrows2 = mysqli_affected_rows($mydb);
 	}
 // Don't check on the UPDATE nr of rows, because when the values in the variables and in the table are the same,
 // the $nrofrows2 is set to 0. 
 	elseif ($nrofrows1 == 0) { 
 		$changelog_new  = "Set to $logStatus on $datetime. ";
 		$sqlquery3 = "INSERT INTO net2ftp_log_status VALUES('$currentmonth', '" . $logStatus . "', '" . $changelog_new . "');";
-		$result3   = mysql_query("$sqlquery3");
-		$nrofrows3 = mysql_affected_rows($mydb);
+		$result3   = mysqli_query($mydb, "$sqlquery3");
+		$nrofrows3 = mysqli_affected_rows($mydb);
 		if ($nrofrows3 != 1) { 
 			setErrorVars(false, __("Table net2ftp_log_status could not be updated."), debug_backtrace(), __FILE__, __LINE__);
 			return false; 
@@ -516,10 +516,10 @@ function emptyLogs($datefrom, $dateto) {
 // -------------------------------------------------------------------------
 	for ($i=1; $i<=sizeof($tables); $i++) {
 		$sqlquery_empty   = "DELETE FROM $tables[$i] WHERE date BETWEEN '$datefrom' AND '$dateto';";
-		$result_empty[$i] = mysql_query("$sqlquery_empty");
+		$result_empty[$i] = mysqli_query($mydb, "$sqlquery_empty");
 
 		$sqlquery_optimize   = "OPTIMIZE TABLE `" . $tables[$i] . "`;";
-		$result_optimize[$i] = mysql_query("$sqlquery_optimize");
+		$result_optimize[$i] = mysqli_query($mydb, "$sqlquery_optimize");
 
 		if ($result_empty[$i] == true)    { 
 			$net2ftp_output["emptyLogs"][] = __("The table <b>%1\$s</b> was emptied successfully.", $tables[$i]); 
@@ -641,7 +641,7 @@ function rotateLogs() {
 			$table_archive_drop = $table . "_" . $dropmonth;  // Example: net2ftp_log_access_201106
 
 			$sqlquery_rename   = "RENAME TABLE $table TO $table_archive";
-			$result_rename[$i] = mysql_query("$sqlquery_rename");
+			$result_rename[$i] = mysqli_query($mydb, "$sqlquery_rename");
 
 			if ($result_rename[$i] == true) { 
 				$net2ftp_output["rotateLogs"][] = __("The log tables were renamed successfully."); 
@@ -673,7 +673,7 @@ function rotateLogs() {
 			$table_archive_drop = $table . "_" . $dropmonth;  // Example: net2ftp_log_access_201106
 
 			$sqlquery_copy   = "CREATE TABLE $table LIKE $table_archive";
-			$result_copy[$i] = mysql_query("$sqlquery_copy");
+			$result_copy[$i] = mysqli_query($mydb, "$sqlquery_copy");
 
 			if ($result_copy[$i] == true) { 
 				$net2ftp_output["rotateLogs"][] = __("The log tables were copied successfully."); 
@@ -705,7 +705,7 @@ function rotateLogs() {
 			$table_archive_drop = $table . "_" . $dropmonth;  // Example: net2ftp_log_access_201106
 
 			$sqlquery_drop   = "DROP TABLE IF EXISTS $table_archive_drop;";
-			$result_drop[$i] = mysql_query("$sqlquery_drop");
+			$result_drop[$i] = mysqli_query($mydb, "$sqlquery_drop");
 
 			if ($result_drop[$i] == true) { 
 				$net2ftp_output["rotateLogs"][] = __("The oldest log table was dropped successfully."); 

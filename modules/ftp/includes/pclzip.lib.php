@@ -5335,24 +5335,9 @@ echo "p entry filename 2 is " . $p_entry['filename'] . " <br />\n";
   {
     $v_result=1;
 
-    // ----- Look if function exists
-    if (   (!function_exists("get_magic_quotes_runtime"))
-	    || (!function_exists("set_magic_quotes_runtime"))) {
-      return $v_result;
-	}
-
-    // ----- Look if already done
-    if ($this->magic_quotes_status != -1) {
-      return $v_result;
-	}
-
-	// ----- Get and memorize the magic_quote value
-	$this->magic_quotes_status = @get_magic_quotes_runtime();
-
-	// ----- Disable magic_quotes
-	if ($this->magic_quotes_status == 1) {
-	  @set_magic_quotes_runtime(0);
-	}
+    // get_magic_quotes_runtime() and set_magic_quotes_runtime() were removed
+    // in PHP 8.0. Magic quotes were always disabled from PHP 5.4 onward,
+    // so there is nothing to do here.
 
     // ----- Return
     return $v_result;
@@ -5369,21 +5354,9 @@ echo "p entry filename 2 is " . $p_entry['filename'] . " <br />\n";
   {
     $v_result=1;
 
-    // ----- Look if function exists
-    if (   (!function_exists("get_magic_quotes_runtime"))
-	    || (!function_exists("set_magic_quotes_runtime"))) {
-      return $v_result;
-	}
-
-    // ----- Look if something to do
-    if ($this->magic_quotes_status != -1) {
-      return $v_result;
-	}
-
-	// ----- Swap back magic_quotes
-	if ($this->magic_quotes_status == 1) {
-  	  @set_magic_quotes_runtime($this->magic_quotes_status);
-	}
+    // get_magic_quotes_runtime() and set_magic_quotes_runtime() were removed
+    // in PHP 8.0. Magic quotes were always disabled from PHP 5.4 onward,
+    // so there is nothing to restore here.
 
     // ----- Return
     return $v_result;

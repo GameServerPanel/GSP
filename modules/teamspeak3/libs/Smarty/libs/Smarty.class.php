@@ -724,8 +724,7 @@ class Smarty extends Smarty_Internal_Data {
     {
         static $camel_func;
         if (!isset($camel_func))
-            $camel_func = create_function('$c', 'return "_" . strtolower($c[1]);'); 
-        // PHP4 call to constructor?
+            $camel_func = function($c) { return "_" . strtolower($c[1]); };
         if (strtolower($name) == 'smarty') {
             throw new SmartyException('Please use parent::__construct() to call parent constuctor');
             return false;

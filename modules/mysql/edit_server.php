@@ -45,20 +45,14 @@ $(document).ready(function(){
 
 require_once('includes/form_table_class.php');
 require_once('includes/lib_remote.php');
-if ( function_exists('mysqli_connect') )
-	require_once("modules/mysql/mysqli_database.php");
-else
-	require_once("modules/mysql/mysql_database.php");
+// mysqli is always available in PHP 7+
+require_once("modules/mysql/mysqli_database.php");
 
 function get_mysql_admin_user(array $mysql_server) {
 	return !empty($mysql_server['mysql_admin_user']) ? $mysql_server['mysql_admin_user'] : 'root';
 }
 
 function mysqli_connect_safe($host, $user, $pass, $db = "", $port = null) {
-	if (!function_exists('mysqli_connect')) {
-		return false;
-	}
-
 	mysqli_report(MYSQLI_REPORT_OFF);
 	try {
 		return mysqli_connect($host, $user, $pass, $db, $port);
@@ -182,32 +176,6 @@ function exec_ogp_module() {
 							}
 						}
 					}
-					else
-					{
-						@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], $mysql_db['db_user'], $mysql_db['db_passwd']);
-						
-						if ( $link === FALSE )
-						{
-							@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], get_mysql_admin_user($mysql_db), $mysql_db['mysql_root_passwd']);
-
-							if ( $link !== FALSE )
-							{
-								$queries = array("CREATE DATABASE IF NOT EXISTS `".$mysql_db['db_name']."`;",
-												 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$mysql_db['db_passwd']."';",
-												 "FLUSH PRIVILEGES;");
-								foreach ((array)$queries as $query)
-								{
-									@$return = mysql_query($query);
-									if(!$return)
-									{
-										break;
-									}
-								}
-								
-								mysql_close($link);
-							}
-						}
-					}
 				}
 				print_success(get_lang_f('db_added_for_home_id',$_POST['home_id']));
 			}
@@ -247,24 +215,6 @@ function exec_ogp_module() {
 							break;
 					}
 					mysqli_close($link);
-					$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
-				}
-			}
-			else
-			{
-				@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], get_mysql_admin_user($mysql_db), $mysql_db['mysql_root_passwd']);
-				
-				if ( $link !== FALSE )
-				{
-					$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
-									 "DROP USER '".$mysql_db['db_user']."'@'%';");
-					foreach ((array)$queries as $query)
-					{
-						@$return = mysql_query($query);
-						if(!$return)
-							break;
-					}
-					mysql_close($link);
 					$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 				}
 			}
@@ -338,25 +288,6 @@ function exec_ogp_module() {
 							$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 						}
 					}
-					else
-					{
-						@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], get_mysql_admin_user($mysql_db), $mysql_db['mysql_root_passwd']);
-						
-						if ( $link !== FALSE )
-						{
-							$queries = array("DROP USER '".$mysql_db['db_user']."'@'%';",
-											 "GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
-											 "FLUSH PRIVILEGES;");
-							foreach ((array)$queries as $query)
-							{
-								@$return = mysql_query($query);
-								if(!$return)
-									break;
-							}
-							mysql_close($link);
-							$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
-						}
-					}
 				}
 			}
 			
@@ -402,29 +333,6 @@ function exec_ogp_module() {
 									break;
 							}
 							mysqli_close($link);
-							$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
-						}
-					}
-					else
-					{
-						@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], get_mysql_admin_user($mysql_db), $mysql_db['mysql_root_passwd']);
-						
-						if ( $link !== FALSE )
-						{
-							if($enabled == "0")
-								$queries = array("DROP USER '".$mysql_db['db_user']."'@'%';",
-												 "FLUSH PRIVILEGES;");
-							else
-								$queries = array("GRANT ".$mysql_db['privilegies_str']." ON `".$mysql_db['db_name']."`.* TO '".$mysql_db['db_user']."'@'%' IDENTIFIED BY '".$post_db_passwd."';",
-												 "FLUSH PRIVILEGES;");
-												 
-							foreach ((array)$queries as $query)
-							{
-								@$return = mysql_query($query);
-								if(!$return)
-									break;
-							}
-							mysql_close($link);
 							$modDb->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 						}
 					}
@@ -488,23 +396,6 @@ function exec_ogp_module() {
 										break;
 								}
 								mysqli_close($link);
-							}
-						}
-						else
-						{
-							@$link = mysql_connect($mysql_server['mysql_ip'].':'.$mysql_server['mysql_port'], get_mysql_admin_user($mysql_server), $mysql_server['mysql_root_passwd']);
-							
-							if ( $link !== FALSE )
-							{
-								$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
-												 "DROP USER '".$mysql_db['db_user']."'@'%';");
-								foreach ((array)$queries as $query)
-								{
-									@$return = mysql_query($query);
-									if(!$return)
-										break;
-								}
-								mysql_close($link);
 							}
 						}
 					}

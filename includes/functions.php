@@ -1055,10 +1055,8 @@ function removeInvalidFileNameCharacters($string){
 
 function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 	global $db, $db_host, $db_user, $db_pass, $db_name, $table_prefix, $db_port;
-	if ( function_exists('mysqli_connect') )
-		require_once("modules/mysql/mysqli_database.php");
-	else
-		require_once("modules/mysql/mysql_database.php");
+	// mysqli is always available in PHP 7+; the old mysql extension was removed in PHP 7.
+	require_once("modules/mysql/mysqli_database.php");
 		
 	require_once('includes/lib_remote.php');
 		
@@ -1089,48 +1087,29 @@ function deleteMysqlAddonDatabasesForGameServerHome($home_id){
 				}
 				else
 				{
-					if( function_exists('mysqli_connect') )
-					{
-						mysqli_report(MYSQLI_REPORT_OFF);
-						try {
-							$link = mysqli_connect($mysql_db['mysql_ip'], $mysql_admin_user, $mysql_db['mysql_root_passwd'], "", $mysql_db['mysql_port']);
-						} catch (Exception $e) {
-							$link = false;
-						} catch (Throwable $e) {
-							$link = false;
-						}
-						
-						if ( $link !== FALSE )
-						{
-							$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
-											 "DROP USER '".$mysql_db['db_user']."'@'%';");
-							foreach ((array)$queries as $query)
-							{
-								@$return = mysqli_query($link, $query);
-								if(!$return)
-									break;
-							}
-							mysqli_close($link);
-							$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
-						}
+					// mysqli_connect is always available in PHP 7+; the old mysql_*
+					// fallback has been removed as those functions were removed in PHP 7.
+					mysqli_report(MYSQLI_REPORT_OFF);
+					try {
+						$link = mysqli_connect($mysql_db['mysql_ip'], $mysql_admin_user, $mysql_db['mysql_root_passwd'], "", $mysql_db['mysql_port']);
+					} catch (Exception $e) {
+						$link = false;
+					} catch (Throwable $e) {
+						$link = false;
 					}
-					else
+					
+					if ( $link !== FALSE )
 					{
-						@$link = mysql_connect($mysql_db['mysql_ip'].':'.$mysql_db['mysql_port'], $mysql_admin_user, $mysql_db['mysql_root_passwd']);
-						
-						if ( $link !== FALSE )
+						$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
+										 "DROP USER '".$mysql_db['db_user']."'@'%';");
+						foreach ((array)$queries as $query)
 						{
-							$queries = array("DROP DATABASE ".$mysql_db['db_name'].";",
-											 "DROP USER '".$mysql_db['db_user']."'@'%';");
-							foreach ((array)$queries as $query)
-							{
-								@$return = mysql_query($query);
-								if(!$return)
-									break;
-							}
-							mysql_close($link);
-							$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
+							@$return = mysqli_query($link, $query);
+							if(!$return)
+								break;
 						}
+						mysqli_close($link);
+						$db->connect($db_host,$db_user,$db_pass,$db_name,$table_prefix,isset($db_port)?$db_port:NULL);
 					}
 				}
 				

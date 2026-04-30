@@ -31,11 +31,8 @@ defined("NET2FTP") or die("Direct access to this location is not allowed.");
 // 1 When a variable is submitted, quotes ' are replaced by backslash-quotes \'
 // This function removes the extra backslash that is added
 // -------------------------------------------------------------------------
-if (get_magic_quotes_gpc() == 1) {
-	remove_magic_quotes($_POST);
-	remove_magic_quotes($_GET);
-	remove_magic_quotes($_COOKIE);
-}
+// Note: get_magic_quotes_gpc() was removed in PHP 8.0; magic quotes are
+// always disabled on PHP 5.4+ so no stripping is needed.
 
 // Do not add remove_magic_quotes for $GLOBALS because this would call the same
 // function a second time, replacing \' by ' and \" by "
@@ -430,30 +427,11 @@ $net2ftp_globals["browser_platform"] = getBrowser("platform");
 // **                                                                                  **
 // **                                                                                  **
 
-function remove_magic_quotes(&$x, $keyname="") {
+function remove_magic_quotes($x, $keyname="") {
 
-	// http://www.php.net/manual/en/configuration.php#ini.magic-quotes-gpc (by the way: gpc = get post cookie)
-	// if (magic_quotes_gpc == 1), then PHP converts automatically " --> \", ' --> \'
-	// Has only to be done when getting info from get post cookie
-	if (get_magic_quotes_gpc() == 1) {
-
-		if (is_array($x)) {
-			while (list($key,$value) = each($x)) {
-				if ($value) { remove_magic_quotes($x[$key],$key); }
-			}
-		}
-		else { 
-			$quote = "'";
-			$doublequote = "\"";
-			$backslash = "\\";
-
-			$x = str_replace("$backslash$quote", $quote, $x);
-			$x = str_replace("$backslash$doublequote", $doublequote, $x);
-			$x = str_replace("$backslash$backslash", $backslash, $x);
-		}
-
-	} // end if get_magic_quotes_gpc
-
+	// get_magic_quotes_gpc() was removed in PHP 8.0; magic quotes are always
+	// disabled on PHP 5.4+, so this function is now a no-op kept for
+	// compatibility with any callers that may still reference it.
 	return $x;
 
 } // end function remove_magic_quotes

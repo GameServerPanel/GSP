@@ -36,22 +36,18 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
     }
 	
 	public function connect($db_host, $db_user, $db_pass, $db_name, $table_prefix = NULL) {
-        if ( !extension_loaded("mysql") )
-            return -99;
-
+        // The mysql extension was removed in PHP 7. This class now uses mysqli.
         $this->table_prefix = $table_prefix;
 
         /// \todo We might want to do other checks here as well?
         if ( $db_host === NULL )
             return -1;
 
-        $this->link = mysql_connect($db_host, $db_user, $db_pass);
+        $this->link = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 
-        if ( $this->link === FALSE )
+        if ( $this->link === FALSE || mysqli_connect_errno() )
             return -11;
 
-        if ( mysql_select_db($db_name,$this->link) === FALSE )
-            return -12;
 
         return TRUE;
     }
@@ -60,20 +56,20 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         if ( !$this->link ) return FALSE;
 
         ++$this->queries_;
-        $result = mysql_query($query, $this->link);
+        $result = mysqli_query($this->link, $query);
 
-        if ( mysql_errno($this->link) > 0 )
-            print mysql_error($this->link);
+        if ( mysqli_errno($this->link) > 0 )
+            print mysqli_error($this->link);
 
         if ( $result === FALSE )
             return FALSE;
 
-        if ( mysql_num_rows($result) == 0 )
+        if ( mysqli_num_rows($result) == 0 )
             return FALSE;
 
         $results = array();
 
-        while ( $row = mysql_fetch_assoc( $result ) )
+        while ( $row = mysqli_fetch_assoc( $result ) )
             array_push($results,$row);
 
         return $results;
@@ -93,22 +89,22 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         $query = sprintf("INSERT INTO `%smysql_servers` (`remote_server_id`,`mysql_name`,`mysql_ip`,`mysql_port`,`mysql_admin_user`,`mysql_root_passwd`,`privilegies_str`)
             VALUES('%s','%s','%s','%s','%s','%s','%s');",
                 $this->table_prefix,
-				mysql_real_escape_string($remote_server_id,$this->link),
-                mysql_real_escape_string($mysql_name,$this->link),
-                mysql_real_escape_string($mysql_ip,$this->link),
-				mysql_real_escape_string($mysql_port,$this->link),
-                mysql_real_escape_string($mysql_admin_user,$this->link),
-                mysql_real_escape_string($mysql_root_passwd,$this->link),
-				mysql_real_escape_string($privilegies_str,$this->link));
+				mysqli_real_escape_string($this->link, $remote_server_id),
+                mysqli_real_escape_string($this->link, $mysql_name),
+                mysqli_real_escape_string($this->link, $mysql_ip),
+				mysqli_real_escape_string($this->link, $mysql_port),
+                mysqli_real_escape_string($this->link, $mysql_admin_user),
+                mysqli_real_escape_string($this->link, $mysql_root_passwd),
+				mysqli_real_escape_string($this->link, $privilegies_str));
         ++$this->queries_;
-        mysql_query($query,$this->link);
+        mysqli_query($this->link, $query);
 
-        if( mysql_errno($this->link) != 0 )
+        if( mysqli_errno($this->link) != 0 )
         {
             return false;
         }
 
-        return mysql_insert_id($this->link);
+        return mysqli_insert_id($this->link);
     }
 	
     public function editMysqlServer($mysql_server_id,$remote_server_id,$mysql_name,$mysql_ip,$mysql_port,$mysql_admin_user,$mysql_root_passwd,$privilegies_str)
@@ -118,17 +114,17 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
                 `mysql_admin_user` = '%s', `mysql_root_passwd` = '%s', `privilegies_str` = '%s'
 				WHERE `mysql_server_id` = %s;",
 				$this->table_prefix,
-				mysql_real_escape_string($remote_server_id,$this->link),
-				mysql_real_escape_string($mysql_name,$this->link),
-				mysql_real_escape_string($mysql_ip,$this->link),
-				mysql_real_escape_string($mysql_port,$this->link),
-                mysql_real_escape_string($mysql_admin_user,$this->link),
-				mysql_real_escape_string($mysql_root_passwd,$this->link),
-				mysql_real_escape_string($privilegies_str,$this->link),
-				mysql_real_escape_string($mysql_server_id,$this->link));
+				mysqli_real_escape_string($this->link, $remote_server_id),
+				mysqli_real_escape_string($this->link, $mysql_name),
+				mysqli_real_escape_string($this->link, $mysql_ip),
+				mysqli_real_escape_string($this->link, $mysql_port),
+                mysqli_real_escape_string($this->link, $mysql_admin_user),
+				mysqli_real_escape_string($this->link, $mysql_root_passwd),
+				mysqli_real_escape_string($this->link, $privilegies_str),
+				mysqli_real_escape_string($this->link, $mysql_server_id));
 		
         ++$this->queries_;
-        if ( mysql_query($query) === FALSE )
+        if ( mysqli_query($this->link, $query) === FALSE )
             return FALSE;
 
         return TRUE;
@@ -145,20 +141,20 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 
         $query = sprintf("SELECT * FROM `%smysql_servers` WHERE `mysql_server_id` = %d",
             $this->table_prefix,
-            mysql_real_escape_string($id,$this->link));
+            mysqli_real_escape_string($this->link, $id));
 
         ++$this->queries_;
-        $result = mysql_query($query, $this->link);
+        $result = mysqli_query($this->link, $query);
 
         // If there are no servers then we can stop here.
-        if ( mysql_num_rows($result) != 1 )
+        if ( mysqli_num_rows($result) != 1 )
             return FALSE;
 
-        return mysql_fetch_assoc( $result );
+        return mysqli_fetch_assoc( $result );
     }
 	
 	public function removeMysqlServer($mysql_server_id){
-		$mysql_server_id = mysql_real_escape_string($mysql_server_id, $this->link);
+		$mysql_server_id = mysqli_real_escape_string($this->link, $mysql_server_id);
 
         $return = TRUE;
 
@@ -169,7 +165,7 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         {
             $query = sprintf($query,$this->table_prefix,$mysql_server_id);
             ++$this->queries_;
-            $result = mysql_query($query,$this->link);
+            $result = mysqli_query($this->link, $query);
             $return = ($result === FALSE) ? FALSE : $return;
         }
         return $return;
@@ -178,7 +174,7 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 	public function getMysqlServerDBs($mysql_server_id){
         $query = sprintf("SELECT * FROM `%smysql_databases` WHERE mysql_server_id = %d;",
             $this->table_prefix,
-            mysql_real_escape_string($mysql_server_id,$this->link));
+            mysqli_real_escape_string($this->link, $mysql_server_id));
         return $this->listQuery($query);
     }
 	
@@ -186,27 +182,27 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 		$query = sprintf("INSERT INTO `%smysql_databases` (`mysql_server_id`, `home_id`, `db_user`, `db_passwd`, `db_name`, `enabled`)
             VALUES('%d','%d','%s','%s','%s','%d');",
                 $this->table_prefix,
-				mysql_real_escape_string($mysql_server_id,$this->link),
-                mysql_real_escape_string($home_id,$this->link),
-                mysql_real_escape_string($db_user,$this->link),
-				mysql_real_escape_string($db_passwd,$this->link),
-                mysql_real_escape_string($db_name,$this->link),
-				mysql_real_escape_string($enabled,$this->link));
+				mysqli_real_escape_string($this->link, $mysql_server_id),
+                mysqli_real_escape_string($this->link, $home_id),
+                mysqli_real_escape_string($this->link, $db_user),
+				mysqli_real_escape_string($this->link, $db_passwd),
+                mysqli_real_escape_string($this->link, $db_name),
+				mysqli_real_escape_string($this->link, $enabled));
         ++$this->queries_;
-        mysql_query($query,$this->link);
+        mysqli_query($this->link, $query);
 
-        if( mysql_errno($this->link) != 0 )
+        if( mysqli_errno($this->link) != 0 )
         {
             return false;
         }
 
-        return mysql_insert_id($this->link);
+        return mysqli_insert_id($this->link);
 	}
 	
 	public function getMysqlDBbyId($db_id){
 		$query = sprintf('SELECT * FROM `%1$smysql_databases` NATURAL JOIN `%1$smysql_servers` WHERE db_id = %2$d;',
             $this->table_prefix,
-            mysql_real_escape_string($db_id,$this->link));
+            mysqli_real_escape_string($this->link, $db_id));
 		$db_info = $this->listQuery($query);
         return $db_info[0];
 	}
@@ -214,15 +210,15 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 	public function getMysqlDBsbyHomeId($home_id){
 		$query = sprintf('SELECT * FROM `%1$smysql_databases` WHERE enabled = 1 AND home_id = %2$d;',
             $this->table_prefix,
-            mysql_real_escape_string($home_id,$this->link));
+            mysqli_real_escape_string($this->link, $home_id));
         return $this->listQuery($query);
 	}
 	
 	public function getMysqlHomeDBbyId($home_id,$db_id){
 		$query = sprintf('SELECT * FROM `%1$smysql_databases` NATURAL JOIN `%1$smysql_servers` WHERE home_id = %2$d AND db_id = %3$d;',
             $this->table_prefix,
-			mysql_real_escape_string($home_id,$this->link),
-            mysql_real_escape_string($db_id,$this->link));
+			mysqli_real_escape_string($this->link, $home_id),
+            mysqli_real_escape_string($this->link, $db_id));
 		$db_info = $this->listQuery($query);
         return $db_info[0];
 	}
@@ -233,17 +229,17 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 						 SET `home_id`='%d', `db_user`='%s', `db_passwd`='%s', `db_name`='%s',`enabled`='%d'
 						 WHERE `db_id` = '%d';",
                 $this->table_prefix,
-                mysql_real_escape_string($home_id, $this->link),
-                mysql_real_escape_string($db_user, $this->link),
-				mysql_real_escape_string($db_passwd, $this->link),
-				mysql_real_escape_string($db_name, $this->link),
-				mysql_real_escape_string($enabled, $this->link),
-                mysql_real_escape_string($db_id, $this->link) );
+                mysqli_real_escape_string($this->link, $home_id),
+                mysqli_real_escape_string($this->link, $db_user),
+				mysqli_real_escape_string($this->link, $db_passwd),
+				mysqli_real_escape_string($this->link, $db_name),
+				mysqli_real_escape_string($this->link, $enabled),
+                mysqli_real_escape_string($this->link, $db_id) );
 
         ++$this->queries_;
-        mysql_query($query,$this->link);
+        mysqli_query($this->link, $query);
 
-        if( mysql_errno($this->link) != 0 )
+        if( mysqli_errno($this->link) != 0 )
             return FALSE;
 
         return true;
@@ -254,10 +250,10 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         $query = sprintf("DELETE FROM `%smysql_databases`
 				  WHERE `db_id` = '%d'",
 				  $this->table_prefix,
-                  mysql_real_escape_string($db_id, $this->link));
+                  mysqli_real_escape_string($this->link, $db_id));
 
         ++$this->queries_;
-        if ( mysql_query($query) === FALSE )
+        if ( mysqli_query($this->link, $query) === FALSE )
             return FALSE;
 
         return TRUE;
@@ -267,7 +263,7 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
         $query = sprintf('SELECT %1$sserver_homes.*,%1$sremote_servers.*, %1$sconfig_homes.game_name
             FROM `%1$sserver_homes` NATURAL JOIN `%1$sconfig_homes` NATURAL JOIN `%1$sremote_servers` WHERE remote_server_id=%2$s;',
             $this->table_prefix,
-			mysql_real_escape_string($remote_server_id,$this->link));
+			mysqli_real_escape_string($this->link, $remote_server_id));
         return $this->listQuery($query);
 	}
 }
