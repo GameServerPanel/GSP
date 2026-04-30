@@ -234,33 +234,17 @@ function exec_ogp_module() {
 		else
 		{
 			$mysql_admin_user = get_mysql_admin_user($mysql_server);
-			if( function_exists('mysqli_connect') )
-			{
-				$link = mysqli_connect_safe($mysql_server['mysql_ip'], $mysql_admin_user, $mysql_server['mysql_root_passwd'], "", $mysql_server['mysql_port']);
+			// mysqli is always available in PHP 7+; the old mysql_* fallback has been removed.
+			$link = mysqli_connect_safe($mysql_server['mysql_ip'], $mysql_admin_user, $mysql_server['mysql_root_passwd'], "", $mysql_server['mysql_port']);
 
-				if ( $link === FALSE )
-				{
-					$server_status = "<span class='failure'>".get_lang('mysql_offline')."</span>";
-				}
-				else
-				{
-					$server_status = "<span class='success'>".get_lang('mysql_online')."</span>";
-					mysqli_close($link);
-				}
+			if ( $link === FALSE )
+			{
+				$server_status = "<span class='failure'>".get_lang('mysql_offline')."</span>";
 			}
 			else
 			{
-				@$link = mysql_connect($mysql_server['mysql_ip'].':'.$mysql_server['mysql_port'], $mysql_admin_user, $mysql_server['mysql_root_passwd']);
-
-				if ( $link === FALSE )
-				{
-					$server_status = "<span class='failure'>".get_lang('mysql_offline')."</span>";
-				}
-				else
-				{
-					$server_status = "<span class='success'>".get_lang('mysql_online')."</span>";
-					mysql_close($link);
-				}
+				$server_status = "<span class='success'>".get_lang('mysql_online')."</span>";
+				mysqli_close($link);
 			}
 		}
 		

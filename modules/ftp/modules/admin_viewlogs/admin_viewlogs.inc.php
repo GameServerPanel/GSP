@@ -237,14 +237,14 @@ function printTable($sqlquery) {
 // -------------------------------------------------------------------------
 // Execute the SQL query
 // -------------------------------------------------------------------------
-	$result = mysql_query("$sqlquery");
+	$result = mysqli_query($mydb, "$sqlquery");
 	if ($result == false) { 
 		$errormessage = __("Unable to execute the SQL query <b>%1\$s</b>.", $sqlquery); 
 		setErrorVars(false, $errormessage, debug_backtrace(), __FILE__, __LINE__);
 		return false;	
 	}
-	$nrofrows = mysql_num_rows($result);
-	$nrofcolumns_withindex = mysql_num_fields($result) + 1;
+	$nrofrows = mysqli_num_rows($result);
+	$nrofcolumns_withindex = mysqli_num_fields($result) + 1;
 	 
 
 // ------------------------------------------------------------------------- 
@@ -260,19 +260,19 @@ function printTable($sqlquery) {
 
 	if ($nrofrows != 0) {
 // Second row: header
-		$row = mysql_fetch_array($result, MYSQL_ASSOC);
+		$row = mysqli_fetch_array($result, MYSQLI_ASSOC);
 		$output .= "<tr>\n";
 		$output .= "<td>Index</td>\n";
-		while(list($fieldname, $fieldvalue) = each($row) ) { $output .= "<td>$fieldname</td>\n"; }
+		foreach ($row as $fieldname => $fieldvalue) { $output .= "<td>$fieldname</td>\n"; }
 		$output .= "</tr>\n";
-		mysql_data_seek($result, 0); // reset row pointer to the first row
+		mysqli_data_seek($result, 0); // reset row pointer to the first row
 
 // 3rd and next rows: data
 		$rowcounter = 1;
-		while($row = mysql_fetch_array($result, MYSQL_ASSOC)) {
+		while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
 			$output .= "<tr>\n";
 			$output .= "<td>$rowcounter</td>\n";
-			while(list($fieldname, $fieldvalue) = each($row) ) { $output .= "<td>" . htmlEncode2($fieldvalue) . "</td>\n"; }
+			foreach ($row as $fieldname => $fieldvalue) { $output .= "<td>" . htmlEncode2($fieldvalue) . "</td>\n"; }
 			$output .= "</tr>\n";
 			$rowcounter++;
 		}
@@ -289,7 +289,7 @@ function printTable($sqlquery) {
 // ------------------------------------------------------------------------- 
 // Free the $result
 // ------------------------------------------------------------------------- 
-	mysql_free_result($result);
+	mysqli_free_result($result);
 
 	return $output;
 	

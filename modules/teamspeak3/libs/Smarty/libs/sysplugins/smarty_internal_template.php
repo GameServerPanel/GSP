@@ -896,8 +896,7 @@ class Smarty_Internal_Template extends Smarty_Internal_Data {
     {
         static $camel_func;
         if (!isset($camel_func))
-            $camel_func = create_function('$c', 'return "_" . strtolower($c[1]);'); 
-        // see if this is a set/get for a property
+            $camel_func = function($c) { return "_" . strtolower($c[1]); };
         $first3 = strtolower(substr($name, 0, 3));
         if (in_array($first3, array('set', 'get')) && substr($name, 3, 1) !== '_') {
             // try to keep case correct for future PHP 6.0 case-sensitive class methods

@@ -611,14 +611,14 @@ function getRootdirectory() {
 // Get user's home directory
 // -------------------------------------------------------------------------
 		$sqlquery1 = "SELECT homedirectory FROM net2ftp_users WHERE ftpserver = '$net2ftp_ftpserver_safe' AND username = '$net2ftp_username_safe';";
-		$result1   = mysql_query("$sqlquery1") or die("Unable to execute SQL SELECT query (isAuthorizedDirectory > sqlquery1) <br /> $sqlquery1");
-		$nrofrows1 = mysql_num_rows($result1);
+		$result1   = mysqli_query($mydb, "$sqlquery1") or die("Unable to execute SQL SELECT query (isAuthorizedDirectory > sqlquery1) <br /> $sqlquery1");
+		$nrofrows1 = mysqli_num_rows($result1);
 
 		if     ($nrofrows1 == 0) { 
 			$net2ftp_globals["homedirectory"] = "/";
 		}
 		elseif ($nrofrows1 == 1) { 
-			$resultRow1 = mysql_fetch_row($result1); 
+			$resultRow1 = mysqli_fetch_row($result1); 
 			$net2ftp_globals["homedirectory"] = $resultRow1[0];
 		}
 		else { 
