@@ -29,8 +29,8 @@ function connect2db() {
 	global $net2ftp_settings;
 
 	$mydb = mysqli_connect($net2ftp_settings["dbserver"], $net2ftp_settings["dbusername"], $net2ftp_settings["dbpassword"], $net2ftp_settings["dbname"]);
-	if ($mydb == false) { 
-		setErrorVars(false, __("Unable to connect to the MySQL database. Please check your MySQL database settings in net2ftp's configuration file settings.inc.php."), debug_backtrace(), __FILE__, __LINE__);
+	if ($mydb == false || mysqli_connect_errno()) { 
+		setErrorVars(false, __("Unable to connect to the MySQL database or select the database. Please check your MySQL database settings in net2ftp's configuration file settings.inc.php."), debug_backtrace(), __FILE__, __LINE__);
 		return false;
 	}
 

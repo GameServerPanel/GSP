@@ -45,7 +45,7 @@ class MySQLModuleDatabase extends OGPDatabaseMySQL
 
         $this->link = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 
-        if ( $this->link === FALSE )
+        if ( $this->link === FALSE || mysqli_connect_errno() )
             return -11;
 
 

@@ -427,7 +427,7 @@ $net2ftp_globals["browser_platform"] = getBrowser("platform");
 // **                                                                                  **
 // **                                                                                  **
 
-function remove_magic_quotes(&$x, $keyname="") {
+function remove_magic_quotes($x, $keyname="") {
 
 	// get_magic_quotes_gpc() was removed in PHP 8.0; magic quotes are always
 	// disabled on PHP 5.4+, so this function is now a no-op kept for
