@@ -134,7 +134,6 @@ if (!function_exists('admin_register_server_in_billing')) {
             'payment_txid'             => 'admin-created',
             'paid_ts'                  => $now,
             'coupon_id'                => 0,
-            'extended'                 => 0,
         );
 
         $order_id = $db->resultInsertId('billing_orders', $order_fields);

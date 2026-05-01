@@ -57,7 +57,7 @@ function exec_ogp_module()
 
 	require_once("includes/refreshed.php");
 	$refresh = new refreshed();
-        $OnlineServers .= "<p>Recent updates and changes</p>";
+	$OnlineServers = "<p>Recent updates and changes</p>";
 	?>
 	<div style="margin-top:20px;">
 	<?php 

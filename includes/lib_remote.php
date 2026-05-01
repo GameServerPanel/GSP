@@ -869,6 +869,7 @@ class OGPRemoteLibrary
 
 		if ( $retval > 0 )
 		{
+			$data_tmp = is_string($data_tmp) ? $data_tmp : '';
 			$lines = explode('\n',$data_tmp);
 			foreach ((array)$lines as $line)
 			{
