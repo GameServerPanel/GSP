@@ -5,7 +5,7 @@
  * Shared helper for recording admin-created game servers in the billing tables,
  * so they are treated identically to FREE website orders:
  *   billing_invoices (status='paid', amount=0)
- *   billing_orders   (status='installed', price=0, created_by_admin=1)
+ *   billing_orders   (status='installed', price=0, created_by_admin=1, set in INSERT)
  *
  * This does NOT re-provision the server — the caller (add_home.php) already
  * created the server via the panel DB layer. We only write the billing ledger
@@ -134,19 +134,13 @@ if (!function_exists('admin_register_server_in_billing')) {
             'payment_txid'             => 'admin-created',
             'paid_ts'                  => $now,
             'coupon_id'                => 0,
+            'created_by_admin'         => 1,
         );
 
         $order_id = $db->resultInsertId('billing_orders', $order_fields);
         if ($order_id === FALSE) {
             return FALSE;
         }
-
-        // Optionally mark as admin-created (column added by admin_billing_migration.sql)
-        $db->query(
-            "UPDATE OGP_DB_PREFIXbilling_orders
-             SET created_by_admin = 1
-             WHERE order_id = " . intval($order_id)
-        );
 
         // ------------------------------------------------------------------ //
         // 5. Link the invoice back to the new order.                         //

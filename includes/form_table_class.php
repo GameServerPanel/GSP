@@ -60,11 +60,7 @@
 
 class FormTable {
 
-	
-	public function __construct()
-	{
-		$this->i = 0;
-	}
+	public $i = 0;
 
 	public function start_form($action, $method = "post", $extra = "")
 	{
