@@ -110,7 +110,6 @@ function gsp_fetch_github_releases($repo_owner, $repo_name)
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'GSP-Panel-Updater');
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		$data = curl_exec($ch);
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
@@ -123,10 +122,6 @@ function gsp_fetch_github_releases($repo_owner, $repo_name)
 				'method'  => 'GET',
 				'header'  => "User-Agent: GSP-Panel-Updater\r\n",
 				'timeout' => 10,
-			],
-			'ssl' => [
-				'verify_peer'      => false,
-				'verify_peer_name' => false,
 			],
 		]);
 		$data = @file_get_contents($url, false, $ctx);
@@ -148,15 +143,26 @@ function gsp_backup_database($backup_dir)
 		return false;
 	}
 
+	// Write credentials to a temporary file to avoid exposing them in process listings
+	$creds_file = tempnam(sys_get_temp_dir(), 'gsp_db_');
+	if ($creds_file === false) {
+		return false;
+	}
+	file_put_contents($creds_file,
+		"[client]\nuser=" . addcslashes($db_user, "\\\n\"'") . "\n"
+		. "password=" . addcslashes($db_pass, "\\\n\"'") . "\n"
+	);
+	chmod($creds_file, 0600);
+
 	$sql_file = $backup_dir . '/' . $db_name . '_backup.sql';
-	$command  = 'mysqldump --skip-opt --single-transaction --add-drop-table'
+	$command  = 'mysqldump --defaults-extra-file=' . escapeshellarg($creds_file)
+	          . ' --skip-opt --single-transaction --add-drop-table'
 	          . ' --create-options --extended-insert --quick --set-charset'
-	          . ' -u ' . escapeshellarg($db_user)
-	          . ' -p'  . escapeshellarg($db_pass)
-	          . ' '    . escapeshellarg($db_name)
-	          . ' > '  . escapeshellarg($sql_file)
+	          . ' '   . escapeshellarg($db_name)
+	          . ' > ' . escapeshellarg($sql_file)
 	          . ' 2>&1';
 	@system($command);
+	@unlink($creds_file);
 
 	if (!file_exists($sql_file) || filesize($sql_file) < 100) {
 		return false;
@@ -282,7 +288,6 @@ function gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir)
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'GSP-Panel-Updater');
 		curl_setopt($ch, CURLOPT_TIMEOUT, 180);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		$data = curl_exec($ch);
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -298,10 +303,6 @@ function gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir)
 				'header'          => "User-Agent: GSP-Panel-Updater\r\n",
 				'timeout'         => 180,
 				'follow_location' => 1,
-			],
-			'ssl' => [
-				'verify_peer'      => false,
-				'verify_peer_name' => false,
 			],
 		]);
 		$data = @file_get_contents($url, false, $ctx);
@@ -424,11 +425,13 @@ function gsp_rmdir_recursive($dir)
 // ---------------------------------------------------------------------------
 function gsp_fix_permissions($panel_dir)
 {
-	// Restore sane defaults: files 644, directories 755
-	@system('find ' . escapeshellarg($panel_dir)
-		. ' -maxdepth 10 -name "*.php" -exec chmod 644 {} \; 2>/dev/null');
-	@system('find ' . escapeshellarg($panel_dir)
-		. ' -maxdepth 10 -type d -exec chmod 755 {} \; 2>/dev/null');
+	// Restore sane defaults in a single find traversal: files 644, directories 755
+	@system(
+		'find ' . escapeshellarg($panel_dir)
+		. ' -maxdepth 10 \( -name "*.php" -exec chmod 644 {} + \)'
+		. ' -o \( -type d -exec chmod 755 {} + \)'
+		. ' 2>/dev/null'
+	);
 }
 
 function gsp_clear_panel_cache($panel_dir)
@@ -601,15 +604,23 @@ function gsp_do_revert($backup_ts)
 	// Restore database
 	@include(GSP_PANEL_DIR . '/includes/config.inc.php');
 	if (!empty($db_user) && !empty($db_name)) {
-		$cmd = 'mysql'
-		     . ' --user='     . escapeshellarg($db_user)
-		     . ' --password=' . escapeshellarg($db_pass)
-		     . ' '            . escapeshellarg($db_name)
-		     . ' < '          . escapeshellarg($sql_file)
-		     . ' 2>&1';
-		@system($cmd, $ret);
-		if ($ret !== 0) {
-			gsp_update_log("Revert warning: database restore exited with code {$ret}");
+		// Write credentials to a temp file to avoid exposing them in process listings
+		$creds_file = tempnam(sys_get_temp_dir(), 'gsp_db_');
+		if ($creds_file !== false) {
+			file_put_contents($creds_file,
+				"[client]\nuser=" . addcslashes($db_user, "\\\n\"'") . "\n"
+				. "password=" . addcslashes($db_pass, "\\\n\"'") . "\n"
+			);
+			chmod($creds_file, 0600);
+			$cmd = 'mysql --defaults-extra-file=' . escapeshellarg($creds_file)
+			     . ' '  . escapeshellarg($db_name)
+			     . ' < ' . escapeshellarg($sql_file)
+			     . ' 2>&1';
+			@system($cmd, $ret);
+			@unlink($creds_file);
+			if ($ret !== 0) {
+				gsp_update_log("Revert warning: database restore exited with code {$ret}");
+			}
 		}
 	}
 
@@ -646,7 +657,11 @@ function gsp_panel_update_section()
 
 	// Per-session CSRF token
 	if (empty($_SESSION['gsp_update_csrf'])) {
-		$_SESSION['gsp_update_csrf'] = bin2hex(random_bytes(16));
+		try {
+			$_SESSION['gsp_update_csrf'] = bin2hex(random_bytes(16));
+		} catch (Exception $e) {
+			$_SESSION['gsp_update_csrf'] = bin2hex(openssl_random_pseudo_bytes(16));
+		}
 	}
 	$csrf_token = $_SESSION['gsp_update_csrf'];
 
@@ -727,7 +742,11 @@ function gsp_panel_update_section()
 		}
 
 		// Rotate CSRF token after every submission
-		$_SESSION['gsp_update_csrf'] = bin2hex(random_bytes(16));
+		try {
+			$_SESSION['gsp_update_csrf'] = bin2hex(random_bytes(16));
+		} catch (Exception $e) {
+			$_SESSION['gsp_update_csrf'] = bin2hex(openssl_random_pseudo_bytes(16));
+		}
 		$csrf_token = $_SESSION['gsp_update_csrf'];
 	}
 	// ---- End POST handling --------------------------------------------------
