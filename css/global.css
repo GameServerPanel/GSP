@@ -106,3 +106,10 @@ table.hundred{
 	0% { transform: rotate(0deg); }
 	100% { transform: rotate(360deg); }
 }
+/* GSP version descriptor shown in the panel footer */
+.gsp-version-footer {
+text-align: center;
+font-size: 0.8em;
+color: #888;
+padding: 4px 0;
+}

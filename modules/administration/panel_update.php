@@ -20,6 +20,7 @@ define('GSP_PANEL_DIR',     realpath(dirname(__FILE__) . '/../../'));
 define('GSP_BACKUP_BASE',   '/var/backups/gsp-panel');
 define('GSP_UPDATE_LOG',    GSP_PANEL_DIR . '/logs/panel_updates.log');
 define('GSP_VERSION_FILE',  GSP_PANEL_DIR . '/includes/panel_version.php');
+define('GSP_VERSION_JSON',  GSP_PANEL_DIR . '/version.json');
 
 // ---------------------------------------------------------------------------
 // Helper: write a line to the panel update log
@@ -96,6 +97,37 @@ function gsp_write_version_file($version, $branch_or_type)
 	$content .= "define('GSP_BRANCH',  " . var_export($branch_or_type, true) . ");\n";
 	$content .= "define('GSP_UPDATE_TIME', " . var_export(date('Y-m-d H:i:s'), true) . ");\n";
 	@file_put_contents(GSP_VERSION_FILE, $content);
+}
+
+// ---------------------------------------------------------------------------
+// Helper: read version.json and return its data as an array (or null)
+// ---------------------------------------------------------------------------
+function gsp_read_version_json()
+{
+	if (!file_exists(GSP_VERSION_JSON)) {
+		return null;
+	}
+	$data = json_decode(file_get_contents(GSP_VERSION_JSON), true);
+	return is_array($data) ? $data : null;
+}
+
+// ---------------------------------------------------------------------------
+// Helper: write version.json with canonical installed-version metadata
+// ---------------------------------------------------------------------------
+function gsp_write_version_json($installed_type, $installed_source, $installed_version, $installed_commit = null)
+{
+	$allowed_types = ['release', 'development', 'cutting-edge'];
+	if (!in_array($installed_type, $allowed_types, true)) {
+		$installed_type = 'unknown';
+	}
+	$data = [
+		'installed_type'    => $installed_type,
+		'installed_source'  => $installed_source,
+		'installed_version' => $installed_version,
+		'installed_commit'  => $installed_commit,
+		'installed_at'      => date('Y-m-d H:i:s'),
+	];
+	@file_put_contents(GSP_VERSION_JSON, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 }
 
 // ---------------------------------------------------------------------------
@@ -509,6 +541,51 @@ function gsp_get_available_backups()
 }
 
 // ---------------------------------------------------------------------------
+// Update: attempt a git-based update (fetch + checkout + reset --hard)
+// Returns an array on success or null if git is unavailable / fails.
+// ---------------------------------------------------------------------------
+function gsp_try_git_update($branch)
+{
+	if (!function_exists('exec') || !is_dir(GSP_PANEL_DIR . '/.git')) {
+		return null;
+	}
+
+	$panel_arg  = escapeshellarg(GSP_PANEL_DIR);
+	$branch_arg = escapeshellarg($branch);
+	$origin_ref = escapeshellarg('origin/' . $branch);
+
+	$out = [];
+	$ret = 0;
+
+	exec("git -C {$panel_arg} fetch origin {$branch_arg} --tags 2>&1", $out, $ret);
+	if ($ret !== 0) {
+		gsp_update_log("Git fetch for branch {$branch} failed (exit {$ret}): " . implode(' | ', $out));
+		return null;
+	}
+
+	exec("git -C {$panel_arg} checkout {$branch_arg} 2>&1", $out, $ret);
+	exec("git -C {$panel_arg} reset --hard {$origin_ref} 2>&1", $out, $ret);
+	if ($ret !== 0) {
+		gsp_update_log("Git checkout/reset for branch {$branch} failed (exit {$ret}): " . implode(' | ', $out));
+		return null;
+	}
+
+	$commit_out = [];
+	$ret2       = 0;
+	exec("git -C {$panel_arg} rev-parse HEAD 2>&1", $commit_out, $ret2);
+	$commit = ($ret2 === 0 && !empty($commit_out[0]) && preg_match('/^[0-9a-f]{40,64}$/i', trim($commit_out[0])))
+		? trim($commit_out[0])
+		: null;
+
+	return [
+		'success' => true,
+		'method'  => 'git',
+		'commit'  => $commit,
+		'output'  => implode("\n", $out),
+	];
+}
+
+// ---------------------------------------------------------------------------
 // Orchestrate a full update
 // ---------------------------------------------------------------------------
 function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
@@ -523,35 +600,59 @@ function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
 	}
 	gsp_update_log("Backup created at {$backup['backup_ts']} before {$update_type} update to {$ref}");
 
-	// Step 2 — download
-	$temp_dir = sys_get_temp_dir() . '/gsp_dl_' . time();
-	@mkdir($temp_dir, 0750);
-	$zip_file = gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir);
-	if (!$zip_file) {
+	// Step 2 — try git for branch updates; fall back to ZIP download
+	$commit_after = null;
+	$files_copied = 0;
+	$used_git     = false;
+
+	if ($update_type !== 'release') {
+		$git_result = gsp_try_git_update($ref);
+		if ($git_result && $git_result['success']) {
+			$commit_after = $git_result['commit'];
+			$used_git     = true;
+			gsp_update_log("Updated via git to {$ref}: " . $git_result['output']);
+		} else {
+			gsp_update_log("Git update not available or failed for {$ref}; falling back to ZIP download");
+		}
+	}
+
+	if (!$used_git) {
+		$temp_dir = sys_get_temp_dir() . '/gsp_dl_' . time();
+		@mkdir($temp_dir, 0750);
+		$zip_file = gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir);
+		if (!$zip_file) {
+			@rmdir($temp_dir);
+			return [
+				'success' => false,
+				'error'   => 'Failed to download update ZIP from GitHub. Check network connectivity.',
+			];
+		}
+		gsp_update_log("Downloaded update ZIP for ref={$ref}");
+
+		$apply = gsp_apply_update($zip_file);
+		@unlink($zip_file);
 		@rmdir($temp_dir);
-		return [
-			'success' => false,
-			'error'   => 'Failed to download update ZIP from GitHub. Check network connectivity.',
-		];
+		if (!$apply['success']) {
+			return $apply;
+		}
+		$files_copied = $apply['files_copied'];
+		$commit_after = gsp_get_git_commit();
+		gsp_update_log("Applied update via ZIP: {$apply['files_copied']} files written");
 	}
-	gsp_update_log("Downloaded update ZIP for ref={$ref}");
 
-	// Step 3 — apply
-	$apply = gsp_apply_update($zip_file);
-	@unlink($zip_file);
-	@rmdir($temp_dir);
-	if (!$apply['success']) {
-		return $apply;
-	}
-	gsp_update_log("Applied update: {$apply['files_copied']} files written");
-
-	// Step 4 — housekeeping
+	// Step 3 — housekeeping
 	gsp_fix_permissions($panel_dir);
 	gsp_clear_panel_cache($panel_dir);
 	gsp_write_version_file($ref, $update_type);
+
+	// Write version.json with canonical type/source/version data
+	$vsource  = ($update_type === 'release') ? 'GitHub Releases' : $ref;
+	$vversion = ($update_type === 'release') ? $ref : ($commit_after ?? $ref);
+	gsp_write_version_json($update_type, $vsource, $vversion, $commit_after);
+
 	$db->setSettings(['ogp_version' => $ref, 'version_type' => $update_type]);
 
-	// Step 5 — post-update module handling (mirrors updating.php behaviour)
+	// Step 4 — post-update module handling (mirrors updating.php behaviour)
 	if (file_exists($panel_dir . '/modules/modulemanager/module_handling.php')) {
 		require_once($panel_dir . '/modules/modulemanager/module_handling.php');
 	}
@@ -563,7 +664,7 @@ function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
 	}
 
 	gsp_update_log("Update to {$ref} (type={$update_type}) complete");
-	return ['success' => true, 'files_copied' => $apply['files_copied']];
+	return ['success' => true, 'files_copied' => $files_copied];
 }
 
 // ---------------------------------------------------------------------------
@@ -707,7 +808,7 @@ function gsp_panel_update_section()
 					if ($result['success']) {
 						print_success(
 							'Panel updated to release <strong>' . htmlspecialchars($version) . '</strong>. '
-							. intval($result['files_copied']) . ' file(s) updated.'
+							. intval($result['files_copied']) . ' file(s) updated. Source: <strong>GitHub Releases</strong>'
 						);
 						gsp_update_log("Admin {$user_label} updated panel to release {$version}");
 					} else {
@@ -717,11 +818,12 @@ function gsp_panel_update_section()
 				}
 
 			} elseif ($action === 'update_stable') {
-				$result = gsp_do_update($repo_owner, $repo_name, $stable_branch, 'stable');
+				$result = gsp_do_update($repo_owner, $repo_name, $stable_branch, 'development');
 				if ($result['success']) {
 					print_success(
 						'Panel updated to development version (<strong>' . htmlspecialchars($stable_branch) . '</strong>). '
-						. intval($result['files_copied']) . ' file(s) updated.'
+						. intval($result['files_copied']) . ' file(s) updated. Source: <strong>'
+						. htmlspecialchars($stable_branch) . '</strong>'
 					);
 					gsp_update_log("Admin {$user_label} updated panel to stable branch {$stable_branch}");
 				} else {
@@ -730,11 +832,12 @@ function gsp_panel_update_section()
 				}
 
 			} elseif ($action === 'update_unstable') {
-				$result = gsp_do_update($repo_owner, $repo_name, $unstable_branch, 'unstable');
+				$result = gsp_do_update($repo_owner, $repo_name, $unstable_branch, 'cutting-edge');
 				if ($result['success']) {
 					print_success(
 						'Panel updated to cutting edge version (<strong>' . htmlspecialchars($unstable_branch) . '</strong>). '
-						. intval($result['files_copied']) . ' file(s) updated.'
+						. intval($result['files_copied']) . ' file(s) updated. Source: <strong>'
+						. htmlspecialchars($unstable_branch) . '</strong>'
 					);
 					gsp_update_log("Admin {$user_label} updated panel to unstable branch {$unstable_branch}");
 				} else {
@@ -772,6 +875,7 @@ function gsp_panel_update_section()
 	$current_version  = gsp_get_current_version();
 	$current_branch   = gsp_get_current_branch();
 	$git_commit       = gsp_get_git_commit();
+	$vinfo            = gsp_read_version_json();
 	$releases         = gsp_fetch_github_releases($repo_owner, $repo_name);
 	$latest_release   = (is_array($releases) && !empty($releases))
 		? htmlspecialchars($releases[0]['tag_name'] ?? 'N/A')
@@ -783,12 +887,24 @@ function gsp_panel_update_section()
 	echo "<table class='administration-table'><tr><td>\n";
 
 	// Current status table
+	echo "<h3>Current Installation</h3>\n";
 	echo "<table class='center'>\n";
-	echo "<tr><td><strong>Installed Version:</strong></td><td>" . htmlspecialchars($current_version) . "</td></tr>\n";
-	echo "<tr><td><strong>Current Branch / Type:</strong></td><td>" . htmlspecialchars($current_branch) . "</td></tr>\n";
-	if ($git_commit) {
-		echo "<tr><td><strong>Git Commit:</strong></td><td>"
-		   . htmlspecialchars(substr($git_commit, 0, 12)) . "</td></tr>\n";
+	if ($vinfo) {
+		echo "<tr><td><strong>Installed Type:</strong></td><td>" . htmlspecialchars($vinfo['installed_type'] ?? 'N/A') . "</td></tr>\n";
+		echo "<tr><td><strong>Installed Source:</strong></td><td>" . htmlspecialchars($vinfo['installed_source'] ?? 'N/A') . "</td></tr>\n";
+		echo "<tr><td><strong>Installed Version:</strong></td><td>" . htmlspecialchars($vinfo['installed_version'] ?? 'N/A') . "</td></tr>\n";
+		if (!empty($vinfo['installed_commit'])) {
+			echo "<tr><td><strong>Installed Commit:</strong></td><td>"
+			   . htmlspecialchars(substr($vinfo['installed_commit'], 0, 12)) . "</td></tr>\n";
+		}
+		echo "<tr><td><strong>Installed / Updated At:</strong></td><td>" . htmlspecialchars($vinfo['installed_at'] ?? 'N/A') . "</td></tr>\n";
+	} else {
+		echo "<tr><td><strong>Installed Version:</strong></td><td>" . htmlspecialchars($current_version) . "</td></tr>\n";
+		echo "<tr><td><strong>Current Branch / Type:</strong></td><td>" . htmlspecialchars($current_branch) . "</td></tr>\n";
+		if ($git_commit) {
+			echo "<tr><td><strong>Git Commit:</strong></td><td>"
+			   . htmlspecialchars(substr($git_commit, 0, 12)) . "</td></tr>\n";
+		}
 	}
 	echo "<tr><td><strong>Latest Release on GitHub:</strong></td><td>" . $latest_release . "</td></tr>\n";
 	echo "<tr><td><strong>Repository:</strong></td><td>"
