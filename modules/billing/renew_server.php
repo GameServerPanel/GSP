@@ -210,9 +210,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_renewal'])) {
     // Determine price based on duration (fall back to monthly if missing)
     $price = ($duration === 'year' && !empty($order['price_year']) && floatval($order['price_year']) > 0) ? floatval($order['price_year']) : floatval($order['price_monthly']);
 
-    // Prepare update to set this order into renew state
+    // Prepare update to set this order into Invoiced state (renewal requested)
     if ($upd = $db->prepare("UPDATE {$table_prefix}billing_orders SET status = ?, invoice_duration = ?, qty = ?, price = ? WHERE order_id = ? AND user_id = ? LIMIT 1")) {
-        $new_status = 'renew';
+        $new_status = 'Invoiced';
         $orderIdInt = intval($order_id);
         $userIdInt = intval($user_id);
         $price_val = number_format($price, 2, '.', '');

@@ -42,12 +42,13 @@ $query = "SELECT
             h.home_id,
             h.home_name,
             h.enabled,
+            h.billing_status,
+            h.server_expiration_date,
             rs.remote_server_name,
             gc.game_name,
             o.order_id,
             o.status,
             o.invoice_duration,
-            -- use end_date as the expiration marker (set when order is paid/created)
             o.end_date AS expiration_date,
             bs.service_name,
             bs.price_monthly,
@@ -88,22 +89,31 @@ $result = mysqli_query($db, $query);
             <tbody>
                 <?php while ($server = mysqli_fetch_assoc($result)): ?>
                     <?php
-                    $is_active = $server['enabled'] == 1;
-                    $is_expired = strtotime($server['expiration_date']) < time();
-                    $status_class = $is_active ? 'text-success' : 'text-danger';
-                    $status_text = $is_active ? 'Active' : 'Inactive';
-                    
-                    if ($is_expired) {
-                        $status_text = 'Expired';
-                        $status_class = 'text-danger';
+                    // Use billing_status from server_homes (set by migration + cron).
+                    // Falls back to computing from expiration date for legacy rows.
+                    $billing_status = $server['billing_status'] ?? null;
+                    if (!$billing_status) {
+                        $exp_ts = !empty($server['server_expiration_date']) ? strtotime($server['server_expiration_date']) : false;
+                        if ($exp_ts && $exp_ts < time()) {
+                            $billing_status = 'Expired';
+                        } else {
+                            $billing_status = 'Active';
+                        }
                     }
+                    $status_class_map = [
+                        'Active'   => 'text-success',
+                        'Invoiced' => 'text-warning',
+                        'Expired'  => 'text-danger',
+                    ];
+                    $status_class = $status_class_map[$billing_status] ?? 'text-secondary';
+                    $exp_date     = $server['server_expiration_date'] ?? $server['expiration_date'];
                     ?>
                     <tr>
                         <td><?php echo htmlspecialchars($server['home_name'] ?? 'Unknown'); ?></td>
                         <td><?php echo htmlspecialchars($server['game_name'] ?? $server['service_name'] ?? 'Unknown'); ?></td>
                         <td><?php echo htmlspecialchars($server['remote_server_name'] ?? 'Unknown'); ?></td>
-                        <td class="<?php echo $status_class; ?>"><?php echo $status_text; ?></td>
-                        <td><?php echo $server['expiration_date'] ? date('M d, Y', strtotime($server['expiration_date'])) : 'N/A'; ?></td>
+                        <td class="<?php echo $status_class; ?>"><?php echo htmlspecialchars($billing_status); ?></td>
+                        <td><?php echo $exp_date ? date('M d, Y', strtotime($exp_date)) : 'N/A'; ?></td>
                         <td>
                             <?php 
                             $price = $server['price'] ?? $server['price_monthly'];

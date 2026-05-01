@@ -32,7 +32,7 @@ if ($db && $user_id > 0) {
               FROM {$table_prefix}billing_orders o
               LEFT JOIN {$table_prefix}billing_services s ON o.service_id = s.service_id
               WHERE o.user_id = $user_id 
-              AND o.status = 'paid'
+              AND o.status = 'Active'
               ORDER BY o.order_date DESC 
               LIMIT 10";
     

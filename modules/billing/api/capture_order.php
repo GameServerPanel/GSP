@@ -210,12 +210,13 @@ if ($coupon_id > 0) {
     }
 }
 
-// Mark all due invoices for this user as paid
+// Mark all due invoices for this user as paid.
+// Note: billing_invoices is the pre-purchase cart table and uses its own
+// status vocabulary (due -> paid). This is separate from gsp_invoices
+// (renewal invoices) and server_homes.billing_status (Active/Invoiced/Expired).
 $updateInvoicesSql = "UPDATE {$table_prefix}billing_invoices 
                       SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'
                       WHERE user_id=$user_id AND status='due'";
-
-log_payment('UPDATE_INVOICES_SQL', $updateInvoicesSql);
 $updateResult = mysqli_query($mysqli, $updateInvoicesSql);
 
 if (!$updateResult) {
@@ -265,7 +266,7 @@ while ($inv = mysqli_fetch_assoc($invoicesResult)) {
         }
         $newEndDate = date('Y-m-d H:i:s', strtotime("+$qty $durationUnit", $baseTs));
         $renewSql = "UPDATE {$table_prefix}billing_orders 
-                     SET status='installed', end_date='$newEndDate', paid_ts='$now', payment_txid='$esc_txid'
+                     SET status='Active', end_date='$newEndDate', paid_ts='$now', payment_txid='$esc_txid'
                      WHERE order_id=$existing_order_id LIMIT 1";
         if (mysqli_query($mysqli, $renewSql)) {
             $renewedOrders++;
@@ -274,6 +275,28 @@ while ($inv = mysqli_fetch_assoc($invoicesResult)) {
                 'invoice_id' => $invoice_id,
                 'new_end_date' => $newEndDate
             ]);
+
+            // Also update server_homes.billing_status and next_invoice_date
+            $homeIdRow = mysqli_query($mysqli, "SELECT home_id FROM {$table_prefix}billing_orders WHERE order_id=$existing_order_id LIMIT 1");
+            if ($homeIdRow && mysqli_num_rows($homeIdRow) === 1) {
+                $homeData = mysqli_fetch_assoc($homeIdRow);
+                $home_id_upd = intval($homeData['home_id'] ?? 0);
+                if ($home_id_upd > 0) {
+                    $next_inv_date = mysqli_real_escape_string($mysqli, $newEndDate);
+                    mysqli_query($mysqli, "UPDATE {$table_prefix}server_homes
+                        SET billing_status        = 'Active',
+                            next_invoice_date     = '$next_inv_date',
+                            server_expiration_date = NULL
+                        WHERE home_id = $home_id_upd");
+                    // Mark the matching gsp_invoices renewal invoice as Active
+                    mysqli_query($mysqli, "UPDATE {$table_prefix}invoices
+                        SET billing_status = 'Active',
+                            paid_at        = '$now',
+                            payment_id     = '$esc_txid'
+                        WHERE home_id = $home_id_upd AND billing_status = 'Invoiced'");
+                    log_payment('SERVER_HOME_ACTIVATED', ['home_id' => $home_id_upd]);
+                }
+            }
         } else {
             log_payment('ORDER_RENEWAL_FAILED', [
                 'order_id' => $existing_order_id,
@@ -298,14 +321,14 @@ while ($inv = mysqli_fetch_assoc($invoicesResult)) {
     // Calculate end_date
     $end_date = date('Y-m-d H:i:s', strtotime("+$qty $duration"));
     
-    // Insert order with status='paid' (panel will provision and change to 'active')
+    // Insert order with status='Active' (server will be provisioned automatically)
     $insertOrderSql = "INSERT INTO {$table_prefix}billing_orders (
         user_id, service_id, home_name, ip, max_players, qty, invoice_duration,
         price, remote_control_password, ftp_password, status, order_date, end_date,
         payment_txid, paid_ts, paypal_data
     ) VALUES (
         $user_id, $service_id, '$home_name', $ip, $max_players, $qty, '$duration',
-        $amount, '$rcon_pw', '$ftp_pw', 'paid', '$now', '$end_date',
+        $amount, '$rcon_pw', '$ftp_pw', 'Active', '$now', '$end_date',
         '$esc_txid', '$now', '$esc_paypal_json'
     )";
     

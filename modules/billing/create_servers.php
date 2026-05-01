@@ -45,12 +45,12 @@ function exec_ogp_module()
 		}
 	}
 	
-	// Handle provision_all request - provision all paid orders for this user
+	// Handle provision_all request - provision all Active (paid) orders for this user
 	if ($provision_all) {
 		if ( $isAdmin ){
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE status='paid' ORDER BY order_id" );
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
 		} else {
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='paid' ORDER BY order_id" );
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
 		}
 	}
 	// Handle provision_single or order_id parameter - provision specific order
@@ -62,9 +62,9 @@ function exec_ogp_module()
 		}
 		$idList = implode(',', array_map('intval', $orderIds));
 		if ( $isAdmin ){
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND status='paid'" );
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND status='Active'" );
 		} else {
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND user_id=".$db->realEscapeSingle($user_id)." AND status='paid'" );
+			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND user_id=".$db->realEscapeSingle($user_id)." AND status='Active'" );
 		}
 	}
 	$processed_orders = array();
@@ -338,16 +338,10 @@ function exec_ogp_module()
 				
 				
 			}
-			// Set expiration date in ogp database
-			//status is: in-cart, paid, installed, invoiced, suspended, deleted
-			// 'paid' - order has been paid but server not yet created
-			// 'installed' - server created and active
-			// 'invoiced' - invoice created for renewal
-			// 'suspended' - server suspended for non-payment
-			// 'deleted' - server deleted after extended suspension
-			//end_date the server will be suspended 
-			//in cron_shop the end_date is used to delete the server
-			//several days after being suspended
+			// Set expiration date in panel database
+			// Status values: Active (provisioned & current), Invoiced (renewal invoice open),
+			//                 Expired (past due and awaiting deletion)
+			// end_date / next_invoice_date: when the next renewal invoice should be generated
 			if ($order['invoice_duration'] == "day")
 			{
 				
@@ -397,19 +391,28 @@ function exec_ogp_module()
 				}	
 				
 			}
-			// set order status to 'installed' to indicate server has been provisioned
+			$end_date_str = date('Y-m-d H:i:s', $end_date);
+
+			// Set order status to 'Active' (server provisioned and current)
 			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
-						SET status='installed' 
+						SET status='Active' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 	
-			// set the order expiration
+			// Set the order expiration / next renewal date
 			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
-						SET end_date='" . $db->realEscapeSingle($end_date) . "' 
+						SET end_date='" . $db->realEscapeSingle($end_date_str) . "' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 						
-			// Save home id created by this order
+			// Save home_id created by this order
 			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
 						SET home_id='" . $db->realEscapeSingle($home_id) . "' WHERE order_id=".$db->realEscapeSingle($order_id));
+
+			// Set billing_status and next_invoice_date on server_homes
+			$db->query("UPDATE OGP_DB_PREFIXserver_homes
+						SET billing_status     = 'Active',
+							next_invoice_date  = '" . $db->realEscapeSingle($end_date_str) . "',
+							billing_enabled    = 1
+						WHERE home_id = " . $db->realEscapeSingle($home_id));
 			
 			$provisioned_count++;
 						

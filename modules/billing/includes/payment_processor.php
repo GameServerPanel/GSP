@@ -164,7 +164,7 @@ function process_payment_record(array $record) {
                     $dt = new DateTime($extend_from);
                     if ($months > 0) $dt->modify('+' . intval($months) . ' months');
                     $new_end = $dt->format('Y-m-d H:i:s');
-                    $update = "UPDATE `" . $TABLE_PREFIX . "billing_orders` SET end_date = ?, status='paid', payment_txid = ?, paid_ts = ? WHERE order_id = ?";
+                    $update = "UPDATE `" . $TABLE_PREFIX . "billing_orders` SET end_date = ?, status='Active', payment_txid = ?, paid_ts = ? WHERE order_id = ?";
                     if ($u = mysqli_prepare($db, $update)) {
                         mysqli_stmt_bind_param($u, 'sssi', $new_end, $esc_txid, $now, $order_id);
                         mysqli_stmt_execute($u);
@@ -189,7 +189,7 @@ function process_payment_record(array $record) {
             $price = number_format($invoice_amount, 2, '.', '');
 
             $insert2 = sprintf(
-                "INSERT INTO `%s` (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, order_date, end_date, payment_txid, paid_ts) VALUES (%d, %d, '%s', %d, %d, %d, '%s', %s, '%s', '%s', 'paid', '%s', '%s', '%s', '%s')",
+                "INSERT INTO `%s` (user_id, service_id, home_name, ip, max_players, qty, invoice_duration, price, remote_control_password, ftp_password, status, order_date, end_date, payment_txid, paid_ts) VALUES (%d, %d, '%s', %d, %d, %d, '%s', %s, '%s', '%s', 'Active', '%s', '%s', '%s', '%s')",
                 $TABLE_PREFIX . 'billing_orders',
                 $user_id, $service_id, $esc_home, $ip, $max_players, $qty, $esc_duration, $price, $esc_rcon, $esc_ftp, $now, $end_date, $esc_txid, $now
             );

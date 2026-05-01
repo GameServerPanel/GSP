@@ -12,20 +12,22 @@ function exec_ogp_module()
 	
 	echo "<h2>My Server Orders</h2>";
 	
-	// Get paid but not installed orders for this user
+	// Get Active (paid) but not yet provisioned orders for this user
 	if ($isAdmin) {
 		$orders = $db->resultQuery("SELECT o.*, s.service_name, u.users_login 
 									FROM OGP_DB_PREFIXbilling_orders o
 									LEFT JOIN OGP_DB_PREFIXbilling_services s ON o.service_id = s.service_id
 									LEFT JOIN OGP_DB_PREFIXusers u ON o.user_id = u.user_id
-									WHERE o.status IN ('paid')
+									WHERE o.status = 'Active'
+									  AND (o.home_id = '0' OR o.home_id = '')
 									ORDER BY o.order_date DESC");
 	} else {
 		$orders = $db->resultQuery("SELECT o.*, s.service_name 
 									FROM OGP_DB_PREFIXbilling_orders o
 									LEFT JOIN OGP_DB_PREFIXbilling_services s ON o.service_id = s.service_id
 									WHERE o.user_id = ".$db->realEscapeSingle($user_id)."
-									AND o.status IN ('paid')
+									  AND o.status = 'Active'
+									  AND (o.home_id = '0' OR o.home_id = '')
 									ORDER BY o.order_date DESC");
 	}
 	
