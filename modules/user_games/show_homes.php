@@ -92,7 +92,7 @@ function exec_ogp_module()
 		echo "</td><td>".$expiration_date."</td><td>
 			<a href='?m=user_games&amp;p=del&amp;home_id=$row[home_id]'>[".get_lang('delete')."]</a>
 			<a href='?m=user_games&amp;p=edit&amp;home_id=$row[home_id]'>[".get_lang('edit')."]</a>
-			<a href='?m=user_games&amp;p=clone&amp;home_id=$row[home_id]'>[".get_lang('clone')."]</a>
+			<a href='?m=user_games&amp;p=migrate&amp;home_id=$row[home_id]'>[".get_lang('migrate')."]</a>
 			</td></tr>";
 	}
 	

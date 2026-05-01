@@ -220,4 +220,24 @@ define('OGP_LANG_ftp_account_username_too_long', "FTP username is too long. Try 
 define('OGP_LANG_ftp_account_password_too_long', "FTP password is too long. Try a shorter password no longer than 20 characters.");
 define('OGP_LANG_other_servers_exist_with_path_please_change', "Other homes exist with the same path. It is recommended (but not required) that you change this path to something unique. You may have problems if you do NOT.");
 define('OGP_LANG_change_access_rights_for_selected_servers', "Change access rights for selected servers");
+
+// Migrate feature (replaces Clone)
+define('OGP_LANG_migrate',                          "Migrate");
+define('OGP_LANG_migrate_server',                   "Migrate Server: %s");
+define('OGP_LANG_migrate_info',                     "This tool copies all files from the source server to a destination server of the same game type.  The source is never deleted or modified.");
+define('OGP_LANG_migrate_bullet_no_delete',         "The source server is NOT deleted.");
+define('OGP_LANG_migrate_bullet_same_game',         "Destination must be the same game type.");
+define('OGP_LANG_migrate_bullet_overwrite',         "All files in the destination will be overwritten.");
+define('OGP_LANG_migrate_bullet_no_billing',        "Billing records are not changed automatically.");
+define('OGP_LANG_migrate_source',                   "Source");
+define('OGP_LANG_migrate_destination',              "Destination");
+define('OGP_LANG_migrate_confirm_overwrite',        "Confirm overwrite");
+define('OGP_LANG_migrate_confirm_overwrite_info',   "Check this box to confirm you want to overwrite the destination server files.");
+define('OGP_LANG_migrate_start',                    "Start Migration");
+define('OGP_LANG_migrate_no_compatible_destinations', "No compatible destination servers found (same game type, different server).");
+define('OGP_LANG_migrate_different_game_type',      "Source and destination must be the same game type.");
+define('OGP_LANG_migrate_confirm_required',         "You must tick the confirmation checkbox before starting a migration.");
+define('OGP_LANG_migrate_running_background',       "Migration started and is running in the background.");
+define('OGP_LANG_migrate_complete',                 "Migration completed successfully.");
+define('OGP_LANG_migrate_failed_code',              "Migration failed with return code %d.");
 ?>

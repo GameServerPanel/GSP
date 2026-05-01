@@ -151,6 +151,22 @@ function exec_ogp_module()
 					}
 					print_success(get_lang('game_home_added'));
 					$db->logger(get_lang('game_home_added')." ($server_name)");
+
+					// Record the server in the billing tables so it participates in the
+					// normal lifecycle (renewals, expiration, admin dashboard).
+					require_once('billing_integration.php');
+					admin_register_server_in_billing(
+						$db,
+						$web_user_id,
+						$home_cfg_id,
+						$rserver_id,
+						$server_name,
+						0,            // max_players — set later via edit_home
+						$access_rights,
+						$ftp,
+						$new_home_id
+					);
+
 					$view->refresh("?m=user_games&amp;p=edit&amp;home_id=$new_home_id", 0);
 				}else{
 					print_failure(get_lang_f("failed_to_assign_home_to_user", $new_home_id, $web_user . " " . $db->getError()));
