@@ -1,0 +1,87 @@
+name: Promote Unstable to Stable
+
+# This workflow is MANUAL-ONLY.
+# It overwrites the stable branch with the exact contents of unstable.
+# No merge is performed — stable becomes identical to unstable (force push).
+
+on:
+  workflow_dispatch:
+
+jobs:
+  promote:
+    name: Overwrite stable with unstable
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to push to protected/non-protected branches
+
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history so all branches are available
+
+      - name: Fetch both branches
+        run: |
+          git fetch origin unstable stable
+
+      - name: Verify unstable branch exists
+        run: |
+          if ! git rev-parse --verify origin/unstable > /dev/null 2>&1; then
+            echo "ERROR: Branch 'unstable' does not exist on origin. Aborting."
+            exit 1
+          fi
+          echo "Branch 'unstable' confirmed."
+
+      - name: Verify stable branch exists
+        run: |
+          if ! git rev-parse --verify origin/stable > /dev/null 2>&1; then
+            echo "ERROR: Branch 'stable' does not exist on origin. Aborting."
+            exit 1
+          fi
+          echo "Branch 'stable' confirmed."
+
+      - name: Show current commit hashes before update
+        run: |
+          UNSTABLE_COMMIT=$(git rev-parse origin/unstable)
+          STABLE_COMMIT=$(git rev-parse origin/stable)
+          echo "Current unstable commit : $UNSTABLE_COMMIT"
+          echo "Current stable commit   : $STABLE_COMMIT"
+          echo "UNSTABLE_COMMIT=$UNSTABLE_COMMIT" >> "$GITHUB_ENV"
+          echo "STABLE_BEFORE=$STABLE_COMMIT"    >> "$GITHUB_ENV"
+
+      - name: Check out stable locally
+        run: |
+          git checkout stable
+
+      - name: Reset stable to match unstable exactly
+        # This is NOT a merge. We hard-reset stable to the same commit as unstable.
+        # After this step, stable and unstable are byte-for-byte identical.
+        run: |
+          git reset --hard origin/unstable
+
+      - name: Force push stable to origin
+        # --force is intentional: we are deliberately replacing stable with unstable.
+        # GITHUB_TOKEN is sufficient for repositories where the actor has write access.
+        run: |
+          git push origin stable --force
+
+      - name: Show stable commit after update
+        run: |
+          git fetch origin stable
+          STABLE_AFTER=$(git rev-parse origin/stable)
+          echo "-------------------------------------------"
+          echo "Promotion summary"
+          echo "-------------------------------------------"
+          echo "unstable commit        : $UNSTABLE_COMMIT"
+          echo "stable commit (before) : $STABLE_BEFORE"
+          echo "stable commit (after)  : $STABLE_AFTER"
+          echo "-------------------------------------------"
+          if [ "$STABLE_AFTER" = "$UNSTABLE_COMMIT" ]; then
+            echo "SUCCESS: stable now matches unstable."
+          else
+            echo "WARNING: stable commit does not match expected unstable commit."
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
