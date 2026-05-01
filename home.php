@@ -210,7 +210,7 @@ function ogpHome()
 				foreach ((array)$server_homes as $server_home)
 				{
 					$button_name = htmlentities($server_home['home_name']);
-					if( ! preg_match("/none/i", $server_home['mod_name']) ) 
+					if( ! preg_match("/none/i", (string)$server_home['mod_name']) ) 
 						$button_name .= " - ".$server_home['mod_name'];
 					$game_homes_list .= "<li><a title='".$server_home['ip'].':'.$server_home['port'].
 										"' class='user_menu_link' href='?m=gamemanager&p=game_monitor&home_id-mod_id-ip-port=".
