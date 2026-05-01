@@ -85,6 +85,7 @@ $install_queries[0] = array(
         `payment_txid` VARCHAR(255) NULL,
         `paid_ts` DATETIME NULL,
         `coupon_id` INT(11) NOT NULL DEFAULT 0,
+        `created_by_admin` TINYINT(1) NOT NULL DEFAULT 0,
         PRIMARY KEY (`order_id`),
         KEY `user_id` (`user_id`),
         KEY `status` (`status`),
