@@ -1,0 +1,119 @@
+name: Create Release
+
+# Manually triggered from the GitHub UI (Actions → Create Release → Run workflow)
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v1.0.0)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Release notes / description (optional)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  release:
+    name: Build & Publish Release
+    runs-on: ubuntu-latest
+    # Needed to create tags, releases, and upload assets
+    permissions:
+      contents: write
+
+    steps:
+      # ──────────────────────────────────────────────
+      # 1. Checkout the full repository history so we
+      #    can inspect branches and create tags.
+      # ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ──────────────────────────────────────────────
+      # 2. Safety: only allow releases from the
+      #    "stable" branch.
+      # ──────────────────────────────────────────────
+      - name: Verify we are on the stable branch
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "Current branch: ${BRANCH}"
+          if [ "${BRANCH}" != "stable" ]; then
+            echo "::error::Releases must be created from the 'stable' branch. Current branch is '${BRANCH}'."
+            exit 1
+          fi
+
+      # ──────────────────────────────────────────────
+      # 3. Safety: abort if the tag already exists to
+      #    prevent accidental overwrites.
+      # ──────────────────────────────────────────────
+      - name: Check that tag does not already exist
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          echo "Checking for existing tag: ${VERSION}"
+          if git ls-remote --tags origin "refs/tags/${VERSION}" | grep -q "${VERSION}"; then
+            echo "::error::Tag '${VERSION}' already exists on origin. Aborting."
+            exit 1
+          fi
+          echo "Tag '${VERSION}' does not exist yet — safe to proceed."
+
+      # ──────────────────────────────────────────────
+      # 4. Create the annotated git tag locally and
+      #    push it to origin.
+      # ──────────────────────────────────────────────
+      - name: Create and push git tag
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${VERSION}" -m "Release ${VERSION}"
+          git push origin "${VERSION}"
+          echo "Tag '${VERSION}' pushed to origin."
+
+      # ──────────────────────────────────────────────
+      # 5. Build the release ZIP, excluding files that
+      #    should never ship (secrets, dev artifacts,
+      #    version-control metadata, etc.).
+      # ──────────────────────────────────────────────
+      - name: Build release ZIP artifact
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          ARCHIVE="gsp-${VERSION}.zip"
+
+          echo "Building ${ARCHIVE} …"
+
+          zip -r "${ARCHIVE}" . \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "node_modules/*" \
+            --exclude "vendor/*" \
+            --exclude "logs/*" \
+            --exclude "backups/*" \
+            --exclude "*.log" \
+            --exclude "*.sql" \
+            --exclude "includes/config.php" \
+            --exclude "modules/billing/includes/config.inc.php" \
+            --exclude ".password" \
+            --exclude "*.password"
+
+          echo "Archive created:"
+          ls -lh "${ARCHIVE}"
+
+      # ──────────────────────────────────────────────
+      # 6. Create the GitHub Release and upload the
+      #    ZIP asset.  Uses only the built-in
+      #    GITHUB_TOKEN — no personal token needed.
+      # ──────────────────────────────────────────────
+      - name: Create GitHub Release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          name: "GSP ${{ github.event.inputs.version }}"
+          body: ${{ github.event.inputs.release_notes }}
+          draft: false
+          prerelease: false
+          files: gsp-${{ github.event.inputs.version }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
