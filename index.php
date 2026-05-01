@@ -486,7 +486,7 @@ function ogpHome()
 <hr>
 
 <div style="text-align:center"> <h1>Level UP your gaming</h1></div>
-
+this is dev
 <div class="row">
 
 	%bottom%
