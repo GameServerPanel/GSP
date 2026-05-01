@@ -184,142 +184,315 @@ function gsp_fetch_github_releases($repo_owner, $repo_name)
 }
 
 // ---------------------------------------------------------------------------
-// Backup: dump the MySQL database into $backup_dir
+// Helper: read DB credentials from includes/config.inc.php using an
+// isolated scope so the caller's variables are not polluted and side effects
+// from the config file (e.g. debug.php inclusion) stay contained.
+// Returns an array with keys host/port/user/pass/name, or null on failure.
 // ---------------------------------------------------------------------------
-function gsp_backup_database($backup_dir)
+function load_panel_db_config()
 {
-	// Load DB credentials from config
-	@include(GSP_PANEL_DIR . '/includes/config.inc.php');
-	if (empty($db_user) || empty($db_name)) {
-		return false;
+	$config_file = GSP_PANEL_DIR . '/includes/config.inc.php';
+	if (!is_readable($config_file)) {
+		return null;
 	}
 
-	// Write credentials to a temporary file to avoid exposing them in process listings
+	// Static closure gives an isolated variable scope; the @ suppresses any
+	// non-fatal errors from transitive includes (e.g. debug.php).
+	$capture = static function ($__file) {
+		$db_host = 'localhost';
+		$db_port = '3306';
+		$db_user = '';
+		$db_pass = '';
+		$db_name = '';
+		@include $__file;
+		return [
+			'host' => (string) $db_host,
+			'port' => (string) $db_port,
+			'user' => (string) $db_user,
+			'pass' => (string) $db_pass,
+			'name' => (string) $db_name,
+		];
+	};
+
+	$cfg = $capture($config_file);
+
+	if (empty($cfg['user']) || empty($cfg['name'])) {
+		return null;
+	}
+
+	return $cfg;
+}
+
+// ---------------------------------------------------------------------------
+// Backup: dump the MySQL database into $backup_dir/database.sql
+// Returns ['success'=>bool, 'error'=>string, 'file'=>string]
+// ---------------------------------------------------------------------------
+function create_database_backup($backup_dir, $db_config)
+{
+	// Verify mysqldump is available before attempting anything
+	$check_out = [];
+	$check_ret = 0;
+	exec('command -v mysqldump 2>/dev/null', $check_out, $check_ret);
+	if ($check_ret !== 0 || empty($check_out[0])) {
+		return [
+			'success' => false,
+			'error'   => 'mysqldump is not installed or not in PATH. '
+			           . 'Install the mysql-client package and ensure it is on the PATH.',
+		];
+	}
+
+	$sql_file   = $backup_dir . '/database.sql';
 	$creds_file = tempnam(sys_get_temp_dir(), 'gsp_db_');
 	if ($creds_file === false) {
-		return false;
+		return ['success' => false, 'error' => 'Cannot create temporary credentials file.'];
 	}
-	file_put_contents($creds_file,
-		"[client]\nuser=" . addcslashes($db_user, "\\\n\"'") . "\n"
-		. "password=" . addcslashes($db_pass, "\\\n\"'") . "\n"
-	);
+
+	// Build MySQL option-file content; addcslashes protects backslashes and
+	// newlines so values are safe inside the ini-style [client] section.
+	// The password never appears in the process list this way.
+	$creds = "[client]\n"
+	       . "user="     . addcslashes($db_config['user'], "\\\n") . "\n"
+	       . "password=" . addcslashes($db_config['pass'], "\\\n") . "\n";
+	if (!empty($db_config['host'])) {
+		$creds .= "host=" . addcslashes($db_config['host'], "\\\n") . "\n";
+	}
+	if (!empty($db_config['port']) && $db_config['port'] !== '3306') {
+		$creds .= "port=" . addcslashes($db_config['port'], "\\\n") . "\n";
+	}
+	file_put_contents($creds_file, $creds);
 	chmod($creds_file, 0600);
 
-	$sql_file = $backup_dir . '/' . $db_name . '_backup.sql';
-	$command  = 'mysqldump --defaults-extra-file=' . escapeshellarg($creds_file)
-	          . ' --skip-opt --single-transaction --add-drop-table'
-	          . ' --create-options --extended-insert --quick --set-charset'
-	          . ' '   . escapeshellarg($db_name)
-	          . ' > ' . escapeshellarg($sql_file)
-	          . ' 2>&1';
-	@system($command);
+	// Redirect stderr to a separate temp file so it never pollutes the SQL dump
+	$err_tmp = tempnam(sys_get_temp_dir(), 'gsp_db_err_');
+	if ($err_tmp === false) {
+		@unlink($creds_file);
+		return ['success' => false, 'error' => 'Cannot create temporary file for mysqldump error capture.'];
+	}
+	$command = 'mysqldump --defaults-extra-file=' . escapeshellarg($creds_file)
+	         . ' --skip-opt --single-transaction --add-drop-table'
+	         . ' --create-options --extended-insert --quick --set-charset'
+	         . ' '    . escapeshellarg($db_config['name'])
+	         . ' > '  . escapeshellarg($sql_file)
+	         . ' 2> ' . escapeshellarg($err_tmp);
+
+	$unused = [];
+	$ret    = 0;
+	exec($command, $unused, $ret);
 	@unlink($creds_file);
 
+	// Collect stderr; strip lines mentioning "password" or "passwd" as a
+	// defensive measure (mysqldump error output does not normally include the
+	// password, but we filter anyway in case of unusual configurations).
+	$err_output = '';
+	if (file_exists($err_tmp)) {
+		$raw = trim(file_get_contents($err_tmp));
+		@unlink($err_tmp);
+		if ($raw !== '') {
+			$err_output = implode("\n", array_filter(
+				explode("\n", $raw),
+				static function ($line) {
+					return stripos($line, 'password') === false
+					    && stripos($line, 'passwd') === false;
+				}
+			));
+		}
+	}
+
+	if ($ret !== 0) {
+		@unlink($sql_file);
+		$msg = 'mysqldump failed (exit code ' . $ret . ').';
+		if ($err_output !== '') {
+			$msg .= ' Error: ' . $err_output;
+		}
+		return ['success' => false, 'error' => $msg];
+	}
+
 	if (!file_exists($sql_file) || filesize($sql_file) < 100) {
-		return false;
+		@unlink($sql_file);
+		return ['success' => false, 'error' => 'Database dump file is missing or empty after mysqldump.'];
 	}
-	return $sql_file;
+
+	return ['success' => true, 'file' => $sql_file];
 }
 
 // ---------------------------------------------------------------------------
-// Backup: recursively copy panel files (excluding noise dirs) into $dst_dir
+// Backup: tar-gzip the panel root into $backup_dir/panel-files.tar.gz
+// Returns ['success'=>bool, 'error'=>string, 'file'=>string]
 // ---------------------------------------------------------------------------
-function gsp_backup_files($src_dir, $dst_dir)
+function create_panel_files_archive($backup_dir, $panel_root)
 {
-	$exclude_top = ['.git', 'logs', 'backups', 'cache', 'tmp'];
-
-	if (!is_dir($dst_dir) && !@mkdir($dst_dir, 0750, true)) {
-		return false;
+	// Verify tar is available
+	$check_out = [];
+	$check_ret = 0;
+	exec('command -v tar 2>/dev/null', $check_out, $check_ret);
+	if ($check_ret !== 0 || empty($check_out[0])) {
+		return ['success' => false, 'error' => 'tar is not installed or not in PATH.'];
 	}
 
-	$iter = new RecursiveIteratorIterator(
-		new RecursiveDirectoryIterator($src_dir, RecursiveDirectoryIterator::SKIP_DOTS),
-		RecursiveIteratorIterator::SELF_FIRST
-	);
+	$tar_file = $backup_dir . '/panel-files.tar.gz';
 
-	foreach ($iter as $item) {
-		$rel   = substr($item->getPathname(), strlen($src_dir) + 1);
-		$parts = preg_split('#[/\\\\]#', $rel);
+	// Top-level directories are anchored with ./ so they only match at the
+	// archive root; wildcard patterns match at any depth.
+	$exclude_dirs  = ['./backups', './.git', './logs', './cache', './tmp', './node_modules', './vendor'];
+	$exclude_globs = ['*.log', '*.sql'];
 
-		// Skip excluded top-level directories
-		if (in_array($parts[0], $exclude_top)) {
-			continue;
-		}
-
-		// Skip *.log files
-		if (!$item->isDir() && substr($item->getFilename(), -4) === '.log') {
-			continue;
-		}
-
-		$dst_path = $dst_dir . DIRECTORY_SEPARATOR . $rel;
-
-		if ($item->isDir()) {
-			if (!is_dir($dst_path)) {
-				@mkdir($dst_path, 0755, true);
-			}
-		} else {
-			$dst_parent = dirname($dst_path);
-			if (!is_dir($dst_parent)) {
-				@mkdir($dst_parent, 0755, true);
-			}
-			if (!@copy($item->getPathname(), $dst_path)) {
-				return false;
-			}
-		}
+	$exclude_args = '';
+	foreach ($exclude_dirs as $dir) {
+		$exclude_args .= ' --exclude=' . escapeshellarg($dir);
 	}
-	return true;
+	foreach ($exclude_globs as $glob) {
+		$exclude_args .= ' --exclude=' . escapeshellarg($glob);
+	}
+
+	// -C panel_root . preserves relative paths (./home.php, ./modules/…)
+	$command = 'tar -czf ' . escapeshellarg($tar_file)
+	         . $exclude_args
+	         . ' -C ' . escapeshellarg($panel_root)
+	         . ' . 2>&1';
+
+	$out = [];
+	$ret = 0;
+	exec($command, $out, $ret);
+
+	if ($ret !== 0) {
+		@unlink($tar_file);
+		return [
+			'success' => false,
+			'error'   => 'tar failed (exit code ' . $ret . '). ' . implode(' | ', $out),
+		];
+	}
+
+	if (!file_exists($tar_file) || filesize($tar_file) < 100) {
+		@unlink($tar_file);
+		return ['success' => false, 'error' => 'Panel archive file is missing or empty after tar.'];
+	}
+
+	return ['success' => true, 'file' => $tar_file];
 }
 
 // ---------------------------------------------------------------------------
-// Backup: create a full timestamped backup (DB + files + metadata)
+// Backup: write backup.json metadata into $backup_dir
+// Returns true on success, false on failure.
 // ---------------------------------------------------------------------------
-function gsp_create_full_backup($update_type, $update_target)
+function write_backup_metadata($backup_dir, $metadata)
+{
+	return file_put_contents(
+		$backup_dir . '/backup.json',
+		json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+	) !== false;
+}
+
+// ---------------------------------------------------------------------------
+// Backup: create a full timestamped backup (DB + files + metadata + log)
+// ---------------------------------------------------------------------------
+function gsp_create_full_backup($update_target_type, $update_target_version)
 {
 	$ts         = date('Y-m-d_H-i-s');
 	$backup_dir = GSP_BACKUP_BASE . '/' . $ts;
 
-	// Ensure backup base exists
-	if (!is_dir(GSP_BACKUP_BASE) && !@mkdir(GSP_BACKUP_BASE, 0750, true)) {
+	// Helper that writes a timestamped line to backup.log inside $backup_dir
+	$append_log = static function ($msg) use ($backup_dir) {
+		$line = '[' . date('Y-m-d H:i:s') . '] ' . $msg . PHP_EOL;
+		@file_put_contents($backup_dir . '/backup.log', $line, FILE_APPEND | LOCK_EX);
+	};
+
+	// 1. Ensure backup base directory exists (0755 so the web server can write)
+	if (!is_dir(GSP_BACKUP_BASE)) {
+		$mkdir_ok = @mkdir(GSP_BACKUP_BASE, 0755, true);
+		if (!$mkdir_ok) {
+			$last_err = error_get_last();
+			$detail   = ($last_err && !empty($last_err['message'])) ? ' (' . $last_err['message'] . ')' : '';
+			return [
+				'success' => false,
+				'error'   => 'Cannot create backup base directory: ' . GSP_BACKUP_BASE . $detail
+				           . '. Ensure the web server user has write access to: '
+				           . dirname(GSP_BACKUP_BASE),
+			];
+		}
+	}
+
+	// 2. Create timestamped backup directory
+	if (!@mkdir($backup_dir, 0755, true)) {
+		$last_err = error_get_last();
+		$detail   = ($last_err && !empty($last_err['message'])) ? ' (' . $last_err['message'] . ')' : '';
 		return [
 			'success' => false,
-			'error'   => 'Cannot create backup directory ' . GSP_BACKUP_BASE
-			           . '. Ensure the panel directory is writable by the web server.',
+			'error'   => 'Cannot create backup directory: ' . $backup_dir . $detail
+			           . '. Ensure the web server user has write access to: ' . GSP_BACKUP_BASE,
 		];
 	}
 
-	if (!@mkdir($backup_dir, 0750, true)) {
-		return ['success' => false, 'error' => 'Cannot create backup directory: ' . $backup_dir];
-	}
+	$append_log("Backup started. Target: {$update_target_type} / {$update_target_version}");
+	$append_log("Panel root: " . GSP_PANEL_DIR);
+	$append_log("Backup directory: {$backup_dir}");
 
-	// 1. Database backup
-	$sql_file = gsp_backup_database($backup_dir);
-	if ($sql_file === false) {
+	// 3. Load DB configuration from includes/config.inc.php
+	$db_config = load_panel_db_config();
+	if ($db_config === null) {
+		$append_log("ERROR: Cannot load database configuration from includes/config.inc.php");
 		return [
 			'success' => false,
-			'error'   => 'Database backup failed. Check that mysqldump is installed and credentials are correct.',
+			'error'   => 'Cannot load database configuration. '
+			           . 'Ensure includes/config.inc.php exists and contains valid DB credentials.',
 		];
 	}
+	$append_log("DB config loaded. Host: {$db_config['host']}, Database: {$db_config['name']}");
 
-	// 2. File backup
-	$backup_files_dir = $backup_dir . '/files';
-	if (!gsp_backup_files(GSP_PANEL_DIR, $backup_files_dir)) {
-		return ['success' => false, 'error' => 'Panel file backup failed.'];
+	// 4. Database backup — stops the update if it fails
+	$append_log("Starting database backup (mysqldump)...");
+	$db_result = create_database_backup($backup_dir, $db_config);
+	if (!$db_result['success']) {
+		$append_log("ERROR: Database backup failed: " . $db_result['error']);
+		return ['success' => false, 'error' => $db_result['error']];
 	}
+	$append_log("Database backup complete: database.sql (" . filesize($db_result['file']) . " bytes)");
 
-	// 3. Metadata
-	$meta = [
-		'backup_timestamp'  => $ts,
-		'git_commit'        => gsp_get_git_commit(),
-		'installed_version' => gsp_get_current_version(),
-		'update_type'       => $update_type,
-		'update_target'     => $update_target,
+	// 5. Panel files archive — stops the update if it fails
+	$append_log("Starting panel files archive (tar gzip)...");
+	$tar_result = create_panel_files_archive($backup_dir, GSP_PANEL_DIR);
+	if (!$tar_result['success']) {
+		$append_log("ERROR: Panel files archive failed: " . $tar_result['error']);
+		return ['success' => false, 'error' => $tar_result['error']];
+	}
+	$append_log("Panel files archive complete: panel-files.tar.gz (" . filesize($tar_result['file']) . " bytes)");
+
+	// 6. Write backup.json metadata
+	$vinfo    = gsp_read_version_json();
+	$metadata = [
+		'backup_timestamp'      => $ts,
+		'panel_root'            => GSP_PANEL_DIR,
+		'database_host'         => $db_config['host'],
+		'database_name'         => $db_config['name'],
+		'installed_version'     => $vinfo
+			? ($vinfo['installed_version'] ?? gsp_get_current_version())
+			: gsp_get_current_version(),
+		'git_branch'            => gsp_get_current_branch(),
+		'git_commit'            => gsp_get_git_commit(),
+		'update_target_type'    => $update_target_type,
+		'update_target_version' => $update_target_version,
+		'backup_status'         => 'complete',
 	];
-	file_put_contents($backup_dir . '/backup.json', json_encode($meta, JSON_PRETTY_PRINT));
+	write_backup_metadata($backup_dir, $metadata);
+	$append_log("Backup metadata written (backup.json).");
+
+	// 7. Final validation — both required files must be present and non-empty
+	$sql_file = $backup_dir . '/database.sql';
+	$tar_file = $backup_dir . '/panel-files.tar.gz';
+
+	if (!file_exists($sql_file) || filesize($sql_file) < 100) {
+		$append_log("ERROR: Validation failed — database.sql is missing or empty.");
+		return ['success' => false, 'error' => 'Backup validation failed: database.sql is missing or empty.'];
+	}
+	if (!file_exists($tar_file) || filesize($tar_file) < 100) {
+		$append_log("ERROR: Validation failed — panel-files.tar.gz is missing or empty.");
+		return ['success' => false, 'error' => 'Backup validation failed: panel-files.tar.gz is missing or empty.'];
+	}
+
+	$append_log("Backup validated and complete.");
 
 	return [
 		'success'    => true,
 		'backup_dir' => $backup_dir,
-		'sql_file'   => $sql_file,
 		'backup_ts'  => $ts,
 	];
 }
@@ -679,16 +852,24 @@ function gsp_do_revert($backup_ts)
 		return ['success' => false, 'error' => 'Backup directory not found: ' . htmlspecialchars($backup_ts)];
 	}
 
-	$backup_files_dir = $backup_dir . '/files';
-	if (!is_dir($backup_files_dir)) {
-		return ['success' => false, 'error' => 'Backup files directory not found.'];
+	// Detect backup format: new (panel-files.tar.gz) or legacy (files/ directory)
+	$tar_archive      = $backup_dir . '/panel-files.tar.gz';
+	$legacy_files_dir = $backup_dir . '/files';
+	$use_tar          = file_exists($tar_archive);
+
+	if (!$use_tar && !is_dir($legacy_files_dir)) {
+		return ['success' => false, 'error' => 'Backup files not found (expected panel-files.tar.gz or files/ directory).'];
 	}
 
-	$sql_files = glob($backup_dir . '/*.sql');
-	if (!$sql_files) {
+	// Detect SQL file: new (database.sql) or legacy glob *.sql
+	$sql_file = $backup_dir . '/database.sql';
+	if (!file_exists($sql_file)) {
+		$sql_candidates = glob($backup_dir . '/*.sql') ?: [];
+		$sql_file       = !empty($sql_candidates) ? $sql_candidates[0] : null;
+	}
+	if (!$sql_file || !file_exists($sql_file)) {
 		return ['success' => false, 'error' => 'No SQL dump found in backup.'];
 	}
-	$sql_file = $sql_files[0];
 
 	// Enable maintenance mode for the duration of the revert
 	$had_maintenance = isset($db->getSettings()['maintenance_mode'])
@@ -702,51 +883,76 @@ function gsp_do_revert($backup_ts)
 	}
 
 	// Restore files
-	$copied = 0;
-	$iter   = new RecursiveIteratorIterator(
-		new RecursiveDirectoryIterator($backup_files_dir, RecursiveDirectoryIterator::SKIP_DOTS),
-		RecursiveIteratorIterator::SELF_FIRST
-	);
-	foreach ($iter as $item) {
-		$rel     = substr($item->getPathname(), strlen($backup_files_dir));
-		$dst     = $panel_dir . $rel;
-		if ($item->isDir()) {
-			if (!is_dir($dst)) {
-				@mkdir($dst, 0755, true);
-			}
+	$files_restored = 0;
+	if ($use_tar) {
+		// New format: extract tar archive back to the panel root
+		$out = [];
+		$ret = 0;
+		exec('tar -xzf ' . escapeshellarg($tar_archive) . ' -C ' . escapeshellarg($panel_dir) . ' 2>&1', $out, $ret);
+		if ($ret === 0) {
+			// tar restores files in place; it does not provide a count,
+			// so use 0 here — callers should not rely on an exact file count for the tar path.
+			$files_restored = 0;
+			gsp_update_log("Revert: extracted panel-files.tar.gz to {$panel_dir}");
 		} else {
-			$dst_dir = dirname($dst);
-			if (!is_dir($dst_dir)) {
-				@mkdir($dst_dir, 0755, true);
-			}
-			if (@copy($item->getPathname(), $dst)) {
-				$copied++;
+			gsp_update_log("Revert warning: tar extraction exited with code {$ret}: " . implode(' | ', $out));
+		}
+	} else {
+		// Legacy format: recursive copy from files/ directory
+		$iter = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($legacy_files_dir, RecursiveDirectoryIterator::SKIP_DOTS),
+			RecursiveIteratorIterator::SELF_FIRST
+		);
+		foreach ($iter as $item) {
+			$rel = substr($item->getPathname(), strlen($legacy_files_dir));
+			$dst = $panel_dir . $rel;
+			if ($item->isDir()) {
+				if (!is_dir($dst)) {
+					@mkdir($dst, 0755, true);
+				}
+			} else {
+				$dst_parent = dirname($dst);
+				if (!is_dir($dst_parent)) {
+					@mkdir($dst_parent, 0755, true);
+				}
+				if (@copy($item->getPathname(), $dst)) {
+					$files_restored++;
+				}
 			}
 		}
+		gsp_update_log("Revert: restored {$files_restored} files from legacy backup {$backup_ts}");
 	}
-	gsp_update_log("Revert: restored {$copied} files from backup {$backup_ts}");
 
-	// Restore database
-	@include(GSP_PANEL_DIR . '/includes/config.inc.php');
-	if (!empty($db_user) && !empty($db_name)) {
-		// Write credentials to a temp file to avoid exposing them in process listings
+	// Restore database using credentials from config
+	$db_config = load_panel_db_config();
+	if ($db_config !== null) {
 		$creds_file = tempnam(sys_get_temp_dir(), 'gsp_db_');
 		if ($creds_file !== false) {
-			file_put_contents($creds_file,
-				"[client]\nuser=" . addcslashes($db_user, "\\\n\"'") . "\n"
-				. "password=" . addcslashes($db_pass, "\\\n\"'") . "\n"
-			);
+			$creds = "[client]\n"
+			       . "user="     . addcslashes($db_config['user'], "\\\n") . "\n"
+			       . "password=" . addcslashes($db_config['pass'], "\\\n") . "\n";
+			if (!empty($db_config['host'])) {
+				$creds .= "host=" . addcslashes($db_config['host'], "\\\n") . "\n";
+			}
+			if (!empty($db_config['port']) && $db_config['port'] !== '3306') {
+				$creds .= "port=" . addcslashes($db_config['port'], "\\\n") . "\n";
+			}
+			file_put_contents($creds_file, $creds);
 			chmod($creds_file, 0600);
 			$cmd = 'mysql --defaults-extra-file=' . escapeshellarg($creds_file)
-			     . ' '  . escapeshellarg($db_name)
+			     . ' '  . escapeshellarg($db_config['name'])
 			     . ' < ' . escapeshellarg($sql_file)
 			     . ' 2>&1';
-			@system($cmd, $ret);
+			$unused_out = [];
+			$ret        = 0;
+			exec($cmd, $unused_out, $ret);
 			@unlink($creds_file);
 			if ($ret !== 0) {
 				gsp_update_log("Revert warning: database restore exited with code {$ret}");
 			}
 		}
+	} else {
+		gsp_update_log("Revert warning: could not load DB config; database was not restored.");
 	}
 
 	// Housekeeping
@@ -759,7 +965,7 @@ function gsp_do_revert($backup_ts)
 	}
 
 	gsp_update_log("Revert to backup {$backup_ts} complete");
-	return ['success' => true, 'files_restored' => $copied];
+	return ['success' => true, 'files_restored' => $files_restored];
 }
 
 // ---------------------------------------------------------------------------
@@ -908,6 +1114,20 @@ function gsp_panel_update_section()
 	echo "<tr><td><strong>Latest Release on GitHub:</strong></td><td>" . $latest_release . "</td></tr>\n";
 	echo "<tr><td><strong>Repository:</strong></td><td>"
 	   . htmlspecialchars("{$repo_owner}/{$repo_name}") . "</td></tr>\n";
+	// Backup status rows
+	echo "<tr><td><strong>Backup Directory:</strong></td><td><code>"
+	   . htmlspecialchars(GSP_BACKUP_BASE) . "</code></td></tr>\n";
+	if (!empty($backups)) {
+		$last_bk = $backups[0];
+		$last_ts = htmlspecialchars($last_bk['ts']);
+		$last_status = !empty($last_bk['meta']['backup_status'])
+			? htmlspecialchars($last_bk['meta']['backup_status'])
+			: 'unknown';
+		echo "<tr><td><strong>Last Backup:</strong></td><td>"
+		   . $last_ts . " &mdash; status: " . $last_status . "</td></tr>\n";
+	} else {
+		echo "<tr><td><strong>Last Backup:</strong></td><td><em>None yet</em></td></tr>\n";
+	}
 	echo "</table>\n<br>\n";
 
 	// ---- Numbered Releases --------------------------------------------------
@@ -974,9 +1194,13 @@ function gsp_panel_update_section()
 		foreach ($backups as $bk) {
 			$ts    = htmlspecialchars($bk['ts']);
 			$label = $ts;
-			if (!empty($bk['meta']['update_type']) && !empty($bk['meta']['update_target'])) {
-				$label .= ' (before ' . htmlspecialchars($bk['meta']['update_type'])
-				        . ': ' . htmlspecialchars($bk['meta']['update_target']) . ')';
+			// Support both new metadata keys (update_target_type/update_target_version)
+			// and legacy keys (update_type/update_target) for backward compatibility
+			$bk_type   = $bk['meta']['update_target_type']    ?? $bk['meta']['update_type']    ?? '';
+			$bk_target = $bk['meta']['update_target_version'] ?? $bk['meta']['update_target'] ?? '';
+			if (!empty($bk_type) && !empty($bk_target)) {
+				$label .= ' (before ' . htmlspecialchars($bk_type)
+				        . ': ' . htmlspecialchars($bk_target) . ')';
 			}
 			if (!empty($bk['meta']['installed_version'])) {
 				$label .= ' [was v' . htmlspecialchars($bk['meta']['installed_version']) . ']';
