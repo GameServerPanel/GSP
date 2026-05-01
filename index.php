@@ -68,8 +68,10 @@ if (!$db instanceof OGPDatabase) {
 }
 
 // Logged in user settings - access this global variable where needed
-if(hasValue($_SESSION['user_id'])){
-	$loggedInUserInfo = $db->getUserById($_SESSION['user_id']);
+// Guard: read user_id only if it exists in the session to avoid undefined-key warnings.
+$sessionUserId = $_SESSION['user_id'] ?? null;
+if(hasValue($sessionUserId)){
+	$loggedInUserInfo = $db->getUserById($sessionUserId);
 }
 
 $settings = $db->getSettings();
