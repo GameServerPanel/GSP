@@ -227,6 +227,29 @@ class OGPView {
         
         // Add our magnific popup holder to the page (hidden element):
         $footer .= '<div class="mangificWrapper hide"><div class="white-popup"><div class="magnificTitle"></div><div class="magnificSubTitle"></div><div class="magnificContentsDiv"></div><button title="Close (Esc)" type="button" class="mfp-close">&times;</button></div></div>';
+
+		// GSP version descriptor (reads version.json written by the update system)
+		$gsp_vfile = dirname(__FILE__) . '/../version.json';
+		if (file_exists($gsp_vfile)) {
+			$gsp_vdata = json_decode(file_get_contents($gsp_vfile), true);
+			if (is_array($gsp_vdata)) {
+				$_vtype   = $gsp_vdata['installed_type']   ?? 'unknown';
+				$_vsource = $gsp_vdata['installed_source'] ?? '';
+				$_vcommit = $gsp_vdata['installed_commit'] ?? '';
+				if ($_vtype === 'cutting-edge')    $type_label = 'Cutting Edge';
+				elseif ($_vtype === 'development') $type_label = 'Development';
+				elseif ($_vtype === 'release')     $type_label = 'Release';
+				else                               $type_label = 'Unknown';
+				$_vdesc = 'GSP Panel: ' . $type_label;
+				if ($_vsource) $_vdesc .= ' - ' . htmlspecialchars($_vsource);
+				if ($_vcommit) $_vdesc .= ' - commit ' . htmlspecialchars(substr($_vcommit, 0, 7));
+			} else {
+				$_vdesc = 'GSP Panel: Unknown Version';
+			}
+		} else {
+			$_vdesc = 'GSP Panel: Unknown Version';
+		}
+		$footer .= '<div class="gsp-version-footer">' . $_vdesc . '</div>';
 		
 		if (!isset($_GET['action']))
 		{
