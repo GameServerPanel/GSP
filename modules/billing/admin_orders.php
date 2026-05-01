@@ -29,14 +29,14 @@ function exec_ogp_module()
 					header("Location: home.php?m=billing&p=provision_servers&order_id=".$order_id);
 					exit;
 					break;
-				case 'suspend':
-					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='suspended' WHERE order_id=".$order_id);
+				case 'expire':
+					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='Expired' WHERE order_id=".$order_id);
 					break;
 				case 'activate':
-					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='paid' WHERE order_id=".$order_id);
+					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='Active' WHERE order_id=".$order_id);
 					break;
-				case 'delete':
-					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='deleted' WHERE order_id=".$order_id);
+				case 'invoice':
+					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='Invoiced' WHERE order_id=".$order_id);
 					break;
 			}
 		}
@@ -56,12 +56,9 @@ function exec_ogp_module()
 	echo "<input type='hidden' name='p' value='admin_orders'>";
 	echo "Status: <select name='status' onchange='this.form.submit()'>";
 	echo "<option value='all' ".($status_filter == 'all' ? 'selected' : '').">All Orders</option>";
-	echo "<option value='in-cart' ".($status_filter == 'in-cart' ? 'selected' : '').">In Cart</option>";
-	echo "<option value='paid' ".($status_filter == 'paid' ? 'selected' : '').">Paid (Awaiting Provision)</option>";
-	echo "<option value='installed' ".($status_filter == 'installed' ? 'selected' : '').">Installed (Active)</option>";
-	echo "<option value='invoiced' ".($status_filter == 'invoiced' ? 'selected' : '').">Renewal Invoiced</option>";
-	echo "<option value='suspended' ".($status_filter == 'suspended' ? 'selected' : '').">Suspended</option>";
-	echo "<option value='deleted' ".($status_filter == 'deleted' ? 'selected' : '').">Deleted</option>";
+	echo "<option value='Active' ".($status_filter == 'Active' ? 'selected' : '').">Active</option>";
+	echo "<option value='Invoiced' ".($status_filter == 'Invoiced' ? 'selected' : '').">Invoiced</option>";
+	echo "<option value='Expired' ".($status_filter == 'Expired' ? 'selected' : '').">Expired</option>";
 	echo "</select> ";
 	echo "Search: <input type='text' name='search' value='".$search."' placeholder='Order ID, username, server name...'> ";
 	echo "<button type='submit' class='btn'>Filter</button>";
@@ -101,9 +98,9 @@ function exec_ogp_module()
 	echo "<select name='bulk_action'>";
 	echo "<option value=''>-- Choose Action --</option>";
 	echo "<option value='provision'>Provision Servers</option>";
-	echo "<option value='activate'>Set to Paid (Activate)</option>";
-	echo "<option value='suspend'>Suspend</option>";
-	echo "<option value='delete'>Delete</option>";
+	echo "<option value='activate'>Set Active</option>";
+	echo "<option value='invoice'>Set Invoiced</option>";
+	echo "<option value='expire'>Set Expired</option>";
 	echo "</select> ";
 	echo "<button type='submit' class='btn'>Apply</button>";
 	echo "</div>";
@@ -128,11 +125,10 @@ function exec_ogp_module()
 	foreach ((array)$orders as $order) {
 		$status_class = '';
 		switch ($order['status']) {
-			case 'paid': $status_class = 'label-warning'; break;
-			case 'installed': $status_class = 'label-success'; break;
-			case 'suspended': $status_class = 'label-danger'; break;
-			case 'deleted': $status_class = 'label-default'; break;
-			default: $status_class = 'label-info';
+			case 'Active':   $status_class = 'label-success'; break;
+			case 'Invoiced': $status_class = 'label-warning'; break;
+			case 'Expired':  $status_class = 'label-danger';  break;
+			default:         $status_class = 'label-info';
 		}
 		
 		echo "<tr>";
@@ -150,11 +146,11 @@ function exec_ogp_module()
 		echo "<td>".($order['home_id'] ? $order['home_id'] : 'N/A')."</td>";
 		echo "<td>";
 		
-		if ($order['status'] == 'paid') {
+		if ($order['status'] == 'Active' && !$order['home_id']) {
 			echo "<a href='home.php?m=billing&p=provision_servers&order_id=".$order['order_id']."' class='btn btn-sm'>Provision</a> ";
 		}
 		
-		if ($order['status'] == 'installed' && $order['home_id']) {
+		if ($order['status'] == 'Active' && $order['home_id']) {
 			echo "<a href='home.php?m=gamemanager&p=game_monitor&home_id-mod_id-ip=".$order['home_id']."' class='btn btn-sm'>View Server</a> ";
 		}
 		

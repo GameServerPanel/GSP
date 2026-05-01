@@ -44,12 +44,9 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
     .btn-save { background: #28a745; color: white; border: none; padding: 5px 12px; border-radius: 3px; cursor: pointer; }
     .btn-save:hover { background: #218838; }
     .status-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: 600; }
-    .status-paid { background: #d4edda; color: #155724; }
-    .status-pending { background: #fff3cd; color: #856404; }
-    .status-in-cart { background: #d1ecf1; color: #0c5460; }
-    .status-expired { background: #f8d7da; color: #721c24; }
-    .status-renew { background: #cce5ff; color: #004085; }
-    .status-installed { background: #d4edda; color: #155724; }
+    .status-Active   { background: #d4edda; color: #155724; }
+    .status-Invoiced { background: #fff3cd; color: #856404; }
+    .status-Expired  { background: #f8d7da; color: #721c24; }
   </style>
 </head>
 <body>
@@ -128,12 +125,9 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
                 <label style="margin-right: 15px;">
                   <strong>Status:</strong>
                   <select name="status" class="edit-select" required>
-                    <option value="in-cart" <?php echo $row['status'] === 'in-cart' ? 'selected' : ''; ?>>IN-CART</option>
-                    <option value="paid" <?php echo $row['status'] === 'paid' ? 'selected' : ''; ?>>PAID</option>
-                    <option value="installed" <?php echo $row['status'] === 'installed' ? 'selected' : ''; ?>>INSTALLED</option>
-                    <option value="renew" <?php echo $row['status'] === 'renew' ? 'selected' : ''; ?>>RENEW</option>
-                    <option value="pending" <?php echo $row['status'] === 'pending' ? 'selected' : ''; ?>>PENDING</option>
-                    <option value="expired" <?php echo $row['status'] === 'expired' ? 'selected' : ''; ?>>EXPIRED</option>
+                    <option value="Active"   <?php echo $row['status'] === 'Active'   ? 'selected' : ''; ?>>ACTIVE</option>
+                    <option value="Invoiced" <?php echo $row['status'] === 'Invoiced' ? 'selected' : ''; ?>>INVOICED</option>
+                    <option value="Expired"  <?php echo $row['status'] === 'Expired'  ? 'selected' : ''; ?>>EXPIRED</option>
                   </select>
                 </label>
                 <button type="submit" name="update_invoice" class="btn-save">Save Changes</button>
