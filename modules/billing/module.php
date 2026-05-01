@@ -25,7 +25,7 @@
 // Module general information
 $module_title = "billing";
 $module_version = "3.0";
-$db_version = 2;
+$db_version = 1;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -85,7 +85,6 @@ $install_queries[0] = array(
         `payment_txid` VARCHAR(255) NULL,
         `paid_ts` DATETIME NULL,
         `coupon_id` INT(11) NOT NULL DEFAULT 0,
-        `created_by_admin` TINYINT(1) NOT NULL DEFAULT 0,
         PRIMARY KEY (`order_id`),
         KEY `user_id` (`user_id`),
         KEY `status` (`status`),
@@ -123,13 +122,6 @@ $install_queries[0] = array(
         KEY `due_date` (`due_date`),
         KEY `service_id` (`service_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;"
-);
-
-// Version 2: Add created_by_admin column to billing_orders for existing installs
-$install_queries[1] = array(
-    "ALTER TABLE `".OGP_DB_PREFIX."billing_orders`
-        ADD COLUMN IF NOT EXISTS `created_by_admin` TINYINT(1) NOT NULL DEFAULT 0
-        COMMENT 'Set to 1 when an admin manually created this server via the panel';"
 );
 
 ?>
