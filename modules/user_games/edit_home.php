@@ -715,7 +715,7 @@ function exec_ogp_module()
 	echo "<tr><td class='right'>". get_lang("game_control_password") .":</td><td class='left'>";
 	echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>";
 	echo "<input type='hidden' name='home_id' value=\"$home_id\" />\n";
-	echo "<input type='text' size='30' name='control_password' value=\"".str_replace('"', "&quot;", $home_info['control_password'])."\" />";
+	echo "<input type='password' size='30' name='control_password' value=\"".str_replace('"', "&quot;", $home_info['control_password'])."\" />";
 	echo "<input type='submit' name='change_control_password' value='". get_lang("change_control_password") ."' />";
 	echo "</form></td></tr>";
 	echo "<tr><td colspan='2' class='info'>". get_lang("change_control_password_info") ."</td></tr>";
@@ -754,7 +754,7 @@ function exec_ogp_module()
 		// Form to edit control ftp password
 		echo "<tr><td class='right'>". get_lang("server_ftp_password") .":</td><td class='left'>";
 		echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>";
-		echo "<input type='text' size='30' name='ftp_password' value=\"".str_replace('"', "&quot;", $home_info['ftp_password'])."\" />";
+		echo "<input type='password' size='30' name='ftp_password' value=\"".str_replace('"', "&quot;", $home_info['ftp_password'])."\" />";
 		echo "<input type='submit' name='change_ftp_password' value='". get_lang("change_ftp_password") ."' />";
 		echo "</form></td></tr>";
 		echo "<tr><td  colspan='2' class='info'>". get_lang("change_ftp_password_info") ."</td></tr>";

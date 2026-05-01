@@ -16,11 +16,11 @@
  */
 
 // Panel root is two directories up from this file (modules/administration/panel_update.php)
-define('GSP_PANEL_DIR',     realpath(dirname(__FILE__) . '/../../'));
-define('GSP_BACKUP_BASE',   GSP_PANEL_DIR . '/backups');
-define('GSP_UPDATE_LOG',    GSP_PANEL_DIR . '/logs/panel_updates.log');
-define('GSP_VERSION_FILE',  GSP_PANEL_DIR . '/includes/panel_version.php');
-define('GSP_VERSION_JSON',  GSP_PANEL_DIR . '/version.json');
+defined('GSP_PANEL_DIR')    || define('GSP_PANEL_DIR',   realpath(dirname(__FILE__) . '/../../'));
+defined('GSP_BACKUP_BASE')  || define('GSP_BACKUP_BASE', GSP_PANEL_DIR . '/backups');
+defined('GSP_UPDATE_LOG')   || define('GSP_UPDATE_LOG',  GSP_PANEL_DIR . '/logs/panel_updates.log');
+defined('GSP_VERSION_FILE') || define('GSP_VERSION_FILE', GSP_PANEL_DIR . '/includes/panel_version.php');
+defined('GSP_VERSION_JSON') || define('GSP_VERSION_JSON', GSP_PANEL_DIR . '/version.json');
 
 // ---------------------------------------------------------------------------
 // Helper: write a line to the panel update log
@@ -33,6 +33,35 @@ function gsp_update_log($message)
 	}
 	$line = '[' . date('Y-m-d H:i:s') . '] ' . $message . PHP_EOL;
 	@file_put_contents(GSP_UPDATE_LOG, $line, FILE_APPEND | LOCK_EX);
+}
+
+// ---------------------------------------------------------------------------
+// Helper: insert a row into gsp_panel_update_log (silently skips on failure)
+// ---------------------------------------------------------------------------
+function gsp_log_update_to_db($channel, $branch, $status, $message, $backup_path = null, $db_backup_path = null, $file_backup_path = null, $started_at = null, $finished_at = null)
+{
+	global $db;
+	if (!isset($db) || !is_object($db)) {
+		return;
+	}
+	if ($started_at === null) {
+		$started_at = date('Y-m-d H:i:s');
+	}
+	$channel          = $db->real_escape_string((string) $channel);
+	$branch           = $branch !== null  ? "'" . $db->real_escape_string((string) $branch)           . "'" : 'NULL';
+	$status           = $db->real_escape_string((string) $status);
+	$message_esc      = $message !== null ? "'" . $db->real_escape_string((string) $message)           . "'" : 'NULL';
+	$backup_path_esc  = $backup_path !== null      ? "'" . $db->real_escape_string((string) $backup_path)      . "'" : 'NULL';
+	$db_backup_esc    = $db_backup_path !== null   ? "'" . $db->real_escape_string((string) $db_backup_path)   . "'" : 'NULL';
+	$file_backup_esc  = $file_backup_path !== null ? "'" . $db->real_escape_string((string) $file_backup_path) . "'" : 'NULL';
+	$started_esc      = "'" . $db->real_escape_string($started_at) . "'";
+	$finished_esc     = $finished_at !== null ? "'" . $db->real_escape_string((string) $finished_at) . "'" : 'NULL';
+	$db->query(
+		"INSERT INTO OGP_DB_PREFIXpanel_update_log"
+		. " (channel, branch, status, message, backup_path, db_backup_path, file_backup_path, started_at, finished_at)"
+		. " VALUES ('{$channel}', {$branch}, '{$status}', {$message_esc},"
+		. "  {$backup_path_esc}, {$db_backup_esc}, {$file_backup_esc}, {$started_esc}, {$finished_esc})"
+	);
 }
 
 // ---------------------------------------------------------------------------
@@ -836,7 +865,7 @@ function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
 	}
 
 	gsp_update_log("Update to {$ref} (type={$update_type}) complete");
-	return ['success' => true, 'files_copied' => $files_copied];
+	return ['success' => true, 'files_copied' => $files_copied, 'backup_dir' => $backup['backup_dir']];
 }
 
 // ---------------------------------------------------------------------------
@@ -1004,26 +1033,69 @@ function gsp_panel_update_section()
 			$user_label = htmlspecialchars($_SESSION['users_login'])
 				. ' (IP: ' . htmlspecialchars($_SERVER['REMOTE_ADDR']) . ')';
 
-			if ($action === 'update_release') {
+			if ($action === 'backup_only') {
+				$started_at = date('Y-m-d H:i:s');
+				$result = gsp_create_full_backup('backup-only', 'manual');
+				$finished_at = date('Y-m-d H:i:s');
+				if ($result['success']) {
+					$bk_dir = htmlspecialchars($result['backup_dir']);
+					print_success('Backup created successfully at <code>' . $bk_dir . '</code>.');
+					gsp_update_log("Admin {$user_label} created manual backup at {$result['backup_dir']}");
+					gsp_log_update_to_db(
+						'backup-only', null, 'success',
+						'Manual backup by ' . $_SESSION['users_login'],
+						$result['backup_dir'],
+						$result['backup_dir'] . '/database.sql',
+						$result['backup_dir'] . '/panel-files.tar.gz',
+						$started_at, $finished_at
+					);
+				} else {
+					print_failure('Backup failed: ' . htmlspecialchars($result['error']));
+					gsp_update_log("Admin {$user_label} manual backup FAILED: {$result['error']}");
+					gsp_log_update_to_db(
+						'backup-only', null, 'failed',
+						'Manual backup failed: ' . $result['error'],
+						null, null, null, $started_at, $finished_at
+					);
+				}
+
+			} elseif ($action === 'update_release') {
 				$version = isset($_POST['gsp_release_version']) ? trim($_POST['gsp_release_version']) : '';
 				if (!preg_match('/^[a-zA-Z0-9._\-]+$/', $version) || strlen($version) > 80) {
 					print_failure('Invalid release tag selected.');
 				} else {
+					$started_at = date('Y-m-d H:i:s');
 					$result = gsp_do_update($repo_owner, $repo_name, $version, 'release');
+					$finished_at = date('Y-m-d H:i:s');
 					if ($result['success']) {
 						print_success(
 							'Panel updated to release <strong>' . htmlspecialchars($version) . '</strong>. '
 							. intval($result['files_copied']) . ' file(s) updated. Source: <strong>GitHub Releases</strong>'
 						);
 						gsp_update_log("Admin {$user_label} updated panel to release {$version}");
+						gsp_log_update_to_db(
+							'release', $version, 'success',
+							'Updated to release ' . $version . ' by ' . $_SESSION['users_login'],
+							$result['backup_dir'] ?? null,
+							isset($result['backup_dir']) ? $result['backup_dir'] . '/database.sql'      : null,
+							isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
+							$started_at, $finished_at
+						);
 					} else {
 						print_failure('Update failed: ' . htmlspecialchars($result['error']));
 						gsp_update_log("Admin {$user_label} update to release {$version} FAILED: {$result['error']}");
+						gsp_log_update_to_db(
+							'release', $version, 'failed',
+							'Update to release ' . $version . ' failed: ' . $result['error'],
+							null, null, null, $started_at, $finished_at
+						);
 					}
 				}
 
 			} elseif ($action === 'update_stable') {
+				$started_at = date('Y-m-d H:i:s');
 				$result = gsp_do_update($repo_owner, $repo_name, $stable_branch, 'development');
+				$finished_at = date('Y-m-d H:i:s');
 				if ($result['success']) {
 					print_success(
 						'Panel updated to development version (<strong>' . htmlspecialchars($stable_branch) . '</strong>). '
@@ -1031,13 +1103,28 @@ function gsp_panel_update_section()
 						. htmlspecialchars($stable_branch) . '</strong>'
 					);
 					gsp_update_log("Admin {$user_label} updated panel to stable branch {$stable_branch}");
+					gsp_log_update_to_db(
+						'development', $stable_branch, 'success',
+						'Updated to stable branch ' . $stable_branch . ' by ' . $_SESSION['users_login'],
+						$result['backup_dir'] ?? null,
+						isset($result['backup_dir']) ? $result['backup_dir'] . '/database.sql'      : null,
+						isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
+						$started_at, $finished_at
+					);
 				} else {
 					print_failure('Update failed: ' . htmlspecialchars($result['error']));
 					gsp_update_log("Admin {$user_label} update to stable branch {$stable_branch} FAILED: {$result['error']}");
+					gsp_log_update_to_db(
+						'development', $stable_branch, 'failed',
+						'Update to stable branch ' . $stable_branch . ' failed: ' . $result['error'],
+						null, null, null, $started_at, $finished_at
+					);
 				}
 
 			} elseif ($action === 'update_unstable') {
+				$started_at = date('Y-m-d H:i:s');
 				$result = gsp_do_update($repo_owner, $repo_name, $unstable_branch, 'cutting-edge');
+				$finished_at = date('Y-m-d H:i:s');
 				if ($result['success']) {
 					print_success(
 						'Panel updated to cutting edge version (<strong>' . htmlspecialchars($unstable_branch) . '</strong>). '
@@ -1045,9 +1132,22 @@ function gsp_panel_update_section()
 						. htmlspecialchars($unstable_branch) . '</strong>'
 					);
 					gsp_update_log("Admin {$user_label} updated panel to unstable branch {$unstable_branch}");
+					gsp_log_update_to_db(
+						'cutting-edge', $unstable_branch, 'success',
+						'Updated to cutting-edge branch ' . $unstable_branch . ' by ' . $_SESSION['users_login'],
+						$result['backup_dir'] ?? null,
+						isset($result['backup_dir']) ? $result['backup_dir'] . '/database.sql'      : null,
+						isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
+						$started_at, $finished_at
+					);
 				} else {
 					print_failure('Update failed: ' . htmlspecialchars($result['error']));
 					gsp_update_log("Admin {$user_label} update to unstable branch {$unstable_branch} FAILED: {$result['error']}");
+					gsp_log_update_to_db(
+						'cutting-edge', $unstable_branch, 'failed',
+						'Update to cutting-edge branch ' . $unstable_branch . ' failed: ' . $result['error'],
+						null, null, null, $started_at, $finished_at
+					);
 				}
 
 			} elseif ($action === 'revert') {
@@ -1055,16 +1155,31 @@ function gsp_panel_update_section()
 				if (!preg_match('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}$/', $backup_ts)) {
 					print_failure('Invalid backup timestamp selected.');
 				} else {
+					$started_at = date('Y-m-d H:i:s');
 					$result = gsp_do_revert($backup_ts);
+					$finished_at = date('Y-m-d H:i:s');
 					if ($result['success']) {
 						print_success(
 							'Panel reverted to backup from <strong>' . htmlspecialchars($backup_ts) . '</strong>. '
 							. intval($result['files_restored']) . ' file(s) restored.'
 						);
 						gsp_update_log("Admin {$user_label} reverted panel to backup {$backup_ts}");
+						gsp_log_update_to_db(
+							'revert', $backup_ts, 'success',
+							'Reverted to backup ' . $backup_ts . ' by ' . $_SESSION['users_login'],
+							GSP_BACKUP_BASE . '/' . $backup_ts,
+							GSP_BACKUP_BASE . '/' . $backup_ts . '/database.sql',
+							GSP_BACKUP_BASE . '/' . $backup_ts . '/panel-files.tar.gz',
+							$started_at, $finished_at
+						);
 					} else {
 						print_failure('Revert failed: ' . htmlspecialchars($result['error']));
 						gsp_update_log("Admin {$user_label} revert to backup {$backup_ts} FAILED: {$result['error']}");
+						gsp_log_update_to_db(
+							'revert', $backup_ts, 'failed',
+							'Revert to backup ' . $backup_ts . ' failed: ' . $result['error'],
+							null, null, null, $started_at, $finished_at
+						);
 					}
 				}
 			}
@@ -1129,6 +1244,20 @@ function gsp_panel_update_section()
 		echo "<tr><td><strong>Last Backup:</strong></td><td><em>None yet</em></td></tr>\n";
 	}
 	echo "</table>\n<br>\n";
+
+	// ---- Backup Only --------------------------------------------------------
+	echo "<h3>Create Backup</h3>\n";
+	echo "<form method='POST'>\n";
+	echo "<input type='hidden' name='gsp_update_action' value='backup_only'>\n";
+	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
+	echo "<button type='submit'"
+	   . " onclick='return confirm(\"Create a backup of panel files and the database now (no update). Continue?\");'>"
+	   . "Create Backup Now</button>\n";
+	echo "<span style='margin-left:10px;color:#666;'>Saves to: <code>"
+	   . htmlspecialchars(GSP_BACKUP_BASE) . "</code></span>\n";
+	echo "</form>\n";
+
+	echo "<br>\n";
 
 	// ---- Numbered Releases --------------------------------------------------
 	echo "<h3>Numbered Releases</h3>\n";
