@@ -123,10 +123,8 @@ if (is_array($due_for_invoice)) {
 
         // Normalise rate_type to the ENUM values used in {prefix}invoices
         $raw_rate = strtolower($srv['invoice_duration'] ?? $default_rate_type);
-        $rate_map = ['day' => 'daily', 'daily' => 'daily',
-                     'month' => 'monthly', 'monthly' => 'monthly',
-                     'year' => 'yearly', 'yearly' => 'yearly'];
-        $rate_type = $rate_map[$raw_rate] ?? 'monthly';
+        $rate_map = ['day' => 'daily', 'month' => 'monthly', 'year' => 'yearly'];
+        $rate_type = $rate_map[$raw_rate] ?? $raw_rate;
 
         // Pricing: billing_config > billing_orders flat price
         $price_per_player = $default_price_player;
@@ -206,7 +204,7 @@ if (is_array($due_for_invoice)) {
 //   Servers whose expiration date has passed and whose last invoice
 //   is still unpaid.
 // ======================================================================
-$db->logger("BILLING-CRON: --- Step B: Invoiced -> Expired ---");
+$db->logger("BILLING-CRON: --- Step B: Invoiced -> Expired (grace_days={$grace_days}) ---");
 
 $past_due = $db->resultQuery("
     SELECT sh.home_id, sh.home_name, sh.user_id_main AS user_id,
@@ -217,7 +215,7 @@ $past_due = $db->resultQuery("
     WHERE sh.billing_enabled      = 1
       AND sh.billing_status       = 'Invoiced'
       AND sh.server_expiration_date IS NOT NULL
-      AND sh.server_expiration_date < NOW()
+      AND sh.server_expiration_date < DATE_SUB(NOW(), INTERVAL {$grace_days} DAY)
       AND (
           sh.last_invoice_id IS NULL
           OR EXISTS (

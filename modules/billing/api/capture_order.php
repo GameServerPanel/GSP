@@ -210,7 +210,10 @@ if ($coupon_id > 0) {
     }
 }
 
-// Mark all due invoices for this user as paid
+// Mark all due invoices for this user as paid.
+// Note: billing_invoices is the pre-purchase cart table and uses its own
+// status vocabulary (due -> paid). This is separate from gsp_invoices
+// (renewal invoices) and server_homes.billing_status (Active/Invoiced/Expired).
 $updateInvoicesSql = "UPDATE {$table_prefix}billing_invoices 
                       SET status='paid', paid_date='$now', payment_txid='$esc_txid', payment_method='paypal'
                       WHERE user_id=$user_id AND status='due'";

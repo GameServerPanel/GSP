@@ -194,7 +194,7 @@ WHERE sh.`server_expiration_date` IS NULL
   AND bo.`end_date` IS NOT NULL;
 
 -- ============================================================
--- SECTION 6: Normalise gsp_billing_orders.status to new values
+-- SECTION 6: Normalize gsp_billing_orders.status to new values
 -- ============================================================
 
 -- Active (was: paid, installed, active, running, enabled, online)
@@ -256,5 +256,5 @@ SELECT CONCAT(
     'Migration complete. ',
     'gsp_server_homes now has billing_status/next_invoice_date/last_invoice_id/billing_enabled. ',
     'gsp_invoices and gsp_billing_config tables created. ',
-    'gsp_billing_orders.status normalised to Active/Invoiced/Expired.'
+    'gsp_billing_orders.status normalized to Active/Invoiced/Expired.'
 ) AS Migration_Result;
