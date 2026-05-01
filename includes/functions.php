@@ -630,6 +630,7 @@ function get_game_selector($os, $game_cfgs, $home_cfg_id = FALSE)
 }
 
 function getClientIPAddress(){
+	$ip = null;
 	if(isset($_SERVER['HTTP_CF_CONNECTING_IP']) && !empty($_SERVER['HTTP_CF_CONNECTING_IP'])){
 		$ip = $_SERVER['HTTP_CF_CONNECTING_IP'];
 	}else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
@@ -638,7 +639,7 @@ function getClientIPAddress(){
 		$ip = $_SERVER['HTTP_X_REAL_IP'];
 	}
 	
-	if(filter_var($ip, FILTER_VALIDATE_IP)){
+	if(isset($ip) && filter_var($ip, FILTER_VALIDATE_IP)){
 		return $ip;
 	}
 		
