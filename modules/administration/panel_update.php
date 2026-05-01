@@ -99,6 +99,19 @@ function gsp_write_version_file($version, $branch_or_type)
 }
 
 // ---------------------------------------------------------------------------
+// Helper: generate a cryptographically strong random hex token
+// ---------------------------------------------------------------------------
+function gsp_random_token($bytes = 16)
+{
+	try {
+		return bin2hex(random_bytes($bytes));
+	} catch (\Throwable $e) {
+		// Fallback for environments where random_bytes() is unavailable
+		return bin2hex(openssl_random_pseudo_bytes($bytes));
+	}
+}
+
+// ---------------------------------------------------------------------------
 // GitHub API: fetch list of releases (newest first)
 // ---------------------------------------------------------------------------
 function gsp_fetch_github_releases($repo_owner, $repo_name)
@@ -110,6 +123,8 @@ function gsp_fetch_github_releases($repo_owner, $repo_name)
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'GSP-Panel-Updater');
 		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		$data = curl_exec($ch);
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		curl_close($ch);
@@ -122,6 +137,10 @@ function gsp_fetch_github_releases($repo_owner, $repo_name)
 				'method'  => 'GET',
 				'header'  => "User-Agent: GSP-Panel-Updater\r\n",
 				'timeout' => 10,
+			],
+			'ssl' => [
+				'verify_peer'      => true,
+				'verify_peer_name' => true,
 			],
 		]);
 		$data = @file_get_contents($url, false, $ctx);
@@ -288,6 +307,8 @@ function gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir)
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_USERAGENT, 'GSP-Panel-Updater');
 		curl_setopt($ch, CURLOPT_TIMEOUT, 180);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 		$data = curl_exec($ch);
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -303,6 +324,10 @@ function gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir)
 				'header'          => "User-Agent: GSP-Panel-Updater\r\n",
 				'timeout'         => 180,
 				'follow_location' => 1,
+			],
+			'ssl' => [
+				'verify_peer'      => true,
+				'verify_peer_name' => true,
 			],
 		]);
 		$data = @file_get_contents($url, false, $ctx);
@@ -657,11 +682,7 @@ function gsp_panel_update_section()
 
 	// Per-session CSRF token
 	if (empty($_SESSION['gsp_update_csrf'])) {
-		try {
-			$_SESSION['gsp_update_csrf'] = bin2hex(random_bytes(16));
-		} catch (Exception $e) {
-			$_SESSION['gsp_update_csrf'] = bin2hex(openssl_random_pseudo_bytes(16));
-		}
+		$_SESSION['gsp_update_csrf'] = gsp_random_token();
 	}
 	$csrf_token = $_SESSION['gsp_update_csrf'];
 
@@ -742,11 +763,7 @@ function gsp_panel_update_section()
 		}
 
 		// Rotate CSRF token after every submission
-		try {
-			$_SESSION['gsp_update_csrf'] = bin2hex(random_bytes(16));
-		} catch (Exception $e) {
-			$_SESSION['gsp_update_csrf'] = bin2hex(openssl_random_pseudo_bytes(16));
-		}
+		$_SESSION['gsp_update_csrf'] = gsp_random_token();
 		$csrf_token = $_SESSION['gsp_update_csrf'];
 	}
 	// ---- End POST handling --------------------------------------------------
