@@ -24,29 +24,17 @@ jobs:
 
     steps:
       # ──────────────────────────────────────────────
-      # 1. Checkout the full repository history so we
-      #    can inspect branches and create tags.
+      # 1. Checkout Panel-stable with full history so
+      #    we can inspect branches and create tags.
       # ──────────────────────────────────────────────
-      - name: Checkout repository
+      - name: Checkout Panel-stable
         uses: actions/checkout@v4
         with:
+          ref: Panel-stable
           fetch-depth: 0
 
       # ──────────────────────────────────────────────
-      # 2. Safety: only allow releases from the
-      #    "stable" branch.
-      # ──────────────────────────────────────────────
-      - name: Verify we are on the stable branch
-        run: |
-          BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          echo "Current branch: ${BRANCH}"
-          if [ "${BRANCH}" != "stable" ]; then
-            echo "::error::Releases must be created from the 'stable' branch. Current branch is '${BRANCH}'."
-            exit 1
-          fi
-
-      # ──────────────────────────────────────────────
-      # 3. Safety: abort if the tag already exists to
+      # 2. Safety: abort if the tag already exists to
       #    prevent accidental overwrites.
       # ──────────────────────────────────────────────
       - name: Check that tag does not already exist
@@ -60,8 +48,8 @@ jobs:
           echo "Tag '${VERSION}' does not exist yet — safe to proceed."
 
       # ──────────────────────────────────────────────
-      # 4. Create the annotated git tag locally and
-      #    push it to origin.
+      # 3. Create the annotated git tag on Panel-stable
+      #    and push it to origin.
       # ──────────────────────────────────────────────
       - name: Create and push git tag
         run: |
@@ -73,7 +61,7 @@ jobs:
           echo "Tag '${VERSION}' pushed to origin."
 
       # ──────────────────────────────────────────────
-      # 5. Build the release ZIP, excluding files that
+      # 4. Build the release ZIP, excluding files that
       #    should never ship (secrets, dev artifacts,
       #    version-control metadata, etc.).
       # ──────────────────────────────────────────────
@@ -102,7 +90,7 @@ jobs:
           ls -lh "${ARCHIVE}"
 
       # ──────────────────────────────────────────────
-      # 6. Create the GitHub Release and upload the
+      # 5. Create the GitHub Release and upload the
       #    ZIP asset.  Uses only the built-in
       #    GITHUB_TOKEN — no personal token needed.
       # ──────────────────────────────────────────────
