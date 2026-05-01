@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "Update";
-$module_version = "1.1";
-$db_version = 2; // avoid 'duplicate table' error message.
+$module_version = "1.2";
+$db_version = 3; // avoid 'duplicate table' error message.
 $module_required = TRUE;
 $module_menus = array(
     array( 'subpage' => '', 'name'=>'Update', 'group'=>'admin' )
@@ -38,13 +38,28 @@ $install_queries[1] = array(
         `file_path` VARCHAR(1000) UNIQUE NOT NULL
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
 $install_queries[2] = array(
-	"DELETE FROM ".OGP_DB_PREFIX."update_blacklist
+"DELETE FROM ".OGP_DB_PREFIX."update_blacklist
 WHERE file_path IN (SELECT * 
              FROM (SELECT file_path FROM ".OGP_DB_PREFIX."update_blacklist 
                    GROUP BY file_path HAVING (COUNT(*) > 1)
                   ) AS A
             );",
     "ALTER TABLE ".OGP_DB_PREFIX."update_blacklist MODIFY file_path VARCHAR(1000);",
-	"ALTER TABLE ".OGP_DB_PREFIX."update_blacklist ADD UNIQUE (file_path);"
+"ALTER TABLE ".OGP_DB_PREFIX."update_blacklist ADD UNIQUE (file_path);"
+);
+$install_queries[3] = array(
+"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."panel_update_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `channel` varchar(64) NOT NULL,
+  `branch` varchar(128) DEFAULT NULL,
+  `status` varchar(32) NOT NULL,
+  `message` text DEFAULT NULL,
+  `backup_path` varchar(255) DEFAULT NULL,
+  `db_backup_path` varchar(255) DEFAULT NULL,
+  `file_backup_path` varchar(255) DEFAULT NULL,
+  `started_at` datetime NOT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 );
 ?>

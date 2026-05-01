@@ -181,11 +181,6 @@ function exec_ogp_module()
 		 "</table>\n";
 	### END ICONS TO FRAMES
 	
-	### PANEL UPDATES
-	require_once(dirname(__FILE__) . '/panel_update.php');
-	gsp_panel_update_section();
-	### END PANEL UPDATES
-
 	### CHANGE MENU ORDER
 		
 	if ( isset( $_POST['changeOrder'] ) )
