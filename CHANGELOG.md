@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-05-01 (latest)
+- Changed panel update backup location from `/var/backups/gsp-panel` to `<panel_root>/backups/` so all backups are self-contained inside the panel directory and require no external path or elevated permissions.
+- Removed stale "Dev Testing" placeholder heading from the panel login page (`index.php`).
+
 ## 2026-05-01
 - Added safe panel update system to `home.php?m=administration&p=main`:
   - Numbered Releases: fetches GitHub releases via API, shows newest-first dropdown, updates to selected tag.

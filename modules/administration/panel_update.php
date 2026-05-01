@@ -17,7 +17,7 @@
 
 // Panel root is two directories up from this file (modules/administration/panel_update.php)
 define('GSP_PANEL_DIR',     realpath(dirname(__FILE__) . '/../../'));
-define('GSP_BACKUP_BASE',   '/var/backups/gsp-panel');
+define('GSP_BACKUP_BASE',   GSP_PANEL_DIR . '/backups');
 define('GSP_UPDATE_LOG',    GSP_PANEL_DIR . '/logs/panel_updates.log');
 define('GSP_VERSION_FILE',  GSP_PANEL_DIR . '/includes/panel_version.php');
 define('GSP_VERSION_JSON',  GSP_PANEL_DIR . '/version.json');
@@ -283,8 +283,7 @@ function gsp_create_full_backup($update_type, $update_target)
 		return [
 			'success' => false,
 			'error'   => 'Cannot create backup directory ' . GSP_BACKUP_BASE
-			           . '. Run: sudo mkdir -p ' . GSP_BACKUP_BASE
-			           . ' && sudo chown www-data:www-data ' . GSP_BACKUP_BASE,
+			           . '. Ensure the panel directory is writable by the web server.',
 		];
 	}
 
