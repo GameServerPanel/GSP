@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-05-01
+- Added safe panel update system to `home.php?m=administration&p=main`:
+  - Numbered Releases: fetches GitHub releases via API, shows newest-first dropdown, updates to selected tag.
+  - Development Version: pulls from the stable branch (default `Panel-stable`).
+  - Cutting Edge Version: pulls from the unstable branch (default `Panel-unstable`) with an instability warning.
+  - Full pre-update backup (DB via mysqldump + panel files via PHP copy, excluding `.git/`, `logs/`, `cache/`, `tmp/`) saved to `/var/backups/gsp-panel/YYYY-mm-dd_HH-MM-SS/`.
+  - `backup.json` metadata (timestamp, git commit, current version, update target) written with each backup.
+  - Revert section lists available backups; restores files and database from the selected snapshot.
+  - Config files (`includes/config.inc.php`, DB update-blacklist) preserved across all updates.
+  - CSRF protection on every update/revert form; admin-only access enforced.
+  - All update actions logged to `logs/panel_updates.log`.
+  - Installed version/branch written to `includes/panel_version.php` after each update.
+
 ## 2026-04-23
 - Applied a repository-wide PHP 8 compatibility sweep across PHP sources to harden array iteration/count/key checks, normalize `date()` timestamp casting, and quote bare `delete/edit/remove` string concatenations.
 

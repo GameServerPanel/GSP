@@ -46,4 +46,12 @@ define('OGP_LANG_banned_until', "Banned until");
 define('OGP_LANG_unban_selected_ips', "Unban selected IPs");
 define('OGP_LANG_view', "View");
 define('OGP_LANG_per_page', "log entries per page");
+define('OGP_LANG_panel_updates', "Panel Updates");
+define('OGP_LANG_update_to_selected_release', "Update to Selected Release");
+define('OGP_LANG_update_to_dev_version', "Update to Development Version");
+define('OGP_LANG_update_to_cutting_edge', "Update to Cutting Edge Version");
+define('OGP_LANG_cutting_edge_warning', "Warning: The cutting edge version may be unstable or contain bugs. Use with caution in production.");
+define('OGP_LANG_revert_panel_update', "Revert Panel Update");
+define('OGP_LANG_installed_version', "Installed Version");
+define('OGP_LANG_latest_release', "Latest Release on GitHub");
 ?>
