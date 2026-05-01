@@ -67,6 +67,7 @@ function exec_ogp_module()
 		$query_name = $mod; // If query name does not exist use mod key instead.
 
 	// Check if the screen running the server is running.
+	$map = '';
 	if ($server_xml->protocol == "gameq")
 	{
 		require('protocol/GameQ/functions.php');

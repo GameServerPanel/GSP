@@ -73,7 +73,8 @@ class OGPDatabaseMySQL extends OGPDatabase
 	}
 	
 	public function realEscapeSingle($string){
-		return mysqli_real_escape_string($this->link, $string);
+		if ($string === null) return '';
+		return mysqli_real_escape_string($this->link, (string)$string);
 	}
 
 	private function listQuery($query) {
