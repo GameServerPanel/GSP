@@ -131,45 +131,59 @@ $rows[] = [
 ];
 
 // ── Writable / readable paths ────────────────────────────────────────────────
+// Paths marked 'required_writable' will show as 'error' (not just 'warning')
+// when they are not writable, because the installer WILL crash without them.
 $paths_to_check = [
-    'includes/'                  => 'Config directory (must be writable at install time)',
-    'modules/'                   => 'Modules directory',
-    'upload/'                    => 'Upload directory (optional)',
-    'cache/'                     => 'Cache directory (optional)',
-    'log/'                       => 'Log directory (optional)',
-    'temp/'                      => 'Temp directory (optional)',
-    'includes/config.inc.php'    => 'Panel config file (writable at install time)',
+    'includes/'                  => ['note' => 'Config directory (must be writable at install time)',       'required_writable' => true],
+    'modules/'                   => ['note' => 'Modules directory',                                         'required_writable' => false],
+    'upload/'                    => ['note' => 'Upload directory (optional)',                                'required_writable' => false, 'optional' => true],
+    'cache/'                     => ['note' => 'Cache directory (optional)',                                 'required_writable' => false, 'optional' => true],
+    'log/'                       => ['note' => 'Log directory (optional)',                                   'required_writable' => false, 'optional' => true],
+    'temp/'                      => ['note' => 'Temp directory (optional)',                                  'required_writable' => false, 'optional' => true],
+    'includes/config.inc.php'    => ['note' => 'Panel config file (must be writable at install time)',      'required_writable' => true],
 ];
 
-foreach ($paths_to_check as $rel => $note) {
-    $abs      = CHECK_BASE . '/' . $rel;
-    $optional = in_array($rel, ['upload/', 'cache/', 'log/', 'temp/'], true);
+foreach ($paths_to_check as $rel => $meta) {
+    $note             = $meta['note'];
+    $required_writable = $meta['required_writable'];
+    $optional         = $meta['optional'] ?? false;
+    $abs              = CHECK_BASE . '/' . $rel;
 
     if (!file_exists($abs)) {
+        // For required-writable files that don't exist yet, the parent directory
+        // must be writable. Flag as error only if the parent dir is also not writable.
+        if ($required_writable && !is_dir($abs)) {
+            $parent_writable = is_writable(dirname($abs));
+            $not_exist_status = $parent_writable ? 'warning' : 'error';
+        } else {
+            $not_exist_status = $optional ? 'warning' : 'missing';
+        }
         $rows[] = [
             'section' => 'Filesystem',
             'name'    => $rel,
-            'status'  => $optional ? 'warning' : 'warning',
+            'status'  => $not_exist_status,
             'current' => 'Does not exist',
-            'fix'     => 'mkdir -p ' . escapeshellarg($rel),
+            'fix'     => is_dir(dirname($abs))
+                ? 'sudo touch ' . escapeshellarg($rel) . ' && sudo chmod 664 ' . escapeshellarg($rel) . ' && sudo chown www-data:www-data ' . escapeshellarg($rel)
+                : 'sudo mkdir -p ' . escapeshellarg(rtrim($rel, '/')) . ' && sudo chown -R www-data:www-data ' . escapeshellarg(rtrim($rel, '/')),
             'notes'   => $note . ($optional ? ' (optional)' : ''),
         ];
         continue;
     }
 
-    $is_dir  = is_dir($abs);
+    $is_dir   = is_dir($abs);
     $readable = is_readable($abs);
     $writable = is_writable($abs);
 
     if ($is_dir) {
-        $status = ($readable && $writable) ? 'ok' : 'warning';
+        $status = ($readable && $writable) ? 'ok' : ($required_writable ? 'error' : 'warning');
         $cur    = 'Exists — readable: ' . ($readable ? 'yes' : 'no') . ', writable: ' . ($writable ? 'yes' : 'no');
         $fix    = (!$writable) ? 'sudo chmod -R 775 ' . escapeshellarg($rel) . ' && sudo chown -R www-data:www-data ' . escapeshellarg($rel) : '';
     } else {
         // It's a file
-        $status = ($readable && $writable) ? 'ok' : 'warning';
+        $status = ($readable && $writable) ? 'ok' : ($required_writable ? 'error' : 'warning');
         $cur    = 'Exists — readable: ' . ($readable ? 'yes' : 'no') . ', writable: ' . ($writable ? 'yes' : 'no');
-        $fix    = (!$writable) ? 'sudo chmod 664 ' . escapeshellarg($rel) : '';
+        $fix    = (!$writable) ? 'sudo chmod 664 ' . escapeshellarg($rel) . ' && sudo chown www-data:www-data ' . escapeshellarg($rel) : '';
     }
 
     $rows[] = [
@@ -296,6 +310,7 @@ if (is_readable($config_path)) {
 // ---------------------------------------------------------------------------
 $count_ok      = 0;
 $count_warning = 0;
+$count_error   = 0;
 $count_missing = 0;
 $count_unknown = 0;
 
@@ -303,6 +318,7 @@ foreach ($rows as $r) {
     switch ($r['status']) {
         case 'ok':      $count_ok++;      break;
         case 'warning': $count_warning++; break;
+        case 'error':   $count_error++;   break;
         case 'missing': $count_missing++; break;
         default:        $count_unknown++; break;
     }
@@ -338,6 +354,7 @@ foreach ($rows as $r) {
         .summary-box .lbl { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }
         .summary-ok      { background: #1a3a1a; border: 1px solid #2e6b2e; color: #7ddb7d; }
         .summary-warning { background: #3a2e00; border: 1px solid #7a6000; color: #ffd84d; }
+        .summary-error   { background: #3a1000; border: 1px solid #9a3000; color: #ff9944; }
         .summary-missing { background: #3a1a1a; border: 1px solid #7a2e2e; color: #ff7b7b; }
         .summary-unknown { background: #252535; border: 1px solid #4a4a6a; color: #aaaacc; }
         .actions { margin-bottom: 22px; }
@@ -360,6 +377,7 @@ foreach ($rows as $r) {
         .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
         .badge-ok      { background: #1a3a1a; color: #7ddb7d; border: 1px solid #2e6b2e; }
         .badge-warning { background: #3a2e00; color: #ffd84d; border: 1px solid #7a6000; }
+        .badge-error   { background: #3a1000; color: #ff9944; border: 1px solid #9a3000; }
         .badge-missing { background: #3a1a1a; color: #ff7b7b; border: 1px solid #7a2e2e; }
         .badge-unknown { background: #252535; color: #aaaacc; border: 1px solid #4a4a6a; }
         .td-fix code, .td-current code { font-family: "Courier New", monospace; font-size: 12px; background: #0d0d22; padding: 2px 6px; border-radius: 4px; color: #aaf; word-break: break-all; display: inline-block; }
@@ -378,8 +396,10 @@ foreach ($rows as $r) {
     <div class="header">
         <h1>🔍 GSP / WDS — Dependency Check</h1>
         <p>This page checks the server environment for GSP panel compatibility.
-           <strong>No dependency is a hard blocker</strong> — missing items appear as warnings only.
-           The installer at <a href="install.php" style="color:#7aaaf5">install.php</a> can proceed regardless.</p>
+           Items marked <strong>Warning</strong> or <strong>Missing</strong> are non-blocking.
+           Items marked <strong>Error</strong> (e.g. unwritable <code>includes/</code> directory) <em>will</em> cause
+           the installer to crash — fix those before running
+           <a href="install.php" style="color:#7aaaf5">install.php</a>.</p>
     </div>
 
     <!-- Summary boxes -->
@@ -391,6 +411,10 @@ foreach ($rows as $r) {
         <div class="summary-box summary-warning">
             <div class="num"><?= $count_warning ?></div>
             <div class="lbl">Warning</div>
+        </div>
+        <div class="summary-box summary-error">
+            <div class="num"><?= $count_error ?></div>
+            <div class="lbl">Error</div>
         </div>
         <div class="summary-box summary-missing">
             <div class="num"><?= $count_missing ?></div>
@@ -408,7 +432,13 @@ foreach ($rows as $r) {
         <a href="check.php"   class="btn btn-secondary">↺ Refresh Check</a>
     </div>
 
-    <?php if ($count_missing === 0 && $count_warning === 0): ?>
+    <?php if ($count_error > 0): ?>
+    <div class="note-box" style="background:#2a1400;border-color:#9a3000;color:#ff9944;">
+        <strong>⚠ <?= $count_error ?> critical error<?= $count_error > 1 ? 's' : '' ?> found.</strong>
+        Items marked <strong>Error</strong> will prevent the installer from completing.
+        Apply the suggested fixes before running <a href="install.php" style="color:#ffb870">install.php</a>.
+    </div>
+    <?php elseif ($count_missing === 0 && $count_warning === 0): ?>
     <div class="note-box">
         <strong>✔ All checks passed.</strong>
         Your server environment looks good for GSP installation.
