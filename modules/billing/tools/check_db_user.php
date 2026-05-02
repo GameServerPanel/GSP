@@ -1,6 +1,6 @@
 <?php
 require_once(__DIR__ . '/../includes/config_loader.php');
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
     echo "DB connect failed: " . mysqli_connect_error() . PHP_EOL;
     exit(1);

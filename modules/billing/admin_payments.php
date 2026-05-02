@@ -10,7 +10,7 @@ require_once __DIR__ . '/classes/BillingRepository.php';
 
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 $transactions = [];
 $errorMsg = '';
 if (!$db) {

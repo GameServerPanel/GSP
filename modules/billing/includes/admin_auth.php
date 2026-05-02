@@ -4,17 +4,8 @@ require_once(__DIR__ . '/session_bridge.php');
 
 // If not logged in, redirect to login
 if (empty($_SESSION['website_user_id'])) {
-    // Build absolute login URL to avoid browser-relative resolution issues
-    $script = $_SERVER['SCRIPT_NAME'] ?? '';
-    $siteRoot = '/';
-    $pos = strpos($script, '/_website');
-    if ($pos !== false) {
-        $siteRoot = substr($script, 0, $pos + strlen('/_website'));
-    } else {
-        $siteRoot = rtrim(dirname($script), '/\\');
-    }
-    $loginUrl = $siteRoot . '/login.php';
-    $returnTo = $siteRoot . '/' . basename($_SERVER['PHP_SELF']);
+    $loginUrl = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/\\') . '/login.php';
+    $returnTo = $_SERVER['SCRIPT_NAME'] ?? '/';
     header('Location: ' . $loginUrl . '?return_to=' . urlencode($returnTo));
     exit();
 }
@@ -29,15 +20,13 @@ require_once(__DIR__ . '/config_loader.php');
 /** @var string $db_name Database name */
 /** @var string $table_prefix Table prefix for database tables */
 
+$auth_db_port = isset($db_port) ? (int)$db_port : null;
 // Use a local connection variable so we don't clash with pages that also use $db
-$auth_db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$auth_db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, $auth_db_port);
 if (!$auth_db) {
     // If DB unavailable, deny access gracefully
-    // Redirect to absolute login URL
-    $script = $_SERVER['SCRIPT_NAME'] ?? '';
-    $pos = strpos($script, '/_website');
-    $siteRoot = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rtrim(dirname($script), '/\\');
-    header('Location: ' . $siteRoot . '/login.php');
+    $loginUrl = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/\\') . '/login.php';
+    header('Location: ' . $loginUrl);
     exit();
 }
 
@@ -52,15 +41,10 @@ mysqli_close($auth_db);
 
 if (strtolower($role) !== 'admin') {
     // Not an admin — redirect to login or home
-    // Redirect to absolute login URL
-    $script = $_SERVER['SCRIPT_NAME'] ?? '';
-    $pos = strpos($script, '/_website');
-    $siteRoot = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rtrim(dirname($script), '/\\');
-    header('Location: ' . $siteRoot . '/login.php');
+    $loginUrl = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/'), '/\\') . '/login.php';
+    header('Location: ' . $loginUrl);
     exit();
 }
 
 // If we reach here, user is an admin
 ?>
-
-

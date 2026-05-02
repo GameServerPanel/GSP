@@ -18,8 +18,8 @@ $siteBaseUrl = isset($SITE_BASE_URL) ? trim((string)$SITE_BASE_URL) : '';
 // Protect this page: require admin
 require_once(__DIR__ . '/includes/admin_auth.php');
 
-// Create database connection (admin_auth already validated DB but we need connection for UI ops)
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+// Create database connection
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
   die("Connection failed: " . mysqli_connect_error());
 }
@@ -29,7 +29,7 @@ include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
 echo "<div class='panel mb-12'><strong>Need the XML field reference?</strong> ";
-echo "<a href=\"/modules/billing/docs/xml_notes.php\" target=\"_blank\" rel=\"noopener\">Open XML Notes</a>";
+echo "<a href=\"docs/xml_notes.php\" target=\"_blank\" rel=\"noopener\">Open XML Notes</a>";
 echo "</div>";
 
 /* show errors during setup */

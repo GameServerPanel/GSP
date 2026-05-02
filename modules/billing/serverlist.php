@@ -22,7 +22,7 @@ require_once(__DIR__ . '/bootstrap.php');
 /** @var string $table_prefix Table prefix for database tables */
 
 // Create database connection
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
     die("Connection failed: " . mysqli_connect_error());
 }

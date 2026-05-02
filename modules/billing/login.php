@@ -20,10 +20,9 @@ require_once(__DIR__ . '/includes/log.php');
 /** @var string $db_name Database name */
 /** @var string $table_prefix Table prefix for database tables */
 
-// Determine site root up to /_website so we can enforce absolute redirects within this site
+// Determine site root (directory of this script) for building absolute redirects within this site
 $script = $_SERVER['SCRIPT_NAME'] ?? '';
-$pos = strpos($script, '/_website');
-$SITE_ROOT_PATH = $pos !== false ? substr($script, 0, $pos + strlen('/_website')) : rtrim(dirname($script), '/\\');
+$SITE_ROOT_PATH = rtrim(dirname($script), '/\\');
 
 // Strict sanitizer that returns an absolute path under $SITE_ROOT_PATH or empty string on invalid
 $sanitize_return_path = function($p) use ($SITE_ROOT_PATH) {
@@ -50,7 +49,7 @@ $sanitize_return_path = function($p) use ($SITE_ROOT_PATH) {
 };
 
 // Create database connection
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
     die("Connection failed: " . mysqli_connect_error());
 }

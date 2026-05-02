@@ -28,7 +28,7 @@ $billing_db_opened_by_bootstrap = false;
  */
 function billing_get_db()
 {
-    global $billing_db, $db, $db_host, $db_user, $db_pass, $db_name, $billing_db_opened_by_bootstrap;
+    global $billing_db, $db, $db_host, $db_user, $db_pass, $db_name, $db_port, $billing_db_opened_by_bootstrap;
     if (!empty($billing_db) && ($billing_db instanceof mysqli)) {
         return $billing_db;
     }
@@ -36,8 +36,9 @@ function billing_get_db()
         $billing_db = $db;
         return $billing_db;
     }
+    $port = isset($db_port) ? (int)$db_port : null;
     // Try to connect (suppress warnings; caller may check return value)
-    $conn = @mysqli_connect($db_host ?? null, $db_user ?? null, $db_pass ?? null, $db_name ?? null);
+    $conn = @mysqli_connect($db_host ?? null, $db_user ?? null, $db_pass ?? null, $db_name ?? null, $port);
     if ($conn) {
         // Set charset when available
         if (function_exists('mysqli_set_charset')) {
