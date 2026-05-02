@@ -37,7 +37,7 @@ $projectRoot = realpath(__DIR__ . '/../../..');
 if ($projectRoot !== false) {
     $panelConfig = $projectRoot . '/includes/config.inc.php';
 } else {
-    $panelConfig = __DIR__ . '/../../..' . '/includes/config.inc.php';
+    $panelConfig = __DIR__ . '/../../../includes/config.inc.php';
 }
 
 if ($panelConfig && is_readable($panelConfig)) {
