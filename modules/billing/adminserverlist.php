@@ -11,6 +11,8 @@
     .svc-table td.game-name { text-align: left; white-space: nowrap; }
     .price-input { width: 80px; }
     .slot-input  { width: 60px; }
+    .desc-input  { width: 160px; }
+    .img-input   { width: 160px; }
     .muted { color: #999; font-size: 0.85em; }
     .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
     .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
@@ -23,14 +25,25 @@
 /**
  * Admin service configuration page.
  *
- * On every load this page syncs gsp_billing_services with the panel's game/mod
- * config list (config_mods joined with config_homes).  It provides a table UI
- * where admins can enable/disable services, set prices, configure slot ranges,
- * and choose which remote servers each game can be installed on.
+ * On every load this page syncs gsp_billing_services with the panel's game
+ * config list (config_homes).  One billing_services row is maintained per
+ * config_homes entry; the row is keyed by home_cfg_id.  config_mods is NOT
+ * used as the identity source — mods are install-time details that belong in
+ * the game config tables, not here.
  *
  * remote_server_id in gsp_billing_services stores a comma-separated list of
  * numeric remote server IDs, e.g. "1,3,7".  The deprecated
  * gsp_billing_service_remote_servers mapping table is never referenced here.
+ *
+ * Columns synced from config_homes (read-only in the UI):
+ *   service_name  ← game_name
+ *   description   ← game_name (default; admin may override via separate edit)
+ *   home_cfg_id   ← home_cfg_id  (sync key)
+ *
+ * Columns that are admin-editable and NEVER overwritten by sync:
+ *   enabled, out_of_stock, slot_min_qty, slot_max_qty,
+ *   price_daily, price_monthly, price_year,
+ *   remote_server_id, description, img_url
  */
 
 require_once(__DIR__ . '/bootstrap.php');
@@ -50,32 +63,28 @@ include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
 /* -----------------------------------------------------------------------
-   Auto-sync: keep billing_services in step with game/mod config list
+   Auto-sync: keep billing_services in step with config_homes
+   Source: one row per config_homes entry, keyed by home_cfg_id.
    Runs on every page load; INSERT and soft-disable only — never hard-delete.
 ----------------------------------------------------------------------- */
 function sync_billing_services(mysqli $db, string $prefix): array
 {
-    $messages = [];
-
-    // Schema auto-repair: add any missing columns to billing_services before syncing.
-    // col_exists() is provided by bootstrap.php.
+    $messages  = [];
     $tableName = $prefix . 'billing_services';
 
-    // Map of column => ALTER TABLE fragment to add it if missing.
+    // Schema auto-repair: ensure all expected columns exist.
+    // col_exists() is provided by bootstrap.php.
     $autoRepairCols = [
+        'home_cfg_id'      => "ADD COLUMN `home_cfg_id` INT(11) NOT NULL DEFAULT 0",
         'description'      => "ADD COLUMN `description` VARCHAR(1000) NOT NULL DEFAULT ''",
         'img_url'          => "ADD COLUMN `img_url` VARCHAR(255) NOT NULL DEFAULT ''",
-        'out_of_stock'     => "ADD COLUMN `out_of_stock` VARCHAR(255) NOT NULL DEFAULT ''",
-        'slot_min_qty'     => "ADD COLUMN `slot_min_qty` INT(11) NOT NULL DEFAULT 0",
-        'slot_max_qty'     => "ADD COLUMN `slot_max_qty` INT(11) NOT NULL DEFAULT 0",
+        'out_of_stock'     => "ADD COLUMN `out_of_stock` TINYINT(1) NOT NULL DEFAULT 0",
+        'slot_min_qty'     => "ADD COLUMN `slot_min_qty` INT(11) NOT NULL DEFAULT 1",
+        'slot_max_qty'     => "ADD COLUMN `slot_max_qty` INT(11) NOT NULL DEFAULT 100",
         'price_daily'      => "ADD COLUMN `price_daily` FLOAT(15,4) NOT NULL DEFAULT 0",
         'price_monthly'    => "ADD COLUMN `price_monthly` FLOAT(15,4) NOT NULL DEFAULT 0",
         'price_year'       => "ADD COLUMN `price_year` FLOAT(15,4) NOT NULL DEFAULT 0",
         'remote_server_id' => "ADD COLUMN `remote_server_id` VARCHAR(255) NOT NULL DEFAULT ''",
-        'install_method'   => "ADD COLUMN `install_method` VARCHAR(255) NOT NULL DEFAULT 'steamcmd'",
-        'ftp'              => "ADD COLUMN `ftp` VARCHAR(255) NOT NULL DEFAULT ''",
-        'manual_url'       => "ADD COLUMN `manual_url` VARCHAR(255) NOT NULL DEFAULT ''",
-        'access_rights'    => "ADD COLUMN `access_rights` VARCHAR(255) NOT NULL DEFAULT ''",
     ];
 
     foreach ($autoRepairCols as $col => $alterFragment) {
@@ -88,82 +97,83 @@ function sync_billing_services(mysqli $db, string $prefix): array
         }
     }
 
-    // If critical columns are still missing after repair, skip the sync to avoid SQL errors.
-    foreach (['service_name', 'mod_cfg_id', 'enabled'] as $critical) {
+    // If critical columns are still absent after repair, abort to avoid SQL errors.
+    foreach (['service_name', 'home_cfg_id', 'enabled'] as $critical) {
         if (!col_exists($db, $tableName, $critical)) {
             $messages[] = "⚠ Critical column '{$critical}' missing from {$tableName}; skipping sync.";
             return $messages;
         }
     }
 
-    // Load all games/mods from panel config tables
-    $gameMods = [];
+    // Load all game configs from config_homes — one entry per game XML.
+    $configHomes = [];
     $res = $db->query(
-        "SELECT cm.mod_cfg_id, cm.home_cfg_id, cm.mod_name, ch.game_name
-         FROM `{$prefix}config_mods` cm
-         JOIN `{$prefix}config_homes` ch ON ch.home_cfg_id = cm.home_cfg_id
-         ORDER BY ch.game_name, cm.mod_name"
+        "SELECT home_cfg_id, game_name, home_cfg_file
+         FROM `{$prefix}config_homes`
+         ORDER BY game_name"
     );
     if ($res) {
         while ($row = $res->fetch_assoc()) {
-            $gameMods[(int)$row['mod_cfg_id']] = $row;
+            $configHomes[(int)$row['home_cfg_id']] = $row;
         }
     }
 
-    if (empty($gameMods)) {
-        // config_mods is empty or tables don't exist yet — nothing to sync
+    if (empty($configHomes)) {
+        // config_homes is empty or the table does not exist yet — nothing to sync.
         return $messages;
     }
 
-    // Load existing billing_services indexed by mod_cfg_id
+    // Load existing billing_services indexed by home_cfg_id.
     $existing = [];
     $svcRes = $db->query(
-        "SELECT service_id, mod_cfg_id, enabled, out_of_stock
-         FROM `{$prefix}billing_services`"
+        "SELECT service_id, home_cfg_id, enabled, out_of_stock
+         FROM `{$tableName}`"
     );
     if ($svcRes) {
         while ($row = $svcRes->fetch_assoc()) {
-            $existing[(int)$row['mod_cfg_id']] = $row;
+            $hid = (int)$row['home_cfg_id'];
+            if ($hid > 0) {
+                $existing[$hid] = $row;
+            }
         }
     }
 
-    // Insert new rows for game/mods not yet in billing_services
-    foreach ($gameMods as $modCfgId => $gm) {
-        if (isset($existing[$modCfgId])) {
+    // Insert a new row for every config_homes entry not yet in billing_services.
+    // Admin-editable fields (prices, slots, enabled, etc.) get safe defaults so
+    // the service is visible to the admin but not yet live in the store.
+    foreach ($configHomes as $homeCfgId => $ch) {
+        if (isset($existing[$homeCfgId])) {
             continue;
         }
-        $svcName   = $db->real_escape_string($gm['mod_name'] ?: $gm['game_name']);
-        $homeCfgId = (int)$gm['home_cfg_id'];
-        // remote_server_id is intentionally empty: no servers are assigned until
-        // an admin reviews and enables the service on the adminserverlist page.
+        $svcName = $db->real_escape_string($ch['game_name']);
         $db->query(
-            "INSERT INTO `{$prefix}billing_services`
+            "INSERT INTO `{$tableName}`
                 (home_cfg_id, mod_cfg_id, service_name, description,
                  remote_server_id, enabled, out_of_stock,
                  price_daily, price_monthly, price_year,
-                 slot_min_qty, slot_max_qty, install_method,
-                 img_url, ftp, manual_url, access_rights)
+                 slot_min_qty, slot_max_qty,
+                 img_url, ftp, install_method, manual_url, access_rights)
              VALUES
-                ({$homeCfgId}, {$modCfgId}, '{$svcName}', '{$svcName}',
+                ({$homeCfgId}, 0, '{$svcName}', '{$svcName}',
                  '', 0, 0,
-                 0, 0, 0,
-                 1, 100, 'steamcmd',
-                 '', '', '', '')"
+                 0.00, 0.00, 0.00,
+                 1, 100,
+                 '', '', 'steamcmd', '', '')"
         );
-        $messages[] = "Added new service: " . ($gm['mod_name'] ?: $gm['game_name']);
+        $messages[] = "Added new service: " . $ch['game_name'];
     }
 
-    // Soft-disable billing_services whose mod_cfg_id no longer appears in config_mods
-    foreach ($existing as $modCfgId => $svcRow) {
-        if ($modCfgId > 0 && !isset($gameMods[$modCfgId])) {
+    // Soft-disable billing_services whose home_cfg_id no longer appears in config_homes.
+    foreach ($existing as $homeCfgId => $svcRow) {
+        if (!isset($configHomes[$homeCfgId])) {
             $sid = (int)$svcRow['service_id'];
             $db->query(
-                "UPDATE `{$prefix}billing_services`
+                "UPDATE `{$tableName}`
                  SET enabled = 0, out_of_stock = 1
                  WHERE service_id = {$sid} AND enabled = 1"
             );
             if ($db->affected_rows > 0) {
-                $messages[] = "Service ID {$sid} disabled — game mod no longer in config.";
+                $messages[] = "Service ID {$sid} disabled — game config no longer in config_homes.";
             }
         }
     }
@@ -178,6 +188,8 @@ $flashType = 'ok';
 
 /* -----------------------------------------------------------------------
    SAVE: service configuration form submitted
+   Only admin-editable fields are updated; service_name and home_cfg_id
+   are never overwritten here.
 ----------------------------------------------------------------------- */
 if (isset($_POST['save_services'])) {
     // Load valid remote server IDs for validation
@@ -194,12 +206,15 @@ if (isset($_POST['save_services'])) {
     foreach ((array)$postedServices as $sid => $svcData) {
         $sid          = (int)$sid;
         $enabled      = isset($svcData['enabled']) ? 1 : 0;
+        $outOfStock   = isset($svcData['out_of_stock']) ? 1 : 0;
         $priceDaily   = number_format((float)($svcData['price_daily']   ?? 0), 4, '.', '');
         $priceMonthly = number_format((float)($svcData['price_monthly'] ?? 0), 4, '.', '');
         $priceYear    = number_format((float)($svcData['price_year']    ?? 0), 4, '.', '');
-        $slotMin      = max(0, (int)($svcData['slot_min_qty'] ?? 0));
-        $slotMax      = max(0, (int)($svcData['slot_max_qty'] ?? 0));
+        $slotMin      = max(1, (int)($svcData['slot_min_qty'] ?? 1));
+        $slotMax      = max(1, (int)($svcData['slot_max_qty'] ?? 1));
         if ($slotMax < $slotMin) { $slotMax = $slotMin; }
+        $description  = $db->real_escape_string(substr((string)($svcData['description'] ?? ''), 0, 1000));
+        $imgUrl       = $db->real_escape_string(substr((string)($svcData['img_url'] ?? ''), 0, 255));
 
         // Build comma-separated remote_server_id from checkboxes, validating each ID
         $checkedIds = [];
@@ -214,11 +229,14 @@ if (isset($_POST['save_services'])) {
         $db->query(
             "UPDATE `{$table_prefix}billing_services`
              SET enabled          = {$enabled},
+                 out_of_stock     = {$outOfStock},
                  price_daily      = '{$priceDaily}',
                  price_monthly    = '{$priceMonthly}',
                  price_year       = '{$priceYear}',
                  slot_min_qty     = {$slotMin},
                  slot_max_qty     = {$slotMax},
+                 description      = '{$description}',
+                 img_url          = '{$imgUrl}',
                  remote_server_id = '{$remoteServerIdStr}'
              WHERE service_id = {$sid}"
         );
@@ -228,7 +246,7 @@ if (isset($_POST['save_services'])) {
 }
 
 /* -----------------------------------------------------------------------
-   Load data for display
+   Load data for display — join config_homes to show the config XML filename
 ----------------------------------------------------------------------- */
 $remoteServers = [];
 $rsRes = $db->query(
@@ -242,10 +260,14 @@ while ($rsRes && ($row = $rsRes->fetch_assoc())) {
 
 $services = [];
 $svcRes = $db->query(
-    "SELECT service_id, service_name, enabled, price_daily, price_monthly, price_year,
-            slot_min_qty, slot_max_qty, remote_server_id
-     FROM `{$table_prefix}billing_services`
-     ORDER BY service_name"
+    "SELECT bs.service_id, bs.service_name, bs.enabled, bs.out_of_stock,
+            bs.price_daily, bs.price_monthly, bs.price_year,
+            bs.slot_min_qty, bs.slot_max_qty,
+            bs.remote_server_id, bs.description, bs.img_url,
+            ch.home_cfg_file
+     FROM `{$table_prefix}billing_services` bs
+     LEFT JOIN `{$table_prefix}config_homes` ch ON ch.home_cfg_id = bs.home_cfg_id
+     ORDER BY bs.service_name"
 );
 while ($svcRes && ($row = $svcRes->fetch_assoc())) {
     $services[] = $row;
@@ -260,9 +282,9 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
 <p class="muted">
     Enable services, configure pricing and slot ranges, and select which remote servers
     each game can be installed on.  The service list is automatically kept in sync with
-    the panel game/mod configuration.  Check one or more servers to make a game available
-    for purchase; leaving all servers unchecked prevents the game from appearing in the
-    store.
+    the panel game configuration (<code>config_homes</code>).  Check one or more servers
+    to make a game available for purchase; leaving all servers unchecked prevents the
+    game from appearing in the store.
 </p>
 
 <?php if (empty($services)): ?>
@@ -276,20 +298,26 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
   <table class="svc-table">
     <thead>
       <tr>
-        <th class="game-name">Game / Service</th>
+        <th class="game-name">Game Name</th>
+        <th>Config XML</th>
         <th>Enabled</th>
+        <th>Out of Stock</th>
+        <th>Min Slots</th>
+        <th>Max Slots</th>
         <th>Price / Day ($)</th>
         <th>Price / Month ($)</th>
         <th>Price / Year ($)</th>
-        <th>Min Slots</th>
-        <th>Max Slots</th>
+        <th>Description</th>
+        <th>Image URL</th>
         <th>Available Servers</th>
       </tr>
     </thead>
     <tbody>
     <?php foreach ((array)$services as $svc):
       $sid = (int)$svc['service_id'];
-      $svcEnabled = (int)$svc['enabled'];
+      $svcEnabled    = (int)$svc['enabled'];
+      $svcOutOfStock = (int)$svc['out_of_stock'];
+      $cfgFile       = (string)($svc['home_cfg_file'] ?? '');
 
       // Parse existing remote_server_id CSV into a set for fast checkbox lookup
       $savedIds = [];
@@ -306,10 +334,32 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
           <div class="muted">ID: <?php echo $sid; ?></div>
         </td>
 
+        <td class="muted">
+          <?php echo $cfgFile !== '' ? h($cfgFile) : '<em>—</em>'; ?>
+        </td>
+
         <td style="text-align:center;">
           <input type="hidden"   name="svc[<?php echo $sid; ?>][enabled]" value="0">
           <input type="checkbox" name="svc[<?php echo $sid; ?>][enabled]" value="1"
                  <?php echo $svcEnabled ? 'checked' : ''; ?>>
+        </td>
+
+        <td style="text-align:center;">
+          <input type="hidden"   name="svc[<?php echo $sid; ?>][out_of_stock]" value="0">
+          <input type="checkbox" name="svc[<?php echo $sid; ?>][out_of_stock]" value="1"
+                 <?php echo $svcOutOfStock ? 'checked' : ''; ?>>
+        </td>
+
+        <td>
+          <input type="number" min="1" class="slot-input"
+                 name="svc[<?php echo $sid; ?>][slot_min_qty]"
+                 value="<?php echo (int)$svc['slot_min_qty']; ?>">
+        </td>
+
+        <td>
+          <input type="number" min="1" class="slot-input"
+                 name="svc[<?php echo $sid; ?>][slot_max_qty]"
+                 value="<?php echo (int)$svc['slot_max_qty']; ?>">
         </td>
 
         <td>
@@ -331,15 +381,15 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
         </td>
 
         <td>
-          <input type="number" min="0" class="slot-input"
-                 name="svc[<?php echo $sid; ?>][slot_min_qty]"
-                 value="<?php echo (int)$svc['slot_min_qty']; ?>">
+          <input type="text" class="desc-input"
+                 name="svc[<?php echo $sid; ?>][description]"
+                 value="<?php echo h($svc['description']); ?>">
         </td>
 
         <td>
-          <input type="number" min="0" class="slot-input"
-                 name="svc[<?php echo $sid; ?>][slot_max_qty]"
-                 value="<?php echo (int)$svc['slot_max_qty']; ?>">
+          <input type="text" class="img-input"
+                 name="svc[<?php echo $sid; ?>][img_url]"
+                 value="<?php echo h($svc['img_url']); ?>">
         </td>
 
         <td class="servers-cell">
@@ -379,9 +429,12 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
   <ul>
     <li>A service will only appear in the store when <strong>Enabled</strong> is checked
         <em>and</em> at least one server is selected.</li>
+    <li>The <strong>Game Name</strong> and <strong>Config XML</strong> columns are sourced
+        from <code><?php echo h("{$table_prefix}config_homes"); ?></code> and are read-only
+        here.  To change them, update the game XML config in the panel.</li>
     <li>Available servers are stored as a comma-separated list of server IDs in
         <code><?php echo h("{$table_prefix}billing_services.remote_server_id"); ?></code>.</li>
-    <li>The service list is automatically synced with the panel game/mod configuration on
+    <li>The service list is automatically synced with the panel game configuration on
         every page load.  New games are added with <em>Enabled = off</em> so they do not
         appear in the store until you configure and enable them.</li>
     <li>Games removed from the panel configuration are disabled automatically; they are
