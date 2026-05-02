@@ -5,14 +5,15 @@ if (!$db) {
     echo "DB connect failed: " . mysqli_connect_error() . PHP_EOL;
     exit(1);
 }
-$user = $argv[1] ?? 'iaregamer';
+$prefix    = defined('OGP_DB_PREFIX') ? OGP_DB_PREFIX : (isset($table_prefix) ? $table_prefix : 'gsp_');
+$user      = $argv[1] ?? 'iaregamer';
 $user_safe = mysqli_real_escape_string($db, $user);
 $has_shadow = false;
-$res_cols = mysqli_query($db, "SHOW COLUMNS FROM ogp_users LIKE 'users_pass_hash'");
+$res_cols = mysqli_query($db, "SHOW COLUMNS FROM `{$prefix}users` LIKE 'users_pass_hash'");
 if ($res_cols && mysqli_num_rows($res_cols) > 0) $has_shadow = true;
 $select_fields = 'user_id, users_login, users_passwd';
 if ($has_shadow) $select_fields .= ", users_pass_hash";
-$q = "SELECT $select_fields FROM ogp_users WHERE users_login = '$user_safe' LIMIT 1";
+$q = "SELECT $select_fields FROM `{$prefix}users` WHERE users_login = '$user_safe' LIMIT 1";
 $res = mysqli_query($db, $q);
 if (!$res) {
     echo "Query error: " . mysqli_error($db) . PHP_EOL;
