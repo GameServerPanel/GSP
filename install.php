@@ -221,8 +221,18 @@ function install() {
             "\$db_type=\"".$db_type."\";\n".
             "?>";
 
-        $temp = @fopen("includes/config.inc.php", "w");
-        if (!@fwrite($temp, $config)) {
+        $temp = fopen("includes/config.inc.php", "w");
+        if ($temp === false) {
+            print_failure(get_lang('unable_to_write_config') .
+                " &mdash; <code>includes/config.inc.php</code> could not be opened for writing. " .
+                "Please run: <code>sudo chmod 664 includes/config.inc.php &amp;&amp; sudo chown www-data:www-data includes/config.inc.php</code> " .
+                "(or <code>sudo chmod -R 775 includes/ &amp;&amp; sudo chown -R www-data:www-data includes/</code> if the file does not yet exist). " .
+                "You can also use the <a href='check.php'>Dependency Check</a> page for a full diagnostics report.");
+            echo "<p><a href='?step=1'>".get_lang('back')."</a></p>";
+            echo "</td></tr></table>\n";
+            return;
+        }
+        if (fwrite($temp, $config) === false) {
             print_failure(get_lang('unable_to_write_config'));
             echo "<p><a href='?step=1'>".get_lang('back')."</a></p>";
             fclose($temp);
