@@ -62,6 +62,11 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if ( $db_host === NULL )
 			return -1;
 
+		// PHP 8.1+ changed the default mysqli error reporting mode to throw exceptions.
+		// Disable that so all calling code can continue to rely on return-value error
+		// checking rather than exception handling.
+		mysqli_report(MYSQLI_REPORT_OFF);
+
 		// Use explicit port when provided; otherwise fall back to MySQL default (3306).
 		$port = ($db_port !== NULL && $db_port !== '') ? (int)$db_port : NULL;
 		$this->link = mysqli_connect( $db_host, $db_user, $db_pass, $db_name, $port );
@@ -81,7 +86,12 @@ class OGPDatabaseMySQL extends OGPDatabase
 		if ( !$this->link ) return FALSE;
 
 		++$this->queries_;
-		$result = mysqli_query($this->link,$query);
+		try {
+			$result = mysqli_query($this->link,$query);
+		} catch ( \Throwable $e ) {
+			error_log("OGPDatabaseMySQL::listQuery exception: " . $e->getMessage());
+			return FALSE;
+		}
 
 		if ( mysqli_errno($this->link) > 0 )
 			print mysqli_error($this->link);
@@ -1169,7 +1179,12 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$query = str_replace( "OGP_DB_PREFIX", $this->table_prefix, $query );
 
 		++$this->queries_;
-		mysqli_query($this->link,$query);
+		try {
+			mysqli_query($this->link,$query);
+		} catch ( \Throwable $e ) {
+			error_log("OGPDatabaseMySQL::query exception: " . $e->getMessage());
+			return FALSE;
+		}
 
 		if( mysqli_errno($this->link) != 0 )
 		{
