@@ -229,66 +229,47 @@ function exec_ogp_module()
 				}
 				
 				//Install files for this service in the remote server
-				// -Steam
 				$exec_folder_path = clean_path($home_info['home_path'] . "/" . $server_xml->exe_location );
 				$exec_path = clean_path($exec_folder_path . "/" . $server_xml->server_exec_name );
 
-				if ($install_method == "steam")
+				if ( (string)$server_xml->installer === "steamcmd" && !empty((string)$installer_name) )
 				{
-					if ( $server_xml->installer == "steamcmd" )
-					{
-						if( preg_match("/win32/", $server_xml->game_key) OR preg_match("/win64/", $server_xml->game_key) ) 
-							$cfg_os = "windows";
-						elseif( preg_match("/linux/", $server_xml->game_key) )
-							$cfg_os = "linux";
-						
-						// Some games like L4D2 require anonymous login
-						if($mod_xml->installer_login){
-							$login = $mod_xml->installer_login;
-							$pass = '';
-						}else{
-							$login = $settings['steam_user'];
-							$pass = $settings['steam_pass'];
-						}
-						
-						$modname = ( $installer_name == '90' and !preg_match("/(cstrike|valve)/", $modkey) ) ? $modkey : '';
-						$betaname = isset($mod_xml->betaname) ? $mod_xml->betaname : '';
-						$betapwd = isset($mod_xml->betapwd) ? $mod_xml->betapwd : '';
-						$arch = isset($mod_xml->steam_bitness) ? $mod_xml->steam_bitness : '';
-						
-						$remote->steam_cmd( $home_id,$home_info['home_path'],$installer_name,$modname,
-											$betaname,$betapwd,$login,$pass,$settings['steam_guard'],
-											$exec_folder_path,$exec_path,$precmd,$postcmd,$cfg_os,'',$arch); 
-					}
-				}
-				// -Rsync
-				elseif ($install_method == "rsync")
-				{
-
-					//Rsync Server
-					$url = "files.iaregamer.com";
-					//OS
 					if( preg_match("/win32/", $server_xml->game_key) OR preg_match("/win64/", $server_xml->game_key) ) 
-						$os = "windows";
+						$cfg_os = "windows";
 					elseif( preg_match("/linux/", $server_xml->game_key) )
-						$os = "linux";
-					//Rsync Game Name
-					//JUST SET RS_GNAME TO GAME xml NAME
-					$rs_gname =  $server_xml->game_key;
-
-					//Starting Sync
-					$full_url = "$url/rsync_installer/$rs_gname/$os/";
-
-
-
-					$remote->start_rsync_install($home_id,$home_info['home_path'],"$full_url",$exec_folder_path,$exec_path,$precmd,$postcmd);
+						$cfg_os = "linux";
+					
+					// Some games like L4D2 require anonymous login
+					if($mod_xml->installer_login){
+						$login = $mod_xml->installer_login;
+						$pass = '';
+					}else{
+						$login = $settings['steam_user'];
+						$pass = $settings['steam_pass'];
+					}
+					
+					$modname = ( $installer_name == '90' and !preg_match("/(cstrike|valve)/", $modkey) ) ? $modkey : '';
+					$betaname = isset($mod_xml->betaname) ? $mod_xml->betaname : '';
+					$betapwd = isset($mod_xml->betapwd) ? $mod_xml->betapwd : '';
+					$arch = isset($mod_xml->steam_bitness) ? $mod_xml->steam_bitness : '';
+					
+					$remote->steam_cmd( $home_id,$home_info['home_path'],$installer_name,$modname,
+										$betaname,$betapwd,$login,$pass,$settings['steam_guard'],
+										$exec_folder_path,$exec_path,$precmd,$postcmd,$cfg_os,'',$arch); 
 				}
-				// -Manual
-				elseif ($install_method == "manual")
+				else
 				{
-					// Start File Download and uncompress
-					$filename = !empty($manual_url) ? substr($manual_url, -9) : "";
-					$remote->start_file_download($manual_url,$home_info['home_path'],$filename,"uncompress");
+					// No SteamCMD installer — run pre/post install scripts only.
+					if (!empty((string)$precmd)) {
+						$result = $remote->exec((string)$precmd);
+						if ($result === NULL)
+							$db->logger("Script-only install: pre_install script returned no output for home_id $home_id");
+					}
+					if (!empty((string)$postcmd)) {
+						$result = $remote->exec((string)$postcmd);
+						if ($result === NULL)
+							$db->logger("Script-only install: post_install script returned no output for home_id $home_id");
+					}
 				}
 				echo "<h4><br><p>".get_lang('starting_installations')."</p></h4><br>";
 				//PANEL LOG 

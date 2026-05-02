@@ -297,55 +297,6 @@ function send_rcon_command($command, $remote, $server_xml, $home_info, $home_id,
 	}
 }
 
-function test_rsync_response($address)
-{
-	$starttime = microtime(true);
-	$fp = fsockopen($address, 873, $errno, $errstr, 3);
-	$stoptime  = microtime(true);
-	if (!$fp) {
-		return FALSE;
-	}
-	else
-	{
-		$out = "Connection: Close\r\n\r\n";
-		fwrite($fp, $out);
-		$response = "";
-		while (!feof($fp)) {
-			$response .= fgets($fp, 128);
-		}
-		fclose($fp);
-		if(strstr($response,"@RSYNCD"))
-		{
-			$response_time = ($stoptime - $starttime);
-			return $response_time;
-		}
-		else
-			return FALSE;
-	}
-}
-
-function get_faster_rsync($rsync_sites)
-{
-	$faster = "NONE";
-	foreach ((array)$rsync_sites as $site)
-	{
-		list($url,$name) = explode('|', $site);
-		$current_time = test_rsync_response($url);
-		if($response_time !== FALSE)
-		{
-			if(!isset($previous_time))
-				$faster = $url;
-			if($previous_time > $current_time)
-				$faster = $url;
-			$previous_time = $current_time;
-		}
-	}
-	
-	if($faster == "NONE")
-		$faster = "rsync.opengamepanel.org";
-	return $faster;
-}
-
 function get_download_filename($url)
 {
 	if(empty($url) or !filter_var($url, FILTER_VALIDATE_URL))

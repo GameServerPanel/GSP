@@ -29,8 +29,8 @@ define('OGP_LANG_no_game_homes_assigned', "You don't have any servers assigned t
 define('OGP_LANG_select_game_home_to_configure', "Select a game server that you want to configure");
 define('OGP_LANG_file_manager', "File Manager");
 define('OGP_LANG_configure_mods', "Configure mods");
-define('OGP_LANG_install_update_steam', "Install/Update");
-define('OGP_LANG_install_update_manual', "Install/Update");
+define('OGP_LANG_install_update_steam', "Update");
+define('OGP_LANG_install_update_manual', "Update");
 define('OGP_LANG_assign_game_homes', "Assign game servers");
 define('OGP_LANG_user', "User");
 define('OGP_LANG_group', "Group");
@@ -130,7 +130,6 @@ define('OGP_LANG_error_occured_remote_host', "Error occurred on the remote host"
 define('OGP_LANG_follow_server_status', "You can follow the server status from");
 define('OGP_LANG_addons', "Addons");
 define('OGP_LANG_hostname', "Hostname");
-define('OGP_LANG_rsync_install', "[Rsync Install]");
 define('OGP_LANG_ping', "Ping");
 define('OGP_LANG_team', "Team");
 define('OGP_LANG_deaths', "Deaths");
@@ -142,7 +141,7 @@ define('OGP_LANG_player', "Player");
 define('OGP_LANG_port', "Port");
 define('OGP_LANG_rcon_presets', "RCON presets");
 define('OGP_LANG_update_from_local_master_server', "Update from local Master Server");
-define('OGP_LANG_update_from_selected_rsync_server', "Update from selected Rsync server");
+define('OGP_LANG_update_from_selected_rsync_server', "Update from selected server");
 define('OGP_LANG_execute_selected_server_operations', "Execute selected server operations");
 define('OGP_LANG_execute_operations', "Execute operations");
 define('OGP_LANG_account_expiration', "Account expiration");
@@ -207,5 +206,4 @@ define('OGP_LANG_phan', "Phantom");
 define('OGP_LANG_sec', "Seconds");
 define('OGP_LANG_unknown_rsync_mirror', "You attempted to start an update from a mirror which doesn't exist.");
 define('OGP_LANG_custom_fields', "Server Settings");
-?>
 
