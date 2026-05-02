@@ -68,10 +68,10 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
 <post_install>
 mkdir -p ./cfg
 touch ./cfg/epochmod_win32.xml
-wget http://files.iaregamer.com/addons/arma2Addons.tar .
-wget http://files.iaregamer.com/addons/epochmod.tar .
+wget http://files.iaregamer.com/gamefiles/arma2Addons.tar .
+wget http://files.iaregamer.com/gamefiles/epochmod.tar .
 tar -xvf arma2Addons.tar
-tar -zxvf epochmod.tar
+tar -xvf epochmod.tar
 
 #Create Database ---------------------------------------
 
@@ -137,6 +137,7 @@ fi
 
 rm *.sh
 rm *.gz
+rm +.tar
 rm *.sql
 
 printf '%s\r\n' \
