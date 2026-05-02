@@ -66,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['inv
     if (!headers_sent()) {
         header('Location: admin_invoices.php?msg=' . urlencode($message) . '&type=' . $msgType);
         mysqli_close($db);
+        $db = null;
         exit;
     }
 }
@@ -81,6 +82,7 @@ $res = $db->query(
 );
 if ($res) $invoices = $res->fetch_all(MYSQLI_ASSOC);
 mysqli_close($db);
+$db = null;
 
 if (isset($_GET['msg']))  $message = $_GET['msg'];
 if (isset($_GET['type'])) $msgType = $_GET['type'];

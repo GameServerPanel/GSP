@@ -66,6 +66,9 @@ function join_base($base, $path){
 $locationCol = col_exists($db, "{$table_prefix}billing_services", 'remote_server_id') ? 'remote_server_id' :
                (col_exists($db, "{$table_prefix}billing_services", 'remote_server') ? 'remote_server' : 'remote_server_id');
 
+/* whether gsp_remote_servers has an 'enabled' column (may be missing on older installs) */
+$rsHasEnabled = col_exists($db, "{$table_prefix}remote_servers", 'enabled');
+
 $flash = [];
 
 /* A) Update global server location enable flags */
@@ -76,9 +79,11 @@ if (isset($_POST['update_remote_servers'])) {
   foreach ((array)$allIds as $row) {
     $id = (int)$row['remote_server_id'];
     $e  = isset($enabledSet[$id]) ? 1 : 0;
-    $db->query("UPDATE {$table_prefix}remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
+    if ($rsHasEnabled) {
+      $db->query("UPDATE {$table_prefix}remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
+    }
   }
-  $flash[] = "Server locations updated.";
+  $flash[] = $rsHasEnabled ? "Server locations updated." : "Server locations updated (note: 'enabled' column missing from remote_servers — run add_remote_server_enabled_column.sql migration).";
 }
 
 /* helper: update one service row from posted array */
@@ -148,13 +153,21 @@ if (isset($_POST['remove_service'], $_POST['service_id_remove'])) {
 }
 
 /* fetch data for UI */
-$remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, enabled FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
-$services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_monthly, img_url, enabled FROM {$table_prefix}billing_services ORDER BY service_name");
+$rsEnabledExpr = $rsHasEnabled ? ', enabled' : ', 1 AS enabled';
+$remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name{$rsEnabledExpr} FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
+$services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_daily, price_monthly, price_year, img_url, enabled FROM {$table_prefix}billing_services ORDER BY service_name");
 ?>
 
 <?php if ($flash): ?>
   <div class="panel" style="margin-bottom:12px"><?php foreach ((array)$flash as $m) echo "<div>".h($m)."</div>"; ?></div>
-    <div class="panel mb-12"><?php foreach ((array)$flash as $m) echo "<div>".h($m)."</div>"; ?></div>
+<?php endif; ?>
+
+<?php if (!$rsHasEnabled): ?>
+  <div class="panel" style="margin-bottom:12px;background:#fff3cd;border:1px solid #ffc107;">
+    <strong>⚠ Schema notice:</strong> The <code><?php echo h("{$table_prefix}remote_servers"); ?></code> table is missing the <code>enabled</code> column.
+    Server location enable/disable is currently non-functional.
+    Run <code>modules/billing/add_remote_server_enabled_column.sql</code> to add the column.
+  </div>
 <?php endif; ?>
 
 <h2>Enable/Disable Server Locations (Global)</h2>
@@ -170,7 +183,6 @@ $services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locat
     <?php endforeach; ?>
   </div>
   <div style="margin-top:10px;"><button type="submit">Update Enabled Servers</button></div>
-    <div class="mt-10"><button type="submit">Update Enabled Servers</button></div>
 </form>
 
 <hr>
