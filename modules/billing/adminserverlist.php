@@ -83,7 +83,11 @@ if (isset($_POST['update_remote_servers'])) {
       $db->query("UPDATE {$table_prefix}remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
     }
   }
-  $flash[] = $rsHasEnabled ? "Server locations updated." : "Server locations updated (note: 'enabled' column missing from remote_servers — run add_remote_server_enabled_column.sql migration).";
+  if ($rsHasEnabled) {
+    $flash[] = "Server locations updated.";
+  } else {
+    $flash[] = "Server locations updated (note: 'enabled' column missing from remote_servers — run add_remote_server_enabled_column.sql migration).";
+  }
 }
 
 /* helper: update one service row from posted array */
@@ -153,9 +157,13 @@ if (isset($_POST['remove_service'], $_POST['service_id_remove'])) {
 }
 
 /* fetch data for UI */
-$rsEnabledExpr = $rsHasEnabled ? ', enabled' : ', 1 AS enabled';
-$remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name{$rsEnabledExpr} FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
-$services      = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_daily, price_monthly, price_year, img_url, enabled FROM {$table_prefix}billing_services ORDER BY service_name");
+// Build remote-servers query — include `enabled` only when the column exists (older installs may be missing it).
+if ($rsHasEnabled) {
+  $remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, enabled FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
+} else {
+  $remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, 1 AS enabled FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
+}
+$services = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_daily, price_monthly, price_year, img_url, enabled FROM {$table_prefix}billing_services ORDER BY service_name");
 ?>
 
 <?php if ($flash): ?>
