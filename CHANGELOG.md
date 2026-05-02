@@ -1,6 +1,9 @@
 # Changelog
 
-## 2026-05-01 (latest)
+## 2026-05-02 (latest)
+- Removed 22 stray backup/duplicate files left by manual editing (`.bak`, `.BAK`, `.orig`, `.backup` extensions). Files inside `modules/config_games/server_configs/backup/` (intentional runtime backup folder) were left untouched.
+
+## 2026-05-01
 - Changed panel update backup location from `/var/backups/gsp-panel` to `<panel_root>/backups/` so all backups are self-contained inside the panel directory and require no external path or elevated permissions.
 - Removed stale "Dev Testing" placeholder heading from the panel login page (`index.php`).
 
