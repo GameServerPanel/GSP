@@ -171,7 +171,16 @@ class BillingService
         // If current expiry is in the future, extend from it; otherwise reset from period_end
         $currentExpiry = $home['billing_expires_at'] ?? null;
         if ($currentExpiry && strtotime($currentExpiry) > time()) {
-            $currentPeriodSecs = strtotime($invoiceRow['period_end'] ?? $now) - strtotime($invoiceRow['period_start'] ?? $now);
+            // Calculate the period length from the invoice; fall back to rate_type if dates are missing
+            $periodStart = $invoiceRow['period_start'] ?? null;
+            $periodEndVal = $invoiceRow['period_end'] ?? null;
+            if ($periodStart && $periodEndVal) {
+                $currentPeriodSecs = strtotime($periodEndVal) - strtotime($periodStart);
+            } else {
+                $rateType2   = $invoiceRow['rate_type'] ?? 'monthly';
+                $periodSecMap = ['daily' => 86400, 'monthly' => 31 * 86400, 'yearly' => 365 * 86400];
+                $currentPeriodSecs = $periodSecMap[$rateType2] ?? (31 * 86400);
+            }
             $newExpiry = date('Y-m-d H:i:s', strtotime($currentExpiry) + max(86400, $currentPeriodSecs));
         } else {
             $newExpiry = $periodEnd;

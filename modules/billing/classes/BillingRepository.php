@@ -200,7 +200,16 @@ class BillingRepository
             if (array_key_exists($col, $data)) {
                 $set[]    = "`{$col}` = ?";
                 $params[] = $data[$col];
-                $types   .= is_int($data[$col]) ? 'i' : 's';
+                $val      = $data[$col];
+                if ($val === null) {
+                    $types .= 's'; // NULL binds safely as string in mysqli
+                } elseif (is_int($val)) {
+                    $types .= 'i';
+                } elseif (is_float($val)) {
+                    $types .= 'd';
+                } else {
+                    $types .= 's';
+                }
             }
         }
         if (empty($set)) return false;

@@ -250,9 +250,9 @@ if ($applied_coupon && $coupon_discount_percent > 0) {
 
 $final_amount = $total_amount - $discount_amount;
 
-// PayPal configuration
-$sandbox = true;
-$client_id = 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c';
+// PayPal configuration (from config)
+$sandbox   = $paypal_sandbox ?? true;
+$client_id = $paypal_client_id ?? '';
 
 // Prepare PayPal items
 $paypal_items = [];

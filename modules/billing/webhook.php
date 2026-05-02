@@ -3,10 +3,10 @@ require_once(__DIR__ . '/includes/config_loader.php');
 if (is_file(__DIR__ . '/includes/log.php')) require_once(__DIR__ . '/includes/log.php');
 
 $config = [
-  'sandbox'       => true,
-  'client_id'     => 'AfvY_C2zA_hTHxHq7TIhtOeub4xBdySYrt_Hjj3d_WYQwjWI9NfOAVOTeResx2rgZ_nP5tOoxQSAHw8c',
-  'client_secret' => 'EJ216np9cAj9n7KSddez3fLVxGe-zi4oKKKl1YGqPp88XIikr4Qzbxh0XW2as-V6LgdX-upjtQAg9dC0',
-  'webhook_id'    => '6N620673281740730',
+  'sandbox'       => $paypal_sandbox ?? true,
+  'client_id'     => $paypal_client_id ?? '',
+  'client_secret' => $paypal_client_secret ?? '',
+  'webhook_id'    => $paypal_webhook_id ?? '',
   'data_dir'      => rtrim(
     (defined('SITE_DATA_DIR') ? SITE_DATA_DIR : '') ?: ($SITE_DATA_DIR ?? ''),
     DIRECTORY_SEPARATOR

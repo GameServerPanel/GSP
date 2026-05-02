@@ -125,18 +125,18 @@ $install_queries[0] = array(
 );
 
 // Version 2: New columns on billing_invoices, transaction log table, service-to-node mapping
+// Each ALTER TABLE is a separate statement because ADD COLUMN IF NOT EXISTS requires MySQL 8.0+.
+// The module manager only runs these once (on db_version bump 1->2), so they do not need IF NOT EXISTS.
 $install_queries[1] = array(
-    // Add new columns to billing_invoices (IF NOT EXISTS for idempotence)
-    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices`
-        ADD COLUMN IF NOT EXISTS `home_id` INT(11) NOT NULL DEFAULT 0 AFTER `service_id`,
-        ADD COLUMN IF NOT EXISTS `rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly' AFTER `invoice_duration`,
-        ADD COLUMN IF NOT EXISTS `rate_per_player` DECIMAL(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`,
-        ADD COLUMN IF NOT EXISTS `players` INT(11) NOT NULL DEFAULT 0 AFTER `rate_per_player`,
-        ADD COLUMN IF NOT EXISTS `period_start` DATETIME NULL AFTER `players`,
-        ADD COLUMN IF NOT EXISTS `period_end` DATETIME NULL AFTER `period_start`,
-        ADD COLUMN IF NOT EXISTS `subtotal` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `period_end`,
-        ADD COLUMN IF NOT EXISTS `total_due` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`,
-        ADD COLUMN IF NOT EXISTS `payment_status` ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid' AFTER `total_due`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `home_id` INT(11) NOT NULL DEFAULT 0 AFTER `service_id`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly' AFTER `invoice_duration`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `rate_per_player` DECIMAL(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `players` INT(11) NOT NULL DEFAULT 0 AFTER `rate_per_player`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `period_start` DATETIME NULL AFTER `players`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `period_end` DATETIME NULL AFTER `period_start`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `subtotal` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `period_end`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `total_due` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`",
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices` ADD COLUMN `payment_status` ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid' AFTER `total_due`",
 
     // Payment transaction log — immutable audit trail
     "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_transactions` (
