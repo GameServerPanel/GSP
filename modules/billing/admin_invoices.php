@@ -1,160 +1,171 @@
 <?php
-// Admin invoices viewer and editor
-$session_name = session_name(); session_start();
-require_once(__DIR__ . '/bootstrap.php');
-require_once(__DIR__ . '/includes/admin_auth.php');
+// Admin invoices management
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('opengamepanel_web');
+    session_start();
+}
+require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/includes/admin_auth.php';
+require_once __DIR__ . '/classes/BillingRepository.php';
+require_once __DIR__ . '/classes/BillingService.php';
+require_once __DIR__ . '/classes/GatewayFactory.php';
+
+function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 if (!$db) die('DB connection failed');
+mysqli_set_charset($db, 'utf8mb4');
+$prefix = $table_prefix ?? 'gsp_';
+$repo   = new BillingRepository($db, $prefix);
+$svc    = new BillingService($repo);
 
-// Handle POST requests for invoice updates
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['update_invoice'])) {
-        $orderId = intval($_POST['order_id']);
-        $newStatus = mysqli_real_escape_string($db, $_POST['status']);
-        $newPrice = floatval($_POST['price']);
-        
-        $sql = "UPDATE {$table_prefix}billing_orders SET status = '$newStatus', price = $newPrice WHERE order_id = $orderId LIMIT 1";
-        mysqli_query($db, $sql);
-        header('Location: admin_invoices.php?updated=' . $orderId);
+$message = '';
+$msgType = 'success';
+
+// Handle POST: mark as paid (manual), cancel, or refund
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['invoice_id'])) {
+    $invId  = intval($_POST['invoice_id']);
+    $action = $_POST['action'];
+    $now    = date('Y-m-d H:i:s');
+
+    // Fetch invoice to verify it exists
+    $invRow = null;
+    $stmt = $db->prepare("SELECT * FROM `{$prefix}billing_invoices` WHERE invoice_id = ? LIMIT 1");
+    if ($stmt) {
+        $stmt->bind_param('i', $invId);
+        $stmt->execute();
+        $invRow = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+    }
+
+    if (!$invRow) {
+        $message = "Invoice #{$invId} not found.";
+        $msgType = 'error';
+    } elseif ($action === 'mark_paid') {
+        $gateway       = GatewayFactory::make('manual');
+        $captureResult = $gateway->handleCallback([
+            // total_due is the new schema field; amount is the legacy column during migration
+            'amount'   => $invRow['total_due'] ?? $invRow['amount'] ?? 0,
+            'currency' => $invRow['currency'] ?? 'USD',
+        ]);
+        $captureResult['payment_method'] = 'manual';
+        $homeId  = intval($invRow['home_id'] ?? 0);
+        $result  = $svc->processPaymentSuccess($captureResult, $invId, intval($invRow['user_id']), $homeId, $invRow);
+        $message = $result['success'] ? "Invoice #{$invId} marked as paid (manual)." : "Failed to mark invoice #{$invId} as paid.";
+        if (!$result['success']) $msgType = 'error';
+    } elseif ($action === 'cancel') {
+        $stmt = $db->prepare("UPDATE `{$prefix}billing_invoices` SET payment_status='cancelled' WHERE invoice_id=? LIMIT 1");
+        if ($stmt) { $stmt->bind_param('i', $invId); $stmt->execute(); $stmt->close(); }
+        $message = "Invoice #{$invId} cancelled.";
+    } elseif ($action === 'refund') {
+        $stmt = $db->prepare("UPDATE `{$prefix}billing_invoices` SET payment_status='refunded' WHERE invoice_id=? LIMIT 1");
+        if ($stmt) { $stmt->bind_param('i', $invId); $stmt->execute(); $stmt->close(); }
+        $message = "Invoice #{$invId} marked as refunded.";
+    }
+
+    if (!headers_sent()) {
+        header('Location: admin_invoices.php?msg=' . urlencode($message) . '&type=' . $msgType);
+        mysqli_close($db);
         exit;
     }
 }
 
-// Fetch all orders with coupon information
-$orders = mysqli_query($db, "SELECT o.*, u.user_name, c.code AS coupon_code, c.discount_percent AS coupon_discount 
-    FROM {$table_prefix}billing_orders o 
-    LEFT JOIN {$table_prefix}users u ON o.user_id = u.user_id 
-    LEFT JOIN {$table_prefix}billing_coupons c ON o.coupon_id = c.coupon_id
-    ORDER BY o.order_id DESC");
+// Fetch invoices
+$invoices = [];
+$res = $db->query(
+    "SELECT i.*, u.users_login, u.users_email
+     FROM `{$prefix}billing_invoices` i
+     LEFT JOIN `{$prefix}users` u ON u.user_id = i.user_id
+     ORDER BY i.invoice_id DESC
+     LIMIT 500"
+);
+if ($res) $invoices = $res->fetch_all(MYSQLI_ASSOC);
+mysqli_close($db);
 
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+if (isset($_GET['msg']))  $message = $_GET['msg'];
+if (isset($_GET['type'])) $msgType = $_GET['type'];
 ?>
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Admin — Invoices</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/header.css">
   <style>
-    .edit-row { background: #f9f9f9; }
-    .edit-input { width: 80px; padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
-    .edit-select { padding: 4px; border: 1px solid #ccc; border-radius: 3px; }
-    .btn-save { background: #28a745; color: white; border: none; padding: 5px 12px; border-radius: 3px; cursor: pointer; }
-    .btn-save:hover { background: #218838; }
-    .status-badge { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: 600; }
-    .status-Active   { background: #d4edda; color: #155724; }
-    .status-Invoiced { background: #fff3cd; color: #856404; }
-    .status-Expired  { background: #f8d7da; color: #721c24; }
+    .status-badge     { display:inline-block; padding:2px 8px; border-radius:3px; font-size:12px; font-weight:600; }
+    .status-paid      { background:#d4edda; color:#155724; }
+    .status-unpaid    { background:#fff3cd; color:#856404; }
+    .status-cancelled { background:#e2e3e5; color:#383d41; }
+    .status-refunded  { background:#f8d7da; color:#721c24; }
+    .action-btn { padding:3px 8px; font-size:12px; border:none; border-radius:3px; cursor:pointer; }
+    .btn-pay    { background:#28a745; color:#fff; }
+    .btn-cancel { background:#6c757d; color:#fff; }
+    .btn-refund { background:#dc3545; color:#fff; }
   </style>
 </head>
 <body>
-<?php include(__DIR__ . '/includes/top.php'); include(__DIR__ . '/includes/menu.php'); ?>
+<?php include __DIR__ . '/includes/top.php'; include __DIR__ . '/includes/menu.php'; ?>
 <div class="container-wide panel">
   <h1>Admin — All Invoices</h1>
-  <?php if (isset($_GET['updated'])): ?>
-    <div style="background: #d4edda; padding: 10px; margin-bottom: 15px; border-radius: 3px; color: #155724;">
-      ✓ Invoice #<?php echo h($_GET['updated']); ?> updated successfully.
+  <?php if ($message): ?>
+    <div style="background:<?= $msgType==='error' ? '#f8d7da' : '#d4edda' ?>;padding:10px;margin-bottom:15px;border-radius:3px;color:<?= $msgType==='error' ? '#721c24' : '#155724' ?>;">
+      <?= h($message) ?>
     </div>
   <?php endif; ?>
-  
-  <?php if (!$orders || mysqli_num_rows($orders) === 0): ?>
-    <p>No invoices found.</p>
-  <?php else: ?>
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>User</th>
-          <th>Home ID</th>
-          <th>Home Name</th>
-          <th>IP</th>
-          <th>Price</th>
-          <th>Duration</th>
-          <th>Status</th>
-          <th>Created</th>
-          <th>Finish Date</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php while ($row = mysqli_fetch_assoc($orders)): ?>
-        <tr id="row-<?php echo $row['order_id']; ?>">
-          <td><?php echo h($row['order_id']); ?></td>
-          <td><?php echo h($row['user_name'] ?? 'N/A'); ?></td>
-          <td><?php echo h($row['home_id'] ?? 'N/A'); ?></td>
-          <td><?php echo h($row['home_name']); ?></td>
-          <td><?php echo h($row['ip']); ?></td>
-          <td>
-            <?php 
-            $price = floatval($row['price']);
-            $discount = floatval($row['discount_amount'] ?? 0);
-            
-            if ($discount > 0 && !empty($row['coupon_code'])) {
-                echo '<span style="text-decoration: line-through; color: #999;">$' . number_format($price + $discount, 2) . '</span><br>';
-                echo '<strong>$' . number_format($price, 2) . '</strong>';
-                echo '<br><small style="color: #28a745;">(' . h($row['coupon_code']) . ' -' . number_format($row['coupon_discount'], 0) . '%)</small>';
-            } else {
-                echo '$' . number_format($price, 2);
-            }
-            ?>
-          </td>
-          <td><?php echo h($row['invoice_duration']); ?></td>
-          <td>
-            <span class="status-badge status-<?php echo h($row['status']); ?>">
-              <?php echo strtoupper(h($row['status'])); ?>
-            </span>
-          </td>
-          <td><?php echo h($row['order_date']); ?></td>
-          <td><?php echo h($row['end_date'] ?? 'N/A'); ?></td>
-          <td>
-            <button onclick="editRow(<?php echo $row['order_id']; ?>)" class="gsw-btn" style="padding: 4px 10px; font-size: 12px;">Edit</button>
-          </td>
-        </tr>
-        <tr id="edit-<?php echo $row['order_id']; ?>" class="edit-row" style="display: none;">
-          <td colspan="11">
-            <form method="post" action="" style="padding: 10px;">
-              <input type="hidden" name="order_id" value="<?php echo $row['order_id']; ?>">
-              <strong>Edit Invoice #<?php echo $row['order_id']; ?></strong>
-              <div style="margin-top: 10px;">
-                <label style="margin-right: 15px;">
-                  <strong>Price:</strong> 
-                  <input type="number" name="price" value="<?php echo $row['price']; ?>" step="0.01" class="edit-input" required>
-                </label>
-                <label style="margin-right: 15px;">
-                  <strong>Status:</strong>
-                  <select name="status" class="edit-select" required>
-                    <option value="Active"   <?php echo $row['status'] === 'Active'   ? 'selected' : ''; ?>>ACTIVE</option>
-                    <option value="Invoiced" <?php echo $row['status'] === 'Invoiced' ? 'selected' : ''; ?>>INVOICED</option>
-                    <option value="Expired"  <?php echo $row['status'] === 'Expired'  ? 'selected' : ''; ?>>EXPIRED</option>
-                  </select>
-                </label>
-                <button type="submit" name="update_invoice" class="btn-save">Save Changes</button>
-                <button type="button" onclick="cancelEdit(<?php echo $row['order_id']; ?>)" class="gsw-btn" style="padding: 5px 12px; margin-left: 5px;">Cancel</button>
-              </div>
+
+  <table class="cart-table">
+    <thead>
+      <tr>
+        <th>#</th><th>User</th><th>Server</th><th>Service</th>
+        <th>Rate</th><th>Players</th><th>Period</th>
+        <th>Total</th><th>Status</th><th>Method</th><th>Txn ID</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php if (empty($invoices)): ?>
+      <tr><td colspan="12" style="text-align:center">No invoices found.</td></tr>
+    <?php else: foreach ($invoices as $inv): ?>
+      <tr>
+        <td><?= h($inv['invoice_id']) ?></td>
+        <td><?= h($inv['users_login'] ?? $inv['user_id']) ?></td>
+        <td><?= h($inv['home_id'] ?: '—') ?></td>
+        <td><?= h($inv['service_id']) ?></td>
+        <td><?= h($inv['rate_type'] ?? '—') ?></td>
+        <td><?= h($inv['players'] ?? '—') ?></td>
+        <td style="font-size:11px"><?= h(substr($inv['period_start'] ?? '', 0, 10)) ?> – <?= h(substr($inv['period_end'] ?? '', 0, 10)) ?></td>
+        <td><?= h(number_format((float)($inv['total_due'] ?? $inv['amount'] ?? 0), 2)) ?></td>
+        <td><span class="status-badge status-<?= h(in_array($inv['payment_status'] ?? '', ['unpaid','paid','cancelled','refunded']) ? $inv['payment_status'] : 'unpaid') ?>"><?= h($inv['payment_status'] ?? 'unpaid') ?></span></td>
+        <td><?= h($inv['payment_method'] ?? '—') ?></td>
+        <td style="font-size:11px;max-width:120px;overflow:hidden"><?= h($inv['payment_txid'] ?? '—') ?></td>
+        <td>
+          <?php if (($inv['payment_status'] ?? '') !== 'paid'): ?>
+            <form method="post" style="display:inline">
+              <input type="hidden" name="invoice_id" value="<?= intval($inv['invoice_id']) ?>">
+              <input type="hidden" name="action" value="mark_paid">
+              <button type="submit" class="action-btn btn-pay">Mark Paid</button>
             </form>
-          </td>
-        </tr>
-      <?php endwhile; ?>
-      </tbody>
-    </table>
-  <?php endif; ?>
+          <?php endif; ?>
+          <?php if (!in_array($inv['payment_status'] ?? '', ['cancelled','refunded'])): ?>
+            <form method="post" style="display:inline" onsubmit="return confirm('Cancel this invoice?')">
+              <input type="hidden" name="invoice_id" value="<?= intval($inv['invoice_id']) ?>">
+              <input type="hidden" name="action" value="cancel">
+              <button type="submit" class="action-btn btn-cancel">Cancel</button>
+            </form>
+          <?php endif; ?>
+          <?php if (($inv['payment_status'] ?? '') === 'paid'): ?>
+            <form method="post" style="display:inline" onsubmit="return confirm('Mark as refunded?')">
+              <input type="hidden" name="invoice_id" value="<?= intval($inv['invoice_id']) ?>">
+              <input type="hidden" name="action" value="refund">
+              <button type="submit" class="action-btn btn-refund">Refund</button>
+            </form>
+          <?php endif; ?>
+        </td>
+      </tr>
+    <?php endforeach; endif; ?>
+    </tbody>
+  </table>
 </div>
-
-<script>
-function editRow(orderId) {
-  document.getElementById('row-' + orderId).style.display = 'none';
-  document.getElementById('edit-' + orderId).style.display = 'table-row';
-}
-
-function cancelEdit(orderId) {
-  document.getElementById('row-' + orderId).style.display = 'table-row';
-  document.getElementById('edit-' + orderId).style.display = 'none';
-}
-</script>
-
-<?php include(__DIR__ . '/includes/footer.php'); ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
-

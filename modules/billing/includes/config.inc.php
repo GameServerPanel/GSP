@@ -29,4 +29,10 @@ $SITE_BACKGROUND = trim((string)$SITE_BACKGROUND);
 
 // Data directory for persisted payment webhook JSON files (relative to repo root)
 $SITE_DATA_DIR = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR . 'data';
+
+// PayPal configuration — set credentials here, never in API files
+$paypal_sandbox       = true;   // Set to false for live payments
+$paypal_client_id     = '';     // Your PayPal Client ID
+$paypal_client_secret = '';     // Your PayPal Client Secret
+$paypal_webhook_id    = '';     // Your PayPal Webhook ID (for webhook signature verification)
 ?>

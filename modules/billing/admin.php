@@ -22,8 +22,9 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   <p>Welcome to the admin area. From here you can manage servers, payments, and site settings.</p>
 
   <div class="admin-flex-wrap">
-  <a class="gsw-btn" href="adminserverlist.php">Manage Servers & Services</a>
-  <a class="gsw-btn" href="./invoices.php">Invoice History</a>
+  <a class="gsw-btn" href="adminserverlist.php">Manage Servers &amp; Services</a>
+  <a class="gsw-btn" href="admin_invoices.php">Manage Invoices</a>
+  <a class="gsw-btn" href="admin_payments.php">Transaction Log</a>
   <a class="gsw-btn" href="admin_coupons.php">Manage Coupons</a>
   <a class="gsw-btn" href="admin_config.php">Edit Site Config</a>
   <a class="gsw-btn" href="admin_xml_editor.php">XML Config Editor</a>
@@ -39,7 +40,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   </ul>
 
   <h3>Sandbox account (testing)</h3>
-  <p>Use PayPal sandbox credentials when testing payments. Set your sandbox <code>client_id</code> and <code>client_secret</code> in the runtime config that the payment handlers use (for this site those are in the respective files under <code>_website/api/</code> or in a central config if you moved credentials).</p>
+  <p>Use PayPal sandbox credentials when testing payments. Set your sandbox <code>client_id</code> and <code>client_secret</code> in <code>modules/billing/includes/config.inc.php</code> (the <code>$paypal_client_id</code> and <code>$paypal_client_secret</code> variables). Set <code>$paypal_sandbox = false</code> for live payments.</p>
   <ul>
     <li>Create a sandbox business account at <a href="https://developer.paypal.com">PayPal Developer</a> and obtain a sandbox client ID/secret.</li>
     <li>Update the payment handler config and restart the webserver if required.</li>
