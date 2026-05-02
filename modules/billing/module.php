@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "3.0";
-$db_version = 2;
+$module_version = "3.1";
+$db_version = 3;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -171,6 +171,12 @@ $install_queries[1] = array(
         KEY `service_id` (`service_id`),
         KEY `remote_server_id` (`remote_server_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+);
+
+// Version 3 (array index 2, because install_queries is zero-indexed starting from version 1):
+// Add override_price to service-to-server mapping table
+$install_queries[2] = array(
+    "ALTER TABLE `".OGP_DB_PREFIX."billing_service_remote_servers` ADD COLUMN `override_price` DECIMAL(10,2) NULL AFTER `enabled`"
 );
 
 ?>

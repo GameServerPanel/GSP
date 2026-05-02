@@ -3,389 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Server List - GameServers.World</title>
+    <title>Admin Server / Game Matrix - GameServers.World</title>
+    <style>
+    .matrix-table { border-collapse: collapse; width: 100%; }
+    .matrix-table th, .matrix-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; text-align: center; }
+    .matrix-table th { background: #f5f5f5; white-space: nowrap; }
+    .matrix-table td.game-name { text-align: left; white-space: nowrap; }
+    .override-input { width: 72px; margin-top: 4px; }
+    .muted { color: #999; font-size: 0.85em; }
+    .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
+    .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
+    </style>
 </head>
 <body>
 <?php
-// gameservers.world admin — mysqli only, bulk + per-row update, image base URL + small button
+// Admin matrix page: game × server availability + price overrides
 
-/* === SITE_BASE_URL is loaded from includes/config.inc.php; leave empty to use relative paths === */
-
-// Include billing bootstrap (loads config and DB helper)
 require_once(__DIR__ . '/bootstrap.php');
-$siteBaseUrl = isset($SITE_BASE_URL) ? trim((string)$SITE_BASE_URL) : '';
-
-// Protect this page: require admin
 require_once(__DIR__ . '/includes/admin_auth.php');
 
-// Create database connection
+function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
-  die("Connection failed: " . mysqli_connect_error());
+    die("Connection failed: " . mysqli_connect_error());
 }
 
-// Include top bar and menu
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
-echo "<div class='panel mb-12'><strong>Need the XML field reference?</strong> ";
-echo "<a href=\"docs/xml_notes.php\" target=\"_blank\" rel=\"noopener\">Open XML Notes</a>";
-echo "</div>";
-
-/* show errors during setup */
-@ini_set('display_errors','1'); 
-error_reporting(E_ALL);
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
-function esc_mysqli($db, $v){ return $db->real_escape_string($v); }
-function fetch_all_assoc($db, $sql){
-  $res = $db->query($sql);
-  return $res ? $res->fetch_all(MYSQLI_ASSOC) : [];
+// Ensure the mapping table exists with the override_price column
+$db->query(
+    "CREATE TABLE IF NOT EXISTS `{$table_prefix}billing_service_remote_servers` (
+        `id`               INT(11) NOT NULL AUTO_INCREMENT,
+        `service_id`       INT(11) NOT NULL,
+        `remote_server_id` INT(11) NOT NULL,
+        `enabled`          TINYINT(1) NOT NULL DEFAULT 1,
+        `override_price`   DECIMAL(10,2) NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `svc_rs` (`service_id`, `remote_server_id`),
+        KEY `service_id` (`service_id`),
+        KEY `remote_server_id` (`remote_server_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+);
+// Add override_price if this is an older install that already has the table without it
+$chk = $db->query("SHOW COLUMNS FROM `{$table_prefix}billing_service_remote_servers` LIKE 'override_price'");
+if ($chk && $chk->num_rows === 0) {
+    $db->query("ALTER TABLE `{$table_prefix}billing_service_remote_servers` ADD COLUMN `override_price` DECIMAL(10,2) NULL");
 }
-function col_exists($db, $table, $col){
-  $res = $db->query("SHOW COLUMNS FROM `$table` LIKE '".$db->real_escape_string($col)."'");
-  return ($res && $res->num_rows > 0);
-}
-function parse_id_list($s){
-  $tokens = preg_split('/\s+/', trim((string)$s));
-  $out = [];
-  foreach ((array)$tokens as $t) {
-    if ($t === '') continue;
-    if (preg_match('/^\d+$/', $t)) $out[] = (int)$t;
-  }
-  return array_values(array_unique($out));
-}
-/* URL helpers for image preview */
-function is_abs_url($u){ return (bool)preg_match('~^(?:https?:)?//|^data:~i', (string)$u); }
-function join_base($base, $path){
-  $base = rtrim((string)$base, '/');
-  $path = ltrim((string)$path, '/');
-  return $base !== '' ? $base.'/'.$path : $path;
-}
-
-/* which column holds space-separated locations */
-$locationCol = col_exists($db, "{$table_prefix}billing_services", 'remote_server_id') ? 'remote_server_id' :
-               (col_exists($db, "{$table_prefix}billing_services", 'remote_server') ? 'remote_server' : 'remote_server_id');
-
-/* whether gsp_remote_servers has an 'enabled' column (may be missing on older installs) */
-$rsHasEnabled = col_exists($db, "{$table_prefix}remote_servers", 'enabled');
 
 $flash = [];
+$flashType = 'ok';
 
-/* A) Update global server location enable flags */
-if (isset($_POST['update_remote_servers'])) {
-  $enabledIds = array_map('intval', $_POST['rs'] ?? []);
-  $enabledSet = array_flip($enabledIds);
-  $allIds = fetch_all_assoc($db, "SELECT remote_server_id FROM {$table_prefix}remote_servers");
-  foreach ((array)$allIds as $row) {
-    $id = (int)$row['remote_server_id'];
-    $e  = isset($enabledSet[$id]) ? 1 : 0;
-    if ($rsHasEnabled) {
-      $db->query("UPDATE {$table_prefix}remote_servers SET enabled={$e} WHERE remote_server_id={$id}");
+/* -----------------------------------------------------------------------
+   SAVE: matrix form submitted
+----------------------------------------------------------------------- */
+if (isset($_POST['save_matrix'])) {
+    $postedServices = $_POST['svc'] ?? [];
+    $postedMappings = $_POST['map'] ?? [];
+
+    foreach ((array)$postedServices as $sid => $svcData) {
+        $sid        = (int)$sid;
+        $enabled    = isset($svcData['enabled']) ? 1 : 0;
+        $base_price = number_format((float)($svcData['base_price'] ?? 0), 2, '.', '');
+        $period     = in_array($svcData['period'] ?? 'monthly', ['daily','monthly','yearly'], true)
+                      ? $svcData['period'] : 'monthly';
+
+        $price_col = $period === 'daily' ? 'price_daily' : ($period === 'yearly' ? 'price_year' : 'price_monthly');
+        $base_esc   = $db->real_escape_string($base_price);
+
+        $db->query(
+            "UPDATE `{$table_prefix}billing_services`
+             SET enabled = {$enabled},
+                 `{$price_col}` = '{$base_esc}'
+             WHERE service_id = {$sid}"
+        );
     }
-  }
-  if ($rsHasEnabled) {
-    $flash[] = "Server locations updated.";
-  } else {
-    $flash[] = "Server locations updated (note: 'enabled' column missing from remote_servers — run add_remote_server_enabled_column.sql migration).";
-  }
+
+    // Upsert mappings: for every service x server pair post data received
+    $allServerIds = [];
+    $rsRes = $db->query("SELECT remote_server_id FROM `{$table_prefix}remote_servers`");
+    while ($rsRes && ($rsRow = $rsRes->fetch_assoc())) {
+        $allServerIds[] = (int)$rsRow['remote_server_id'];
+    }
+
+    $stmt = $db->prepare(
+        "INSERT INTO `{$table_prefix}billing_service_remote_servers`
+            (service_id, remote_server_id, enabled, override_price)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+            enabled        = VALUES(enabled),
+            override_price = VALUES(override_price)"
+    );
+    foreach ((array)$postedServices as $sid => $ignored) {
+        $sid = (int)$sid;
+        foreach ($allServerIds as $rid) {
+            $mapEnabled = isset($postedMappings[$sid][$rid]['enabled']) ? 1 : 0;
+            $ovRaw      = $postedMappings[$sid][$rid]['override_price'] ?? '';
+            $ovPrice    = (trim($ovRaw) === '') ? null : number_format((float)$ovRaw, 2, '.', '');
+            if ($stmt) {
+                $stmt->bind_param('iisd', $sid, $rid, $mapEnabled, $ovPrice);
+                $stmt->execute();
+            }
+        }
+    }
+    if ($stmt) {
+        $stmt->close();
+    }
+
+    $flash[] = "Matrix saved successfully.";
 }
 
-/* helper: update one service row from posted array */
-function update_service_row(mysqli $db, string $locationCol, int $sid, array $svc){
-  $name  = esc_mysqli($db, trim($svc['service_name'] ?? ''));
-  $priceMonthly = number_format((float)($svc['price_monthly'] ?? 0), 2, '.', '');
-  $priceYearly = number_format((float)($svc['price_year'] ?? 0), 2, '.', '');
-  $priceDaily = number_format((float)($svc['price_daily'] ?? 0), 2, '.', '');
-  $priceMonthEsc = esc_mysqli($db, $priceMonthly);
-  $priceYearEsc = esc_mysqli($db, $priceYearly);
-  $priceDailyEsc = esc_mysqli($db, $priceDaily);
-  $img   = esc_mysqli($db, trim($svc['img_url'] ?? ''));
-  $en    = !empty($svc['enabled']) ? 1 : 0;
-
-  $minSlots = max(1, (int)($svc['slot_min_qty'] ?? 1));
-  $maxSlots = max($minSlots, (int)($svc['slot_max_qty'] ?? $minSlots));
-
-  $selected = [];
-  if (!empty($svc['locations']) && is_array($svc['locations'])) {
-    $selected = array_map('intval', $svc['locations']);
-    $selected = array_values(array_unique($selected));
-  }
-  $primary = isset($svc['primary_location']) ? (int)$svc['primary_location'] : 0;
-  if ($primary && in_array($primary, $selected, true)) {
-    $selected = array_values(array_diff($selected, [$primary]));
-    array_unshift($selected, $primary);
-  }
-  $locList    = implode(' ', $selected);
-  $locListEsc = esc_mysqli($db, $locList);
-
-  $sql = "UPDATE {$table_prefix}billing_services
-             SET service_name='{$name}',
-                 `{$locationCol}`='{$locListEsc}',
-                 slot_min_qty={$minSlots},
-                 slot_max_qty={$maxSlots},
-                 price_daily='{$priceDailyEsc}',
-                 price_monthly='{$priceMonthEsc}',
-                 price_year='{$priceYearEsc}',
-                 img_url='{$img}',
-                 enabled={$en}
-           WHERE service_id={$sid}";
-  $db->query($sql);
-}
-
-/* B1) PER-ROW UPDATE */
-if (isset($_POST['update_single']) && isset($_POST['service']) && is_array($_POST['service'])) {
-  $sid = (int)$_POST['update_single'];
-  if (isset($_POST['service'][$sid])) {
-    update_service_row($db, $locationCol, $sid, $_POST['service'][$sid]);
-    $flash[] = "Service #{$sid} updated.";
-  }
-}
-
-/* B2) BULK UPDATE (single button at bottom) */
-if (isset($_POST['bulk_update']) && !empty($_POST['service']) && is_array($_POST['service'])) {
-  foreach ((array)$_POST['service'] as $sid => $svc) {
-    update_service_row($db, $locationCol, (int)$sid, (array)$svc);
-  }
-  $flash[] = "All edited services have been updated.";
-}
-
-/* C) Remove a service (separate small form) */
+/* -----------------------------------------------------------------------
+   Remove a service
+----------------------------------------------------------------------- */
 if (isset($_POST['remove_service'], $_POST['service_id_remove'])) {
-  $sid = (int)$_POST['service_id_remove'];
-  $db->query("DELETE FROM {$table_prefix}billing_services WHERE service_id={$sid}");
-  $flash[] = "Service #{$sid} removed.";
+    $sid = (int)$_POST['service_id_remove'];
+    $db->query("DELETE FROM `{$table_prefix}billing_service_remote_servers` WHERE service_id = {$sid}");
+    $db->query("DELETE FROM `{$table_prefix}billing_services` WHERE service_id = {$sid}");
+    $flash[] = "Service #{$sid} removed.";
 }
 
-/* fetch data for UI */
-// Build remote-servers query — include `enabled` only when the column exists (older installs may be missing it).
-if ($rsHasEnabled) {
-  $remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, enabled FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
-} else {
-  $remoteServers = fetch_all_assoc($db, "SELECT remote_server_id, remote_server_name, 1 AS enabled FROM {$table_prefix}remote_servers ORDER BY remote_server_name");
+/* -----------------------------------------------------------------------
+   Load data
+----------------------------------------------------------------------- */
+$remoteServers = [];
+$rsRes = $db->query("SELECT remote_server_id, remote_server_name FROM `{$table_prefix}remote_servers` ORDER BY remote_server_name");
+while ($rsRes && ($row = $rsRes->fetch_assoc())) {
+    $remoteServers[] = $row;
 }
-$services = fetch_all_assoc($db, "SELECT service_id, service_name, `{$locationCol}` AS locs, slot_min_qty, slot_max_qty, price_daily, price_monthly, price_year, img_url, enabled FROM {$table_prefix}billing_services ORDER BY service_name");
+
+$services = [];
+$svcRes = $db->query(
+    "SELECT service_id, service_name, enabled, price_daily, price_monthly, price_year
+     FROM `{$table_prefix}billing_services`
+     ORDER BY service_name"
+);
+while ($svcRes && ($row = $svcRes->fetch_assoc())) {
+    $services[] = $row;
+}
+
+// Load existing mappings into a lookup: $mappings[$service_id][$remote_server_id] = ['enabled'=>..,'override_price'=>..]
+$mappings = [];
+$mapRes = $db->query(
+    "SELECT service_id, remote_server_id, enabled, override_price
+     FROM `{$table_prefix}billing_service_remote_servers`"
+);
+while ($mapRes && ($row = $mapRes->fetch_assoc())) {
+    $mappings[(int)$row['service_id']][(int)$row['remote_server_id']] = [
+        'enabled'        => (int)$row['enabled'],
+        'override_price' => $row['override_price'],
+    ];
+}
 ?>
 
-<?php if ($flash): ?>
-  <div class="panel" style="margin-bottom:12px"><?php foreach ((array)$flash as $m) echo "<div>".h($m)."</div>"; ?></div>
-<?php endif; ?>
+<?php foreach ((array)$flash as $msg): ?>
+  <div class="flash-<?php echo $flashType; ?>"><?php echo h($msg); ?></div>
+<?php endforeach; ?>
 
-<?php if (!$rsHasEnabled): ?>
-  <div class="panel" style="margin-bottom:12px;background:#fff3cd;border:1px solid #ffc107;">
-    <strong>⚠ Schema notice:</strong> The <code><?php echo h("{$table_prefix}remote_servers"); ?></code> table is missing the <code>enabled</code> column.
-    Server location enable/disable is currently non-functional.
-    Run <code>modules/billing/add_remote_server_enabled_column.sql</code> to add the column.
-  </div>
-<?php endif; ?>
+<h2>Game &times; Server Matrix</h2>
+<p class="muted">
+  Enable or disable each game for billing, set its base price and billing period, then
+  toggle availability per server and optionally override the price for that location.
+  Leave override blank to use the base price.
+</p>
 
-<h2>Enable/Disable Server Locations (Global)</h2>
-<form method="post" action="">
-  <input type="hidden" name="update_remote_servers" value="1">
-  <div style="display:flex;flex-wrap:wrap;gap:10px;">
-    <?php foreach ((array)$remoteServers as $rs): ?>
-  <label class="loc-label min-w-240">
-        <input type="checkbox" name="rs[]" value="<?php echo (int)$rs['remote_server_id']; ?>" <?php echo ((int)$rs['enabled']===1?'checked':''); ?>>
-        <b><?php echo h($rs['remote_server_name']); ?></b>
-  <small class="muted">(ID: <?php echo (int)$rs['remote_server_id']; ?>)</small>
-      </label>
-    <?php endforeach; ?>
-  </div>
-  <div style="margin-top:10px;"><button type="submit">Update Enabled Servers</button></div>
-</form>
-
-<hr>
-
-<h2>Current Services</h2>
-<?php if (!$services): ?>
-  <p>No services found.</p>
+<?php if (empty($services)): ?>
+  <p>No billing services found. Add services first via the database or the panel.</p>
 <?php else: ?>
 
-<!-- SINGLE BULK FORM FOR ALL SERVICES -->
 <form method="post" action="">
+  <input type="hidden" name="save_matrix" value="1">
 
-  <table class="center" style="text-align:center;width:100%;border-collapse:collapse;">
+  <div style="overflow-x:auto;">
+  <table class="matrix-table">
     <thead>
       <tr>
-  <th>Enabled</th>
-  <th>Service Name <small class="muted">(ID below)</small></th>
-  <th>Min Slots</th>
-  <th>Max Slots</th>
-  <th>Price (Daily)</th>
-  <th>Price (Monthly)</th>
-  <th>Price (Year)</th>
-  <th>Thumbnail URL</th>
-  <th>Preview</th>
-  <th>Update Row</th>
+        <th class="game-name">Game</th>
+        <th>Enabled</th>
+        <th>Base Price ($)</th>
+        <th>Period</th>
+        <?php foreach ((array)$remoteServers as $rs): ?>
+          <th><?php echo h($rs['remote_server_name']); ?><br>
+            <span class="muted">#<?php echo (int)$rs['remote_server_id']; ?></span>
+          </th>
+        <?php endforeach; ?>
       </tr>
     </thead>
     <tbody>
-    <?php foreach ((array)$services as $row): ?>
-      <?php
-        $sid      = (int)$row['service_id'];
-        $selected = parse_id_list($row['locs'] ?? '');
-        $primary  = $selected[0] ?? 0; // first ID is "primary"
-        $selSet   = array_flip($selected);
-        $imgUrl   = trim((string)$row['img_url']);
-        $displayUrl = '';
-        if ($imgUrl !== '') {
-          if (is_abs_url($imgUrl)) {
-            $displayUrl = $imgUrl;
-          } elseif ($siteBaseUrl !== '') {
-            $displayUrl = join_base($siteBaseUrl, $imgUrl);
-          } else {
-            // Use relative path (local folder)
-            $displayUrl = $imgUrl;
-          }
-        }
-      ?>
-
-      <!-- MAIN ROW (no bottom border) -->
+    <?php foreach ((array)$services as $svc):
+      $sid        = (int)$svc['service_id'];
+      $svcEnabled = (int)$svc['enabled'];
+      // Determine current base price and period from existing columns
+      if ((float)$svc['price_monthly'] > 0) {
+          $basePrice = number_format((float)$svc['price_monthly'], 2, '.', '');
+          $period    = 'monthly';
+      } elseif ((float)$svc['price_daily'] > 0) {
+          $basePrice = number_format((float)$svc['price_daily'], 2, '.', '');
+          $period    = 'daily';
+      } elseif ((float)$svc['price_year'] > 0) {
+          $basePrice = number_format((float)$svc['price_year'], 2, '.', '');
+          $period    = 'yearly';
+      } else {
+          $basePrice = '0.00';
+          $period    = 'monthly';
+      }
+    ?>
       <tr>
-        <!-- Enabled first -->
-        <td>
-          <input type="hidden" name="service[<?php echo $sid; ?>][enabled]" value="0">
-          <input type="checkbox" name="service[<?php echo $sid; ?>][enabled]" value="1" <?php echo ((int)$row['enabled']===1?'checked':''); ?>>
-        </td>
-
-        <!-- Service name (with tiny ID under it) -->
-        <td>
-          <input type="text" name="service[<?php echo $sid; ?>][service_name]" value="<?php echo h($row['service_name']); ?>" class="min-w-260">
-          <div class="small-muted">ID: <?php echo $sid; ?></div>
+        <td class="game-name">
+          <?php echo h($svc['service_name']); ?>
+          <div class="muted">ID: <?php echo $sid; ?></div>
         </td>
 
         <td>
-          <input type="number" name="service[<?php echo $sid; ?>][slot_min_qty]" value="<?php echo (int)$row['slot_min_qty']; ?>" min="1" step="1" class="w-90">
+          <input type="hidden"   name="svc[<?php echo $sid; ?>][enabled]" value="0">
+          <input type="checkbox" name="svc[<?php echo $sid; ?>][enabled]" value="1"
+                 <?php echo $svcEnabled ? 'checked' : ''; ?>>
         </td>
 
         <td>
-          <input type="number" name="service[<?php echo $sid; ?>][slot_max_qty]" value="<?php echo (int)$row['slot_max_qty']; ?>" min="1" step="1" class="w-90">
+          <input type="number" step="0.01" min="0"
+                 name="svc[<?php echo $sid; ?>][base_price]"
+                 value="<?php echo h($basePrice); ?>"
+                 style="width:90px;">
         </td>
 
         <td>
-          <input type="text" name="service[<?php echo $sid; ?>][price_daily]" value="<?php echo h(number_format((float)$row['price_daily'], 2, '.', '')); ?>" size="8">
+          <select name="svc[<?php echo $sid; ?>][period]">
+            <option value="monthly" <?php echo $period === 'monthly' ? 'selected' : ''; ?>>Monthly</option>
+            <option value="daily"   <?php echo $period === 'daily'   ? 'selected' : ''; ?>>Daily</option>
+            <option value="yearly"  <?php echo $period === 'yearly'  ? 'selected' : ''; ?>>Yearly</option>
+          </select>
         </td>
 
-        <td>
-          <input type="text" name="service[<?php echo $sid; ?>][price_monthly]" value="<?php echo h($row['price_monthly']); ?>" size="8">
-        </td>
-
-        <td>
-          <input type="text" name="service[<?php echo $sid; ?>][price_year]" value="<?php echo h(number_format((float)$row['price_year'], 2, '.', '')); ?>" size="8">
-        </td>
-
-        <!-- Thumbnail URL input -->
-        <td>
-          <input type="text" name="service[<?php echo $sid; ?>][img_url]" value="<?php echo h($row['img_url']); ?>" class="min-w-240">
-        </td>
-
-        <!-- Preview (uses BASE + relative path) -->
-        <td>
-          <?php if ($displayUrl !== ''): ?>
-      <img src="<?php echo h($displayUrl); ?>" alt="preview" loading="lazy" class="img-preview" onerror="this.style.display='none'">
-          <?php else: ?>
-            <span class="muted">(no image)</span>
-          <?php endif; ?>
-        </td>
-
-        <!-- Per-row Update (smaller) -->
-  <td>
-     <button type="submit" name="update_single" value="<?php echo $sid; ?>" class="btn-small">Update Row</button>
-  </td>
+        <?php foreach ((array)$remoteServers as $rs):
+          $rid        = (int)$rs['remote_server_id'];
+          $mapEntry   = $mappings[$sid][$rid] ?? ['enabled' => 0, 'override_price' => null];
+          $mapEnabled = (int)$mapEntry['enabled'];
+          $ovPrice    = $mapEntry['override_price'];
+        ?>
+          <td>
+            <input type="hidden"   name="map[<?php echo $sid; ?>][<?php echo $rid; ?>][enabled]" value="0">
+            <input type="checkbox" name="map[<?php echo $sid; ?>][<?php echo $rid; ?>][enabled]" value="1"
+                   <?php echo $mapEnabled ? 'checked' : ''; ?>>
+            <br>
+            <input type="number" step="0.01" min="0" placeholder="override"
+                   class="override-input"
+                   name="map[<?php echo $sid; ?>][<?php echo $rid; ?>][override_price]"
+                   value="<?php echo ($ovPrice !== null ? h(number_format((float)$ovPrice, 2, '.', '')) : ''); ?>">
+          </td>
+        <?php endforeach; ?>
       </tr>
-
-      <!-- LOCATIONS ROW (single bottom divider) -->
-      <tr>
-        <td colspan="8" style="border-bottom:1px solid #f0f0f0; padding:8px 6px; text-align:left;">
-          <div class="locs-box" data-sid="<?php echo $sid; ?>" style="display:flex; flex-wrap:wrap; gap:8px;">
-            <?php foreach ((array)$remoteServers as $rs): ?>
-              <?php
-                $rid = (int)$rs['remote_server_id'];
-                $isChecked = isset($selSet[$rid]);
-                $isPrimary = ($primary === $rid);
-              ?>
-              <label class="loc-label">
-                <input type="checkbox" class="locchk" data-sid="<?php echo $sid; ?>"
-                       name="service[<?php echo $sid; ?>][locations][]" value="<?php echo $rid; ?>"
-                       <?php echo $isChecked ? 'checked' : ''; ?> class="mr-6">
-                <?php echo h($rs['remote_server_name']); ?> (<?php echo $rid; ?>)
-                <span style="margin-left:10px;">
-                  <input type="radio" class="locprim" data-sid="<?php echo $sid; ?>"
-                         name="service[<?php echo $sid; ?>][primary_location]" value="<?php echo $rid; ?>"
-                         <?php echo $isPrimary ? 'checked' : ''; ?> <?php echo $isChecked ? '' : 'disabled'; ?>>
-                  <small>Primary</small>
-                </span>
-                <?php if ((int)$rs['enabled'] === 0): ?>
-                  <small class="text-danger ml-8">[Globally disabled]</small>
-                <?php endif; ?>
-              </label>
-            <?php endforeach; ?>
-          </div>
-        </td>
-      </tr>
-
     <?php endforeach; ?>
     </tbody>
   </table>
-
-  <div style="margin-top:14px; text-align:right;">
-    <button type="submit" name="bulk_update" value="1">Update All</button>
   </div>
 
+  <div style="margin-top:14px;">
+    <button type="submit">Save Matrix</button>
+  </div>
 </form>
 
-  <h3 style="margin-top:20px;">Remove a Service</h3>
-  <form method="post" action="" style="display:flex;gap:8px;align-items:center;">
-    <input type="hidden" name="remove_service" value="1">
-    <select name="service_id_remove">
-      <?php foreach ((array)$services as $s): ?>
-        <option value="<?php echo (int)$s['service_id']; ?>">
-          <?php echo h($s['service_name']); ?> (ID: <?php echo (int)$s['service_id']; ?>)
-        </option>
-      <?php endforeach; ?>
-    </select>
-    <button type="submit" onclick="return confirm('Remove this service? This cannot be undone.')">Remove</button>
-  </form>
+<h3 style="margin-top:28px;">Remove a Service</h3>
+<form method="post" action="" style="display:flex;gap:8px;align-items:center;">
+  <input type="hidden" name="remove_service" value="1">
+  <select name="service_id_remove">
+    <?php foreach ((array)$services as $s): ?>
+      <option value="<?php echo (int)$s['service_id']; ?>">
+        <?php echo h($s['service_name']); ?> (ID: <?php echo (int)$s['service_id']; ?>)
+      </option>
+    <?php endforeach; ?>
+  </select>
+  <button type="submit" onclick="return confirm('Remove this service and all its server mappings? This cannot be undone.')">Remove</button>
+</form>
+
 <?php endif; ?>
 
 <div class="panel" style="margin-top:20px;">
-  <h3>Environment</h3>
-  <table class="cart-table">
-    <tr><th>Site Base URL</th><td><?php echo $siteBaseUrl !== '' ? h($siteBaseUrl) : '(empty — using relative paths)'; ?></td></tr>
-    <tr><th>Data directory</th><td><?php echo isset($SITE_DATA_DIR) ? h($SITE_DATA_DIR) : '(unset)'; ?></td></tr>
-    <tr><th>PHP SAPI</th><td><?php echo h(PHP_SAPI); ?></td></tr>
-    <tr><th>Writable?</th><td><?php echo (isset($SITE_DATA_DIR) && is_writable($SITE_DATA_DIR)) ? 'yes' : 'no'; ?></td></tr>
-    <tr><th>XML Reference</th><td><a href="/modules/billing/docs/xml_notes.php" target="_blank" rel="noopener">Open XML Notes</a></td></tr>
-  </table>
+  <p><strong>Legend:</strong> Checkbox = server is available for this game.
+  Override price = customer pays this amount instead of the base price for that location.
+  Leave override blank to use the game base price.</p>
+  <p class="muted">
+    Availability is controlled entirely by <code><?php echo h("{$table_prefix}billing_service_remote_servers"); ?></code>.
+    No entry or <code>enabled = 0</code> means the server is not offered for that game.
+  </p>
 </div>
 
-<!-- JS: Per-row: enable/disable Primary radios based on whether that location is checked -->
-<script>
-document.querySelectorAll('.locs-box').forEach(function(box){
-  const sid = box.getAttribute('data-sid');
-  const checks = box.querySelectorAll('input.locchk[data-sid="'+sid+'"]');
-
-  function refreshRadios() {
-    checks.forEach(function(chk){
-      const rid = chk.value;
-      const rad = box.querySelector('input.locprim[data-sid="'+sid+'"][value="'+rid+'"]');
-      if (!rad) return;
-      if (chk.checked) {
-        rad.disabled = false;
-      } else {
-        if (rad.checked) rad.checked = false;
-        rad.disabled = true;
-      }
-    });
-  }
-
-  checks.forEach(chk => chk.addEventListener('change', refreshRadios));
-  refreshRadios();
-});
-</script>
-
-<?php
-// Close database connection safely
-billing_maybe_close_db($db);
-?>
+<?php billing_maybe_close_db($db); ?>
 </body>
 </html>

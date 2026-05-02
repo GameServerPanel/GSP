@@ -188,46 +188,30 @@ if ($row['price_monthly'] == 0.0) {
 			<tr>
 			  <td align="right"><b>Location</b></td>
 			  <td align="left">
-			<?php
-			//loop through multiple remote server ID stored in services 'remote_server_ip' as text
-			//change WHERE clause to IS IN clause
-  			$rsiArray = explode(" ", $row['remote_server_id']);
-            $rsi = implode(",",$rsiArray);
-			//get the out of stock into an array and see if the rsID is in that array
+						<?php
+			// Fetch servers enabled for this game via the billing_service_remote_servers mapping table.
+			// Only servers with an enabled mapping row are shown; remote_servers.enabled is not used.
 			$available_server = false;
-			//loop through each of the assigned servers and see if its disabled
-			foreach ((array)$rsiArray as $rsi)
-			{
-				$query = "SELECT * FROM {$table_prefix}remote_servers WHERE remote_server_id = ".$rsi;
-				$result = $db->query($query);
-				foreach ((array)$result as $rs)
-				{
-							
-					$rsID =$rs['remote_server_id'];
-					$rsNAME = $rs['remote_server_name'];
-					//echo  "<option  value='$rsID'>$rsNAME</option>";
-					// add disabled to lable and input if $rsID is in out_of_stock
-					$is_unavailable = "";
-					$service_text_color = "";
-					
-											
-					if($rs['enabled']==0)
-					{
-						$is_unavailable = "disabled";
-						$service_text_color = "red";
-					}
-					if($is_unavailable == "")
-					{
-						$available_server = true;
-					}
-					
-					
-					//default radio button 
-					// //<input type='radio' $is_unavailable  name='ip_id' id='$rsID' value='$rsID' >
-					echo "<div>
-				  <input type='radio' $is_unavailable  name='ip_id' id='$rsID' value='$rsID' required>
-  				  <label for '$rsID' $is_unavailable ><span  style='color:$service_text_color'>$rsNAME </span></label>
-				</div>";
+			$sid_order = (int)$row['service_id'];
+			$mappedQuery = "SELECT m.remote_server_id, m.override_price, r.remote_server_name
+			               FROM {$table_prefix}billing_service_remote_servers m
+			               JOIN {$table_prefix}remote_servers r
+			                 ON r.remote_server_id = m.remote_server_id
+			               WHERE m.service_id = {$sid_order} AND m.enabled = 1
+			               ORDER BY r.remote_server_name";
+			$mappedResult = $db->query($mappedQuery);
+			if ($mappedResult) {
+				$firstServer = true;
+				while ($rs = $mappedResult->fetch_assoc()) {
+					$rsID    = (int)$rs['remote_server_id'];
+					$rsNAME  = htmlspecialchars((string)$rs['remote_server_name'], ENT_QUOTES, 'UTF-8');
+					$checked = $firstServer ? ' checked' : '';
+					$available_server = true;
+					$firstServer = false;
+					echo "<div>\n"
+					   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' required{$checked}>\n"
+					   . "  <label for='rs_{$rsID}'>{$rsNAME}</label>\n"
+					   . "</div>\n";
 				}
 			}
 			?>
