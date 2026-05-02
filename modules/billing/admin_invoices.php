@@ -43,7 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'], $_POST['inv
         $msgType = 'error';
     } elseif ($action === 'mark_paid') {
         $gateway       = GatewayFactory::make('manual');
-        $captureResult = $gateway->handleCallback(['amount' => $invRow['total_due'] ?? $invRow['amount'] ?? 0, 'currency' => $invRow['currency'] ?? 'USD']);
+        $captureResult = $gateway->handleCallback([
+            // total_due is the new schema field; amount is the legacy column during migration
+            'amount'   => $invRow['total_due'] ?? $invRow['amount'] ?? 0,
+            'currency' => $invRow['currency'] ?? 'USD',
+        ]);
         $captureResult['payment_method'] = 'manual';
         $homeId  = intval($invRow['home_id'] ?? 0);
         $result  = $svc->processPaymentSuccess($captureResult, $invId, intval($invRow['user_id']), $homeId, $invRow);
@@ -131,7 +135,7 @@ if (isset($_GET['type'])) $msgType = $_GET['type'];
         <td><?= h($inv['players'] ?? '—') ?></td>
         <td style="font-size:11px"><?= h(substr($inv['period_start'] ?? '', 0, 10)) ?> – <?= h(substr($inv['period_end'] ?? '', 0, 10)) ?></td>
         <td><?= h(number_format((float)($inv['total_due'] ?? $inv['amount'] ?? 0), 2)) ?></td>
-        <td><span class="status-badge status-<?= h($inv['payment_status'] ?? 'unpaid') ?>"><?= h($inv['payment_status'] ?? 'unpaid') ?></span></td>
+        <td><span class="status-badge status-<?= h(in_array($inv['payment_status'] ?? '', ['unpaid','paid','cancelled','refunded']) ? $inv['payment_status'] : 'unpaid') ?>"><?= h($inv['payment_status'] ?? 'unpaid') ?></span></td>
         <td><?= h($inv['payment_method'] ?? '—') ?></td>
         <td style="font-size:11px;max-width:120px;overflow:hidden"><?= h($inv['payment_txid'] ?? '—') ?></td>
         <td>

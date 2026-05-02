@@ -109,7 +109,7 @@ class BillingRepository
         if (!$stmt) return 0;
         $rawJson = is_array($data['raw_response']) ? json_encode($data['raw_response']) : (string)($data['raw_response'] ?? '');
         $stmt->bind_param(
-            'iiissdss' . 's',
+            'iiissdsss',
             $data['invoice_id'],
             $data['user_id'],
             $data['home_id'],

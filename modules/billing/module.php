@@ -130,12 +130,12 @@ $install_queries[1] = array(
     "ALTER TABLE `".OGP_DB_PREFIX."billing_invoices`
         ADD COLUMN IF NOT EXISTS `home_id` INT(11) NOT NULL DEFAULT 0 AFTER `service_id`,
         ADD COLUMN IF NOT EXISTS `rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly' AFTER `invoice_duration`,
-        ADD COLUMN IF NOT EXISTS `rate_per_player` FLOAT(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`,
+        ADD COLUMN IF NOT EXISTS `rate_per_player` DECIMAL(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`,
         ADD COLUMN IF NOT EXISTS `players` INT(11) NOT NULL DEFAULT 0 AFTER `rate_per_player`,
         ADD COLUMN IF NOT EXISTS `period_start` DATETIME NULL AFTER `players`,
         ADD COLUMN IF NOT EXISTS `period_end` DATETIME NULL AFTER `period_start`,
-        ADD COLUMN IF NOT EXISTS `subtotal` FLOAT(15,2) NOT NULL DEFAULT 0 AFTER `period_end`,
-        ADD COLUMN IF NOT EXISTS `total_due` FLOAT(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`,
+        ADD COLUMN IF NOT EXISTS `subtotal` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `period_end`,
+        ADD COLUMN IF NOT EXISTS `total_due` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`,
         ADD COLUMN IF NOT EXISTS `payment_status` ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid' AFTER `total_due`",
 
     // Payment transaction log — immutable audit trail

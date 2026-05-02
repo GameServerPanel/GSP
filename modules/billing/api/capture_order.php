@@ -153,6 +153,11 @@ if (!empty($newOrderIds)) {
         $GLOBALS['settings'] = $panelCtx['settings'];
         require_once __DIR__ . '/../create_servers.php';
         $autoProvision = billing_invoke_provision(['order_ids' => $newOrderIds, 'user_id' => $userId, 'is_admin' => true]);
+        if (($autoProvision['failed_count'] ?? 0) > 0) {
+            cap_log('AUTO_PROVISION_PARTIAL_FAILURE', $autoProvision);
+        }
+    } else {
+        cap_log('AUTO_PROVISION_SKIPPED', 'panel bootstrap failed — orders require manual provisioning: ' . implode(',', $newOrderIds));
     }
 }
 
