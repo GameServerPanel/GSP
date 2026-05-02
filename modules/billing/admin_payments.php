@@ -28,6 +28,7 @@ if (!$db) {
 
     $transactions = $repo->getTransactions($filter, 200, 0);
     mysqli_close($db);
+    $db = null;
 }
 ?>
 <!doctype html>

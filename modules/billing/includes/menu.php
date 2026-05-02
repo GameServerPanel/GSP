@@ -55,7 +55,10 @@ if ($is_logged_in) {
   // Prefer reusing an existing $db if present, otherwise open a local connection
   $menu_db = null;
   $menu_db_opened = false;
-  if (isset($db) && $db instanceof mysqli) {
+  // Only reuse $db if it is still an open (non-closed) connection.
+  // mysqli_thread_id() returns 0 on a closed handle; no @ needed since instanceof
+  // already guarantees $db is a mysqli object.
+  if (isset($db) && $db instanceof mysqli && mysqli_thread_id($db)) {
     $menu_db = $db;
   } else {
     $menu_db_port = isset($db_port) ? (int)$db_port : null;

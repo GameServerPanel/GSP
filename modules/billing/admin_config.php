@@ -5,7 +5,10 @@ require_once(__DIR__ . '/includes/config_loader.php');
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('opengamepanel_web');
+    session_start();
+}
 if (empty($_SESSION['admin_csrf'])) $_SESSION['admin_csrf'] = bin2hex(random_bytes(16));
 $csrf = $_SESSION['admin_csrf'];
 
