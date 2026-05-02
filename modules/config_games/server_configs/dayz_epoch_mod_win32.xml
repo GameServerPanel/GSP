@@ -84,7 +84,7 @@ mysqlServerID=2
 panelDB=panel
 panelPrefix=gsp_
 panelHost=mysql.iaregamer.com
-panelPort=3307
+panelPort=3306
 panelUser=remoteuser
 panelPass=Pkloyn7yvpht!
 
