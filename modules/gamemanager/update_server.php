@@ -54,11 +54,8 @@ function exec_ogp_module() {
 
 	$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
 
-	if ( $server_xml->installer != "steamcmd" )
-	{
-		print_failure( get_lang("xml_steam_error") );
-		return;
-	}
+	$use_steamcmd = ((string)$server_xml->installer === "steamcmd");
+
 	$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'], $home_info['timeout']);
 	$host_stat = $remote->status_chk();
 	if( $host_stat === 0 )
@@ -134,7 +131,7 @@ function exec_ogp_module() {
 				}
 				
 			}
-			else
+			elseif ($use_steamcmd && !empty((string)$installer_name))
 			{
 				if( preg_match("/win32/", $server_xml->game_key) OR preg_match("/win64/", $server_xml->game_key) ) 
 					$cfg_os = "windows";
@@ -167,6 +164,17 @@ function exec_ogp_module() {
 				$steam_out = $remote->steam_cmd( $home_id,$home_info['home_path'],$installer_name,$modname,
 												 $betaname,$betapwd,$login,$pass,$settings['steam_guard'],
 												 $exec_folder_path,$exec_path,$precmd,$postcmd,$cfg_os,$lockFiles,$arch);
+			}
+			else
+			{
+				// No SteamCMD installer — run pre/post install scripts only.
+				if (!empty((string)$precmd))
+					$remote->exec((string)$precmd);
+				if (!empty((string)$postcmd))
+					$remote->exec((string)$postcmd);
+				print_success( get_lang("update_started") );
+				$view->refresh("?m=gamemanager&amp;p=game_monitor&amp;home_id=$home_id", 3);
+				return;
 			}
 			
 			if( $steam_out === 0 )

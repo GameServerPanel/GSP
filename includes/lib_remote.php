@@ -492,36 +492,6 @@ class OGPRemoteLibrary
 	/// \return -1 If could not connect to the remote host.
 	/// \return -3 In case of unknown error
 	/// \todo This function is not complete. Also the agent side requires work.
-	public function start_rsync_install($home_id,$home_path,$url,$exec_folder_path,$exec_path,$precmd,$postcmd,$filesToLock="")
-	{
-		$params_array = $this->encrypt_params($home_id,$home_path,$url,$exec_folder_path,$exec_path,$precmd,$postcmd,$filesToLock);
-		$this->add_enc_chk($params_array);
-		$request = xmlrpc_encode_request("start_rsync_install",$params_array);
-		$response = $this->sendRequest($request);
-
-		if ( $response === 1 )
-			return 1;
-		else if ( $response === 0 )
-			return 0;
-		else
-			return -1;
-	}
-
-	public function rsync_progress($home)
-	{
-		$args = $this->encryptParam($home);
-		$this->add_enc_chk($args);
-		$request = xmlrpc_encode_request("rsync_progress",$args);
-		$response = $this->sendRequest($request);
-
-		if( !$response )
-			return -1;
-
-		#if (is_array($response) && xmlrpc_is_fault($response))
-		 # return -3;
-
-		return $response;
-	}
 	/// \return array of files in directory, when request success.
 	/// \return -1 If unable to connect to the remote server.
 	/// \return -2 In case directory was not accessible.

@@ -44,42 +44,6 @@ function create_back_button($module,$subpage = "")
     return $retval;
 }
 
-/// Creates HTML drop box from given array with the given listname, custom for Rsync sites
-function create_drop_box_from_array_rsync($input_array, $listname, $current_value = "", $use_only_values = true)
-{
-    $count = 1;
-    $retval = "<select id=\"$listname\" name=\"$listname\">\n";
-    foreach ((array)$input_array as $key => $value)
-    {
-        $value = trim($value);
-		list($rsync_site,$location) = explode("|", $value);
-        // We want to print lines with zeros, but not empty lines.
-        if ( $value !== "0" && empty($value) )
-        {
-            continue;
-        }
-
-        if ( $use_only_values === true )
-        {
-       #     $key = $value;
-        }
-
-        if ( $key == $current_value )
-        {
-            $retval .= "<option value='$count' selected='selected'>$rsync_site - $location</option>\n";
-        }
-        else
-        {
-            $retval .= "<option value='$count'>$rsync_site - $location</option>\n";
-        }
-
-        ++$count;
-    }
-    $retval .= "</select>\n";
-    return $retval;
-}
-
-
 /// Creates HTML drop box from given array with the given listname.
 function create_drop_box_from_array($input_array,$listname,$current_value = "", $use_only_values = true)
 {

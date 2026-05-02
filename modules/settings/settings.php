@@ -57,7 +57,6 @@ function exec_ogp_module()
 			"steam_guard" => $_REQUEST['steam_guard'],
 			"editable_email" => $_REQUEST['editable_email'],
 			"old_dashboard_behavior" => $_REQUEST['old_dashboard_behavior'],
-			"rsync_available" => $_REQUEST['rsync_available'],
 			"support_widget_title" => $_REQUEST['support_widget_title'],
 			"support_widget_content" => $_REQUEST['support_widget_content'],
 			"support_widget_link" => $_REQUEST['support_widget_link'],
@@ -117,8 +116,6 @@ function exec_ogp_module()
 		$zones["$tz"] = $tz . '[' . $abbr . ' ' . formatOffset($offset) . ']';
 	}
 	
-	$rsync_options = array("1" => get_lang('all_available_servers'), "2" => get_lang('only_remote_servers'), "3" => get_lang('only_local_servers'));
-
 	$row = $db->getSettings();
 
 	echo "<h2>".get_lang('settings')."</h2>";
@@ -168,8 +165,6 @@ function exec_ogp_module()
 		 $mail_setting = isset($row['editable_email']) ? $row['editable_email'] : "1";
 	$ft->add_field('on_off','editable_email',$mail_setting);
 	$ft->add_field('on_off','old_dashboard_behavior',@$row['old_dashboard_behavior']);
-	$ft->add_custom_field('rsync_available',
-		 create_drop_box_from_array($rsync_options,"rsync_available",@$row['rsync_available'],false));
 	$ft->add_field('string','support_widget_title',@$row['support_widget_title']);
 	$ft->add_field('text','support_widget_content',@$row['support_widget_content'], 38);
 	$ft->add_field('string','support_widget_link',@$row['support_widget_link']);
