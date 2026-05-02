@@ -201,12 +201,15 @@ if ($row['price_monthly'] == 0.0) {
 			               ORDER BY r.remote_server_name";
 			$mappedResult = $db->query($mappedQuery);
 			if ($mappedResult) {
+				$firstServer = true;
 				while ($rs = $mappedResult->fetch_assoc()) {
-					$rsID   = (int)$rs['remote_server_id'];
-					$rsNAME = htmlspecialchars((string)$rs['remote_server_name'], ENT_QUOTES, 'UTF-8');
+					$rsID    = (int)$rs['remote_server_id'];
+					$rsNAME  = htmlspecialchars((string)$rs['remote_server_name'], ENT_QUOTES, 'UTF-8');
+					$checked = $firstServer ? ' checked' : '';
 					$available_server = true;
+					$firstServer = false;
 					echo "<div>\n"
-					   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' required>\n"
+					   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' required{$checked}>\n"
 					   . "  <label for='rs_{$rsID}'>{$rsNAME}</label>\n"
 					   . "</div>\n";
 				}

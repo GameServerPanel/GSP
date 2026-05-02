@@ -173,7 +173,8 @@ $install_queries[1] = array(
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 );
 
-// Version 3: Add override_price to service-to-server mapping table
+// Version 3 (array index 2, because install_queries is zero-indexed starting from version 1):
+// Add override_price to service-to-server mapping table
 $install_queries[2] = array(
     "ALTER TABLE `".OGP_DB_PREFIX."billing_service_remote_servers` ADD COLUMN `override_price` DECIMAL(10,2) NULL AFTER `enabled`"
 );

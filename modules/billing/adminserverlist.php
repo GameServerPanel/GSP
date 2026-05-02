@@ -71,7 +71,6 @@ if (isset($_POST['save_matrix'])) {
 
         $price_col = $period === 'daily' ? 'price_daily' : ($period === 'yearly' ? 'price_year' : 'price_monthly');
         $base_esc   = $db->real_escape_string($base_price);
-        $period_esc = $db->real_escape_string($period);
 
         $db->query(
             "UPDATE `{$table_prefix}billing_services`
@@ -88,22 +87,28 @@ if (isset($_POST['save_matrix'])) {
         $allServerIds[] = (int)$rsRow['remote_server_id'];
     }
 
+    $stmt = $db->prepare(
+        "INSERT INTO `{$table_prefix}billing_service_remote_servers`
+            (service_id, remote_server_id, enabled, override_price)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+            enabled        = VALUES(enabled),
+            override_price = VALUES(override_price)"
+    );
     foreach ((array)$postedServices as $sid => $ignored) {
         $sid = (int)$sid;
         foreach ($allServerIds as $rid) {
             $mapEnabled = isset($postedMappings[$sid][$rid]['enabled']) ? 1 : 0;
             $ovRaw      = $postedMappings[$sid][$rid]['override_price'] ?? '';
-            $override   = (trim($ovRaw) === '') ? 'NULL' : "'" . $db->real_escape_string(number_format((float)$ovRaw, 2, '.', '')) . "'";
-
-            $db->query(
-                "INSERT INTO `{$table_prefix}billing_service_remote_servers`
-                    (service_id, remote_server_id, enabled, override_price)
-                 VALUES ({$sid}, {$rid}, {$mapEnabled}, {$override})
-                 ON DUPLICATE KEY UPDATE
-                    enabled        = VALUES(enabled),
-                    override_price = VALUES(override_price)"
-            );
+            $ovPrice    = (trim($ovRaw) === '') ? null : number_format((float)$ovRaw, 2, '.', '');
+            if ($stmt) {
+                $stmt->bind_param('iisd', $sid, $rid, $mapEnabled, $ovPrice);
+                $stmt->execute();
+            }
         }
+    }
+    if ($stmt) {
+        $stmt->close();
     }
 
     $flash[] = "Matrix saved successfully.";
