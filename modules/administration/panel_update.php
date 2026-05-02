@@ -1098,14 +1098,14 @@ function gsp_panel_update_section()
 				$finished_at = date('Y-m-d H:i:s');
 				if ($result['success']) {
 					print_success(
-						'Panel updated to development version (<strong>' . htmlspecialchars($stable_branch) . '</strong>). '
+						'Panel updated to GitHub Stable (<strong>' . htmlspecialchars($stable_branch) . '</strong>). '
 						. intval($result['files_copied']) . ' file(s) updated. Source: <strong>'
 						. htmlspecialchars($stable_branch) . '</strong>'
 					);
-					gsp_update_log("Admin {$user_label} updated panel to stable branch {$stable_branch}");
+					gsp_update_log("Admin {$user_label} updated panel to GitHub Stable branch {$stable_branch}");
 					gsp_log_update_to_db(
 						'development', $stable_branch, 'success',
-						'Updated to stable branch ' . $stable_branch . ' by ' . $_SESSION['users_login'],
+						'Updated to GitHub Stable branch ' . $stable_branch . ' by ' . $_SESSION['users_login'],
 						$result['backup_dir'] ?? null,
 						isset($result['backup_dir']) ? $result['backup_dir'] . '/database.sql'      : null,
 						isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
@@ -1113,10 +1113,10 @@ function gsp_panel_update_section()
 					);
 				} else {
 					print_failure('Update failed: ' . htmlspecialchars($result['error']));
-					gsp_update_log("Admin {$user_label} update to stable branch {$stable_branch} FAILED: {$result['error']}");
+					gsp_update_log("Admin {$user_label} update to GitHub Stable branch {$stable_branch} FAILED: {$result['error']}");
 					gsp_log_update_to_db(
 						'development', $stable_branch, 'failed',
-						'Update to stable branch ' . $stable_branch . ' failed: ' . $result['error'],
+						'Update to GitHub Stable branch ' . $stable_branch . ' failed: ' . $result['error'],
 						null, null, null, $started_at, $finished_at
 					);
 				}
@@ -1127,14 +1127,14 @@ function gsp_panel_update_section()
 				$finished_at = date('Y-m-d H:i:s');
 				if ($result['success']) {
 					print_success(
-						'Panel updated to cutting edge version (<strong>' . htmlspecialchars($unstable_branch) . '</strong>). '
+						'Panel updated to GitHub Unstable (<strong>' . htmlspecialchars($unstable_branch) . '</strong>). '
 						. intval($result['files_copied']) . ' file(s) updated. Source: <strong>'
 						. htmlspecialchars($unstable_branch) . '</strong>'
 					);
-					gsp_update_log("Admin {$user_label} updated panel to unstable branch {$unstable_branch}");
+					gsp_update_log("Admin {$user_label} updated panel to GitHub Unstable branch {$unstable_branch}");
 					gsp_log_update_to_db(
 						'cutting-edge', $unstable_branch, 'success',
-						'Updated to cutting-edge branch ' . $unstable_branch . ' by ' . $_SESSION['users_login'],
+						'Updated to GitHub Unstable branch ' . $unstable_branch . ' by ' . $_SESSION['users_login'],
 						$result['backup_dir'] ?? null,
 						isset($result['backup_dir']) ? $result['backup_dir'] . '/database.sql'      : null,
 						isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
@@ -1142,10 +1142,10 @@ function gsp_panel_update_section()
 					);
 				} else {
 					print_failure('Update failed: ' . htmlspecialchars($result['error']));
-					gsp_update_log("Admin {$user_label} update to unstable branch {$unstable_branch} FAILED: {$result['error']}");
+					gsp_update_log("Admin {$user_label} update to GitHub Unstable branch {$unstable_branch} FAILED: {$result['error']}");
 					gsp_log_update_to_db(
 						'cutting-edge', $unstable_branch, 'failed',
-						'Update to cutting-edge branch ' . $unstable_branch . ' failed: ' . $result['error'],
+						'Update to GitHub Unstable branch ' . $unstable_branch . ' failed: ' . $result['error'],
 						null, null, null, $started_at, $finished_at
 					);
 				}
@@ -1282,32 +1282,34 @@ function gsp_panel_update_section()
 
 	echo "<br>\n";
 
-	// ---- Development Version ------------------------------------------------
-	echo "<h3>Development Version</h3>\n";
+	// ---- GitHub Stable -------------------------------------------------------
+	echo "<h3>GitHub Stable</h3>\n";
+	echo "<p>GitHub Stable should always match the latest official numbered release.</p>\n";
 	echo "<form method='POST'>\n";
 	echo "<input type='hidden' name='gsp_update_action' value='update_stable'>\n";
 	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
 	echo "<button type='submit'"
-	   . " onclick='return confirm(\"Back up and update the panel to the "
+	   . " onclick='return confirm(\"Back up and update the panel to GitHub Stable ("
 	   . htmlspecialchars($stable_branch, ENT_QUOTES)
-	   . " branch. Continue?\");'>"
-	   . "Update to Development Version</button>";
+	   . "). Continue?\");'>"
+	   . "Update to GitHub Stable</button>";
 	echo " <span style='margin-left:10px;color:#666;'>Branch: "
 	   . htmlspecialchars($stable_branch) . "</span>\n";
 	echo "</form>\n";
 
 	echo "<br>\n";
 
-	// ---- Cutting Edge Version -----------------------------------------------
-	echo "<h3>Cutting Edge Version</h3>\n";
+	// ---- GitHub Unstable -----------------------------------------------------
+	echo "<h3>GitHub Unstable</h3>\n";
+	echo "<p>GitHub Unstable represents the latest development branch and may be unstable.</p>\n";
 	echo "<p class='failure' style='display:inline-block;padding:5px 10px;'>"
-	   . "&#9888; Warning: The cutting edge version may be unstable or contain bugs. Use with caution in production.</p><br><br>\n";
+	   . "&#9888; Warning: GitHub Unstable may contain bugs or incomplete features. Use with caution in production.</p><br><br>\n";
 	echo "<form method='POST'>\n";
 	echo "<input type='hidden' name='gsp_update_action' value='update_unstable'>\n";
 	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
 	echo "<button type='submit'"
-	   . " onclick='return confirm(\"WARNING: This is the cutting-edge (unstable) branch and may contain bugs.\\n\\nBack up and update anyway?\");'>"
-	   . "Update to Cutting Edge Version</button>";
+	   . " onclick='return confirm(\"WARNING: This is GitHub Unstable and may contain bugs.\\n\\nBack up and update anyway?\");'>"
+	   . "Update to GitHub Unstable</button>";
 	echo " <span style='margin-left:10px;color:#666;'>Branch: "
 	   . htmlspecialchars($unstable_branch) . "</span>\n";
 	echo "</form>\n";
