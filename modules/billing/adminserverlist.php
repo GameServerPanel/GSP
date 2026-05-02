@@ -57,6 +57,25 @@ function sync_billing_services(mysqli $db, string $prefix): array
 {
     $messages = [];
 
+    // Schema guard: verify billing_services has the expected columns before touching it.
+    // col_exists() is provided by bootstrap.php.
+    $requiredCols = ['home_cfg_id', 'mod_cfg_id', 'service_name', 'description',
+                     'remote_server_id', 'enabled', 'out_of_stock',
+                     'price_daily', 'price_monthly', 'price_year',
+                     'slot_min_qty', 'slot_max_qty', 'install_method'];
+    $tableName = $prefix . 'billing_services';
+    foreach ($requiredCols as $col) {
+        if (!col_exists($db, $tableName, $col)) {
+            $messages[] = "⚠ Schema issue: column '{$col}' missing from {$tableName}. Run the billing module migration.";
+        }
+    }
+    // If critical columns are missing, skip the sync to avoid SQL errors.
+    foreach (['service_name', 'mod_cfg_id', 'enabled'] as $critical) {
+        if (!col_exists($db, $tableName, $critical)) {
+            return $messages;
+        }
+    }
+
     // Load all games/mods from panel config tables
     $gameMods = [];
     $res = $db->query(
@@ -97,12 +116,14 @@ function sync_billing_services(mysqli $db, string $prefix): array
         $homeCfgId = (int)$gm['home_cfg_id'];
         $db->query(
             "INSERT INTO `{$prefix}billing_services`
-                (home_cfg_id, mod_cfg_id, service_name, remote_server_id,
-                 enabled, out_of_stock, price_daily, price_monthly, price_year,
+                (home_cfg_id, mod_cfg_id, service_name, description,
+                 remote_server_id, enabled, out_of_stock,
+                 price_daily, price_monthly, price_year,
                  slot_min_qty, slot_max_qty, install_method)
              VALUES
-                ({$homeCfgId}, {$modCfgId}, '{$svcName}', '',
-                 0, 0, 0, 0, 0,
+                ({$homeCfgId}, {$modCfgId}, '{$svcName}', '{$svcName}',
+                 '', 0, 0,
+                 0, 0, 0,
                  1, 100, 'steamcmd')"
         );
         $messages[] = "Added new service: " . ($gm['mod_name'] ?: $gm['game_name']);
