@@ -24,6 +24,62 @@
 
 require_once("server_config_parser.php");
 
+/**
+ * Safely convert any config value (string, NULL, or array from SimpleXML) to a
+ * plain PHP string without triggering "Array to string conversion" notices.
+ *
+ * - string / int / float → cast directly
+ * - NULL                 → empty string
+ * - SimpleXMLElement     → (string) cast (its __toString returns node text)
+ * - simple flat array    → comma-separated list of leaf values
+ * - nested/complex array → JSON (pretty-printed for readability in admin forms)
+ */
+function gsp_normalize_config_value($value): string
+{
+    if ($value === null) {
+        return '';
+    }
+    if ($value instanceof SimpleXMLElement) {
+        return (string)$value;
+    }
+    if (!is_array($value)) {
+        return (string)$value;
+    }
+    // Flat array → comma-separated list of scalar/castable items
+    $isFlat = true;
+    foreach ($value as $item) {
+        if (is_array($item) || ($item instanceof SimpleXMLElement && count($item->children()) > 0)) {
+            $isFlat = false;
+            break;
+        }
+    }
+    if ($isFlat) {
+        return implode(',', array_map(function ($item) {
+            return (string)$item;
+        }, $value));
+    }
+    return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+}
+
+/**
+ * Return an HTML-safe string suitable for display (echo) in the editor.
+ * Always wraps the result in htmlspecialchars.
+ */
+function gsp_value_to_display_string($value): string
+{
+    return htmlspecialchars(gsp_normalize_config_value($value), ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Return an HTML-safe string suitable for use as an HTML form field value.
+ * Identical to gsp_value_to_display_string — kept as a distinct function so
+ * callers can signal intent and future formatting rules can differ.
+ */
+function gsp_value_to_editable_string($value): string
+{
+    return htmlspecialchars(gsp_normalize_config_value($value), ENT_QUOTES, 'UTF-8');
+}
+
 function config_games_normalize_path($path)
 {
     $clean = preg_replace('/[^A-Za-z0-9_\\[\\]\\/\\-]/', '', (string)$path);
@@ -121,7 +177,7 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
         $html .= "<div class='xml-node__attributes'><strong>Attributes</strong>";
         foreach ((array)$attributes as $attrName => $attrValue) {
             $attrSafe = htmlspecialchars($attrName, ENT_QUOTES, 'UTF-8');
-            $valSafe = htmlspecialchars((string)$attrValue, ENT_QUOTES, 'UTF-8');
+            $valSafe = gsp_value_to_editable_string($attrValue);
             $html .= "<div class='attr-row'><span>{$attrSafe}</span><input type='text' name=\"nodes[{$safeNodeKey}][attributes][{$attrSafe}]\" value=\"{$valSafe}\" placeholder='Leave blank to remove'></div>";
         }
         $html .= "<div class='attr-row'><input type='text' name=\"nodes[{$safeNodeKey}][new_attribute][name]\" placeholder='New attribute name'><input type='text' name=\"nodes[{$safeNodeKey}][new_attribute][value]\" placeholder='New attribute value'></div>";
