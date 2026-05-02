@@ -77,8 +77,7 @@ function sync_billing_services(mysqli $db, string $prefix): array
 
     foreach ($autoRepairCols as $col => $alterFragment) {
         if (!col_exists($db, $tableName, $col)) {
-            $t = $db->real_escape_string($tableName);
-            if ($db->query("ALTER TABLE `{$t}` {$alterFragment}")) {
+            if ($db->query("ALTER TABLE `{$tableName}` {$alterFragment}")) {
                 $messages[] = "✔ Auto-repaired: added column '{$col}' to {$tableName}.";
             } else {
                 $messages[] = "✖ Could not add column '{$col}' to {$tableName}: " . $db->error;

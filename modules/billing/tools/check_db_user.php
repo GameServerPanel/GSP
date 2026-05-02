@@ -5,7 +5,7 @@ if (!$db) {
     echo "DB connect failed: " . mysqli_connect_error() . PHP_EOL;
     exit(1);
 }
-$prefix    = isset($table_prefix) ? $table_prefix : '';
+$prefix    = defined('OGP_DB_PREFIX') ? OGP_DB_PREFIX : (isset($table_prefix) ? $table_prefix : 'gsp_');
 $user      = $argv[1] ?? 'iaregamer';
 $user_safe = mysqli_real_escape_string($db, $user);
 $has_shadow = false;

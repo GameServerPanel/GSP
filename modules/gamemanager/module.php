@@ -35,7 +35,7 @@ $install_queries[0] = array(
         `ip_id` int(11) NOT NULL,
         `port` int(11) NOT NULL,
         `home_id` int(11) NOT NULL,
-        `force_mod_id` int(11) NOT NULL DEFAULT '0',
+        `force_mod_id` int(11) NOT NULL DEFAULT 0,
         PRIMARY KEY  (`ip_id`,`port`)
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;",
 

@@ -96,7 +96,8 @@ $install_queries[0] = array(
         KEY `home_id` (`home_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
 
-    // Billing Invoices — created on cart add, paid after payment capture
+    // Billing Invoices — created on cart add, paid after payment capture.
+    // home_id is 0 until the service is provisioned after payment.
     "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_invoices` (
         `invoice_id`             INT(11)          NOT NULL AUTO_INCREMENT,
         `order_id`               INT(11)          NOT NULL DEFAULT 0,
