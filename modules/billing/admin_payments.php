@@ -1,59 +1,92 @@
 <?php
-// Admin payments viewer — lists persisted PayPal webhook JSON files
-$session_name = session_name(); session_start();
-require_once(__DIR__ . '/includes/config_loader.php');
-require_once(__DIR__ . '/includes/admin_auth.php');
-
-$dataDir = (isset($SITE_DATA_DIR) && $SITE_DATA_DIR) ? $SITE_DATA_DIR : realpath(__DIR__ . '/') . DIRECTORY_SEPARATOR . 'data';
-$files = [];
-if (is_dir($dataDir)) {
-    foreach (glob($dataDir . '/*.json') as $file) {
-        $files[] = $file;
-    }
+// Admin payment transaction log viewer
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('opengamepanel_web');
+    session_start();
 }
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/includes/admin_auth.php';
+require_once __DIR__ . '/classes/BillingRepository.php';
+
+function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$transactions = [];
+$errorMsg = '';
+if (!$db) {
+    $errorMsg = 'Database connection failed.';
+} else {
+    mysqli_set_charset($db, 'utf8mb4');
+    $prefix = $table_prefix ?? 'gsp_';
+    $repo   = new BillingRepository($db, $prefix);
+
+    // Build filter from GET params
+    $filter = [];
+    if (!empty($_GET['user_id']))         $filter['user_id']        = intval($_GET['user_id']);
+    if (!empty($_GET['home_id']))         $filter['home_id']        = intval($_GET['home_id']);
+    if (!empty($_GET['payment_method']))  $filter['payment_method'] = trim($_GET['payment_method']);
+
+    $transactions = $repo->getTransactions($filter, 200, 0);
+    mysqli_close($db);
+}
 ?>
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Admin — Payments</title>
+  <title>Admin — Payment Transactions</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/header.css">
 </head>
 <body>
-<?php include(__DIR__ . '/includes/top.php'); include(__DIR__ . '/includes/menu.php'); ?>
+<?php include __DIR__ . '/includes/top.php'; include __DIR__ . '/includes/menu.php'; ?>
 <div class="container-wide panel">
-  <h1>Payments (webhook)</h1>
-  <?php if (!$files): ?>
-    <p>No payment records found in <?php echo h($dataDir); ?></p>
+  <h1>Payment Transaction Log</h1>
+  <?php if ($errorMsg): ?><div class="alert alert-error"><?= h($errorMsg) ?></div><?php endif; ?>
+
+  <form method="get" style="margin-bottom:15px;">
+    <label>User ID: <input name="user_id" value="<?= h($_GET['user_id'] ?? '') ?>" style="width:80px"></label>
+    <label>Server ID: <input name="home_id" value="<?= h($_GET['home_id'] ?? '') ?>" style="width:80px"></label>
+    <label>Method:
+      <select name="payment_method">
+        <option value="">All</option>
+        <option value="paypal"  <?= ($_GET['payment_method'] ?? '') === 'paypal'  ? 'selected' : '' ?>>PayPal</option>
+        <option value="stripe"  <?= ($_GET['payment_method'] ?? '') === 'stripe'  ? 'selected' : '' ?>>Stripe</option>
+        <option value="manual"  <?= ($_GET['payment_method'] ?? '') === 'manual'  ? 'selected' : '' ?>>Manual</option>
+      </select>
+    </label>
+    <button type="submit" class="gsw-btn">Filter</button>
+    <a href="admin_payments.php" class="gsw-btn-secondary">Clear</a>
+  </form>
+
+  <?php if (empty($transactions)): ?>
+    <p>No transactions found<?= (!empty($filter) ? ' matching filters' : '') ?>.</p>
   <?php else: ?>
-    <table class="cart-table">
-      <thead>
-        <tr>
-          <th>Filename</th>
-          <th>Invoice</th>
-          <th>Amount</th>
-          <th>Payer</th>
-          <th>Date</th>
-          <th>View</th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php foreach ((array)$files as $f): $j = json_decode(file_get_contents($f), true) ?: []; ?>
-        <tr>
-          <td><?php echo h(basename($f)); ?></td>
-          <td><?php echo h($j['invoice'] ?? ($j['custom'] ?? '')); ?></td>
-          <td><?php echo h(($j['currency'] ?? '') . ' ' . number_format((float)($j['amount'] ?? 0),2)); ?></td>
-          <td><?php echo h($j['payer'] ?? ''); ?></td>
-          <td><?php echo h($j['ts'] ?? ''); ?></td>
-          <td><a href="return.php?invoice=<?php echo urlencode($j['invoice'] ?? ($j['custom'] ?? '')); ?>">View</a></td>
-        </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
+  <table class="cart-table">
+    <thead>
+      <tr>
+        <th>#</th><th>Invoice</th><th>User</th><th>Server</th>
+        <th>Method</th><th>Txn ID</th><th>Amount</th><th>Status</th><th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($transactions as $t): ?>
+      <tr>
+        <td><?= h($t['transaction_id']) ?></td>
+        <td><?= h($t['invoice_id']) ?></td>
+        <td><?= h($t['users_login'] ?? $t['user_id']) ?></td>
+        <td><?= $t['home_id'] ? h($t['home_id']) : '—' ?></td>
+        <td><?= h($t['payment_method']) ?></td>
+        <td style="font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis"><?= h($t['transaction_external_id']) ?></td>
+        <td><?= h($t['currency'] . ' ' . number_format((float)$t['amount'], 2)) ?></td>
+        <td><span class="status-badge status-<?= h(ucfirst($t['status'])) ?>"><?= h($t['status']) ?></span></td>
+        <td><?= h($t['created_at']) ?></td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
   <?php endif; ?>
 </div>
-<?php include(__DIR__ . '/includes/footer.php'); ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
