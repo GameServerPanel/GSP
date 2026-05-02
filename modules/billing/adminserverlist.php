@@ -207,9 +207,7 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
 }
 ?>
 
-<?php foreach (array_merge((array)$syncMessages, (array)$flash) as $idx => $msg):
-    $type = ($flashType === 'err' || $idx < count((array)$syncMessages) && count($syncMessages) > 0 && strpos($msg, 'disabled') !== false) ? 'ok' : $flashType;
-?>
+<?php foreach (array_merge((array)$syncMessages, (array)$flash) as $msg): ?>
   <div class="flash-<?php echo $flashType; ?>"><?php echo h($msg); ?></div>
 <?php endforeach; ?>
 
