@@ -57,21 +57,39 @@ function sync_billing_services(mysqli $db, string $prefix): array
 {
     $messages = [];
 
-    // Schema guard: verify billing_services has the expected columns before touching it.
+    // Schema auto-repair: add any missing columns to billing_services before syncing.
     // col_exists() is provided by bootstrap.php.
-    $requiredCols = ['home_cfg_id', 'mod_cfg_id', 'service_name', 'description',
-                     'remote_server_id', 'enabled', 'out_of_stock',
-                     'price_daily', 'price_monthly', 'price_year',
-                     'slot_min_qty', 'slot_max_qty', 'install_method'];
     $tableName = $prefix . 'billing_services';
-    foreach ($requiredCols as $col) {
+
+    // Map of column => ALTER TABLE fragment to add it if missing.
+    $autoRepairCols = [
+        'description'      => "ADD COLUMN `description` VARCHAR(1000) NOT NULL DEFAULT ''",
+        'img_url'          => "ADD COLUMN `img_url` VARCHAR(255) NOT NULL DEFAULT ''",
+        'out_of_stock'     => "ADD COLUMN `out_of_stock` VARCHAR(255) NOT NULL DEFAULT ''",
+        'slot_min_qty'     => "ADD COLUMN `slot_min_qty` INT(11) NOT NULL DEFAULT 0",
+        'slot_max_qty'     => "ADD COLUMN `slot_max_qty` INT(11) NOT NULL DEFAULT 0",
+        'price_daily'      => "ADD COLUMN `price_daily` FLOAT(15,4) NOT NULL DEFAULT 0",
+        'price_monthly'    => "ADD COLUMN `price_monthly` FLOAT(15,4) NOT NULL DEFAULT 0",
+        'price_year'       => "ADD COLUMN `price_year` FLOAT(15,4) NOT NULL DEFAULT 0",
+        'remote_server_id' => "ADD COLUMN `remote_server_id` VARCHAR(255) NOT NULL DEFAULT ''",
+        'install_method'   => "ADD COLUMN `install_method` VARCHAR(255) NOT NULL DEFAULT 'steamcmd'",
+    ];
+
+    foreach ($autoRepairCols as $col => $alterFragment) {
         if (!col_exists($db, $tableName, $col)) {
-            $messages[] = "⚠ Schema issue: column '{$col}' missing from {$tableName}. Run the billing module migration.";
+            $t = $db->real_escape_string($tableName);
+            if ($db->query("ALTER TABLE `{$t}` {$alterFragment}")) {
+                $messages[] = "✔ Auto-repaired: added column '{$col}' to {$tableName}.";
+            } else {
+                $messages[] = "✖ Could not add column '{$col}' to {$tableName}: " . $db->error;
+            }
         }
     }
-    // If critical columns are missing, skip the sync to avoid SQL errors.
+
+    // If critical columns are still missing after repair, skip the sync to avoid SQL errors.
     foreach (['service_name', 'mod_cfg_id', 'enabled'] as $critical) {
         if (!col_exists($db, $tableName, $critical)) {
+            $messages[] = "⚠ Critical column '{$critical}' missing from {$tableName}; skipping sync.";
             return $messages;
         }
     }

@@ -2,6 +2,17 @@
 // Admin landing page
 require_once(__DIR__ . '/includes/admin_auth.php');
 require_once(__DIR__ . '/includes/config_loader.php');
+
+// Ensure site variables are defined regardless of which config was loaded.
+// The panel config (loaded first by config_loader) does not define these, so
+// we fall back to safe defaults when they are absent.
+if (!isset($SITE_BASE_URL)) {
+    $SITE_BASE_URL = '';
+}
+if (!isset($SITE_DATA_DIR)) {
+    $SITE_DATA_DIR = realpath(__DIR__ . '/data') ?: (__DIR__ . '/data');
+}
+
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
