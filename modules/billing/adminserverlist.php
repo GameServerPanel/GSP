@@ -73,6 +73,9 @@ function sync_billing_services(mysqli $db, string $prefix): array
         'price_year'       => "ADD COLUMN `price_year` FLOAT(15,4) NOT NULL DEFAULT 0",
         'remote_server_id' => "ADD COLUMN `remote_server_id` VARCHAR(255) NOT NULL DEFAULT ''",
         'install_method'   => "ADD COLUMN `install_method` VARCHAR(255) NOT NULL DEFAULT 'steamcmd'",
+        'ftp'              => "ADD COLUMN `ftp` VARCHAR(255) NOT NULL DEFAULT ''",
+        'manual_url'       => "ADD COLUMN `manual_url` VARCHAR(255) NOT NULL DEFAULT ''",
+        'access_rights'    => "ADD COLUMN `access_rights` VARCHAR(255) NOT NULL DEFAULT ''",
     ];
 
     foreach ($autoRepairCols as $col => $alterFragment) {
@@ -138,12 +141,14 @@ function sync_billing_services(mysqli $db, string $prefix): array
                 (home_cfg_id, mod_cfg_id, service_name, description,
                  remote_server_id, enabled, out_of_stock,
                  price_daily, price_monthly, price_year,
-                 slot_min_qty, slot_max_qty, install_method)
+                 slot_min_qty, slot_max_qty, install_method,
+                 img_url, ftp, manual_url, access_rights)
              VALUES
                 ({$homeCfgId}, {$modCfgId}, '{$svcName}', '{$svcName}',
                  '', 0, 0,
                  0, 0, 0,
-                 1, 100, 'steamcmd')"
+                 1, 100, 'steamcmd',
+                 '', '', '', '')"
         );
         $messages[] = "Added new service: " . ($gm['mod_name'] ?: $gm['game_name']);
     }
