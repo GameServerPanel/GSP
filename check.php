@@ -156,7 +156,7 @@ foreach ($paths_to_check as $rel => $meta) {
             $parent_writable = is_writable(dirname($abs));
             $not_exist_status = $parent_writable ? 'warning' : 'error';
         } else {
-            $not_exist_status = $optional ? 'warning' : 'warning';
+            $not_exist_status = $optional ? 'warning' : 'missing';
         }
         $rows[] = [
             'section' => 'Filesystem',
