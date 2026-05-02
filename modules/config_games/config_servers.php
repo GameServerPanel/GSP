@@ -55,7 +55,7 @@ function gsp_normalize_config_value($value): string
     }
     if ($isFlat) {
         return implode(',', array_map(function ($item) {
-            return $item instanceof SimpleXMLElement ? (string)$item : (string)$item;
+            return (string)$item;
         }, $value));
     }
     return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);

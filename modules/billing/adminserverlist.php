@@ -114,6 +114,8 @@ function sync_billing_services(mysqli $db, string $prefix): array
         }
         $svcName   = $db->real_escape_string($gm['mod_name'] ?: $gm['game_name']);
         $homeCfgId = (int)$gm['home_cfg_id'];
+        // remote_server_id is intentionally empty: no servers are assigned until
+        // an admin reviews and enables the service on the adminserverlist page.
         $db->query(
             "INSERT INTO `{$prefix}billing_services`
                 (home_cfg_id, mod_cfg_id, service_name, description,
