@@ -260,10 +260,16 @@ function exec_ogp_module()
 				else
 				{
 					// No SteamCMD installer — run pre/post install scripts only.
-					if (!empty((string)$precmd))
-						$remote->exec((string)$precmd);
-					if (!empty((string)$postcmd))
-						$remote->exec((string)$postcmd);
+					if (!empty((string)$precmd)) {
+						$result = $remote->exec((string)$precmd);
+						if ($result === NULL)
+							$db->logger("Script-only install: pre_install script returned no output for home_id $home_id");
+					}
+					if (!empty((string)$postcmd)) {
+						$result = $remote->exec((string)$postcmd);
+						if ($result === NULL)
+							$db->logger("Script-only install: post_install script returned no output for home_id $home_id");
+					}
 				}
 				echo "<h4><br><p>".get_lang('starting_installations')."</p></h4><br>";
 				//PANEL LOG 

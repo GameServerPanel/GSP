@@ -168,11 +168,20 @@ function exec_ogp_module() {
 			else
 			{
 				// No SteamCMD installer — run pre/post install scripts only.
-				if (!empty((string)$precmd))
+				$ran_scripts = false;
+				if (!empty((string)$precmd)) {
 					$remote->exec((string)$precmd);
-				if (!empty((string)$postcmd))
+					$ran_scripts = true;
+				}
+				if (!empty((string)$postcmd)) {
 					$remote->exec((string)$postcmd);
-				print_success( get_lang("update_started") );
+					$ran_scripts = true;
+				}
+				if ($ran_scripts) {
+					print_success( get_lang("update_started") );
+				} else {
+					print_success( get_lang("update_completed") );
+				}
 				$view->refresh("?m=gamemanager&amp;p=game_monitor&amp;home_id=$home_id", 3);
 				return;
 			}
