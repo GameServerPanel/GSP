@@ -1,0 +1,38 @@
+/* FTP iFrame */
+@font-face
+{
+font-family: Neucha;
+src: url(Neucha.woff);
+}
+
+.header,.page .label {
+	font-size:1.4em !important;
+	font-family: Neucha;
+}
+
+h1 {
+	font-family: Neucha;
+}
+
+.header span{
+	font-size:1.1em !important;
+}
+
+body ,#main{
+	background: #DDD !important;
+}
+
+div.page > table{
+	background: linear-gradient(to bottom, rgba(181,189,200,1) 0%,rgba(130,140,149,1) 36%,rgba(40,52,59,1) 100%) !important;
+	font-family: Neucha;
+}
+
+div.page > table > tbody > tr > td > center > div > div > table{
+	font-size:1.6em !important;
+	height:85px !important;
+}
+
+.browse_rows_even,
+.browse_rows_odd{
+	background:rgb(242, 242, 245);
+}

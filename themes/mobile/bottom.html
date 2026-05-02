@@ -1,0 +1,96 @@
+<script type="text/javascript">
+// Anonymous "self-invoking" function
+function GetURLParameter(sParam)
+{
+	var sPageURL = window.location.search.substring(1);
+	var sURLVariables = sPageURL.split('&');
+	for (var i = 0; i < sURLVariables.length; i++)
+	{
+		var sParameterName = sURLVariables[i].split('=');
+		if (sParameterName[0] == sParam)
+		{
+			return sParameterName[1];
+		}
+	}
+}
+
+function escapeRegExp(string){
+  return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function loadme(){
+	var pathArray = window.location.pathname.split( '/' );
+	var currentFile = pathArray[pathArray.length-1];
+	var urlParams = window.location.search;
+	var flipStatus = sessionStorage.getItem("flip");
+	
+	if( (currentFile == 'index.php' || currentFile == '') && urlParams == '')
+	{
+		$('#content > div > table').css('width','100%');
+	}
+	
+	function create_menu_selector(dom) {
+		var result = '<select style="font-size:1.8em;" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">';
+		if(currentFile == 'home.php')
+			result += "<option></option>";
+		$(dom).each(function(){
+			var url = $(this).attr('href'),
+				name = $(this).text(),
+				selected;
+			if(urlParams.match(new RegExp(escapeRegExp(url))))
+				selected = 'selected="selected"';
+			else
+				selected = '';
+			result += "<option value='"+url+"' "+selected+">"+name+"</option>" ; 
+		});
+		if(currentFile == 'home.php')
+			result += "<option value='?logout' >Logout</option>";
+		result += "</select>";
+		return result;
+	}
+	
+	var menuSelector = create_menu_selector('.menu-bg > div > ul > li > a');
+	
+	if(urlParams != '?logout')
+		$('.menu-bg').empty().append(menuSelector);
+
+	if(currentFile == 'home.php' && GetURLParameter('m') == 'ftp')
+	{
+		$('iframe').load(function() {
+			$('iframe').contents().find("head").append('<link rel="stylesheet" type="text/css" href="../../themes/mobile/iframe.css">');
+		});
+	}
+	
+	if(currentFile == 'home.php' && GetURLParameter('m') == 'administration' && GetURLParameter('p') == 'main')
+	{
+		
+	}
+}
+
+if(!window.jQuery)
+{
+	// Load the script
+	var script = document.createElement("SCRIPT");
+	script.src = 'js/jquery/jquery-1.11.0.min.js';
+	script.type = 'text/javascript';
+	document.getElementsByTagName("head")[0].appendChild(script);
+		// Poll for jQuery to come into existance
+	var checkReady = function(callback) {
+		if (window.jQuery) {
+			callback(jQuery);
+		}
+		else {
+			window.setTimeout(function() { checkReady(callback); }, 100);
+		}
+	};
+	
+	// Start polling...
+	checkReady(function($) {
+		loadme();
+	});
+}
+else
+{
+	loadme();
+}
+</script>
