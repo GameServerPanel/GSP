@@ -2,36 +2,25 @@
 /**
  * Billing config loader
  *
- * Priority order (standalone-first):
- *   1. modules/billing/includes/config.inc.php  (local billing config — always wins when present)
- *   2. <panel_root>/includes/config.inc.php      (panel config — fallback when no local config)
+ * Priority order (panel-first):
+ *   1. <panel_root>/includes/config.inc.php      (active panel config — always wins when present)
+ *   2. modules/billing/includes/config.inc.php  (local billing config — standalone fallback only)
  *
- * This ensures that copying modules/billing/ to any web root works correctly
- * after editing its own config.inc.php, without being overridden by a parent
- * panel installation that may have a different database name.
+ * The panel config is preferred so that every billing page, migration, and schema
+ * check automatically uses the database from the active installation.  This prevents
+ * a testing install from accidentally writing to a production database when the local
+ * billing config.inc.php still contains hard-coded production credentials.
+ *
+ * Standalone deployments (billing module deployed without the panel) should place
+ * their own config.inc.php in modules/billing/includes/ as a fallback.
  */
 if (defined('BILLING_CONFIG_LOADED')) {
     return;
 }
 
-$localConfig = __DIR__ . '/config.inc.php';
 $attempted = [];
 
-// Always prefer the local billing config so the module is self-contained.
-if (is_readable($localConfig)) {
-    $attempted[] = $localConfig;
-    require_once $localConfig;
-    if (!defined('BILLING_CONFIG_PATH')) {
-        define('BILLING_CONFIG_PATH', $localConfig);
-    }
-    define('BILLING_CONFIG_LOADED', true);
-    return;
-}
-
-$attempted[] = $localConfig;
-
-// Fallback: try to load the panel's config (useful when running embedded inside the panel
-// and no local copy has been made yet).
+// Prefer the panel config so the billing module always uses the active installation's DB.
 $panelConfig = null;
 $projectRoot = realpath(__DIR__ . '/../../..');
 if ($projectRoot !== false) {
@@ -51,6 +40,21 @@ if ($panelConfig && is_readable($panelConfig)) {
 }
 
 $attempted[] = $panelConfig;
+
+// Fallback: local billing config (useful for standalone deployments where no panel is present).
+$localConfig = __DIR__ . '/config.inc.php';
+
+if (is_readable($localConfig)) {
+    $attempted[] = $localConfig;
+    require_once $localConfig;
+    if (!defined('BILLING_CONFIG_PATH')) {
+        define('BILLING_CONFIG_PATH', $localConfig);
+    }
+    define('BILLING_CONFIG_LOADED', true);
+    return;
+}
+
+$attempted[] = $localConfig;
 
 $message = "GSP Billing module cannot find config.inc.php.\n";
 $message .= "Looked in:\n";
