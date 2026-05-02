@@ -3,210 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Server / Game Matrix - GameServers.World</title>
+    <title>Admin Service Configuration - GSP</title>
     <style>
-    .matrix-table { border-collapse: collapse; width: 100%; }
-    .matrix-table th, .matrix-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; text-align: center; }
-    .matrix-table th { background: #f5f5f5; white-space: nowrap; }
-    .matrix-table td.game-name { text-align: left; white-space: nowrap; }
-    .override-input { width: 72px; margin-top: 4px; }
+    .svc-table { border-collapse: collapse; width: 100%; }
+    .svc-table th, .svc-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; }
+    .svc-table th { background: #f5f5f5; white-space: nowrap; text-align: center; }
+    .svc-table td.game-name { text-align: left; white-space: nowrap; }
+    .price-input { width: 80px; }
+    .slot-input  { width: 60px; }
     .muted { color: #999; font-size: 0.85em; }
     .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
     .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
+    .servers-cell { text-align: left; }
+    .server-cb-label { display: block; white-space: nowrap; margin: 2px 0; }
     </style>
 </head>
 <body>
 <?php
-// Admin matrix page: game × server availability + price overrides
+/**
+ * Admin service configuration page.
+ *
+ * On every load this page syncs gsp_billing_services with the panel's game/mod
+ * config list (config_mods joined with config_homes).  It provides a table UI
+ * where admins can enable/disable services, set prices, configure slot ranges,
+ * and choose which remote servers each game can be installed on.
+ *
+ * remote_server_id in gsp_billing_services stores a comma-separated list of
+ * numeric remote server IDs, e.g. "1,3,7".  The deprecated
+ * gsp_billing_service_remote_servers mapping table is never referenced here.
+ */
 
 require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/admin_auth.php');
 
-function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
+function h(mixed $s): string
+{
+    return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+}
 
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
-if (!$db) {
-    die("Connection failed: " . mysqli_connect_error());
+$db = billing_get_db();
+if (!($db instanceof mysqli)) {
+    die("Database connection failed.");
 }
 
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');
 
-// Ensure the mapping table exists with the override_price column
-$db->query(
-    "CREATE TABLE IF NOT EXISTS `{$table_prefix}billing_service_remote_servers` (
-        `id`               INT(11) NOT NULL AUTO_INCREMENT,
-        `service_id`       INT(11) NOT NULL,
-        `remote_server_id` INT(11) NOT NULL,
-        `enabled`          TINYINT(1) NOT NULL DEFAULT 1,
-        `override_price`   DECIMAL(10,2) NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `svc_rs` (`service_id`, `remote_server_id`),
-        KEY `service_id` (`service_id`),
-        KEY `remote_server_id` (`remote_server_id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
-);
-// Add override_price if this is an older install that already has the table without it
-$chk = $db->query("SHOW COLUMNS FROM `{$table_prefix}billing_service_remote_servers` LIKE 'override_price'");
-if ($chk && $chk->num_rows === 0) {
-    $db->query("ALTER TABLE `{$table_prefix}billing_service_remote_servers` ADD COLUMN `override_price` DECIMAL(10,2) NULL");
+/* -----------------------------------------------------------------------
+   Auto-sync: keep billing_services in step with game/mod config list
+   Runs on every page load; INSERT and soft-disable only — never hard-delete.
+----------------------------------------------------------------------- */
+function sync_billing_services(mysqli $db, string $prefix): array
+{
+    $messages = [];
+
+    // Load all games/mods from panel config tables
+    $gameMods = [];
+    $res = $db->query(
+        "SELECT cm.mod_cfg_id, cm.home_cfg_id, cm.mod_name, ch.game_name
+         FROM `{$prefix}config_mods` cm
+         JOIN `{$prefix}config_homes` ch ON ch.home_cfg_id = cm.home_cfg_id
+         ORDER BY ch.game_name, cm.mod_name"
+    );
+    if ($res) {
+        while ($row = $res->fetch_assoc()) {
+            $gameMods[(int)$row['mod_cfg_id']] = $row;
+        }
+    }
+
+    if (empty($gameMods)) {
+        // config_mods is empty or tables don't exist yet — nothing to sync
+        return $messages;
+    }
+
+    // Load existing billing_services indexed by mod_cfg_id
+    $existing = [];
+    $svcRes = $db->query(
+        "SELECT service_id, mod_cfg_id, enabled, out_of_stock
+         FROM `{$prefix}billing_services`"
+    );
+    if ($svcRes) {
+        while ($row = $svcRes->fetch_assoc()) {
+            $existing[(int)$row['mod_cfg_id']] = $row;
+        }
+    }
+
+    // Insert new rows for game/mods not yet in billing_services
+    foreach ($gameMods as $modCfgId => $gm) {
+        if (isset($existing[$modCfgId])) {
+            continue;
+        }
+        $svcName   = $db->real_escape_string($gm['mod_name'] ?: $gm['game_name']);
+        $homeCfgId = (int)$gm['home_cfg_id'];
+        $db->query(
+            "INSERT INTO `{$prefix}billing_services`
+                (home_cfg_id, mod_cfg_id, service_name, remote_server_id,
+                 enabled, out_of_stock, price_daily, price_monthly, price_year,
+                 slot_min_qty, slot_max_qty, install_method)
+             VALUES
+                ({$homeCfgId}, {$modCfgId}, '{$svcName}', '',
+                 0, 0, 0, 0, 0,
+                 1, 100, 'steamcmd')"
+        );
+        $messages[] = "Added new service: " . ($gm['mod_name'] ?: $gm['game_name']);
+    }
+
+    // Soft-disable billing_services whose mod_cfg_id no longer appears in config_mods
+    foreach ($existing as $modCfgId => $svcRow) {
+        if ($modCfgId > 0 && !isset($gameMods[$modCfgId])) {
+            $sid = (int)$svcRow['service_id'];
+            $db->query(
+                "UPDATE `{$prefix}billing_services`
+                 SET enabled = 0, out_of_stock = 1
+                 WHERE service_id = {$sid} AND enabled = 1"
+            );
+            if ($db->affected_rows > 0) {
+                $messages[] = "Service ID {$sid} disabled — game mod no longer in config.";
+            }
+        }
+    }
+
+    return $messages;
 }
 
-$flash = [];
+$syncMessages = sync_billing_services($db, $table_prefix);
+
+$flash     = [];
 $flashType = 'ok';
 
 /* -----------------------------------------------------------------------
-   SAVE: matrix form submitted
+   SAVE: service configuration form submitted
 ----------------------------------------------------------------------- */
-if (isset($_POST['save_matrix'])) {
+if (isset($_POST['save_services'])) {
+    // Load valid remote server IDs for validation
+    $validServerIds = [];
+    $rsRes = $db->query("SELECT remote_server_id FROM `{$table_prefix}remote_servers`");
+    while ($rsRes && ($rsRow = $rsRes->fetch_assoc())) {
+        $validServerIds[] = (int)$rsRow['remote_server_id'];
+    }
+    $validSet = array_flip($validServerIds);
+
     $postedServices = $_POST['svc'] ?? [];
-    $postedMappings = $_POST['map'] ?? [];
+    $postedServers  = $_POST['servers'] ?? [];
 
     foreach ((array)$postedServices as $sid => $svcData) {
-        $sid        = (int)$sid;
-        $enabled    = isset($svcData['enabled']) ? 1 : 0;
-        $base_price = number_format((float)($svcData['base_price'] ?? 0), 2, '.', '');
-        $period     = in_array($svcData['period'] ?? 'monthly', ['daily','monthly','yearly'], true)
-                      ? $svcData['period'] : 'monthly';
+        $sid          = (int)$sid;
+        $enabled      = isset($svcData['enabled']) ? 1 : 0;
+        $priceDaily   = number_format((float)($svcData['price_daily']   ?? 0), 4, '.', '');
+        $priceMonthly = number_format((float)($svcData['price_monthly'] ?? 0), 4, '.', '');
+        $priceYear    = number_format((float)($svcData['price_year']    ?? 0), 4, '.', '');
+        $slotMin      = max(0, (int)($svcData['slot_min_qty'] ?? 0));
+        $slotMax      = max(0, (int)($svcData['slot_max_qty'] ?? 0));
+        if ($slotMax < $slotMin) { $slotMax = $slotMin; }
 
-        $price_col = $period === 'daily' ? 'price_daily' : ($period === 'yearly' ? 'price_year' : 'price_monthly');
-        $base_esc   = $db->real_escape_string($base_price);
+        // Build comma-separated remote_server_id from checkboxes, validating each ID
+        $checkedIds = [];
+        foreach ((array)($postedServers[$sid] ?? []) as $rawId) {
+            $rid = (int)$rawId;
+            if (isset($validSet[$rid])) {
+                $checkedIds[] = $rid;
+            }
+        }
+        $remoteServerIdStr = $db->real_escape_string(implode(',', $checkedIds));
 
         $db->query(
             "UPDATE `{$table_prefix}billing_services`
-             SET enabled = {$enabled},
-                 `{$price_col}` = '{$base_esc}'
+             SET enabled          = {$enabled},
+                 price_daily      = '{$priceDaily}',
+                 price_monthly    = '{$priceMonthly}',
+                 price_year       = '{$priceYear}',
+                 slot_min_qty     = {$slotMin},
+                 slot_max_qty     = {$slotMax},
+                 remote_server_id = '{$remoteServerIdStr}'
              WHERE service_id = {$sid}"
         );
     }
 
-    // Upsert mappings: for every service x server pair post data received
-    $allServerIds = [];
-    $rsRes = $db->query("SELECT remote_server_id FROM `{$table_prefix}remote_servers`");
-    while ($rsRes && ($rsRow = $rsRes->fetch_assoc())) {
-        $allServerIds[] = (int)$rsRow['remote_server_id'];
-    }
-
-    $stmt = $db->prepare(
-        "INSERT INTO `{$table_prefix}billing_service_remote_servers`
-            (service_id, remote_server_id, enabled, override_price)
-         VALUES (?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE
-            enabled        = VALUES(enabled),
-            override_price = VALUES(override_price)"
-    );
-    foreach ((array)$postedServices as $sid => $ignored) {
-        $sid = (int)$sid;
-        foreach ($allServerIds as $rid) {
-            $mapEnabled = isset($postedMappings[$sid][$rid]['enabled']) ? 1 : 0;
-            $ovRaw      = $postedMappings[$sid][$rid]['override_price'] ?? '';
-            $ovPrice    = (trim($ovRaw) === '') ? null : number_format((float)$ovRaw, 2, '.', '');
-            if ($stmt) {
-                $stmt->bind_param('iisd', $sid, $rid, $mapEnabled, $ovPrice);
-                $stmt->execute();
-            }
-        }
-    }
-    if ($stmt) {
-        $stmt->close();
-    }
-
-    $flash[] = "Matrix saved successfully.";
+    $flash[] = "Services saved.";
 }
 
 /* -----------------------------------------------------------------------
-   Remove a service
------------------------------------------------------------------------ */
-if (isset($_POST['remove_service'], $_POST['service_id_remove'])) {
-    $sid = (int)$_POST['service_id_remove'];
-    $db->query("DELETE FROM `{$table_prefix}billing_service_remote_servers` WHERE service_id = {$sid}");
-    $db->query("DELETE FROM `{$table_prefix}billing_services` WHERE service_id = {$sid}");
-    $flash[] = "Service #{$sid} removed.";
-}
-
-/* -----------------------------------------------------------------------
-   Load data
+   Load data for display
 ----------------------------------------------------------------------- */
 $remoteServers = [];
-$rsRes = $db->query("SELECT remote_server_id, remote_server_name FROM `{$table_prefix}remote_servers` ORDER BY remote_server_name");
+$rsRes = $db->query(
+    "SELECT remote_server_id, remote_server_name
+     FROM `{$table_prefix}remote_servers`
+     ORDER BY remote_server_name"
+);
 while ($rsRes && ($row = $rsRes->fetch_assoc())) {
     $remoteServers[] = $row;
 }
 
 $services = [];
 $svcRes = $db->query(
-    "SELECT service_id, service_name, enabled, price_daily, price_monthly, price_year
+    "SELECT service_id, service_name, enabled, price_daily, price_monthly, price_year,
+            slot_min_qty, slot_max_qty, remote_server_id
      FROM `{$table_prefix}billing_services`
      ORDER BY service_name"
 );
 while ($svcRes && ($row = $svcRes->fetch_assoc())) {
     $services[] = $row;
 }
-
-// Load existing mappings into a lookup: $mappings[$service_id][$remote_server_id] = ['enabled'=>..,'override_price'=>..]
-$mappings = [];
-$mapRes = $db->query(
-    "SELECT service_id, remote_server_id, enabled, override_price
-     FROM `{$table_prefix}billing_service_remote_servers`"
-);
-while ($mapRes && ($row = $mapRes->fetch_assoc())) {
-    $mappings[(int)$row['service_id']][(int)$row['remote_server_id']] = [
-        'enabled'        => (int)$row['enabled'],
-        'override_price' => $row['override_price'],
-    ];
-}
 ?>
 
-<?php foreach ((array)$flash as $msg): ?>
+<?php foreach (array_merge((array)$syncMessages, (array)$flash) as $msg): ?>
   <div class="flash-<?php echo $flashType; ?>"><?php echo h($msg); ?></div>
 <?php endforeach; ?>
 
-<h2>Game &times; Server Matrix</h2>
+<h2>Service Configuration</h2>
 <p class="muted">
-  Enable or disable each game for billing, set its base price and billing period, then
-  toggle availability per server and optionally override the price for that location.
-  Leave override blank to use the base price.
+    Enable services, configure pricing and slot ranges, and select which remote servers
+    each game can be installed on.  The service list is automatically kept in sync with
+    the panel game/mod configuration.  Check one or more servers to make a game available
+    for purchase; leaving all servers unchecked prevents the game from appearing in the
+    store.
 </p>
 
 <?php if (empty($services)): ?>
-  <p>No billing services found. Add services first via the database or the panel.</p>
+  <p>No billing services found. Ensure game configs are loaded in the panel (Home &rarr; Games configuration).</p>
 <?php else: ?>
 
 <form method="post" action="">
-  <input type="hidden" name="save_matrix" value="1">
+  <input type="hidden" name="save_services" value="1">
 
   <div style="overflow-x:auto;">
-  <table class="matrix-table">
+  <table class="svc-table">
     <thead>
       <tr>
-        <th class="game-name">Game</th>
+        <th class="game-name">Game / Service</th>
         <th>Enabled</th>
-        <th>Base Price ($)</th>
-        <th>Period</th>
-        <?php foreach ((array)$remoteServers as $rs): ?>
-          <th><?php echo h($rs['remote_server_name']); ?><br>
-            <span class="muted">#<?php echo (int)$rs['remote_server_id']; ?></span>
-          </th>
-        <?php endforeach; ?>
+        <th>Price / Day ($)</th>
+        <th>Price / Month ($)</th>
+        <th>Price / Year ($)</th>
+        <th>Min Slots</th>
+        <th>Max Slots</th>
+        <th>Available Servers</th>
       </tr>
     </thead>
     <tbody>
     <?php foreach ((array)$services as $svc):
-      $sid        = (int)$svc['service_id'];
+      $sid = (int)$svc['service_id'];
       $svcEnabled = (int)$svc['enabled'];
-      // Determine current base price and period from existing columns
-      if ((float)$svc['price_monthly'] > 0) {
-          $basePrice = number_format((float)$svc['price_monthly'], 2, '.', '');
-          $period    = 'monthly';
-      } elseif ((float)$svc['price_daily'] > 0) {
-          $basePrice = number_format((float)$svc['price_daily'], 2, '.', '');
-          $period    = 'daily';
-      } elseif ((float)$svc['price_year'] > 0) {
-          $basePrice = number_format((float)$svc['price_year'], 2, '.', '');
-          $period    = 'yearly';
-      } else {
-          $basePrice = '0.00';
-          $period    = 'monthly';
+
+      // Parse existing remote_server_id CSV into a set for fast checkbox lookup
+      $savedIds = [];
+      foreach (explode(',', (string)$svc['remote_server_id']) as $part) {
+          $part = trim($part);
+          if ($part !== '' && ctype_digit($part)) {
+              $savedIds[(int)$part] = true;
+          }
       }
     ?>
       <tr>
@@ -215,44 +261,61 @@ while ($mapRes && ($row = $mapRes->fetch_assoc())) {
           <div class="muted">ID: <?php echo $sid; ?></div>
         </td>
 
-        <td>
+        <td style="text-align:center;">
           <input type="hidden"   name="svc[<?php echo $sid; ?>][enabled]" value="0">
           <input type="checkbox" name="svc[<?php echo $sid; ?>][enabled]" value="1"
                  <?php echo $svcEnabled ? 'checked' : ''; ?>>
         </td>
 
         <td>
-          <input type="number" step="0.01" min="0"
-                 name="svc[<?php echo $sid; ?>][base_price]"
-                 value="<?php echo h($basePrice); ?>"
-                 style="width:90px;">
+          <input type="number" step="0.0001" min="0" class="price-input"
+                 name="svc[<?php echo $sid; ?>][price_daily]"
+                 value="<?php echo h(number_format((float)$svc['price_daily'], 4, '.', '')); ?>">
         </td>
 
         <td>
-          <select name="svc[<?php echo $sid; ?>][period]">
-            <option value="monthly" <?php echo $period === 'monthly' ? 'selected' : ''; ?>>Monthly</option>
-            <option value="daily"   <?php echo $period === 'daily'   ? 'selected' : ''; ?>>Daily</option>
-            <option value="yearly"  <?php echo $period === 'yearly'  ? 'selected' : ''; ?>>Yearly</option>
-          </select>
+          <input type="number" step="0.0001" min="0" class="price-input"
+                 name="svc[<?php echo $sid; ?>][price_monthly]"
+                 value="<?php echo h(number_format((float)$svc['price_monthly'], 4, '.', '')); ?>">
         </td>
 
-        <?php foreach ((array)$remoteServers as $rs):
-          $rid        = (int)$rs['remote_server_id'];
-          $mapEntry   = $mappings[$sid][$rid] ?? ['enabled' => 0, 'override_price' => null];
-          $mapEnabled = (int)$mapEntry['enabled'];
-          $ovPrice    = $mapEntry['override_price'];
-        ?>
-          <td>
-            <input type="hidden"   name="map[<?php echo $sid; ?>][<?php echo $rid; ?>][enabled]" value="0">
-            <input type="checkbox" name="map[<?php echo $sid; ?>][<?php echo $rid; ?>][enabled]" value="1"
-                   <?php echo $mapEnabled ? 'checked' : ''; ?>>
-            <br>
-            <input type="number" step="0.01" min="0" placeholder="override"
-                   class="override-input"
-                   name="map[<?php echo $sid; ?>][<?php echo $rid; ?>][override_price]"
-                   value="<?php echo ($ovPrice !== null ? h(number_format((float)$ovPrice, 2, '.', '')) : ''); ?>">
-          </td>
-        <?php endforeach; ?>
+        <td>
+          <input type="number" step="0.0001" min="0" class="price-input"
+                 name="svc[<?php echo $sid; ?>][price_year]"
+                 value="<?php echo h(number_format((float)$svc['price_year'], 4, '.', '')); ?>">
+        </td>
+
+        <td>
+          <input type="number" min="0" class="slot-input"
+                 name="svc[<?php echo $sid; ?>][slot_min_qty]"
+                 value="<?php echo (int)$svc['slot_min_qty']; ?>">
+        </td>
+
+        <td>
+          <input type="number" min="0" class="slot-input"
+                 name="svc[<?php echo $sid; ?>][slot_max_qty]"
+                 value="<?php echo (int)$svc['slot_max_qty']; ?>">
+        </td>
+
+        <td class="servers-cell">
+          <?php if (empty($remoteServers)): ?>
+            <span class="muted">No remote servers configured</span>
+          <?php else: ?>
+            <?php foreach ((array)$remoteServers as $rs):
+              $rid     = (int)$rs['remote_server_id'];
+              $checked = isset($savedIds[$rid]) ? 'checked' : '';
+            ?>
+              <label class="server-cb-label">
+                <input type="checkbox"
+                       name="servers[<?php echo $sid; ?>][]"
+                       value="<?php echo $rid; ?>"
+                       <?php echo $checked; ?>>
+                <?php echo h($rs['remote_server_name']); ?>
+                <span class="muted">(#<?php echo $rid; ?>)</span>
+              </label>
+            <?php endforeach; ?>
+          <?php endif; ?>
+        </td>
       </tr>
     <?php endforeach; ?>
     </tbody>
@@ -260,33 +323,25 @@ while ($mapRes && ($row = $mapRes->fetch_assoc())) {
   </div>
 
   <div style="margin-top:14px;">
-    <button type="submit">Save Matrix</button>
+    <button type="submit">Save Services</button>
   </div>
-</form>
-
-<h3 style="margin-top:28px;">Remove a Service</h3>
-<form method="post" action="" style="display:flex;gap:8px;align-items:center;">
-  <input type="hidden" name="remove_service" value="1">
-  <select name="service_id_remove">
-    <?php foreach ((array)$services as $s): ?>
-      <option value="<?php echo (int)$s['service_id']; ?>">
-        <?php echo h($s['service_name']); ?> (ID: <?php echo (int)$s['service_id']; ?>)
-      </option>
-    <?php endforeach; ?>
-  </select>
-  <button type="submit" onclick="return confirm('Remove this service and all its server mappings? This cannot be undone.')">Remove</button>
 </form>
 
 <?php endif; ?>
 
-<div class="panel" style="margin-top:20px;">
-  <p><strong>Legend:</strong> Checkbox = server is available for this game.
-  Override price = customer pays this amount instead of the base price for that location.
-  Leave override blank to use the game base price.</p>
-  <p class="muted">
-    Availability is controlled entirely by <code><?php echo h("{$table_prefix}billing_service_remote_servers"); ?></code>.
-    No entry or <code>enabled = 0</code> means the server is not offered for that game.
-  </p>
+<div style="margin-top:20px;" class="panel">
+  <p><strong>Notes:</strong></p>
+  <ul>
+    <li>A service will only appear in the store when <strong>Enabled</strong> is checked
+        <em>and</em> at least one server is selected.</li>
+    <li>Available servers are stored as a comma-separated list of server IDs in
+        <code><?php echo h("{$table_prefix}billing_services.remote_server_id"); ?></code>.</li>
+    <li>The service list is automatically synced with the panel game/mod configuration on
+        every page load.  New games are added with <em>Enabled = off</em> so they do not
+        appear in the store until you configure and enable them.</li>
+    <li>Games removed from the panel configuration are disabled automatically; they are
+        never deleted while orders may reference them.</li>
+  </ul>
 </div>
 
 <?php billing_maybe_close_db($db); ?>

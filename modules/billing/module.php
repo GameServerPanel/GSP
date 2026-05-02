@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "3.1";
-$db_version = 3;
+$module_version = "3.2";
+$db_version = 4;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -44,25 +44,26 @@ $install_queries[0] = array(
     // Billing Services - Available game server packages
     "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_services` (
         `service_id` INT(11) NOT NULL AUTO_INCREMENT,
-        `home_cfg_id` INT(11) NOT NULL,
-        `mod_cfg_id` INT(11) NOT NULL,
+        `home_cfg_id` INT(11) NOT NULL DEFAULT 0,
+        `mod_cfg_id` INT(11) NOT NULL DEFAULT 0,
         `service_name` VARCHAR(255) NOT NULL,
-        `remote_server_id` VARCHAR(255) NOT NULL,
+        `remote_server_id` VARCHAR(255) NOT NULL DEFAULT '',
         `out_of_stock` VARCHAR(255) NOT NULL DEFAULT '',
-        `slot_max_qty` INT(11) NOT NULL,
-        `slot_min_qty` INT(11) NOT NULL,
+        `slot_max_qty` INT(11) NOT NULL DEFAULT 0,
+        `slot_min_qty` INT(11) NOT NULL DEFAULT 0,
         `price_daily` FLOAT(15,4) NOT NULL DEFAULT 0,
         `price_monthly` FLOAT(15,4) NOT NULL DEFAULT 0,
         `price_year` FLOAT(15,4) NOT NULL DEFAULT 0,
         `description` VARCHAR(1000) NOT NULL DEFAULT '',
         `img_url` VARCHAR(255) NOT NULL DEFAULT '',
         `ftp` VARCHAR(255) NOT NULL DEFAULT '',
-        `install_method` VARCHAR(255) NOT NULL DEFAULT '',
+        `install_method` VARCHAR(255) NOT NULL DEFAULT 'steamcmd',
         `manual_url` VARCHAR(255) NOT NULL DEFAULT '', 
         `access_rights` VARCHAR(255) NOT NULL DEFAULT '',
-        `enabled` INT(11) NOT NULL DEFAULT 1,
+        `enabled` INT(11) NOT NULL DEFAULT 0,
         PRIMARY KEY (`service_id`),
-        KEY `enabled` (`enabled`)
+        KEY `enabled` (`enabled`),
+        KEY `mod_cfg_id` (`mod_cfg_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
     
     // Billing Orders - Actual game server instances (ongoing services)
@@ -177,6 +178,13 @@ $install_queries[1] = array(
 // Add override_price to service-to-server mapping table
 $install_queries[2] = array(
     "ALTER TABLE `".OGP_DB_PREFIX."billing_service_remote_servers` ADD COLUMN `override_price` DECIMAL(10,2) NULL AFTER `enabled`"
+);
+
+// Version 4 (array index 3): Remove the separate service-to-server mapping table.
+// remote_server_id on billing_services now stores a comma-separated list of server IDs.
+// The mapping table is no longer used; drop it if it still exists from older installs.
+$install_queries[3] = array(
+    "DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_service_remote_servers`"
 );
 
 ?>

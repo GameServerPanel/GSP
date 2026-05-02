@@ -189,29 +189,37 @@ if ($row['price_monthly'] == 0.0) {
 			  <td align="right"><b>Location</b></td>
 			  <td align="left">
 						<?php
-			// Fetch servers enabled for this game via the billing_service_remote_servers mapping table.
-			// Only servers with an enabled mapping row are shown; remote_servers.enabled is not used.
+			// Fetch servers available for this game from billing_services.remote_server_id
+			// (a comma-separated list of numeric remote server IDs, e.g. "1,3,7").
 			$available_server = false;
-			$sid_order = (int)$row['service_id'];
-			$mappedQuery = "SELECT m.remote_server_id, m.override_price, r.remote_server_name
-			               FROM {$table_prefix}billing_service_remote_servers m
-			               JOIN {$table_prefix}remote_servers r
-			                 ON r.remote_server_id = m.remote_server_id
-			               WHERE m.service_id = {$sid_order} AND m.enabled = 1
-			               ORDER BY r.remote_server_name";
-			$mappedResult = $db->query($mappedQuery);
-			if ($mappedResult) {
-				$firstServer = true;
-				while ($rs = $mappedResult->fetch_assoc()) {
-					$rsID    = (int)$rs['remote_server_id'];
-					$rsNAME  = htmlspecialchars((string)$rs['remote_server_name'], ENT_QUOTES, 'UTF-8');
-					$checked = $firstServer ? ' checked' : '';
-					$available_server = true;
-					$firstServer = false;
-					echo "<div>\n"
-					   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' required{$checked}>\n"
-					   . "  <label for='rs_{$rsID}'>{$rsNAME}</label>\n"
-					   . "</div>\n";
+			$remoteIdsCsv = (string)($row['remote_server_id'] ?? '');
+			$allowedIds = [];
+			foreach (explode(',', $remoteIdsCsv) as $part) {
+				$part = trim($part);
+				if ($part !== '' && ctype_digit($part)) {
+					$allowedIds[] = (int)$part;
+				}
+			}
+			if (!empty($allowedIds)) {
+				$inList = implode(',', $allowedIds);
+				$rsQuery = "SELECT remote_server_id, remote_server_name
+				            FROM {$table_prefix}remote_servers
+				            WHERE remote_server_id IN ({$inList})
+				            ORDER BY remote_server_name";
+				$rsResult = $db->query($rsQuery);
+				if ($rsResult) {
+					$firstServer = true;
+					while ($rs = $rsResult->fetch_assoc()) {
+						$rsID    = (int)$rs['remote_server_id'];
+						$rsNAME  = htmlspecialchars((string)$rs['remote_server_name'], ENT_QUOTES, 'UTF-8');
+						$checked = $firstServer ? ' checked' : '';
+						$available_server = true;
+						$firstServer = false;
+						echo "<div>\n"
+						   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' required{$checked}>\n"
+						   . "  <label for='rs_{$rsID}'>{$rsNAME}</label>\n"
+						   . "</div>\n";
+					}
 				}
 			}
 			?>

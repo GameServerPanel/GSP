@@ -39,7 +39,7 @@ if (isset($_POST['save']) && !empty($_POST['description'])) {
 
 // Fetch services
 $service_id = isset($_REQUEST['service_id']) ? intval($_REQUEST['service_id']) : 0;
-$where_service_id = $service_id !== 0 ? "WHERE enabled = 1 AND service_id = $service_id" : "WHERE enabled = 1";
+$where_service_id = $service_id !== 0 ? "WHERE enabled = 1 AND service_id = $service_id AND remote_server_id != ''" : "WHERE enabled = 1 AND remote_server_id != ''";
 $qry_services = "SELECT * FROM {$table_prefix}billing_services $where_service_id ORDER BY service_name";
 $services = $db->query($qry_services);
 
