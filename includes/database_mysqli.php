@@ -3588,11 +3588,11 @@ class OGPDatabaseMySQL extends OGPDatabase
 		
 	public function getNextAvailablePort($ip_id,$home_cfg_id){
 		$ranges = $this->getPortsRange($ip_id,$home_cfg_id);
-		$range = $ranges[0];
+		$range = is_array($ranges) ? ($ranges[0] ?? null) : null;
 		if(empty($range))
 		{
 			$ranges = $this->getPortsRange($ip_id,"0");
-			$range = $ranges[0];
+			$range = is_array($ranges) ? ($ranges[0] ?? null) : null;
 		}
 		if(empty($range))
 			$range = array('start_port' => '27015','end_port' => '39915', 'port_increment' => '100');

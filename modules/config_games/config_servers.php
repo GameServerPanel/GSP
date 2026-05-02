@@ -173,9 +173,9 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
     }
 
     $attributes = $node->attributes();
-    if ($attributes && count((array)$attributes) > 0) {
+    if ($attributes && count($attributes) > 0) {
         $html .= "<div class='xml-node__attributes'><strong>Attributes</strong>";
-        foreach ((array)$attributes as $attrName => $attrValue) {
+        foreach ($attributes as $attrName => $attrValue) {
             $attrSafe = htmlspecialchars($attrName, ENT_QUOTES, 'UTF-8');
             $valSafe = gsp_value_to_editable_string($attrValue);
             $html .= "<div class='attr-row'><span>{$attrSafe}</span><input type='text' name=\"nodes[{$safeNodeKey}][attributes][{$attrSafe}]\" value=\"{$valSafe}\" placeholder='Leave blank to remove'></div>";
