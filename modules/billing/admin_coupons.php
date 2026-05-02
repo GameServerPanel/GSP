@@ -36,7 +36,7 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
 $db = false;
 try {
   // suppress direct output; we'll log errors and show a friendly message
-  $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+  $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 } catch (Throwable $e) {
   error_log('[admin_coupons] mysqli_connect exception: ' . $e->getMessage());
   $db = false;

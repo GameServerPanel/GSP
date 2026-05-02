@@ -12,7 +12,7 @@ require_once(__DIR__ . '/bootstrap.php');
 
 // Simple registration form (creates a user in {table_prefix}users with MD5 password)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['username']) && !empty($_POST['password'])) {
-    $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+    $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
     if ($db) {
         $username = trim($_POST['username']);
         $password = $_POST['password'];

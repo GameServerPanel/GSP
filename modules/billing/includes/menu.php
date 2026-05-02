@@ -58,7 +58,8 @@ if ($is_logged_in) {
   if (isset($db) && $db instanceof mysqli) {
     $menu_db = $db;
   } else {
-    $menu_db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+    $menu_db_port = isset($db_port) ? (int)$db_port : null;
+    $menu_db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, $menu_db_port);
     $menu_db_opened = true;
   }
 

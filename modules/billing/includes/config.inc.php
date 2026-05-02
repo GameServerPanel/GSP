@@ -8,6 +8,7 @@
 # database configuration in includes/config.inc.php
 ###############################################
 $db_host="localhost";
+$db_port="3306";
 $db_user="localuser";
 $db_pass="Pkloyn7yvpht!";
 $db_name="panel";

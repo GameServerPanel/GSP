@@ -19,7 +19,7 @@ require_once(__DIR__ . '/includes/log.php');
 /** @var string $table_prefix Table prefix for database tables */
 
 // Connect to DB (use mysqli like other website modules)
-$db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
     // fail silently and redirect back
     $back = $_SERVER['HTTP_REFERER'] ?? 'my_account.php';

@@ -22,7 +22,7 @@ $user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_
            (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
 
 // Connect to database
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 $orders = [];
 $total_paid = 0;
 

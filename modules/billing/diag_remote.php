@@ -37,7 +37,7 @@ if (defined('BILLING_CONFIG_PATH') && is_readable(BILLING_CONFIG_PATH)) {
 echo "Trying DB connection...\n";
 $ok = false;
 if (isset($db_host)) {
-    $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+    $db = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
     if ($db) {
         echo "DB connect: OK (host=$db_host db=$db_name)\n";
         $ok = true;
