@@ -106,9 +106,9 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
   
   
   
-<img src="../<?php echo $row['img_url'];?>" width="460" height="225" >
+<img src="<?php echo htmlspecialchars(billing_image_url((string)($row['img_url'] ?? '')), ENT_QUOTES, 'UTF-8');?>" width="460" height="225" >
 <br>
-<?php echo $row['service_name'];?>
+<?php echo htmlspecialchars((string)$row['service_name'], ENT_QUOTES, 'UTF-8');?>
 <br>
 <?php 
 if ($row['price_monthly'] == 0.0) {
@@ -143,8 +143,8 @@ if ($row['price_monthly'] == 0.0) {
 			?>
 			<div class="float-left decorative-bottom">
 			
-			<img src="../<?php echo $row['img_url'];?>" width=230 height=112 border=0 ">
-			<center><b>	<?php echo $row['service_name'];?></b></center>
+			<img src="<?php echo htmlspecialchars(billing_image_url((string)($row['img_url'] ?? '')), ENT_QUOTES, 'UTF-8');?>" width="230" height="112">
+			<center><b>	<?php echo htmlspecialchars((string)$row['service_name'], ENT_QUOTES, 'UTF-8');?></b></center>
 			<?php
 			
 			//$isAdmin = if( current_user_can('administrator')){

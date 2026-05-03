@@ -108,4 +108,35 @@ if (!isset($db) || !($db instanceof mysqli)) {
     }
 }
 
+/**
+ * Resolve a billing_services.img_url value to a browser-safe URL.
+ *
+ * Rules:
+ *  - Empty string → '' (caller should skip the <img> tag).
+ *  - Full URL (http:// or https://) → returned as-is.
+ *  - Bare filename (e.g. "dayz.jpg") → "/images/games/{filename}".
+ *  - Anything else treated as a bare filename for safety.
+ *
+ * Output is NOT htmlspecialchars'd here; callers must escape for HTML context.
+ */
+if (!function_exists('billing_image_url')) {
+    function billing_image_url(string $imgUrl): string
+    {
+        $imgUrl = trim($imgUrl);
+        if ($imgUrl === '') {
+            return '';
+        }
+        // Keep full external URLs intact
+        if (str_starts_with($imgUrl, 'http://') || str_starts_with($imgUrl, 'https://')) {
+            return $imgUrl;
+        }
+        // Strip any leading path separators/directories so we always get a bare filename
+        $filename = basename($imgUrl);
+        if ($filename === '') {
+            return '';
+        }
+        return '/images/games/' . $filename;
+    }
+}
+
 // End bootstrap

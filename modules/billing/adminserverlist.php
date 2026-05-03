@@ -15,6 +15,9 @@
     .slot-input  { width: 60px; }
     .desc-input  { width: 160px; }
     .img-input   { width: 160px; }
+    .img-select  { max-width: 180px; }
+    .img-fallback { display: none; max-width: 180px; margin-top: 4px; }
+    .img-fallback.img-fallback-visible { display: block; }
     .muted { color: #999; font-size: 0.85em; }
     .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #155724; }
     .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #721c24; }
@@ -54,6 +57,94 @@ require_once(__DIR__ . '/includes/admin_auth.php');
 function h(mixed $s): string
 {
     return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Return a sorted list of image filenames available in /images/games/.
+ * Only files with recognised image extensions are included.
+ */
+function list_game_images(): array
+{
+    $dir = __DIR__ . '/../../images/games';
+    if (!is_dir($dir)) {
+        return [];
+    }
+    $exts  = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+    $files = [];
+    foreach (scandir($dir) as $f) {
+        if ($f === '.' || $f === '..') continue;
+        $ext = strtolower(pathinfo($f, PATHINFO_EXTENSION));
+        if (in_array($ext, $exts, true)) {
+            $files[] = $f;
+        }
+    }
+    natcasesort($files);
+    return array_values($files);
+}
+
+/**
+ * Normalize a game name or filename stem so that platform/architecture
+ * suffixes are stripped before comparison.
+ *
+ * Examples:
+ *   "7 Days to Die linux64"   → "7daystodie"
+ *   "arma3_win64"             → "arma3"
+ *   "dayz_epoch_mod_win32"    → "dayzepochmod"
+ */
+function normalize_game_name(string $name): string
+{
+    $name = strtolower($name);
+    // Strip extension if present
+    $name = preg_replace('/\.[a-z]{2,4}$/', '', $name);
+    // Strip common platform/arch suffixes (as whole words or underscore-delimited tokens)
+    $name = preg_replace('/[\s_\-]*(linux64|linux32|linux|win64|win32|windows|win|x64|x86|32|64)/', '', $name);
+    // Remove punctuation, spaces and underscores
+    $name = preg_replace('/[^a-z0-9]/', '', $name);
+    return $name;
+}
+
+/**
+ * Given a game name (from config_homes.game_name or home_cfg_file), try to find
+ * a matching image filename from the list of available game images.
+ * Returns the filename (e.g. "arma_3.jpg") or '' if nothing suitable is found.
+ */
+function guess_game_image(string $gameName, string $cfgFile, array $availableImages): string
+{
+    if (empty($availableImages)) {
+        return '';
+    }
+
+    // Build a normalised→filename map for available images
+    $normMap = [];
+    foreach ($availableImages as $imgFile) {
+        $stem = pathinfo($imgFile, PATHINFO_FILENAME);
+        $key  = normalize_game_name($stem);
+        if ($key !== '') {
+            // Keep the first match for duplicate normalised keys
+            $normMap[$key] = $normMap[$key] ?? $imgFile;
+        }
+    }
+
+    // Candidates to try, in priority order: game display name, then cfg file stem
+    $candidates = [$gameName];
+    if ($cfgFile !== '') {
+        $candidates[] = pathinfo($cfgFile, PATHINFO_FILENAME);
+    }
+
+    foreach ($candidates as $candidate) {
+        $key = normalize_game_name($candidate);
+        if ($key !== '' && isset($normMap[$key])) {
+            return $normMap[$key];
+        }
+        // Also try prefix matching: game "dayz epoch" → find "dayz_epochmod"
+        foreach ($normMap as $normImgKey => $imgFile) {
+            if (str_starts_with($normImgKey, $key) || str_starts_with($key, $normImgKey)) {
+                return $imgFile;
+            }
+        }
+    }
+
+    return '';
 }
 
 $db = billing_get_db();
@@ -142,11 +233,15 @@ function sync_billing_services(mysqli $db, string $prefix): array
     // Insert a new row for every config_homes entry not yet in billing_services.
     // Admin-editable fields (prices, slots, enabled, etc.) get safe defaults so
     // the service is visible to the admin but not yet live in the store.
+    $availableImages = list_game_images();
     foreach ($configHomes as $homeCfgId => $ch) {
         if (isset($existing[$homeCfgId])) {
             continue;
         }
         $svcName = $db->real_escape_string($ch['game_name']);
+        $guessedImg = $db->real_escape_string(
+            guess_game_image((string)$ch['game_name'], (string)($ch['home_cfg_file'] ?? ''), $availableImages)
+        );
         $db->query(
             "INSERT INTO `{$tableName}`
                 (home_cfg_id, mod_cfg_id, service_name, description,
@@ -159,9 +254,13 @@ function sync_billing_services(mysqli $db, string $prefix): array
                  '', 0,
                  0.00, 0.00, 0.00,
                  1, 100,
-                 '', '', 'steamcmd', '', '')"
+                 '{$guessedImg}', '', 'steamcmd', '', '')"
         );
-        $messages[] = "Added new service: " . $ch['game_name'];
+        $msg = "Added new service: " . $ch['game_name'];
+        if ($guessedImg !== '') {
+            $msg .= " (image auto-set: {$guessedImg})";
+        }
+        $messages[] = $msg;
     }
 
     // Soft-disable billing_services whose home_cfg_id no longer appears in config_homes.
@@ -214,7 +313,14 @@ if (isset($_POST['save_services'])) {
         $slotMax      = max(1, (int)($svcData['slot_max_qty'] ?? 1));
         if ($slotMax < $slotMin) { $slotMax = $slotMin; }
         $description  = $db->real_escape_string(substr((string)($svcData['description'] ?? ''), 0, 1000));
-        $imgUrl       = $db->real_escape_string(substr((string)($svcData['img_url'] ?? ''), 0, 255));
+        // Merge dropdown and fallback text input:
+        //   - dropdown value "__other__" means use the text fallback field
+        //   - otherwise use the dropdown value (bare filename or '')
+        $rawImgUrl = (string)($svcData['img_url'] ?? '');
+        if ($rawImgUrl === '__other__') {
+            $rawImgUrl = (string)($svcData['img_url_other'] ?? '');
+        }
+        $imgUrl = $db->real_escape_string(substr($rawImgUrl, 0, 255));
 
         // Build comma-separated remote_server_id from checkboxes, validating each ID
         $checkedIds = [];
@@ -306,12 +412,14 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
         <th>Price / Month ($)</th>
         <th>Price / Year ($)</th>
         <th>Description</th>
-        <th>Image URL</th>
+        <th>Image</th>
         <th>Available Servers</th>
       </tr>
     </thead>
     <tbody>
-    <?php foreach ((array)$services as $svc):
+    <?php
+    $gameImageFiles = list_game_images();
+    foreach ((array)$services as $svc):
       $sid = (int)$svc['service_id'];
       $svcEnabled    = (int)$svc['enabled'];
       $cfgFile       = (string)($svc['home_cfg_file'] ?? '');
@@ -378,9 +486,40 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
         </td>
 
         <td>
-          <input type="text" class="img-input"
-                 name="svc[<?php echo $sid; ?>][img_url]"
-                 value="<?php echo h($svc['img_url']); ?>">
+          <?php
+            // Determine whether saved value is a bare filename (in /images/games/),
+            // a full external URL, or empty.
+            $savedImg    = (string)($svc['img_url'] ?? '');
+            $isExternal  = (str_starts_with($savedImg, 'http://') || str_starts_with($savedImg, 'https://'));
+            $inDropdown  = !$isExternal && in_array(basename($savedImg), $gameImageFiles, true);
+            // Value to pre-select in the dropdown: use bare filename, or '' if external/missing
+            $dropdownVal = (!$isExternal && $savedImg !== '') ? basename($savedImg) : '';
+          ?>
+          <select name="svc[<?php echo $sid; ?>][img_url]"
+                  class="img-select"
+                  data-fallback-id="imgfb_<?php echo $sid; ?>">
+            <option value="">— none —</option>
+            <?php foreach ($gameImageFiles as $imgFile): ?>
+              <option value="<?php echo h($imgFile); ?>"
+                <?php echo ($dropdownVal === $imgFile) ? 'selected' : ''; ?>>
+                <?php echo h($imgFile); ?>
+              </option>
+            <?php endforeach; ?>
+            <option value="__other__" <?php echo ($isExternal || (!$inDropdown && $savedImg !== '')) ? 'selected' : ''; ?>>
+              — other / full URL —
+            </option>
+          </select>
+          <?php
+            // Show fallback text input when the saved value is external or not in dropdown
+            $fbClass = ($isExternal || (!$inDropdown && $savedImg !== '')) ? 'img-fallback img-fallback-visible' : 'img-fallback';
+            $fbValue = ($isExternal || (!$inDropdown && $savedImg !== '')) ? $savedImg : '';
+          ?>
+          <input type="text"
+                 id="imgfb_<?php echo $sid; ?>"
+                 class="<?php echo $fbClass; ?>"
+                 name="svc[<?php echo $sid; ?>][img_url_other]"
+                 placeholder="Full URL or filename"
+                 value="<?php echo h($fbValue); ?>">
         </td>
 
         <td class="servers-cell">
@@ -434,5 +573,18 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
 </div>
 
 <?php billing_maybe_close_db($db); ?>
+
+<script>
+// Toggle fallback text input when image dropdown changes
+document.querySelectorAll('select[data-fallback-id]').forEach((sel) => {
+    sel.addEventListener('change', function () {
+        const fb = document.getElementById(this.dataset.fallbackId);
+        if (!fb) return;
+        const show = (this.value === '__other__');
+        fb.classList.toggle('img-fallback-visible', show);
+        if (!show) fb.value = '';
+    });
+});
+</script>
 </body>
 </html>
