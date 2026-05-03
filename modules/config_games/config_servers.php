@@ -185,6 +185,14 @@ function config_games_script_node_names(): array
  * CDATA section so the file becomes well-formed.  Non-script elements are left
  * untouched.
  *
+ * Assumptions / limitations:
+ *  - Script elements are treated as leaf nodes (no child elements expected).
+ *    Nested XML tags inside a script block are not supported and the regex
+ *    will not handle them correctly.
+ *  - The detection of an already-present CDATA section relies on the opening
+ *    tag being immediately followed by '<![CDATA[' (with optional whitespace).
+ *    If a script block mixes text and CDATA it is left unchanged.
+ *
  * This is applied to raw XML submitted through the editor's "Raw XML" path
  * before the validation step, giving a best-effort fix rather than a hard
  * rejection for the most common authoring mistake.
@@ -201,7 +209,9 @@ function config_games_sanitize_xml_scripts(string $xml): string
             function ($m) use ($tag) {
                 $attrs   = $m[1];
                 $content = $m[2];
-                // Only wrap if the content contains raw < that are not XML entities/tags.
+                // Only wrap if the content contains a raw '<' character.  XML
+                // entities such as &lt; do not contain a literal '<' so they
+                // are not matched here and do not trigger CDATA wrapping.
                 if (strpos($content, '<') === false) {
                     return $m[0];
                 }
@@ -432,7 +442,7 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
             continue;
         }
         $hasChildren = !empty($nodeData['has_children']);
-        $nodeName    = strtolower(substr($path, (int)strrpos($path, '/') + 1));
+        $nodeName    = strtolower(($slashPos = strrpos($path, '/')) !== false ? substr($path, $slashPos + 1) : $path);
         $isScriptNode = in_array($nodeName, config_games_script_node_names(), true);
         if (array_key_exists('value', (array)$nodeData)) {
             $normalizedValue = config_games_normalize_newlines($nodeData['value']);
