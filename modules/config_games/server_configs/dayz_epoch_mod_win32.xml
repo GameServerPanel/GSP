@@ -66,89 +66,59 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
 </server_params>
 
 <post_install>
+
 mkdir -p ./cfg
 touch ./cfg/epochmod_win32.xml
-wget http://files.iaregamer.com/gamefiles/arma2Addons.tar .
-wget http://files.iaregamer.com/gamefiles/epochmod.tar .
+
+wget --progress=dot:giga http://files.iaregamer.com/gamefiles/arma2Addons.tar
 tar -xvf arma2Addons.tar
+rm -f arma2Addons.tar
+
+wget --progress=dot:giga http://files.iaregamer.com/gamefiles/epochmod.tar
 tar -xvf epochmod.tar
+rm -f epochmod.tar
+
 
 #Create Database ---------------------------------------
 
-dbPass=$(&lt;/dev/urandom tr -dc _A-Z-a-z-0-9 | head -c8)
+dbPass=$(&lt;/dev/urandom tr -dc 'A-Za-z0-9_' | head -c 12)
 srvID=${PWD##*/}
-dbID=server_${srvID}
-mysqlServerID=2
+dbID="server_${srvID}"
 
-# Panel DB connection (where gsp_mysql_servers / gsp_mysql_databases live)
-panelDB=panel
-panelPrefix=gsp_
-panelHost=mysql.iaregamer.com
-panelPort=3306
-panelUser=remoteuser
-panelPass=Pkloyn7yvpht!
+sed -i "s/^Host = .*/Host = mysql.iaregamer.com/" cfg/hiveext.ini
+sed -i "s/^Port = .*/Port = 3306/" cfg/hiveext.ini
+sed -i "s/^Database = .*/Database = ${dbID}/" cfg/hiveext.ini
+sed -i "s/^Username = .*/Username = ${dbID}/" cfg/hiveext.ini
+sed -i "s/^Password = .*/Password = ${dbPass}/" cfg/hiveext.ini
 
-# Resolve target game DB server/profile from panel metadata (default: mysql_server_id=2 -> MySQL 5.7)
-mysqlProfile=$(mysql -N -B -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "SELECT mysql_ip,mysql_port,COALESCE(NULLIF(mysql_admin_user,''),'root'),mysql_root_passwd FROM ${panelDB}.${panelPrefix}mysql_servers WHERE mysql_server_id = ${mysqlServerID} LIMIT 1")
+mysql -e "
+CREATE DATABASE IF NOT EXISTS \`${dbID}\`;
+CREATE USER IF NOT EXISTS '${dbID}'@'%' IDENTIFIED BY '${dbPass}';
+GRANT ALL ON \`${dbID}\`.* TO '${dbID}'@'%';
 
-if [ -z "${mysqlProfile}" ]; then
-   echo "ERROR: Could not resolve mysql server profile id ${mysqlServerID} from ${panelDB}.${panelPrefix}mysql_servers"
-   exit 1
-fi
+DELETE FROM panel.gsp_mysql_databases WHERE db_user='${dbID}';
+INSERT INTO panel.gsp_mysql_databases
+(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled)
+VALUES (1, ${srvID}, '${dbID}', '${dbPass}', '${dbID}', 1);
+"
 
-IFS=$'\t' read -r mysqlHost mysqlPort mysqlAdminUser mysqlAdminPass &lt;&lt;EOF
-${mysqlProfile}
-EOF
+mysql --force "${dbID}" &lt; 1.9.0_fresh.sql
 
-mysqlPort=${mysqlPort:-3306}
 
-sed -i "s/dayzhivemind/${dbID}/g" epoch.sql
 
-sed -i "s/Host = .*/Host = ${mysqlHost}/g" cfg/hiveext.ini
-sed -i "s/Database = .*/Database = ${dbID}/g" cfg/hiveext.ini
-sed -i "s/Username = .*/Username = ${dbID}/g" cfg/hiveext.ini
-sed -i "s/Password = .*/Password = ${dbPass}/g" cfg/hiveext.ini
-sed -i "s/Port = .*/Port = ${mysqlPort}/g" cfg/hiveext.ini
 
-mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "CREATE DATABASE IF NOT EXISTS \`${dbID}\`"
-
-# MySQL 5.7/8 compatible user creation + grants
-mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "CREATE USER IF NOT EXISTS '${dbID}'@'localhost' IDENTIFIED BY '${dbPass}'"
-mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "CREATE USER IF NOT EXISTS '${dbID}'@'%' IDENTIFIED BY '${dbPass}'"
-mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "GRANT ALL ON \`${dbID}\`.* TO '${dbID}'@'localhost'"
-mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "GRANT ALL ON \`${dbID}\`.* TO '${dbID}'@'%'"
-mysql -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -e "FLUSH PRIVILEGES;"
-
-# Import with compatibility flags for routines/events under binary logging
-# Keep stderr in a file to avoid flooding panel output with non-fatal import warnings.
-mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; epoch.sql 2> ./cfg/mysql_import_errors.log
-mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; add_events.sql 2>> ./cfg/mysql_import_errors.log
-mysql --force --init-command="SET SESSION sql_mode=''; SET SESSION log_bin_trust_function_creators=1;" -u${mysqlAdminUser} -p${mysqlAdminPass} -h${mysqlHost} -P${mysqlPort} -D ${dbID} &lt; update1071.sql 2>> ./cfg/mysql_import_errors.log
-
-mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "DELETE FROM ${panelDB}.${panelPrefix}mysql_databases WHERE db_user = '${dbID}'"
-
-# Backward-compatible insert: new schema with snapshot columns OR legacy schema.
-hasSnapshotCols=$(mysql -N -B -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA='${panelDB}' AND TABLE_NAME='${panelPrefix}mysql_databases' AND COLUMN_NAME IN ('db_mysql_ip','db_mysql_port','db_admin_user','db_admin_passwd')")
-if [ "${hasSnapshotCols}" = "4" ]; then
-   mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "INSERT INTO ${panelDB}.${panelPrefix}mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled, db_mysql_ip, db_mysql_port, db_admin_user, db_admin_passwd) VALUES (${mysqlServerID},${srvID},'${dbID}','${dbPass}','${dbID}',1,'${mysqlHost}','${mysqlPort}','${mysqlAdminUser}','${mysqlAdminPass}')"
-else
-   mysql -u${panelUser} -p${panelPass} -h${panelHost} -P${panelPort} -e "INSERT INTO ${panelDB}.${panelPrefix}mysql_databases(mysql_server_id, home_id, db_user, db_passwd, db_name, enabled) VALUES (${mysqlServerID},${srvID},'${dbID}','${dbPass}','${dbID}',1)"
-fi
-
-rm *.sh
-rm *.gz
-rm +.tar
-rm *.sql
+# Create _alsoRun.bat -----------------------------------
 
 printf '%s\r\n' \
 '@echo off' \
 'del /q "..\_alsoRun.pid" 2>nul' \
-'cd bec \
+'cd bec' \
 'start "BEC" bec.exe --dsc --dec -f config.cfg' \
-'cd .. \
-'timeout /t 1 /nobreak >nul' \
+'cd ..' \
+'timeout /t 3 /nobreak >nul' \
 'for /f "tokens=2 delims==" %%P in ('"'"'wmic process where "ExecutablePath='"'"'%cd:\=\\%\\bec.exe'"'"'" get ProcessId /value ^| find "="'"'"') do >"..\_alsoRun.pid" echo %%P' \
 > _alsoRun.bat
+
 
 </post_install>
 <pre_start>
