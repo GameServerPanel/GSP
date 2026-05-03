@@ -65,7 +65,7 @@ Make sure if you install a MOD, you list the name here or else it wont get loade
  </param>
 </server_params>
 
-<post_install>
+<post_install><![CDATA[
 
 mkdir -p ./cfg
 touch ./cfg/epochmod_win32.xml
@@ -81,7 +81,7 @@ rm -f epochmod.tar
 
 #Create Database ---------------------------------------
 
-dbPass=$(&lt;/dev/urandom tr -dc 'A-Za-z0-9_' | head -c 12)
+dbPass=$(tr -dc 'A-Za-z0-9_' </dev/urandom | head -c 12)
 srvID=${PWD##*/}
 dbID="server_${srvID}"
 
@@ -102,9 +102,7 @@ INSERT INTO panel.gsp_mysql_databases
 VALUES (1, ${srvID}, '${dbID}', '${dbPass}', '${dbID}', 1);
 "
 
-mysql --force "${dbID}" &lt; 1.9.0_fresh.sql
-
-
+mysql --force "${dbID}" < 1.9.0_fresh.sql
 
 
 # Create _alsoRun.bat -----------------------------------
@@ -119,8 +117,7 @@ printf '%s\r\n' \
 'for /f "tokens=2 delims==" %%P in ('"'"'wmic process where "ExecutablePath='"'"'%cd:\=\\%\\bec.exe'"'"'" get ProcessId /value ^| find "="'"'"') do >"..\_alsoRun.pid" echo %%P' \
 > _alsoRun.bat
 
-
-</post_install>
+]]></post_install>
 <pre_start>
 </pre_start>
 
