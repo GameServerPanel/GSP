@@ -69,8 +69,11 @@ include(__DIR__ . '/includes/menu.php');
     <?php if (!isset($_REQUEST['service_id'])): ?>
         <!-- Service listing (all) -->
     <div class="float-left p-30-20">
-            <img src="../<?php echo $row['img_url']; ?>" width="460" height="225"><br>
-            <strong><?php echo $row['service_name']; ?></strong><br>
+            <?php $imgSrc = billing_image_url((string)($row['img_url'] ?? '')); ?>
+            <?php if ($imgSrc !== ''): ?>
+            <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" width="460" height="225"><br>
+            <?php endif; ?>
+            <strong><?php echo htmlspecialchars((string)$row['service_name'], ENT_QUOTES, 'UTF-8'); ?></strong><br>
             <?php
             echo ($row['price_monthly'] == 0.0) ? "FREE" : "$" . number_format(floatval($row['price_monthly']), 2) . " Monthly";
             ?>
@@ -81,8 +84,11 @@ include(__DIR__ . '/includes/menu.php');
     <?php else: ?>
         <!-- Single service detail view -->
     <div class="float-left decorative-bottom">
-            <img src="<?php echo $row['img_url']; ?>" width="230" height="112"><br>
-            <center><b><?php echo $row['service_name']; ?></b></center>
+            <?php $imgSrc = billing_image_url((string)($row['img_url'] ?? '')); ?>
+            <?php if ($imgSrc !== ''): ?>
+            <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" width="230" height="112"><br>
+            <?php endif; ?>
+            <center><b><?php echo htmlspecialchars((string)$row['service_name'], ENT_QUOTES, 'UTF-8'); ?></b></center>
 
             <?php
             $isAdmin = false; // change to actual check, e.g. current_user_can('administrator')

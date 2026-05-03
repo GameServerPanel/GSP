@@ -106,7 +106,7 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
   
   
   
-<img src="../<?php echo $row['img_url'];?>" width="460" height="225" >
+<img src="<?php echo htmlspecialchars(billing_image_url((string)($row['img_url'] ?? '')), ENT_QUOTES, 'UTF-8');?>" width="460" height="225" >
 <br>
 <?php echo $row['service_name'];?>
 <br>
@@ -143,7 +143,7 @@ if ($row['price_monthly'] == 0.0) {
 			?>
 			<div class="float-left decorative-bottom">
 			
-			<img src="../<?php echo $row['img_url'];?>" width=230 height=112 border=0 ">
+			<img src="<?php echo htmlspecialchars(billing_image_url((string)($row['img_url'] ?? '')), ENT_QUOTES, 'UTF-8');?>" width="230" height="112">
 			<center><b>	<?php echo $row['service_name'];?></b></center>
 			<?php
 			
