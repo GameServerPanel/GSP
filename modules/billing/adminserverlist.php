@@ -6,16 +6,18 @@
     <title>Admin Service Configuration - GSP</title>
     <style>
     .svc-table { border-collapse: collapse; width: 100%; }
-    .svc-table th, .svc-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; }
-    .svc-table th { background: #f5f5f5; white-space: nowrap; text-align: center; }
+    .svc-table th, .svc-table td { border: 1px solid #4a6080; padding: 6px 8px; vertical-align: middle; }
+    /* Sticky header: stays visible while scrolling; dark background with light text for readability */
+    .svc-table thead th { position: sticky; top: 0; z-index: 10; background: #2c3e50; color: #f0f0f0; white-space: nowrap; text-align: center; }
+    .svc-table thead th.game-name { text-align: left; }
     .svc-table td.game-name { text-align: left; white-space: nowrap; }
     .price-input { width: 80px; }
     .slot-input  { width: 60px; }
     .desc-input  { width: 160px; }
     .img-input   { width: 160px; }
     .muted { color: #999; font-size: 0.85em; }
-    .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
-    .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; }
+    .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #155724; }
+    .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #721c24; }
     .servers-cell { text-align: left; }
     .server-cb-label { display: block; white-space: nowrap; margin: 2px 0; }
     </style>
@@ -41,7 +43,7 @@
  *   home_cfg_id   ← home_cfg_id  (sync key)
  *
  * Columns that are admin-editable and NEVER overwritten by sync:
- *   enabled, out_of_stock, slot_min_qty, slot_max_qty,
+ *   enabled, slot_min_qty, slot_max_qty,
  *   price_daily, price_monthly, price_year,
  *   remote_server_id, description, img_url
  */
@@ -78,7 +80,6 @@ function sync_billing_services(mysqli $db, string $prefix): array
         'home_cfg_id'      => "ADD COLUMN `home_cfg_id` INT(11) NOT NULL DEFAULT 0",
         'description'      => "ADD COLUMN `description` VARCHAR(1000) NOT NULL DEFAULT ''",
         'img_url'          => "ADD COLUMN `img_url` VARCHAR(255) NOT NULL DEFAULT ''",
-        'out_of_stock'     => "ADD COLUMN `out_of_stock` TINYINT(1) NOT NULL DEFAULT 0",
         'slot_min_qty'     => "ADD COLUMN `slot_min_qty` INT(11) NOT NULL DEFAULT 1",
         'slot_max_qty'     => "ADD COLUMN `slot_max_qty` INT(11) NOT NULL DEFAULT 100",
         'price_daily'      => "ADD COLUMN `price_daily` FLOAT(15,4) NOT NULL DEFAULT 0",
@@ -126,7 +127,7 @@ function sync_billing_services(mysqli $db, string $prefix): array
     // Load existing billing_services indexed by home_cfg_id.
     $existing = [];
     $svcRes = $db->query(
-        "SELECT service_id, home_cfg_id, enabled, out_of_stock
+        "SELECT service_id, home_cfg_id, enabled
          FROM `{$tableName}`"
     );
     if ($svcRes) {
@@ -149,13 +150,13 @@ function sync_billing_services(mysqli $db, string $prefix): array
         $db->query(
             "INSERT INTO `{$tableName}`
                 (home_cfg_id, mod_cfg_id, service_name, description,
-                 remote_server_id, enabled, out_of_stock,
+                 remote_server_id, enabled,
                  price_daily, price_monthly, price_year,
                  slot_min_qty, slot_max_qty,
                  img_url, ftp, install_method, manual_url, access_rights)
              VALUES
                 ({$homeCfgId}, 0, '{$svcName}', '{$svcName}',
-                 '', 0, 0,
+                 '', 0,
                  0.00, 0.00, 0.00,
                  1, 100,
                  '', '', 'steamcmd', '', '')"
@@ -169,7 +170,7 @@ function sync_billing_services(mysqli $db, string $prefix): array
             $sid = (int)$svcRow['service_id'];
             $db->query(
                 "UPDATE `{$tableName}`
-                 SET enabled = 0, out_of_stock = 1
+                 SET enabled = 0
                  WHERE service_id = {$sid} AND enabled = 1"
             );
             if ($db->affected_rows > 0) {
@@ -206,10 +207,9 @@ if (isset($_POST['save_services'])) {
     foreach ((array)$postedServices as $sid => $svcData) {
         $sid          = (int)$sid;
         $enabled      = isset($svcData['enabled']) ? 1 : 0;
-        $outOfStock   = isset($svcData['out_of_stock']) ? 1 : 0;
-        $priceDaily   = number_format((float)($svcData['price_daily']   ?? 0), 4, '.', '');
-        $priceMonthly = number_format((float)($svcData['price_monthly'] ?? 0), 4, '.', '');
-        $priceYear    = number_format((float)($svcData['price_year']    ?? 0), 4, '.', '');
+        $priceDaily   = number_format((float)($svcData['price_daily']   ?? 0), 2, '.', '');
+        $priceMonthly = number_format((float)($svcData['price_monthly'] ?? 0), 2, '.', '');
+        $priceYear    = number_format((float)($svcData['price_year']    ?? 0), 2, '.', '');
         $slotMin      = max(1, (int)($svcData['slot_min_qty'] ?? 1));
         $slotMax      = max(1, (int)($svcData['slot_max_qty'] ?? 1));
         if ($slotMax < $slotMin) { $slotMax = $slotMin; }
@@ -229,7 +229,6 @@ if (isset($_POST['save_services'])) {
         $db->query(
             "UPDATE `{$table_prefix}billing_services`
              SET enabled          = {$enabled},
-                 out_of_stock     = {$outOfStock},
                  price_daily      = '{$priceDaily}',
                  price_monthly    = '{$priceMonthly}',
                  price_year       = '{$priceYear}',
@@ -260,7 +259,7 @@ while ($rsRes && ($row = $rsRes->fetch_assoc())) {
 
 $services = [];
 $svcRes = $db->query(
-    "SELECT bs.service_id, bs.service_name, bs.enabled, bs.out_of_stock,
+    "SELECT bs.service_id, bs.service_name, bs.enabled,
             bs.price_daily, bs.price_monthly, bs.price_year,
             bs.slot_min_qty, bs.slot_max_qty,
             bs.remote_server_id, bs.description, bs.img_url,
@@ -301,7 +300,6 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
         <th class="game-name">Game Name</th>
         <th>Config XML</th>
         <th>Enabled</th>
-        <th>Out of Stock</th>
         <th>Min Slots</th>
         <th>Max Slots</th>
         <th>Price / Day ($)</th>
@@ -316,7 +314,6 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
     <?php foreach ((array)$services as $svc):
       $sid = (int)$svc['service_id'];
       $svcEnabled    = (int)$svc['enabled'];
-      $svcOutOfStock = (int)$svc['out_of_stock'];
       $cfgFile       = (string)($svc['home_cfg_file'] ?? '');
 
       // Parse existing remote_server_id CSV into a set for fast checkbox lookup
@@ -344,12 +341,6 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
                  <?php echo $svcEnabled ? 'checked' : ''; ?>>
         </td>
 
-        <td style="text-align:center;">
-          <input type="hidden"   name="svc[<?php echo $sid; ?>][out_of_stock]" value="0">
-          <input type="checkbox" name="svc[<?php echo $sid; ?>][out_of_stock]" value="1"
-                 <?php echo $svcOutOfStock ? 'checked' : ''; ?>>
-        </td>
-
         <td>
           <input type="number" min="1" class="slot-input"
                  name="svc[<?php echo $sid; ?>][slot_min_qty]"
@@ -363,21 +354,21 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
         </td>
 
         <td>
-          <input type="number" step="0.0001" min="0" class="price-input"
+          <input type="number" step="0.01" min="0" class="price-input"
                  name="svc[<?php echo $sid; ?>][price_daily]"
-                 value="<?php echo h(number_format((float)$svc['price_daily'], 4, '.', '')); ?>">
+                 value="<?php echo h(number_format((float)$svc['price_daily'], 2, '.', '')); ?>">
         </td>
 
         <td>
-          <input type="number" step="0.0001" min="0" class="price-input"
+          <input type="number" step="0.01" min="0" class="price-input"
                  name="svc[<?php echo $sid; ?>][price_monthly]"
-                 value="<?php echo h(number_format((float)$svc['price_monthly'], 4, '.', '')); ?>">
+                 value="<?php echo h(number_format((float)$svc['price_monthly'], 2, '.', '')); ?>">
         </td>
 
         <td>
-          <input type="number" step="0.0001" min="0" class="price-input"
+          <input type="number" step="0.01" min="0" class="price-input"
                  name="svc[<?php echo $sid; ?>][price_year]"
-                 value="<?php echo h(number_format((float)$svc['price_year'], 4, '.', '')); ?>">
+                 value="<?php echo h(number_format((float)$svc['price_year'], 2, '.', '')); ?>">
         </td>
 
         <td>

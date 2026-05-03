@@ -39,15 +39,24 @@ if (isset($_POST['save']) && !empty($_POST['description'])) {
 
 // Fetch services
 $service_id = isset($_REQUEST['service_id']) ? intval($_REQUEST['service_id']) : 0;
-$where_service_id = $service_id !== 0 ? "WHERE enabled = 1 AND service_id = $service_id AND remote_server_id != ''" : "WHERE enabled = 1 AND remote_server_id != ''";
+$where_service_id = $service_id !== 0
+    ? "WHERE enabled = 1 AND service_id = $service_id AND remote_server_id != '' AND remote_server_id IS NOT NULL"
+    : "WHERE enabled = 1 AND remote_server_id != '' AND remote_server_id IS NOT NULL";
 $qry_services = "SELECT * FROM {$table_prefix}billing_services $where_service_id ORDER BY service_name";
-$services = $db->query($qry_services);
+$result_services = $db->query($qry_services);
 
-if (!$services) {
+if (!$result_services) {
     echo "<meta http-equiv='refresh' content='1'>";
     billing_maybe_close_db($db);
     return;
 }
+
+// Fetch all service rows into an array so the template foreach works correctly
+$serviceRows = [];
+while ($row = $result_services->fetch_assoc()) {
+    $serviceRows[] = $row;
+}
+$result_services->free();
 
 // Include top bar and menu
 include(__DIR__ . '/includes/top.php');
@@ -56,7 +65,7 @@ include(__DIR__ . '/includes/menu.php');
 
 <!-- Services container: clearfix to contain floated service cards so footer clears correctly -->
 <div class="clearfix container-wide">
-<?php foreach ((array)$services as $row): ?>
+<?php foreach ($serviceRows as $row): ?>
     <?php if (!isset($_REQUEST['service_id'])): ?>
         <!-- Service listing (all) -->
     <div class="float-left p-30-20">
