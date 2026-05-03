@@ -1,6 +1,12 @@
 # Changelog
 
-## 2026-05-02 (latest)
+## 2026-05-03 (latest)
+- **GSP 1.0 baseline:** Reset all bundled/core module versions to `1.0`. DB schema versions (`$db_version`) are unchanged.
+- **FAQ module refresh:** Restored online RSS update code from upstream (opengamepanel.org), fixed `$local = false` initialization bug, switched local cache to `ogpfaq.rss`, added PHP 8.3-compatible `(array)` casts, restored upstream credits footer, and opened `navigation.xml` access to `user,admin,subuser`.
+- **Config XML editor improvements:** Added schema validation before save (both structured editor and raw XML path); invalid XML is rejected with line-level error messages instead of being written to disk. Added auto-restore from backup on validation failure. Fields are now displayed in schema-defined order with required/optional badges. Added a raw XML editing panel with validation warning. Unknown/custom XML fields are preserved when only specific nodes are modified.
+- **Obsidian theme:** Added `themes/Obsidian/` from `hmrserver/Obsidian`. The theme is immediately selectable in the panel theme settings.
+
+
 - Removed 22 stray backup/duplicate files left by manual editing (`.bak`, `.BAK`, `.orig`, `.backup` extensions). Files inside `modules/config_games/server_configs/backup/` (intentional runtime backup folder) were left untouched.
 
 ## 2026-05-01

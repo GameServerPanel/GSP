@@ -36,11 +36,11 @@ function exec_ogp_module()
 
 	require 'modules/faq/rss_php.php';
 	$url = 'https://opengamepanel.org/faq/rss.php';
-	$local_copy = 'modules/faq/faq.rss'; ## Relative path
-	$save_as = realpath('modules' . DIRECTORY_SEPARATOR . 'faq') . DIRECTORY_SEPARATOR . 'faq.rss'; 
+	$local_copy = 'modules/faq/ogpfaq.rss'; ## Relative path
+	$save_as = realpath('modules' . DIRECTORY_SEPARATOR . 'faq') . DIRECTORY_SEPARATOR . 'ogpfaq.rss';
 	## Full path (adding the filename to realpath would fail if the file does not exists yet)
 	$online = false;
-	$local = true;
+	$local = false;
 	$updated = false;
 	$s = (isset($_SERVER['HTTPS'])) ? "s" : "";
 	$p = (isset($_SERVER['SERVER_PORT']) and $_SERVER['SERVER_PORT'] != "80") ? ":".$_SERVER['SERVER_PORT'] : "";
@@ -57,8 +57,7 @@ function exec_ogp_module()
 		$items = $rss->getItems(); #returns all rss items
 		$local = true;
 	}
-	/*
-	echo "<script>console.log('Last Update : ".date("r", filemtime($save_as))."\\nCurrent Time: ".date('r',time())."\\nNext Update : ".date('r', strtotime("+1 day", filemtime($save_as)))."');</script>";
+	echo "<script>console.log('Last Update : ".(file_exists($save_as) ? date("r", filemtime($save_as)) : 'N/A')."\\nCurrent Time: ".date('r',time())."\\nNext Update : ".(file_exists($save_as) ? date('r', strtotime("+1 day", filemtime($save_as))) : 'N/A')."');</script>";
 	if( ($local AND ( strtotime("+1 day", filemtime($save_as)) <= strtotime("now") )) OR !$local) # Check the file is older than 1 day to avoid spamming the server
 	{
 		stream_context_set_default(array('ssl' => array(
@@ -66,13 +65,13 @@ function exec_ogp_module()
 				'verify_peer_name' => false
 			)
 		));
-		
-		$headers = get_headers( $url, 1 );
+
+		$headers = @get_headers( $url, 1 );
 		touch( $save_as ); # Connection done, so we reset the file modification time even if the server is down (avoid server spamming)
 		echo "<script>console.log('Trying to connect to ".$url."');</script>";
-		if( $headers[0] == 'HTTP/1.1 200 OK')
+		if( is_array($headers) && isset($headers[0]) && $headers[0] == 'HTTP/1.1 200 OK')
 		{
-			$online = false;
+			$online = true;
 			$rss_online = new rss_php;
 			$rss_online->load($url); # SERVER USAGE WARNING : using 32kb of server bandwidth each time each person loads this function 
 			$items_online = $rss_online->getItems();
@@ -111,7 +110,6 @@ function exec_ogp_module()
 		$rss->load($local_url);
 		$items = $rss->getItems(); #returns all rss items
 	}
-	*/
 	
 	if(!file_exists($save_as))
 	{
@@ -147,11 +145,15 @@ function exec_ogp_module()
 	
 	echo "<div class='footer' >".
 			"<div style='display:block;float:left' >".
-				"<b class='imagetext'></b><br>".
+				"<b class='imagetext'>Powered by:</b><br>".
+				"<a href='http://docs.s9y.org/index.html' target='_blank' ><img class='footerimg' style='height:50px;' src='http://docs.s9y.org/img/logos/s9y.png'></a>".
 			"</div>".
 			"<div class='credits' style='display:block;float:right' >".
 				"<b>Credits:</b><br>".
-				"<div class='credittext'><br>".
+				"<div class='credittext'>Original Idea | Chief Content Maintainer : <b>omano</b> at opengamepanel.org<br>".
+				"Front End Developer | <b>james30263</b> at opengamepanel.org<br>".
+				"Back End Developer | <b>DieFeM</b> at opengamepanel.org<br>".
+				"Beta Tester | Content Maintainer : <b>rocco</b> at opengamepanel.org</div>".
 			"</div>".
 		 "</div>";
 }

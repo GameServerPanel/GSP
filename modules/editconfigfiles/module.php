@@ -24,6 +24,6 @@
 // Module general information
 
 $module_title = "Edit Config Files";
-$module_version = "0.2";
+$module_version = "1.0";
 $db_version = 0;
 $module_required = false;

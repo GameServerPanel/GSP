@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "Utilities";
-$module_version = "2.0";
+$module_version = "1.0";
 $db_version = 0;
 $module_required = TRUE;
 $module_menus = array( array( 'subpage' => '', 'name'=>'Utilities', 'group'=>'user' ) );

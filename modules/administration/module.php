@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "Administration";
-$module_version = "1.1";
+$module_version = "1.0";
 $db_version = 1;
 $module_required = TRUE;
 $module_menus = array( array( 'subpage' => 'watch_logger', 'name'=>'Watch Logger', 'group'=>'admin' ) );
