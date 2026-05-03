@@ -169,6 +169,50 @@ function config_games_validate_xml_file(string $config_file): array
     return [];
 }
 
+/**
+ * Script-like element names whose text content is shell/batch code.
+ * These nodes should be stored as CDATA sections so that characters such as
+ * '<', '>', '&', etc. survive round-trips through the XML parser unchanged.
+ */
+function config_games_script_node_names(): array
+{
+    return ['pre_install', 'post_install', 'pre_start', 'post_start', 'precmd', 'postcmd'];
+}
+
+/**
+ * Auto-sanitize raw XML text: for every script-like element whose text content
+ * contains a bare '<' outside an existing CDATA block, wrap that content in a
+ * CDATA section so the file becomes well-formed.  Non-script elements are left
+ * untouched.
+ *
+ * This is applied to raw XML submitted through the editor's "Raw XML" path
+ * before the validation step, giving a best-effort fix rather than a hard
+ * rejection for the most common authoring mistake.
+ *
+ * @param  string $xml  Raw XML string (may be malformed).
+ * @return string       XML string with script content wrapped in CDATA where needed.
+ */
+function config_games_sanitize_xml_scripts(string $xml): string
+{
+    $tags = config_games_script_node_names();
+    foreach ($tags as $tag) {
+        $xml = preg_replace_callback(
+            '/<' . preg_quote($tag, '/') . '(\s[^>]*)?>(?!\s*<!\[CDATA\[)(.*?)<\/' . preg_quote($tag, '/') . '>/si',
+            function ($m) use ($tag) {
+                $attrs   = $m[1];
+                $content = $m[2];
+                // Only wrap if the content contains raw < that are not XML entities/tags.
+                if (strpos($content, '<') === false) {
+                    return $m[0];
+                }
+                return '<' . $tag . $attrs . '><![CDATA[' . $content . ']]></' . $tag . '>';
+            },
+            $xml
+        );
+    }
+    return $xml;
+}
+
 function config_games_print_editor_css()
 {
     static $printed = false;
@@ -388,13 +432,19 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
             continue;
         }
         $hasChildren = !empty($nodeData['has_children']);
+        $nodeName    = strtolower(substr($path, (int)strrpos($path, '/') + 1));
+        $isScriptNode = in_array($nodeName, config_games_script_node_names(), true);
         if (array_key_exists('value', (array)$nodeData)) {
             $normalizedValue = config_games_normalize_newlines($nodeData['value']);
             while ($domNode->firstChild) {
                 $domNode->removeChild($domNode->firstChild);
             }
             if ($normalizedValue !== '') {
-                $domNode->appendChild($dom->createTextNode($normalizedValue));
+                if ($isScriptNode) {
+                    $domNode->appendChild($dom->createCDATASection($normalizedValue));
+                } else {
+                    $domNode->appendChild($dom->createTextNode($normalizedValue));
+                }
             }
         } elseif (!$hasChildren) {
             while ($domNode->firstChild) {
@@ -530,9 +580,11 @@ function exec_ogp_module() {
             if ($cfg_info !== FALSE) {
                 $config_file = SERVER_CONFIG_LOCATION . $cfg_info['home_cfg_file'];
                 $raw_content = $_POST['raw_xml_content'];
+                // Apply best-effort auto-fix: wrap bare '<' chars in script blocks with CDATA.
+                $sanitized_content = config_games_sanitize_xml_scripts($raw_content);
                 // Write to a temp file for validation
                 $tmp = tempnam(sys_get_temp_dir(), 'gsp_xml_');
-                file_put_contents($tmp, $raw_content);
+                file_put_contents($tmp, $sanitized_content);
                 $xmlErrors = config_games_validate_xml_file($tmp);
                 @unlink($tmp);
                 if (!empty($xmlErrors)) {
@@ -542,7 +594,7 @@ function exec_ogp_module() {
                     }
                     echo "</ul></div>";
                 } else {
-                    if (file_put_contents($config_file, $raw_content) !== false) {
+                    if (file_put_contents($config_file, $sanitized_content) !== false) {
                         print_success(get_lang('configs_updated_ok'));
                         $config = read_server_config($config_file);
                         if ($config !== FALSE) {
