@@ -93,11 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if (!$authOk && !empty($legacyHash)) {
                 $authOk = (md5($password) === $legacyHash);
-                if ($authOk && function_exists('password_hash')) {
-                    $newHash = password_hash($password, PASSWORD_DEFAULT);
-                    $escapedHash = mysqli_real_escape_string($db, $newHash);
-                    mysqli_query($db, "UPDATE {$table_prefix}users SET users_pass_hash = '$escapedHash' WHERE user_id = $userId LIMIT 1");
-                }
             }
             if ($authOk) {
                 session_regenerate_id(true);
