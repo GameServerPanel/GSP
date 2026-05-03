@@ -17,6 +17,7 @@
     .img-input   { width: 160px; }
     .img-select  { max-width: 180px; }
     .img-fallback { display: none; max-width: 180px; margin-top: 4px; }
+    .img-fallback.img-fallback-visible { display: block; }
     .muted { color: #999; font-size: 0.85em; }
     .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #155724; }
     .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #721c24; }
@@ -495,12 +496,8 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
             $dropdownVal = (!$isExternal && $savedImg !== '') ? basename($savedImg) : '';
           ?>
           <select name="svc[<?php echo $sid; ?>][img_url]"
-                  style="max-width:180px;"
-                  onchange="
-                    var other=document.getElementById('imgfb_<?php echo $sid; ?>');
-                    other.style.display=(this.value==='__other__')?'block':'none';
-                    if(this.value!=='__other__') other.value='';
-                  ">
+                  class="img-select"
+                  data-fallback-id="imgfb_<?php echo $sid; ?>">
             <option value="">— none —</option>
             <?php foreach ($gameImageFiles as $imgFile): ?>
               <option value="<?php echo h($imgFile); ?>"
@@ -514,14 +511,14 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
           </select>
           <?php
             // Show fallback text input when the saved value is external or not in dropdown
-            $fbDisplay = ($isExternal || (!$inDropdown && $savedImg !== '')) ? 'block' : 'none';
-            $fbValue   = ($isExternal || (!$inDropdown && $savedImg !== '')) ? $savedImg : '';
+            $fbClass = ($isExternal || (!$inDropdown && $savedImg !== '')) ? 'img-fallback img-fallback-visible' : 'img-fallback';
+            $fbValue = ($isExternal || (!$inDropdown && $savedImg !== '')) ? $savedImg : '';
           ?>
           <input type="text"
                  id="imgfb_<?php echo $sid; ?>"
+                 class="<?php echo $fbClass; ?>"
                  name="svc[<?php echo $sid; ?>][img_url_other]"
                  placeholder="Full URL or filename"
-                 style="display:<?php echo $fbDisplay; ?>;max-width:180px;margin-top:4px;"
                  value="<?php echo h($fbValue); ?>">
         </td>
 
@@ -576,5 +573,18 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
 </div>
 
 <?php billing_maybe_close_db($db); ?>
+
+<script>
+// Toggle fallback text input when image dropdown changes
+document.querySelectorAll('select[data-fallback-id]').forEach(function (sel) {
+    sel.addEventListener('change', function () {
+        var fb = document.getElementById(this.dataset.fallbackId);
+        if (!fb) return;
+        var show = (this.value === '__other__');
+        fb.classList.toggle('img-fallback-visible', show);
+        if (!show) fb.value = '';
+    });
+});
+</script>
 </body>
 </html>
