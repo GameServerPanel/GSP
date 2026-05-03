@@ -8,7 +8,7 @@
 //* navigation.xml (OPTIONAL):
 
 $module_title = "Backup/Restore";
-$module_version = "0.2";
+$module_version = "1.0";
 $db_version = 0;
 $module_required = false;
 ?>

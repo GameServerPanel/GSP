@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "Addons Manager";
-$module_version = "1.2";
+$module_version = "1.0";
 $db_version = 1;
 $module_required = TRUE;
 $module_menus = array( array( 'subpage' => 'addons_manager', 'name'=>'Addons Manager', 'group'=>'admin' ) );

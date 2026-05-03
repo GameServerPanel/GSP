@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "Server manager";
-$module_version = "1.6.1";
+$module_version = "1.0";
 $db_version = 1;
 $module_required = TRUE;
 $module_menus = array(

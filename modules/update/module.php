@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "Update";
-$module_version = "1.2";
+$module_version = "1.0";
 $db_version = 3; // avoid 'duplicate table' error message.
 $module_required = TRUE;
 $module_menus = array(

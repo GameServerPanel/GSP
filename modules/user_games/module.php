@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "User games";
-$module_version = "1.3";
+$module_version = "1.0";
 $db_version = 3;
 $module_required = TRUE;
 $module_menus = array(

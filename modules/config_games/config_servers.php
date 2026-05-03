@@ -98,6 +98,77 @@ function config_games_next_form_key(): string
     return 'node_' . $counter;
 }
 
+// Schema-defined element order and required/optional flags for game_config root.
+// Source: modules/config_games/schema_server_config.xml (server_config_type sequence).
+function config_games_schema_order(): array
+{
+    return [
+        'game_key'              => true,
+        'protocol'              => false,
+        'lgsl_query_name'       => false,
+        'gameq_query_name'      => false,
+        'installer'             => false,
+        'game_name'             => true,
+        'server_exec_name'      => true,
+        'query_port'            => false,
+        'cli_template'          => false,
+        'cli_params'            => false,
+        'reserve_ports'         => false,
+        'cli_allow_chars'       => false,
+        'maps_location'         => false,
+        'map_list'              => false,
+        'console_log'           => false,
+        'exe_location'          => false,
+        'max_user_amount'       => false,
+        'control_protocol'      => false,
+        'control_protocol_type' => false,
+        'mods'                  => true,
+        'replace_texts'         => false,
+        'server_params'         => false,
+        'custom_fields'         => false,
+        'list_players_command'  => false,
+        'player_info_regex'     => false,
+        'player_info'           => false,
+        'player_commands'       => false,
+        'pre_install'           => false,
+        'post_install'          => false,
+        'pre_start'             => false,
+        'post_start'            => false,
+        'environment_variables' => false,
+        'lock_files'            => false,
+        'configuration_files'   => false,
+    ];
+}
+
+/**
+ * Validate an XML file against the game config schema.
+ * Returns an empty array on success, or an array of error strings on failure.
+ */
+function config_games_validate_xml_file(string $config_file): array
+{
+    if (!file_exists($config_file) || !is_readable($config_file)) {
+        return ['Configuration file not found or unreadable: ' . htmlspecialchars($config_file, ENT_QUOTES, 'UTF-8')];
+    }
+    $prev = libxml_use_internal_errors(true);
+    libxml_clear_errors();
+    $dom = new DOMDocument();
+    if ($dom->load($config_file) === false) {
+        $errors = array_map(function ($e) { return trim($e->message) . ' (line ' . $e->line . ')'; }, libxml_get_errors());
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+        return $errors ?: ['XML is not well-formed.'];
+    }
+    if ($dom->schemaValidate(XML_SCHEMA) !== true) {
+        $errors = array_map(function ($e) { return trim($e->message) . ' (line ' . $e->line . ')'; }, libxml_get_errors());
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
+        return $errors ?: ['XML failed schema validation.'];
+    }
+    libxml_clear_errors();
+    libxml_use_internal_errors($prev);
+    return [];
+}
+
 function config_games_print_editor_css()
 {
     static $printed = false;
@@ -109,9 +180,14 @@ function config_games_print_editor_css()
 <style>
 .xml-editor-wrapper{margin:20px 0;padding:12px;background:#111;border:1px solid #222;border-radius:8px}
 .xml-node{border:1px solid #333;border-radius:6px;padding:12px;margin-bottom:10px;background:#181818}
+.xml-node--required{border-left:3px solid #1c6dd0}
 .xml-node__header{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #2a2a2a;padding-bottom:6px;margin-bottom:8px}
 .xml-node__title{font-weight:600;color:#f5f5f5}
+.xml-node__title--required::after{content:" *";color:#e06c75;font-size:0.8rem}
 .xml-node__path{font-size:0.85rem;color:#989898}
+.xml-node__badge{font-size:0.72rem;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
+.xml-node__badge--required{background:#1c3a6d;color:#7eb3f0}
+.xml-node__badge--optional{background:#2a2a2a;color:#888}
 .xml-node__body label{font-size:0.85rem;color:#bbb;display:block;margin-bottom:4px}
 .xml-node__body input[type="text"], .xml-node__body textarea, .xml-node__body select{width:100%;padding:8px;border:1px solid #3a3a3a;border-radius:4px;background:#101010;color:#fff;font-family:monospace}
 .xml-node__body textarea{min-height:120px}
@@ -127,12 +203,20 @@ function config_games_print_editor_css()
 .xml-global-save:hover{background:#1f7aec;transform:translateY(-1px)}
 .xml-global-save--top{float:right;margin:0 18px 12px 0}
 .xml-hint{font-size:0.85rem;color:#999;margin-top:4px}
+.xml-validation-errors{background:#2d0f0f;border:1px solid #8b1c1c;border-radius:6px;padding:12px 16px;margin-bottom:14px;color:#f88}
+.xml-validation-errors ul{margin:6px 0 0 16px;padding:0}
+.xml-raw-toggle{margin:8px 0 4px;color:#7eb3f0;cursor:pointer;font-size:0.9rem;text-decoration:underline;background:none;border:none;padding:0}
+.xml-raw-section{margin-top:10px;display:none}
+.xml-raw-section textarea{width:100%;min-height:300px;font-family:monospace;font-size:0.85rem;background:#0c0c0c;color:#eee;border:1px solid #3a3a3a;border-radius:4px;padding:8px}
+.xml-raw-warning{background:#2d2200;border:1px solid #7a5a00;border-radius:4px;padding:8px 12px;color:#f0c050;font-size:0.85rem;margin-bottom:6px}
+.xml-section-header{margin:20px 0 4px;font-size:0.8rem;color:#888;text-transform:uppercase;letter-spacing:0.1em;border-bottom:1px solid #2a2a2a;padding-bottom:4px}
 </style>
 CSS;
 }
 
-function config_games_render_node(SimpleXMLElement $node, array $ancestors, array &$counters, int $depth = 0)
+function config_games_render_node(SimpleXMLElement $node, array $ancestors, array &$counters, int $depth = 0, ?bool $isRequired = null)
 {
+    $schemaOrder = config_games_schema_order();
     $name = $node->getName();
     $pathKey = implode('/', $ancestors) === '' ? $name : implode('/', $ancestors) . '/' . $name;
     $counters[$pathKey] = ($counters[$pathKey] ?? 0) + 1;
@@ -149,9 +233,18 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
     $displayPath = htmlspecialchars(str_replace('[', '[', $rawPath), ENT_QUOTES, 'UTF-8');
     $isScript = in_array(strtolower($name), ['pre_install','post_install','precmd','postcmd','cli_template']);
 
-    $html = "<div class='xml-node depth-{$depth}'>";
+    // Determine required status: use passed value, fall back to schema lookup for top-level nodes
+    if ($isRequired === null) {
+        $isRequired = $depth === 1 && array_key_exists($name, $schemaOrder) ? $schemaOrder[$name] : false;
+    }
+    $nodeClass = 'xml-node depth-' . $depth . ($isRequired ? ' xml-node--required' : '');
+    $badge = $isRequired
+        ? "<span class='xml-node__badge xml-node__badge--required'>required</span>"
+        : "<span class='xml-node__badge xml-node__badge--optional'>optional</span>";
+
+    $html = "<div class='{$nodeClass}'>";
     $actionId = 'node_action_' . substr(md5($safePath . $index), 0, 8);
-    $html .= "<div class='xml-node__header'><div><div class='xml-node__title'>{$safeLabel}</div><div class='xml-node__path'>{$displayPath}</div></div>";
+    $html .= "<div class='xml-node__header'><div><div class='xml-node__title'>{$safeLabel}{$badge}</div><div class='xml-node__path'>{$displayPath}</div></div>";
     $html .= "<div class='xml-node__actions'><label for=\"{$actionId}\">Action</label>";
     $html .= "<select id=\"{$actionId}\" name=\"nodes[{$safeNodeKey}][action]\"><option value='keep'>Save Changes</option><option value='remove'>Remove Node</option></select>";
     $html .= "<button type='submit' name='save_xml' value='1' class='xml-node__apply'>Apply</button></div></div>";
@@ -201,25 +294,59 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
 function config_games_render_editor(SimpleXMLElement $xml)
 {
     config_games_print_editor_css();
+    $schemaOrder = config_games_schema_order();
     $rootName = $xml->getName();
     $html = "<div class='xml-editor-wrapper'>";
     $counters = [];
-    foreach ($xml->children() as $child) {
-        $html .= config_games_render_node($child, [$rootName], $counters);
+
+    // Sort top-level children by schema order; unknown elements follow at the end.
+    $children = iterator_to_array($xml->children(), false);
+    usort($children, function ($a, $b) use ($schemaOrder) {
+        $nameA = $a->getName();
+        $nameB = $b->getName();
+        $orderKeys = array_keys($schemaOrder);
+        $posA = ($idx = array_search($nameA, $orderKeys)) !== false ? $idx : PHP_INT_MAX;
+        $posB = ($idx = array_search($nameB, $orderKeys)) !== false ? $idx : PHP_INT_MAX;
+        return $posA <=> $posB;
+    });
+
+    $lastSection = null;
+    foreach ($children as $child) {
+        $cName = $child->getName();
+        $isRequired = $schemaOrder[$cName] ?? null;
+        // Print section dividers between required and optional groups
+        $section = ($isRequired === true) ? 'required' : (($isRequired === false) ? 'optional' : 'custom');
+        if ($section !== $lastSection) {
+            if ($section === 'required') {
+                $html .= "<div class='xml-section-header'>&#x2605; Required Fields</div>";
+            } elseif ($section === 'optional') {
+                $html .= "<div class='xml-section-header'>Optional Fields</div>";
+            } else {
+                $html .= "<div class='xml-section-header'>Custom / Unknown Fields</div>";
+            }
+            $lastSection = $section;
+        }
+        $html .= config_games_render_node($child, [$rootName], $counters, 0, $isRequired);
     }
+
     $html .= "</div>";
     return $html;
 }
 
+/**
+ * Save XML from structured form nodes payload.
+ * Validates against the schema before writing.
+ * Returns true on success, or an array of error strings on failure.
+ */
 function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
 {
     $cfg_info = $db->getGameCfg($home_cfg_id);
     if ($cfg_info === FALSE) {
-        return false;
+        return ['Configuration record not found in database.'];
     }
     $config_file = SERVER_CONFIG_LOCATION . $cfg_info['home_cfg_file'];
     if (!file_exists($config_file) || !is_readable($config_file)) {
-        return false;
+        return ['Configuration file not found or not readable: ' . htmlspecialchars($config_file, ENT_QUOTES, 'UTF-8')];
     }
     $nodes = [];
     foreach ((array)$nodesPayload as $key => $data) {
@@ -232,14 +359,16 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
         $nodes[$cleanPath] = $data;
     }
     if (empty($nodes)) {
-        return false;
+        return ['No node data was submitted.'];
     }
     $dom = new DOMDocument();
     $dom->preserveWhiteSpace = false;
     $dom->formatOutput = true;
     if (@$dom->load($config_file) === false) {
-        return false;
+        return ['The configuration file could not be parsed as XML. It may be malformed.'];
     }
+    // Keep a backup of the original content so we can restore on validation failure.
+    $backup = file_get_contents($config_file);
     $xpath = new DOMXPath($dom);
     uksort($nodes, function ($a, $b) {
         return substr_count($b, '/') <=> substr_count($a, '/');
@@ -295,7 +424,20 @@ function config_games_save_xml($db, $home_cfg_id, array $nodesPayload)
         }
     }
     if ($dom->save($config_file) === false) {
-        return false;
+        // Restore backup on write failure
+        if (isset($backup)) {
+            file_put_contents($config_file, $backup);
+        }
+        return ['Failed to write the configuration file. Check file permissions.'];
+    }
+    // Validate the saved file against the schema.
+    $errors = config_games_validate_xml_file($config_file);
+    if (!empty($errors)) {
+        // Restore original on schema failure
+        if (isset($backup)) {
+            file_put_contents($config_file, $backup);
+        }
+        return $errors;
     }
     $savedContents = @file_get_contents($config_file);
     if ($savedContents !== false) {
@@ -381,11 +523,51 @@ function exec_ogp_module() {
     
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_xml']) && isset($_POST['home_cfg_id'])) {
         $edit_id = (int)$_POST['home_cfg_id'];
-        $nodesPayload = isset($_POST['nodes']) && is_array($_POST['nodes']) ? $_POST['nodes'] : [];
-        if (config_games_save_xml($db, $edit_id, $nodesPayload)) {
-            print_success(get_lang('configs_updated_ok'));
+
+        // Raw XML save path
+        if (isset($_POST['raw_xml_content'])) {
+            $cfg_info = $db->getGameCfg($edit_id);
+            if ($cfg_info !== FALSE) {
+                $config_file = SERVER_CONFIG_LOCATION . $cfg_info['home_cfg_file'];
+                $raw_content = $_POST['raw_xml_content'];
+                // Write to a temp file for validation
+                $tmp = tempnam(sys_get_temp_dir(), 'gsp_xml_');
+                file_put_contents($tmp, $raw_content);
+                $xmlErrors = config_games_validate_xml_file($tmp);
+                @unlink($tmp);
+                if (!empty($xmlErrors)) {
+                    echo "<div class='xml-validation-errors'><strong>&#x26A0; XML validation failed &mdash; file was NOT saved:</strong><ul>";
+                    foreach ($xmlErrors as $err) {
+                        echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+                    }
+                    echo "</ul></div>";
+                } else {
+                    if (file_put_contents($config_file, $raw_content) !== false) {
+                        print_success(get_lang('configs_updated_ok'));
+                        $config = read_server_config($config_file);
+                        if ($config !== FALSE) {
+                            $db->addGameCfg($config);
+                        }
+                    } else {
+                        print_failure('Failed to write configuration file. Check permissions.');
+                    }
+                }
+            } else {
+                print_failure('Configuration record not found.');
+            }
         } else {
-            print_failure('Failed to save XML configuration.');
+            $nodesPayload = isset($_POST['nodes']) && is_array($_POST['nodes']) ? $_POST['nodes'] : [];
+            $result = config_games_save_xml($db, $edit_id, $nodesPayload);
+            if ($result === true) {
+                print_success(get_lang('configs_updated_ok'));
+            } else {
+                $errors = is_array($result) ? $result : ['Failed to save XML configuration.'];
+                echo "<div class='xml-validation-errors'><strong>&#x26A0; XML validation failed &mdash; file was NOT saved:</strong><ul>";
+                foreach ($errors as $err) {
+                    echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+                }
+                echo "</ul></div>";
+            }
         }
         $_GET['home_cfg_id'] = $edit_id;
     }
@@ -464,17 +646,36 @@ function exec_ogp_module() {
 				echo "<a href='?m=config_games&home_cfg_id=".$home_cfg_id."&delete'>".get_lang_f('delete_game_config_for',$cfg_info['game_name']." $os $arch")."</a><br>";
 				
 				$xml = @simplexml_load_file($config_file);
+				// Also show any schema validation errors on the current file (informational, before editing)
+				$existingErrors = config_games_validate_xml_file($config_file);
+				if (!empty($existingErrors)) {
+					echo "<div class='xml-validation-errors'><strong>&#x26A0; This file currently fails schema validation:</strong><ul>";
+					foreach ($existingErrors as $err) {
+						echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+					}
+					echo "</ul></div>";
+				}
 				if ($xml === false) {
 					print_failure(get_lang_f("error_when_handling_file",$config_file));
 				} else {
+					$raw_xml_content = htmlspecialchars(file_get_contents($config_file), ENT_QUOTES, 'UTF-8');
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
 					echo "<button type='submit' name='save_xml' value='1' class='xml-global-save xml-global-save--top'>".get_lang('save')."</button>";
 					echo "<div style='clear:both'></div>";
 					echo config_games_render_editor($xml);
 					echo "<div class='xml-actions'><button type='submit' name='save_xml' value='1' class='xml-global-save'>".get_lang('save')."</button></div>";
+					echo "<p class='note'>&#x2605; = required field. Use the action dropdown to remove entire sections. Attribute values left blank will be removed. Script sections such as post_install are fully editable. Changes are validated against the schema before saving.</p>";
+					// Raw XML editor
+					echo "<hr style='margin:24px 0;border-color:#333'>";
+					echo "<h3 style='margin-bottom:8px'>Raw XML Editor</h3>";
+					echo "<div class='xml-raw-warning'>&#x26A0; <strong>Warning:</strong> Saving raw XML bypasses the guided editor. The file will be validated against the schema before saving. Invalid XML will be rejected.</div>";
+					echo "<button type='button' class='xml-raw-toggle' onclick=\"var s=document.getElementById('raw_xml_section');s.style.display=s.style.display==='none'?'block':'none'\">Toggle Raw XML Editor</button>";
+					echo "<div id='raw_xml_section' class='xml-raw-section'>";
+					echo "<textarea name='raw_xml_content'>{$raw_xml_content}</textarea>";
+					echo "<div class='xml-actions' style='margin-top:8px'><button type='submit' name='save_xml' value='1' class='xml-global-save'>Save Raw XML</button></div>";
+					echo "</div>";
 					echo "</form>";
-					echo "<p class='note'>Use the action dropdown to remove entire sections. Attribute values left blank will be removed. Script sections such as post_install are fully editable.</p>";
 				}
 			}
 		}

@@ -24,7 +24,7 @@
 
 // Module general information
 $module_title = "ftp";
-$module_version = "1.41";
+$module_version = "1.0";
 $db_version = 1;
 $module_required = TRUE;
 $module_menus = array( array( 'subpage' => 'ftp_admin', 'name'=>'FTP Admin', 'group'=>'admin' ) );
