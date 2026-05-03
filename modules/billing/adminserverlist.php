@@ -576,11 +576,11 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
 
 <script>
 // Toggle fallback text input when image dropdown changes
-document.querySelectorAll('select[data-fallback-id]').forEach(function (sel) {
+document.querySelectorAll('select[data-fallback-id]').forEach((sel) => {
     sel.addEventListener('change', function () {
-        var fb = document.getElementById(this.dataset.fallbackId);
+        const fb = document.getElementById(this.dataset.fallbackId);
         if (!fb) return;
-        var show = (this.value === '__other__');
+        const show = (this.value === '__other__');
         fb.classList.toggle('img-fallback-visible', show);
         if (!show) fb.value = '';
     });
