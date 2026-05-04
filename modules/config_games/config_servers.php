@@ -699,7 +699,7 @@ function exec_ogp_module() {
 	
 	if ( isset($_GET['home_cfg_id']) )
 	{
-		echo "<p><a class='xml-jump-link' href='#xml-editor-section'>&#x2193; Jump to XML Editor</a></p>";
+		echo "<p><a class='xml-jump-link' href='#xml-editor-section' aria-label='Jump to XML Editor section below'>&#x2193; Jump to XML Editor</a></p>";
 		$home_cfg_id = trim($_GET['home_cfg_id']);
 		
 		$cfg_info = $db->getGameCfg($home_cfg_id);

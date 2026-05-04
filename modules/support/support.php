@@ -103,7 +103,7 @@ if (!empty($webhook)) {
 		
 	if(!isset($user['users_email']) or $user['users_email'] == "")
 	{
-		echo get_lang('email_address').' <em>(optional)</em>:
+		echo get_lang('email_address').' <em>('.get_lang('optional').')</em>:
 			<br />
 			<input type="text" name="email" id="email" style="width: 250px;" />
 			<br />
@@ -114,7 +114,7 @@ if (!empty($webhook)) {
 		echo '<input type="hidden" name="email" id="email" value="'.$user['users_email'].'" />';
 	}
 	
-	echo get_lang('subject').' <em>(optional)</em>:
+	echo get_lang('subject').' <em>('.get_lang('optional').')</em>:
 	<br />
 	<input type="text" name="subject" id="subject" style="width: 250px;" />
 	<br />
