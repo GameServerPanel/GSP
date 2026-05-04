@@ -97,35 +97,69 @@ class WorkshopRepository
 
         $gameKey             = $this->esc($data['game_key'] ?? '');
         $gameName            = $this->esc($data['game_name'] ?? '');
+        $steamAppId          = $this->esc($data['steam_app_id'] ?? '');
         $workshopAppId       = $this->esc($data['workshop_app_id'] ?? '');
+        $steamLoginRequired  = empty($data['steam_login_required']) ? 0 : 1;
+        $steamcmdLoginMode   = in_array($data['steamcmd_login_mode'] ?? '', ['anonymous', 'account'], true)
+                                   ? $this->esc($data['steamcmd_login_mode'])
+                                   : 'anonymous';
+        $steamcmdPath        = $this->esc($data['steamcmd_path'] ?? '');
         $supportedOs         = $this->esc($data['supported_os'] ?? 'linux');
         $cachePathTpl        = $this->esc($data['cache_path_template'] ?? '');
         $installPathTpl      = $this->esc($data['install_path_template'] ?? '');
-        $folderNameTpl       = $this->esc($data['folder_name_template'] ?? '@{mod_id}');
-        $copyMethod          = $this->esc($data['copy_method'] ?? 'rsync');
-        $installScript       = isset($data['install_script']) && $data['install_script'] !== '' ? "'" . $this->esc($data['install_script']) . "'" : 'NULL';
-        $configFileTpl       = isset($data['config_file_template']) && $data['config_file_template'] !== '' ? "'" . $this->esc($data['config_file_template']) . "'" : 'NULL';
-        $launchParamTpl      = isset($data['launch_param_template']) && $data['launch_param_template'] !== '' ? "'" . $this->esc($data['launch_param_template']) . "'" : 'NULL';
+        $folderNamingFormat  = in_array($data['folder_naming_format'] ?? '', ['@%mod_name%', '@%workshop_id%', 'custom'], true)
+                                   ? $this->esc($data['folder_naming_format'])
+                                   : '@%workshop_id%';
+        $folderNameTpl       = $this->esc($data['folder_name_template'] ?? '@%workshop_id%');
+        $modLaunchParam      = $this->esc($data['mod_launch_param'] ?? '');
+        $modSeparator        = in_array($data['mod_separator'] ?? '', ['semicolon', 'comma', 'space'], true)
+                                   ? $this->esc($data['mod_separator'])
+                                   : 'semicolon';
+        $copyMethod          = in_array($data['copy_method'] ?? '', ['copy', 'rsync', 'symlink'], true)
+                                   ? $this->esc($data['copy_method'])
+                                   : 'rsync';
+        $copyKeys            = empty($data['copy_keys']) ? 0 : 1;
+        $keySourcePath       = $this->nullOrStr($data['key_source_path'] ?? '');
+        $keyDestPath         = $this->nullOrStr($data['key_dest_path'] ?? '');
+        $preUpdateScript     = $this->nullOrStr($data['pre_update_script'] ?? '');
+        $installScript       = $this->nullOrStr($data['install_script'] ?? '');
+        $postUpdateScript    = $this->nullOrStr($data['post_update_script'] ?? '');
+        $configFileTpl       = $this->nullOrStr($data['config_file_template'] ?? '');
+        $launchParamTpl      = $this->nullOrStr($data['launch_param_template'] ?? '');
         $requiresRestart     = empty($data['requires_restart']) ? 0 : 1;
+        $validationNotes     = $this->nullOrStr($data['validation_notes'] ?? '');
         $enabled             = isset($data['enabled']) && !$data['enabled'] ? 0 : 1;
 
         if ($id > 0) {
             $this->exec(
                 "UPDATE `{$this->prefix}workshop_game_profiles` SET
-                    game_key            = '{$gameKey}',
-                    game_name           = '{$gameName}',
-                    workshop_app_id     = '{$workshopAppId}',
-                    supported_os        = '{$supportedOs}',
-                    cache_path_template = '{$cachePathTpl}',
+                    game_key              = '{$gameKey}',
+                    game_name             = '{$gameName}',
+                    steam_app_id          = '{$steamAppId}',
+                    workshop_app_id       = '{$workshopAppId}',
+                    steam_login_required  = {$steamLoginRequired},
+                    steamcmd_login_mode   = '{$steamcmdLoginMode}',
+                    steamcmd_path         = '{$steamcmdPath}',
+                    supported_os          = '{$supportedOs}',
+                    cache_path_template   = '{$cachePathTpl}',
                     install_path_template = '{$installPathTpl}',
-                    folder_name_template = '{$folderNameTpl}',
-                    copy_method         = '{$copyMethod}',
-                    install_script      = {$installScript},
-                    config_file_template = {$configFileTpl},
+                    folder_naming_format  = '{$folderNamingFormat}',
+                    folder_name_template  = '{$folderNameTpl}',
+                    mod_launch_param      = '{$modLaunchParam}',
+                    mod_separator         = '{$modSeparator}',
+                    copy_method           = '{$copyMethod}',
+                    copy_keys             = {$copyKeys},
+                    key_source_path       = {$keySourcePath},
+                    key_dest_path         = {$keyDestPath},
+                    pre_update_script     = {$preUpdateScript},
+                    install_script        = {$installScript},
+                    post_update_script    = {$postUpdateScript},
+                    config_file_template  = {$configFileTpl},
                     launch_param_template = {$launchParamTpl},
-                    requires_restart    = {$requiresRestart},
-                    enabled             = {$enabled},
-                    updated_at          = NOW()
+                    requires_restart      = {$requiresRestart},
+                    validation_notes      = {$validationNotes},
+                    enabled               = {$enabled},
+                    updated_at            = NOW()
                  WHERE id = {$id}"
             );
             return $id;
@@ -133,15 +167,29 @@ class WorkshopRepository
 
         $this->exec(
             "INSERT INTO `{$this->prefix}workshop_game_profiles`
-                (game_key, game_name, workshop_app_id, supported_os, cache_path_template,
-                 install_path_template, folder_name_template, copy_method, install_script,
-                 config_file_template, launch_param_template, requires_restart, enabled, created_at)
+                (game_key, game_name, steam_app_id, workshop_app_id, steam_login_required,
+                 steamcmd_login_mode, steamcmd_path, supported_os, cache_path_template,
+                 install_path_template, folder_naming_format, folder_name_template,
+                 mod_launch_param, mod_separator, copy_method, copy_keys,
+                 key_source_path, key_dest_path, pre_update_script, install_script,
+                 post_update_script, config_file_template, launch_param_template,
+                 requires_restart, validation_notes, enabled, created_at)
              VALUES
-                ('{$gameKey}', '{$gameName}', '{$workshopAppId}', '{$supportedOs}', '{$cachePathTpl}',
-                 '{$installPathTpl}', '{$folderNameTpl}', '{$copyMethod}', {$installScript},
-                 {$configFileTpl}, {$launchParamTpl}, {$requiresRestart}, {$enabled}, NOW())"
+                ('{$gameKey}', '{$gameName}', '{$steamAppId}', '{$workshopAppId}', {$steamLoginRequired},
+                 '{$steamcmdLoginMode}', '{$steamcmdPath}', '{$supportedOs}', '{$cachePathTpl}',
+                 '{$installPathTpl}', '{$folderNamingFormat}', '{$folderNameTpl}',
+                 '{$modLaunchParam}', '{$modSeparator}', '{$copyMethod}', {$copyKeys},
+                 {$keySourcePath}, {$keyDestPath}, {$preUpdateScript}, {$installScript},
+                 {$postUpdateScript}, {$configFileTpl}, {$launchParamTpl},
+                 {$requiresRestart}, {$validationNotes}, {$enabled}, NOW())"
         );
         return $this->lastInsertId();
+    }
+
+    /** Return NULL or an escaped quoted string, for optional TEXT columns. */
+    private function nullOrStr(string $value): string
+    {
+        return $value !== '' ? "'" . $this->esc($value) . "'" : 'NULL';
     }
 
     public function deleteProfile(int $id): bool
@@ -270,6 +318,10 @@ class WorkshopRepository
      * Insert a new mod row or update the existing one (upsert by home_id + workshop_id).
      * Returns the row id.
      */
+    /**
+     * Insert (id = 0) or update (id > 0) a Workshop mod entry for a game home.
+     * Returns the row id.
+     */
     public function insertOrUpdateMod(
         int $homeId,
         int $agentId,
@@ -278,12 +330,14 @@ class WorkshopRepository
         string $workshopId,
         string $installPath,
         string $title = '',
-        int $loadOrder = 0
+        int $loadOrder = 0,
+        string $customFolder = ''
     ): int {
-        $appId       = $this->esc($appId);
-        $workshopId  = $this->esc($workshopId);
-        $installPath = $this->esc($installPath);
-        $title       = $this->esc($title);
+        $appId        = $this->esc($appId);
+        $workshopId   = $this->esc($workshopId);
+        $installPath  = $this->esc($installPath);
+        $title        = $this->esc($title);
+        $customFolder = $this->esc($customFolder);
 
         $existing = $this->getServerMod($homeId, $workshopId);
 
@@ -294,6 +348,7 @@ class WorkshopRepository
                     profile_id       = {$profileId},
                     workshop_app_id  = '{$appId}',
                     title            = '{$title}',
+                    custom_folder    = '{$customFolder}',
                     install_path     = '{$installPath}',
                     load_order       = {$loadOrder},
                     enabled          = 1,
@@ -305,9 +360,9 @@ class WorkshopRepository
 
         $this->exec(
             "INSERT INTO `{$this->prefix}server_workshop_mods`
-                (home_id, agent_id, profile_id, workshop_app_id, workshop_id, title, enabled, install_path, load_order, installed_at)
+                (home_id, agent_id, profile_id, workshop_app_id, workshop_id, title, custom_folder, enabled, install_path, load_order, installed_at)
              VALUES
-                ({$homeId}, {$agentId}, {$profileId}, '{$appId}', '{$workshopId}', '{$title}', 1, '{$installPath}', {$loadOrder}, NOW())"
+                ({$homeId}, {$agentId}, {$profileId}, '{$appId}', '{$workshopId}', '{$title}', '{$customFolder}', 1, '{$installPath}', {$loadOrder}, NOW())"
         );
         return $this->lastInsertId();
     }
@@ -349,9 +404,13 @@ class WorkshopRepository
     {
         return $this->select(
             "SELECT m.*,
-                    p.cache_path_template, p.install_path_template, p.folder_name_template,
-                    p.copy_method, p.install_script, p.config_file_template, p.launch_param_template,
-                    p.requires_restart
+                     p.steam_app_id, p.cache_path_template, p.install_path_template,
+                     p.folder_naming_format, p.folder_name_template,
+                     p.copy_method, p.copy_keys, p.key_source_path, p.key_dest_path,
+                     p.pre_update_script, p.install_script, p.post_update_script,
+                     p.steamcmd_path, p.steamcmd_login_mode,
+                     p.config_file_template, p.launch_param_template,
+                     p.requires_restart
              FROM `{$this->prefix}server_workshop_mods` m
              JOIN `{$this->prefix}workshop_game_profiles` p ON m.profile_id = p.id
              WHERE m.enabled = 1 AND p.enabled = 1
@@ -434,5 +493,101 @@ class WorkshopRepository
              FROM `{$this->prefix}server_workshop_mods` m
              WHERE m.enabled = 1 AND m.profile_id = {$profileId}"
         );
+    }
+
+    // ------------------------------------------------------------------
+    // SERVER WORKSHOP SETTINGS (per-server/home configuration)
+    // ------------------------------------------------------------------
+
+    /**
+     * Return the workshop settings row for a game home, or null if not set.
+     */
+    public function getServerSettings(int $homeId): ?array
+    {
+        return $this->selectOne(
+            "SELECT * FROM `{$this->prefix}server_workshop_settings`
+             WHERE home_id = {$homeId} LIMIT 1"
+        );
+    }
+
+    /**
+     * Upsert server-level workshop settings.
+     */
+    public function saveServerSettings(int $homeId, array $data): void
+    {
+        $workshopEnabled  = empty($data['workshop_enabled']) ? 0 : 1;
+        $profileId        = isset($data['profile_id']) && (int)$data['profile_id'] > 0
+                                ? (int)$data['profile_id']
+                                : 'NULL';
+        $updateMode       = in_array($data['update_mode'] ?? '', ['manual', 'scheduled', 'on_restart'], true)
+                                ? "'" . $this->esc($data['update_mode']) . "'"
+                                : "'manual'";
+        $restartBehavior  = in_array($data['restart_behavior'] ?? '', ['none', 'queue', 'stop_update_start'], true)
+                                ? "'" . $this->esc($data['restart_behavior']) . "'"
+                                : "'none'";
+        $updateQueued     = empty($data['update_queued']) ? 0 : 1;
+
+        $this->exec(
+            "INSERT INTO `{$this->prefix}server_workshop_settings`
+                 (home_id, workshop_enabled, profile_id, update_mode, restart_behavior, update_queued, updated_at)
+             VALUES
+                 ({$homeId}, {$workshopEnabled}, {$profileId}, {$updateMode}, {$restartBehavior}, {$updateQueued}, NOW())
+             ON DUPLICATE KEY UPDATE
+                 workshop_enabled = {$workshopEnabled},
+                 profile_id       = {$profileId},
+                 update_mode      = {$updateMode},
+                 restart_behavior = {$restartBehavior},
+                 update_queued    = {$updateQueued},
+                 updated_at       = NOW()"
+        );
+    }
+
+    /**
+     * Record the result of an update run for a home.
+     */
+    public function recordUpdateResult(int $homeId, string $status, string $error = ''): void
+    {
+        $status    = $this->esc($status);
+        $errorSql  = $error !== '' ? "'" . $this->esc($error) . "'" : 'NULL';
+        $successSql = $status === 'success' ? 'NOW()' : 'last_success_time';
+
+        $this->exec(
+            "INSERT INTO `{$this->prefix}server_workshop_settings`
+                 (home_id, last_update_status, last_update_error, last_update_time, last_success_time)
+             VALUES
+                 ({$homeId}, '{$status}', {$errorSql}, NOW(), " . ($status === 'success' ? 'NOW()' : 'NULL') . ")
+             ON DUPLICATE KEY UPDATE
+                 last_update_status = '{$status}',
+                 last_update_error  = {$errorSql},
+                 last_update_time   = NOW(),
+                 last_success_time  = {$successSql}"
+        );
+    }
+
+    /**
+     * Mark a manual update as queued (or clear the queue flag).
+     */
+    public function setUpdateQueued(int $homeId, bool $queued): void
+    {
+        $val = $queued ? 1 : 0;
+        $this->exec(
+            "INSERT INTO `{$this->prefix}server_workshop_settings` (home_id, update_queued)
+             VALUES ({$homeId}, {$val})
+             ON DUPLICATE KEY UPDATE update_queued = {$val}"
+        );
+    }
+
+    /**
+     * Return all home IDs that have a queued manual update.
+     *
+     * @return array<int,int>
+     */
+    public function listQueuedUpdateHomes(): array
+    {
+        $rows = $this->select(
+            "SELECT home_id FROM `{$this->prefix}server_workshop_settings`
+             WHERE update_queued = 1 AND workshop_enabled = 1"
+        );
+        return array_column($rows, 'home_id');
     }
 }

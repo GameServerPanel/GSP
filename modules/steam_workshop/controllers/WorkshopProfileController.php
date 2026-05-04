@@ -157,24 +157,58 @@ class WorkshopProfileController
         $osValues  = array_values(array_intersect($osRaw, $allowedOs));
         $supportedOs = implode(',', $osValues !== [] ? $osValues : ['linux']);
 
-        $allowedMethods = ['rsync', 'robocopy', 'custom_script'];
-        $copyMethod = in_array($post['copy_method'] ?? '', $allowedMethods, true)
+        $allowedCopyMethods = ['copy', 'rsync', 'symlink'];
+        $copyMethod = in_array($post['copy_method'] ?? '', $allowedCopyMethods, true)
             ? (string)$post['copy_method']
             : 'rsync';
+
+        $allowedLoginModes = ['anonymous', 'account'];
+        $steamcmdLoginMode = in_array($post['steamcmd_login_mode'] ?? '', $allowedLoginModes, true)
+            ? (string)$post['steamcmd_login_mode']
+            : 'anonymous';
+
+        $allowedFolderFormats = ['@%mod_name%', '@%workshop_id%', 'custom'];
+        $folderNamingFormat = in_array($post['folder_naming_format'] ?? '', $allowedFolderFormats, true)
+            ? (string)$post['folder_naming_format']
+            : '@%workshop_id%';
+
+        $allowedSeparators = ['semicolon', 'comma', 'space'];
+        $modSeparator = in_array($post['mod_separator'] ?? '', $allowedSeparators, true)
+            ? (string)$post['mod_separator']
+            : 'semicolon';
+
+        // When folder naming is preset (@%mod_name% or @%workshop_id%), derive template from format.
+        // When 'custom', use the admin-supplied value.
+        $folderNameTemplate = $folderNamingFormat !== 'custom'
+            ? $folderNamingFormat
+            : trim((string)($post['folder_name_template'] ?? '@%workshop_id%'));
 
         return [
             'game_key'              => trim((string)($post['game_key'] ?? '')),
             'game_name'             => trim((string)($post['game_name'] ?? '')),
+            'steam_app_id'          => preg_replace('/[^0-9]/', '', (string)($post['steam_app_id'] ?? '')) ?? '',
             'workshop_app_id'       => preg_replace('/[^0-9]/', '', (string)($post['workshop_app_id'] ?? '')) ?? '',
+            'steam_login_required'  => !empty($post['steam_login_required']) ? 1 : 0,
+            'steamcmd_login_mode'   => $steamcmdLoginMode,
+            'steamcmd_path'         => trim((string)($post['steamcmd_path'] ?? '')),
             'supported_os'          => $supportedOs,
             'cache_path_template'   => trim((string)($post['cache_path_template'] ?? '')),
             'install_path_template' => trim((string)($post['install_path_template'] ?? '')),
-            'folder_name_template'  => trim((string)($post['folder_name_template'] ?? '@{mod_id}')),
+            'folder_naming_format'  => $folderNamingFormat,
+            'folder_name_template'  => $folderNameTemplate,
+            'mod_launch_param'      => trim((string)($post['mod_launch_param'] ?? '')),
+            'mod_separator'         => $modSeparator,
             'copy_method'           => $copyMethod,
+            'copy_keys'             => !empty($post['copy_keys']) ? 1 : 0,
+            'key_source_path'       => trim((string)($post['key_source_path'] ?? '')),
+            'key_dest_path'         => trim((string)($post['key_dest_path'] ?? '')),
+            'pre_update_script'     => trim((string)($post['pre_update_script'] ?? '')),
             'install_script'        => trim((string)($post['install_script'] ?? '')),
+            'post_update_script'    => trim((string)($post['post_update_script'] ?? '')),
             'config_file_template'  => trim((string)($post['config_file_template'] ?? '')),
             'launch_param_template' => trim((string)($post['launch_param_template'] ?? '')),
             'requires_restart'      => !empty($post['requires_restart']) ? 1 : 0,
+            'validation_notes'      => trim((string)($post['validation_notes'] ?? '')),
             'enabled'               => !empty($post['enabled']) ? 1 : 0,
         ];
     }
@@ -198,10 +232,13 @@ class WorkshopProfileController
             $errors[] = $this->lang['error_app_id_required'] ?? 'Workshop App ID is required.';
         }
         if (($data['cache_path_template'] ?? '') === '') {
-            $errors[] = $this->lang['error_cache_path_required'] ?? 'Cache path template is required.';
+            $errors[] = $this->lang['error_cache_path_required'] ?? 'SteamCMD cache path template is required.';
         }
         if (($data['install_path_template'] ?? '') === '') {
-            $errors[] = $this->lang['error_install_path_required'] ?? 'Install path template is required.';
+            $errors[] = $this->lang['error_install_path_required'] ?? 'Server install path template is required.';
+        }
+        if (($data['folder_naming_format'] ?? '') === 'custom' && ($data['folder_name_template'] ?? '') === '') {
+            $errors[] = $this->lang['error_folder_template_required'] ?? 'Custom folder name template is required when format is set to custom.';
         }
         return $errors;
     }

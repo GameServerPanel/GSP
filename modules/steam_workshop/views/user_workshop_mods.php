@@ -7,14 +7,141 @@ declare(strict_types=1);
 /** @var string|null $appId */
 /** @var array[]    $installedMods */
 /** @var array[]    $availableMods */
+/** @var array      $serverSettings */
+/** @var array[]    $allProfiles */
 /** @var bool       $isAdmin */
 
 $homeName   = htmlspecialchars($home['home_name'] ?? ('#' . $homeId));
 $baseAction = '?m=steam_workshop&p=main';
+
+$wsEnabled      = !empty($serverSettings['workshop_enabled']);
+$curProfileId   = (int)($serverSettings['profile_id'] ?? 0);
+$updateMode     = (string)($serverSettings['update_mode'] ?? 'manual');
+$restartBehav   = (string)($serverSettings['restart_behavior'] ?? 'none');
+$lastStatus     = (string)($serverSettings['last_update_status'] ?? '');
+$lastError      = (string)($serverSettings['last_update_error'] ?? '');
+$lastUpdateTime = (string)($serverSettings['last_update_time'] ?? '');
+$lastSuccess    = (string)($serverSettings['last_success_time'] ?? '');
+$updateQueued   = !empty($serverSettings['update_queued']);
+
+$updateModes = [
+    'manual'     => $lang['update_mode_manual']    ?? 'Manual only',
+    'scheduled'  => $lang['update_mode_scheduled'] ?? 'Scheduled',
+    'on_restart' => $lang['update_mode_on_restart'] ?? 'Before server restart',
+];
+$restartBehaviors = [
+    'none'             => $lang['restart_behavior_none']   ?? 'No restart',
+    'queue'            => $lang['restart_behavior_queue']  ?? 'Queue restart',
+    'stop_update_start'=> $lang['restart_behavior_stop']   ?? 'Stop / Update / Start',
+];
+
+$statusClass = match($lastStatus) {
+    'success' => 'sw-badge--enabled',
+    'failed'  => 'sw-badge--danger',
+    'running' => 'sw-badge--info',
+    'pending' => 'sw-badge--warning',
+    default   => '',
+};
 ?>
 <div class="sw-user sw-ws-mods">
     <p><a href="<?php echo $baseAction; ?>">&larr; <?php echo htmlspecialchars($lang['button_cancel'] ?? 'Back'); ?></a></p>
     <h3><?php echo sprintf(htmlspecialchars($lang['user_workshop_server_heading'] ?? 'Workshop Mods – %s'), $homeName); ?></h3>
+
+    <!-- ── Workshop server settings ── -->
+    <section class="sw-server-settings">
+        <h4><?php echo htmlspecialchars($lang['heading_server_settings'] ?? 'Workshop Settings for this server'); ?></h4>
+        <form method="post" action="<?php echo $baseAction; ?>" class="sw-form sw-settings-form">
+            <input type="hidden" name="ws_action" value="save_settings">
+            <input type="hidden" name="home_id"   value="<?php echo $homeId; ?>">
+
+            <div class="sw-form__grid sw-form__grid--2col">
+                <label class="sw-checkbox">
+                    <input type="checkbox" name="workshop_enabled" value="1" id="sw-ws-enabled"
+                           <?php echo $wsEnabled ? 'checked' : ''; ?>>
+                    <span><?php echo htmlspecialchars($lang['label_workshop_enabled'] ?? 'Enable Workshop for this server'); ?></span>
+                </label>
+
+                <label>
+                    <?php echo htmlspecialchars($lang['label_select_profile'] ?? 'Workshop game profile'); ?>
+                    <select name="profile_id">
+                        <option value="0">-- <?php echo htmlspecialchars($lang['label_auto_detect'] ?? 'Auto-detect from game type'); ?> --</option>
+                        <?php foreach ((array)$allProfiles as $p): ?>
+                            <option value="<?php echo (int)$p['id']; ?>"
+                                <?php echo $curProfileId === (int)$p['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($p['game_name'] . ' (' . $p['workshop_app_id'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+
+                <label>
+                    <?php echo htmlspecialchars($lang['label_update_mode'] ?? 'Update mode'); ?>
+                    <select name="update_mode">
+                        <?php foreach ($updateModes as $mVal => $mLabel): ?>
+                            <option value="<?php echo $mVal; ?>" <?php echo $updateMode === $mVal ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($mLabel); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+
+                <label>
+                    <?php echo htmlspecialchars($lang['label_restart_behavior'] ?? 'Restart behavior'); ?>
+                    <select name="restart_behavior">
+                        <?php foreach ($restartBehaviors as $rVal => $rLabel): ?>
+                            <option value="<?php echo $rVal; ?>" <?php echo $restartBehav === $rVal ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($rLabel); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </label>
+            </div>
+
+            <div class="sw-form__actions">
+                <button type="submit" class="btn primary">
+                    <?php echo htmlspecialchars($lang['button_save'] ?? 'Save'); ?>
+                </button>
+            </div>
+        </form>
+
+        <!-- Update status summary -->
+        <div class="sw-update-status">
+            <dl class="sw-status-grid">
+                <?php if ($lastStatus !== ''): ?>
+                    <dt><?php echo htmlspecialchars($lang['label_last_update_status'] ?? 'Last update status'); ?></dt>
+                    <dd><span class="sw-badge <?php echo $statusClass; ?>"><?php echo htmlspecialchars($lastStatus); ?></span></dd>
+                <?php endif; ?>
+                <?php if ($lastUpdateTime !== ''): ?>
+                    <dt><?php echo htmlspecialchars($lang['label_last_update_time'] ?? 'Last update time'); ?></dt>
+                    <dd><?php echo htmlspecialchars($lastUpdateTime); ?></dd>
+                <?php endif; ?>
+                <?php if ($lastSuccess !== ''): ?>
+                    <dt><?php echo htmlspecialchars($lang['label_last_success_time'] ?? 'Last successful update'); ?></dt>
+                    <dd><?php echo htmlspecialchars($lastSuccess); ?></dd>
+                <?php endif; ?>
+                <?php if ($lastError !== ''): ?>
+                    <dt><?php echo htmlspecialchars($lang['label_last_update_error'] ?? 'Last error'); ?></dt>
+                    <dd class="sw-error-text"><code><?php echo htmlspecialchars($lastError); ?></code></dd>
+                <?php endif; ?>
+            </dl>
+
+            <?php if ($updateQueued): ?>
+                <p class="sw-notice sw-notice--info">
+                    <?php echo htmlspecialchars($lang['update_queued_notice'] ?? 'A manual update is queued and will run on the next scheduler cycle.'); ?>
+                </p>
+            <?php endif; ?>
+
+            <!-- Queue manual update -->
+            <form method="post" action="<?php echo $baseAction; ?>" class="sw-inline">
+                <input type="hidden" name="ws_action" value="queue_update">
+                <input type="hidden" name="home_id"   value="<?php echo $homeId; ?>">
+                <button type="submit" class="btn secondary"
+                        <?php echo !$wsEnabled ? 'disabled title="Enable Workshop for this server first."' : ''; ?>>
+                    <?php echo htmlspecialchars($lang['btn_queue_update'] ?? 'Queue manual update'); ?>
+                </button>
+            </form>
+        </div>
+    </section>
 
     <?php if ($profile === null): ?>
         <div class="sw-notice">
@@ -22,7 +149,14 @@ $baseAction = '?m=steam_workshop&p=main';
         </div>
     <?php else: ?>
 
-    <!-- Installed mods table -->
+    <?php if (!empty($profile['validation_notes'])): ?>
+        <div class="sw-notice sw-notice--info">
+            <strong><?php echo htmlspecialchars($lang['label_admin_notes'] ?? 'Admin notes:'); ?></strong>
+            <?php echo htmlspecialchars($profile['validation_notes']); ?>
+        </div>
+    <?php endif; ?>
+
+    <!-- ── Installed mods table ── -->
     <h4><?php echo htmlspecialchars($lang['heading_installed_mods'] ?? 'Installed Mods'); ?></h4>
     <?php if (empty($installedMods)): ?>
         <p class="sw-empty"><?php echo htmlspecialchars($lang['no_installed_mods'] ?? 'No mods installed yet.'); ?></p>
@@ -32,6 +166,7 @@ $baseAction = '?m=steam_workshop&p=main';
                 <tr>
                     <th><?php echo htmlspecialchars($lang['col_mod_id'] ?? 'Workshop ID'); ?></th>
                     <th><?php echo htmlspecialchars($lang['col_mod_title'] ?? 'Title'); ?></th>
+                    <th><?php echo htmlspecialchars($lang['col_mod_folder'] ?? 'Install folder'); ?></th>
                     <th><?php echo htmlspecialchars($lang['mods_header_enabled'] ?? 'Enabled'); ?></th>
                     <th><?php echo htmlspecialchars($lang['col_load_order'] ?? 'Load order'); ?></th>
                     <th><?php echo htmlspecialchars($lang['admin_col_actions'] ?? 'Actions'); ?></th>
@@ -46,6 +181,7 @@ $baseAction = '?m=steam_workshop&p=main';
                                target="_blank" rel="noopener"><?php echo $wid; ?></a>
                         </td>
                         <td><?php echo htmlspecialchars($mod['title'] ?? $mod['workshop_id']); ?></td>
+                        <td><code><?php echo htmlspecialchars($mod['custom_folder'] !== '' ? $mod['custom_folder'] : ($mod['install_path'] ?? '')); ?></code></td>
                         <td>
                             <form method="post" action="<?php echo $baseAction; ?>" class="sw-toggle-form">
                                 <input type="hidden" name="ws_action"   value="toggle">
@@ -97,7 +233,7 @@ $baseAction = '?m=steam_workshop&p=main';
         </table>
     <?php endif; ?>
 
-    <!-- Install from cache -->
+    <!-- ── Available cached mods ── -->
     <?php if (!empty($availableMods)): ?>
         <h4><?php echo htmlspecialchars($lang['heading_cached_mods'] ?? 'Available Cached Mods (this agent)'); ?></h4>
         <table class="table sw-ws-mods__cache-table">
@@ -132,7 +268,7 @@ $baseAction = '?m=steam_workshop&p=main';
         </table>
     <?php endif; ?>
 
-    <!-- Search + install by Workshop ID -->
+    <!-- ── Install by Workshop ID ── -->
     <h4><?php echo htmlspecialchars($lang['heading_install_mod'] ?? 'Install Mod by Workshop ID'); ?></h4>
     <form method="post" action="<?php echo $baseAction; ?>" class="sw-form sw-install-form">
         <input type="hidden" name="ws_action" value="install">
@@ -149,9 +285,9 @@ $baseAction = '?m=steam_workshop&p=main';
         </div>
     </form>
 
-    <!-- Steam Workshop search widget (reuse existing JS picker) -->
+    <!-- ── Steam Workshop search widget ── -->
     <?php
-    $scriptPath    = (string)($_SERVER['PHP_SELF'] ?? '/index.php');
+    $scriptPath     = (string)($_SERVER['PHP_SELF'] ?? '/index.php');
     $searchEndpoint = sprintf('%s?m=steam_workshop&p=main&action=search&home_id=%d', $scriptPath, $homeId);
     $langAttrs = [
         'add'     => $lang['mod_picker_action_add'] ?? 'Add',
@@ -201,20 +337,15 @@ $baseAction = '?m=steam_workshop&p=main';
 </div>
 
 <script>
-/* Simple toggle / order auto-submit for the mods table */
 document.addEventListener('DOMContentLoaded', function () {
     // Toggle enable/disable: submit the parent form immediately on change
     document.querySelectorAll('.js-ws-toggle').forEach(function (cb) {
-        cb.addEventListener('change', function () {
-            cb.closest('form').submit();
-        });
+        cb.addEventListener('change', function () { cb.closest('form').submit(); });
     });
 
-    // Load order: submit on change (blur triggers faster than enter on number inputs)
+    // Load order: submit on change
     document.querySelectorAll('.js-ws-order').forEach(function (inp) {
-        inp.addEventListener('change', function () {
-            inp.closest('form').submit();
-        });
+        inp.addEventListener('change', function () { inp.closest('form').submit(); });
     });
 });
 </script>
