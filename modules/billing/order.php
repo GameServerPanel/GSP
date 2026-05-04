@@ -66,39 +66,46 @@ THIS IS WHAT WE DISPLAY ON THE SHOP PAGE AT THE TOP
 
 	<?php 
 	// Shop Form
-	if(intval($_REQUEST['service_id']) !==0) $where_service_id = " WHERE enabled = 1 and service_id=".intval($_REQUEST['service_id']); else $where_service_id = " where enabled = 1";
-	$qry_services = "SELECT * FROM {$table_prefix}billing_services ".$where_service_id ." ORDER BY service_name";
-	$services = $db->query($qry_services);
-	
-	if (isset($_REQUEST['service_id']) && $services === false) {
-		echo "<meta http-equiv='refresh' content='1'>";
-		return;
+	$req_service_id = intval($_REQUEST['service_id'] ?? 0);
+	if ($req_service_id !== 0) {
+		$where_service_id = " WHERE enabled = 1 AND service_id=" . $req_service_id;
+	} else {
+		$where_service_id = " WHERE enabled = 1";
 	}
-	
-	foreach ((array)$services as $key => $row) {
-		$service_ids[$key] = $row['service_id'];
-		$home_cfg_id[$key] = $row['home_cfg_id'];
-		$mod_cfg_id[$key] = $row['mod_cfg_id'];
-	$service_name[$key] = $row['service_name'];
-		$remote_server_id[$key] = $row['remote_server_id'];
-		$slot_max_qty[$key] = $row['slot_max_qty'];
-		$slot_min_qty[$key] = $row['slot_min_qty'];
-		$price_daily[$key] = $row['price_daily'];
-		$price_monthly[$key] = $row['price_monthly'];
-		$price_year[$key] = $row['price_year'];
-		$description[$key] = $row['description'];
-		$img_url[$key] = $row['img_url'];
-		$ftp[$key] = $row['ftp'];
-		$install_method[$key] = $row['install_method'];
-		$manual_url[$key] = $row['manual_url'];
-	$access_rights_list[$key] = $row['access_rights'];
+	$qry_services = "SELECT * FROM {$table_prefix}billing_services " . $where_service_id . " ORDER BY service_name";
+	$services_result = $db->query($qry_services);
+
+	if ($services_result === false) {
+		echo "<p class='error'>Unable to load service information. Please try again or contact support.</p>";
+		error_log("billing order.php: query failed - " . $db->error . " | SQL: " . $qry_services);
+		billing_maybe_close_db($db);
+		include(__DIR__ . '/includes/footer.php');
+		echo '</body></html>';
+		exit;
 	}
-	
+
+	// Fetch all rows into an array so foreach works correctly
+	$serviceRows = [];
+	while ($row = $services_result->fetch_assoc()) {
+		$serviceRows[] = $row;
+	}
+	$services_result->free();
+
+	if ($req_service_id !== 0 && empty($serviceRows)) {
+		error_log("billing order.php: service_id={$req_service_id} not found or not enabled");
+		echo "<p class='error'>The requested service could not be found or is no longer available.</p>";
+		echo "<p><a href='serverlist.php'>Back to server list</a></p>";
+		billing_maybe_close_db($db);
+		include(__DIR__ . '/includes/footer.php');
+		echo '</body></html>';
+		exit;
+	}
+
 ?>	
 <div class="clearfix">
 	<?php
-	foreach ((array)$services as $row)
-	{ 
+	foreach ($serviceRows as $row)
+	{
 	if(!isset($_REQUEST['service_id']))
 		{
 	?>
@@ -177,7 +184,7 @@ if ($row['price_monthly'] == 0.0) {
 			</div>
 			<table class="float-left">
 			<form method="post" action="add_to_cart.php">
-    		<input type="hidden" name="service_id" size="15" value="<?php if(isset($_POST['service_id'])) echo $_POST['service_id'];?>">
+    		<input type="hidden" name="service_id" size="15" value="<?php echo intval($_REQUEST['service_id'] ?? $row['service_id'] ?? 0); ?>">
 			<input type="hidden" name="remote_control_password" size="15" value="ChangeMe">
 			<input type="hidden" name="ftp_password" size="15" value="ChangeMe">
 			<tr>
