@@ -63,14 +63,6 @@ if (!function_exists('gsp_collect_xml_error')) {
 		$log_message = "[GSP] $title" . (empty($details) ? '' : ' Details: ' . $details);
 		error_log($log_message);
 
-		static $errors = [];
-		$errors[] = array(
-			'file'    => $file,
-			'title'   => $title,
-			'details' => $details,
-		);
-		// Store in a predictable global so callers (e.g. home.php) can read it
-		// even across include boundaries without having to call the function.
 		$GLOBALS['_gsp_xml_errors'][] = array(
 			'file'    => $file,
 			'title'   => $title,

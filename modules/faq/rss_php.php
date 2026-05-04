@@ -76,6 +76,7 @@ class rss_php {
             $rss = ltrim($rss);
 
             // Reject obviously non-XML content early to avoid noisy libxml warnings.
+            // Minimum well-formed XML is at least "<a/>" (4 bytes); require one more.
             if(strlen($rss) < 5 || $rss[0] !== '<') {
                 return;
             }

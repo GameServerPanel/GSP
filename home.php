@@ -234,7 +234,7 @@ function ogpHome()
 		if ($isAdmin) {
 			$xml_errors = function_exists('gsp_get_xml_errors') ? gsp_get_xml_errors() : array();
 			if (!empty($xml_errors)) {
-				echo "<div style='background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:10px 14px;margin:10px 0;color:#856404;font-size:0.9em;'>";
+				echo "<div class='gsp-xml-error-banner' style='background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:10px 14px;margin:10px 0;color:#856404;font-size:0.9em;'>";
 				echo "<strong>⚠ One or more game config XML files failed to load and have been skipped:</strong><ul style='margin:6px 0 0 16px;'>";
 				foreach ($xml_errors as $xe) {
 					echo "<li><code>" . htmlspecialchars(basename($xe['file']), ENT_QUOTES, 'UTF-8') . "</code>: "
