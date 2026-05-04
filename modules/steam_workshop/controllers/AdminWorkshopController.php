@@ -148,8 +148,8 @@ class AdminWorkshopController
     {
         $rows = [];
         foreach ($this->gameGroups as $group) {
-            $primaryKey = $group['primary_game_key'];
-            $override = ($this->adapterFormGameKey === $primaryKey) ? $this->adapterFormOverride : null;
+            $primaryKey = isset($group['primary_game_key']) ? (string)$group['primary_game_key'] : '';
+            $override = ($primaryKey !== '' && $this->adapterFormGameKey === $primaryKey) ? $this->adapterFormOverride : null;
 
             $mappingValues = [];
             foreach ((array)$group['game_keys'] as $gameKey) {
@@ -159,16 +159,16 @@ class AdminWorkshopController
             }
 
             $rows[] = [
-                'group_key' => $group['group_key'],
-                'app_id' => $group['app_id'],
-                'game_name' => $group['game_name'],
-                'game_keys' => $group['game_keys'],
+                'group_key' => $group['group_key'] ?? '',
+                'app_id' => $group['app_id'] ?? '',
+                'game_name' => $group['game_name'] ?? '',
+                'game_keys' => $group['game_keys'] ?? [],
                 'primary_game_key' => $primaryKey,
                 'mixed_mapping' => count((array)$mappingValues) > 1,
                 'selected_adapter' => count((array)$mappingValues) === 1 ? array_key_first($mappingValues) : '',
-                'exists' => $this->service->gameAdapterExists($primaryKey),
-                'adapter' => $this->service->getGameAdapter($primaryKey),
-                'updated_at' => $this->service->getGameAdapterUpdatedAt($primaryKey),
+                'exists' => $primaryKey !== '' && $this->service->gameAdapterExists($primaryKey),
+                'adapter' => $primaryKey !== '' ? $this->service->getGameAdapter($primaryKey) : null,
+                'updated_at' => $primaryKey !== '' ? $this->service->getGameAdapterUpdatedAt($primaryKey) : null,
                 'form' => $this->service->getAdapterFormData($primaryKey, $override),
             ];
         }
