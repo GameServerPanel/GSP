@@ -29,8 +29,11 @@ $module_required = TRUE;
 $module_menus = array();
 
 // -----------------------------------------------------------------------
-// $install_queries[0]  – run during FRESH install (all keys executed).
-// $install_queries[2]  – run when upgrading an existing v1 install to v2.
+// $install_queries[0]  – executed for FRESH installs (all keys run).
+//                        Contains the full v2 schema with every column.
+// $install_queries[2]  – executed when upgrading an existing v1 install
+//                        to v2 (ALTER TABLE + new settings table).
+// $db_version = 2  (v1 = original release; v2 = this rewrite).
 // -----------------------------------------------------------------------
 $install_queries = array();
 

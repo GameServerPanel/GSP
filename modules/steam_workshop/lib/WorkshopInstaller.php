@@ -382,7 +382,12 @@ class WorkshopInstaller
         }
 
         $loginMode    = (string)($profile['steamcmd_login_mode'] ?? 'anonymous');
-        $loginArg     = $loginMode === 'account' ? 'account_placeholder' : 'anonymous';
+        // TODO: When login_mode is 'account', replace 'anonymous' with the
+        // configured SteamCMD credentials (username + password) loaded from
+        // a secure panel-side credential store. Until that feature is
+        // implemented, 'account' mode logs in anonymously (which works for
+        // free/publicly-accessible Workshop items).
+        $loginArg     = 'anonymous';
 
         $cmd = implode(' ', [
             escapeshellarg($steamcmdPath),
@@ -422,19 +427,19 @@ class WorkshopInstaller
      */
     private function checkNeedsSync(
         object $remote,
-        string $cachePath,
-        string $installPath,
+        string $sourcePath,
+        string $targetPath,
         array $profile,
         array &$log
     ): bool {
         $copyMethod = (string)($profile['copy_method'] ?? 'rsync');
-        $log[]      = "Pre-start compare: cache={$cachePath} dest={$installPath} method={$copyMethod}";
+        $log[]      = "Pre-start compare: source={$sourcePath} target={$targetPath} method={$copyMethod}";
 
         if ($copyMethod === 'rsync') {
             $cmd  = sprintf(
                 'rsync -rcn --delete %s %s 2>/dev/null; echo "RSYNC_EXIT:$?"',
-                escapeshellarg(rtrim($cachePath, '/') . '/'),
-                escapeshellarg(rtrim($installPath, '/') . '/')
+                escapeshellarg(rtrim($sourcePath, '/') . '/'),
+                escapeshellarg(rtrim($targetPath, '/') . '/')
             );
             $out  = (string)$remote->exec($cmd);
             $body = preg_replace('/RSYNC_EXIT:\d+\s*$/', '', $out) ?? '';

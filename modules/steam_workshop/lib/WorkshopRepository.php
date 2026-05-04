@@ -315,10 +315,6 @@ class WorkshopRepository
     }
 
     /**
-     * Insert a new mod row or update the existing one (upsert by home_id + workshop_id).
-     * Returns the row id.
-     */
-    /**
      * Insert (id = 0) or update (id > 0) a Workshop mod entry for a game home.
      * Returns the row id.
      */

@@ -20,7 +20,7 @@ $folderFormats   = ['@%mod_name%' => '@%mod_name% (mod title)', '@%workshop_id%'
 $curFolderFormat = (string)($profile['folder_naming_format'] ?? '@%workshop_id%');
 $separatorList   = ['semicolon' => 'Semicolon ( ; )', 'comma' => 'Comma ( , )', 'space' => 'Space ( )'];
 $curSeparator    = (string)($profile['mod_separator'] ?? 'semicolon');
-$copyMethods     = ['rsync' => 'rsync (Linux/Unix)', 'copy' => 'cp / basic copy', 'symlink' => 'Symlink'];
+$copyMethods     = ['rsync' => 'rsync (Linux/Unix)', 'copy' => 'cp / basic copy', 'symlink' => 'Symlink (requires persistent cache path)'];
 $curCopyMethod   = (string)($profile['copy_method'] ?? 'rsync');
 $loginModes      = ['anonymous' => 'Anonymous (recommended for free mods)', 'account' => 'Configured account (paid games)'];
 $curLoginMode    = (string)($profile['steamcmd_login_mode'] ?? 'anonymous');

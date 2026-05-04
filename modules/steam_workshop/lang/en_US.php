@@ -226,7 +226,7 @@ return [
     'profile_hint_steamcmd_path'        => 'Full path to steamcmd.sh on the remote agent. Leave blank to use the agent default (/home/gameserver/steamcmd/steamcmd.sh).',
     'profile_label_steam_login_required'=> 'Steam login required (game is not free / requires ownership)',
     'profile_label_steamcmd_login_mode' => 'SteamCMD login mode',
-    'profile_hint_steamcmd_login_mode'  => 'Use anonymous for free Workshop mods. Use configured account for games requiring ownership.',
+    'profile_hint_steamcmd_login_mode'  => 'Use anonymous for free Workshop mods. Configured account mode stores the intent; full credential injection requires panel-level Steam account configuration (see admin docs).',
     'profile_label_os'                  => 'Supported OS',
     'profile_label_cache_path'          => 'Workshop download/cache path',
     'profile_hint_cache_path'           => 'Where SteamCMD stores downloaded mod content on the agent. E.g. /home/gameserver/steamcmd/steamapps/workshop/content/%workshop_app_id%/%workshop_id%',

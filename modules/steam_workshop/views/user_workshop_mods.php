@@ -287,8 +287,8 @@ $statusClass = match($lastStatus) {
 
     <!-- ── Steam Workshop search widget ── -->
     <?php
-    $scriptPath     = (string)($_SERVER['PHP_SELF'] ?? '/index.php');
-    $searchEndpoint = sprintf('%s?m=steam_workshop&p=main&action=search&home_id=%d', $scriptPath, $homeId);
+    $requestPath     = (string)($_SERVER['PHP_SELF'] ?? '/index.php');
+    $searchEndpoint = sprintf('%s?m=steam_workshop&p=main&action=search&home_id=%d', $requestPath, $homeId);
     $langAttrs = [
         'add'     => $lang['mod_picker_action_add'] ?? 'Add',
         'remove'  => $lang['mod_picker_action_remove'] ?? 'Remove',
