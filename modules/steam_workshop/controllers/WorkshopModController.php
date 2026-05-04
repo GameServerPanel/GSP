@@ -72,6 +72,12 @@ class WorkshopModController
                 case 'sync':
                     $this->handleSync($userId, $isAdmin);
                     return;
+                case 'save_settings':
+                    $this->handleSaveSettings($userId, $isAdmin);
+                    return;
+                case 'queue_update':
+                    $this->handleQueueUpdate($userId, $isAdmin);
+                    return;
             }
         }
 
@@ -131,23 +137,40 @@ class WorkshopModController
         }
 
         $agentId = (int)($home['remote_server_id'] ?? 0);
-        $appId   = $this->searchService->getSteamAppIdForGameKey((string)($home['game_key'] ?? ''));
-        $profile = $appId !== null ? $this->repo->getProfileByAppId($appId) : null;
 
-        $installedMods  = $this->repo->listModsForHome($homeId);
-        $availableMods  = ($profile !== null && $appId !== null)
+        // Load server-level settings
+        $serverSettings = $this->repo->getServerSettings($homeId);
+
+        // Determine active profile: from server settings, or fall back to app-id lookup
+        $profile = null;
+        if ($serverSettings !== null && !empty($serverSettings['profile_id'])) {
+            $profile = $this->repo->getProfileById((int)$serverSettings['profile_id']);
+        }
+        if ($profile === null) {
+            $appId   = $this->searchService->getSteamAppIdForGameKey((string)($home['game_key'] ?? ''));
+            $profile = $appId !== null ? $this->repo->getProfileByAppId($appId) : null;
+        }
+        $appId = $profile !== null ? (string)($profile['workshop_app_id'] ?? '') : null;
+
+        // All enabled profiles for the profile selector
+        $allProfiles = $this->repo->listProfiles(true);
+
+        $installedMods = $this->repo->listModsForHome($homeId);
+        $availableMods = ($profile !== null && $appId !== null)
             ? $this->repo->listCacheForAgent($agentId, $appId)
             : [];
 
         $this->render('user_workshop_mods', [
-            'lang'          => $this->lang,
-            'home'          => $home,
-            'homeId'        => $homeId,
-            'profile'       => $profile,
-            'appId'         => $appId,
-            'installedMods' => $installedMods,
-            'availableMods' => $availableMods,
-            'isAdmin'       => $isAdmin,
+            'lang'           => $this->lang,
+            'home'           => $home,
+            'homeId'         => $homeId,
+            'profile'        => $profile,
+            'appId'          => $appId,
+            'installedMods'  => $installedMods,
+            'availableMods'  => $availableMods,
+            'serverSettings' => $serverSettings ?? [],
+            'allProfiles'    => $allProfiles,
+            'isAdmin'        => $isAdmin,
         ]);
     }
 
@@ -346,6 +369,56 @@ class WorkshopModController
         }
 
         echo json_encode(['ok' => true, 'results' => $payload['results'], 'pagination' => $payload['pagination']]);
+    }
+
+    private function handleSaveSettings(int $userId, bool $isAdmin): void
+    {
+        $homeId = (int)($_POST['home_id'] ?? 0);
+        if ($homeId <= 0) {
+            print_failure($this->lang['error_missing_home'] ?? 'Select a server first.');
+            $this->handleIndex($userId, $isAdmin);
+            return;
+        }
+
+        $home = $this->getHome($homeId, $userId, $isAdmin);
+        if ($home === null) {
+            print_failure($this->lang['error_home_not_found'] ?? 'Server not found.');
+            $this->handleIndex($userId, $isAdmin);
+            return;
+        }
+
+        $this->repo->saveServerSettings($homeId, [
+            'workshop_enabled' => !empty($_POST['workshop_enabled']) ? 1 : 0,
+            'profile_id'       => (int)($_POST['profile_id'] ?? 0),
+            'update_mode'      => $_POST['update_mode'] ?? 'manual',
+            'restart_behavior' => $_POST['restart_behavior'] ?? 'none',
+        ]);
+
+        print_success($this->lang['settings_saved'] ?? 'Workshop settings saved.');
+        $_GET['home_id'] = $homeId;
+        $this->handleModsPage($userId, $isAdmin);
+    }
+
+    private function handleQueueUpdate(int $userId, bool $isAdmin): void
+    {
+        $homeId = (int)($_POST['home_id'] ?? 0);
+        if ($homeId <= 0) {
+            print_failure($this->lang['error_missing_home'] ?? 'Select a server first.');
+            $this->handleIndex($userId, $isAdmin);
+            return;
+        }
+
+        $home = $this->getHome($homeId, $userId, $isAdmin);
+        if ($home === null) {
+            print_failure($this->lang['error_home_not_found'] ?? 'Server not found.');
+            $this->handleIndex($userId, $isAdmin);
+            return;
+        }
+
+        $this->repo->setUpdateQueued($homeId, true);
+        print_success($this->lang['update_queued'] ?? 'Manual update queued. It will run on the next scheduler cycle.');
+        $_GET['home_id'] = $homeId;
+        $this->handleModsPage($userId, $isAdmin);
     }
 
     // ------------------------------------------------------------------

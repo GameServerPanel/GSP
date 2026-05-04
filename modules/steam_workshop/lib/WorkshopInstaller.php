@@ -5,16 +5,22 @@ declare(strict_types=1);
  * WorkshopInstaller: handles mod download (via agent SteamCMD) and
  * copy/sync from agent cache to server install path.
  *
- * Template variables supported in all paths/scripts:
- *   {home_id}          numeric home id
- *   {agent_id}         numeric remote_server_id
- *   {workshop_app_id}  Steam app id (e.g. 221100)
- *   {mod_id}           Workshop mod id (numeric string)
- *   {mod_title}        mod title (sanitised)
- *   {steamcmd_path}    path to steamcmd.sh / steamcmd.exe on the agent
- *   {server_path}      game server home_path
- *   {install_path}     resolved install path for this mod
- *   {cache_path}       resolved cache path for this mod
+ * Template variables supported in all paths/scripts (%var% style):
+ *   %home_id%           numeric home id
+ *   %server_path%       game server home_path
+ *   %steam_app_id%      Steam game App ID (e.g. 221100 for DayZ)
+ *   %workshop_app_id%   Workshop App ID used for +workshop_download_item
+ *   %workshop_id%       Workshop mod item id (numeric)
+ *   %mod_name%          mod title sanitised for use as a folder name
+ *   %install_name%      resolved mod folder name (from folder_naming_format)
+ *   %download_path%     alias for %source_path% (SteamCMD cache dir for this mod)
+ *   %source_path%       SteamCMD cache directory for this mod
+ *   %target_path%       resolved install directory for this mod
+ *   %keys_source_path%  key source path (resolved from profile key_source_path)
+ *   %keys_target_path%  key destination path (resolved from profile key_dest_path)
+ *   %steamcmd_path%     path to steamcmd.sh on the agent
+ *
+ * Legacy {var} style placeholders are also resolved for backward compat.
  */
 
 require_once __DIR__ . '/WorkshopRepository.php';
@@ -43,91 +49,82 @@ class WorkshopInstaller
      * @param array  $home         Row from getGameHome/getUserGameHome
      * @param array  $profile      Row from gsp_workshop_game_profiles
      * @param string $workshopId   Numeric workshop item id
-     * @param string $steamCmdPath Path to steamcmd binary on the agent
      * @return array{success:bool, message:string, restart_required:bool, log:list<string>}
      */
     public function install(
         array $home,
         array $profile,
-        string $workshopId,
-        string $steamCmdPath = ''
+        string $workshopId
     ): array {
         $log = [];
 
-        // Validate workshop id
         $workshopId = preg_replace('/[^0-9]/', '', $workshopId) ?? '';
         if ($workshopId === '') {
             return $this->fail('Workshop ID must be numeric.', $log);
         }
 
-        $homeId   = (int)($home['home_id'] ?? 0);
-        $agentId  = (int)($home['remote_server_id'] ?? 0);
-        $appId    = (string)($profile['workshop_app_id'] ?? '');
-        $osType   = $this->detectOsType($home);
+        $homeId  = (int)($home['home_id'] ?? 0);
+        $agentId = (int)($home['remote_server_id'] ?? 0);
+        $appId   = (string)($profile['workshop_app_id'] ?? '');
+        $osType  = $this->detectOsType($home);
 
         if ($homeId <= 0 || $agentId <= 0 || $appId === '') {
             return $this->fail('Invalid home, agent, or app ID.', $log);
         }
 
-        // Build template vars
-        $vars = $this->buildTemplateVars($home, $profile, $workshopId, '', $steamCmdPath);
-        $cachePath   = $this->resolveTemplate((string)($profile['cache_path_template'] ?? ''), $vars);
-        $installPath = $this->resolveTemplate((string)($profile['install_path_template'] ?? ''), $vars);
-        $vars['{cache_path}']   = $cachePath;
-        $vars['{install_path}'] = $installPath;
-
-        // Build remote library
         $remote = $this->buildRemote($home);
         if ($remote === null) {
             return $this->fail('Unable to connect to agent.', $log);
         }
-
-        // Check agent connectivity
         if ($remote->status_chk() !== 1) {
             return $this->fail('Agent is offline.', $log);
         }
 
-        // Check cache
-        $cacheEntry = $this->repo->getCacheEntry($agentId, $appId, $workshopId);
-        $log[] = "Cache check: agent={$agentId} app={$appId} mod={$workshopId}";
+        // Build template vars (source/target paths filled after resolution below)
+        $vars = $this->buildTemplateVars($home, $profile, $workshopId);
 
-        if ($cacheEntry === null || ($cacheEntry['status'] ?? '') !== 'cached') {
-            $log[] = 'Cache MISS – triggering SteamCMD download on agent.';
-            $downloadResult = $this->triggerSteamCmdDownload(
-                $remote, $agentId, $appId, $workshopId, $steamCmdPath, $cachePath, $log
-            );
-
-            if (!$downloadResult) {
-                // Update cache status to 'missing' so the cron can retry
-                $this->repo->upsertCacheEntry($agentId, $osType, $appId, $workshopId, $cachePath, 'missing');
-                return $this->fail(
-                    'SteamCMD download failed. The mod will be retried on the next scheduled update.',
-                    $log
-                );
-            }
-
-            $log[] = 'SteamCMD download success.';
-            $this->repo->upsertCacheEntry($agentId, $osType, $appId, $workshopId, $cachePath, 'cached');
-        } else {
-            $log[] = 'Cache HIT – using existing cached copy.';
+        // Run pre-update script once (before mods)
+        $preScript = trim((string)($profile['pre_update_script'] ?? ''));
+        if ($preScript !== '') {
+            $log[] = 'Running pre-update script.';
+            $this->runScript($remote, $preScript, $vars, $log);
         }
 
-        // Copy / sync from cache to server install path
+        // Download
+        $cacheResult = $this->ensureCached($remote, $agentId, $osType, $appId, $workshopId, $profile, $vars, $log);
+        if (!$cacheResult) {
+            return $this->fail('SteamCMD download failed.', $log);
+        }
+
+        // Copy/sync to server
         $syncResult = $this->syncToServer($remote, $profile, $vars, $log);
         if (!$syncResult) {
             return $this->fail('Sync from cache to server failed. Check agent logs.', $log);
         }
 
-        // Optional install script (admin-defined only)
+        // Per-mod install script
         $installScript = trim((string)($profile['install_script'] ?? ''));
         if ($installScript !== '') {
-            $this->runInstallScript($remote, $installScript, $vars, $log);
+            $log[] = 'Running per-mod install script.';
+            $this->runScript($remote, $installScript, $vars, $log);
+        }
+
+        // Copy keys if configured
+        if (!empty($profile['copy_keys'])) {
+            $this->copyKeys($remote, $profile, $vars, $log);
+        }
+
+        // Post-update script
+        $postScript = trim((string)($profile['post_update_script'] ?? ''));
+        if ($postScript !== '') {
+            $log[] = 'Running post-update script.';
+            $this->runScript($remote, $postScript, $vars, $log);
         }
 
         // Record in database
         $this->repo->insertOrUpdateMod(
             $homeId, $agentId, (int)$profile['id'], $appId, $workshopId,
-            $installPath, '', 0
+            $vars['%target_path%'] ?? '', '', 0
         );
 
         $restartRequired = !empty($profile['requires_restart']);
@@ -152,14 +149,13 @@ class WorkshopInstaller
      */
     public function syncMod(array $home, array $modRow, array $profile): array
     {
-        $log = [];
+        $log        = [];
         $workshopId = (string)($modRow['workshop_id'] ?? '');
         $agentId    = (int)($modRow['agent_id'] ?? 0);
         $appId      = (string)($modRow['workshop_app_id'] ?? '');
 
         $cacheEntry = $this->repo->getCacheEntry($agentId, $appId, $workshopId);
         if ($cacheEntry === null || ($cacheEntry['status'] ?? '') !== 'cached') {
-            $log[] = "Cache entry not available for mod {$workshopId} – skipping sync.";
             return ['success' => false, 'changed' => false, 'message' => 'Mod not cached yet.', 'log' => $log];
         }
 
@@ -169,10 +165,8 @@ class WorkshopInstaller
         }
 
         $vars = $this->buildTemplateVars($home, $profile, $workshopId, $modRow['title'] ?? '');
-        $vars['{cache_path}']   = $this->resolveTemplate((string)($profile['cache_path_template'] ?? ''), $vars);
-        $vars['{install_path}'] = (string)($modRow['install_path'] ?? $this->resolveTemplate((string)($profile['install_path_template'] ?? ''), $vars));
 
-        $changed = $this->checkNeedsSync($remote, $vars['{cache_path}'], $vars['{install_path}'], $profile, $log);
+        $changed = $this->checkNeedsSync($remote, $vars['%source_path%'], $vars['%target_path%'], $profile, $log);
         if (!$changed) {
             $log[] = 'No changes detected – skipping sync.';
             return ['success' => true, 'changed' => false, 'message' => 'Already up to date.', 'log' => $log];
@@ -180,6 +174,16 @@ class WorkshopInstaller
 
         $log[] = 'Changes detected – syncing.';
         $ok = $this->syncToServer($remote, $profile, $vars, $log);
+
+        if ($ok) {
+            $installScript = trim((string)($profile['install_script'] ?? ''));
+            if ($installScript !== '') {
+                $this->runScript($remote, $installScript, $vars, $log);
+            }
+            if (!empty($profile['copy_keys'])) {
+                $this->copyKeys($remote, $profile, $vars, $log);
+            }
+        }
 
         return [
             'success' => $ok,
@@ -190,17 +194,34 @@ class WorkshopInstaller
     }
 
     // ------------------------------------------------------------------
-    // Template resolution
+    // Template resolution (public – used by WorkshopUpdater)
     // ------------------------------------------------------------------
 
     /**
      * Replace template placeholders in a string.
+     * Supports both %var% (canonical) and {var} (legacy) style.
      *
      * @param array<string,string> $vars
      */
     public function resolveTemplate(string $template, array $vars): string
     {
-        return str_replace(array_keys($vars), array_values($vars), $template);
+        // %var% style (canonical)
+        $result = str_replace(array_keys($vars), array_values($vars), $template);
+
+        // Legacy {var} style aliases – map old keys to same values
+        $legacy = [];
+        foreach ($vars as $k => $v) {
+            $legacyKey = '{' . trim($k, '%') . '}';
+            $legacy[$legacyKey] = $v;
+        }
+        // Extra legacy aliases
+        $legacy['{mod_id}']    = $vars['%workshop_id%'] ?? '';
+        $legacy['{mod_title}'] = $vars['%mod_name%'] ?? '';
+        $legacy['{mod_folder}'] = $vars['%install_name%'] ?? '';
+        $legacy['{install_path}'] = $vars['%target_path%'] ?? '';
+        $legacy['{cache_path}']   = $vars['%source_path%'] ?? '';
+
+        return str_replace(array_keys($legacy), array_values($legacy), $result);
     }
 
     /**
@@ -212,36 +233,111 @@ class WorkshopInstaller
         array $home,
         array $profile,
         string $workshopId,
-        string $modTitle = '',
-        string $steamCmdPath = ''
+        string $modTitle = ''
     ): array {
-        $serverPath = rtrim((string)($home['home_path'] ?? ''), '/');
-        $safeName   = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $modTitle) ?? '';
+        $serverPath   = rtrim((string)($home['home_path'] ?? ''), '/');
+        $steamcmdPath = trim((string)($profile['steamcmd_path'] ?? ''));
+        if ($steamcmdPath === '') {
+            $steamcmdPath = '/home/gameserver/steamcmd/steamcmd.sh';
+        }
 
-        $folderNameTpl  = (string)($profile['folder_name_template'] ?? '@{mod_id}');
-        $folderNameVars = [
-            '{mod_id}'    => $workshopId,
-            '{mod_title}' => $safeName,
-        ];
-        $folderName = str_replace(array_keys($folderNameVars), array_values($folderNameVars), $folderNameTpl);
+        $safeName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $modTitle) ?? '';
+
+        // Resolve folder name from format
+        $folderFormat = (string)($profile['folder_naming_format'] ?? '@%workshop_id%');
+        if ($folderFormat === '@%mod_name%') {
+            $installName = '@' . $safeName;
+        } elseif ($folderFormat === '@%workshop_id%') {
+            $installName = '@' . $workshopId;
+        } else {
+            // custom – use folder_name_template as-is, resolve %workshop_id%/%mod_name% inline
+            $tpl = (string)($profile['folder_name_template'] ?? '@%workshop_id%');
+            $installName = str_replace(['%workshop_id%', '%mod_name%'], [$workshopId, $safeName], $tpl);
+        }
+
+        $steamAppId     = (string)($profile['steam_app_id'] ?? '');
+        $workshopAppId  = (string)($profile['workshop_app_id'] ?? '');
+
+        // Resolve cache/source path template
+        $cachePathTpl = (string)($profile['cache_path_template'] ?? '');
+        $sourcePath   = str_replace(
+            ['%workshop_app_id%', '%workshop_id%', '%mod_name%', '%install_name%', '%steam_app_id%', '%steamcmd_path%'],
+            [$workshopAppId, $workshopId, $safeName, $installName, $steamAppId, dirname($steamcmdPath)],
+            $cachePathTpl
+        );
+
+        // Resolve target/install path template
+        $installPathTpl = (string)($profile['install_path_template'] ?? '');
+        $targetPath     = str_replace(
+            ['%server_path%', '%workshop_app_id%', '%workshop_id%', '%mod_name%', '%install_name%', '%steam_app_id%'],
+            [$serverPath, $workshopAppId, $workshopId, $safeName, $installName, $steamAppId],
+            $installPathTpl
+        );
+
+        // Resolve key paths
+        $keySourceRaw = (string)($profile['key_source_path'] ?? '');
+        $keyDestRaw   = (string)($profile['key_dest_path'] ?? '');
+        $keySource    = str_replace(['%source_path%', '%server_path%'], [$sourcePath, $serverPath], $keySourceRaw);
+        $keyDest      = str_replace(['%target_path%', '%server_path%'], [$targetPath, $serverPath], $keyDestRaw);
 
         return [
-            '{home_id}'         => (string)($home['home_id'] ?? ''),
-            '{agent_id}'        => (string)($home['remote_server_id'] ?? ''),
-            '{workshop_app_id}' => (string)($profile['workshop_app_id'] ?? ''),
-            '{mod_id}'          => $workshopId,
-            '{mod_title}'       => $safeName,
-            '{mod_folder}'      => $folderName,
-            '{steamcmd_path}'   => $steamCmdPath !== '' ? $steamCmdPath : '/home/gameserver/steamcmd',
-            '{server_path}'     => $serverPath,
-            '{install_path}'    => '',   // filled by caller after resolution
-            '{cache_path}'      => '',   // filled by caller after resolution
+            '%home_id%'          => (string)($home['home_id'] ?? ''),
+            '%server_path%'      => $serverPath,
+            '%steam_app_id%'     => $steamAppId,
+            '%workshop_app_id%'  => $workshopAppId,
+            '%workshop_id%'      => $workshopId,
+            '%mod_name%'         => $safeName,
+            '%install_name%'     => $installName,
+            '%download_path%'    => $sourcePath,
+            '%source_path%'      => $sourcePath,
+            '%target_path%'      => $targetPath,
+            '%keys_source_path%' => $keySource,
+            '%keys_target_path%' => $keyDest,
+            '%steamcmd_path%'    => $steamcmdPath,
         ];
     }
 
     // ------------------------------------------------------------------
     // Private helpers
     // ------------------------------------------------------------------
+
+    /**
+     * Ensure a mod is downloaded/cached on the agent.
+     * Returns true if cached and available.
+     *
+     * @param list<string> $log
+     */
+    private function ensureCached(
+        object $remote,
+        int $agentId,
+        string $osType,
+        string $appId,
+        string $workshopId,
+        array $profile,
+        array &$vars,
+        array &$log
+    ): bool {
+        $sourcePath = $vars['%source_path%'];
+
+        $cacheEntry = $this->repo->getCacheEntry($agentId, $appId, $workshopId);
+        $log[] = "Cache check: agent={$agentId} app={$appId} mod={$workshopId}";
+
+        if ($cacheEntry !== null && ($cacheEntry['status'] ?? '') === 'cached') {
+            $log[] = 'Cache HIT – using existing cached copy.';
+            return true;
+        }
+
+        $log[] = 'Cache MISS – triggering SteamCMD download on agent.';
+        $ok = $this->triggerSteamCmdDownload($remote, $agentId, $appId, $workshopId, $profile, $sourcePath, $log);
+
+        $status = $ok ? 'cached' : 'missing';
+        $this->repo->upsertCacheEntry($agentId, $osType, $appId, $workshopId, $sourcePath, $status);
+
+        if ($ok) {
+            $log[] = 'SteamCMD download success.';
+        }
+        return $ok;
+    }
 
     /** Build an OGPRemoteLibrary instance from a home row. */
     private function buildRemote(array $home): ?object
@@ -253,9 +349,9 @@ class WorkshopInstaller
             return null;
         }
 
-        $ip  = (string)($home['agent_ip'] ?? '');
-        $port = (string)($home['agent_port'] ?? '');
-        $key  = (string)($home['encryption_key'] ?? '');
+        $ip      = (string)($home['agent_ip'] ?? '');
+        $port    = (string)($home['agent_port'] ?? '');
+        $key     = (string)($home['encryption_key'] ?? '');
         $timeout = isset($home['timeout']) ? (int)$home['timeout'] : 30;
 
         if ($ip === '' || $port === '') {
@@ -266,7 +362,7 @@ class WorkshopInstaller
     }
 
     /**
-     * Trigger a SteamCMD workshop_download_item on the agent via exec().
+     * Trigger a SteamCMD workshop_download_item on the agent.
      * Returns true on success.
      *
      * @param list<string> $log
@@ -276,36 +372,43 @@ class WorkshopInstaller
         int $agentId,
         string $appId,
         string $workshopId,
-        string $steamCmdPath,
+        array $profile,
         string $cachePath,
         array &$log
     ): bool {
-        if ($steamCmdPath === '') {
-            $steamCmdPath = '/home/gameserver/steamcmd/steamcmd.sh';
+        $steamcmdPath = trim((string)($profile['steamcmd_path'] ?? ''));
+        if ($steamcmdPath === '') {
+            $steamcmdPath = '/home/gameserver/steamcmd/steamcmd.sh';
         }
 
+        $loginMode    = (string)($profile['steamcmd_login_mode'] ?? 'anonymous');
+        // TODO: When login_mode is 'account', replace 'anonymous' with the
+        // configured SteamCMD credentials (username + password) loaded from
+        // a secure panel-side credential store. Until that feature is
+        // implemented, 'account' mode logs in anonymously (which works for
+        // free/publicly-accessible Workshop items).
+        $loginArg     = 'anonymous';
+
         $cmd = implode(' ', [
-            escapeshellarg($steamCmdPath),
-            '+login', 'anonymous',
+            escapeshellarg($steamcmdPath),
+            '+login', escapeshellarg($loginArg),
             '+workshop_download_item', escapeshellarg($appId), escapeshellarg($workshopId),
             'validate',
             '+quit',
         ]);
 
-        $log[] = "SteamCMD start: {$cmd}";
+        $log[] = "SteamCMD start: agent={$agentId} app={$appId} mod={$workshopId}";
         $this->writeLog("STEAMCMD START agent={$agentId} app={$appId} mod={$workshopId}");
 
         $output = $remote->exec($cmd);
 
         if ($output === null) {
             $log[] = 'SteamCMD: no response from agent (command may still be running).';
-            $this->writeLog("STEAMCMD NO_RESPONSE agent={$agentId} app={$appId} mod={$workshopId}");
-            // Treat as unknown – check file existence
         } else {
             $log[] = 'SteamCMD output: ' . substr((string)$output, 0, 500);
         }
 
-        // Verify the download succeeded by checking for the cache path on the agent
+        // Verify by checking whether the cache path now exists
         $exists = $remote->rfile_exists($cachePath);
         if ($exists === 1) {
             $this->writeLog("STEAMCMD SUCCESS agent={$agentId} app={$appId} mod={$workshopId} path={$cachePath}");
@@ -317,52 +420,33 @@ class WorkshopInstaller
     }
 
     /**
-     * Check if cache path differs from install path using a dry-run compare.
+     * Check if cache path differs from install path (dry-run compare).
      * Returns true if sync is needed.
      *
      * @param list<string> $log
      */
     private function checkNeedsSync(
         object $remote,
-        string $cachePath,
-        string $installPath,
+        string $sourcePath,
+        string $targetPath,
         array $profile,
         array &$log
     ): bool {
         $copyMethod = (string)($profile['copy_method'] ?? 'rsync');
-        $log[]      = "Pre-start compare: cache={$cachePath} dest={$installPath} method={$copyMethod}";
+        $log[]      = "Pre-start compare: source={$sourcePath} target={$targetPath} method={$copyMethod}";
 
         if ($copyMethod === 'rsync') {
-            // Dry-run: any output lines (beyond the exit sentinel) mean changes exist
-            $cmd = sprintf(
+            $cmd  = sprintf(
                 'rsync -rcn --delete %s %s 2>/dev/null; echo "RSYNC_EXIT:$?"',
-                escapeshellarg(rtrim($cachePath, '/') . '/'),
-                escapeshellarg(rtrim($installPath, '/') . '/')
+                escapeshellarg(rtrim($sourcePath, '/') . '/'),
+                escapeshellarg(rtrim($targetPath, '/') . '/')
             );
             $out  = (string)$remote->exec($cmd);
-            // Strip the exit line, then check for any non-whitespace output
             $body = preg_replace('/RSYNC_EXIT:\d+\s*$/', '', $out) ?? '';
             return preg_match('/\S/', $body) === 1;
         }
 
-        if ($copyMethod === 'robocopy') {
-            // List-only mode: robocopy exit code 0 = no differences, 1+ = changes or errors.
-            // Embed the exit code in output so we can read it back via exec().
-            $cmd = sprintf(
-                'robocopy /L /MIR /NJH /NJS %s %s; echo "ROBOCOPY_EXIT:$LASTEXITCODE"',
-                escapeshellarg($cachePath),
-                escapeshellarg($installPath)
-            );
-            $out  = (string)$remote->exec($cmd);
-            if (preg_match('/ROBOCOPY_EXIT:(\d+)/', $out, $m)) {
-                // 0 = no change; 1–7 = informational (changes found); 8+ = error
-                return (int)$m[1] !== 0;
-            }
-            // If we cannot determine, assume sync is needed
-            return true;
-        }
-
-        // custom_script: always sync
+        // copy / symlink: always sync
         return true;
     }
 
@@ -375,98 +459,110 @@ class WorkshopInstaller
     private function syncToServer(
         object $remote,
         array $profile,
-        array $vars,
+        array &$vars,
         array &$log
     ): bool {
         $copyMethod  = (string)($profile['copy_method'] ?? 'rsync');
-        $cachePath   = $vars['{cache_path}'] ?? '';
-        $installPath = $vars['{install_path}'] ?? '';
+        $sourcePath  = $vars['%source_path%'];
+        $targetPath  = $vars['%target_path%'];
 
-        if ($cachePath === '' || $installPath === '') {
-            $log[] = 'Sync skipped: empty cache or install path.';
+        if ($sourcePath === '' || $targetPath === '') {
+            $log[] = 'Sync skipped: empty source or target path.';
             return false;
         }
 
-        $log[] = "Sync start: method={$copyMethod} cache={$cachePath} dest={$installPath}";
-        $this->writeLog("COPY START method={$copyMethod} cache={$cachePath} dest={$installPath}");
+        $log[] = "Sync start: method={$copyMethod} source={$sourcePath} target={$targetPath}";
+        $this->writeLog("COPY START method={$copyMethod} source={$sourcePath} target={$targetPath}");
 
         if ($copyMethod === 'rsync') {
             $cmd = sprintf(
                 'mkdir -p %s && rsync -a --delete %s %s 2>&1; echo "EXIT:$?"',
-                escapeshellarg($installPath),
-                escapeshellarg(rtrim($cachePath, '/') . '/'),
-                escapeshellarg(rtrim($installPath, '/') . '/')
+                escapeshellarg($targetPath),
+                escapeshellarg(rtrim($sourcePath, '/') . '/'),
+                escapeshellarg(rtrim($targetPath, '/') . '/')
             );
-        } elseif ($copyMethod === 'robocopy') {
+        } elseif ($copyMethod === 'symlink') {
             $cmd = sprintf(
-                'robocopy /MIR /NJH /NJS %s %s; echo "ROBOCOPY_EXIT:$LASTEXITCODE"',
-                escapeshellarg($cachePath),
-                escapeshellarg($installPath)
+                'mkdir -p %s && ln -sfn %s %s 2>&1; echo "EXIT:$?"',
+                escapeshellarg(dirname($targetPath)),
+                escapeshellarg($sourcePath),
+                escapeshellarg($targetPath)
             );
-        } elseif ($copyMethod === 'custom_script') {
-            $script = trim((string)($profile['install_script'] ?? ''));
-            if ($script === '') {
-                $log[] = 'custom_script requested but install_script is empty – falling back to rsync.';
-                $cmd = sprintf(
-                    'mkdir -p %s && rsync -a --delete %s %s 2>&1; echo "EXIT:$?"',
-                    escapeshellarg($installPath),
-                    escapeshellarg(rtrim($cachePath, '/') . '/'),
-                    escapeshellarg(rtrim($installPath, '/') . '/')
-                );
-            } else {
-                // The admin-defined script is templated; execute it via the agent exec()
-                $resolvedScript = $this->resolveTemplate($script, $vars);
-                $cmd = $resolvedScript . ' 2>&1; echo "EXIT:$?"';
-            }
         } else {
-            $log[] = "Unknown copy method '{$copyMethod}'.";
-            return false;
+            // 'copy' – basic cp
+            $cmd = sprintf(
+                'mkdir -p %s && cp -r %s %s 2>&1; echo "EXIT:$?"',
+                escapeshellarg($targetPath),
+                escapeshellarg(rtrim($sourcePath, '/') . '/.'),
+                escapeshellarg($targetPath)
+            );
         }
 
         $out = (string)$remote->exec($cmd);
         $log[] = 'Sync output: ' . substr($out, 0, 500);
 
-        // Determine success from embedded exit code sentinel
-        if ($copyMethod === 'robocopy') {
-            if (preg_match('/ROBOCOPY_EXIT:(\d+)/', $out, $m)) {
-                // 0–7 = success/informational; 8+ = error
-                $ok = (int)$m[1] < 8;
-            } else {
-                $ok = true; // assume success if no code extracted
-            }
+        if (preg_match('/EXIT:(\d+)/', $out, $m)) {
+            $ok = (int)$m[1] === 0;
         } else {
-            if (preg_match('/EXIT:(\d+)/', $out, $m)) {
-                $ok = (int)$m[1] === 0;
-            } else {
-                $ok = true;
-            }
+            $ok = true;
         }
 
         if ($ok) {
             $log[] = 'Sync success.';
-            $this->writeLog("COPY SUCCESS cache={$cachePath} dest={$installPath}");
+            $this->writeLog("COPY SUCCESS source={$sourcePath} target={$targetPath}");
         } else {
             $log[] = 'Sync failed (non-zero exit).';
-            $this->writeLog("COPY FAILURE cache={$cachePath} dest={$installPath}");
+            $this->writeLog("COPY FAILURE source={$sourcePath} target={$targetPath}");
         }
 
         return $ok;
     }
 
     /**
-     * Run the admin-defined install script on the agent.
+     * Copy key files from the mod's keys directory to the server keys directory.
      *
      * @param array<string,string> $vars
      * @param list<string>         $log
      */
-    private function runInstallScript(
+    private function copyKeys(
+        object $remote,
+        array $profile,
+        array $vars,
+        array &$log
+    ): void {
+        $keySrc  = $vars['%keys_source_path%'];
+        $keyDest = $vars['%keys_target_path%'];
+
+        if ($keySrc === '' || $keyDest === '') {
+            $log[] = 'Key copy skipped: key paths not configured.';
+            return;
+        }
+
+        $log[] = "Copying keys: {$keySrc} → {$keyDest}";
+        $cmd = sprintf(
+            'if [ -d %s ]; then mkdir -p %s && cp -f %s/*.bikey %s/ 2>/dev/null; fi; echo "EXIT:$?"',
+            escapeshellarg($keySrc),
+            escapeshellarg($keyDest),
+            escapeshellarg($keySrc),
+            escapeshellarg($keyDest)
+        );
+        $out  = (string)$remote->exec($cmd);
+        $log[] = 'Key copy output: ' . substr($out, 0, 200);
+    }
+
+    /**
+     * Run an admin-defined bash script on the agent after resolving template vars.
+     *
+     * @param array<string,string> $vars
+     * @param list<string>         $log
+     */
+    private function runScript(
         object $remote,
         string $script,
         array $vars,
         array &$log
     ): void {
         $resolved = $this->resolveTemplate($script, $vars);
-        $log[]    = 'Running install script.';
         $out      = (string)$remote->exec($resolved . ' 2>&1');
         $log[]    = 'Script output: ' . substr($out, 0, 500);
         $this->writeLog('SCRIPT OUTPUT: ' . substr($out, 0, 1000));
@@ -475,10 +571,7 @@ class WorkshopInstaller
     private function detectOsType(array $home): string
     {
         $gameKey = strtolower((string)($home['game_key'] ?? ''));
-        if (preg_match('/win/', $gameKey)) {
-            return 'windows';
-        }
-        return 'linux';
+        return preg_match('/win/', $gameKey) ? 'windows' : 'linux';
     }
 
     private function writeLog(string $message): void

@@ -20,8 +20,8 @@ declare(strict_types=1);
                 <tr>
                     <th><?php echo htmlspecialchars($lang['profile_col_game'] ?? 'Game'); ?></th>
                     <th><?php echo htmlspecialchars($lang['profile_col_key'] ?? 'Game Key'); ?></th>
-                    <th>App ID</th>
-                    <th>OS</th>
+                    <th><?php echo htmlspecialchars($lang['profile_col_app_ids'] ?? 'App IDs'); ?></th>
+                    <th><?php echo htmlspecialchars($lang['profile_col_login'] ?? 'Login'); ?></th>
                     <th><?php echo htmlspecialchars($lang['profile_col_method'] ?? 'Install Method'); ?></th>
                     <th><?php echo htmlspecialchars($lang['profile_col_restart'] ?? 'Restart?'); ?></th>
                     <th><?php echo htmlspecialchars($lang['profile_col_status'] ?? 'Status'); ?></th>
@@ -33,8 +33,16 @@ declare(strict_types=1);
                     <tr>
                         <td><?php echo htmlspecialchars($profile['game_name']); ?></td>
                         <td><code><?php echo htmlspecialchars($profile['game_key']); ?></code></td>
-                        <td><?php echo htmlspecialchars($profile['workshop_app_id']); ?></td>
-                        <td><?php echo htmlspecialchars($profile['supported_os']); ?></td>
+                        <td>
+                            <small><?php echo htmlspecialchars($lang['profile_col_steam'] ?? 'Steam'); ?>:</small> <?php echo htmlspecialchars($profile['steam_app_id'] !== '' ? $profile['steam_app_id'] : '—'); ?><br>
+                            <small><?php echo htmlspecialchars($lang['profile_col_workshop'] ?? 'Workshop'); ?>:</small> <?php echo htmlspecialchars($profile['workshop_app_id']); ?>
+                        </td>
+                        <td>
+                            <?php echo htmlspecialchars($profile['steamcmd_login_mode'] ?? 'anonymous'); ?>
+                            <?php if (!empty($profile['steam_login_required'])): ?>
+                                <span class="sw-badge sw-badge--warning"><?php echo htmlspecialchars($lang['profile_badge_login_required'] ?? 'Login req.'); ?></span>
+                            <?php endif; ?>
+                        </td>
                         <td><?php echo htmlspecialchars($profile['copy_method']); ?></td>
                         <td><?php echo $profile['requires_restart'] ? '&#10004;' : '&#10008;'; ?></td>
                         <td>
