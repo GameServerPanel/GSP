@@ -187,6 +187,12 @@ function ogpHome()
 			foreach ((array)$servers_by_game_name as $game_name => $server_homes )
 			{
 				$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$server_homes[0]['home_cfg_file']);
+				if ($server_xml === FALSE)
+				{
+					// Bad XML – skip this game from the navigation list; error is
+					// already collected and will be shown to admins below.
+					continue;
+				}
 				$mod = $server_homes[0]['mod_key'];
 				// If query name does not exist use mod key instead.
 				if ($server_xml->protocol == "gameq")
@@ -223,6 +229,26 @@ function ogpHome()
 		}
 		else
 			$game_homes_list = "";
+
+		// Show admin-only warning for any game config XMLs that failed to parse.
+		if ($isAdmin) {
+			$xml_errors = function_exists('gsp_get_xml_errors') ? gsp_get_xml_errors() : array();
+			if (!empty($xml_errors)) {
+				echo "<div style='background:#fff3cd;border:1px solid #ffc107;border-radius:4px;padding:10px 14px;margin:10px 0;color:#856404;font-size:0.9em;'>";
+				echo "<strong>⚠ One or more game config XML files failed to load and have been skipped:</strong><ul style='margin:6px 0 0 16px;'>";
+				foreach ($xml_errors as $xe) {
+					echo "<li><code>" . htmlspecialchars(basename($xe['file']), ENT_QUOTES, 'UTF-8') . "</code>: "
+						. htmlspecialchars($xe['title'], ENT_QUOTES, 'UTF-8');
+					if (!empty($xe['details'])) {
+						echo " — <em>" . nl2br(htmlspecialchars($xe['details'], ENT_QUOTES, 'UTF-8')) . "</em>";
+					}
+					echo "</li>";
+				}
+				echo "</ul>";
+				echo "<p style='margin:6px 0 0;'>Use <a href='?m=config_games'>Game/Mod Config</a> to edit and fix the broken file(s).</p>";
+				echo "</div>";
+			}
+		}
 		?>
 		<div class="menu-bg">
 			<div class="menu">

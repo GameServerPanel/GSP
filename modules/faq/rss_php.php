@@ -70,12 +70,28 @@ class rss_php {
 ***/
     private function loadParser($rss=false) {
         if($rss) {
+            // Strip a leading UTF-8 BOM and any whitespace before the XML declaration
+            // to prevent "Extra content at the end of the document" and related errors.
+            $rss = preg_replace('/^\xEF\xBB\xBF/', '', (string)$rss);
+            $rss = ltrim($rss);
+
+            // Reject obviously non-XML content early to avoid noisy libxml warnings.
+            if(strlen($rss) < 5 || $rss[0] !== '<') {
+                return;
+            }
+
             $this->document = array();
             $this->channel = array();
             $this->items = array();
             $DOMDocument = new DOMDocument;
             $DOMDocument->strictErrorChecking = false;
-            $DOMDocument->loadXML($rss);
+            $prevErrors = libxml_use_internal_errors(true);
+            $loaded = $DOMDocument->loadXML($rss);
+            libxml_clear_errors();
+            libxml_use_internal_errors($prevErrors);
+            if($loaded === false) {
+                return;
+            }
             $this->document = $this->extractDOM($DOMDocument->childNodes);
         }
     }
@@ -99,6 +115,7 @@ class rss_php {
     
     private function extractDOM($nodeList,$parentNodeName=false) {
         $itemCounter = 0;
+        $tempNode = array();
         foreach ((array)$nodeList as $values) {
             if(substr($values->nodeName,0,1) != '#') {
                 if($values->nodeName == 'item') {

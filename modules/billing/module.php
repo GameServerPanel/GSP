@@ -30,12 +30,9 @@ $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
 
-// Register module menus so panel can show links (user and admin views)
-$module_menus = array(
-    array('subpage' => 'my_orders', 'name' => 'My Orders', 'group' => 'user'),
-    array('subpage' => 'provision_servers', 'name' => 'Provision Servers', 'group' => 'user'),
-    array('subpage' => 'admin_orders', 'name' => 'Manage Orders', 'group' => 'admin')
-);
+// No panel menu entries – billing runs as a standalone website, not panel pages.
+// Install/uninstall/update DB logic below is still active.
+$module_menus = array();
 
 $install_queries = array();
 
