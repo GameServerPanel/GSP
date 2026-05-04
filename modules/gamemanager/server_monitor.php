@@ -594,7 +594,6 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 		 "' data-upload_failure='". get_lang("check_dev_console") .
 		 "' >put the log file here</div>\n";
 */
-echo "<div>Put the log file here</div>";
 //include("log.php");
 ?>
 

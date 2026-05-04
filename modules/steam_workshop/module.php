@@ -26,13 +26,7 @@ $module_title = "Steam Workshop";
 $module_version = "2.1";
 $db_version = 1;
 $module_required = TRUE;
-$module_menus = array(
-	array(
-		'subpage' => 'workshop_admin',
-		'name'    => 'Steam Workshop',
-		'group'   => 'admin'
-	)
-);
+$module_menus = array();
 
 // Database schema migration: create the three Workshop tables when not present.
 // Called by the panel module installer when db_version increments.
