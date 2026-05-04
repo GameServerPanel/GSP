@@ -69,7 +69,7 @@ function exec_ogp_module() {
 		}
 	}
 	
-	echo "<h2>".($my_user_id !== $user_id ? get_lang_f('editing_profile', htmlentities($userInfo['users_login'])) : get_lang('your_profile'))."</h2>";
+	echo "<h2>".($my_user_id !== $user_id ? get_lang_f('editing_profile', htmlentities($userInfo['users_login'] ?? '', ENT_QUOTES, 'UTF-8')) : get_lang('your_profile'))."</h2>";
 	echo "<div align='center'>";
 	require_once("includes/form_table_class.php");
 

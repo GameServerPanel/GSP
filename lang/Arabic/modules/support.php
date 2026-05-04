@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "لقد تلقيت طلبا للدعم من %s (%s).<br> <br> سيرفر : %s.<br> <br> %s");
-define('OGP_LANG_message_has_been_sent', "أشكركم على الاتصال بنا! تم استلام رسالتك وسنرد عليها عن طريق البريد الإلكتروني.");
-define('OGP_LANG_please_describe_your_issue_below', "يرجى استخدام النموذج أدناه لطلب الدعم لخادم اللعبة.<br> سنرد في أقرب وقت ممكن.");
-define('OGP_LANG_select_server', "اختر سيرفر");
-define('OGP_LANG_email_address', "عنوان البريد الإلكترونى");
-define('OGP_LANG_subject', "العنوان");
-define('OGP_LANG_message', "الرسالة");
-define('OGP_LANG_email_must_be_filled_out', "يجب ملء عنوان البريد الإلكتروني.");
-define('OGP_LANG_subject_must_be_filled_out', "يجب ملء العنوان.");
-define('OGP_LANG_message_must_be_filled_out', "يجب ملء الرسالة.");
-define('OGP_LANG_send', "إرسال");
-define('OGP_LANG_error', "خطأ");
-define('OGP_LANG_info', "معلومات");
+define('LANG_support_email_content', "لقد تلقيت طلبا للدعم من %s (%s).<br> <br> سيرفر : %s.<br> <br> %s");
+define('LANG_message_has_been_sent', "أشكركم على الاتصال بنا! تم استلام رسالتك وسنرد عليها عن طريق البريد الإلكتروني.");
+define('LANG_please_describe_your_issue_below', "يرجى استخدام النموذج أدناه لطلب الدعم لخادم اللعبة.<br> سنرد في أقرب وقت ممكن.");
+define('LANG_select_server', "اختر سيرفر");
+define('LANG_email_address', "عنوان البريد الإلكترونى");
+define('LANG_subject', "العنوان");
+define('LANG_message', "الرسالة");
+define('LANG_email_must_be_filled_out', "يجب ملء عنوان البريد الإلكتروني.");
+define('LANG_subject_must_be_filled_out', "يجب ملء العنوان.");
+define('LANG_message_must_be_filled_out', "يجب ملء الرسالة.");
+define('LANG_send', "إرسال");
+define('LANG_error', "خطأ");
+define('LANG_info', "معلومات");
 ?>

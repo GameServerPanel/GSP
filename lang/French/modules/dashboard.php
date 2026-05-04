@@ -22,22 +22,22 @@
  *
  */
 
-define('OGP_LANG_dashboard_ftp_text', "Le client FTP peut compresser les fichiers et les envoyer par e-mail, peut décompresser aussi, éditer les fichiers textes, et bien plus.");
-define('OGP_LANG_dashboard_addons_manager_text', "Administrez différents types de services avec OGP. Choisissez parmi 115 serveurs de jeux et services fournis par OGP.");
-define('OGP_LANG_dashboard_game_monitor_text', "Surveiller le trafic et les logs facilement. Vous pouvez voir si vos serveurs sont démarrés ou non.");
-define('OGP_LANG_dashboard_support_text', "Obtenez du support de l'équipe professionnelle d'OGP sur le forum. Réponse rapide et grande attention.");
-define('OGP_LANG_welcome_text', "Bienvenue sur Open Game Panel (OGP). Open Game Panel est un projet Open Source, qui vous permet de démarrer, superviser et installer plusieurs types de serveurs de jeux.");
-define('OGP_LANG_any_server_is_online', "Aucun serveur démarré");
-define('OGP_LANG_current_map', "Carte actuelle");
-define('OGP_LANG_server_ip_port', "IP:Port");
-define('OGP_LANG_statistics', "Statistiques");
-define('OGP_LANG_servers', "Serveurs");
-define('OGP_LANG_players', "Joueurs");
-define('OGP_LANG_server_status', "État du Serveur");
-define('OGP_LANG_no_games_to_monitor', "Il n'y a actuellement pas de serveurs de jeux en ligne ou hors ligne");
-define('OGP_LANG_online_servers', "Serveurs démarrés");
-define('OGP_LANG_add_games_in', "Si vous souhaitez ajouter des jeux, vous pouvez le faire en %s");
-define('OGP_LANG_currently_online', "Joueurs en ligne");
-define('OGP_LANG_game_servers', "Serveurs de jeux");
-define('OGP_LANG_select_remote_server', "Sélectionner le Serveur Distant");
+define('LANG_dashboard_ftp_text', "Le client FTP peut compresser les fichiers et les envoyer par e-mail, peut décompresser aussi, éditer les fichiers textes, et bien plus.");
+define('LANG_dashboard_addons_manager_text', "Administrez différents types de services avec OGP. Choisissez parmi 115 serveurs de jeux et services fournis par OGP.");
+define('LANG_dashboard_game_monitor_text', "Surveiller le trafic et les logs facilement. Vous pouvez voir si vos serveurs sont démarrés ou non.");
+define('LANG_dashboard_support_text', "Obtenez du support de l'équipe professionnelle d'OGP sur le forum. Réponse rapide et grande attention.");
+define('LANG_welcome_text', "Bienvenue sur Open Game Panel (OGP). Open Game Panel est un projet Open Source, qui vous permet de démarrer, superviser et installer plusieurs types de serveurs de jeux.");
+define('LANG_any_server_is_online', "Aucun serveur démarré");
+define('LANG_current_map', "Carte actuelle");
+define('LANG_server_ip_port', "IP:Port");
+define('LANG_statistics', "Statistiques");
+define('LANG_servers', "Serveurs");
+define('LANG_players', "Joueurs");
+define('LANG_server_status', "État du Serveur");
+define('LANG_no_games_to_monitor', "Il n'y a actuellement pas de serveurs de jeux en ligne ou hors ligne");
+define('LANG_online_servers', "Serveurs démarrés");
+define('LANG_add_games_in', "Si vous souhaitez ajouter des jeux, vous pouvez le faire en %s");
+define('LANG_currently_online', "Joueurs en ligne");
+define('LANG_game_servers', "Serveurs de jeux");
+define('LANG_select_remote_server', "Sélectionner le Serveur Distant");
 ?>

@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "دستورات RCON");
-define('OGP_LANG_has_sent_to', "ارسال شود به");
-define('OGP_LANG_need_set_remote_pass', "باید گذرواژه Remote ست شود");
-define('OGP_LANG_before_sending_rcon_com', "پس از ارسال دستور RCON");
-define('OGP_LANG_send_command', "ارسال دستور");
-define('OGP_LANG_check-all', "همه موارد را انتخاب کن");
-define('OGP_LANG_uncheck-all', "همه موارد را از حالت انتخاب خارج کن");
+define('LANG_rcon_command_title', "دستورات RCON");
+define('LANG_has_sent_to', "ارسال شود به");
+define('LANG_need_set_remote_pass', "باید گذرواژه Remote ست شود");
+define('LANG_before_sending_rcon_com', "پس از ارسال دستور RCON");
+define('LANG_send_command', "ارسال دستور");
+define('LANG_check-all', "همه موارد را انتخاب کن");
+define('LANG_uncheck-all', "همه موارد را از حالت انتخاب خارج کن");
 ?>

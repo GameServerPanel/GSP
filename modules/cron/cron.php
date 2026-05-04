@@ -56,7 +56,7 @@ function exec_ogp_module()
 	{
 		if(!checkCronInput($_POST['minute'], $_POST['hour'], $_POST['dayOfTheMonth'], $_POST['month'], $_POST['dayOfTheWeek']))
 		{
-			print_failure(get_lang('OGP_LANG_bad_inputs'));
+			print_failure(get_lang('bad_inputs'));
 			$view->refresh('?m=cron&p=cron',2);
 			return;
 		}

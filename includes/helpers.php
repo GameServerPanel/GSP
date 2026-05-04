@@ -23,7 +23,7 @@
  */
 
 // Globals
-$OGPLangPre = "OGP_LANG_";
+$OGPLangPre = "LANG_";
 
 // Ignore any request with unwanted values at 'm' or 'p'
 if( isset($_REQUEST['m']) and !preg_match("/^([a-z]|[0-9]|_|-)+$/i", $_REQUEST['m']) )

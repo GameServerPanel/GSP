@@ -22,19 +22,19 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "קיבלת בקשת תמיכה מ%s(%s).<br><br> שרת:
+define('LANG_support_email_content', "קיבלת בקשת תמיכה מ%s(%s).<br><br> שרת:
 %s.<br><br>%s");
-define('OGP_LANG_message_has_been_sent', "תודה שיצרת איתנו קשר! הודעתך התקבלה נחזור אליך באמצעות הדוא\"ל");
-define('OGP_LANG_please_describe_your_issue_below', "אנא השתמש בטופס שלהלן כדי לבקש תמיכה בשרת המשחק שלך.<br>
+define('LANG_message_has_been_sent', "תודה שיצרת איתנו קשר! הודעתך התקבלה נחזור אליך באמצעות הדוא\"ל");
+define('LANG_please_describe_your_issue_below', "אנא השתמש בטופס שלהלן כדי לבקש תמיכה בשרת המשחק שלך.<br>
  אנו נגיב בהקדם האפשרי.");
-define('OGP_LANG_select_server', "בחר שרת");
-define('OGP_LANG_email_address', "דוא\"ל");
-define('OGP_LANG_subject', "נושא");
-define('OGP_LANG_message', "הודעה");
-define('OGP_LANG_email_must_be_filled_out', "יש למלא את כתובת הדוא\"ל.");
-define('OGP_LANG_subject_must_be_filled_out', "יש למלא את הנושא.");
-define('OGP_LANG_message_must_be_filled_out', "יש למלא את ההודעה.");
-define('OGP_LANG_send', "שלח");
-define('OGP_LANG_error', "שגיאה");
-define('OGP_LANG_info', "מידע");
+define('LANG_select_server', "בחר שרת");
+define('LANG_email_address', "דוא\"ל");
+define('LANG_subject', "נושא");
+define('LANG_message', "הודעה");
+define('LANG_email_must_be_filled_out', "יש למלא את כתובת הדוא\"ל.");
+define('LANG_subject_must_be_filled_out', "יש למלא את הנושא.");
+define('LANG_message_must_be_filled_out', "יש למלא את ההודעה.");
+define('LANG_send', "שלח");
+define('LANG_error', "שגיאה");
+define('LANG_info', "מידע");
 ?>

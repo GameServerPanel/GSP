@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "Εντολές RCON");
-define('OGP_LANG_has_sent_to', "έχει σταλεί στο");
-define('OGP_LANG_need_set_remote_pass', "πρέπει να ρυθμίσετε την απομακρυσμένη είσοδο");
-define('OGP_LANG_before_sending_rcon_com', "πριν στείλετε εντολή rcon");
-define('OGP_LANG_send_command', "Στείλτε εντολή");
-define('OGP_LANG_check-all', "Επιλέξτε τα όλα");
-define('OGP_LANG_uncheck-all', "Αποεπιλέξτε τα όλα");
+define('LANG_rcon_command_title', "Εντολές RCON");
+define('LANG_has_sent_to', "έχει σταλεί στο");
+define('LANG_need_set_remote_pass', "πρέπει να ρυθμίσετε την απομακρυσμένη είσοδο");
+define('LANG_before_sending_rcon_com', "πριν στείλετε εντολή rcon");
+define('LANG_send_command', "Στείλτε εντολή");
+define('LANG_check-all', "Επιλέξτε τα όλα");
+define('LANG_uncheck-all', "Αποεπιλέξτε τα όλα");
 ?>

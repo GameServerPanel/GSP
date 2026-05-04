@@ -22,28 +22,28 @@
  *
  */
 
-define('OGP_LANG_external_links', "Links externos");
-define('OGP_LANG_url', "URL");
-define('OGP_LANG_name', "Nome");
-define('OGP_LANG_add_it', "Adicionar");
-define('OGP_LANG_link_has_been_removed', "%s link foi removido.");
-define('OGP_LANG_db_backup', "Backup do Banco de dados");
-define('OGP_LANG_download_db_backup', "Baixar DB backup");
-define('OGP_LANG_restore_db_backup', "Restaurar DB backup");
-define('OGP_LANG_sql_file', "arquivo (.SQL)");
-define('OGP_LANG_change_buttons_order', "Alterar ordem dos botões da barra de navegação");
-define('OGP_LANG_when', "Data/hora");
-define('OGP_LANG_who', "Nome de Usuário");
-define('OGP_LANG_where', "endereço de IP");
-define('OGP_LANG_what', "Ação");
-define('OGP_LANG_search', "Pesquisa");
-define('OGP_LANG_empty_logger', "Log vazio");
-define('OGP_LANG_ban_list', "Lista de banidos");
-define('OGP_LANG_no_banned_ips', "Não há IPs banidos");
-define('OGP_LANG_unban', "Remover IP");
-define('OGP_LANG_client_ip', "IP do cliente");
-define('OGP_LANG_banned_until', "banido até");
-define('OGP_LANG_unban_selected_ips', "Desbloquear IPs selecionados");
-define('OGP_LANG_view', "Visão");
-define('OGP_LANG_per_page', "entradas por página log");
+define('LANG_external_links', "Links externos");
+define('LANG_url', "URL");
+define('LANG_name', "Nome");
+define('LANG_add_it', "Adicionar");
+define('LANG_link_has_been_removed', "%s link foi removido.");
+define('LANG_db_backup', "Backup do Banco de dados");
+define('LANG_download_db_backup', "Baixar DB backup");
+define('LANG_restore_db_backup', "Restaurar DB backup");
+define('LANG_sql_file', "arquivo (.SQL)");
+define('LANG_change_buttons_order', "Alterar ordem dos botões da barra de navegação");
+define('LANG_when', "Data/hora");
+define('LANG_who', "Nome de Usuário");
+define('LANG_where', "endereço de IP");
+define('LANG_what', "Ação");
+define('LANG_search', "Pesquisa");
+define('LANG_empty_logger', "Log vazio");
+define('LANG_ban_list', "Lista de banidos");
+define('LANG_no_banned_ips', "Não há IPs banidos");
+define('LANG_unban', "Remover IP");
+define('LANG_client_ip', "IP do cliente");
+define('LANG_banned_until', "banido até");
+define('LANG_unban_selected_ips', "Desbloquear IPs selecionados");
+define('LANG_view', "Visão");
+define('LANG_per_page', "entradas por página log");
 ?>

@@ -22,28 +22,28 @@
  *
  */
 
-define('OGP_LANG_external_links', "Εξωτερικοί Σύνδεσμοι");
-define('OGP_LANG_url', "URL");
-define('OGP_LANG_name', "Όνομα");
-define('OGP_LANG_add_it', "Προσθέστε");
-define('OGP_LANG_link_has_been_removed', "Ο %s σύνδεσμος καταργήθηκε.");
-define('OGP_LANG_db_backup', "Αντίγραφο Ασφαλείας Βάσης Δεδομένων");
-define('OGP_LANG_download_db_backup', "Κατεβάστε Αντίγραφο Ασφαλείας Βάσης Δεδομένων");
-define('OGP_LANG_restore_db_backup', "Επαναφέρετε Αντίγραφο Ασφαλείας Βάσης Δεδομένων");
-define('OGP_LANG_sql_file', "αρχείο (.sql)");
-define('OGP_LANG_change_buttons_order', "Αλλάξτε την σειρά των καρτέλων.");
-define('OGP_LANG_when', "Ημερομηνία / Ώρα");
-define('OGP_LANG_who', "Όνομα Χρήστη");
-define('OGP_LANG_where', "Διεύθυνση IP");
-define('OGP_LANG_what', "Ενέργεια");
-define('OGP_LANG_search', "Ψάξιμο");
-define('OGP_LANG_empty_logger', "Κενός Καταγραφέας");
-define('OGP_LANG_ban_list', "Λίστα Απαγόρευσης");
-define('OGP_LANG_no_banned_ips', "Δεν υπάρχουν απαγορευμένες διευθύνσεις IP.");
-define('OGP_LANG_unban', "Άρση απαγόρευσης διεύθυνσης IP.");
-define('OGP_LANG_client_ip', "Διεύθυνση IP Πελάτη");
-define('OGP_LANG_banned_until', "Απαγόρευση μέχρι");
-define('OGP_LANG_unban_selected_ips', "Άρση απαγόρευσης των επιλεγμένων διευθύνσεων IP.");
-define('OGP_LANG_view', "Όψη");
-define('OGP_LANG_per_page', "Καταχωρήσεις καταγραφής ανά σελίδα.");
+define('LANG_external_links', "Εξωτερικοί Σύνδεσμοι");
+define('LANG_url', "URL");
+define('LANG_name', "Όνομα");
+define('LANG_add_it', "Προσθέστε");
+define('LANG_link_has_been_removed', "Ο %s σύνδεσμος καταργήθηκε.");
+define('LANG_db_backup', "Αντίγραφο Ασφαλείας Βάσης Δεδομένων");
+define('LANG_download_db_backup', "Κατεβάστε Αντίγραφο Ασφαλείας Βάσης Δεδομένων");
+define('LANG_restore_db_backup', "Επαναφέρετε Αντίγραφο Ασφαλείας Βάσης Δεδομένων");
+define('LANG_sql_file', "αρχείο (.sql)");
+define('LANG_change_buttons_order', "Αλλάξτε την σειρά των καρτέλων.");
+define('LANG_when', "Ημερομηνία / Ώρα");
+define('LANG_who', "Όνομα Χρήστη");
+define('LANG_where', "Διεύθυνση IP");
+define('LANG_what', "Ενέργεια");
+define('LANG_search', "Ψάξιμο");
+define('LANG_empty_logger', "Κενός Καταγραφέας");
+define('LANG_ban_list', "Λίστα Απαγόρευσης");
+define('LANG_no_banned_ips', "Δεν υπάρχουν απαγορευμένες διευθύνσεις IP.");
+define('LANG_unban', "Άρση απαγόρευσης διεύθυνσης IP.");
+define('LANG_client_ip', "Διεύθυνση IP Πελάτη");
+define('LANG_banned_until', "Απαγόρευση μέχρι");
+define('LANG_unban_selected_ips', "Άρση απαγόρευσης των επιλεγμένων διευθύνσεων IP.");
+define('LANG_view', "Όψη");
+define('LANG_per_page', "Καταχωρήσεις καταγραφής ανά σελίδα.");
 ?>

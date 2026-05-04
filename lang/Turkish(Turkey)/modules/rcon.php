@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "RCON komutları");
-define('OGP_LANG_has_sent_to', "gönderildi");
-define('OGP_LANG_need_set_remote_pass', "uzaktan kontrol şifresi belirlemelisiniz");
-define('OGP_LANG_before_sending_rcon_com', "RCON komutu göndermeden önce");
-define('OGP_LANG_send_command', "Komut gönder");
-define('OGP_LANG_check-all', "Tümünü seç");
-define('OGP_LANG_uncheck-all', "Tüm seçimleri kaldır");
+define('LANG_rcon_command_title', "RCON komutları");
+define('LANG_has_sent_to', "gönderildi");
+define('LANG_need_set_remote_pass', "uzaktan kontrol şifresi belirlemelisiniz");
+define('LANG_before_sending_rcon_com', "RCON komutu göndermeden önce");
+define('LANG_send_command', "Komut gönder");
+define('LANG_check-all', "Tümünü seç");
+define('LANG_uncheck-all', "Tüm seçimleri kaldır");
 ?>

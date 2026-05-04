@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "Вы получили запрос на поддержку от %s (%s). <br><br> Сервер: %s. <br><br>%s");
-define('OGP_LANG_message_has_been_sent', "Благодарим Вас за обращение к нам! Ваше сообщение получено, и мы ответим на него по электронной почте.");
-define('OGP_LANG_please_describe_your_issue_below', "Пожалуйста, используйте форму ниже, чтобы запросить поддержку для вашего игрового сервера.<br>Мы ответим как можно скорее.");
-define('OGP_LANG_select_server', "Выбрать сервер");
-define('OGP_LANG_email_address', "Адрес электронной почты");
-define('OGP_LANG_subject', "Тема");
-define('OGP_LANG_message', "Сообщение");
-define('OGP_LANG_email_must_be_filled_out', "Адрес электронной почты должен быть заполнен.");
-define('OGP_LANG_subject_must_be_filled_out', "Тема электронной почты должен быть заполнена.");
-define('OGP_LANG_message_must_be_filled_out', "Сообщение электронной почты должен быть заполнено.");
-define('OGP_LANG_send', "Отправить");
-define('OGP_LANG_error', "Ошибка");
-define('OGP_LANG_info', "Информация");
+define('LANG_support_email_content', "Вы получили запрос на поддержку от %s (%s). <br><br> Сервер: %s. <br><br>%s");
+define('LANG_message_has_been_sent', "Благодарим Вас за обращение к нам! Ваше сообщение получено, и мы ответим на него по электронной почте.");
+define('LANG_please_describe_your_issue_below', "Пожалуйста, используйте форму ниже, чтобы запросить поддержку для вашего игрового сервера.<br>Мы ответим как можно скорее.");
+define('LANG_select_server', "Выбрать сервер");
+define('LANG_email_address', "Адрес электронной почты");
+define('LANG_subject', "Тема");
+define('LANG_message', "Сообщение");
+define('LANG_email_must_be_filled_out', "Адрес электронной почты должен быть заполнен.");
+define('LANG_subject_must_be_filled_out', "Тема электронной почты должен быть заполнена.");
+define('LANG_message_must_be_filled_out', "Сообщение электронной почты должен быть заполнено.");
+define('LANG_send', "Отправить");
+define('LANG_error', "Ошибка");
+define('LANG_info', "Информация");
 ?>

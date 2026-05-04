@@ -22,22 +22,22 @@
  *
  */
 
-define('OGP_LANG_dashboard_ftp_text', "Clientul FTP poate comprima fișierele și le poate trimite prin e-mail, poate decomprima, edita fișiere text și multe altele.");
-define('OGP_LANG_dashboard_addons_manager_text', "Gestionați toate tipurile de servicii cu OGP. Alegeți dintre cele peste 115 servere, furnizate direct de OGP.");
-define('OGP_LANG_dashboard_game_monitor_text', "Urmăriți și monitorizați rapid traficul și jurnalele. Puteți vedea ce servere sunt pornite sau oprite.");
-define('OGP_LANG_dashboard_support_text', "Obțineți asistență de la echipa profesionista OGP pe forum. Răspuns rapid și o atenție deosebită.");
-define('OGP_LANG_welcome_text', "Bine ați venit în Panoul Open Game (OGP). OGP este un software open source, care vă permite să instalați, să porniți și să monitorizați diferite servere de jocuri.");
-define('OGP_LANG_any_server_is_online', "Serverul este online");
-define('OGP_LANG_current_map', "Harta curentă");
-define('OGP_LANG_server_ip_port', "IP:Port");
-define('OGP_LANG_statistics', "Statistici");
-define('OGP_LANG_servers', "Servere");
-define('OGP_LANG_players', "Jucători");
-define('OGP_LANG_server_status', "Starea serverului");
-define('OGP_LANG_no_games_to_monitor', "În prezent nu există servere de jocuri online / offline");
-define('OGP_LANG_online_servers', "Servere online");
-define('OGP_LANG_add_games_in', "Dacă vreți să adaugați jocuri puteți să o faceți în %s");
-define('OGP_LANG_currently_online', "Acum online");
-define('OGP_LANG_game_servers', "Servere jocuri");
-define('OGP_LANG_select_remote_server', "Selectați Remote server");
+define('LANG_dashboard_ftp_text', "Clientul FTP poate comprima fișierele și le poate trimite prin e-mail, poate decomprima, edita fișiere text și multe altele.");
+define('LANG_dashboard_addons_manager_text', "Gestionați toate tipurile de servicii cu OGP. Alegeți dintre cele peste 115 servere, furnizate direct de OGP.");
+define('LANG_dashboard_game_monitor_text', "Urmăriți și monitorizați rapid traficul și jurnalele. Puteți vedea ce servere sunt pornite sau oprite.");
+define('LANG_dashboard_support_text', "Obțineți asistență de la echipa profesionista OGP pe forum. Răspuns rapid și o atenție deosebită.");
+define('LANG_welcome_text', "Bine ați venit în Panoul Open Game (OGP). OGP este un software open source, care vă permite să instalați, să porniți și să monitorizați diferite servere de jocuri.");
+define('LANG_any_server_is_online', "Serverul este online");
+define('LANG_current_map', "Harta curentă");
+define('LANG_server_ip_port', "IP:Port");
+define('LANG_statistics', "Statistici");
+define('LANG_servers', "Servere");
+define('LANG_players', "Jucători");
+define('LANG_server_status', "Starea serverului");
+define('LANG_no_games_to_monitor', "În prezent nu există servere de jocuri online / offline");
+define('LANG_online_servers', "Servere online");
+define('LANG_add_games_in', "Dacă vreți să adaugați jocuri puteți să o faceți în %s");
+define('LANG_currently_online', "Acum online");
+define('LANG_game_servers', "Servere jocuri");
+define('LANG_select_remote_server', "Selectați Remote server");
 ?>

@@ -113,7 +113,7 @@ function exec_ogp_module() {
 					": <select name=\"user_to_add\">";
 				foreach ((array)$available_users as $user_row)
 				{
-					echo "<option value=\"$user_row[user_id]\">" . htmlentities($user_row[users_login]) . "</option>";
+					echo "<option value=\"$user_row[user_id]\">" . htmlentities($user_row[users_login] ?? '', ENT_QUOTES, 'UTF-8') . "</option>";
 				}
 				echo "</select>\n";
 				echo "<input type='hidden' name='group_id' value='$row[group_id]' />";

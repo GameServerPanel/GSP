@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "Du har modtaget en support henvendelse fra %s (%s). <br> <br> Server: 1%s. <br> <br> %s");
-define('OGP_LANG_message_has_been_sent', "tak fordi du kontakter os! Din besked er blevet modtaget og vi vil besvare den via email.");
-define('OGP_LANG_please_describe_your_issue_below', "Brug Venligst formen herunder til at efterspørge support til din spil server. <br>vi besvare så hurtigt som muligt.");
-define('OGP_LANG_select_server', "Vælg en server");
-define('OGP_LANG_email_address', "Email adresse");
-define('OGP_LANG_subject', "Subjekt");
-define('OGP_LANG_message', "Besked");
-define('OGP_LANG_email_must_be_filled_out', "email adressen skal udfyldes.");
-define('OGP_LANG_subject_must_be_filled_out', "Subjektet skal udfyldes.");
-define('OGP_LANG_message_must_be_filled_out', "Beskeden skal udfyldes.");
-define('OGP_LANG_send', "Send");
-define('OGP_LANG_error', "Fejl");
-define('OGP_LANG_info', "Info");
+define('LANG_support_email_content', "Du har modtaget en support henvendelse fra %s (%s). <br> <br> Server: 1%s. <br> <br> %s");
+define('LANG_message_has_been_sent', "tak fordi du kontakter os! Din besked er blevet modtaget og vi vil besvare den via email.");
+define('LANG_please_describe_your_issue_below', "Brug Venligst formen herunder til at efterspørge support til din spil server. <br>vi besvare så hurtigt som muligt.");
+define('LANG_select_server', "Vælg en server");
+define('LANG_email_address', "Email adresse");
+define('LANG_subject', "Subjekt");
+define('LANG_message', "Besked");
+define('LANG_email_must_be_filled_out', "email adressen skal udfyldes.");
+define('LANG_subject_must_be_filled_out', "Subjektet skal udfyldes.");
+define('LANG_message_must_be_filled_out', "Beskeden skal udfyldes.");
+define('LANG_send', "Send");
+define('LANG_error', "Fejl");
+define('LANG_info', "Info");
 ?>

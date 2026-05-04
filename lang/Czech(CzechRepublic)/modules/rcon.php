@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "Příkazy RCON");
-define('OGP_LANG_has_sent_to', "poslal na");
-define('OGP_LANG_need_set_remote_pass', "potřebujete nastavit vzdálený průchod");
-define('OGP_LANG_before_sending_rcon_com', "před odesláním rcon com");
-define('OGP_LANG_send_command', "Odeslat příkaz");
-define('OGP_LANG_check-all', "Zkontrolovat vše");
-define('OGP_LANG_uncheck-all', "Zrušte zaškrtnutí všech");
+define('LANG_rcon_command_title', "Příkazy RCON");
+define('LANG_has_sent_to', "poslal na");
+define('LANG_need_set_remote_pass', "potřebujete nastavit vzdálený průchod");
+define('LANG_before_sending_rcon_com', "před odesláním rcon com");
+define('LANG_send_command', "Odeslat příkaz");
+define('LANG_check-all', "Zkontrolovat vše");
+define('LANG_uncheck-all', "Zrušte zaškrtnutí všech");
 ?>

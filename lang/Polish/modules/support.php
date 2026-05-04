@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "Odebrano żądanie pomocy z %s (%s).<br><br>Serwer: %s.<br><br>%s");
-define('OGP_LANG_message_has_been_sent', "Dziękujemy za skontaktowanie się z nami! Twoja wiadomość została odebrana, odpowiemy na adres e-mail.");
-define('OGP_LANG_please_describe_your_issue_below', "Proszę użyć poniższego formularza, aby zwrócić się o pomoc do serwera gry.<br> Postaramy się odpowiedzieć tak szybko jak to możliwe.");
-define('OGP_LANG_select_server', "Wybierz serwer");
-define('OGP_LANG_email_address', "Adres email");
-define('OGP_LANG_subject', "Temat");
-define('OGP_LANG_message', "Wiadomość");
-define('OGP_LANG_email_must_be_filled_out', "Adres e-mail musi być wpisany.");
-define('OGP_LANG_subject_must_be_filled_out', "Tytuł musi zostać wpisany.");
-define('OGP_LANG_message_must_be_filled_out', "Wiadomość musi zostać napisana.");
-define('OGP_LANG_send', "Wyślij");
-define('OGP_LANG_error', "Błąd");
-define('OGP_LANG_info', "Informacje");
+define('LANG_support_email_content', "Odebrano żądanie pomocy z %s (%s).<br><br>Serwer: %s.<br><br>%s");
+define('LANG_message_has_been_sent', "Dziękujemy za skontaktowanie się z nami! Twoja wiadomość została odebrana, odpowiemy na adres e-mail.");
+define('LANG_please_describe_your_issue_below', "Proszę użyć poniższego formularza, aby zwrócić się o pomoc do serwera gry.<br> Postaramy się odpowiedzieć tak szybko jak to możliwe.");
+define('LANG_select_server', "Wybierz serwer");
+define('LANG_email_address', "Adres email");
+define('LANG_subject', "Temat");
+define('LANG_message', "Wiadomość");
+define('LANG_email_must_be_filled_out', "Adres e-mail musi być wpisany.");
+define('LANG_subject_must_be_filled_out', "Tytuł musi zostać wpisany.");
+define('LANG_message_must_be_filled_out', "Wiadomość musi zostać napisana.");
+define('LANG_send', "Wyślij");
+define('LANG_error', "Błąd");
+define('LANG_info', "Informacje");
 ?>
