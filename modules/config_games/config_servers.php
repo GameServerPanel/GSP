@@ -23,6 +23,7 @@
  */
 
 require_once("server_config_parser.php");
+require_once(__DIR__ . "/xml_tag_descriptions.php");
 
 /**
  * Safely convert any config value (string, NULL, or array from SimpleXML) to a
@@ -264,6 +265,14 @@ function config_games_print_editor_css()
 .xml-raw-section textarea{width:100%;min-height:300px;font-family:monospace;font-size:0.85rem;background:#0c0c0c;color:#eee;border:1px solid #3a3a3a;border-radius:4px;padding:8px}
 .xml-raw-warning{background:#2d2200;border:1px solid #7a5a00;border-radius:4px;padding:8px 12px;color:#f0c050;font-size:0.85rem;margin-bottom:6px}
 .xml-section-header{margin:20px 0 4px;font-size:0.8rem;color:#888;text-transform:uppercase;letter-spacing:0.1em;border-bottom:1px solid #2a2a2a;padding-bottom:4px}
+.xml-node__desc{font-size:0.82rem;color:#aaa;background:#0e0e0e;border-left:3px solid #2a4a7a;padding:6px 10px;margin:6px 0 8px;border-radius:0 4px 4px 0}
+.xml-node__options{margin:4px 0 4px 12px;padding:0;list-style:disc inside}
+.xml-node__options li{margin-bottom:2px}
+.xml-node__options code{color:#7eb3f0;background:rgba(30,100,200,0.12);padding:1px 4px;border-radius:3px}
+.xml-node__example{display:block;margin-top:4px;color:#888}
+.xml-node__example code{color:#a0d0a0;background:rgba(30,150,50,0.1);padding:1px 4px;border-radius:3px}
+.xml-jump-link{display:inline-block;margin-bottom:12px;padding:6px 14px;background:#1c6dd0;color:#fff;border-radius:4px;text-decoration:none;font-size:0.9rem}
+.xml-jump-link:hover{background:#1f7aec;text-decoration:none}
 </style>
 CSS;
 }
@@ -296,12 +305,34 @@ function config_games_render_node(SimpleXMLElement $node, array $ancestors, arra
         ? "<span class='xml-node__badge xml-node__badge--required'>required</span>"
         : "<span class='xml-node__badge xml-node__badge--optional'>optional</span>";
 
+    // Look up per-tag description from the descriptions helper.
+    $tagDescriptions = config_games_tag_descriptions();
+    $tagDesc = $tagDescriptions[$name] ?? null;
+
     $html = "<div class='{$nodeClass}'>";
     $actionId = 'node_action_' . substr(md5($safePath . $index), 0, 8);
     $html .= "<div class='xml-node__header'><div><div class='xml-node__title'>{$safeLabel}{$badge}</div><div class='xml-node__path'>{$displayPath}</div></div>";
     $html .= "<div class='xml-node__actions'><label for=\"{$actionId}\">Action</label>";
     $html .= "<select id=\"{$actionId}\" name=\"nodes[{$safeNodeKey}][action]\"><option value='keep'>Save Changes</option><option value='remove'>Remove Node</option></select>";
     $html .= "<button type='submit' name='save_xml' value='1' class='xml-node__apply'>Apply</button></div></div>";
+    if ($tagDesc !== null) {
+        $safeDesc = htmlspecialchars($tagDesc['desc'], ENT_QUOTES, 'UTF-8');
+        $html .= "<div class='xml-node__desc'>{$safeDesc}";
+        if (!empty($tagDesc['options'])) {
+            $html .= "<ul class='xml-node__options'>";
+            foreach ($tagDesc['options'] as $optVal => $optLabel) {
+                $safeOptVal   = htmlspecialchars((string)$optVal, ENT_QUOTES, 'UTF-8');
+                $safeOptLabel = htmlspecialchars($optLabel, ENT_QUOTES, 'UTF-8');
+                $html .= "<li><code>{$safeOptVal}</code> &ndash; {$safeOptLabel}</li>";
+            }
+            $html .= "</ul>";
+        }
+        if (!empty($tagDesc['example'])) {
+            $safeExample = htmlspecialchars($tagDesc['example'], ENT_QUOTES, 'UTF-8');
+            $html .= "<span class='xml-node__example'>Example: <code>{$safeExample}</code></span>";
+        }
+        $html .= "</div>";
+    }
     $html .= "<div class='xml-node__body'>";
     $html .= "<input type='hidden' name=\"nodes[{$safeNodeKey}][path]\" value=\"{$safePath}\">";
     $html .= "<input type='hidden' name=\"nodes[{$safeNodeKey}][has_children]\" value=\"" . ($hasChildren ? '1' : '0') . "\">";
@@ -667,7 +698,8 @@ function exec_ogp_module() {
 		  </table>\n";
 	
 	if ( isset($_GET['home_cfg_id']) )
-    {
+	{
+		echo "<p><a class='xml-jump-link' href='#xml-editor-section' aria-label='Jump to XML Editor section below'>&#x2193; Jump to XML Editor</a></p>";
 		$home_cfg_id = trim($_GET['home_cfg_id']);
 		
 		$cfg_info = $db->getGameCfg($home_cfg_id);
@@ -721,6 +753,7 @@ function exec_ogp_module() {
 					print_failure(get_lang_f("error_when_handling_file",$config_file));
 				} else {
 					$raw_xml_content = htmlspecialchars(file_get_contents($config_file), ENT_QUOTES, 'UTF-8');
+					echo "<div id='xml-editor-section'>";
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
 					echo "<button type='submit' name='save_xml' value='1' class='xml-global-save xml-global-save--top'>".get_lang('save')."</button>";
@@ -738,6 +771,7 @@ function exec_ogp_module() {
 					echo "<div class='xml-actions' style='margin-top:8px'><button type='submit' name='save_xml' value='1' class='xml-global-save'>Save Raw XML</button></div>";
 					echo "</div>";
 					echo "</form>";
+					echo "</div>"; // #xml-editor-section
 				}
 			}
 		}

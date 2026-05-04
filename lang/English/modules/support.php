@@ -32,6 +32,7 @@ define('LANG_message', "Message");
 define('LANG_email_must_be_filled_out', "The email address must be filled out.");
 define('LANG_subject_must_be_filled_out', "The subject must be filled out.");
 define('LANG_message_must_be_filled_out', "The message must be filled out.");
+define('LANG_optional', "optional");
 define('LANG_send', "Send");
 define('LANG_error', "Error");
 define('LANG_info', "Info");
