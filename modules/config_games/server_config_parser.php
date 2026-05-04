@@ -52,6 +52,32 @@ if (!function_exists('ogp_render_config_error')) {
 	}
 }
 
+/**
+ * Collect a non-fatal XML parse/validation error for a game config file.
+ * Errors are stored in a static array and can be retrieved via
+ * gsp_get_xml_errors().  Does NOT stop page execution.
+ */
+if (!function_exists('gsp_collect_xml_error')) {
+	function gsp_collect_xml_error(string $file, string $title, string $details = ''): void
+	{
+		$log_message = "[GSP] $title" . (empty($details) ? '' : ' Details: ' . $details);
+		error_log($log_message);
+
+		$GLOBALS['_gsp_xml_errors'][] = array(
+			'file'    => $file,
+			'title'   => $title,
+			'details' => $details,
+		);
+	}
+}
+
+if (!function_exists('gsp_get_xml_errors')) {
+	function gsp_get_xml_errors(): array
+	{
+		return isset($GLOBALS['_gsp_xml_errors']) ? $GLOBALS['_gsp_xml_errors'] : array();
+	}
+}
+
 if (!function_exists('ogp_render_missing_xml_extensions')) {
 	function ogp_render_missing_xml_extensions($missing_extensions)
 	{
@@ -114,36 +140,47 @@ function read_server_config( $filename )
 	ogp_ensure_xml_support();
 
 	if (!is_readable($filename)) {
-		ogp_render_config_error(
+		gsp_collect_xml_error(
+			$filename,
 			"Game configuration file is missing or unreadable.",
 			"Expected at: {$filename}"
 		);
+		return FALSE;
 	}
 
 	$previous_error_state = libxml_use_internal_errors(true);
 	$dom = new DOMDocument();
 	if ($dom->load($filename) === FALSE)
 	{
-		ogp_render_config_error(
+		gsp_collect_xml_error(
+			$filename,
 			"Unable to load XML configuration.",
 			"File: {$filename}\n".ogp_format_libxml_errors()
 		);
+		libxml_use_internal_errors($previous_error_state);
+		return FALSE;
 	}
 
 	if ( $dom->schemaValidate(XML_SCHEMA) !== TRUE )
 	{
-		ogp_render_config_error(
+		gsp_collect_xml_error(
+			$filename,
 			"XML configuration failed schema validation.",
 			"File: {$filename}\nSchema: ".XML_SCHEMA."\n".ogp_format_libxml_errors()
 		);
+		libxml_use_internal_errors($previous_error_state);
+		return FALSE;
 	}
 
 	$xml = simplexml_import_dom($dom);
 	if($xml === false){
-		ogp_render_config_error(
+		gsp_collect_xml_error(
+			$filename,
 			"Failed to parse XML configuration.",
 			"File: {$filename}\n".ogp_format_libxml_errors()
 		);
+		libxml_use_internal_errors($previous_error_state);
+		return FALSE;
 	}
 
 	$xml->addChild('home_cfg_file',basename($filename));

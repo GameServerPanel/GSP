@@ -28,11 +28,6 @@ $db_version = 1;
 $module_required = TRUE;
 $module_menus = array(
 	array(
-		'subpage' => 'main',
-		'name'    => 'Steam Workshop',
-		'group'   => 'user'
-	),
-	array(
 		'subpage' => 'workshop_admin',
 		'name'    => 'Steam Workshop',
 		'group'   => 'admin'
