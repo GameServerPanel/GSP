@@ -42,7 +42,7 @@ if (isset($server_xml) && isset($server_home['home_id']))
 				$label = 'Steam Workshop';
 			}
 
-			$href = "?m=steam_workshop&p=main&action=edit&home_id=" . $homeId;
+			$href = "?m=steam_workshop&p=server_mods&action=edit&home_id=" . $homeId;
 			$module_buttons = array(
 				"<a class='monitorbutton' href='" . $href . "'>
 					<img src='" . check_theme_image("images/steam_workshop.png") . "' title='" . $label . "'>

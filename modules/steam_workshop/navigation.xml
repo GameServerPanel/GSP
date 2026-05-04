@@ -1,5 +1,5 @@
 <navigation>
-  <page key="main" file="main.php" access="admin" />
+  <page key="server_mods" file="main.php" access="admin" />
   <page key="uninstall" file="uninstall.php" access="admin" />
   <page key="workshop_admin" file="workshop_admin.php" access="admin" />
 </navigation>
