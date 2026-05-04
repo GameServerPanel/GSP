@@ -31,9 +31,17 @@ class WorkshopProfileController
 
     public function handle(): void
     {
+        global $db;
+
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+        if (!$db->isAdmin($userId)) {
+            print_failure($this->lang['error_admin_only'] ?? 'Administrator access required.');
+            return;
+        }
+
         echo '<link rel="stylesheet" type="text/css" href="modules/steam_workshop/steam_workshop.css" />';
 
-        $action = $_GET['sw_action'] ?? 'profiles';
+        $action = $_GET['sw_action'] ?? 'list';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $postAction = $_POST['sw_action'] ?? '';
@@ -48,6 +56,7 @@ class WorkshopProfileController
         }
 
         switch ($action) {
+            case 'config_form':
             case 'profile_form':
                 $this->handleForm((int)($_GET['profile_id'] ?? 0));
                 break;
