@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "You have received a support request from %s (%s).<br><br>Server: %s.<br><br>%s");
-define('OGP_LANG_message_has_been_sent', "Děkujeme, že jste nás kontaktovali! Vaše zpráva byla přijata a na ni budeme reagovat emailem.");
-define('OGP_LANG_please_describe_your_issue_below', "Please use the form below to request support for your game server.<br>We will respond as soon as possible.");
-define('OGP_LANG_select_server', "Vyberte server");
-define('OGP_LANG_email_address', "Emailová adresa");
-define('OGP_LANG_subject', "Předmět");
-define('OGP_LANG_message', "Zpráva");
-define('OGP_LANG_email_must_be_filled_out', "E-mailová adresa musí být vyplněna.");
-define('OGP_LANG_subject_must_be_filled_out', "Předmět musí být vyplněn.");
-define('OGP_LANG_message_must_be_filled_out', "Zpráva musí být vyplněna.");
-define('OGP_LANG_send', "Poslat");
-define('OGP_LANG_error', "Chyba");
-define('OGP_LANG_info', "Informace");
+define('LANG_support_email_content', "You have received a support request from %s (%s).<br><br>Server: %s.<br><br>%s");
+define('LANG_message_has_been_sent', "Děkujeme, že jste nás kontaktovali! Vaše zpráva byla přijata a na ni budeme reagovat emailem.");
+define('LANG_please_describe_your_issue_below', "Please use the form below to request support for your game server.<br>We will respond as soon as possible.");
+define('LANG_select_server', "Vyberte server");
+define('LANG_email_address', "Emailová adresa");
+define('LANG_subject', "Předmět");
+define('LANG_message', "Zpráva");
+define('LANG_email_must_be_filled_out', "E-mailová adresa musí být vyplněna.");
+define('LANG_subject_must_be_filled_out', "Předmět musí být vyplněn.");
+define('LANG_message_must_be_filled_out', "Zpráva musí být vyplněna.");
+define('LANG_send', "Poslat");
+define('LANG_error', "Chyba");
+define('LANG_info', "Informace");
 ?>

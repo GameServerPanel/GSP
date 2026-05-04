@@ -23,21 +23,21 @@
  */
 
 include 'update.php';
-define('OGP_LANG_unable_download', "%s indirilemedi.");
-define('OGP_LANG_md5_failed', "%s için yapılan MD5 testi başarısız, tekrar deneyin.");
-define('OGP_LANG_uninstall', "Kaldır");
-define('OGP_LANG_install', "Kur");
-define('OGP_LANG_uptodate', "Güncel");
-define('OGP_LANG_update_available', "Güncelleme mevcut");
-define('OGP_LANG_not_installed', "Kurulmamış");
-define('OGP_LANG_installed', "Kuruldu");
-define('OGP_LANG_download_update', "İndir/Güncelle");
-define('OGP_LANG_are_you_sure', "Emin misiniz");
-define('OGP_LANG_uninstalling_module_dataloss', "Bir modülü kaldırarak bununla ilgili tüm verileri kaybedersiniz.");
-define('OGP_LANG_remove_files_for', "Tüm dosyaları silmek istiyor musunuz");
-define('OGP_LANG_confirm', "Kabul Et");
-define('OGP_LANG_cancel', "İptal Et");
-define('OGP_LANG_extra_themes', "Ekstra temalar");
-define('OGP_LANG_extra_modules', "Ekstra modüller");
-define('OGP_LANG_search_for_updates', "Güncellemeleri kontrol et");
+define('LANG_unable_download', "%s indirilemedi.");
+define('LANG_md5_failed', "%s için yapılan MD5 testi başarısız, tekrar deneyin.");
+define('LANG_uninstall', "Kaldır");
+define('LANG_install', "Kur");
+define('LANG_uptodate', "Güncel");
+define('LANG_update_available', "Güncelleme mevcut");
+define('LANG_not_installed', "Kurulmamış");
+define('LANG_installed', "Kuruldu");
+define('LANG_download_update', "İndir/Güncelle");
+define('LANG_are_you_sure', "Emin misiniz");
+define('LANG_uninstalling_module_dataloss', "Bir modülü kaldırarak bununla ilgili tüm verileri kaybedersiniz.");
+define('LANG_remove_files_for', "Tüm dosyaları silmek istiyor musunuz");
+define('LANG_confirm', "Kabul Et");
+define('LANG_cancel', "İptal Et");
+define('LANG_extra_themes', "Ekstra temalar");
+define('LANG_extra_modules', "Ekstra modüller");
+define('LANG_search_for_updates', "Güncellemeleri kontrol et");
 ?>

@@ -35,7 +35,7 @@ if (!defined('GSP_XMLRPC_READY')) {
 			if (!headers_sent()) {
 				header('Content-Type: text/plain; charset=UTF-8', true, 500);
 			}
-			echo nl2br(htmlentities($message));
+			echo nl2br(htmlentities($message ?? '', ENT_QUOTES, 'UTF-8'));
 		}
 		exit(1);
 	}

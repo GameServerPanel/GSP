@@ -215,7 +215,7 @@ function ogpHome()
 									"'><span data-icon_path='$icon_path'>$game_name</span></a>\n<ul id='submenu_1' >\n";
 				foreach ((array)$server_homes as $server_home)
 				{
-					$button_name = htmlentities($server_home['home_name']);
+					$button_name = htmlentities($server_home['home_name'] ?? '', ENT_QUOTES, 'UTF-8');
 					if( ! preg_match("/none/i", (string)$server_home['mod_name']) ) 
 						$button_name .= " - ".$server_home['mod_name'];
 					$game_homes_list .= "<li><a title='".$server_home['ip'].':'.$server_home['port'].

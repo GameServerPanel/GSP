@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "Primili ste zahtjev za podršku od %s (%s).<br><br>Server: %s.<br><br>%s ");
-define('OGP_LANG_message_has_been_sent', "Hvala što ste nas kontaktirali! Vaša je poruka primljena i mi ćemo odgovoriti putem e-pošte.");
-define('OGP_LANG_please_describe_your_issue_below', "Upotrijebite obrazac u nastavku kako biste zatražili potporu vašem serveru.<br>Odgovorit ćemo što je prije moguće.");
-define('OGP_LANG_select_server', "Odaberite server");
-define('OGP_LANG_email_address', "E-pošta");
-define('OGP_LANG_subject', "Subjekt");
-define('OGP_LANG_message', "Poruka");
-define('OGP_LANG_email_must_be_filled_out', "Adresa e-pošte mora biti popunjena.");
-define('OGP_LANG_subject_must_be_filled_out', "Mora se ispuniti subjekt.");
-define('OGP_LANG_message_must_be_filled_out', "Poruka mora biti popunjena.");
-define('OGP_LANG_send', "Poslati");
-define('OGP_LANG_error', "Greška");
-define('OGP_LANG_info', "Detalji");
+define('LANG_support_email_content', "Primili ste zahtjev za podršku od %s (%s).<br><br>Server: %s.<br><br>%s ");
+define('LANG_message_has_been_sent', "Hvala što ste nas kontaktirali! Vaša je poruka primljena i mi ćemo odgovoriti putem e-pošte.");
+define('LANG_please_describe_your_issue_below', "Upotrijebite obrazac u nastavku kako biste zatražili potporu vašem serveru.<br>Odgovorit ćemo što je prije moguće.");
+define('LANG_select_server', "Odaberite server");
+define('LANG_email_address', "E-pošta");
+define('LANG_subject', "Subjekt");
+define('LANG_message', "Poruka");
+define('LANG_email_must_be_filled_out', "Adresa e-pošte mora biti popunjena.");
+define('LANG_subject_must_be_filled_out', "Mora se ispuniti subjekt.");
+define('LANG_message_must_be_filled_out', "Poruka mora biti popunjena.");
+define('LANG_send', "Poslati");
+define('LANG_error', "Greška");
+define('LANG_info', "Detalji");
 ?>

@@ -22,9 +22,9 @@
  *
  */
 
-define('OGP_LANG_dsi_long', "صورة سيرفر ديناميكية");
-define('OGP_LANG_dsi_select_server', "الرجاء اختيار سيرفر من القائمة المنسدلة");
-define('OGP_LANG_dsi_admin_long', "إعدادات صورة السيرفر الديناميكية");
-define('OGP_LANG_dsi_list', "قائمة صور السيرفر الديناميكية");
-define('OGP_LANG_no_game_homes_assigned', "ليس لديك أي خوادم تم تعيينها لحسابك.");
+define('LANG_dsi_long', "صورة سيرفر ديناميكية");
+define('LANG_dsi_select_server', "الرجاء اختيار سيرفر من القائمة المنسدلة");
+define('LANG_dsi_admin_long', "إعدادات صورة السيرفر الديناميكية");
+define('LANG_dsi_list', "قائمة صور السيرفر الديناميكية");
+define('LANG_no_game_homes_assigned', "ليس لديك أي خوادم تم تعيينها لحسابك.");
 ?>

@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "%s (%s) size bir destek talebi gönderdi. <br><br>Sunucu:%s<br><br>%s");
-define('OGP_LANG_message_has_been_sent', "Bizimle iletişime geçtiğiniz için teşekkür ederiz. Mesajınız bize ulaştı, size mail üzerinden geri dönüş yapacağız.");
-define('OGP_LANG_please_describe_your_issue_below', "Oyun sunucunuz için destek almak için lütfen aşağıdaki formu doldurun.<br>En kısa sürede tarafınıza dönüş yapılacaktır.");
-define('OGP_LANG_select_server', "Sunucu seç");
-define('OGP_LANG_email_address', "Email adresiniz");
-define('OGP_LANG_subject', "Konu");
-define('OGP_LANG_message', "Mesaj");
-define('OGP_LANG_email_must_be_filled_out', "Email adresi kısmı doldurulmuş olmalıdır.");
-define('OGP_LANG_subject_must_be_filled_out', "Konu kısmı doldurulmuş olmalıdır.");
-define('OGP_LANG_message_must_be_filled_out', "Mesaj kısmı doldurulmuş olmalıdır.");
-define('OGP_LANG_send', "Gönder");
-define('OGP_LANG_error', "Hata");
-define('OGP_LANG_info', "Bilgi");
+define('LANG_support_email_content', "%s (%s) size bir destek talebi gönderdi. <br><br>Sunucu:%s<br><br>%s");
+define('LANG_message_has_been_sent', "Bizimle iletişime geçtiğiniz için teşekkür ederiz. Mesajınız bize ulaştı, size mail üzerinden geri dönüş yapacağız.");
+define('LANG_please_describe_your_issue_below', "Oyun sunucunuz için destek almak için lütfen aşağıdaki formu doldurun.<br>En kısa sürede tarafınıza dönüş yapılacaktır.");
+define('LANG_select_server', "Sunucu seç");
+define('LANG_email_address', "Email adresiniz");
+define('LANG_subject', "Konu");
+define('LANG_message', "Mesaj");
+define('LANG_email_must_be_filled_out', "Email adresi kısmı doldurulmuş olmalıdır.");
+define('LANG_subject_must_be_filled_out', "Konu kısmı doldurulmuş olmalıdır.");
+define('LANG_message_must_be_filled_out', "Mesaj kısmı doldurulmuş olmalıdır.");
+define('LANG_send', "Gönder");
+define('LANG_error', "Hata");
+define('LANG_info', "Bilgi");
 ?>

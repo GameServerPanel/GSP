@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "RCON команда");
-define('OGP_LANG_has_sent_to', "Отправил");
-define('OGP_LANG_need_set_remote_pass', "Необходимо установить удаленный пароль");
-define('OGP_LANG_before_sending_rcon_com', "Перед отправкой rcon команды");
-define('OGP_LANG_send_command', "Отправить команду");
-define('OGP_LANG_check-all', "Выбрать все");
-define('OGP_LANG_uncheck-all', "Снять все");
+define('LANG_rcon_command_title', "RCON команда");
+define('LANG_has_sent_to', "Отправил");
+define('LANG_need_set_remote_pass', "Необходимо установить удаленный пароль");
+define('LANG_before_sending_rcon_com', "Перед отправкой rcon команды");
+define('LANG_send_command', "Отправить команду");
+define('LANG_check-all', "Выбрать все");
+define('LANG_uncheck-all', "Снять все");
 ?>

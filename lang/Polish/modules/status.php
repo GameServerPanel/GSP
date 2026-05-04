@@ -22,27 +22,27 @@
  *
  */
 
-define('OGP_LANG_system_uptime', "Czas Działania Serwera");
-define('OGP_LANG_system_up_time', "Uruchomiony Od");
-define('OGP_LANG_system_up_since', "Uruchomiony");
-define('OGP_LANG_day_word', "Day");
-define('OGP_LANG_days_word', "Days");
-define('OGP_LANG_hour_word', "Hour");
-define('OGP_LANG_hours_word', "Hours");
-define('OGP_LANG_minute_word', "Minute");
-define('OGP_LANG_minutes_word', "Minutes");
-define('OGP_LANG_second_word', "Second");
-define('OGP_LANG_seconds_word', "Seconds");
-define('OGP_LANG_cpu_usage', "Użycie Rdzeni Procesora");
-define('OGP_LANG_cpu_load', "Użycie");
-define('OGP_LANG_ram_usage', "Wykorzystanie Pamięci");
-define('OGP_LANG_ram_used', "Wykorzystana Pamięć");
-define('OGP_LANG_ram_of', "z");
-define('OGP_LANG_storage_space', "Wykorzystanie Dysku");
-define('OGP_LANG_storage_total', "Pojemność");
-define('OGP_LANG_storage_used', "Zajęte Miejsce");
-define('OGP_LANG_storage_free', "Wolne Miejsce");
-define('OGP_LANG_process_monitor', "Monitor Procesów");
-define('OGP_LANG_status_extension_required', "Rozszerzenie wymagane");
-define('OGP_LANG_gd_info', "PHP Extension <a href=\"http://php.net/manual/en/image.installation.php\">GD</a> jest wymagane, aby wygenerować obrazy statusu!");
+define('LANG_system_uptime', "Czas Działania Serwera");
+define('LANG_system_up_time', "Uruchomiony Od");
+define('LANG_system_up_since', "Uruchomiony");
+define('LANG_day_word', "Day");
+define('LANG_days_word', "Days");
+define('LANG_hour_word', "Hour");
+define('LANG_hours_word', "Hours");
+define('LANG_minute_word', "Minute");
+define('LANG_minutes_word', "Minutes");
+define('LANG_second_word', "Second");
+define('LANG_seconds_word', "Seconds");
+define('LANG_cpu_usage', "Użycie Rdzeni Procesora");
+define('LANG_cpu_load', "Użycie");
+define('LANG_ram_usage', "Wykorzystanie Pamięci");
+define('LANG_ram_used', "Wykorzystana Pamięć");
+define('LANG_ram_of', "z");
+define('LANG_storage_space', "Wykorzystanie Dysku");
+define('LANG_storage_total', "Pojemność");
+define('LANG_storage_used', "Zajęte Miejsce");
+define('LANG_storage_free', "Wolne Miejsce");
+define('LANG_process_monitor', "Monitor Procesów");
+define('LANG_status_extension_required', "Rozszerzenie wymagane");
+define('LANG_gd_info', "PHP Extension <a href=\"http://php.net/manual/en/image.installation.php\">GD</a> jest wymagane, aby wygenerować obrazy statusu!");
 ?>

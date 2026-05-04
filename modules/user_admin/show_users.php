@@ -61,7 +61,7 @@ function exec_ogp_module() {
 	$result = $db->getUserList_limit($page_user, $limit_user, $search_field);
 
 	if (empty($result) && $search_field !== false) {
-		print_failure(get_lang_f('no_results_found', htmlentities($search_field)));
+		print_failure(get_lang_f('no_results_found', htmlentities($search_field ?? '', ENT_QUOTES, 'UTF-8')));
 
 		$view->refresh("?m=user_admin", 5);
 		return;
@@ -75,7 +75,7 @@ function exec_ogp_module() {
 				<td style="width: 50%; vertical-align: middle; text-align: right;">
 					<form action="home.php" method="GET" style="float:right;">
 					<input type ="hidden" name="m" value="user_admin" />
-					<input name="search" type="text" id="search" value="' . $search_field . '"/>
+					<input name="search" type="text" id="search" value="' . htmlspecialchars($search_field ?? '', ENT_QUOTES, 'UTF-8') . '"/>
 					<input type="submit" value="'.get_lang('search').'" />
 					</form>
 				</td>
@@ -119,8 +119,8 @@ function exec_ogp_module() {
             get_lang('assign_homes')."]</a><br />
             <a href='?m=user_admin&amp;p=del&amp;user_id=$row[user_id]'>[".get_lang('delete')."]</a><br />
             <a href='?m=user_admin&amp;p=edit_user&amp;user_id=$row[user_id]'>[".get_lang('edit_profile')."]</a></td>
-            <td>".htmlentities($row['users_login'])."</td><td>".htmlentities($row['users_role'])."</td>
-            <td>".htmlentities($row['users_email'])."</td>
+            <td>".htmlentities($row['users_login'] ?? '', ENT_QUOTES, 'UTF-8')."</td><td>".htmlentities($row['users_role'] ?? '', ENT_QUOTES, 'UTF-8')."</td>
+            <td>".htmlentities($row['users_email'] ?? '', ENT_QUOTES, 'UTF-8')."</td>
             <td>$user_expires</td>";
         if(!empty($ownedBy)){
 			print "<td></td>";

@@ -39,7 +39,7 @@ function exec_ogp_module() {
 	$logs = $db->read_logger($p, $l, $search_field);
 
 	if (empty($logs) && !empty($search_field)) {
-		print_failure(get_lang_f('no_results_found', htmlentities($search_field)));
+		print_failure(get_lang_f('no_results_found', htmlentities($search_field ?? '', ENT_QUOTES, 'UTF-8')));
 		$view->refresh("?m=administration&p=watch_logger", 5);
 
 		return;

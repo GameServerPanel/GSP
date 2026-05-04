@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "Sie haben eine Supportanfrage von %s (%s) erhalten.<br><br>Server: %s.<br><br>%s");
-define('OGP_LANG_message_has_been_sent', "Vielen Dank für Ihre Kontaktaufnahme! Ihre Nachricht wurde empfangen und wir werden per E-Mail darauf Antworten.");
-define('OGP_LANG_please_describe_your_issue_below', "Bitte benutzen Sie das untenstehende Formular, um Unterstützung für Ihren Gameserver anzufordern.<br>Wir werden so schnell wie möglich antworten.");
-define('OGP_LANG_select_server', "Wählen Sie einen server");
-define('OGP_LANG_email_address', "E-Mail-Adresse");
-define('OGP_LANG_subject', "Betreff");
-define('OGP_LANG_message', "Nachricht");
-define('OGP_LANG_email_must_be_filled_out', "Die e-Mail-Adresse muss ausgefüllt werden.");
-define('OGP_LANG_subject_must_be_filled_out', "Der Betreff muss ausgefüllt werden.");
-define('OGP_LANG_message_must_be_filled_out', "Die Nachricht muss ausgefüllt werden.");
-define('OGP_LANG_send', "Senden");
-define('OGP_LANG_error', "Fehler");
-define('OGP_LANG_info', "Information");
+define('LANG_support_email_content', "Sie haben eine Supportanfrage von %s (%s) erhalten.<br><br>Server: %s.<br><br>%s");
+define('LANG_message_has_been_sent', "Vielen Dank für Ihre Kontaktaufnahme! Ihre Nachricht wurde empfangen und wir werden per E-Mail darauf Antworten.");
+define('LANG_please_describe_your_issue_below', "Bitte benutzen Sie das untenstehende Formular, um Unterstützung für Ihren Gameserver anzufordern.<br>Wir werden so schnell wie möglich antworten.");
+define('LANG_select_server', "Wählen Sie einen server");
+define('LANG_email_address', "E-Mail-Adresse");
+define('LANG_subject', "Betreff");
+define('LANG_message', "Nachricht");
+define('LANG_email_must_be_filled_out', "Die e-Mail-Adresse muss ausgefüllt werden.");
+define('LANG_subject_must_be_filled_out', "Der Betreff muss ausgefüllt werden.");
+define('LANG_message_must_be_filled_out', "Die Nachricht muss ausgefüllt werden.");
+define('LANG_send', "Senden");
+define('LANG_error', "Fehler");
+define('LANG_info', "Information");
 ?>

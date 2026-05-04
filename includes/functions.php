@@ -243,7 +243,7 @@ function create_home_selector($module, $subpage, $server_homes) {
 				$selected = 'selected="selected"';
 			else
 				$selected = '';
-			echo "<option value='". $server_home['home_id'] . "' $selected >" . htmlentities($server_home['home_name']) . "</option>\n";
+			echo "<option value='". $server_home['home_id'] . "' $selected >" . htmlentities($server_home['home_name'] ?? '', ENT_QUOTES, 'UTF-8') . "</option>\n";
 		}
 		echo "</select>\n";
 		echo "</form>";
@@ -299,7 +299,7 @@ function create_home_selector_address($module, $subpage, $server_homes, $extra_i
 		echo "<option value='". $server_home['home_id'] .
 			 "-" . $server_home['mod_id'] . "-" . $server_home['ip'] . 
 			 "-" . $server_home['port'] . "' $selected >" . 
-			 htmlentities($server_home['home_name']) . " - " . $display_ip .
+			 htmlentities($server_home['home_name'] ?? '', ENT_QUOTES, 'UTF-8') . " - " . $display_ip .
 			 ":" . $server_home['port'] . "</option>\n";
 	}
 	echo "</select>\n";

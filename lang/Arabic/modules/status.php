@@ -22,27 +22,27 @@
  *
  */
 
-define('OGP_LANG_system_uptime', "مدة تشغيل النظام");
-define('OGP_LANG_system_up_time', "مدة التشغيل");
-define('OGP_LANG_system_up_since', "منذ");
-define('OGP_LANG_day_word', "يوم");
-define('OGP_LANG_days_word', "أيام");
-define('OGP_LANG_hour_word', "ساعة");
-define('OGP_LANG_hours_word', "ساعات");
-define('OGP_LANG_minute_word', "دقيقة");
-define('OGP_LANG_minutes_word', "دقائق");
-define('OGP_LANG_second_word', "ثانية");
-define('OGP_LANG_seconds_word', "ثواني");
-define('OGP_LANG_cpu_usage', "استخدام المعالج");
-define('OGP_LANG_cpu_load', "حمل");
-define('OGP_LANG_ram_usage', "استخدام ذاكرة الوصول العشوائي");
-define('OGP_LANG_ram_used', "الذاكرة المستخدمة");
-define('OGP_LANG_ram_of', "من");
-define('OGP_LANG_storage_space', "مساحة التخزين");
-define('OGP_LANG_storage_total', "مساحة القرص");
-define('OGP_LANG_storage_used', "مستخدم");
-define('OGP_LANG_storage_free', "مساحة فارغة");
-define('OGP_LANG_process_monitor', "مراقبة العمليات");
-define('OGP_LANG_status_extension_required', "تمديد مطلوب");
-define('OGP_LANG_gd_info', "تمديدGD<a href=\"http://php.net/manual/en/image.installation.php\"> PHP</a> هو المطلوب لتوليد شريط الصور!");
+define('LANG_system_uptime', "مدة تشغيل النظام");
+define('LANG_system_up_time', "مدة التشغيل");
+define('LANG_system_up_since', "منذ");
+define('LANG_day_word', "يوم");
+define('LANG_days_word', "أيام");
+define('LANG_hour_word', "ساعة");
+define('LANG_hours_word', "ساعات");
+define('LANG_minute_word', "دقيقة");
+define('LANG_minutes_word', "دقائق");
+define('LANG_second_word', "ثانية");
+define('LANG_seconds_word', "ثواني");
+define('LANG_cpu_usage', "استخدام المعالج");
+define('LANG_cpu_load', "حمل");
+define('LANG_ram_usage', "استخدام ذاكرة الوصول العشوائي");
+define('LANG_ram_used', "الذاكرة المستخدمة");
+define('LANG_ram_of', "من");
+define('LANG_storage_space', "مساحة التخزين");
+define('LANG_storage_total', "مساحة القرص");
+define('LANG_storage_used', "مستخدم");
+define('LANG_storage_free', "مساحة فارغة");
+define('LANG_process_monitor', "مراقبة العمليات");
+define('LANG_status_extension_required', "تمديد مطلوب");
+define('LANG_gd_info', "تمديدGD<a href=\"http://php.net/manual/en/image.installation.php\"> PHP</a> هو المطلوب لتوليد شريط الصور!");
 ?>

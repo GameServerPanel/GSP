@@ -276,7 +276,7 @@ function exec_ogp_module()
 					echo "<tr><th>". get_lang("home_id") ."</th><th>". get_lang("home_path") ."</th><th>". get_lang("game_type") ."</th><th>". get_lang("server_name") ."</th><th>". get_lang("port") ."</th></tr>";
 					foreach ((array)$game_homes as $game_home)
 					{
-						echo "<tr><td>".$game_home['home_id']."</td><td>".$game_home['home_path']."</td><td>".$game_home['game_name']."</td><td>".htmlentities($game_home['home_name'])."</td><td>".$game_home['port']."</td></tr>";
+						echo "<tr><td>".$game_home['home_id']."</td><td>".$game_home['home_path']."</td><td>".$game_home['game_name']."</td><td>".htmlentities($game_home['home_name'] ?? '', ENT_QUOTES, 'UTF-8')."</td><td>".$game_home['port']."</td></tr>";
 					}
 					echo "</table>";
 				}

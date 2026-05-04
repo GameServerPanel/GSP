@@ -22,9 +22,9 @@
  *
  */
 
-define('OGP_LANG_dsi_long', "Dinamikus szerver kép");
-define('OGP_LANG_dsi_select_server', "Kérlek, válassz egy szervert a legördülő listából");
-define('OGP_LANG_dsi_admin_long', "Dinamikus szerver kép beállítások");
-define('OGP_LANG_dsi_list', "Dinamikus szerver kép lista");
-define('OGP_LANG_no_game_homes_assigned', "Nincsenek szerverek hozzárendelve a fiókodhoz.");
+define('LANG_dsi_long', "Dinamikus szerver kép");
+define('LANG_dsi_select_server', "Kérlek, válassz egy szervert a legördülő listából");
+define('LANG_dsi_admin_long', "Dinamikus szerver kép beállítások");
+define('LANG_dsi_list', "Dinamikus szerver kép lista");
+define('LANG_no_game_homes_assigned', "Nincsenek szerverek hozzárendelve a fiókodhoz.");
 ?>

@@ -22,17 +22,17 @@
  *
  */
 
-define('OGP_LANG_support_email_content', "Vous avez reçu une demande de support de %s (%s).<br><br>Serveur: %s.<br><br>%s");
-define('OGP_LANG_message_has_been_sent', "Merci de nous avoir contacté! Votre message a bien été envoyé et une réponse vous sera apportée par email dans les meilleurs délais.");
-define('OGP_LANG_please_describe_your_issue_below', "Veuillez utiliser le formulaire suivant pour tout problème technique avec votre serveur.<br>Une réponse sera apportée dans les meilleurs délais.");
-define('OGP_LANG_select_server', "Choisissez un serveur");
-define('OGP_LANG_email_address', "Adresse email");
-define('OGP_LANG_subject', "Sujet");
-define('OGP_LANG_message', "Message");
-define('OGP_LANG_email_must_be_filled_out', "Veuillez indiquer un e-mail.");
-define('OGP_LANG_subject_must_be_filled_out', "Veuillez indiquer un sujet.");
-define('OGP_LANG_message_must_be_filled_out', "Veuillez indiquer un message.");
-define('OGP_LANG_send', "Envoyer");
-define('OGP_LANG_error', "Erreur");
-define('OGP_LANG_info', "Information");
+define('LANG_support_email_content', "Vous avez reçu une demande de support de %s (%s).<br><br>Serveur: %s.<br><br>%s");
+define('LANG_message_has_been_sent', "Merci de nous avoir contacté! Votre message a bien été envoyé et une réponse vous sera apportée par email dans les meilleurs délais.");
+define('LANG_please_describe_your_issue_below', "Veuillez utiliser le formulaire suivant pour tout problème technique avec votre serveur.<br>Une réponse sera apportée dans les meilleurs délais.");
+define('LANG_select_server', "Choisissez un serveur");
+define('LANG_email_address', "Adresse email");
+define('LANG_subject', "Sujet");
+define('LANG_message', "Message");
+define('LANG_email_must_be_filled_out', "Veuillez indiquer un e-mail.");
+define('LANG_subject_must_be_filled_out', "Veuillez indiquer un sujet.");
+define('LANG_message_must_be_filled_out', "Veuillez indiquer un message.");
+define('LANG_send', "Envoyer");
+define('LANG_error', "Erreur");
+define('LANG_info', "Information");
 ?>

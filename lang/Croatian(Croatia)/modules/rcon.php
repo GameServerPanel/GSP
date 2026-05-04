@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "RCON Naredbe");
-define('OGP_LANG_has_sent_to', "poslano za");
-define('OGP_LANG_need_set_remote_pass', "potrebno je postaviti udaljeni pristup");
-define('OGP_LANG_before_sending_rcon_com', "prije slanja rcon naredbe");
-define('OGP_LANG_send_command', "Pošalji naredbu");
-define('OGP_LANG_check-all', "Provjeri sve");
-define('OGP_LANG_uncheck-all', "Odznači sve");
+define('LANG_rcon_command_title', "RCON Naredbe");
+define('LANG_has_sent_to', "poslano za");
+define('LANG_need_set_remote_pass', "potrebno je postaviti udaljeni pristup");
+define('LANG_before_sending_rcon_com', "prije slanja rcon naredbe");
+define('LANG_send_command', "Pošalji naredbu");
+define('LANG_check-all', "Provjeri sve");
+define('LANG_uncheck-all', "Odznači sve");
 ?>

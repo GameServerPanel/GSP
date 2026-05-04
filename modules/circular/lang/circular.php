@@ -22,19 +22,19 @@
  *
  */
 
-define('OGP_LANG_your_circulars', "Your Notifications");
-define('OGP_LANG_status', "Status");
-define('OGP_LANG_subject', "Subject");
-define('OGP_LANG_users_not_red_circular', "Not Seen by");
-define('OGP_LANG_date', "Date");
-define('OGP_LANG_remove_selected_circulars', "Remove Selected");
-define('OGP_LANG_back', "Back");
-define('OGP_LANG_Circular', "Notification");
-define('OGP_LANG_send_to', "Send To");
-define('OGP_LANG_admins', "Admins");
-define('OGP_LANG_users', "Users");
-define('OGP_LANG_groups', "Groups");
-define('OGP_LANG_subusers_of_user', "Subusers");
-define('OGP_LANG_message', "Message");
-define('OGP_LANG_send_circular', "Send Notification");
+define('LANG_your_circulars', "Your Notifications");
+define('LANG_status', "Status");
+define('LANG_subject', "Subject");
+define('LANG_users_not_red_circular', "Not Seen by");
+define('LANG_date', "Date");
+define('LANG_remove_selected_circulars', "Remove Selected");
+define('LANG_back', "Back");
+define('LANG_Circular', "Notification");
+define('LANG_send_to', "Send To");
+define('LANG_admins', "Admins");
+define('LANG_users', "Users");
+define('LANG_groups', "Groups");
+define('LANG_subusers_of_user', "Subusers");
+define('LANG_message', "Message");
+define('LANG_send_circular', "Send Notification");
 ?>

@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "RCON Kommandoer");
-define('OGP_LANG_has_sent_to', "har sendt til");
-define('OGP_LANG_need_set_remote_pass', "skal sætte remote kode");
-define('OGP_LANG_before_sending_rcon_com', "før sendelse rcon com");
-define('OGP_LANG_send_command', "Send Kommando");
-define('OGP_LANG_check-all', "Kontroller alt");
-define('OGP_LANG_uncheck-all', "Fjern markering fra alt");
+define('LANG_rcon_command_title', "RCON Kommandoer");
+define('LANG_has_sent_to', "har sendt til");
+define('LANG_need_set_remote_pass', "skal sætte remote kode");
+define('LANG_before_sending_rcon_com', "før sendelse rcon com");
+define('LANG_send_command', "Send Kommando");
+define('LANG_check-all', "Kontroller alt");
+define('LANG_uncheck-all', "Fjern markering fra alt");
 ?>

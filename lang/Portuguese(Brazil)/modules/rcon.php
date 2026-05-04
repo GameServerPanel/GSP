@@ -22,11 +22,11 @@
  *
  */
 
-define('OGP_LANG_rcon_command_title', "Comandos RCON");
-define('OGP_LANG_has_sent_to', "foi enviado para");
-define('OGP_LANG_need_set_remote_pass', "necessário definir uma senha");
-define('OGP_LANG_before_sending_rcon_com', "antes de enviar comandos rcon");
-define('OGP_LANG_send_command', "Enviar comando");
-define('OGP_LANG_check-all', "Marcar todos");
-define('OGP_LANG_uncheck-all', "Desmarcar todos");
+define('LANG_rcon_command_title', "Comandos RCON");
+define('LANG_has_sent_to', "foi enviado para");
+define('LANG_need_set_remote_pass', "necessário definir uma senha");
+define('LANG_before_sending_rcon_com', "antes de enviar comandos rcon");
+define('LANG_send_command', "Enviar comando");
+define('LANG_check-all', "Marcar todos");
+define('LANG_uncheck-all', "Desmarcar todos");
 ?>
