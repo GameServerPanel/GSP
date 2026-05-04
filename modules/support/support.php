@@ -36,10 +36,17 @@ function exec_ogp_module() {
 
 	if(isset($_POST["submit"])){
 		
-		$email = $_POST["email"];
+		$email = isset($_POST["email"]) ? trim($_POST["email"]) : '';
 		$gameserver = $_POST['gameserver'];
-		$subject = get_lang('support').": ".$_POST["subject"];
-		$message = $_POST["message"];
+		$subjectRaw = isset($_POST["subject"]) ? trim($_POST["subject"]) : '';
+		$subject = get_lang('support') . ($subjectRaw !== '' ? ": " . $subjectRaw : '');
+		$message = isset($_POST["message"]) ? trim($_POST["message"]) : '';
+
+		if ($message === '') {
+			$errMsg = get_lang('message_must_be_filled_out');
+			$errTitle = get_lang('error');
+			echo "<script>$(document).ready(function(){\$('#dialog').html('<p><img src=\"modules/support/images/error.png\">" . htmlspecialchars($errMsg, ENT_QUOTES) . "</p>').attr('title', '" . htmlspecialchars($errTitle, ENT_QUOTES) . "').dialog();});</script>";
+		} else {
 		
 //TICKET SUBMITTED, POST ON DISCORD and log
 //logger
@@ -59,8 +66,8 @@ if (!empty($webhook)) {
 }
 //end discord
 
-		$content = get_lang_f('support_email_content', $user['users_login'], $email, $gameserver, $message);				
-		if( mymail($email, $subject, $content, $settings, $user['users_login']) == TRUE )
+		$content = get_lang_f('support_email_content', $user['users_login'], $email, $gameserver, $message);
+		if ($email === '' || mymail($email, $subject, $content, $settings, $user['users_login']) == TRUE)
 		{
 			?>
 			<script type="text/javascript">
@@ -70,7 +77,8 @@ if (!empty($webhook)) {
 			</script>
 			<?php
 		}
-	} // End else
+	} // end else (message not empty)
+	} // end if submit
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />';
 	echo "<h2>".get_lang('support')."</h2>";
 	echo '
@@ -95,7 +103,7 @@ if (!empty($webhook)) {
 		
 	if(!isset($user['users_email']) or $user['users_email'] == "")
 	{
-		echo get_lang('email_address').':
+		echo get_lang('email_address').' <em>(optional)</em>:
 			<br />
 			<input type="text" name="email" id="email" style="width: 250px;" />
 			<br />
@@ -106,7 +114,7 @@ if (!empty($webhook)) {
 		echo '<input type="hidden" name="email" id="email" value="'.$user['users_email'].'" />';
 	}
 	
-	echo get_lang('subject').':
+	echo get_lang('subject').' <em>(optional)</em>:
 	<br />
 	<input type="text" name="subject" id="subject" style="width: 250px;" />
 	<br />
@@ -123,20 +131,8 @@ if (!empty($webhook)) {
 	<script type="text/javascript">
 	function validateForm()
 	{
-		var $email=document.forms["contactForm"]["email"].value;
-		var $subject=document.forms["contactForm"]["subject"].value;
 		var $message=document.forms["contactForm"]["message"].value;
-		if ($email==null || $email=="")
-		{
-			$('#dialog').html('<p><img src="modules/support/images/error.png" ><?php print_lang('email_must_be_filled_out'); ?></p>').attr('title', '<?php print_lang('error'); ?>').dialog();
-			return false;
-		}
-		else if ($subject==null || $subject=="")
-		{
-			$('#dialog').html('<p><img src="modules/support/images/error.png" ><?php print_lang('subject_must_be_filled_out'); ?></p>').attr('title', '<?php print_lang('error'); ?>').dialog();
-			return false;
-		}
-		else if ($message==null || $message=="")
+		if ($message==null || $message=="")
 		{
 			$('#dialog').html('<p><img src="modules/support/images/error.png" ><?php print_lang('message_must_be_filled_out'); ?></p>').attr('title', '<?php print_lang('error'); ?>').dialog();
 			return false;

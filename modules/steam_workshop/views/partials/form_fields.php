@@ -21,10 +21,10 @@ $currentAdapterName = $adapterOptions[$formConfig['adapter_key']] ?? strtoupper(
     </label>
 
     <label>
-        <span><?php echo htmlspecialchars($lang['label_adapter']); ?></span>
+        <span><?php echo htmlspecialchars($lang['label_adapter'] ?? 'Game type'); ?></span>
         <?php if ($adapterLocked): ?>
             <input type="text" value="<?php echo htmlspecialchars($currentAdapterName); ?>" disabled />
-            <small><?php echo htmlspecialchars($lang['adapter_locked_note'] ?? 'This adapter is managed by the administrator.'); ?></small>
+            <small><?php echo htmlspecialchars($lang['adapter_locked_note'] ?? 'The game type for this server is managed by the administrator.'); ?></small>
         <?php else: ?>
             <select name="workshop[adapter_key]">
                 <?php foreach ((array)$adapterOptions as $key => $label): ?>

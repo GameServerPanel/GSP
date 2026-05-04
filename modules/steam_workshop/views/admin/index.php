@@ -52,7 +52,7 @@ declare(strict_types=1);
                                         <span class="sw-game-label__name"><?php echo htmlspecialchars($row['game_name']); ?></span>
                                         <span class="sw-badge sw-badge--app">App ID <?php echo htmlspecialchars($row['app_id']); ?></span>
                                         <?php if ($row['exists']): ?>
-                                            <span class="sw-badge sw-badge--custom"><?php echo htmlspecialchars($lang['badge_custom_xml'] ?? 'Custom XML'); ?></span>
+                                            <span class="sw-badge sw-badge--custom"><?php echo htmlspecialchars($lang['badge_custom_xml'] ?? 'Custom config'); ?></span>
                                         <?php endif; ?>
                                     </div>
                                     <div class="sw-game-variants">
@@ -61,7 +61,7 @@ declare(strict_types=1);
                                         <?php endforeach; ?>
                                     </div>
                                 </div>
-                                <small class="sw-game-label__hint"><?php echo htmlspecialchars($lang['admin_hint_inline_edit'] ?? 'Use the toggle to edit the XML inline.'); ?></small>
+                                <small class="sw-game-label__hint"><?php echo htmlspecialchars($lang['admin_hint_inline_edit'] ?? 'Use the toggle to configure this game inline.'); ?></small>
                             </td>
                             <td>
                                 <select form="sw-mapping-form" name="mapping[<?php echo htmlspecialchars($groupKey); ?>]">
@@ -86,13 +86,13 @@ declare(strict_types=1);
                             </td>
                             <td class="sw-actions">
                                 <button type="button" class="btn secondary js-toggle-adapter" data-target="<?php echo htmlspecialchars($formId); ?>" aria-expanded="<?php echo $isOpen ? 'true' : 'false'; ?>">
-                                    <?php echo htmlspecialchars($row['exists'] ? ($lang['button_edit_adapter'] ?? 'Edit adapter') : ($lang['button_create_adapter'] ?? 'Create adapter')); ?>
+                                    <?php echo htmlspecialchars($row['exists'] ? ($lang['button_edit_adapter'] ?? 'Edit') : ($lang['button_create_adapter'] ?? 'Create')); ?>
                                 </button>
                                 <?php if ($row['exists']): ?>
                                     <form method="post" class="sw-inline-delete">
                                         <input type="hidden" name="admin_action" value="delete_adapter">
                                         <input type="hidden" name="game_key" value="<?php echo htmlspecialchars($primaryKey); ?>">
-                                        <button type="submit" class="btn danger" onclick="return confirm('<?php echo htmlspecialchars($lang['confirm_delete_adapter'] ?? 'Delete this adapter?'); ?>');">
+                                        <button type="submit" class="btn danger" onclick="return confirm('<?php echo htmlspecialchars($lang['confirm_delete_adapter'] ?? 'Delete this game configuration?'); ?>');">
                                             <?php echo htmlspecialchars($lang['button_delete_adapter'] ?? 'Delete'); ?>
                                         </button>
                                     </form>
@@ -111,7 +111,7 @@ declare(strict_types=1);
                                             <input type="text" value="<?php echo htmlspecialchars($form['game_key']); ?>" readonly>
                                         </label>
                                         <label>
-                                            <?php echo htmlspecialchars($lang['label_adapter_name'] ?? 'Adapter display name'); ?>
+                                            <?php echo htmlspecialchars($lang['label_adapter_name'] ?? 'Game display name'); ?>
                                             <input type="text" name="adapter[name]" value="<?php echo htmlspecialchars($form['name']); ?>" required>
                                         </label>
                                         <label>
@@ -143,7 +143,7 @@ declare(strict_types=1);
                                     </label>
 
                                     <div class="sw-form__actions">
-                                        <button class="btn primary" type="submit"><?php echo htmlspecialchars($lang['button_save_adapter'] ?? 'Save adapter'); ?></button>
+                                        <button class="btn primary" type="submit"><?php echo htmlspecialchars($lang['button_save_adapter'] ?? 'Save game configuration'); ?></button>
                                         <button type="button" class="btn js-toggle-adapter" data-target="<?php echo htmlspecialchars($formId); ?>"><?php echo htmlspecialchars($lang['button_cancel'] ?? 'Cancel'); ?></button>
                                     </div>
                                 </form>
@@ -159,12 +159,12 @@ declare(strict_types=1);
         <button class="btn primary" type="submit" form="sw-mapping-form"><?php echo htmlspecialchars($lang['button_save']); ?></button>
     </div>
 
-    <h3><?php echo htmlspecialchars($lang['admin_heading_adapters'] ?? 'Available adapters'); ?></h3>
+    <h3><?php echo htmlspecialchars($lang['admin_heading_adapters'] ?? 'Available game configurations'); ?></h3>
     <table class="table sw-mods__table">
         <thead>
             <tr>
                 <th><?php echo htmlspecialchars($lang['admin_col_key'] ?? 'Key'); ?></th>
-                <th><?php echo htmlspecialchars($lang['summary_adapter']); ?></th>
+                <th><?php echo htmlspecialchars($lang['summary_adapter'] ?? 'Game'); ?></th>
                 <th>Steam App ID</th>
                 <th><?php echo htmlspecialchars($lang['admin_col_mods_dir'] ?? 'Mods Dir'); ?></th>
                 <th><?php echo htmlspecialchars($lang['summary_hot_reload']); ?></th>
