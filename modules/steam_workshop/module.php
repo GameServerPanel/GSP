@@ -23,7 +23,7 @@
  */
 // Module general information
 $module_title = "Steam Workshop";
-$module_version = "2.1";
+$module_version = "2.2";
 $db_version = 1;
 $module_required = TRUE;
 $module_menus = array();
