@@ -304,30 +304,10 @@ function ogpHome()
 				
 		//NOTIFY DISCORD WHEN ADMIN LOGS IN
 		$trust_admins = array("iaregamer","dimrod","CJB","Bebiano","Syru");
-                if ($userInfo['users_role'] == "admin" && in_array($userInfo['users_login'], $trust_admins) == false) {
-                //WEBHOOK Discord======================================================================================= 
-                // Create new webhook in your Discord channel settings and copy&paste URL
-                //======================================================================================================= 
-		$webhookurl = "https://discord.com/api/webhooks/1087810639390576650/sspI3frko8FLD6ybvzG-_BXhG4wjH7yujFBxffgtTw34uAL_AdrDxY36C-khqs--cEMu";
-		//========================================================================================================
-               $msg = "Admin Login :warning: \nIP:".$client_ip." \nID:".$userInfo['user_id']."  \nUser:".$userInfo['users_login'];
-               $json_data = array ('content'=>"$msg");
-               $make_json = json_encode($json_data);
-			   if(!function_exists('curl_init')){
-				   error_log("OGP Discord webhook skipped: PHP curl extension is not loaded.");
-			   }else{
-				   $ch = curl_init( $webhookurl );
-				   curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-				   curl_setopt( $ch, CURLOPT_POST, 1);
-				   curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-				   curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-				   curl_setopt( $ch, CURLOPT_HEADER, 0);
-				   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-				   $response = curl_exec( $ch );
-				   curl_close($ch);
-			   }
-               //end WEBHOOK Discord
-                }
+		if ($userInfo['users_role'] == "admin" && !in_array($userInfo['users_login'], $trust_admins)) {
+			$msg = "Admin Login :warning: \nIP:".$client_ip." \nID:".$userInfo['user_id']."  \nUser:".$userInfo['users_login'];
+			discordmsg(array('content' => $msg), $settings['discord_webhook_admin'] ?? '');
+		}
 				
 				$_SESSION['user_id'] = $userInfo['user_id'];
 				$_SESSION['users_login'] = $userInfo['users_login'];

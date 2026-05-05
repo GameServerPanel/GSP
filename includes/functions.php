@@ -62,19 +62,26 @@ $msg = json_decode('
 ', true);
 */
 function discordmsg($msg, $webhook) {
-  if($webhook != "") {
-    $ch = curl_init($webhook);
-    $msg = "payload_json=" . urlencode(json_encode($msg))."";
-    
-    if(isset($ch)) {
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      $result = curl_exec($ch);
-      curl_close($ch);
-      return $result;
+    if (empty($webhook)) {
+        return false;
     }
-  }
+    if (!function_exists('curl_init')) {
+        error_log("GSP Discord webhook skipped: PHP curl extension is not loaded.");
+        return false;
+    }
+    $ch = curl_init($webhook);
+    if ($ch === false) {
+        return false;
+    }
+    $payload = "payload_json=" . urlencode(json_encode($msg));
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
 }
 
 
