@@ -516,10 +516,12 @@ function sw_user_render($db, $home_id, array $home, array $profile)
 <h3>Install / Update Mods</h3>
 <p>
   Clicking <strong>Queue Update</strong> marks all enabled mods as <em>queued</em>.
-  Then run the agent on the game server host to download and install the mods:
+  Then run the agent <strong>on the game server host</strong> (where SteamCMD and the game files are located)
+  to download and install the mods. Adjust the path to the panel's
+  <code>modules/steam_workshop/agent_update_workshop.php</code> for your server:
 </p>
 <pre style="background:#222;color:#eee;padding:10px 14px;border-radius:4px;overflow-x:auto;"
->php <?= sw_h(realpath(__DIR__)) ?>/agent_update_workshop.php --home-id=<?= $home_id ?></pre>
+>php /path/to/panel/modules/steam_workshop/agent_update_workshop.php --home-id=<?= $home_id ?></pre>
 
 <form method="post" action="<?= sw_h($base_url) ?>">
   <input type="hidden" name="action" value="queue_update">
