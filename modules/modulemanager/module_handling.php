@@ -207,6 +207,18 @@ function update_module($db, $module_id, $module)
 			{
 				foreach ((array)$install_queries[$i+1] as $query)
 				{
+					// Support PHP callables in addition to plain SQL strings.
+					// A callable receives $db as its only argument and must return
+					// true on success or false on failure.
+					if (is_callable($query))
+					{
+						if ( $query($db) )
+							continue;
+
+						print_failure("".get_lang("query_failed")." (callable migration step) ".get_lang("query_failed_2")."");
+						return -2;
+					}
+
 					if ( $db->query($query) )
 						continue;
 

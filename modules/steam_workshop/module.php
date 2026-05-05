@@ -124,31 +124,88 @@ $install_queries[0] = array(
 );
 
 // Migration: upgrade existing v1 installs to v2 schema.
+//
+// ADD COLUMN IF NOT EXISTS is not supported in MySQL 5.7 (MariaDB only).
+// Each column addition is therefore performed via a PHP closure that:
+//   1. Queries INFORMATION_SCHEMA.COLUMNS to check whether the column exists.
+//   2. Runs ALTER TABLE ADD COLUMN only when it does not exist.
+// This makes the migration safe to run multiple times without errors.
+// OGP_DB_PREFIX in SQL strings is replaced at runtime by the panel DB wrapper.
 $install_queries[2] = array(
-    // New columns on workshop_game_profiles
-    "ALTER TABLE `".OGP_DB_PREFIX."workshop_game_profiles`
-        ADD COLUMN IF NOT EXISTS `steam_app_id`         VARCHAR(32)  NOT NULL DEFAULT '' AFTER `game_name`,
-        ADD COLUMN IF NOT EXISTS `steam_login_required` TINYINT(1)   NOT NULL DEFAULT 0  AFTER `workshop_app_id`,
-        ADD COLUMN IF NOT EXISTS `steamcmd_login_mode`  ENUM('anonymous','account') NOT NULL DEFAULT 'anonymous' AFTER `steam_login_required`,
-        ADD COLUMN IF NOT EXISTS `steamcmd_path`        VARCHAR(512) NOT NULL DEFAULT '' AFTER `steamcmd_login_mode`,
-        ADD COLUMN IF NOT EXISTS `folder_naming_format` ENUM('@%mod_name%','@%workshop_id%','custom') NOT NULL DEFAULT '@%workshop_id%' AFTER `install_path_template`,
-        ADD COLUMN IF NOT EXISTS `mod_launch_param`     VARCHAR(512) NOT NULL DEFAULT '' AFTER `folder_name_template`,
-        ADD COLUMN IF NOT EXISTS `mod_separator`        ENUM('semicolon','comma','space') NOT NULL DEFAULT 'semicolon' AFTER `mod_launch_param`,
-        ADD COLUMN IF NOT EXISTS `copy_keys`            TINYINT(1)   NOT NULL DEFAULT 0  AFTER `copy_method`,
-        ADD COLUMN IF NOT EXISTS `key_source_path`      TEXT         NULL AFTER `copy_keys`,
-        ADD COLUMN IF NOT EXISTS `key_dest_path`        TEXT         NULL AFTER `key_source_path`,
-        ADD COLUMN IF NOT EXISTS `pre_update_script`    TEXT         NULL AFTER `key_dest_path`,
-        ADD COLUMN IF NOT EXISTS `post_update_script`   TEXT         NULL AFTER `install_script`,
-        ADD COLUMN IF NOT EXISTS `validation_notes`     TEXT         NULL AFTER `requires_restart`",
 
-    // Rename copy_method enum values to match new options (copy/rsync/symlink)
-    // (existing 'rsync' stays valid; 'robocopy'/'custom_script' are legacy)
+    // Add new columns to workshop_game_profiles one-by-one (MySQL 5.7 safe).
+    function($db) {
+        // 'OGP_DB_PREFIX' is the literal token that $db->query() / $db->resultQuery()
+        // replaces with the configured table prefix (e.g. 'gsp_') via str_replace at
+        // runtime.  Using it directly in string literals below is intentional and is
+        // the same mechanism used everywhere else in the panel.
+        $tbl_profiles = 'OGP_DB_PREFIXworkshop_game_profiles';
 
-    // New column on server_workshop_mods
-    "ALTER TABLE `".OGP_DB_PREFIX."server_workshop_mods`
-        ADD COLUMN IF NOT EXISTS `custom_folder` VARCHAR(255) NOT NULL DEFAULT '' AFTER `title`",
+        // column_name => column definition (no AFTER clause for portability)
+        // $col is always a value from this hardcoded array — not from user input.
+        $columns = array(
+            'steam_app_id'         => "VARCHAR(32)  NOT NULL DEFAULT ''",
+            'steam_login_required' => "TINYINT(1)   NOT NULL DEFAULT 0",
+            'steamcmd_login_mode'  => "ENUM('anonymous','account') NOT NULL DEFAULT 'anonymous'",
+            'steamcmd_path'        => "VARCHAR(512) NOT NULL DEFAULT ''",
+            'folder_naming_format' => "ENUM('@%mod_name%','@%workshop_id%','custom') NOT NULL DEFAULT '@%workshop_id%'",
+            'mod_launch_param'     => "VARCHAR(512) NOT NULL DEFAULT ''",
+            'mod_separator'        => "ENUM('semicolon','comma','space') NOT NULL DEFAULT 'semicolon'",
+            'copy_keys'            => "TINYINT(1)   NOT NULL DEFAULT 0",
+            'key_source_path'      => "TEXT         NULL",
+            'key_dest_path'        => "TEXT         NULL",
+            'pre_update_script'    => "TEXT         NULL",
+            'post_update_script'   => "TEXT         NULL",
+            'validation_notes'     => "TEXT         NULL",
+        );
+        foreach ($columns as $col => $def) {
+            // INFORMATION_SCHEMA.COLUMNS always returns one row for COUNT(*),
+            // so resultQuery returns an array (never FALSE for this query form).
+            // Escape $col when embedding it in the SQL string literal.
+            $safe_col = $db->realEscapeSingle($col);
+            $check = $db->resultQuery(
+                "SELECT COUNT(*) AS n
+                   FROM information_schema.COLUMNS
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME   = '" . $tbl_profiles . "'
+                    AND COLUMN_NAME  = '" . $safe_col . "'"
+            );
+            // If n > 0 the column already exists; skip it.
+            if ($check !== false && isset($check[0]['n']) && (int)$check[0]['n'] > 0) {
+                continue;
+            }
+            // $col is backtick-quoted so it is safe as an identifier.
+            if (!$db->query(
+                "ALTER TABLE `" . $tbl_profiles . "`
+                 ADD COLUMN `" . $col . "` " . $def
+            )) {
+                return false;
+            }
+        }
+        return true;
+    },
 
-    // New server-level settings table
+    // Add custom_folder to server_workshop_mods (MySQL 5.7 safe).
+    function($db) {
+        // See note above: 'OGP_DB_PREFIX' is replaced by str_replace at runtime.
+        $tbl_mods = 'OGP_DB_PREFIXserver_workshop_mods';
+        $check = $db->resultQuery(
+            "SELECT COUNT(*) AS n
+               FROM information_schema.COLUMNS
+              WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME   = '" . $tbl_mods . "'
+                AND COLUMN_NAME  = 'custom_folder'"
+        );
+        if ($check !== false && isset($check[0]['n']) && (int)$check[0]['n'] > 0) {
+            return true; // Column already exists.
+        }
+        return (bool)$db->query(
+            "ALTER TABLE `" . $tbl_mods . "`
+             ADD COLUMN `custom_folder` VARCHAR(255) NOT NULL DEFAULT ''"
+        );
+    },
+
+    // New server-level settings table (CREATE IF NOT EXISTS is safe to re-run).
     "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."server_workshop_settings` (
       `home_id`              INT          NOT NULL,
       `workshop_enabled`     TINYINT(1)   NOT NULL DEFAULT 0,
