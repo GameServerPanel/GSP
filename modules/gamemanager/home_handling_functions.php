@@ -496,12 +496,16 @@ function get_monitor_buttons($server_home, $server_xml)
  * provisioned).
  *
  * Color thresholds:
- *   green  – more than 10 days remaining  (shows actual date)
+ *   green  – more than 10 days remaining  (shows actual date, YYYY-MM-DD)
  *   yellow – 4–10 days remaining          (shows "X days remaining")
  *   red    – 1–3 days remaining           (shows "X days remaining")
  *   red    – less than 1 day but not yet expired  (shows "Less than 1 day remaining")
  *   red    – already expired/suspended    (shows "Suspended")
  *   red    – no order or NULL/invalid end_date (shows "No expiration date found")
+ *
+ * Expiration grace rule: a server whose end_date falls on today is treated as
+ * active for the full calendar day.  The server only shows "Suspended" once
+ * today's date is strictly after the expiration date (i.e. tomorrow onwards).
  *
  * @param int $home_id  The server home ID.
  * @return string       Safe HTML string ready for inline display.
@@ -551,17 +555,20 @@ function get_server_billing_expiration_html(int $home_id): string
 		return "<span style='color:red;'>No expiration date found</span>";
 	}
 
-	$now  = new DateTime();
-	$diff = $now->diff($end_dt);
+	// Compare dates only (strip time) so a server expiring on today's date is
+	// still shown as active for the full calendar day (grace rule).
+	$today_midnight = (new DateTime())->setTime(0, 0, 0);
+	$end_midnight   = (clone $end_dt)->setTime(0, 0, 0);
+	$diff = $today_midnight->diff($end_midnight);
 
-	if ($end_dt <= $now) {
-		// Server billing period has already passed — treat as suspended.
+	if ($end_midnight < $today_midnight) {
+		// Expiration date is before today — treat as suspended.
 		return "<span style='color:red;'>Suspended</span>";
 	}
 
-	// $diff->days is the total number of whole days between $now and $end_dt.
+	// $diff->days is the total number of whole days between today and end date.
 	$days_remaining = (int)$diff->days;
-	$display_date   = htmlentities($end_dt->format('Y-m-d H:i'), ENT_QUOTES, 'UTF-8');
+	$display_date   = htmlentities($end_dt->format('Y-m-d'), ENT_QUOTES, 'UTF-8');
 
 	if ($days_remaining > 10) {
 		// More than 10 days: show the actual expiration date in green.

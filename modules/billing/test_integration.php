@@ -98,12 +98,14 @@ function exec_ogp_module()
 	}
 	echo "</ul>";
 	
-	// Test 7: Sample paid order check
-	echo "<h3>7. Paid Orders Ready for Provisioning</h3>";
+	// Test 7: Active orders ready for provisioning
+	// Canonical status is 'Active'. Legacy rows may still use 'paid' until
+	// normalize_billing_order_status.sql has been run — include them here.
+	echo "<h3>7. Active Orders Ready for Provisioning</h3>";
 	if ($isAdmin) {
-		$paid_orders = $db->resultQuery("SELECT COUNT(*) as count FROM OGP_DB_PREFIXbilling_orders WHERE status='paid'");
+		$paid_orders = $db->resultQuery("SELECT COUNT(*) as count FROM OGP_DB_PREFIXbilling_orders WHERE status IN ('Active','paid')");
 	} else {
-		$paid_orders = $db->resultQuery("SELECT COUNT(*) as count FROM OGP_DB_PREFIXbilling_orders WHERE status='paid' AND user_id=".$db->realEscapeSingle($user_id));
+		$paid_orders = $db->resultQuery("SELECT COUNT(*) as count FROM OGP_DB_PREFIXbilling_orders WHERE status IN ('Active','paid') AND user_id=".$db->realEscapeSingle($user_id));
 	}
 	
 	if (!empty($paid_orders)) {

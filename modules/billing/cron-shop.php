@@ -215,7 +215,7 @@ $past_due = $db->resultQuery("
     WHERE sh.billing_enabled      = 1
       AND sh.billing_status       = 'Invoiced'
       AND sh.server_expiration_date IS NOT NULL
-      AND sh.server_expiration_date < DATE_SUB(NOW(), INTERVAL {$grace_days} DAY)
+      AND DATE(sh.server_expiration_date) < DATE_SUB(CURDATE(), INTERVAL {$grace_days} DAY)
       AND (
           sh.last_invoice_id IS NULL
           OR EXISTS (
@@ -284,7 +284,7 @@ $to_delete = $db->resultQuery("
     WHERE sh.billing_enabled       = 1
       AND sh.billing_status        = 'Expired'
       AND sh.server_expiration_date IS NOT NULL
-      AND sh.server_expiration_date < DATE_SUB(NOW(), INTERVAL {$delete_after_days} DAY)
+      AND DATE(sh.server_expiration_date) < DATE_SUB(CURDATE(), INTERVAL {$delete_after_days} DAY)
     ORDER BY sh.home_id ASC
 ");
 
