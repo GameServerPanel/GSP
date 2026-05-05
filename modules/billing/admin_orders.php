@@ -197,5 +197,45 @@ function exec_ogp_module()
 	
 	echo "</tbody></table>";
 	echo "</div>";
+
+	// Orphaned home_id diagnostics —————————————————————————————————————————
+	// Find billing_orders rows where home_id != 0 but no matching gsp_server_homes
+	// record exists. These indicate provisioning failures or stale data, and they
+	// are the reason the game monitor may show "No expiration date found".
+	$orphans = $db->resultQuery(
+		"SELECT o.order_id, o.user_id, o.home_name, o.home_id, o.status, o.end_date
+		   FROM OGP_DB_PREFIXbilling_orders o
+		   LEFT JOIN OGP_DB_PREFIXserver_homes sh ON sh.home_id = o.home_id
+		  WHERE o.home_id != '0'
+		    AND o.home_id != ''
+		    AND sh.home_id IS NULL
+		  ORDER BY o.order_id ASC"
+	);
+
+	echo "<div style='margin-top: 30px;'>";
+	echo "<h3>Orphaned home_id Diagnostics</h3>";
+	echo "<p style='color:#666;'>Billing orders that reference a <code>home_id</code> which no longer exists in <code>gsp_server_homes</code>. ";
+	echo "These orders will not show an expiration date on the game monitor. ";
+	echo "Reset <code>home_id</code> to <code>0</code> or re-provision these orders to fix them. ";
+	echo "Run <code>normalize_billing_order_status.sql</code> to standardize any legacy status values.</p>";
+
+	if (empty($orphans)) {
+		echo "<p style='color:green;'>&#10003; No orphaned billing orders found.</p>";
+	} else {
+		echo "<table class='tablesorter' style='width:100%;'>";
+		echo "<thead><tr><th>Order ID</th><th>User ID</th><th>Server Name</th><th>home_id (missing)</th><th>Status</th><th>End Date</th></tr></thead><tbody>";
+		foreach ($orphans as $row) {
+			echo "<tr>";
+			echo "<td>".intval($row['order_id'])."</td>";
+			echo "<td>".intval($row['user_id'])."</td>";
+			echo "<td>".htmlspecialchars($row['home_name'] ?? '')."</td>";
+			echo "<td style='color:red;'>".htmlspecialchars($row['home_id'] ?? '')."</td>";
+			echo "<td>".htmlspecialchars($row['status'] ?? '')."</td>";
+			echo "<td>".htmlspecialchars($row['end_date'] ?? 'NULL')."</td>";
+			echo "</tr>";
+		}
+		echo "</tbody></table>";
+	}
+	echo "</div>";
 }
 ?>

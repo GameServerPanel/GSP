@@ -5,7 +5,7 @@
  * Shared helper for recording admin-created game servers in the billing tables,
  * so they are treated identically to FREE website orders:
  *   billing_invoices (status='paid', amount=0)
- *   billing_orders   (status='installed', price=0)
+ *   billing_orders   (status='Active', price=0)
  *
  * This does NOT re-provision the server — the caller (add_home.php) already
  * created the server via the panel DB layer. We only write the billing ledger
@@ -113,7 +113,7 @@ if (!function_exists('admin_register_server_in_billing')) {
         }
 
         // ------------------------------------------------------------------ //
-        // 4. Insert billing_order (status='installed', already provisioned). //
+        // 4. Insert billing_order (status='Active', already provisioned).   //
         // ------------------------------------------------------------------ //
         $order_fields = array(
             'user_id'                  => intval($user_id),
@@ -128,7 +128,7 @@ if (!function_exists('admin_register_server_in_billing')) {
             'remote_control_password'  => '',
             'ftp_password'             => '',
             'home_id'                  => intval($home_id),
-            'status'                   => 'installed',
+            'status'                   => 'Active',
             'order_date'               => $now,
             'end_date'                 => $end_date,
             'payment_txid'             => 'admin-created',
