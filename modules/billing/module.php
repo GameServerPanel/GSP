@@ -25,7 +25,7 @@
 // Module general information
 $module_title = "billing";
 $module_version = "3.2";
-$db_version = 1;
+$db_version = 2;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -36,12 +36,14 @@ $module_menus = array();
 
 $install_queries = array();
 
-// Baseline schema — all billing tables with their final column set.
-// This is the single source of truth for fresh installs.
+// -----------------------------------------------------------------------
+// db_version 1 — Baseline schema for fresh installs.
 // All CREATE TABLE statements use IF NOT EXISTS so they are safe to re-run.
-// Existing installs at any previous db_version already have these tables and columns,
-// so no incremental ALTER chains are needed here.
-$install_queries[0] = array(
+// NOTE: The panel updater runs $install_queries[$i+1] when upgrading a
+//       module from db_version $i.  A module installed fresh at db_version 0
+//       therefore runs $install_queries[1], not $install_queries[0].
+// -----------------------------------------------------------------------
+$install_queries[1] = array(
     // Billing Services — available game server packages
     "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_services` (
         `service_id`       INT(11)          NOT NULL AUTO_INCREMENT,
@@ -78,6 +80,7 @@ $install_queries[0] = array(
         `invoice_duration`       VARCHAR(16)  NOT NULL DEFAULT 'month',
         `max_players`            INT(11)      NOT NULL DEFAULT 0,
         `price`                  FLOAT(15,2)  NOT NULL DEFAULT 0,
+        `discount_amount`        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
         `remote_control_password` VARCHAR(255) NULL,
         `ftp_password`           VARCHAR(255) NULL,
         `home_id`                VARCHAR(255) NOT NULL DEFAULT '0',
@@ -95,11 +98,13 @@ $install_queries[0] = array(
 
     // Billing Invoices — created on cart add, paid after payment capture.
     // home_id is 0 until the service is provisioned after payment.
+    // billing_status tracks the renewal lifecycle (Active / Invoiced / Expired)
+    // independently of payment_status which tracks the payment state.
     "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_invoices` (
         `invoice_id`             INT(11)          NOT NULL AUTO_INCREMENT,
         `order_id`               INT(11)          NOT NULL DEFAULT 0,
         `user_id`                INT(11)          NOT NULL,
-        `service_id`             INT(11)          NOT NULL,
+        `service_id`             INT(11)          NOT NULL DEFAULT 0, -- 0 = ad-hoc or admin-created invoice not linked to a catalogue service
         `home_id`                INT(11)          NOT NULL DEFAULT 0,
         `home_name`              VARCHAR(255)     NOT NULL DEFAULT '',
         `ip`                     INT(11)          NOT NULL DEFAULT 0,
@@ -109,8 +114,10 @@ $install_queries[0] = array(
         `customer_name`          VARCHAR(255)     NOT NULL DEFAULT '',
         `customer_email`         VARCHAR(255)     NOT NULL DEFAULT '',
         `amount`                 FLOAT(15,2)      NOT NULL DEFAULT 0,
+        `discount_amount`        DECIMAL(10,2)    NOT NULL DEFAULT 0.00,
         `currency`               VARCHAR(3)       NOT NULL DEFAULT 'USD',
         `status`                 VARCHAR(16)      NOT NULL DEFAULT 'due',
+        `billing_status`         VARCHAR(16)      NOT NULL DEFAULT 'due',
         `invoice_date`           DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `due_date`               DATETIME         NULL,
         `paid_date`              DATETIME         NULL,
@@ -127,12 +134,15 @@ $install_queries[0] = array(
         `total_due`              DECIMAL(15,2)    NOT NULL DEFAULT 0,
         `payment_status`         ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid',
         `qty`                    INT(11)          NOT NULL DEFAULT 1,
+        `coupon_id`              INT(11)          NOT NULL DEFAULT 0,
         PRIMARY KEY (`invoice_id`),
-        KEY `order_id`   (`order_id`),
-        KEY `user_id`    (`user_id`),
-        KEY `status`     (`status`),
-        KEY `due_date`   (`due_date`),
-        KEY `service_id` (`service_id`)
+        KEY `order_id`      (`order_id`),
+        KEY `user_id`       (`user_id`),
+        KEY `home_id`       (`home_id`),
+        KEY `status`        (`status`),
+        KEY `due_date`      (`due_date`),
+        KEY `service_id`    (`service_id`),
+        KEY `coupon_id`     (`coupon_id`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
 
     // Billing Transactions — immutable payment audit trail
@@ -157,8 +167,163 @@ $install_queries[0] = array(
         KEY `payment_method` (`payment_method`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;",
 
+    // Billing Coupons — discount codes
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_coupons` (
+        `coupon_id`         INT(11)                              NOT NULL AUTO_INCREMENT,
+        `code`              VARCHAR(50)                          NOT NULL,
+        `name`              VARCHAR(255)                         NOT NULL DEFAULT '',
+        `description`       TEXT                                 NULL,
+        `discount_percent`  DECIMAL(5,2)                         NOT NULL DEFAULT 0.00,
+        `usage_type`        ENUM('one_time','permanent')         NOT NULL DEFAULT 'one_time',
+        `game_filter_type`  ENUM('all_games','specific_games')   NOT NULL DEFAULT 'all_games',
+        `game_filter_list`  TEXT                                 NULL,
+        `max_uses`          INT(11)                              NULL,
+        `current_uses`      INT(11)                              NOT NULL DEFAULT 0,
+        `expires`           DATETIME                             NULL,
+        `created_date`      DATETIME                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `created_by`        INT(11)                              NULL,
+        `is_active`         TINYINT(1)                           NOT NULL DEFAULT 1,
+        PRIMARY KEY (`coupon_id`),
+        UNIQUE KEY `idx_code`            (`code`),
+        KEY `idx_active_expires`         (`is_active`,`expires`),
+        KEY `idx_created_by`             (`created_by`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
+
+    // Billing Config — global and per-game-key billing settings used by cron
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_config` (
+        `config_id`                 INT(11)                          NOT NULL AUTO_INCREMENT,
+        `game_key`                  VARCHAR(100)                     NULL DEFAULT NULL,
+        `enabled`                   TINYINT(1)                       NOT NULL DEFAULT 1,
+        `grace_days`                INT(11)                          NOT NULL DEFAULT 0,
+        `delete_after_expired_days` INT(11)                          NOT NULL DEFAULT 7,
+        `rate_type`                 ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly',
+        `price_per_player`          DECIMAL(10,4)                    NOT NULL DEFAULT 0.0000,
+        PRIMARY KEY (`config_id`),
+        KEY `game_key` (`game_key`),
+        KEY `enabled`  (`enabled`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
+
     // Drop legacy mapping table if it still exists from older installs
     "DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_service_remote_servers`"
+);
+
+// -----------------------------------------------------------------------
+// db_version 2 — Safe idempotent column migrations for existing installs.
+// Each callable checks whether the column already exists before running
+// ALTER TABLE, so this migration can be re-run without errors.
+// -----------------------------------------------------------------------
+$install_queries[2] = array(
+    // billing_orders: add discount_amount if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_orders` ADD `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER `price`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add home_id if missing (needed by cron-shop.php join)
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `home_id` INT(11) NOT NULL DEFAULT 0 AFTER `service_id`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add discount_amount if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER `amount`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add billing_status (lifecycle: Active/Invoiced/Expired) if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `billing_status` VARCHAR(16) NOT NULL DEFAULT 'due' AFTER `status`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add rate_type enum if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly' AFTER `invoice_duration`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add rate_per_player if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `rate_per_player` DECIMAL(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add players if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `players` INT(11) NOT NULL DEFAULT 0 AFTER `rate_per_player`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add subtotal if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `subtotal` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `players`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add total_due if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `total_due` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add payment_status enum if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `payment_status` ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid' AFTER `currency`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoices: add coupon_id if missing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `coupon_id` INT(11) NOT NULL DEFAULT 0 AFTER `qty`")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // Create billing_config table for cron-shop settings if missing
+    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXbilling_config` (
+        `config_id`                 INT(11)                          NOT NULL AUTO_INCREMENT,
+        `game_key`                  VARCHAR(100)                     NULL DEFAULT NULL,
+        `enabled`                   TINYINT(1)                       NOT NULL DEFAULT 1,
+        `grace_days`                INT(11)                          NOT NULL DEFAULT 0,
+        `delete_after_expired_days` INT(11)                          NOT NULL DEFAULT 7,
+        `rate_type`                 ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly',
+        `price_per_player`          DECIMAL(10,4)                    NOT NULL DEFAULT 0.0000,
+        PRIMARY KEY (`config_id`),
+        KEY `game_key` (`game_key`),
+        KEY `enabled`  (`enabled`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
+    // Create billing_coupons table if missing (older installs using panel.sql may not have it)
+    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXbilling_coupons` (
+        `coupon_id`         INT(11)                              NOT NULL AUTO_INCREMENT,
+        `code`              VARCHAR(50)                          NOT NULL,
+        `name`              VARCHAR(255)                         NOT NULL DEFAULT '',
+        `description`       TEXT                                 NULL,
+        `discount_percent`  DECIMAL(5,2)                         NOT NULL DEFAULT 0.00,
+        `usage_type`        ENUM('one_time','permanent')         NOT NULL DEFAULT 'one_time',
+        `game_filter_type`  ENUM('all_games','specific_games')   NOT NULL DEFAULT 'all_games',
+        `game_filter_list`  TEXT                                 NULL,
+        `max_uses`          INT(11)                              NULL,
+        `current_uses`      INT(11)                              NOT NULL DEFAULT 0,
+        `expires`           DATETIME                             NULL,
+        `created_date`      DATETIME                             NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `created_by`        INT(11)                              NULL,
+        `is_active`         TINYINT(1)                           NOT NULL DEFAULT 1,
+        PRIMARY KEY (`coupon_id`),
+        UNIQUE KEY `idx_code`       (`code`),
+        KEY `idx_active_expires`    (`is_active`,`expires`),
+        KEY `idx_created_by`        (`created_by`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;"
 );
 
 ?>

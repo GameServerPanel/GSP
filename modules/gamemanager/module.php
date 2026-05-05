@@ -25,7 +25,7 @@
 // Module general information
 $module_title = "Game manager";
 $module_version = "1.33";
-$db_version = 1;
+$db_version = 2;
 $module_required = TRUE;
 $module_menus = array( array( 'subpage' => 'game_monitor', 'name'=>'Game Monitor', 'group'=>'user' ) );
 $module_access_rights = array('u' => 'allow_updates', 'p' => 'allow_parameter_usage', 'e' => 'allow_extra_params', 'c' => 'allow_custom_fields');
@@ -86,5 +86,76 @@ $install_queries[0] = array(
         `port` char(6) NOT NULL,
         `server_status_cache` longtext NOT NULL
     ) ENGINE=MyISAM DEFAULT CHARSET=latin1;"
+);
+
+// -----------------------------------------------------------------------
+// db_version 2 — Add billing lifecycle columns to server_homes.
+// Each callable is idempotent: it checks whether the column already exists
+// and treats a "Duplicate column name" error as success (not a real failure).
+// -----------------------------------------------------------------------
+$install_queries[2] = array(
+    // billing_status: current lifecycle state (Active / Invoiced / Expired)
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_status` VARCHAR(16) NOT NULL DEFAULT 'Active'")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_enabled: whether this server participates in billing automation
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_enabled` TINYINT(1) NOT NULL DEFAULT 0")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // next_invoice_date: when cron-shop should generate the next renewal invoice
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `next_invoice_date` DATETIME NULL DEFAULT NULL")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // last_invoice_id: FK to billing_invoices.invoice_id (most recent renewal)
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `last_invoice_id` INT(11) NOT NULL DEFAULT 0")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_expires_at: canonical billing expiration date (DATETIME)
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_expires_at` DATETIME NULL DEFAULT NULL")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_price: price stored at provisioning time for renewals
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_price` DECIMAL(15,4) NOT NULL DEFAULT 0.0000")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_rate_type: 'daily' / 'monthly' / 'yearly'
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly'")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_players: slot count used to calculate per-player pricing
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_players` INT(11) NOT NULL DEFAULT 0")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
+    // billing_invoice_sent_at: timestamp of last renewal invoice email
+    function($db) {
+        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXserver_homes` ADD `billing_invoice_sent_at` DATETIME NULL DEFAULT NULL")) {
+            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
+        }
+        return true;
+    },
 );
 ?>

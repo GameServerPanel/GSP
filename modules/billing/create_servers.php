@@ -296,8 +296,9 @@ function exec_ogp_module()
 					  
 	//WEBHOOK Discord======================================================================================= 
                
-               $webhookurl = "https://discord.com/api/webhooks/710275918274363412/g5Tr-EUdEnLfFryOlscxJ6FuPiSJuE6EMKRYmh9UGMiqTUxU5-y9CQrBlDJW7znr0Tol";
-	       //$settings['webhookurl'];
+               $webhookurl = !empty($settings['webhookurl']) ? $settings['webhookurl'] : '';
+             
+               if (!empty($webhookurl)) {
 
              
                $msg = "A new server, ". $home_name ." ID #". $home_id . ", has just been created.";
@@ -314,6 +315,7 @@ function exec_ogp_module()
                //If you need to debug, or find out why you can't send message uncomment line below, and execute script.
                //echo $response;
                //end WEBHOOK Discord
+               }
 				}
 				// END EMAIL
 				
