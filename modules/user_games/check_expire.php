@@ -39,7 +39,7 @@ function exec_ogp_module()
 		}
 	}
 
-	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM OGP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date < " . $today_midnight . ";" );
+	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM OGP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date < " . $today_midnight . ";");
 	if($expired_users)
 	{
 		foreach ((array)$expired_users as $expired_user)

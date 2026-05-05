@@ -23,7 +23,7 @@ WHERE  `status` = 'installed';
 
 -- Map old 'paid' to 'Active'
 -- (Orders that were paid but not yet provisioned should be provisioned
---  via home.php?m=billing&p=provision_servers after this migration.)
+--  via the admin orders panel after this migration.)
 UPDATE `gsp_billing_orders`
 SET    `status` = 'Active'
 WHERE  `status` = 'paid';
