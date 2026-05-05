@@ -210,7 +210,7 @@ $status_config = [
     'paid' => ['label' => 'Paid Invoices', 'class' => 'paid'],
     'completed' => ['label' => 'Completed Invoices', 'class' => 'paid'],
     'in-cart' => ['label' => 'In Cart', 'class' => 'pending'],
-    'installed' => ['label' => 'Installed/Active', 'class' => 'paid'],
+    'installed' => ['label' => 'Active', 'class' => 'paid'],
     'expired' => ['label' => 'Expired Invoices', 'class' => 'expired'],
     'cancelled' => ['label' => 'Cancelled Invoices', 'class' => 'expired'],
 ];
@@ -338,7 +338,7 @@ $status_config = [
                     <div class="server-actions">
                         <?php
                         // Show Renew action for servers that can be renewed
-                        $renewable_statuses = array('paid','installed','invoiced','suspended');
+                        $renewable_statuses = array('active','invoiced','paid','installed','suspended');
                         if (!empty($server['status']) && in_array(strtolower($server['status']), $renewable_statuses)): ?>
                             <a href="renew_server.php?order_id=<?php echo intval($server['order_id']); ?>" class="gsw-btn renew-btn">Renew</a>
                         <?php endif; ?>
