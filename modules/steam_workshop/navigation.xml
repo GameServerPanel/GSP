@@ -1,5 +1,6 @@
 <navigation>
-  <page key="server_mods" file="main.php" access="admin" />
-  <page key="uninstall" file="uninstall.php" access="admin" />
-  <page key="workshop_admin" file="workshop_admin.php" access="admin" />
+  <!-- Admin: manage Steam Workshop game profiles -->
+  <page key="admin"     file="admin.php" access="admin" />
+  <!-- User: manage per-server mods -->
+  <page key="user_mods" file="user.php"  access="admin,user,subuser" />
 </navigation>
