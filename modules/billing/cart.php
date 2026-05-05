@@ -655,14 +655,18 @@ $siteBase = $protocol . $host;
             </div>
             <?php endif; ?>
 
-            <?php if ($final_amount > 0.00): ?>
             <script>
                 function setStatus(msg) {
                     const statusDiv = document.getElementById('status-message');
-                    statusDiv.textContent = msg;
-                    statusDiv.style.display = 'block';
+                    if (statusDiv) {
+                        statusDiv.textContent = msg;
+                        statusDiv.style.display = 'block';
+                    }
                 }
+            </script>
 
+            <?php if ($final_amount > 0.00): ?>
+            <script>
                 paypal.Buttons({
                     createOrder: function(data, actions) {
                         setStatus('Creating order...');
@@ -740,7 +744,7 @@ $siteBase = $protocol . $host;
                     // Remove invoice via AJAX and perform a partial reload of the cart container
                     function removeInvoice(invoiceId) {
                         if (!confirm('Remove this item from your cart?')) return;
-                        if (typeof setStatus === 'function') setStatus('Removing item...');
+                        setStatus('Removing item...');
 
                         var body = 'remove_invoice_ajax=1&invoice_id=' + encodeURIComponent(invoiceId);
 

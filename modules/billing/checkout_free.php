@@ -32,22 +32,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // DB connection
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
-    die('Database connection failed: ' . htmlspecialchars(mysqli_connect_error()));
+    die('<p>Database connection failed. Please <a href="/order.php">return to the shop</a> or contact support.</p>');
 }
 mysqli_set_charset($db, 'utf8mb4');
 
-// Fetch unpaid invoices for this user
+// Fetch unpaid invoices for this user (prepared statement)
 $invoices = [];
-$q = mysqli_query($db, "SELECT * FROM {$table_prefix}billing_invoices
-                        WHERE user_id = " . intval($userId) . "
-                          AND (status = 'due' OR status = '')
-                          AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded'))
-                        ORDER BY invoice_id ASC");
-if ($q) {
-    while ($row = mysqli_fetch_assoc($q)) {
+$stmt = mysqli_prepare($db, "SELECT * FROM {$table_prefix}billing_invoices
+                             WHERE user_id = ?
+                               AND (status = 'due' OR status = '')
+                               AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded'))
+                             ORDER BY invoice_id ASC");
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, 'i', $userId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    while ($row = mysqli_fetch_assoc($result)) {
         $invoices[] = $row;
     }
-    mysqli_free_result($q);
+    mysqli_stmt_close($stmt);
 }
 
 if (empty($invoices)) {
