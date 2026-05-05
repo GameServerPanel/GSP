@@ -4,8 +4,8 @@
  *
  * Shared helper for recording admin-created game servers in the billing tables,
  * so they are treated identically to FREE website orders:
- *   billing_invoices (status='paid', amount=0)
- *   billing_orders   (status='Active', price=0)
+ *   billing_invoices (status='paid', amount=0)   — invoice payment status (paid/unpaid/due)
+ *   billing_orders   (status='Active', price=0)  — order lifecycle status (Active/Invoiced/Expired)
  *
  * This does NOT re-provision the server — the caller (add_home.php) already
  * created the server via the panel DB layer. We only write the billing ledger
@@ -80,7 +80,11 @@ if (!function_exists('admin_register_server_in_billing')) {
         $ftp_flag  = $ftp ? 'enabled' : 'disabled';
 
         // ------------------------------------------------------------------ //
-        // 3. Insert billing_invoice (amount=0, already "paid").              //
+        // 3. Insert billing_invoice (amount=0, payment_status='paid').       //
+        //    Note: billing_invoices.status is the invoice payment lifecycle  //
+        //    ('paid'/'unpaid'/'due') — distinct from billing_orders.status   //
+        //    which uses the three-value order lifecycle (Active/Invoiced/    //
+        //    Expired).                                                        //
         // ------------------------------------------------------------------ //
         $invoice_fields = array(
             'order_id'                 => 0,

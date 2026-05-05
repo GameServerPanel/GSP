@@ -25,7 +25,11 @@
 function exec_ogp_module()
 {
 	global $db;
-	$expired_servers = $db->resultQuery("SELECT home_name, home_id, server_expiration_date FROM OGP_DB_PREFIXserver_homes WHERE server_expiration_date NOT LIKE 'X' AND server_expiration_date <= ".time().";");
+	// Use strtotime(date('Y-m-d')) (midnight of today) so a server whose
+	// expiration falls on today is still considered active for the full
+	// calendar day.  Only timestamps strictly before today midnight are expired.
+	$today_midnight = strtotime(date('Y-m-d'));
+	$expired_servers = $db->resultQuery("SELECT home_name, home_id, server_expiration_date FROM OGP_DB_PREFIXserver_homes WHERE server_expiration_date NOT LIKE 'X' AND server_expiration_date < " . $today_midnight . ";");
 	if($expired_servers)
 	{
 		foreach ((array)$expired_servers as $expired_server)
@@ -35,7 +39,7 @@ function exec_ogp_module()
 		}
 	}
 
-	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM OGP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date <= ".time().";");
+	$expired_users	 = $db->resultQuery("SELECT user_id, home_id, user_expiration_date FROM OGP_DB_PREFIXuser_homes WHERE user_expiration_date NOT LIKE 'X' AND user_expiration_date < " . $today_midnight . ";" );
 	if($expired_users)
 	{
 		foreach ((array)$expired_users as $expired_user)
@@ -50,7 +54,7 @@ function exec_ogp_module()
 										 INNER JOIN
 										 OGP_DB_PREFIXuser_groups ug
 										 ON ug.group_id=g.group_id
-										 WHERE g.user_group_expiration_date NOT LIKE 'X' AND g.user_group_expiration_date <= ".time()." GROUP BY g.home_id;");
+										 WHERE g.user_group_expiration_date NOT LIKE 'X' AND g.user_group_expiration_date < " . $today_midnight . " GROUP BY g.home_id;");
 	if($expired_groups)
 	{
 		foreach ((array)$expired_groups as $expired_group)

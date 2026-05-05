@@ -1,6 +1,11 @@
 # Changelog
 
-## 2026-05-03 (latest)
+## 2026-05-05
+- **Billing order status standardization:** Canonical `billing_orders.status` values are now `Active`, `Invoiced`, and `Expired` only.  All old writes of `installed`, `paid` (as order status), and `suspended` have been replaced.  A SQL migration script `modules/billing/sql/normalize_billing_order_status.sql` converts any existing legacy rows.  Backward-compatibility read paths (e.g. renewable-status checks in `my_account.php`) are preserved until the migration runs.
+- **Expiration display date-only:** The billing expiration shown on the game server monitor (`server_monitor.php`) now displays as `YYYY-MM-DD` only instead of `YYYY-MM-DD HH:MM`.
+- **Full-day expiration grace rule:** A server whose `end_date` falls on today is treated as active for the entire calendar day.  Expiration is only processed starting the next calendar day.  This rule is applied consistently in: billing cron (`cron-shop.php` Steps B and C), the server monitor expiration helper (`home_handling_functions.php::get_server_billing_expiration_html`), and the OGP user/group assignment expiration processor (`user_games/check_expire.php`).  All comparisons now use `DATE(end_date) < CURDATE()` (SQL) or `< strtotime(date('Y-m-d'))` (PHP) — never `<= NOW()` or `<= time()`.
+
+
 - **GSP 1.0 baseline:** Reset all bundled/core module versions to `1.0`. DB schema versions (`$db_version`) are unchanged.
 - **FAQ module refresh:** Restored online RSS update code from upstream (opengamepanel.org), fixed `$local = false` initialization bug, switched local cache to `ogpfaq.rss`, added PHP 8.3-compatible `(array)` casts, restored upstream credits footer, and opened `navigation.xml` access to `user,admin,subuser`.
 - **Config XML editor improvements:** Added schema validation before save (both structured editor and raw XML path); invalid XML is rejected with line-level error messages instead of being written to disk. Added auto-restore from backup on validation failure. Fields are now displayed in schema-defined order with required/optional badges. Added a raw XML editing panel with validation warning. Unknown/custom XML fields are preserved when only specific nodes are modified.
