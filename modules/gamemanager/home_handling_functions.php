@@ -491,7 +491,14 @@ function get_monitor_buttons($server_home, $server_xml)
  * Returns an HTML-formatted expiration label for the given server home_id.
  *
  * Source of truth: billing_orders.end_date (DATETIME, NULL means no date set).
- * The most recent billing order for the home is used (ORDER BY end_date DESC LIMIT 1).
+ * The most recent active billing order for the home is resolved via a LEFT JOIN
+ * from server_homes to billing_orders — the same relationship used by the billing
+ * cron (cron-shop.php) and order-provisioning logic (create_servers.php).
+ *
+ * billing_orders.home_id is VARCHAR(255); server_homes.home_id is INT.
+ * MySQL handles the implicit cast in the JOIN condition automatically.
+ * Only rows where home_id != '0' are considered (home_id = '0' means not yet
+ * provisioned).
  *
  * Color thresholds:
  *   green  – more than 10 days remaining  (shows actual date)
@@ -508,18 +515,34 @@ function get_server_billing_expiration_html(int $home_id): string
 {
 	global $db;
 
-	// Query billing_orders for the most recent end_date on an active order for this home.
-	// Statuses 'Active' and 'Invoiced' represent live subscriptions (invoiced = awaiting renewal).
-	// OGP_DB_PREFIX is replaced at runtime by the panel's DB wrapper.
+	// Use a LEFT JOIN from server_homes to billing_orders — the same join pattern
+	// used throughout the billing module (cron-shop.php, create_servers.php).
+	// billing_orders.home_id is VARCHAR; server_homes.home_id is INT.  MySQL
+	// performs the implicit cast for the equality comparison.
+	// We exclude billing_orders rows where home_id = '0' (not yet provisioned).
+	// OGP_DB_PREFIX is replaced at runtime by the panel DB wrapper (str_replace).
 	$rows = $db->resultQuery(
-		"SELECT end_date FROM OGP_DB_PREFIXbilling_orders
-		 WHERE home_id = " . intval($home_id) . "
-		   AND status IN ('Active','Invoiced')
-		 ORDER BY end_date DESC
-		 LIMIT 1"
+		"SELECT bo.end_date
+		   FROM OGP_DB_PREFIXserver_homes sh
+		   LEFT JOIN OGP_DB_PREFIXbilling_orders bo
+		          ON bo.home_id = sh.home_id
+		         AND bo.home_id != '0'
+		         AND bo.status IN ('Active','Invoiced')
+		  WHERE sh.home_id = " . intval($home_id) . "
+		  ORDER BY bo.end_date DESC
+		  LIMIT 1"
 	);
 
-	if (empty($rows) || empty($rows[0]['end_date'])) {
+	// If the server_homes row itself does not exist, or the query failed, bail out.
+	// empty($rows) is true when resultQuery returns FALSE (0 rows or error).
+	if ($rows === false) {
+		// Query error — billing_orders table may be missing or schema mismatch.
+		return "<span style='color:red;'>No expiration date found</span>";
+	}
+
+	// A LEFT JOIN row always comes back (sh row exists), but bo.end_date may be NULL
+	// when there is no matching billing_orders record for this server.
+	if (empty($rows[0]['end_date'])) {
 		return "<span style='color:red;'>No expiration date found</span>";
 	}
 
