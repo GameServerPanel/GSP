@@ -217,7 +217,7 @@ function exec_ogp_module()
 	echo "<p style='color:#666;'>Billing orders that reference a <code>home_id</code> which no longer exists in <code>gsp_server_homes</code>. ";
 	echo "These orders will not show an expiration date on the game monitor. ";
 	echo "Reset <code>home_id</code> to <code>0</code> or re-provision these orders to fix them. ";
-	echo "Run <code>normalize_billing_order_status.sql</code> to standardise any legacy status values.</p>";
+	echo "Run <code>normalize_billing_order_status.sql</code> to standardize any legacy status values.</p>";
 
 	if (empty($orphans)) {
 		echo "<p style='color:green;'>&#10003; No orphaned billing orders found.</p>";

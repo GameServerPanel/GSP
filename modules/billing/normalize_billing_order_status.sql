@@ -1,6 +1,6 @@
 -- normalize_billing_order_status.sql
 --
--- One-time migration: standardise gsp_billing_orders.status to the canonical
+-- One-time migration: standardize gsp_billing_orders.status to the canonical
 -- three-value set used by cron-shop.php, create_servers.php, and the game
 -- monitor expiration lookup:
 --

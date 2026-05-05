@@ -338,6 +338,9 @@ $status_config = [
                     <div class="server-actions">
                         <?php
                         // Show Renew action for servers that can be renewed
+                        // Status comparison is case-insensitive (strtolower). Canonical
+                        // values are 'Active' and 'Invoiced'; legacy values are included
+                        // as a fallback until normalize_billing_order_status.sql has run.
                         $renewable_statuses = array('active','invoiced','paid','installed','suspended');
                         if (!empty($server['status']) && in_array(strtolower($server['status']), $renewable_statuses)): ?>
                             <a href="renew_server.php?order_id=<?php echo intval($server['order_id']); ?>" class="gsw-btn renew-btn">Renew</a>
