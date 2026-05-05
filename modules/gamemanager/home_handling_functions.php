@@ -486,4 +486,74 @@ function get_monitor_buttons($server_home, $server_xml)
 	}
 	return $buttons_html;
 }
+
+/**
+ * Returns an HTML-formatted expiration label for the given server home_id.
+ *
+ * Source of truth: billing_orders.end_date (DATETIME, NULL means no date set).
+ * The most recent billing order for the home is used (ORDER BY end_date DESC LIMIT 1).
+ *
+ * Color thresholds:
+ *   green  – more than 10 days remaining  (shows actual date)
+ *   yellow – 4–10 days remaining          (shows "X days remaining")
+ *   red    – 1–3 days remaining           (shows "X days remaining")
+ *   red    – less than 1 day but not yet expired  (shows "Less than 1 day remaining")
+ *   red    – already expired/suspended    (shows "Suspended")
+ *   red    – no order or NULL/invalid end_date (shows "No expiration date found")
+ *
+ * @param int $home_id  The server home ID.
+ * @return string       Safe HTML string ready for inline display.
+ */
+function get_server_billing_expiration_html(int $home_id): string
+{
+	global $db;
+
+	// Query billing_orders for the most recent end_date on an active order for this home.
+	// Statuses 'Active' and 'Invoiced' represent live subscriptions (invoiced = awaiting renewal).
+	// OGP_DB_PREFIX is replaced at runtime by the panel's DB wrapper.
+	$rows = $db->resultQuery(
+		"SELECT end_date FROM OGP_DB_PREFIXbilling_orders
+		 WHERE home_id = " . intval($home_id) . "
+		   AND status IN ('Active','Invoiced')
+		 ORDER BY end_date DESC
+		 LIMIT 1"
+	);
+
+	if (empty($rows) || empty($rows[0]['end_date'])) {
+		return "<span style='color:red;'>No expiration date found</span>";
+	}
+
+	// Parse end_date using DateTime for PHP 8.3+ compatibility.
+	try {
+		$end_dt = new DateTime($rows[0]['end_date']);
+	} catch (\Exception $e) {
+		return "<span style='color:red;'>No expiration date found</span>";
+	}
+
+	$now  = new DateTime();
+	$diff = $now->diff($end_dt);
+
+	if ($end_dt <= $now) {
+		// Server billing period has already passed — treat as suspended.
+		return "<span style='color:red;'>Suspended</span>";
+	}
+
+	// $diff->days is the total number of whole days between $now and $end_dt.
+	$days_remaining = (int)$diff->days;
+	$display_date   = htmlentities($end_dt->format('Y-m-d H:i'), ENT_QUOTES, 'UTF-8');
+
+	if ($days_remaining > 10) {
+		// More than 10 days: show the actual expiration date in green.
+		return "<span style='color:green;'>" . $display_date . "</span>";
+	} elseif ($days_remaining >= 4) {
+		// 4–10 days: yellow warning (darkgoldenrod for WCAG contrast).
+		return "<span style='color:#B8860B;'>" . htmlentities($days_remaining, ENT_QUOTES, 'UTF-8') . " days remaining</span>";
+	} elseif ($days_remaining >= 1) {
+		// 1–3 days: urgent red warning.
+		return "<span style='color:red;'>" . htmlentities($days_remaining, ENT_QUOTES, 'UTF-8') . " days remaining</span>";
+	} else {
+		// Less than one full day but not yet expired.
+		return "<span style='color:red;'>Less than 1 day remaining</span>";
+	}
+}
 ?>

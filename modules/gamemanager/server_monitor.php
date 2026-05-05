@@ -351,9 +351,10 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 				
 
 
-			//set the display of how long server has until expired
-			//default is it never expires 
-			$expiration_dates = "This Server Will NEVER Expire";
+			// Look up the billing expiration for this server from billing_orders.end_date.
+			// See get_server_billing_expiration_html() in home_handling_functions.php for
+			// color thresholds: green >10 days, yellow 4-10 days, red 1-3 days or expired.
+			$expiration_dates = get_server_billing_expiration_html((int)$server_home['home_id']);
                          
 			
 			if( !isset($server_home['mod_id']) )
