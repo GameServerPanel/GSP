@@ -104,7 +104,7 @@ $install_queries[1] = array(
         `invoice_id`             INT(11)          NOT NULL AUTO_INCREMENT,
         `order_id`               INT(11)          NOT NULL DEFAULT 0,
         `user_id`                INT(11)          NOT NULL,
-        `service_id`             INT(11)          NOT NULL DEFAULT 0,
+        `service_id`             INT(11)          NOT NULL DEFAULT 0, -- 0 = ad-hoc or admin-created invoice not linked to a catalogue service
         `home_id`                INT(11)          NOT NULL DEFAULT 0,
         `home_name`              VARCHAR(255)     NOT NULL DEFAULT '',
         `ip`                     INT(11)          NOT NULL DEFAULT 0,
