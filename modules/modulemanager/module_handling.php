@@ -205,6 +205,12 @@ function update_module($db, $module_id, $module)
 		{
 			if(isset($install_queries))
 			{
+				if (!array_key_exists($i+1, $install_queries))
+				{
+					trigger_error("Module '" . preg_replace('/[^a-zA-Z0-9_\-]/', '', $module) . "': no migration queries defined for db_version step " . ($i+1) . " – skipping.", E_USER_NOTICE);
+					++$i;
+					continue;
+				}
 				foreach ((array)$install_queries[$i+1] as $query)
 				{
 					// Support PHP callables in addition to plain SQL strings.

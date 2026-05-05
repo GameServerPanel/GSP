@@ -3,7 +3,7 @@
  * GSP – Steam Workshop: User mod management
  * Copyright (C) 2025 WDS / GameServerPanel
  *
- * Accessible via: home.php?m=steam_workshop&p=user_mods&home_id=123
+ * Accessible via: home.php?m=steam_workshop&p=user&home_id=123
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -307,7 +307,7 @@ function sw_user_render($db, $home_id, array $home, array $profile)
     });
     $params = sw_generate_launch_params(array_values($enabled_mods), $profile);
 
-    $base_url = 'home.php?m=steam_workshop&p=user_mods&home_id=' . $home_id;
+    $base_url = 'home.php?m=steam_workshop&p=user&home_id=' . $home_id;
     ?>
 
 <p>
