@@ -147,24 +147,8 @@ function exec_ogp_module()
       $db->logger( "Email FAILED - Server Renewed " . $home_id);
 // END EMAIL
 
-  //WEBHOOK Discord======================================================================================= 
-               
-    
-               $webhookurl = $settings['webhookurl'];
-             
-               $msg = "The ". $home_name ." server ID #". $home_id . " has just been renewed.";
-               $json_data = array ('content'=>"$msg");
-               $make_json = json_encode($json_data);
-               $ch = curl_init( $webhookurl );
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-               curl_setopt( $ch, CURLOPT_POST, 1);
-               curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-               curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-               curl_setopt( $ch, CURLOPT_HEADER, 0);
-               curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-               $response = curl_exec( $ch );
-               //If you need to debug, or find out why you can't send message uncomment line below, and execute script.
-               //echo $response;
+  //WEBHOOK Discord
+               discordmsg(array('content' => "The ". $home_name ." server ID #". $home_id . " has just been renewed."), $settings['discord_webhook_main'] ?? '');
                //end WEBHOOK Discord
 
 			}
@@ -294,28 +278,9 @@ function exec_ogp_module()
 						  $db->logger( "Email FAILED - Server Created " . $home_id);
 
 					  
-	//WEBHOOK Discord======================================================================================= 
-               
-               $webhookurl = !empty($settings['webhookurl']) ? $settings['webhookurl'] : '';
-             
-               if (!empty($webhookurl)) {
-
-             
-               $msg = "A new server, ". $home_name ." ID #". $home_id . ", has just been created.";
-               $json_data = array ('content'=>"$msg");
-               $make_json = json_encode($json_data);
-               $ch = curl_init( $webhookurl );
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-               curl_setopt( $ch, CURLOPT_POST, 1);
-               curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-               curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-               curl_setopt( $ch, CURLOPT_HEADER, 0);
-               curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-               $response = curl_exec( $ch );
-               //If you need to debug, or find out why you can't send message uncomment line below, and execute script.
-               //echo $response;
+	//WEBHOOK Discord
+               discordmsg(array('content' => "A new server, ". $home_name ." ID #". $home_id . ", has just been created."), $settings['discord_webhook_main'] ?? '');
                //end WEBHOOK Discord
-               }
 				}
 				// END EMAIL
 				

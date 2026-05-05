@@ -9,7 +9,7 @@ require 'include/functions.php';
 
 function exec_ogp_module()
 {
-    global $db, $view;
+    global $db, $view, $settings;
 
     $ticket = new Ticket($db);
     $TicketSettings = new TicketSettings($db);
@@ -94,25 +94,10 @@ function exec_ogp_module()
 
 
 
-  //WEBHOOK Discord=======================================================================================
-
-                $webhook = "https://discord.com/api/webhooks/1087807080657854484/yYtW8q63xKj3rTFYrNfW2LJk_GeC_WtuI8eJOyELxWbqTQ-uMzOO2I9qofoJCoHXFhC1";
-		//$webhook = "https://discord.com/api/webhooks/710275918274363412/g5Tr-EUdEnLfFryOlscxJ6FuPiSJuE6EMKRYmh9UGMiqTUxU5-y9CQrBlDJW7znr0Tol";
-
-               $msg = "Server support ticket created:\n"."ServerID: " .$_POST['ticket_service'] ."\n". "Subject: " .$_POST['ticket_subject'];
-               $json_data = array ('content'=>"$msg");
-               $make_json = json_encode($json_data);
-               $ch = curl_init( $webhook );
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
-               curl_setopt( $ch, CURLOPT_POST, 1);
-               curl_setopt( $ch, CURLOPT_POSTFIELDS, $make_json);
-               curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-               curl_setopt( $ch, CURLOPT_HEADER, 0);
-               curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-               $response = curl_exec( $ch );
-               //If you need to debug, or find out why you can't send message uncomment line below, and execute script.
-               //echo $response;
-               //end WEBHOOK Discord
+  //TICKET SUBMITTED, POST ON DISCORD
+                $msg = "Server support ticket created:\n"."ServerID: " .$_POST['ticket_service'] ."\n". "Subject: " .$_POST['ticket_subject'];
+                discordmsg(array('content' => $msg), $settings['discord_webhook_main'] ?? '');
+                //end discord
 
 
 

@@ -24,57 +24,34 @@
  
 #functions go here
 
-//discordmsg() posts a message to webhook 
-//can post form data. Minium is username and content
-/*
-$msg = json_decode('
-{
-    "username":"BOTNAME",
-    "content":"The message the BOTNAME posts.",
-    "embeds": [{
-        "title":"The Link Title",
-        "description":"The Link Description",
-        "url":"https://www.thelinkurl.com/",
-        "color":DECIMALCOLORCODE,
-        "author":{
-            "name":"Site Name",
-            "url":"https://www.sitelink.com/",
-            "icon_url":"URLTOIMG"
-        },
-        "fields":[
-            {
-                "name":"LISTITEM1",
-                "value":"LISTVALUE1",
-                "inline":true
-            },
-            {
-                "name":"LISTITEM2",
-                "value":"LISTVALUE2",
-                "inline":true
-            },
-            {
-                "name":"LISTITEM3",
-                "value":"LISTVALUE3",
-                "inline":true
-            }]
-    }]
-}
-', true);
-*/
+//discordmsg() posts a message to a Discord webhook.
+// $msg  - associative array (e.g. ['content' => '...']) to send as payload_json.
+// $webhook - Discord webhook URL; no-op (returns false) when empty.
+// Returns the response string on success, or false on failure / skipped.
 function discordmsg($msg, $webhook) {
-  if($webhook != "") {
-    $ch = curl_init($webhook);
-    $msg = "payload_json=" . urlencode(json_encode($msg))."";
-    
-    if(isset($ch)) {
-      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-      curl_setopt($ch, CURLOPT_POSTFIELDS, $msg);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-      $result = curl_exec($ch);
-      curl_close($ch);
-      return $result;
+    if (empty($webhook)) {
+        return false;
     }
-  }
+    if (!function_exists('curl_init')) {
+        error_log("GSP Discord webhook skipped: PHP curl extension is not loaded.");
+        return false;
+    }
+    $ch = curl_init($webhook);
+    if ($ch === false) {
+        return false;
+    }
+    $payload = "payload_json=" . urlencode(json_encode($msg));
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+    $result = curl_exec($ch);
+    if ($result === false) {
+        error_log("GSP Discord webhook error: " . curl_error($ch));
+    }
+    curl_close($ch);
+    return $result;
 }
 
 
