@@ -28,7 +28,7 @@ $total_paid = 0;
 
 if ($db && $user_id > 0) {
     // Get recent orders for this user (just paid)
-    $query = "SELECT o.*, s.game_name 
+    $query = "SELECT o.*, s.service_name 
               FROM {$table_prefix}billing_orders o
               LEFT JOIN {$table_prefix}billing_services s ON o.service_id = s.service_id
               WHERE o.user_id = $user_id 
@@ -200,7 +200,7 @@ if ($db && $user_id > 0) {
                 <tr>
                     <td>#<?php echo htmlspecialchars($order['order_id']); ?></td>
                     <td><?php echo htmlspecialchars($order['home_name']); ?></td>
-                    <td><?php echo htmlspecialchars($order['game_name'] ?? 'Game Server'); ?></td>
+                    <td><?php echo htmlspecialchars($order['service_name'] ?? 'Game Server'); ?></td>
                     <td><?php echo htmlspecialchars($order['qty']); ?>x <?php echo htmlspecialchars($order['invoice_duration']); ?></td>
                     <td><span class="status-badge">PAID</span></td>
                     <td style="text-align: right; font-weight: 600; color: #28a745;">

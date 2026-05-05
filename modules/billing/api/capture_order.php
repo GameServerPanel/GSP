@@ -120,25 +120,67 @@ foreach ($invoices as $inv) {
     $homeId    = intval($inv['home_id'] ?? 0);
 
     $result = $svc->processPaymentSuccess($capture, $invoiceId, $userId, $homeId, $inv);
-    if ($result['success']) {
-        $invoicesPaid++;
-        cap_log('INVOICE_PAID', ['invoice_id' => $invoiceId, 'txid' => $txid]);
+    if (!$result['success']) {
+        cap_log('INVOICE_PAY_FAILED', ['invoice_id' => $invoiceId, 'error' => $result['error'] ?? '']);
+        continue;
     }
 
-    // Handle legacy billing_orders linkage (backward compatibility)
+    $invoicesPaid++;
+    cap_log('INVOICE_PAID', ['invoice_id' => $invoiceId, 'txid' => $txid]);
+
+    // Resolve (or create) the billing_orders row for this invoice so the provisioner can run.
+    // billing_orders.status='Active' is what create_servers.php queries.
     $orderId = intval($inv['order_id'] ?? 0);
+
+    $durMap = [
+        'daily'   => '+1 day',  'monthly' => '+1 month', 'yearly' => '+1 year',
+        'day'     => '+1 day',  'month'   => '+1 month', 'year'   => '+1 year',
+    ];
+    $dur    = strtolower($inv['rate_type'] ?? $inv['invoice_duration'] ?? 'month');
+    $newEnd = date('Y-m-d H:i:s', strtotime($durMap[$dur] ?? '+1 month'));
+
     if ($orderId > 0) {
+        // Existing order linked to this invoice — extend it and mark Active.
         $order = $repo->getOrder($orderId);
         if ($order) {
-            $dur    = strtolower($inv['rate_type'] ?? $order['invoice_duration'] ?? 'month');
-            $durMap = [
-                'daily'   => '+1 day',  'monthly' => '+1 month', 'yearly' => '+1 year',
-                'day'     => '+1 day',  'month'   => '+1 month', 'year'   => '+1 year',
-            ];
             $fromTs = (strtotime($order['end_date'] ?? '') > time()) ? strtotime($order['end_date']) : time();
             $newEnd = date('Y-m-d H:i:s', strtotime($durMap[$dur] ?? '+1 month', $fromTs));
             $repo->extendOrder($orderId, $newEnd, $txid, $now);
             $ordersCreated++;
+            // Queue for provisioning only if not yet provisioned (home_id still '0' / empty).
+            $currentHomeId = (string)($order['home_id'] ?? '0');
+            if ($currentHomeId === '' || $currentHomeId === '0') {
+                $newOrderIds[] = $orderId;
+                cap_log('ORDER_QUEUED_PROVISION', ['order_id' => $orderId]);
+            }
+        }
+    } else {
+        // No billing_orders row yet — create one now so the provisioner can run.
+        $newOrderId = $repo->createOrder([
+            'user_id'                 => intval($inv['user_id']),
+            'service_id'              => intval($inv['service_id']),
+            'home_name'               => $inv['home_name'] ?? '',
+            'ip'                      => (string)($inv['ip'] ?? '0'),
+            'qty'                     => intval($inv['qty'] ?? 1),
+            'invoice_duration'        => $inv['invoice_duration'] ?? 'month',
+            'max_players'             => intval($inv['max_players'] ?? 0),
+            'price'                   => (float)($inv['amount'] ?? $inv['total_due'] ?? 0),
+            'remote_control_password' => $inv['remote_control_password'] ?? '',
+            'ftp_password'            => $inv['ftp_password'] ?? '',
+            'status'                  => 'Active',
+            'end_date'                => $newEnd,
+            'payment_txid'            => $txid,
+            'paid_ts'                 => $now,
+            'coupon_id'               => intval($inv['coupon_id'] ?? 0),
+        ]);
+        if ($newOrderId > 0) {
+            // Link invoice → order so retried captures are idempotent.
+            $repo->updateInvoiceOrderId($invoiceId, $newOrderId);
+            $newOrderIds[] = $newOrderId;
+            $ordersCreated++;
+            cap_log('ORDER_CREATED', ['invoice_id' => $invoiceId, 'order_id' => $newOrderId]);
+        } else {
+            cap_log('ORDER_CREATE_FAILED', ['invoice_id' => $invoiceId, 'db_error' => $mysqli->error]);
         }
     }
 }
