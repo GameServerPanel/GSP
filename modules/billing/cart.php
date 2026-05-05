@@ -60,7 +60,9 @@ if (!$db) {
     // columns that may not exist in all deployments (some schemas differ).
     $query = "SELECT i.* 
               FROM {$table_prefix}billing_invoices i
-              WHERE i.user_id = " . intval($user_id) . " AND i.status = 'due'
+              WHERE i.user_id = " . intval($user_id) . "
+                AND (i.status = 'due' OR i.status = '')
+                AND (i.payment_status IS NULL OR i.payment_status NOT IN ('paid','cancelled','refunded'))
               ORDER BY i.invoice_date ASC";
 
     $result = mysqli_query($db, $query);
@@ -195,8 +197,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_invoice_ajax']
         exit;
     }
 
-    // Verify ownership and that invoice is still due
-    $check_q = "SELECT invoice_id FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+    // Verify ownership and that invoice is still unpaid/due
+    $check_q = "SELECT invoice_id FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND (status = 'due' OR status = '') AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded')) LIMIT 1";
     $check_r = mysqli_query($db, $check_q);
     if (!($check_r && mysqli_num_rows($check_r) === 1)) {
         echo json_encode(['success' => false, 'error' => 'Invoice not found or cannot be removed.']);
@@ -204,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_invoice_ajax']
     }
 
     // Hard-delete the invoice row
-    $del_q = "DELETE FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+    $del_q = "DELETE FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND (status = 'due' OR status = '') AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded')) LIMIT 1";
     $ok = mysqli_query($db, $del_q);
     if ($ok && mysqli_affected_rows($db) > 0) {
         echo json_encode(['success' => true]);
@@ -223,12 +225,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_invoice']) && 
         if (!$db) {
             $error_message = 'Unable to remove item: database unavailable.';
         } else {
-            // Verify ownership and that invoice is still due
-            $check_q = "SELECT invoice_id FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+            // Verify ownership and that invoice is still unpaid/due
+            $check_q = "SELECT invoice_id FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND (status = 'due' OR status = '') AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded')) LIMIT 1";
             $check_r = mysqli_query($db, $check_q);
             if ($check_r && mysqli_num_rows($check_r) === 1) {
                 // Hard-delete to remove from cart
-                $del_q = "DELETE FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND status = 'due' LIMIT 1";
+                $del_q = "DELETE FROM {$table_prefix}billing_invoices WHERE invoice_id = " . intval($remove_id) . " AND user_id = " . intval($user_id) . " AND (status = 'due' OR status = '') AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded')) LIMIT 1";
                 if (mysqli_query($db, $del_q)) {
                     // Reload to avoid form re-submission and refresh invoice list
                     header('Location: /cart.php');
@@ -620,6 +622,25 @@ $siteBase = $protocol . $host;
             </div>
 
             <!-- Checkout Section -->
+            <?php if ($final_amount <= 0.00): ?>
+            <!-- Zero-dollar checkout: coupon covers the full amount, no PayPal needed -->
+            <div class="checkout-section">
+                <h3>🎉 Complete Your Free Order</h3>
+                <p>Your coupon covers the full amount. Click below to confirm and automatically provision your server(s).</p>
+                <div id="status-message" class="status-message"></div>
+                <form method="POST" action="/checkout_free.php" onsubmit="document.getElementById('free-submit-btn').disabled=true; document.getElementById('status-message').style.display='block'; document.getElementById('status-message').textContent='Processing…';">
+                    <input type="hidden" name="coupon_id"   value="<?php echo intval($_SESSION['cart_coupon_id'] ?? 0); ?>">
+                    <input type="hidden" name="coupon_code" value="<?php echo htmlspecialchars($_SESSION['cart_coupon_code'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+                    <button id="free-submit-btn" type="submit" class="btn" style="background:#28a745;">
+                        ✓ Complete Free Order
+                    </button>
+                </form>
+                <div class="action-buttons" style="margin-top:15px;">
+                    <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
+                    <a href="/my_account.php" class="btn btn-secondary">My Account</a>
+                </div>
+            </div>
+            <?php else: ?>
             <div class="checkout-section">
                 <h3>Checkout with PayPal</h3>
                 <p>Click the button below to complete your purchase securely through PayPal.</p>
@@ -632,7 +653,9 @@ $siteBase = $protocol . $host;
                     <a href="/my_account.php" class="btn btn-secondary">My Account</a>
                 </div>
             </div>
+            <?php endif; ?>
 
+            <?php if ($final_amount > 0.00): ?>
             <script>
                 function setStatus(msg) {
                     const statusDiv = document.getElementById('status-message');
@@ -712,11 +735,12 @@ $siteBase = $protocol . $host;
                     }
                 }).render('#paypal-button-container');
             </script>
+            <?php endif; ?>
                 <script>
                     // Remove invoice via AJAX and perform a partial reload of the cart container
                     function removeInvoice(invoiceId) {
                         if (!confirm('Remove this item from your cart?')) return;
-                        setStatus('Removing item...');
+                        if (typeof setStatus === 'function') setStatus('Removing item...');
 
                         var body = 'remove_invoice_ajax=1&invoice_id=' + encodeURIComponent(invoiceId);
 

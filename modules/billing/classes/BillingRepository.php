@@ -47,16 +47,79 @@ class BillingRepository
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
-    /** Mark an invoice as paid. */
+    /** Mark an invoice as paid. Also sets status='paid' so it disappears from cart queries. */
     public function markInvoicePaid(int $invoiceId, string $txid, string $method, string $paidAt): bool
     {
         $stmt = $this->db->prepare(
             "UPDATE `{$this->prefix}billing_invoices`
-             SET payment_status='paid', payment_txid=?, payment_method=?, paid_date=?
+             SET payment_status='paid', status='paid', payment_txid=?, payment_method=?, paid_date=?
              WHERE invoice_id = ? LIMIT 1"
         );
         if (!$stmt) return false;
         $stmt->bind_param('sssi', $txid, $method, $paidAt, $invoiceId);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    /**
+     * Create a billing_orders row from invoice/payment data.
+     * Returns new order_id (0 on failure).
+     *
+     * @param array $data Keys: user_id, service_id, home_name, ip, qty, invoice_duration,
+     *                         max_players, price, remote_control_password, ftp_password,
+     *                         status, end_date, payment_txid, paid_ts, coupon_id
+     */
+    public function createOrder(array $data): int
+    {
+        $now      = date('Y-m-d H:i:s');
+        $status   = (string)($data['status'] ?? 'Active');
+        $endDate  = $data['end_date'] ?? null;
+        $txid     = (string)($data['payment_txid'] ?? '');
+        $paidTs   = (string)($data['paid_ts'] ?? $now);
+        $couponId = intval($data['coupon_id'] ?? 0);
+        $ip       = (string)($data['ip'] ?? '0');
+        $qty      = intval($data['qty'] ?? 1);
+        $maxPl    = intval($data['max_players'] ?? 0);
+        $price    = (float)($data['price'] ?? 0);
+        $userId   = intval($data['user_id']);
+        $svcId    = intval($data['service_id']);
+        $homeName = (string)($data['home_name'] ?? '');
+        $invDur   = (string)($data['invoice_duration'] ?? 'month');
+        $rcp      = (string)($data['remote_control_password'] ?? '');
+        $ftp      = (string)($data['ftp_password'] ?? '');
+
+        $stmt = $this->db->prepare(
+            "INSERT INTO `{$this->prefix}billing_orders`
+                (user_id, service_id, home_name, ip, qty, invoice_duration, max_players,
+                 price, remote_control_password, ftp_password, home_id, status,
+                 order_date, end_date, payment_txid, paid_ts, coupon_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', ?, ?, ?, ?, ?, ?)"
+        );
+        if (!$stmt) return 0;
+        $stmt->bind_param(
+            'iissiisdsssssssi',
+            $userId, $svcId, $homeName, $ip, $qty, $invDur, $maxPl,
+            $price, $rcp, $ftp,
+            $status, $now, $endDate, $txid, $paidTs, $couponId
+        );
+        if (!$stmt->execute()) { $stmt->close(); return 0; }
+        $id = (int)$stmt->insert_id;
+        $stmt->close();
+        return $id;
+    }
+
+    /**
+     * Link a billing_invoice row to its corresponding billing_orders row.
+     * Called after createOrder() so the capture endpoint can be idempotent.
+     */
+    public function updateInvoiceOrderId(int $invoiceId, int $orderId): bool
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE `{$this->prefix}billing_invoices` SET order_id = ? WHERE invoice_id = ? LIMIT 1"
+        );
+        if (!$stmt) return false;
+        $stmt->bind_param('ii', $orderId, $invoiceId);
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
