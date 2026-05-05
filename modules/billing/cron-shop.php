@@ -108,7 +108,7 @@ $due_for_invoice = $db->resultQuery("
       AND sh.next_invoice_date IS NOT NULL
       AND sh.next_invoice_date <= NOW()
       AND NOT EXISTS (
-          SELECT 1 FROM {$table_prefix}invoices inv
+          SELECT 1 FROM {$table_prefix}billing_invoices inv
           WHERE inv.home_id = sh.home_id AND inv.billing_status = 'Invoiced'
       )
     ORDER BY sh.home_id ASC
@@ -142,7 +142,7 @@ if (is_array($due_for_invoice)) {
 
         // Guard: skip if an invoice for this exact period already exists
         $exists = $db->resultQuery("
-            SELECT invoice_id FROM {$table_prefix}invoices
+            SELECT invoice_id FROM {$table_prefix}billing_invoices
             WHERE home_id = {$home_id}
               AND due_date = '" . $db->realEscapeSingle($due_date) . "'
             LIMIT 1
@@ -152,11 +152,11 @@ if (is_array($due_for_invoice)) {
             continue;
         }
 
-        // Create renewal invoice in {prefix}invoices
+        // Create renewal invoice in {prefix}billing_invoices
         $db->query("
-            INSERT INTO {$table_prefix}invoices
+            INSERT INTO {$table_prefix}billing_invoices
                 (home_id, user_id, due_date, billing_status, rate_type,
-                 price_per_player, player_slots, quantity, subtotal, total_due)
+                 rate_per_player, players, qty, subtotal, total_due)
             VALUES (
                 {$home_id}, {$user_id},
                 '" . $db->realEscapeSingle($due_date) . "',
@@ -219,10 +219,10 @@ $past_due = $db->resultQuery("
       AND (
           sh.last_invoice_id IS NULL
           OR EXISTS (
-              SELECT 1 FROM {$table_prefix}invoices inv
+              SELECT 1 FROM {$table_prefix}billing_invoices inv
               WHERE inv.invoice_id    = sh.last_invoice_id
                 AND inv.billing_status = 'Invoiced'
-                AND inv.paid_at       IS NULL
+                AND inv.paid_date     IS NULL
           )
       )
     ORDER BY sh.home_id ASC
@@ -243,11 +243,11 @@ if (is_array($past_due)) {
         // Mark matching invoice Expired (if still unpaid)
         if ($last_invoice_id > 0) {
             $db->query("
-                UPDATE {$table_prefix}invoices
+                UPDATE {$table_prefix}billing_invoices
                 SET billing_status = 'Expired'
                 WHERE invoice_id    = {$last_invoice_id}
                   AND billing_status = 'Invoiced'
-                  AND paid_at       IS NULL
+                  AND paid_date     IS NULL
             ");
         }
 
@@ -358,9 +358,9 @@ if (is_array($to_delete)) {
             WHERE home_id = '{$home_id}'
         ");
 
-        // Mark any open gsp_invoices for this home as Expired
+        // Mark any open billing_invoices for this home as Expired
         $db->query("
-            UPDATE {$table_prefix}invoices
+            UPDATE {$table_prefix}billing_invoices
             SET billing_status = 'Expired'
             WHERE home_id      = {$home_id}
               AND billing_status = 'Invoiced'
@@ -394,11 +394,11 @@ $db->logger("BILLING-CRON: --- Step D: Paid invoice safety-net ---");
 $paid_invoices = $db->resultQuery("
     SELECT inv.invoice_id, inv.home_id, inv.rate_type,
            sh.billing_status
-    FROM {$table_prefix}invoices inv
+    FROM {$table_prefix}billing_invoices inv
     INNER JOIN {$table_prefix}server_homes sh ON sh.home_id = inv.home_id
     WHERE inv.billing_status  = 'Invoiced'
       AND sh.billing_status   = 'Invoiced'
-      AND (inv.paid_at IS NOT NULL OR inv.payment_id IS NOT NULL)
+      AND (inv.paid_date IS NOT NULL OR inv.payment_txid IS NOT NULL)
     ORDER BY inv.invoice_id ASC
 ");
 
@@ -413,7 +413,7 @@ if (is_array($paid_invoices)) {
         $next_invoice_date = date('Y-m-d H:i:s', strtotime($period_map[$rate_type] ?? '+1 month'));
 
         $db->query("
-            UPDATE {$table_prefix}invoices
+            UPDATE {$table_prefix}billing_invoices
             SET billing_status = 'Active'
             WHERE invoice_id = {$invoice_id}
         ");

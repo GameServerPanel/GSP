@@ -19,23 +19,23 @@
 -- 'Expired') are left unchanged.
 --
 -- Compatible with MySQL 5.7+ and MariaDB 10.2+.
--- Table prefix is hardcoded to gsp_ (standalone billing module context).
+-- IMPORTANT: Replace <PREFIX> below with your table prefix (e.g. gsp_ or ogp_) (standalone billing module context).
 -- Run ONCE on an existing installation; safe to run again (no-op on clean data).
 
 -- 'installed' → 'Active'
-UPDATE `gsp_billing_orders`
+UPDATE `<PREFIX>billing_orders`
    SET `status` = 'Active'
  WHERE `status` = 'installed';
 
 -- 'paid' → 'Active'
-UPDATE `gsp_billing_orders`
+UPDATE `<PREFIX>billing_orders`
    SET `status` = 'Active'
  WHERE `status` = 'paid';
 
 -- 'suspended' → 'Invoiced'
 -- These rows had an open renewal invoice; cron-shop Step B will move them to
 -- 'Expired' on the next run if the invoice remains unpaid.
-UPDATE `gsp_billing_orders`
+UPDATE `<PREFIX>billing_orders`
    SET `status` = 'Invoiced'
  WHERE `status` = 'suspended';
 
@@ -43,7 +43,7 @@ UPDATE `gsp_billing_orders`
 -- Expected result: only rows with status IN ('Active','Invoiced','Expired',
 -- 'in-cart','cancelled','refunded') should appear.
 SELECT `status`, COUNT(*) AS `count`
-  FROM `gsp_billing_orders`
+  FROM `<PREFIX>billing_orders`
  GROUP BY `status`
  ORDER BY `status`;
 
@@ -56,8 +56,8 @@ SELECT o.`order_id`,
        o.`home_id`         AS missing_home_id,
        o.`status`,
        o.`end_date`
-  FROM `gsp_billing_orders`  o
-  LEFT JOIN `gsp_server_homes` sh ON sh.`home_id` = o.`home_id`
+  FROM `<PREFIX>billing_orders`  o
+  LEFT JOIN `<PREFIX>server_homes` sh ON sh.`home_id` = o.`home_id`
  WHERE o.`home_id` != '0'
    AND o.`home_id` != ''
    AND sh.`home_id` IS NULL

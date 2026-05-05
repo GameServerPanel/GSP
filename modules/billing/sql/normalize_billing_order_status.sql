@@ -17,19 +17,19 @@
 -- ============================================================
 
 -- Map old 'installed' to 'Active'
-UPDATE `gsp_billing_orders`
+UPDATE `<PREFIX>billing_orders`
 SET    `status` = 'Active'
 WHERE  `status` = 'installed';
 
 -- Map old 'paid' to 'Active'
 -- (Orders that were paid but not yet provisioned should be provisioned
 --  via the admin orders panel after this migration.)
-UPDATE `gsp_billing_orders`
+UPDATE `<PREFIX>billing_orders`
 SET    `status` = 'Active'
 WHERE  `status` = 'paid';
 
 -- Map old 'suspended' to 'Expired'
-UPDATE `gsp_billing_orders`
+UPDATE `<PREFIX>billing_orders`
 SET    `status` = 'Expired'
 WHERE  `status` = 'suspended';
 
