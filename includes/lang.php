@@ -132,7 +132,8 @@ function ogp_load_english_fallbacks()
 function ogp_include_lang_file_safely($filePath)
 {
     set_error_handler(function ($severity, $message) {
-        if ($severity === E_WARNING && strpos($message, 'already defined') !== false) {
+        $isConstantRedefinition = (bool)preg_match('/^Constant\\s+.+\\s+already\\s+defined$/i', trim((string)$message));
+        if ($severity === E_WARNING && $isConstantRedefinition) {
             return true;
         }
         return false;

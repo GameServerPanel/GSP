@@ -1134,7 +1134,7 @@ function exec_ogp_module() {
 					echo "<div id='xml-editor-section'>";
 					config_games_render_top_level_editor($home_cfg_id, $config_file);
 
-					echo "<details style='margin:18px 0'><summary style='cursor:pointer;color:#9dc7ff'>Open legacy detailed node editor</summary>";
+					echo "<details style='margin:18px 0'><summary style='cursor:pointer;color:#9dc7ff'>Open legacy detailed node editor (previous default editor)</summary>";
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
 					echo "<button type='submit' name='save_xml' value='1' class='xml-global-save xml-global-save--top'>".get_lang('save')."</button>";
