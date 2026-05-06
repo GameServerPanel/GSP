@@ -253,8 +253,8 @@ if ($applied_coupon && $coupon_discount_percent > 0) {
 $final_amount = $total_amount - $discount_amount;
 
 // PayPal configuration (from config)
-$sandbox   = $paypal_sandbox ?? true;
-$client_id = $paypal_client_id ?? '';
+$client_id = function_exists('gsp_paypal_get_client_id') ? gsp_paypal_get_client_id() : ($paypal_client_id ?? '');
+$sandbox   = function_exists('gsp_paypal_is_sandbox')    ? gsp_paypal_is_sandbox()    : ($paypal_sandbox ?? true);
 
 // Prepare PayPal items
 $paypal_items = [];
@@ -510,7 +510,7 @@ $siteBase = $protocol . $host;
     <link rel="icon" href="images/logo-sm.png" type="image/png">
     <link rel="apple-touch-icon" href="images/logo-sm.png">
     <?php if (!$cart_empty && !empty($client_id)): ?>
-    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=USD&intent=capture"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id, ENT_QUOTES, 'UTF-8'); ?>&currency=USD&intent=capture<?php echo $sandbox ? '&debug=false' : ''; ?>"></script>
     <?php endif; ?>
 </head>
 <body>
@@ -659,7 +659,7 @@ $siteBase = $protocol . $host;
                     }
                     if ($cart_is_admin):
                     ?>
-                    <br><small><em>Admin: set <code>$paypal_client_id</code> in <a href="/admin_config.php" style="color:inherit;text-decoration:underline;">Site Config</a>.</em></small>
+                    <br><small><em>Admin: configure PayPal credentials in <a href="/admin_config.php" style="color:inherit;text-decoration:underline;">Site Config</a>.</em></small>
                     <?php endif; ?>
                 </div>
                 <?php else: ?>

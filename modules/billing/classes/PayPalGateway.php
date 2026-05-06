@@ -20,13 +20,19 @@ class PayPalGateway implements PaymentGatewayInterface
 
     /**
      * Build a PayPalGateway instance from global config variables.
-     * Expects $paypal_client_id, $paypal_client_secret, $paypal_sandbox in scope.
+     * Prefers the new gsp_paypal_* helper functions; falls back to legacy globals.
      */
     public static function fromConfig(): self
     {
-        $clientId     = $GLOBALS['paypal_client_id']     ?? '';
-        $clientSecret = $GLOBALS['paypal_client_secret'] ?? '';
-        $sandbox      = (bool)($GLOBALS['paypal_sandbox'] ?? true);
+        if (function_exists('gsp_paypal_get_client_id')) {
+            $clientId     = gsp_paypal_get_client_id();
+            $clientSecret = gsp_paypal_get_client_secret();
+            $sandbox      = gsp_paypal_is_sandbox();
+        } else {
+            $clientId     = $GLOBALS['paypal_client_id']     ?? '';
+            $clientSecret = $GLOBALS['paypal_client_secret'] ?? '';
+            $sandbox      = (bool)($GLOBALS['paypal_sandbox'] ?? true);
+        }
         return new self($clientId, $clientSecret, $sandbox);
     }
 

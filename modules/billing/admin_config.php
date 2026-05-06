@@ -108,11 +108,22 @@ function billing_admin_build_config(string $existingContent, array $vals): strin
         return '"' . addslashes($v) . '"';
     };
 
-    $sandbox    = (bool)$vals['paypal_sandbox'];
-    $retention  = max(1, min(10, (int)($vals['backup_retention'] ?? 5)));
-    $baseUrl    = trim($vals['SITE_BASE_URL'] ?? '');
-    $bg         = trim($vals['SITE_BACKGROUND'] ?? 'images/dark.jpg');
-    $dataDir    = trim($vals['SITE_DATA_DIR'] ?? '');
+    $mode      = (strtolower($vals['paypal_mode'] ?? 'sandbox') === 'live') ? 'live' : 'sandbox';
+    $retention = max(1, min(10, (int)($vals['backup_retention'] ?? 5)));
+    $baseUrl   = rtrim(trim($vals['SITE_BASE_URL'] ?? ''), '/');
+    $bg        = trim($vals['SITE_BACKGROUND'] ?? 'images/dark.jpg');
+    $dataDir   = trim($vals['SITE_DATA_DIR'] ?? '');
+    $wh_path   = '/' . ltrim(trim($vals['paypal_webhook_path'] ?? '/paypal/webhook.php'), '/');
+
+    // Sandbox credentials — never erase existing secret if field was left blank
+    $sb_id     = trim($vals['paypal_sandbox_client_id']     ?? '');
+    $sb_sec    = trim($vals['paypal_sandbox_client_secret'] ?? '');
+    $sb_wh     = trim($vals['paypal_sandbox_webhook_id']    ?? '');
+
+    // Live credentials — never erase existing secret if field was left blank
+    $lv_id     = trim($vals['paypal_live_client_id']        ?? '');
+    $lv_sec    = trim($vals['paypal_live_client_secret']    ?? '');
+    $lv_wh     = trim($vals['paypal_live_webhook_id']       ?? '');
 
     $dbBlock = '';
     foreach (['db_host', 'db_port', 'db_user', 'db_pass', 'db_name', 'table_prefix', 'db_type'] as $var) {
@@ -135,26 +146,36 @@ function billing_admin_build_config(string $existingContent, array $vals): strin
         . '###############################################' . "\n"
         . $dbBlock
         . "\n"
-        . '// Optional: base URL used by admin pages to build absolute image previews.' . "\n"
-        . '// Leave empty to prefer relative paths (local folder).' . "\n"
+        . '// Optional: base URL without trailing slash (e.g. https://gameservers.world).' . "\n"
+        . '// Leave empty to use relative paths.' . "\n"
         . '$SITE_BASE_URL = ' . $q($baseUrl) . ';' . "\n"
-        . "\n"
-        . '// Normalize: ensure either empty or ends without trailing slash' . "\n"
-        . '$SITE_BASE_URL = trim((string)$SITE_BASE_URL);' . "\n"
+        . '$SITE_BASE_URL = rtrim(trim((string)$SITE_BASE_URL), \'/\');' . "\n"
         . "\n"
         . '// Site-wide background image (relative to site root).' . "\n"
         . '$SITE_BACKGROUND = ' . $q($bg) . ';' . "\n"
-        . '// Normalize' . "\n"
         . '$SITE_BACKGROUND = trim((string)$SITE_BACKGROUND);' . "\n"
         . "\n"
-        . '// Data directory for persisted payment webhook JSON files (relative to repo root)' . "\n"
+        . '// Data directory for persisted payment webhook JSON files.' . "\n"
         . $dataDirLine . "\n"
         . "\n"
-        . '// PayPal configuration — set credentials here, never in API files' . "\n"
-        . '$paypal_sandbox       = ' . ($sandbox ? 'true' : 'false') . ';   // Set to false for live payments' . "\n"
-        . '$paypal_client_id     = ' . $q($vals['paypal_client_id'] ?? '') . ';     // Your PayPal Client ID' . "\n"
-        . '$paypal_client_secret = ' . $q($vals['paypal_client_secret'] ?? '') . ';     // Your PayPal Client Secret' . "\n"
-        . '$paypal_webhook_id    = ' . $q($vals['paypal_webhook_id'] ?? '') . ';     // Your PayPal Webhook ID' . "\n"
+        . '// ---------------------------------------------------------------------------' . "\n"
+        . '// PayPal configuration' . "\n"
+        . '// ---------------------------------------------------------------------------' . "\n"
+        . '$paypal_mode = ' . $q($mode) . ';  // \'sandbox\' or \'live\'' . "\n"
+        . "\n"
+        . '// Sandbox credentials (PayPal Developer Dashboard → sandbox app)' . "\n"
+        . '$paypal_sandbox_client_id     = ' . $q($sb_id) . ';' . "\n"
+        . '$paypal_sandbox_client_secret = ' . $q($sb_sec) . ';' . "\n"
+        . '$paypal_sandbox_webhook_id    = ' . $q($sb_wh) . ';' . "\n"
+        . "\n"
+        . '// Live credentials (leave blank until ready for production)' . "\n"
+        . '$paypal_live_client_id     = ' . $q($lv_id) . ';' . "\n"
+        . '$paypal_live_client_secret = ' . $q($lv_sec) . ';' . "\n"
+        . '$paypal_live_webhook_id    = ' . $q($lv_wh) . ';' . "\n"
+        . "\n"
+        . '// Webhook path (relative to billing site root, must start with /)' . "\n"
+        . '// Full public URL = $SITE_BASE_URL + $paypal_webhook_path' . "\n"
+        . '$paypal_webhook_path = ' . $q($wh_path) . ';' . "\n"
         . "\n"
         . '// Admin config backup retention: how many backups to keep (1–10). Default 5.' . "\n"
         . '$SITE_CONFIG_BACKUP_RETENTION = ' . $retention . ';' . "\n"
@@ -165,15 +186,24 @@ function billing_admin_build_config(string $existingContent, array $vals): strin
 // Read current values from config (already loaded by config_loader above).
 // ---------------------------------------------------------------------------
 $cfgVals = [
-    'SITE_BASE_URL'           => $SITE_BASE_URL          ?? '',
-    'SITE_BACKGROUND'         => $SITE_BACKGROUND         ?? 'images/dark.jpg',
-    'SITE_DATA_DIR'           => isset($SITE_DATA_DIR)    ? $SITE_DATA_DIR : '',
-    'paypal_sandbox'          => $paypal_sandbox          ?? true,
-    'paypal_client_id'        => $paypal_client_id        ?? '',
-    'paypal_client_secret'    => $paypal_client_secret    ?? '',
-    'paypal_webhook_id'       => $paypal_webhook_id       ?? '',
-    'backup_retention'        => $SITE_CONFIG_BACKUP_RETENTION ?? 5,
+    'SITE_BASE_URL'                  => $SITE_BASE_URL          ?? '',
+    'SITE_BACKGROUND'                => $SITE_BACKGROUND         ?? 'images/dark.jpg',
+    'SITE_DATA_DIR'                  => $SITE_DATA_DIR           ?? '',
+    'paypal_mode'                    => $paypal_mode             ?? 'sandbox',
+    'paypal_sandbox_client_id'       => $paypal_sandbox_client_id       ?? '',
+    'paypal_sandbox_client_secret'   => $paypal_sandbox_client_secret   ?? '',
+    'paypal_sandbox_webhook_id'      => $paypal_sandbox_webhook_id      ?? '',
+    'paypal_live_client_id'          => $paypal_live_client_id          ?? '',
+    'paypal_live_client_secret'      => $paypal_live_client_secret      ?? '',
+    'paypal_live_webhook_id'         => $paypal_live_webhook_id         ?? '',
+    'paypal_webhook_path'            => $paypal_webhook_path            ?? '/paypal/webhook.php',
+    'backup_retention'               => $SITE_CONFIG_BACKUP_RETENTION   ?? 5,
 ];
+
+// Computed full webhook URL for display
+$computedWebhookUrl = function_exists('gsp_paypal_get_full_webhook_url')
+    ? gsp_paypal_get_full_webhook_url()
+    : rtrim($cfgVals['SITE_BASE_URL'], '/') . $cfgVals['paypal_webhook_path'];
 
 // Detect panel-mode (DB settings are managed by the panel)
 $panelMode     = defined('BILLING_PANEL_CONFIG_PATH');
@@ -196,15 +226,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     } else {
         // Collect and validate form values
         $formVals = [
-            'SITE_BASE_URL'        => trim($_POST['SITE_BASE_URL']        ?? ''),
-            'SITE_BACKGROUND'      => trim($_POST['SITE_BACKGROUND']      ?? 'images/dark.jpg'),
-            'SITE_DATA_DIR'        => trim($_POST['SITE_DATA_DIR']        ?? ''),
-            'paypal_sandbox'       => (($_POST['paypal_sandbox'] ?? 'true') === 'true'),
-            'paypal_client_id'     => trim($_POST['paypal_client_id']     ?? ''),
-            'paypal_client_secret' => trim($_POST['paypal_client_secret'] ?? ''),
-            'paypal_webhook_id'    => trim($_POST['paypal_webhook_id']    ?? ''),
-            'backup_retention'     => (int)($_POST['backup_retention']    ?? 5),
+            'SITE_BASE_URL'               => trim($_POST['SITE_BASE_URL']               ?? ''),
+            'SITE_BACKGROUND'             => trim($_POST['SITE_BACKGROUND']             ?? 'images/dark.jpg'),
+            'SITE_DATA_DIR'               => trim($_POST['SITE_DATA_DIR']               ?? ''),
+            'paypal_mode'                 => (strtolower(trim($_POST['paypal_mode'] ?? 'sandbox')) === 'live') ? 'live' : 'sandbox',
+            'paypal_sandbox_client_id'    => trim($_POST['paypal_sandbox_client_id']    ?? ''),
+            'paypal_live_client_id'       => trim($_POST['paypal_live_client_id']       ?? ''),
+            'paypal_sandbox_webhook_id'   => trim($_POST['paypal_sandbox_webhook_id']   ?? ''),
+            'paypal_live_webhook_id'      => trim($_POST['paypal_live_webhook_id']      ?? ''),
+            'paypal_webhook_path'         => trim($_POST['paypal_webhook_path']         ?? '/paypal/webhook.php'),
+            'backup_retention'            => (int)($_POST['backup_retention']           ?? 5),
         ];
+
+        // Client secrets: only update if a non-blank value was submitted (never erase existing).
+        $sbSecPost = trim($_POST['paypal_sandbox_client_secret'] ?? '');
+        $formVals['paypal_sandbox_client_secret'] = ($sbSecPost !== '') ? $sbSecPost : ($cfgVals['paypal_sandbox_client_secret'] ?? '');
+
+        $lvSecPost = trim($_POST['paypal_live_client_secret'] ?? '');
+        $formVals['paypal_live_client_secret'] = ($lvSecPost !== '') ? $lvSecPost : ($cfgVals['paypal_live_client_secret'] ?? '');
 
         // Validate
         $validationError = '';
@@ -243,7 +282,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                         $retention = max(1, min(10, $formVals['backup_retention']));
                         billing_admin_apply_retention($bakDir, $retention);
 
-                        $cfgVals    = $formVals; // update displayed values
+                        $cfgVals         = $formVals; // update displayed values
+                        $computedWebhookUrl = rtrim($formVals['SITE_BASE_URL'], '/') . ('/' . ltrim($formVals['paypal_webhook_path'] ?? '/paypal/webhook.php', '/'));
                         $status     = 'Config saved successfully. Backup: ' . basename($bakName);
                         $statusType = 'success';
                     }
@@ -398,8 +438,8 @@ rsort($bakFiles); // newest first
       <div class="field-group">
         <label for="cfg_base_url">Site Base URL</label>
         <div class="field-help">
-          Full base URL without trailing slash (e.g. <code>https://gameservers.world</code>).
-          Leave empty to use relative paths.
+          Full base URL <strong>without trailing slash</strong> (e.g. <code>https://gameservers.world</code>).
+          Leave empty to use relative paths. Used to compute the full public PayPal webhook URL.
         </div>
         <input type="text" id="cfg_base_url" name="SITE_BASE_URL"
                value="<?php echo h((string)$cfgVals['SITE_BASE_URL']); ?>"
@@ -432,59 +472,130 @@ rsort($bakFiles); // newest first
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
       <h3 style="margin-top:0;color:#333;">PayPal Configuration</h3>
 
-      <!-- PayPal Sandbox -->
+      <?php
+      $isSandboxMode = ($cfgVals['paypal_mode'] ?? 'sandbox') !== 'live';
+      $modeLabel     = $isSandboxMode ? '🟡 Sandbox (test mode)' : '🟢 Live (real payments)';
+      $modeBadgeClass = $isSandboxMode ? 'status-info' : 'status-success';
+      ?>
+      <div class="status-box <?php echo h($modeBadgeClass); ?>" style="margin-bottom:14px;font-size:0.95em;">
+        Currently active PayPal mode: <strong><?php echo h($modeLabel); ?></strong>
+      </div>
+
+      <!-- PayPal Mode -->
       <div class="field-group">
-        <label for="cfg_sandbox">PayPal Mode</label>
+        <label for="cfg_mode">PayPal Mode</label>
         <div class="field-help">
-          Use <strong>Sandbox</strong> for testing, <strong>Live</strong> for real payments.
-          Make sure you use the matching Client ID and Secret for the selected mode.
+          <strong>Sandbox</strong> uses test credentials and the PayPal sandbox API — safe for development.
+          <strong>Live</strong> processes real payments. Switch only after configuring live credentials.
         </div>
-        <select id="cfg_sandbox" name="paypal_sandbox">
-          <option value="true"  <?php echo $cfgVals['paypal_sandbox'] ? 'selected' : ''; ?>>Sandbox (test mode)</option>
-          <option value="false" <?php echo !$cfgVals['paypal_sandbox'] ? 'selected' : ''; ?>>Live (real payments)</option>
+        <select id="cfg_mode" name="paypal_mode">
+          <option value="sandbox" <?php echo $isSandboxMode ? 'selected' : ''; ?>>Sandbox (test mode)</option>
+          <option value="live"    <?php echo !$isSandboxMode ? 'selected' : ''; ?>>Live (real payments)</option>
         </select>
       </div>
 
-      <!-- PayPal Client ID -->
+      <!-- Sandbox credentials -->
+      <h4 style="color:#555;margin:20px 0 8px;">Sandbox Credentials</h4>
       <div class="field-group">
-        <label for="cfg_cid">PayPal Client ID</label>
-        <div class="field-help">
-          Your PayPal app Client ID. Safe to expose in browser JS.
-          Found in your PayPal Developer Dashboard under your app credentials.
-        </div>
-        <input type="text" id="cfg_cid" name="paypal_client_id"
-               value="<?php echo h((string)$cfgVals['paypal_client_id']); ?>"
-               placeholder="AY... or AZ...">
+        <label for="cfg_sb_id">Sandbox Client ID</label>
+        <div class="field-help">Found in PayPal Developer Dashboard → sandbox app. Safe to expose in browser JS.</div>
+        <input type="text" id="cfg_sb_id" name="paypal_sandbox_client_id"
+               value="<?php echo h((string)$cfgVals['paypal_sandbox_client_id']); ?>"
+               placeholder="AfvY_... or sandbox client ID">
       </div>
-
-      <!-- PayPal Client Secret -->
       <div class="field-group">
-        <label for="cfg_csecret">PayPal Client Secret</label>
-        <div class="field-help">
-          Your PayPal app Client Secret. <strong>Server-side only</strong> — never sent to the browser.
-        </div>
+        <label for="cfg_sb_sec">Sandbox Client Secret</label>
+        <div class="field-help"><strong>Server-side only</strong> — never sent to the browser. Leave blank to keep existing value.</div>
         <div class="pw-wrap">
-          <input type="password" id="cfg_csecret" name="paypal_client_secret"
-                 value="<?php echo h((string)$cfgVals['paypal_client_secret']); ?>"
+          <input type="password" id="cfg_sb_sec" name="paypal_sandbox_client_secret"
+                 placeholder="<?php echo $cfgVals['paypal_sandbox_client_secret'] !== '' ? '(set — leave blank to keep)' : '(not set)'; ?>"
                  autocomplete="new-password">
           <button type="button" class="btn-show"
-                  onclick="var f=document.getElementById('cfg_csecret');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'Show':'Hide';">
-            Show
-          </button>
+                  onclick="var f=document.getElementById('cfg_sb_sec');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'Show':'Hide';">Show</button>
         </div>
+      </div>
+      <div class="field-group">
+        <label for="cfg_sb_wh">Sandbox Webhook ID</label>
+        <div class="field-help">
+          Webhook ID from your PayPal sandbox app (for signature verification).
+          Leave empty to skip verification in sandbox mode (OK for initial setup).
+        </div>
+        <input type="text" id="cfg_sb_wh" name="paypal_sandbox_webhook_id"
+               value="<?php echo h((string)$cfgVals['paypal_sandbox_webhook_id']); ?>"
+               placeholder="Sandbox Webhook ID">
       </div>
 
-      <!-- PayPal Webhook ID -->
+      <!-- Live credentials -->
+      <h4 style="color:#555;margin:20px 0 8px;">Live Credentials</h4>
       <div class="field-group">
-        <label for="cfg_wh">PayPal Webhook ID</label>
-        <div class="field-help">
-          Webhook ID from your PayPal app (used for webhook signature verification).
-          Leave empty to skip signature verification (not recommended for production).
-        </div>
-        <input type="text" id="cfg_wh" name="paypal_webhook_id"
-               value="<?php echo h((string)$cfgVals['paypal_webhook_id']); ?>"
-               placeholder="Webhook ID">
+        <label for="cfg_lv_id">Live Client ID</label>
+        <div class="field-help">From your PayPal live app. Leave blank until ready for production.</div>
+        <input type="text" id="cfg_lv_id" name="paypal_live_client_id"
+               value="<?php echo h((string)$cfgVals['paypal_live_client_id']); ?>"
+               placeholder="Live Client ID">
       </div>
+      <div class="field-group">
+        <label for="cfg_lv_sec">Live Client Secret</label>
+        <div class="field-help"><strong>Server-side only.</strong> Leave blank to keep existing value.</div>
+        <div class="pw-wrap">
+          <input type="password" id="cfg_lv_sec" name="paypal_live_client_secret"
+                 placeholder="<?php echo $cfgVals['paypal_live_client_secret'] !== '' ? '(set — leave blank to keep)' : '(not set)'; ?>"
+                 autocomplete="new-password">
+          <button type="button" class="btn-show"
+                  onclick="var f=document.getElementById('cfg_lv_sec');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'Show':'Hide';">Show</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="cfg_lv_wh">Live Webhook ID</label>
+        <div class="field-help">Webhook ID from your PayPal live app (for signature verification).</div>
+        <input type="text" id="cfg_lv_wh" name="paypal_live_webhook_id"
+               value="<?php echo h((string)$cfgVals['paypal_live_webhook_id']); ?>"
+               placeholder="Live Webhook ID">
+      </div>
+
+      <!-- Webhook path + computed URL -->
+      <h4 style="color:#555;margin:20px 0 8px;">Webhook Endpoint</h4>
+      <div class="field-help" style="margin-bottom:10px;">
+        PayPal requires a <strong>full public HTTPS URL</strong> to deliver webhook events.
+        Set your Site Base URL above, then copy the computed URL below into your PayPal app's webhook configuration.
+      </div>
+      <div class="field-group">
+        <label for="cfg_wh_path">Webhook Path</label>
+        <div class="field-help">Path relative to the billing site root (must start with <code>/</code>). Default: <code>/paypal/webhook.php</code></div>
+        <input type="text" id="cfg_wh_path" name="paypal_webhook_path"
+               value="<?php echo h((string)$cfgVals['paypal_webhook_path']); ?>"
+               placeholder="/paypal/webhook.php"
+               oninput="updateWebhookUrl()">
+      </div>
+      <div class="field-group">
+        <label>Computed Full Webhook URL <small style="font-weight:normal;color:#888;">(read-only — paste this into PayPal)</small></label>
+        <div class="field-help">
+          This is the URL PayPal will POST webhook events to.
+          It must be publicly accessible over HTTPS before enabling live mode.
+        </div>
+        <input type="text" id="computed_webhook_url"
+               class="readonly-field"
+               value="<?php echo h($computedWebhookUrl); ?>"
+               readonly
+               style="font-family:monospace;color:#333;background:#f0f4ff;">
+        <button type="button" id="copy_webhook_url_btn" class="btn-show" style="margin-top:4px;"
+                onclick="var u=document.getElementById('computed_webhook_url');if(u){navigator.clipboard.writeText(u.value).then(function(){var b=document.getElementById('copy_webhook_url_btn');b.textContent='Copied!';setTimeout(function(){b.textContent='Copy';},2000);});}">Copy</button>
+      </div>
+      <script>
+        function updateWebhookUrl() {
+          var base = document.getElementById('cfg_base_url');
+          var path = document.getElementById('cfg_wh_path');
+          var out  = document.getElementById('computed_webhook_url');
+          if (!base || !path || !out) return;
+          var b = base.value.replace(/\/+$/, '');
+          var p = path.value.replace(/^([^\/])/, '/$1');
+          out.value = b + p;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+          var base = document.getElementById('cfg_base_url');
+          if (base) base.addEventListener('input', updateWebhookUrl);
+        });
+      </script>
 
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
       <h3 style="margin-top:0;color:#333;">Backup Settings</h3>
@@ -509,7 +620,94 @@ rsort($bakFiles); // newest first
   </div>
 
   <!-- ===================================================================
-       SECTION B: Raw PHP editor
+       SECTION B: PayPal Diagnostics
+  ==================================================================== -->
+  <?php
+  // Gather diagnostics data
+  $diag_mode         = $cfgVals['paypal_mode'] ?? 'sandbox';
+  $diag_is_sandbox   = $diag_mode !== 'live';
+  $diag_sb_id_set    = $cfgVals['paypal_sandbox_client_id']     !== '';
+  $diag_sb_sec_set   = $cfgVals['paypal_sandbox_client_secret'] !== '';
+  $diag_sb_wh_set    = $cfgVals['paypal_sandbox_webhook_id']    !== '';
+  $diag_lv_id_set    = $cfgVals['paypal_live_client_id']        !== '';
+  $diag_lv_sec_set   = $cfgVals['paypal_live_client_secret']    !== '';
+  $diag_lv_wh_set    = $cfgVals['paypal_live_webhook_id']       !== '';
+  $diag_wh_path      = $cfgVals['paypal_webhook_path']          ?? '/paypal/webhook.php';
+  $diag_wh_full_url  = $computedWebhookUrl;
+  $diag_wh_file      = __DIR__ . ltrim($diag_wh_path, '/');
+  $diag_wh_exists    = file_exists($diag_wh_file);
+
+  // Active mode credential check
+  $diag_active_id_set  = $diag_is_sandbox ? $diag_sb_id_set  : $diag_lv_id_set;
+  $diag_active_sec_set = $diag_is_sandbox ? $diag_sb_sec_set : $diag_lv_sec_set;
+  $diag_active_wh_set  = $diag_is_sandbox ? $diag_sb_wh_set  : $diag_lv_wh_set;
+
+  function diag_badge(bool $ok, string $yes = 'Yes', string $no = 'No'): string {
+      $cls   = $ok ? 'background:#d4edda;color:#155724;border:1px solid #c3e6cb;' : 'background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;';
+      $label = $ok ? $yes : $no;
+      return '<span style="' . $cls . 'padding:2px 8px;border-radius:3px;font-size:0.85em;font-weight:600;">' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
+  }
+
+  // Last webhook events
+  $diag_recent_events = [];
+  try {
+      $port_int = intval($db_port ?? 3306) ?: 3306;
+      $diag_db  = @mysqli_connect($db_host ?? 'localhost', $db_user ?? '', $db_pass ?? '', $db_name ?? '', $port_int);
+      if ($diag_db) {
+          $pfx_diag = $table_prefix ?? 'gsp_';
+          $res = @mysqli_query($diag_db, "SELECT paypal_event_id, event_type, processing_status, created_at FROM `{$pfx_diag}billing_paypal_webhook_events` ORDER BY id DESC LIMIT 5");
+          if ($res) {
+              while ($row = mysqli_fetch_assoc($res)) {
+                  $diag_recent_events[] = $row;
+              }
+          }
+          mysqli_close($diag_db);
+      }
+  } catch (Throwable $e) {
+      // non-fatal
+  }
+  ?>
+  <div class="cfg-section">
+    <h2>PayPal Diagnostics</h2>
+    <table style="border-collapse:collapse;width:100%;font-size:0.9em;">
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;width:260px;">Current mode</td><td style="padding:6px 8px;"><strong><?php echo h($diag_mode); ?></strong></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Active Client ID configured</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_active_id_set); ?></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Active Client Secret configured</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_active_sec_set); ?></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Active Webhook ID configured</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_active_wh_set, 'Yes', 'No (signature verification skipped)'); ?></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Sandbox credentials</td><td style="padding:6px 8px;">ID: <?php echo diag_badge($diag_sb_id_set); ?> &nbsp; Secret: <?php echo diag_badge($diag_sb_sec_set); ?> &nbsp; Webhook ID: <?php echo diag_badge($diag_sb_wh_set); ?></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Live credentials</td><td style="padding:6px 8px;">ID: <?php echo diag_badge($diag_lv_id_set); ?> &nbsp; Secret: <?php echo diag_badge($diag_lv_sec_set); ?> &nbsp; Webhook ID: <?php echo diag_badge($diag_lv_wh_set); ?></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Webhook path</td><td style="padding:6px 8px;"><code><?php echo h($diag_wh_path); ?></code></td></tr>
+      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Full public webhook URL</td><td style="padding:6px 8px;"><code style="word-break:break-all;"><?php echo h($diag_wh_full_url ?: '(Site Base URL not set)'); ?></code></td></tr>
+      <tr><td style="padding:6px 8px;color:#555;">Webhook file exists on disk</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_wh_exists, 'Yes — ' . h($diag_wh_file), 'No — ' . h($diag_wh_file) . ' not found'); ?></td></tr>
+    </table>
+
+    <?php if (!empty($diag_recent_events)): ?>
+    <h4 style="margin-top:18px;color:#555;">Recent Webhook Events</h4>
+    <table style="border-collapse:collapse;width:100%;font-size:0.85em;">
+      <thead><tr style="background:#f8f9fa;">
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">PayPal Event ID</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">Type</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">Status</th>
+        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">Received</th>
+      </tr></thead>
+      <tbody>
+      <?php foreach ($diag_recent_events as $ev): ?>
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:5px 8px;font-family:monospace;font-size:0.85em;"><?php echo h($ev['paypal_event_id'] ?: '—'); ?></td>
+          <td style="padding:5px 8px;"><?php echo h($ev['event_type']); ?></td>
+          <td style="padding:5px 8px;"><?php echo diag_badge($ev['processing_status'] === 'processed', $ev['processing_status'], $ev['processing_status']); ?></td>
+          <td style="padding:5px 8px;"><?php echo h($ev['created_at']); ?></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    <?php elseif (empty($diag_recent_events)): ?>
+    <p style="color:#888;font-size:0.9em;margin-top:12px;">No webhook events recorded yet. Events will appear here after PayPal delivers the first webhook to <code><?php echo h($diag_wh_full_url ?: $diag_wh_path); ?></code>.</p>
+    <?php endif; ?>
+  </div>
+
+  <!-- ===================================================================
+       SECTION C: Raw PHP editor
   ==================================================================== -->
   <div class="cfg-section">
     <h2>Advanced: Raw Config Editor</h2>
