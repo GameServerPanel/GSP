@@ -14,7 +14,7 @@
  * Panel-child detection:
  *   Walk up from modules/billing/includes/ looking for the pattern
  *   <ancestor>/includes/config.inc.php that contains the GSP panel DB variables
- *   ($db_host, $db_user, $db_name, $table_prefix).  Stop after four levels.
+ *   ($db_host, $db_user, $db_name, $table_prefix).  Stop after six levels.
  *
  * Config sync:
  *   If the panel config DB variables differ from the billing config file on disk, the loader
@@ -44,9 +44,11 @@ if (!function_exists('_billing_extract_db_vars_from_file')) {
         }
         $result = [];
         foreach (['db_host', 'db_port', 'db_user', 'db_pass', 'db_name', 'table_prefix', 'db_type'] as $var) {
-            // Match: $varname = "value"; or $varname="value"; (single or double quotes)
-            if (preg_match('/^\s*\$' . preg_quote($var, '/') . '\s*=\s*["\']([^"\']*)["\']/', $content, $m, 0, 0) ||
-                preg_match('/\$' . preg_quote($var, '/') . '\s*=\s*["\']([^"\']*)["\']/', $content, $m)) {
+            // Match: $varname = "value"; or $varname="value"; (single or double quotes, no escaped quotes)
+            // Note: credentials containing escaped quotes or special chars are not supported by this
+            // regex-based extractor — use var_export() to write values and keep creds simple.
+            if (preg_match('/^\s*\$' . preg_quote($var, '/') . '\s*=\s*"([^"]*)"/m', $content, $m) ||
+                preg_match('/^\s*\$' . preg_quote($var, '/') . "\s*=\s*'([^']*)'/m", $content, $m)) {
                 $result[$var] = $m[1];
             }
         }
@@ -74,9 +76,12 @@ if (!function_exists('_billing_sync_db_vars_to_file')) {
                 continue;
             }
             $newVal = $panelVars[$var];
-            // Match any existing assignment for this var (single or double quotes)
+            // Match any existing assignment for this var (double or single quotes, no escaped quotes)
+            // Use var_export() to produce the replacement value so special characters are handled
+            // correctly (var_export produces a valid PHP string literal).
             $pattern = '/^(\s*\$' . preg_quote($var, '/') . '\s*=\s*)["\'][^"\']*["\'](.*)$/m';
-            $newLine  = '${1}"' . addslashes($newVal) . '"${2}';
+            $exportedVal = var_export($newVal, true); // produces 'value' with proper escaping
+            $newLine  = '${1}' . str_replace('\\', '\\\\', $exportedVal) . '${2}';
             $updated  = preg_replace($pattern, $newLine, $content, 1, $count);
             if ($count > 0 && $updated !== $content) {
                 $content = (string)$updated;

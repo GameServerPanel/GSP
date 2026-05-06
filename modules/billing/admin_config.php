@@ -123,8 +123,7 @@ function billing_admin_build_config(string $existingContent, array $vals): strin
 
     $dataDirLine = ($dataDir !== '' && $dataDir !== 'auto')
         ? '$SITE_DATA_DIR = ' . $q($dataDir) . ';'
-        : '$SITE_DATA_DIR = realpath(__DIR__ . \'/..\')'
-          . ' . DIRECTORY_SEPARATOR . \'data\';';
+        : "\$SITE_DATA_DIR = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR . 'data';";
 
     return '<?php' . "\n"
         . '###############################################' . "\n"
@@ -220,7 +219,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             $existingContent = (string)file_get_contents($cfgPath);
             $newContent      = billing_admin_build_config($existingContent, $formVals);
 
-            // Backup before write
+            // Backup before write.
+            // Note: the backup copy and subsequent file_put_contents are not covered by a
+            // single atomic lock.  This is acceptable for an admin-only operation where
+            // concurrent writes are not expected.
             $bakName = billing_admin_create_backup($cfgPath, $bakDir);
             if (!$bakName) {
                 $status     = 'Failed to create backup. Aborting save.';
@@ -268,6 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             $status     = 'Config must start with <?php';
             $statusType = 'error';
         } else {
+            // Backup then write (admin-only operation; concurrent writes are not expected).
             $bakName = billing_admin_create_backup($cfgPath, $bakDir);
             if (!$bakName) {
                 $status     = 'Failed to create backup. Aborting save.';
