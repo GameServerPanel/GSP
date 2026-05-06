@@ -99,7 +99,7 @@ require_once __DIR__ . '/classes/BillingService.php';
 
 $repo = new BillingRepository($db, $table_prefix);
 $newOrderIds = [];
-$durationMeta = static function (array $invoice): array {
+$duration_meta = static function (array $invoice): array {
     $duration = strtolower((string)($invoice['invoice_duration'] ?? $invoice['rate_type'] ?? 'month'));
     switch ($duration) {
         case 'day':
@@ -119,7 +119,7 @@ foreach ($invoices as $inv) {
     $invoiceId = intval($inv['invoice_id']);
     $invoiceBase = round((float)($inv['subtotal'] ?? $inv['total_due'] ?? $inv['amount'] ?? 0), 2);
     $orderId = intval($inv['order_id'] ?? 0);
-    $meta = $durationMeta($inv);
+    $meta = $duration_meta($inv);
 
     $repo->updateInvoiceFields($invoiceId, [
         'order_id' => $orderId,

@@ -123,7 +123,7 @@ function cap_invoice_ids_from_custom_id(?string $customId): array {
     return array_values(array_unique($invoiceIds));
 }
 
-function cap_duration_metadata(array $invoice): array {
+function cap_get_duration_metadata(array $invoice): array {
     $duration = strtolower((string)($invoice['invoice_duration'] ?? $invoice['rate_type'] ?? 'month'));
     switch ($duration) {
         case 'day':
@@ -139,8 +139,8 @@ function cap_duration_metadata(array $invoice): array {
     }
 }
 
-function cap_end_date(array $invoice, ?string $fromDate = null): string {
-    $meta = cap_duration_metadata($invoice);
+function cap_get_end_date(array $invoice, ?string $fromDate = null): string {
+    $meta = cap_get_duration_metadata($invoice);
     $qty = max(1, intval($invoice['qty'] ?? 1));
     $baseTs = time();
     if (!empty($fromDate)) {
@@ -279,7 +279,7 @@ foreach ($invoices as $inv) {
     $invoiceBase = round((float)($inv['subtotal'] ?? $inv['total_due'] ?? $inv['amount'] ?? 0), 2);
     $lineDiscount = round((float)($discountMap[$invoiceId] ?? 0), 2);
     $lineTotal = round(max(0, $invoiceBase - $lineDiscount), 2);
-    $durationMeta = cap_duration_metadata($inv);
+    $durationMeta = cap_get_duration_metadata($inv);
 
     $invoiceUpdate = [
         'coupon_id' => $couponId,
@@ -319,7 +319,7 @@ foreach ($invoices as $inv) {
         // Existing order linked to this invoice — extend it and mark Active.
         $order = $repo->getOrder($orderId);
         if ($order) {
-            $newEnd = cap_end_date($inv, $order['end_date'] ?? null);
+            $newEnd = cap_get_end_date($inv, $order['end_date'] ?? null);
             $currentHomeId = intval($order['home_id'] ?? 0);
             $repo->updateOrderFields($orderId, [
                 'status' => 'Active',
@@ -342,7 +342,7 @@ foreach ($invoices as $inv) {
         }
     } else {
         // No billing_orders row yet — create one now so the provisioner can run.
-        $newEnd = cap_end_date($inv, null);
+        $newEnd = cap_get_end_date($inv, null);
         $newOrderId = $repo->createOrder([
             'user_id'                 => intval($inv['user_id']),
             'service_id'              => intval($inv['service_id']),

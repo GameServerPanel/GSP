@@ -215,7 +215,7 @@ if ($stmt) {
     $invoice_duration = $durationInfo['invoice_duration'];
     $rate_type = $durationInfo['rate_type'];
     $stmt->bind_param(
-        'iisisssssdsssssdissssddsi',
+        'iisiissssdsssssssdissddsi',
         $esc_user_id,
         $esc_service_id,
         $home_name,
