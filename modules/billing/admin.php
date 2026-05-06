@@ -55,8 +55,6 @@ function h($s){ return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8'); }
   <a class="gsw-btn" href="admin_payments.php">Transaction Log</a>
   <a class="gsw-btn" href="admin_coupons.php">Manage Coupons</a>
   <a class="gsw-btn" href="admin_config.php">Edit Site Config</a>
-  <a class="gsw-btn" href="admin_xml_editor.php">XML Config Editor</a>
-  <a class="gsw-btn" href="docs/xml_notes.php">XML Config Guide</a>
   </div>
 
   <hr>
