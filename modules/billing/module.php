@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "3.4";
-$db_version = 5;
+$module_version = "3.5";
+$db_version = 6;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -383,6 +383,19 @@ $install_queries[5] = array(
         if ($backupCheck && !empty($backupCheck[0]['cnt']) && (int)$backupCheck[0]['cnt'] > 0) return true;
 
         return (bool)$db->query("RENAME TABLE `{$legacy}` TO `{$backup}`");
+    }
+);
+
+// -----------------------------------------------------------------------
+// db_version 6 — Add server_os column to remote_servers for OS-aware
+// game/service selection in the billing storefront.
+// Default 'linux' preserves existing behaviour for all current installs.
+// -----------------------------------------------------------------------
+$install_queries[6] = array(
+    function($db) {
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXremote_servers' AND COLUMN_NAME = 'server_os'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXremote_servers` ADD `server_os` ENUM('linux','windows','any') NOT NULL DEFAULT 'linux' AFTER `display_public_ip`");
     }
 );
 

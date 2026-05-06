@@ -541,7 +541,7 @@ $siteBase = $protocol . $host;
             <div class="cart-empty">
                 <h2>Your cart is empty</h2>
                 <p>Browse our game servers and add them to your cart to get started!</p>
-                <a href="/order.php" class="btn">Browse Servers</a>
+                <a href="/serverlist.php" class="btn">Browse Servers</a>
             </div>
         <?php else: ?>
             <table class="cart-table">
@@ -640,7 +640,7 @@ $siteBase = $protocol . $host;
                     </button>
                 </form>
                 <div class="action-buttons" style="margin-top:15px;">
-                    <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
+                    <a href="/serverlist.php" class="btn btn-secondary">Continue Shopping</a>
                     <a href="/my_account.php" class="btn btn-secondary">My Account</a>
                 </div>
             </div>
@@ -672,7 +672,7 @@ $siteBase = $protocol . $host;
                 <div id="status-message" class="status-message"></div>
                 <?php endif; ?>
                 <div class="action-buttons">
-                    <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
+                    <a href="/serverlist.php" class="btn btn-secondary">Continue Shopping</a>
                     <a href="/my_account.php" class="btn btn-secondary">My Account</a>
                 </div>
             </div>

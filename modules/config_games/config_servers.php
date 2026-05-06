@@ -233,61 +233,61 @@ function config_games_print_editor_css()
     $printed = true;
     echo <<<CSS
 <style>
-.xml-editor-wrapper{margin:20px 0;padding:12px;background:#111;border:1px solid #222;border-radius:8px}
-.xml-node{border:1px solid #333;border-radius:6px;padding:12px;margin-bottom:10px;background:#181818}
+.xml-editor-wrapper{margin:20px 0;padding:14px;background:#111;border:1px solid #222;border-radius:8px;font-size:1rem}
+.xml-node{border:1px solid #333;border-radius:6px;padding:14px;margin-bottom:12px;background:#181818}
 .xml-node--required{border-left:3px solid #1c6dd0}
-.xml-node__header{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #2a2a2a;padding-bottom:6px;margin-bottom:8px}
-.xml-node__title{font-weight:600;color:#f5f5f5}
-.xml-node__title--required::after{content:" *";color:#e06c75;font-size:0.8rem}
-.xml-node__path{font-size:0.85rem;color:#989898}
-.xml-node__badge{font-size:0.72rem;padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
+.xml-node__header{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #2a2a2a;padding-bottom:8px;margin-bottom:10px}
+.xml-node__title{font-weight:600;color:#f5f5f5;font-size:1rem}
+.xml-node__title--required::after{content:" *";color:#e06c75;font-size:0.85rem}
+.xml-node__path{font-size:0.88rem;color:#b0b0b0}
+.xml-node__badge{font-size:0.75rem;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:0.05em;margin-left:6px}
 .xml-node__badge--required{background:#1c3a6d;color:#7eb3f0}
-.xml-node__badge--optional{background:#2a2a2a;color:#888}
-.xml-node__body label{font-size:0.85rem;color:#bbb;display:block;margin-bottom:4px}
-.xml-node__body input[type="text"], .xml-node__body textarea, .xml-node__body select{width:100%;padding:8px;border:1px solid #3a3a3a;border-radius:4px;background:#101010;color:#fff;font-family:monospace}
-.xml-node__body textarea{min-height:120px}
+.xml-node__badge--optional{background:#2a2a2a;color:#aaa}
+.xml-node__body label{font-size:0.9rem;color:#d0d0d0;display:block;margin-bottom:5px}
+.xml-node__body input[type="text"], .xml-node__body textarea, .xml-node__body select{width:100%;padding:8px 10px;border:1px solid #3a3a3a;border-radius:4px;background:#101010;color:#f0f0f0;font-family:monospace;font-size:0.93rem}
+.xml-node__body textarea{min-height:130px;line-height:1.4}
 .xml-node__attributes{margin-top:8px}
 .xml-node__attributes .attr-row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
 .xml-node__attributes .attr-row input[type="text"]{flex:1}
-.xml-children{margin-top:10px;border-left:2px solid #2a2a2a;padding-left:12px}
+.xml-children{margin-top:10px;border-left:2px solid #2a2a2a;padding-left:14px}
 .xml-actions{display:flex;justify-content:flex-end;margin-top:16px;padding:8px 18px 0}
 .xml-node__actions{display:flex;gap:8px;align-items:center}
-.xml-node__apply{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:6px 12px;border-radius:4px;cursor:pointer}
+.xml-node__apply{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:0.93rem}
 .xml-node__apply:hover{background:#1f7aec}
-.xml-global-save{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:10px 28px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;cursor:pointer;transition:background 0.2s ease,transform 0.2s ease;box-shadow:0 2px 6px rgba(0,0,0,0.35)}
+.xml-global-save{background:#1c6dd0;border:1px solid #114b99;color:#fff;padding:10px 28px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;cursor:pointer;transition:background 0.2s ease,transform 0.2s ease;box-shadow:0 2px 6px rgba(0,0,0,0.35);font-size:0.95rem}
 .xml-global-save:hover{background:#1f7aec;transform:translateY(-1px)}
 .xml-global-save--top{float:right;margin:0 18px 12px 0}
-.xml-hint{font-size:0.85rem;color:#999;margin-top:4px}
-.xml-validation-errors{background:#2d0f0f;border:1px solid #8b1c1c;border-radius:6px;padding:12px 16px;margin-bottom:14px;color:#f88}
+.xml-hint{font-size:0.88rem;color:#b0b0b0;margin-top:5px}
+.xml-validation-errors{background:#2d0f0f;border:1px solid #8b1c1c;border-radius:6px;padding:12px 16px;margin-bottom:14px;color:#ffaaaa;font-size:0.93rem}
 .xml-validation-errors ul{margin:6px 0 0 16px;padding:0}
-.xml-raw-toggle{margin:8px 0 4px;color:#7eb3f0;cursor:pointer;font-size:0.9rem;text-decoration:underline;background:none;border:none;padding:0}
+.xml-raw-toggle{margin:8px 0 4px;color:#7eb3f0;cursor:pointer;font-size:0.95rem;text-decoration:underline;background:none;border:none;padding:0}
 .xml-raw-section{margin-top:10px;display:none}
-.xml-raw-section textarea{width:100%;min-height:300px;font-family:monospace;font-size:0.85rem;background:#0c0c0c;color:#eee;border:1px solid #3a3a3a;border-radius:4px;padding:8px}
-.xml-raw-warning{background:#2d2200;border:1px solid #7a5a00;border-radius:4px;padding:8px 12px;color:#f0c050;font-size:0.85rem;margin-bottom:6px}
-.xml-section-header{margin:20px 0 4px;font-size:0.8rem;color:#888;text-transform:uppercase;letter-spacing:0.1em;border-bottom:1px solid #2a2a2a;padding-bottom:4px}
-.xml-node__desc{font-size:0.82rem;color:#aaa;background:#0e0e0e;border-left:3px solid #2a4a7a;padding:6px 10px;margin:6px 0 8px;border-radius:0 4px 4px 0}
-.xml-node__options{margin:4px 0 4px 12px;padding:0;list-style:disc inside}
-.xml-node__options li{margin-bottom:2px}
-.xml-node__options code{color:#7eb3f0;background:rgba(30,100,200,0.12);padding:1px 4px;border-radius:3px}
-.xml-node__example{display:block;margin-top:4px;color:#888}
-.xml-node__example code{color:#a0d0a0;background:rgba(30,150,50,0.1);padding:1px 4px;border-radius:3px}
-.xml-jump-link{display:inline-block;margin-bottom:12px;padding:6px 14px;background:#1c6dd0;color:#fff;border-radius:4px;text-decoration:none;font-size:0.9rem}
+.xml-raw-section textarea{width:100%;min-height:320px;font-family:monospace;font-size:0.9rem;background:#0c0c0c;color:#f0f0f0;border:1px solid #3a3a3a;border-radius:4px;padding:10px;line-height:1.4}
+.xml-raw-warning{background:#2d2200;border:1px solid #7a5a00;border-radius:4px;padding:10px 14px;color:#f0c050;font-size:0.9rem;margin-bottom:8px}
+.xml-section-header{margin:22px 0 6px;font-size:0.85rem;color:#aaa;text-transform:uppercase;letter-spacing:0.1em;border-bottom:1px solid #2a2a2a;padding-bottom:5px}
+.xml-node__desc{font-size:0.88rem;color:#c8c8c8;background:#0e0e0e;border-left:3px solid #2a4a7a;padding:8px 12px;margin:8px 0 10px;border-radius:0 4px 4px 0;line-height:1.5}
+.xml-node__options{margin:6px 0 4px 14px;padding:0;list-style:disc inside}
+.xml-node__options li{margin-bottom:3px;font-size:0.9rem}
+.xml-node__options code{color:#7eb3f0;background:rgba(30,100,200,0.12);padding:1px 5px;border-radius:3px}
+.xml-node__example{display:block;margin-top:6px;color:#aaa;font-size:0.88rem}
+.xml-node__example code{color:#a0d0a0;background:rgba(30,150,50,0.1);padding:1px 5px;border-radius:3px}
+.xml-jump-link{display:inline-block;margin-bottom:12px;padding:7px 16px;background:#1c6dd0;color:#fff;border-radius:4px;text-decoration:none;font-size:0.93rem}
 .xml-jump-link:hover{background:#1f7aec;text-decoration:none}
-.xml-section-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:18px}
-.xml-section-block{border:1px solid #303030;border-radius:6px;background:#141414;padding:12px}
-.xml-section-block__head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
-.xml-section-block__title{font-size:1.02rem;color:#f0f0f0;font-weight:600}
-.xml-section-block__meta{font-size:0.8rem;color:#9f9f9f}
-.xml-section-block__desc{font-size:0.86rem;color:#b0b0b0;margin:0 0 10px}
-.xml-section-block textarea{width:100%;min-height:170px;background:#0f0f0f;border:1px solid #3c3c3c;border-radius:4px;color:#f7f7f7;padding:8px;font-family:monospace;font-size:0.84rem}
-.xml-section-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.xml-btn{border:1px solid #3f3f3f;background:#222;color:#fff;padding:6px 10px;border-radius:4px;cursor:pointer}
+.xml-section-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:20px}
+.xml-section-block{border:1px solid #303030;border-radius:6px;background:#141414;padding:14px}
+.xml-section-block__head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px}
+.xml-section-block__title{font-size:1.05rem;color:#f0f0f0;font-weight:600}
+.xml-section-block__meta{font-size:0.83rem;color:#b0b0b0}
+.xml-section-block__desc{font-size:0.9rem;color:#c8c8c8;margin:0 0 12px;line-height:1.5}
+.xml-section-block textarea{width:100%;min-height:180px;background:#0f0f0f;border:1px solid #3c3c3c;border-radius:4px;color:#f7f7f7;padding:10px;font-family:monospace;font-size:0.9rem;line-height:1.4}
+.xml-section-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.xml-btn{border:1px solid #3f3f3f;background:#222;color:#e8e8e8;padding:7px 12px;border-radius:4px;cursor:pointer;font-size:0.9rem}
 .xml-btn:hover{background:#2a2a2a}
-.xml-btn--primary{background:#1c6dd0;border-color:#114b99}
+.xml-btn--primary{background:#1c6dd0;border-color:#114b99;color:#fff}
 .xml-btn--primary:hover{background:#1f7aec}
-.xml-btn--danger{background:#6b1f1f;border-color:#8d2d2d}
+.xml-btn--danger{background:#6b1f1f;border-color:#8d2d2d;color:#ffcccc}
 .xml-btn--danger:hover{background:#8d2d2d}
-.xml-add-section{border:1px dashed #3a3a3a;border-radius:6px;padding:10px;margin-bottom:16px}
+.xml-add-section{border:1px dashed #3a3a3a;border-radius:6px;padding:12px;margin-bottom:18px}
 .xml-add-section select{min-width:260px}
 </style>
 CSS;
@@ -730,6 +730,23 @@ function config_games_render_top_level_editor($home_cfg_id, $configFile)
         echo "</div>";
         echo "</form>";
     }
+
+    // Render missing optional schema sections as informational cards with an Add button.
+    $descriptions = config_games_tag_descriptions();
+    foreach ($optionalMissing as $missingName) {
+        $safeMissing = htmlspecialchars($missingName, ENT_QUOTES, 'UTF-8');
+        $missingDesc = htmlspecialchars($descriptions[$missingName]['desc'] ?? 'Optional configuration section.', ENT_QUOTES, 'UTF-8');
+        echo "<div class='xml-section-block' style='border-color:#2a3a2a;background:#101810;opacity:0.85'>";
+        echo "<div class='xml-section-block__head'><div><div class='xml-section-block__title' style='color:#a0c0a0'>{$safeMissing}</div><div class='xml-section-block__meta'>Optional &mdash; not in this file</div></div></div>";
+        echo "<p class='xml-section-block__desc' style='font-style:italic;color:#9aba9a'>This section is not currently in this XML file. You can add it if needed.</p>";
+        echo "<p class='xml-section-block__desc'>{$missingDesc}</p>";
+        echo "<form action='?m=config_games&amp;home_cfg_id=" . (int)$home_cfg_id . "' method='post'>";
+        echo "<input type='hidden' name='home_cfg_id' value='" . (int)$home_cfg_id . "'>";
+        echo "<input type='hidden' name='section_name' value='{$safeMissing}'>";
+        echo "<div class='xml-section-actions'><button class='xml-btn xml-btn--primary' type='submit' name='add_optional_section' value='1'>Add Section</button></div>";
+        echo "</form>";
+        echo "</div>";
+    }
     echo "</div>";
 }
 
@@ -1134,22 +1151,12 @@ function exec_ogp_module() {
 					echo "<div id='xml-editor-section'>";
 					config_games_render_top_level_editor($home_cfg_id, $config_file);
 
-					echo "<details style='margin:18px 0'><summary style='cursor:pointer;color:#9dc7ff'>Open legacy detailed node editor (previous default editor)</summary>";
-					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
-					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
-					echo "<button type='submit' name='save_xml' value='1' class='xml-global-save xml-global-save--top'>".get_lang('save')."</button>";
-					echo "<div style='clear:both'></div>";
-					echo config_games_render_editor($xml);
-					echo "<div class='xml-actions'><button type='submit' name='save_xml' value='1' class='xml-global-save'>".get_lang('save')."</button></div>";
-					echo "<p class='note'>&#x2605; = required field. Use the action dropdown to remove entire sections. Attribute values left blank will be removed. Script sections such as post_install are fully editable. Changes are validated against the schema before saving.</p>";
-					echo "</form>";
-					echo "</details>";
-
 					// Raw XML editor
 					echo "<hr style='margin:24px 0;border-color:#333'>";
 					echo "<h3 style='margin-bottom:8px'>Full Raw XML Editor</h3>";
 					echo "<div class='xml-raw-warning'>&#x26A0; <strong>Warning:</strong> Saving raw XML bypasses the guided editor. The file will be validated against the schema before saving. Invalid XML will be rejected.</div>";
-					echo "<button type='button' class='xml-raw-toggle' onclick=\"var s=document.getElementById('raw_xml_section');s.style.display=s.style.display==='none'?'block':'none'\">Toggle Raw XML Editor</button>";
+					echo "<script>function gspToggleRawXml(){var s=document.getElementById('raw_xml_section');var b=document.getElementById('raw_xml_toggle_btn');if(s.style.display!=='block'){s.style.display='block';b.textContent='Hide Raw XML Editor';}else{s.style.display='none';b.textContent='Show Raw XML Editor';}}</script>";
+					echo "<button type='button' id='raw_xml_toggle_btn' class='xml-raw-toggle' onclick='gspToggleRawXml()'>Show Raw XML Editor</button>";
 					echo "<div id='raw_xml_section' class='xml-raw-section'>";
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
