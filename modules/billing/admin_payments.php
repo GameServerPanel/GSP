@@ -26,7 +26,11 @@ if (!$db) {
     if (!empty($_GET['home_id']))         $filter['home_id']        = intval($_GET['home_id']);
     if (!empty($_GET['payment_method']))  $filter['payment_method'] = trim($_GET['payment_method']);
 
-    $transactions = $repo->getTransactions($filter, 200, 0);
+    try {
+        $transactions = $repo->getTransactions($filter, 200, 0);
+    } catch (Throwable $e) {
+        $errorMsg = 'Could not load transactions: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+    }
     mysqli_close($db);
     $db = null;
 }

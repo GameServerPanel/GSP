@@ -42,7 +42,13 @@ $userId = intval($_SESSION['website_user_id'] ?? $_SESSION['user_id'] ?? 0);
 if ($userId <= 0) {
     cap_log('NO_USER_SESSION', ['session_keys' => array_keys($_SESSION)]);
     ob_clean();
-    echo json_encode(['error' => 'no_user_session', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'no_user_session',
+        'message'    => 'You must be logged in to complete payment.',
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 
@@ -51,14 +57,26 @@ $rawInput = file_get_contents('php://input');
 $input    = json_decode($rawInput, true);
 if (json_last_error() !== JSON_ERROR_NONE) {
     ob_clean();
-    echo json_encode(['error' => 'invalid_json', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'invalid_json',
+        'message'    => 'Invalid JSON in request body.',
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 
 $paypalOrderId = $input['order_id'] ?? null;
 if (!$paypalOrderId) {
     ob_clean();
-    echo json_encode(['error' => 'missing_order_id', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'missing_order_id',
+        'message'    => 'Missing PayPal order ID.',
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 
@@ -70,7 +88,13 @@ $mysqli = @mysqli_connect($db_host, $db_user, $db_pass, $db_name, $port);
 if (!$mysqli) {
     cap_log('DB_FAILED', mysqli_connect_error());
     ob_clean();
-    echo json_encode(['error' => 'db_connection_failed', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'db_connection_failed',
+        'message'    => 'Database connection failed.',
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 mysqli_set_charset($mysqli, 'utf8mb4');
@@ -84,8 +108,21 @@ try {
     $gateway = GatewayFactory::make('paypal');
 } catch (Exception $e) {
     cap_log('GATEWAY_ERROR', $e->getMessage());
+    $repo->logPaypalError([
+        'context'    => 'gateway_init',
+        'error_code' => 'gateway_init_failed',
+        'message'    => $e->getMessage(),
+        'order_id'   => $paypalOrderId,
+        'user_id'    => $userId,
+    ]);
     ob_clean();
-    echo json_encode(['error' => 'gateway_init_failed', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'gateway_init_failed',
+        'message'    => 'Payment gateway initialisation failed.',
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     mysqli_close($mysqli);
     exit;
 }
@@ -95,8 +132,24 @@ cap_log('CAPTURE_RESULT', ['success' => $capture['success'], 'txid' => $capture[
 
 if (!$capture['success']) {
     cap_log('CAPTURE_FAILED', $capture);
+    $repo->logPaypalError([
+        'context'         => 'capture_order',
+        'error_code'      => $capture['error'] ?? 'capture_failed',
+        'message'         => $capture['message'] ?? 'PayPal order capture failed.',
+        'paypal_debug_id' => $capture['debug_id'] ?? null,
+        'order_id'        => $paypalOrderId,
+        'user_id'         => $userId,
+        'raw_json'        => $capture,
+    ]);
     ob_clean();
-    echo json_encode(['error' => $capture['error'] ?? 'capture_failed', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => $capture['error'] ?? 'capture_failed',
+        'message'    => $capture['message'] ?? 'PayPal order capture failed. Please try again.',
+        'debug_id'   => $capture['debug_id'] ?? null,
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     mysqli_close($mysqli);
     exit;
 }
@@ -127,6 +180,23 @@ foreach ($invoices as $inv) {
 
     $invoicesPaid++;
     cap_log('INVOICE_PAID', ['invoice_id' => $invoiceId, 'txid' => $txid]);
+
+    // Record transaction in billing_transactions (idempotent — skip on duplicate external ID)
+    $rawCapture = $capture['raw_response'] ?? [];
+    if (is_array($rawCapture)) {
+        unset($rawCapture['client_secret'], $rawCapture['access_token']); // never log secrets
+    }
+    $repo->logTransaction([
+        'invoice_id'              => $invoiceId,
+        'user_id'                 => $userId,
+        'home_id'                 => $homeId,
+        'payment_method'          => 'paypal',
+        'transaction_external_id' => $txid,
+        'amount'                  => (float)($inv['amount'] ?? $inv['total_due'] ?? 0),
+        'currency'                => (string)($inv['currency'] ?? 'USD'),
+        'status'                  => 'completed',
+        'raw_response'            => $rawCapture,
+    ]);
 
     // Resolve (or create) the billing_orders row for this invoice so the provisioner can run.
     // billing_orders.status='Active' is what create_servers.php queries.

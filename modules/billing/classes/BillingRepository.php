@@ -157,12 +157,89 @@ class BillingRepository
     }
 
     // ---------------------------------------------------------------
+    // Safe table-creation helpers (idempotent, check INFORMATION_SCHEMA first)
+    // ---------------------------------------------------------------
+
+    /**
+     * Ensure billing_transactions table exists.
+     * Safe to call on every request; uses INFORMATION_SCHEMA to skip if already present.
+     */
+    public function ensureBillingTransactionsTable(): bool
+    {
+        $res = $this->db->query(
+            "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '{$this->prefix}billing_transactions'"
+        );
+        if ($res && (int)$res->fetch_assoc()['cnt'] > 0) {
+            return true;
+        }
+        return (bool)$this->db->query(
+            "CREATE TABLE IF NOT EXISTS `{$this->prefix}billing_transactions` (
+                `transaction_id`          INT(11)       NOT NULL AUTO_INCREMENT,
+                `invoice_id`              INT(11)       NOT NULL DEFAULT 0,
+                `user_id`                 INT(11)       NOT NULL DEFAULT 0,
+                `home_id`                 INT(11)       NOT NULL DEFAULT 0,
+                `payment_method`          VARCHAR(50)   NOT NULL DEFAULT 'paypal',
+                `transaction_external_id` VARCHAR(255)  NOT NULL DEFAULT '',
+                `amount`                  DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+                `currency`                VARCHAR(3)    NOT NULL DEFAULT 'USD',
+                `status`                  ENUM('pending','completed','failed','refunded') NOT NULL DEFAULT 'pending',
+                `raw_response`            MEDIUMTEXT    NULL,
+                `created_at`              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated_at`              DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`transaction_id`),
+                KEY `invoice_id`     (`invoice_id`),
+                KEY `user_id`        (`user_id`),
+                KEY `home_id`        (`home_id`),
+                KEY `status`         (`status`),
+                KEY `payment_method` (`payment_method`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+    }
+
+    /**
+     * Ensure billing_paypal_errors table exists.
+     * Safe to call on every request; uses INFORMATION_SCHEMA to skip if already present.
+     */
+    public function ensureBillingPaypalErrorsTable(): bool
+    {
+        $res = $this->db->query(
+            "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '{$this->prefix}billing_paypal_errors'"
+        );
+        if ($res && (int)$res->fetch_assoc()['cnt'] > 0) {
+            return true;
+        }
+        return (bool)$this->db->query(
+            "CREATE TABLE IF NOT EXISTS `{$this->prefix}billing_paypal_errors` (
+                `id`                INT         NOT NULL AUTO_INCREMENT,
+                `context`           VARCHAR(64) NOT NULL DEFAULT '',
+                `error_code`        VARCHAR(128) NOT NULL DEFAULT '',
+                `message`           TEXT        NULL,
+                `paypal_debug_id`   VARCHAR(128) NULL,
+                `order_id`          VARCHAR(128) NULL,
+                `capture_id`        VARCHAR(128) NULL,
+                `billing_order_id`  INT         NULL,
+                `user_id`           INT         NULL,
+                `raw_json`          LONGTEXT    NULL,
+                `created_at`        DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                KEY `idx_context`    (`context`),
+                KEY `idx_created_at` (`created_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+        );
+    }
+
+    // ---------------------------------------------------------------
     // Transaction (payment log) helpers
     // ---------------------------------------------------------------
 
-    /** Insert a row into gsp_billing_transactions. Returns new transaction_id. */
+    /** Insert a row into billing_transactions. Returns new transaction_id. */
     public function logTransaction(array $data): int
     {
+        $this->ensureBillingTransactionsTable();
         $stmt = $this->db->prepare(
             "INSERT INTO `{$this->prefix}billing_transactions`
                 (invoice_id, user_id, home_id, payment_method, transaction_external_id,
@@ -171,17 +248,17 @@ class BillingRepository
         );
         if (!$stmt) return 0;
         $rawJson = is_array($data['raw_response']) ? json_encode($data['raw_response']) : (string)($data['raw_response'] ?? '');
+        $invoiceId = intval($data['invoice_id'] ?? 0);
+        $userId    = intval($data['user_id']    ?? 0);
+        $homeId    = intval($data['home_id']    ?? 0);
+        $method    = (string)($data['payment_method']          ?? 'paypal');
+        $extId     = (string)($data['transaction_external_id'] ?? '');
+        $amount    = (float)($data['amount']   ?? 0);
+        $currency  = (string)($data['currency'] ?? 'USD');
+        $status    = (string)($data['status']   ?? 'completed');
         $stmt->bind_param(
             'iiissdsss',
-            $data['invoice_id'],
-            $data['user_id'],
-            $data['home_id'],
-            $data['payment_method'],
-            $data['transaction_external_id'],
-            $data['amount'],
-            $data['currency'],
-            $data['status'],
-            $rawJson
+            $invoiceId, $userId, $homeId, $method, $extId, $amount, $currency, $status, $rawJson
         );
         if (!$stmt->execute()) { $stmt->close(); return 0; }
         $id = (int)$stmt->insert_id;
@@ -189,9 +266,12 @@ class BillingRepository
         return $id;
     }
 
-    /** Get all transactions, optionally filtered. */
+    /** Get all transactions, optionally filtered. Creates the table if missing. */
     public function getTransactions(array $filter = [], int $limit = 100, int $offset = 0): array
     {
+        if (!$this->ensureBillingTransactionsTable()) {
+            return [];
+        }
         $where  = '1=1';
         $params = [];
         $types  = '';
@@ -222,6 +302,72 @@ class BillingRepository
         $stmt = $this->db->prepare($sql);
         if (!$stmt) return [];
         $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    // ---------------------------------------------------------------
+    // PayPal error log helpers
+    // ---------------------------------------------------------------
+
+    /**
+     * Insert a row into billing_paypal_errors. Never logs client secrets.
+     * Returns new error log id (0 on failure).
+     */
+    public function logPaypalError(array $data): int
+    {
+        $this->ensureBillingPaypalErrorsTable();
+        $stmt = $this->db->prepare(
+            "INSERT INTO `{$this->prefix}billing_paypal_errors`
+                (context, error_code, message, paypal_debug_id, order_id, capture_id,
+                 billing_order_id, user_id, raw_json)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
+        if (!$stmt) return 0;
+        $context        = substr((string)($data['context']         ?? ''), 0, 64);
+        $errorCode      = substr((string)($data['error_code']      ?? ''), 0, 128);
+        $message        = (string)($data['message']        ?? '');
+        $debugId        = isset($data['paypal_debug_id'])  ? substr((string)$data['paypal_debug_id'],  0, 128) : null;
+        $orderId        = isset($data['order_id'])         ? substr((string)$data['order_id'],         0, 128) : null;
+        $captureId      = isset($data['capture_id'])       ? substr((string)$data['capture_id'],       0, 128) : null;
+        $billingOrderId = isset($data['billing_order_id']) ? intval($data['billing_order_id']) : null;
+        $userId         = isset($data['user_id'])         ? intval($data['user_id'])         : null;
+        $rawJson        = isset($data['raw_json'])
+            ? (is_array($data['raw_json']) ? json_encode($data['raw_json']) : (string)$data['raw_json'])
+            : null;
+        // Truncate large payloads to avoid LONGTEXT bloat
+        if ($rawJson !== null && strlen($rawJson) > 65536) {
+            $rawJson = substr($rawJson, 0, 65536) . '…[truncated]';
+        }
+        $stmt->bind_param(
+            'sssssssss',
+            $context, $errorCode, $message, $debugId, $orderId, $captureId,
+            $billingOrderId, $userId, $rawJson
+        );
+        if (!$stmt->execute()) { $stmt->close(); return 0; }
+        $id = (int)$stmt->insert_id;
+        $stmt->close();
+        return $id;
+    }
+
+    /**
+     * Return the $limit most recent rows from billing_paypal_errors.
+     * Returns empty array if the table does not exist.
+     */
+    public function getRecentPaypalErrors(int $limit = 10): array
+    {
+        if (!$this->ensureBillingPaypalErrorsTable()) {
+            return [];
+        }
+        $stmt = $this->db->prepare(
+            "SELECT id, created_at, context, error_code, message,
+                    paypal_debug_id, order_id, capture_id, billing_order_id, user_id
+             FROM `{$this->prefix}billing_paypal_errors`
+             ORDER BY id DESC
+             LIMIT ?"
+        );
+        if (!$stmt) return [];
+        $stmt->bind_param('i', $limit);
         $stmt->execute();
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
