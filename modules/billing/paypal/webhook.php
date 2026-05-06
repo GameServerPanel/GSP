@@ -160,7 +160,7 @@ $log_id = wh_log_event($wh_db, $pfx, [
 // ---------------------------------------------------------------------------
 // 6. Process event
 // ---------------------------------------------------------------------------
-$result = wh_process_event($wh_db, $pfx, $event_type, $resource, $evt, $access_token, $api_base, $raw);
+$result = wh_process_event($wh_db, $pfx, $event_type, $resource, $evt, $access_token, $api_base, $raw, $_billing_dir);
 
 // Update log entry with final status
 if ($log_id > 0) {
@@ -258,7 +258,8 @@ function wh_process_event(
     array  $evt,
     string $access_token,
     string $api_base,
-    string $raw_json
+    string $raw_json,
+    string $billing_dir = ''
 ): array {
     switch ($event_type) {
         case 'CHECKOUT.ORDER.APPROVED':
@@ -266,7 +267,7 @@ function wh_process_event(
 
         case 'PAYMENT.CAPTURE.COMPLETED':
         case 'PAYMENT.SALE.COMPLETED':
-            return wh_handle_capture_completed($db, $pfx, $resource, $evt, $access_token, $api_base);
+            return wh_handle_capture_completed($db, $pfx, $resource, $evt, $access_token, $api_base, $billing_dir);
 
         case 'PAYMENT.CAPTURE.DENIED':
         case 'PAYMENT.SALE.DENIED':
@@ -302,7 +303,8 @@ function wh_handle_capture_completed(
     array  $resource,
     array  $evt,
     string $access_token,
-    string $api_base
+    string $api_base,
+    string $billing_dir = ''
 ): array {
     $capture_id = $resource['id'] ?? '';
     $amount     = $resource['amount']['value'] ?? null;
@@ -349,7 +351,7 @@ function wh_handle_capture_completed(
         'custom_id'       => $custom_id,
         'amount'          => $amount,
         'currency'        => $currency,
-    ]);
+    ], $billing_dir);
 
     return ['status' => 'processed', 'billing_order_id' => $billing_order_id];
 }
@@ -426,7 +428,7 @@ function wh_fetch_paypal_order(string $api_base, string $access_token, string $o
  * Match the PayPal capture to a billing invoice, mark it paid, create/extend billing_orders,
  * and trigger server provisioning. Returns the billing_order_id or 0.
  */
-function wh_fulfill_payment(mysqli $db, string $pfx, array $payment): int
+function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $billing_dir = ''): int
 {
     $txid        = $payment['capture_id']      ?? '';
     $custom_id   = $payment['custom_id']       ?? null;
@@ -562,7 +564,8 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment): int
                 wh_log('info', 'order_created', ['order_id' => $new_order_id, 'invoice_id' => $invoice_id]);
 
                 // Attempt provisioning via panel bridge
-                wh_try_provision($_billing_dir ?? dirname(__DIR__), $new_order_id, $user_id);
+                $dir = ($billing_dir !== '') ? $billing_dir : dirname(__DIR__);
+                wh_try_provision($dir, $new_order_id, $user_id);
             } else {
                 wh_log('error', 'order_insert_failed', ['db_error' => mysqli_error($db), 'invoice_id' => $invoice_id]);
             }

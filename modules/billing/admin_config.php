@@ -578,8 +578,8 @@ rsort($bakFiles); // newest first
                value="<?php echo h($computedWebhookUrl); ?>"
                readonly
                style="font-family:monospace;color:#333;background:#f0f4ff;">
-        <button type="button" class="btn-show" style="margin-top:4px;"
-                onclick="navigator.clipboard.writeText(document.getElementById('computed_webhook_url').value).then(function(){this.textContent='Copied!';setTimeout(function(){document.querySelector('[onclick*=computed_webhook_url]').textContent='Copy';},2000);}.bind(this));">Copy</button>
+        <button type="button" id="copy_webhook_url_btn" class="btn-show" style="margin-top:4px;"
+                onclick="var u=document.getElementById('computed_webhook_url');if(u){navigator.clipboard.writeText(u.value).then(function(){var b=document.getElementById('copy_webhook_url_btn');b.textContent='Copied!';setTimeout(function(){b.textContent='Copy';},2000);});}">Copy</button>
       </div>
       <script>
         function updateWebhookUrl() {
