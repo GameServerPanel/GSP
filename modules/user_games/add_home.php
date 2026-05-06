@@ -164,7 +164,9 @@ function exec_ogp_module()
 						0,            // max_players — set later via edit_home
 						$access_rights,
 						$ftp,
-						$new_home_id
+						$new_home_id,
+						$control_password,
+						$ftppassword
 					);
 
 					$view->refresh("?m=user_games&amp;p=edit&amp;home_id=$new_home_id", 0);

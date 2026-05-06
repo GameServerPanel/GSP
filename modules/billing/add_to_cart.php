@@ -13,7 +13,36 @@ require_once(__DIR__ . '/includes/log.php');
 /** @var string $table_prefix Table prefix for database tables */
 
 // Start session if not already
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('opengamepanel_web');
+    session_start();
+}
+
+function billing_generate_password(int $bytes = 12): string
+{
+    try {
+        return substr(bin2hex(random_bytes($bytes)), 0, $bytes * 2);
+    } catch (Throwable $e) {
+        return substr(hash('sha256', uniqid('gsp', true) . microtime(true)), 0, $bytes * 2);
+    }
+}
+
+function billing_normalize_duration(string $duration): array
+{
+    $duration = strtolower(trim($duration));
+    switch ($duration) {
+        case 'day':
+        case 'daily':
+            return ['invoice_duration' => 'day', 'rate_type' => 'daily', 'days' => 1];
+        case 'year':
+        case 'yearly':
+            return ['invoice_duration' => 'year', 'rate_type' => 'yearly', 'days' => 365];
+        case 'month':
+        case 'monthly':
+        default:
+            return ['invoice_duration' => 'month', 'rate_type' => 'monthly', 'days' => 31];
+    }
+}
 
 // Immediate request tracing log (helps confirm the script is hit)
 @mkdir(__DIR__ . '/logs', 0775, true);
@@ -51,11 +80,11 @@ $ip_id = isset($_POST['ip_id']) ? intval($_POST['ip_id']) : 0;
 $max_players = isset($_POST['max_players']) ? intval($_POST['max_players']) : 0;
 $qty = isset($_POST['qty']) ? intval($_POST['qty']) : 1;
 $invoice_duration = isset($_POST['invoice_duration']) ? $_POST['invoice_duration'] : 'month';
-$remote_control_password = isset($_POST['remote_control_password']) ? $_POST['remote_control_password'] : '';
-$ftp_password = isset($_POST['ftp_password']) ? $_POST['ftp_password'] : '';
+$remote_control_password = isset($_POST['remote_control_password']) ? trim((string)$_POST['remote_control_password']) : '';
+$ftp_password = isset($_POST['ftp_password']) ? trim((string)$_POST['ftp_password']) : '';
 
 // Price lookup: try to find service price_monthly
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
+$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
     // Log connection error and exit
     @mkdir(__DIR__ . '/logs', 0775, true);
@@ -94,15 +123,25 @@ if (!empty($resolve_username_for_user_id) && $db) {
     }
 }
 
-$price = 0.0;
+$service_name = '';
+$base_rate = 0.0;
+$slot_min_qty = 1;
+$slot_max_qty = 1;
+$durationInfo = billing_normalize_duration($invoice_duration);
 if ($service_id > 0) {
-    $stmt = $db->prepare("SELECT price_monthly, slot_min_qty, slot_max_qty FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
+    $stmt = $db->prepare("SELECT service_name, price_daily, price_monthly, price_year, slot_min_qty, slot_max_qty FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
     if ($stmt) {
         $stmt->bind_param('i', $service_id);
         $stmt->execute();
-        $stmt->bind_result($price_monthly, $slot_min_qty, $slot_max_qty);
+        $stmt->bind_result($service_name, $price_daily, $price_monthly, $price_year, $slot_min_qty, $slot_max_qty);
         if ($stmt->fetch()) {
-            $price = floatval($price_monthly);
+            if ($durationInfo['rate_type'] === 'daily') {
+                $base_rate = floatval($price_daily);
+            } elseif ($durationInfo['rate_type'] === 'yearly') {
+                $base_rate = floatval($price_year);
+            } else {
+                $base_rate = floatval($price_monthly);
+            }
             // constrain slots
             if ($max_players < $slot_min_qty) $max_players = $slot_min_qty;
             if ($max_players > $slot_max_qty) $max_players = $slot_max_qty;
@@ -111,14 +150,27 @@ if ($service_id > 0) {
     }
 }
 
+if ($remote_control_password === '' || strcasecmp($remote_control_password, 'ChangeMe') === 0) {
+    $remote_control_password = billing_generate_password();
+}
+if ($ftp_password === '' || strcasecmp($ftp_password, 'ChangeMe') === 0) {
+    $ftp_password = billing_generate_password();
+}
+
 // Insert into {table_prefix}billing_invoices (NOT orders - invoice created first)
 $now = date('Y-m-d H:i:s');
 $status = 'due'; // Invoice status: due (unpaid), paid
+$payment_status = 'unpaid';
+$qty = max(1, $qty);
+$max_players = max(1, $max_players);
+$subtotal = round($base_rate * $max_players * $qty, 2);
+$amount = $subtotal;
+$period_end = date('Y-m-d H:i:s', strtotime('+' . ($durationInfo['days'] * $qty) . ' days'));
 
 // Normal flow: process POST immediately. If debug=1 is passed, we'll still log SQL and show results in logs.
 $debug = (isset($_GET['debug']) && $_GET['debug'] == '1') || (isset($_POST['debug']) && $_POST['debug'] == '1');
 
-// Build and execute a simple INSERT using mysqli_query for debugging clarity
+// Build and execute the INSERT with prepared statements
 @mkdir(__DIR__ . '/logs', 0775, true);
 $logfile = __DIR__ . '/logs/add_to_cart.log';
 site_log_info('add_to_cart_invoked', ['user_id'=>$user_id, 'service_id'=>$service_id]);
@@ -145,35 +197,71 @@ $esc_home_name = mysqli_real_escape_string($db, $home_name);
 $esc_ip_id = intval($ip_id);
 $esc_max_players = intval($max_players);
 $esc_qty = intval($qty);
-$esc_invoice_duration = mysqli_real_escape_string($db, $invoice_duration);
-$esc_price = number_format((float)$price, 2, '.', '');
-$esc_remote_control_password = mysqli_real_escape_string($db, $remote_control_password);
-$esc_ftp_password = mysqli_real_escape_string($db, $ftp_password);
-$esc_status = mysqli_real_escape_string($db, $status);
-$esc_customer_name = mysqli_real_escape_string($db, $customer_name);
-$esc_customer_email = mysqli_real_escape_string($db, $customer_email);
-$esc_due_date = mysqli_real_escape_string($db, $due_date);
-$esc_description = mysqli_real_escape_string($db, "New server: {$home_name}");
-
+$description = trim(($service_name !== '' ? $service_name : 'Game Server') . ': ' . $home_name);
 $sql = "INSERT INTO {$table_prefix}billing_invoices (
-    user_id, service_id, home_name, ip, max_players, qty, invoice_duration, 
-    amount, remote_control_password, ftp_password, status, customer_name, 
-    customer_email, due_date, description, currency, order_id
+    order_id, user_id, service_id, home_id, home_name, ip, max_players, remote_control_password,
+    ftp_password, customer_name, customer_email, amount, discount_amount, currency, status,
+    billing_status, invoice_date, due_date, description, invoice_duration, rate_type, rate_per_player,
+    players, period_start, period_end, subtotal, total_due, payment_status, qty, coupon_id
 ) VALUES (
-    {$esc_user_id}, {$esc_service_id}, '{$esc_home_name}', {$esc_ip_id}, 
-    {$esc_max_players}, {$esc_qty}, '{$esc_invoice_duration}', {$esc_price}, 
-    '{$esc_remote_control_password}', '{$esc_ftp_password}', '{$esc_status}', 
-    '{$esc_customer_name}', '{$esc_customer_email}', '{$esc_due_date}', 
-    '{$esc_description}', 'USD', 0
+    0, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, 'USD', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0
 )";
 
-site_log_info('add_to_cart_sql', ['sql'=>$sql]);
-file_put_contents($logfile, date('c') . " - Creating invoice (not order): status=due\n", FILE_APPEND);
-file_put_contents($logfile, date('c') . " - SQL: " . $sql . "\n", FILE_APPEND);
+$stmt = $db->prepare($sql);
+$res = false;
+$err_no = 0;
+$err = '';
+if ($stmt) {
+    $invoice_duration = $durationInfo['invoice_duration'];
+    $rate_type = $durationInfo['rate_type'];
+    $stmt->bind_param(
+        'iisiissssdsssssssdissddsi',
+        $esc_user_id,
+        $esc_service_id,
+        $home_name,
+        $esc_ip_id,
+        $esc_max_players,
+        $remote_control_password,
+        $ftp_password,
+        $customer_name,
+        $customer_email,
+        $amount,
+        $status,
+        $status,
+        $now,
+        $due_date,
+        $description,
+        $invoice_duration,
+        $rate_type,
+        $base_rate,
+        $max_players,
+        $now,
+        $period_end,
+        $subtotal,
+        $amount,
+        $payment_status,
+        $esc_qty
+    );
+    $res = @$stmt->execute();
+    $err_no = mysqli_errno($db);
+    $err = mysqli_error($db);
+} else {
+    $err_no = mysqli_errno($db);
+    $err = mysqli_error($db);
+}
 
-$res = @mysqli_query($db, $sql);
-$err_no = mysqli_errno($db);
-$err = mysqli_error($db);
+site_log_info('add_to_cart_invoice', [
+    'user_id' => $user_id,
+    'service_id' => $service_id,
+    'home_name' => $home_name,
+    'remote_server_id' => $ip_id,
+    'players' => $max_players,
+    'qty' => $qty,
+    'invoice_duration' => $invoice_duration,
+    'subtotal' => $subtotal,
+    'total_due' => $amount,
+]);
+file_put_contents($logfile, date('c') . " - Creating invoice (not order): status=due total_due={$amount}\n", FILE_APPEND);
 
 if (!$res || $err_no > 0) {
     site_log_error('mysqli_query_failed', ['errno'=>$err_no, 'error'=>$err, 'sql'=>$sql]);
@@ -191,6 +279,10 @@ if (!$res || $err_no > 0) {
     $affected = mysqli_affected_rows($db);
     site_log_info('add_to_cart_insert', ['invoice_id'=>$insert_id, 'affected_rows'=>$affected]);
     file_put_contents($logfile, date('c') . " - Invoice created: invoice_id={$insert_id}\n", FILE_APPEND);
+}
+
+if ($stmt instanceof mysqli_stmt) {
+    $stmt->close();
 }
 
 // Redirect to cart page

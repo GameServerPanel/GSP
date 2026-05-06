@@ -7,6 +7,7 @@ class BillingRepository
 {
     private mysqli $db;
     private string $prefix;
+    private array $columnCache = [];
 
     public function __construct(mysqli $db, string $prefix = 'gsp_')
     {
@@ -47,6 +48,32 @@ class BillingRepository
         return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     }
 
+    /** Get invoice rows for a specific user and invoice id list. */
+    public function getInvoicesForUserByIds(int $userId, array $invoiceIds, bool $onlyUnpaid = true): array
+    {
+        $invoiceIds = array_values(array_unique(array_filter(array_map('intval', $invoiceIds), static fn($id) => $id > 0)));
+        if (empty($invoiceIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($invoiceIds), '?'));
+        $types = str_repeat('i', count($invoiceIds) + 1);
+        $params = array_merge([$userId], $invoiceIds);
+        $where = $onlyUnpaid ? " AND payment_status IN ('unpaid','due')" : '';
+        $sql = "SELECT * FROM `{$this->prefix}billing_invoices`
+                WHERE user_id = ? AND invoice_id IN ({$placeholders}){$where}
+                ORDER BY invoice_id ASC";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            return [];
+        }
+        $stmt->bind_param($types, ...$params);
+        $stmt->execute();
+        $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+        return $rows;
+    }
+
     /** Mark an invoice as paid. Also sets status='paid' so it disappears from cart queries. */
     public function markInvoicePaid(int $invoiceId, string $txid, string $method, string $paidAt): bool
     {
@@ -78,6 +105,7 @@ class BillingRepository
         $txid     = (string)($data['payment_txid'] ?? '');
         $paidTs   = (string)($data['paid_ts'] ?? $now);
         $couponId = intval($data['coupon_id'] ?? 0);
+        $discount = (float)($data['discount_amount'] ?? 0);
         $ip       = (string)($data['ip'] ?? '0');
         $qty      = intval($data['qty'] ?? 1);
         $maxPl    = intval($data['max_players'] ?? 0);
@@ -88,25 +116,32 @@ class BillingRepository
         $invDur   = (string)($data['invoice_duration'] ?? 'month');
         $rcp      = (string)($data['remote_control_password'] ?? '');
         $ftp      = (string)($data['ftp_password'] ?? '');
-
-        $stmt = $this->db->prepare(
-            "INSERT INTO `{$this->prefix}billing_orders`
-                (user_id, service_id, home_name, ip, qty, invoice_duration, max_players,
-                 price, remote_control_password, ftp_password, home_id, status,
-                 order_date, end_date, payment_txid, paid_ts, coupon_id)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0', ?, ?, ?, ?, ?, ?)"
-        );
-        if (!$stmt) return 0;
-        $stmt->bind_param(
-            'iissiisdsssssssi',
-            $userId, $svcId, $homeName, $ip, $qty, $invDur, $maxPl,
-            $price, $rcp, $ftp,
-            $status, $now, $endDate, $txid, $paidTs, $couponId
-        );
-        if (!$stmt->execute()) { $stmt->close(); return 0; }
-        $id = (int)$stmt->insert_id;
-        $stmt->close();
-        return $id;
+        $fields = [
+            'user_id' => $userId,
+            'service_id' => $svcId,
+            'home_name' => $homeName,
+            'ip' => $ip,
+            'qty' => $qty,
+            'invoice_duration' => $invDur,
+            'max_players' => $maxPl,
+            'price' => $price,
+            'discount_amount' => $discount,
+            'remote_control_password' => $rcp,
+            'ftp_password' => $ftp,
+            'home_id' => '0',
+            'status' => $status,
+            'order_date' => $now,
+            'end_date' => $endDate,
+            'payment_txid' => $txid,
+            'paid_ts' => $paidTs,
+            'coupon_id' => $couponId,
+        ];
+        if ($this->hasColumn('billing_orders', 'paypal_data')) {
+            $fields['paypal_data'] = isset($data['paypal_data'])
+                ? (is_array($data['paypal_data']) ? json_encode($data['paypal_data']) : (string)$data['paypal_data'])
+                : null;
+        }
+        return $this->insertAssoc('billing_orders', $fields);
     }
 
     /**
@@ -240,6 +275,24 @@ class BillingRepository
     public function logTransaction(array $data): int
     {
         $this->ensureBillingTransactionsTable();
+        $invoiceId = intval($data['invoice_id'] ?? 0);
+        $extId     = (string)($data['transaction_external_id'] ?? '');
+        if ($invoiceId > 0 && $extId !== '') {
+            $existing = $this->db->prepare(
+                "SELECT transaction_id FROM `{$this->prefix}billing_transactions`
+                 WHERE invoice_id = ? AND transaction_external_id = ?
+                 LIMIT 1"
+            );
+            if ($existing) {
+                $existing->bind_param('is', $invoiceId, $extId);
+                $existing->execute();
+                $row = $existing->get_result()->fetch_assoc();
+                $existing->close();
+                if (!empty($row['transaction_id'])) {
+                    return (int)$row['transaction_id'];
+                }
+            }
+        }
         $stmt = $this->db->prepare(
             "INSERT INTO `{$this->prefix}billing_transactions`
                 (invoice_id, user_id, home_id, payment_method, transaction_external_id,
@@ -248,11 +301,9 @@ class BillingRepository
         );
         if (!$stmt) return 0;
         $rawJson = is_array($data['raw_response']) ? json_encode($data['raw_response']) : (string)($data['raw_response'] ?? '');
-        $invoiceId = intval($data['invoice_id'] ?? 0);
         $userId    = intval($data['user_id']    ?? 0);
         $homeId    = intval($data['home_id']    ?? 0);
         $method    = (string)($data['payment_method']          ?? 'paypal');
-        $extId     = (string)($data['transaction_external_id'] ?? '');
         $amount    = (float)($data['amount']   ?? 0);
         $currency  = (string)($data['currency'] ?? 'USD');
         $status    = (string)($data['status']   ?? 'completed');
@@ -493,5 +544,131 @@ class BillingRepository
         $ok = $stmt->execute();
         $stmt->close();
         return $ok;
+    }
+
+    public function getCouponByCode(string $couponCode): ?array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT * FROM `{$this->prefix}billing_coupons`
+             WHERE code = ? AND is_active = 1
+             LIMIT 1"
+        );
+        if (!$stmt) {
+            return null;
+        }
+        $stmt->bind_param('s', $couponCode);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $row ?: null;
+    }
+
+    public function updateInvoiceFields(int $invoiceId, array $data): bool
+    {
+        return $this->updateAssoc('billing_invoices', 'invoice_id', $invoiceId, $data);
+    }
+
+    public function updateOrderFields(int $orderId, array $data): bool
+    {
+        return $this->updateAssoc('billing_orders', 'order_id', $orderId, $data);
+    }
+
+    private function hasColumn(string $table, string $column): bool
+    {
+        $cacheKey = $table . '.' . $column;
+        if (array_key_exists($cacheKey, $this->columnCache)) {
+            return $this->columnCache[$cacheKey];
+        }
+
+        $tableName = $this->db->real_escape_string($this->prefix . $table);
+        $columnName = $this->db->real_escape_string($column);
+        $res = $this->db->query(
+            "SELECT COUNT(*) AS cnt
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '{$tableName}'
+               AND COLUMN_NAME = '{$columnName}'"
+        );
+        $exists = $res ? ((int)($res->fetch_assoc()['cnt'] ?? 0) > 0) : false;
+        $this->columnCache[$cacheKey] = $exists;
+        return $exists;
+    }
+
+    private function insertAssoc(string $table, array $data): int
+    {
+        if (empty($data)) {
+            return 0;
+        }
+        $columns = array_keys($data);
+        $placeholders = implode(',', array_fill(0, count($columns), '?'));
+        $sql = sprintf(
+            "INSERT INTO `%s%s` (%s) VALUES (%s)",
+            $this->prefix,
+            $table,
+            implode(',', array_map(static fn($field) => "`{$field}`", $columns)),
+            $placeholders
+        );
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            return 0;
+        }
+        [$types, $values] = $this->prepareBindValues($data);
+        $stmt->bind_param($types, ...$values);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            return 0;
+        }
+        $id = (int)$stmt->insert_id;
+        $stmt->close();
+        return $id;
+    }
+
+    private function updateAssoc(string $table, string $idColumn, int $idValue, array $data): bool
+    {
+        $data = array_filter($data, static fn($value) => $value !== null);
+        if (empty($data)) {
+            return true;
+        }
+        $set = [];
+        foreach (array_keys($data) as $field) {
+            $set[] = "`{$field}` = ?";
+        }
+        $sql = sprintf(
+            "UPDATE `%s%s` SET %s WHERE `%s` = ? LIMIT 1",
+            $this->prefix,
+            $table,
+            implode(', ', $set),
+            $idColumn
+        );
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            return false;
+        }
+        [$types, $values] = $this->prepareBindValues($data);
+        $types .= 'i';
+        $values[] = $idValue;
+        $stmt->bind_param($types, ...$values);
+        $ok = $stmt->execute();
+        $stmt->close();
+        return $ok;
+    }
+
+    private function prepareBindValues(array $data): array
+    {
+        $types = '';
+        $values = [];
+        foreach ($data as $value) {
+            if (is_int($value)) {
+                $types .= 'i';
+                $values[] = $value;
+            } elseif (is_float($value)) {
+                $types .= 'd';
+                $values[] = $value;
+            } else {
+                $types .= 's';
+                $values[] = ($value === null) ? null : (string)$value;
+            }
+        }
+        return [$types, $values];
     }
 }

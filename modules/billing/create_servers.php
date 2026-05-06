@@ -2,6 +2,17 @@
 require_once __DIR__ . '/../../includes/lib_remote.php';
 require_once __DIR__ . '/../config_games/server_config_parser.php';
 
+if (!function_exists('billing_generate_provision_password')) {
+	function billing_generate_provision_password(int $bytes = 12)
+	{
+		try {
+			return substr(bin2hex(random_bytes($bytes)), 0, $bytes * 2);
+		} catch (Throwable $e) {
+			return substr(hash('sha256', uniqid('gsp-provision', true) . microtime(true)), 0, $bytes * 2);
+		}
+	}
+}
+
 if (!function_exists('billing_invoke_provision')) {
 	function billing_invoke_provision(array $options = array())
 	{
@@ -18,7 +29,8 @@ if (!function_exists('billing_invoke_provision')) {
 
 function exec_ogp_module()
 {
-	global $db,$view,$settings;
+	global $db,$view,$settings,$table_prefix;
+	$db_prefix = isset($table_prefix) ? $table_prefix : '';
 
 	// $now is used in multiple branches below — define it once here so it is
 	// always a string that date() / strtotime() can handle safely (PHP 8 fix).
@@ -48,9 +60,9 @@ function exec_ogp_module()
 	// Handle provision_all request - provision all Active (paid) orders for this user
 	if ($provision_all) {
 		if ( $isAdmin ){
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
+			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
 		} else {
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
+			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
 		}
 	}
 	// Handle provision_single or order_id parameter - provision specific order
@@ -62,9 +74,9 @@ function exec_ogp_module()
 		}
 		$idList = implode(',', array_map('intval', $orderIds));
 		if ( $isAdmin ){
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND status='Active'" );
+			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE order_id IN ($idList) AND status='Active'" );
 		} else {
-			$orders = $db->resultQuery( "SELECT * FROM OGP_DB_PREFIXbilling_orders WHERE order_id IN ($idList) AND user_id=".$db->realEscapeSingle($user_id)." AND status='Active'" );
+			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE order_id IN ($idList) AND user_id=".$db->realEscapeSingle($user_id)." AND status='Active'" );
 		}
 	}
 	$processed_orders = array();
@@ -75,19 +87,28 @@ function exec_ogp_module()
 		
 		foreach ((array)$orders as $order)
 		{
+			$end_date = null;
+			$end_date_str = null;
 			$order_id = $order['order_id'];
 			$processed_orders[] = intval($order_id);
 			$service_id = $order['service_id'];
 			$home_name = $order['home_name'];
 			$remote_control_password = $order['remote_control_password'];
 			$ftp_password = $order['ftp_password'];
+			if ($remote_control_password === '' || strcasecmp((string)$remote_control_password, 'ChangeMe') === 0) {
+				$remote_control_password = billing_generate_provision_password();
+			}
+			if ($ftp_password === '' || strcasecmp((string)$ftp_password, 'ChangeMe') === 0) {
+				$ftp_password = billing_generate_provision_password();
+			}
 			$ip = $order['ip'];
 			$max_players = $order['max_players'];
 			$user_id = $order['user_id'];
 			$extended = isset($order['extended']) && $order['extended'] == "1" ? TRUE : FALSE;
+			$alreadyProvisioned = !$extended && intval($order['home_id'] ?? 0) > 0;
 			//Query service info	
 			$service = $db->resultQuery( "SELECT * 
-							   FROM OGP_DB_PREFIXbilling_services 
+							   FROM `{$db_prefix}billing_services` 
 							   WHERE service_id=".$db->realEscapeSingle($service_id) );
 							   
 			if( !empty( $service[0] ) )
@@ -106,7 +127,11 @@ function exec_ogp_module()
 			else
 				return;
 						
-			if($extended)
+			if($alreadyProvisioned)
+			{
+				$home_id = intval($order['home_id']);
+			}
+			elseif($extended)
 			{
 				$home_id = $order['home_id'];
 				
@@ -167,7 +192,7 @@ function exec_ogp_module()
 				
 				//Add IP:Port Pair to the Game Home
 			//need to get the IP_ID for this remote server.
-				$result = $db->resultQuery("SELECT ip_id FROM OGP_DB_PREFIXremote_server_ips WHERE remote_server_id=".$ip);
+				$result = $db->resultQuery("SELECT ip_id FROM `{$db_prefix}remote_server_ips` WHERE remote_server_id=".$ip);
 			    	foreach ((array)$result as $rs)
 			{
 				$ip_id = $rs['ip_id'];
@@ -290,7 +315,15 @@ function exec_ogp_module()
 			// Status values: Active (provisioned & current), Invoiced (renewal invoice open),
 			//                 Expired (past due and awaiting deletion)
 			// end_date / next_invoice_date: when the next renewal invoice should be generated
-			if ($order['invoice_duration'] == "day")
+			if ($alreadyProvisioned)
+			{
+				$existing_end = strtotime((string)($order['end_date'] ?? ''));
+				if ($existing_end === false || $existing_end <= 0) {
+					$existing_end = time();
+				}
+				$end_date_str = date('Y-m-d H:i:s', $existing_end);
+			}
+			elseif ($order['invoice_duration'] == "day")
 			{
 				
 				if(empty($order['end_date']) || $order['end_date'] === NULL){
@@ -310,7 +343,7 @@ function exec_ogp_module()
 			{
 			// this is a new order
 			if(empty($order['end_date']) || $order['end_date'] === NULL){
-				$end_date = strtotime('+'.$order['qty'].' month'); 
+				$end_date = strtotime('+'.(intval($order['qty']) * 31).' day'); 
 
 				}
 			else{
@@ -319,7 +352,7 @@ function exec_ogp_module()
 				if ($current_end === false) {
 					$current_end = time(); // fallback to now if date is invalid
 				}
-                $end_date = strtotime('+'.$order['qty'].' month', $current_end); 
+				$end_date = strtotime('+'.(intval($order['qty']) * 31).' day', $current_end); 
 				}	
 			}
 			elseif ($order['invoice_duration'] == "year")
@@ -339,24 +372,37 @@ function exec_ogp_module()
 				}	
 				
 			}
-			$end_date_str = date('Y-m-d H:i:s', $end_date);
+			if (!isset($end_date_str)) {
+				$end_date_str = date('Y-m-d H:i:s', $end_date);
+			}
 
 			// Set order status to 'Active' (server provisioned and current)
-			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
+			$db->query("UPDATE `{$db_prefix}billing_orders`
 						SET status='Active' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 	
 			// Set the order expiration / next renewal date
-			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
-						SET end_date='" . $db->realEscapeSingle($end_date_str) . "' 
+			$db->query("UPDATE `{$db_prefix}billing_orders`
+						SET end_date='" . $db->realEscapeSingle($end_date_str) . "',
+							remote_control_password='" . $db->realEscapeSingle($remote_control_password) . "',
+							ftp_password='" . $db->realEscapeSingle($ftp_password) . "'
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 						
 			// Save home_id created by this order
-			$db->query("UPDATE OGP_DB_PREFIXbilling_orders
+			$db->query("UPDATE `{$db_prefix}billing_orders`
 						SET home_id='" . $db->realEscapeSingle($home_id) . "' WHERE order_id=".$db->realEscapeSingle($order_id));
 
+			$db->query("UPDATE `{$db_prefix}billing_invoices`
+						SET home_id=" . $db->realEscapeSingle($home_id) . ",
+							billing_status='Active'
+						WHERE order_id=" . $db->realEscapeSingle($order_id));
+
+			$db->query("UPDATE `{$db_prefix}billing_transactions`
+						SET home_id=" . $db->realEscapeSingle($home_id) . "
+						WHERE invoice_id IN (SELECT invoice_id FROM `{$db_prefix}billing_invoices` WHERE order_id=" . $db->realEscapeSingle($order_id) . ")");
+
 			// Set billing_status and next_invoice_date on server_homes
-			$db->query("UPDATE OGP_DB_PREFIXserver_homes
+			$db->query("UPDATE `{$db_prefix}server_homes`
 						SET billing_status     = 'Active',
 							next_invoice_date  = '" . $db->realEscapeSingle($end_date_str) . "',
 							billing_enabled    = 1
@@ -366,7 +412,7 @@ function exec_ogp_module()
 						
 		}
 					
-        $db->query( "UPDATE OGP_DB_PREFIXgame_mods SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
+        $db->query( "UPDATE `{$db_prefix}game_mods` SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
 	// Show results and redirect
 	if ($provisioned_count > 0) {
@@ -399,7 +445,5 @@ function exec_ogp_module()
 	);
 }
 ?>
-
-
 
 

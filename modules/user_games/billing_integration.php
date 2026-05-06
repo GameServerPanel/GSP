@@ -45,7 +45,9 @@ if (!function_exists('admin_register_server_in_billing')) {
         $max_players,
         $access_rights,
         $ftp,
-        $home_id
+        $home_id,
+        $remote_control_password = '',
+        $ftp_password = ''
     ) {
         // ------------------------------------------------------------------ //
         // 1. Resolve service_id: find an existing billing_service matching   //
@@ -76,7 +78,7 @@ if (!function_exists('admin_register_server_in_billing')) {
         }
 
         $now       = date('Y-m-d H:i:s');
-        $end_date  = date('Y-m-d H:i:s', strtotime('+1 year'));
+        $end_date  = date('Y-m-d H:i:s', strtotime('+31 days'));
         $ftp_flag  = $ftp ? 'enabled' : 'disabled';
 
         // ------------------------------------------------------------------ //
@@ -90,24 +92,34 @@ if (!function_exists('admin_register_server_in_billing')) {
             'order_id'                 => 0,
             'user_id'                  => intval($user_id),
             'service_id'               => $service_id,
+            'home_id'                  => intval($home_id),
             'home_name'                => $home_name,
             'ip'                       => intval($rserver_id),
             'max_players'              => intval($max_players),
-            'remote_control_password'  => '',
-            'ftp_password'             => '',
+            'remote_control_password'  => $remote_control_password,
+            'ftp_password'             => $ftp_password,
             'customer_name'            => $customer_name,
             'customer_email'           => $customer_email,
             'amount'                   => '0.00',
             'discount_amount'          => '0.00',
             'currency'                 => 'USD',
             'status'                   => 'paid',
+            'billing_status'           => 'Active',
             'invoice_date'             => $now,
             'due_date'                 => $now,
             'paid_date'                => $now,
             'payment_txid'             => 'admin-created',
             'payment_method'           => 'admin',
             'description'              => 'Admin-created server: ' . $home_name,
-            'invoice_duration'         => 'year',
+            'invoice_duration'         => 'month',
+            'rate_type'                => 'monthly',
+            'rate_per_player'          => '0.0000',
+            'players'                  => intval($max_players),
+            'period_start'             => $now,
+            'period_end'               => $end_date,
+            'subtotal'                 => '0.00',
+            'total_due'                => '0.00',
+            'payment_status'           => 'paid',
             'qty'                      => 1,
         );
 
@@ -125,12 +137,12 @@ if (!function_exists('admin_register_server_in_billing')) {
             'home_name'                => $home_name,
             'ip'                       => intval($rserver_id),
             'qty'                      => 1,
-            'invoice_duration'         => 'year',
+            'invoice_duration'         => 'month',
             'max_players'              => intval($max_players),
             'price'                    => '0.00',
             'discount_amount'          => '0.00',
-            'remote_control_password'  => '',
-            'ftp_password'             => '',
+            'remote_control_password'  => $remote_control_password,
+            'ftp_password'             => $ftp_password,
             'home_id'                  => intval($home_id),
             'status'                   => 'Active',
             'order_date'               => $now,

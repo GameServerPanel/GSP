@@ -185,8 +185,8 @@ if ($row['price_monthly'] == 0.0) {
 			<table class="float-left">
 			<form method="post" action="add_to_cart.php">
     		<input type="hidden" name="service_id" size="15" value="<?php echo intval($_REQUEST['service_id'] ?? $row['service_id'] ?? 0); ?>">
-			<input type="hidden" name="remote_control_password" size="15" value="ChangeMe">
-			<input type="hidden" name="ftp_password" size="15" value="ChangeMe">
+    		<input type="hidden" name="remote_control_password" size="15" value="">
+			<input type="hidden" name="ftp_password" size="15" value="">
 			<tr>
 			<td align="right"><b>Game Server Name</b> </td>
 			<td align="left">
@@ -269,7 +269,7 @@ if ($row['price_monthly'] == 0.0) {
 				slider.oninput = function() {
 				  output.innerHTML = this.value;
 				  invoiceDuration.innerHTML = "Duration: "+invoiceslider.value+" months";
-				   totalvalue =   invoiceslider.value * <?php echo number_format($row['price_monthly'],2);?>;
+				   totalvalue =  slider.value * invoiceslider.value * <?php echo number_format($row['price_monthly'],2);?>;
 				  price.innerHTML = "Total Price: $"+totalvalue.toFixed(2) ;
 				}
 				invoiceslider.oninput = function() {
