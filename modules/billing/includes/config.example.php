@@ -22,9 +22,8 @@ $table_prefix = "gsp_";     // Table prefix used in the panel database
 $db_type = "mysql";
 
 # --- Site base URL ---
-# Leave empty to use relative paths (works for any install path).
-# Set to your full base URL (without trailing slash) if you need absolute URLs:
-#   e.g. "https://gameservers.world" or "http://173.208.136.11/testing/modules/billing"
+# Full base URL WITHOUT trailing slash. Leave empty to use relative paths.
+# Example: "https://gameservers.world" or "https://your-domain.com"
 $SITE_BASE_URL = '';
 
 # --- Background image ---
@@ -37,10 +36,23 @@ $SITE_BACKGROUND = 'images/dark.jpg';
 $SITE_DATA_DIR = realpath(__DIR__ . '/..') . DIRECTORY_SEPARATOR . 'data';
 
 # --- PayPal settings ---
-$paypal_sandbox       = true;   // Set to false for live payments
-$paypal_client_id     = '';     // Your PayPal Client ID
-$paypal_client_secret = '';     // Your PayPal Client Secret
-$paypal_webhook_id    = '';     // Your PayPal Webhook ID (for webhook signature verification)
+# Mode: 'sandbox' for testing, 'live' for real payments.
+$paypal_mode = 'sandbox';
+
+# Sandbox credentials (PayPal Developer Dashboard → sandbox app)
+$paypal_sandbox_client_id     = '';  // e.g. AfvY_...
+$paypal_sandbox_client_secret = '';  // Keep server-side only
+$paypal_sandbox_webhook_id    = '';  // Set after registering webhook in PayPal
+
+# Live credentials (leave blank until ready for production)
+$paypal_live_client_id     = '';
+$paypal_live_client_secret = '';
+$paypal_live_webhook_id    = '';
+
+# Webhook path (relative to billing site root, must start with /)
+# Full public URL = $SITE_BASE_URL + $paypal_webhook_path
+# Example full URL: https://gameservers.world/paypal/webhook.php
+$paypal_webhook_path = '/paypal/webhook.php';
 
 # --- Admin config backup retention ---
 # Number of config backups to keep (1–10). Oldest backups beyond this limit are deleted.

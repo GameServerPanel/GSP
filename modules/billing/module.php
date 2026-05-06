@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "3.2";
-$db_version = 2;
+$module_version = "3.3";
+$db_version = 3;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -320,6 +320,30 @@ $install_queries[2] = array(
         KEY `idx_active_expires`    (`is_active`,`expires`),
         KEY `idx_created_by`        (`created_by`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;"
+);
+
+// -----------------------------------------------------------------------
+// db_version 3 — Add billing_paypal_webhook_events table for idempotent
+// webhook event processing.
+// -----------------------------------------------------------------------
+$install_queries[3] = array(
+    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXbilling_paypal_webhook_events` (
+        `id`                INT(11)       NOT NULL AUTO_INCREMENT,
+        `paypal_event_id`   VARCHAR(100)  NOT NULL DEFAULT '',
+        `event_type`        VARCHAR(100)  NOT NULL DEFAULT '',
+        `resource_id`       VARCHAR(100)  NOT NULL DEFAULT '',
+        `order_id`          VARCHAR(100)  NOT NULL DEFAULT '',
+        `capture_id`        VARCHAR(100)  NOT NULL DEFAULT '',
+        `billing_order_id`  INT(11)       NOT NULL DEFAULT 0,
+        `processing_status` VARCHAR(50)   NOT NULL DEFAULT 'received',
+        `raw_json`          MEDIUMTEXT    NULL,
+        `created_at`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `processed_at`      DATETIME      NULL,
+        PRIMARY KEY (`id`),
+        UNIQUE KEY `uidx_paypal_event_id` (`paypal_event_id`),
+        KEY `idx_event_type`          (`event_type`),
+        KEY `idx_billing_order_id`    (`billing_order_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 );
 
 ?>

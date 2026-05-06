@@ -207,21 +207,71 @@ unset($_billing_panel_config, $panelDbVars, $diskVars, $needsSync, $k, $v);
 // Step 4: Apply safe defaults for billing-specific variables that may be absent
 // in older config files (never overwrite values already set by the config).
 // ---------------------------------------------------------------------------
+
+// --- PayPal mode (new-style) ---
+// Backward compat: if $paypal_sandbox was set (old config) and $paypal_mode is absent,
+// derive $paypal_mode from $paypal_sandbox.
+if (!isset($paypal_mode)) {
+    if (isset($paypal_sandbox)) {
+        $paypal_mode = $paypal_sandbox ? 'sandbox' : 'live';
+    } else {
+        $paypal_mode = 'sandbox';
+    }
+}
+$paypal_mode = (strtolower((string)$paypal_mode) === 'live') ? 'live' : 'sandbox';
+
+// --- Sandbox credentials ---
+if (!isset($paypal_sandbox_client_id)) {
+    // Backward compat: if old $paypal_client_id was set while in sandbox mode, use it
+    $paypal_sandbox_client_id = (isset($paypal_client_id) && $paypal_mode === 'sandbox') ? $paypal_client_id : '';
+}
+if (!isset($paypal_sandbox_client_secret)) {
+    $paypal_sandbox_client_secret = (isset($paypal_client_secret) && $paypal_mode === 'sandbox') ? $paypal_client_secret : '';
+}
+if (!isset($paypal_sandbox_webhook_id)) {
+    $paypal_sandbox_webhook_id = (isset($paypal_webhook_id) && $paypal_mode === 'sandbox') ? $paypal_webhook_id : '';
+}
+
+// --- Live credentials ---
+if (!isset($paypal_live_client_id)) {
+    $paypal_live_client_id = (isset($paypal_client_id) && $paypal_mode === 'live') ? $paypal_client_id : '';
+}
+if (!isset($paypal_live_client_secret)) {
+    $paypal_live_client_secret = (isset($paypal_client_secret) && $paypal_mode === 'live') ? $paypal_client_secret : '';
+}
+if (!isset($paypal_live_webhook_id)) {
+    $paypal_live_webhook_id = (isset($paypal_webhook_id) && $paypal_mode === 'live') ? $paypal_webhook_id : '';
+}
+
+// --- Legacy compatibility shims (read-only derived values) ---
+// Keep old variable names populated so any code that still reads $paypal_sandbox,
+// $paypal_client_id, $paypal_client_secret, $paypal_webhook_id keeps working.
 if (!isset($paypal_sandbox)) {
-    $paypal_sandbox = true;
+    $paypal_sandbox = ($paypal_mode !== 'live');
 }
 if (!isset($paypal_client_id)) {
-    $paypal_client_id = '';
+    $paypal_client_id = ($paypal_mode === 'live') ? $paypal_live_client_id : $paypal_sandbox_client_id;
 }
 if (!isset($paypal_client_secret)) {
-    $paypal_client_secret = '';
+    $paypal_client_secret = ($paypal_mode === 'live') ? $paypal_live_client_secret : $paypal_sandbox_client_secret;
 }
 if (!isset($paypal_webhook_id)) {
-    $paypal_webhook_id = '';
+    $paypal_webhook_id = ($paypal_mode === 'live') ? $paypal_live_webhook_id : $paypal_sandbox_webhook_id;
 }
+
+// --- Webhook path ---
+if (!isset($paypal_webhook_path) || (string)$paypal_webhook_path === '') {
+    $paypal_webhook_path = '/paypal/webhook.php';
+}
+// Ensure webhook path starts with /
+$paypal_webhook_path = '/' . ltrim((string)$paypal_webhook_path, '/');
+
+// --- Site settings ---
 if (!isset($SITE_BASE_URL)) {
     $SITE_BASE_URL = '';
 }
+$SITE_BASE_URL = rtrim(trim((string)$SITE_BASE_URL), '/');
+
 if (!isset($SITE_BACKGROUND)) {
     $SITE_BACKGROUND = 'images/dark.jpg';
 }
@@ -234,3 +284,77 @@ if (!isset($SITE_CONFIG_BACKUP_RETENTION) || !is_int($SITE_CONFIG_BACKUP_RETENTI
 $SITE_CONFIG_BACKUP_RETENTION = max(1, min(10, (int)$SITE_CONFIG_BACKUP_RETENTION));
 
 define('BILLING_CONFIG_LOADED', true);
+
+// ---------------------------------------------------------------------------
+// PayPal helper functions — use these everywhere instead of reading globals.
+// ---------------------------------------------------------------------------
+
+if (!function_exists('gsp_paypal_get_mode')) {
+    function gsp_paypal_get_mode(): string
+    {
+        return $GLOBALS['paypal_mode'] === 'live' ? 'live' : 'sandbox';
+    }
+}
+
+if (!function_exists('gsp_paypal_is_sandbox')) {
+    function gsp_paypal_is_sandbox(): bool
+    {
+        return gsp_paypal_get_mode() !== 'live';
+    }
+}
+
+if (!function_exists('gsp_paypal_get_client_id')) {
+    function gsp_paypal_get_client_id(): string
+    {
+        if (gsp_paypal_is_sandbox()) {
+            return (string)($GLOBALS['paypal_sandbox_client_id'] ?? '');
+        }
+        return (string)($GLOBALS['paypal_live_client_id'] ?? '');
+    }
+}
+
+if (!function_exists('gsp_paypal_get_client_secret')) {
+    function gsp_paypal_get_client_secret(): string
+    {
+        if (gsp_paypal_is_sandbox()) {
+            return (string)($GLOBALS['paypal_sandbox_client_secret'] ?? '');
+        }
+        return (string)($GLOBALS['paypal_live_client_secret'] ?? '');
+    }
+}
+
+if (!function_exists('gsp_paypal_get_webhook_id')) {
+    function gsp_paypal_get_webhook_id(): string
+    {
+        if (gsp_paypal_is_sandbox()) {
+            return (string)($GLOBALS['paypal_sandbox_webhook_id'] ?? '');
+        }
+        return (string)($GLOBALS['paypal_live_webhook_id'] ?? '');
+    }
+}
+
+if (!function_exists('gsp_paypal_get_api_base')) {
+    function gsp_paypal_get_api_base(): string
+    {
+        return gsp_paypal_is_sandbox()
+            ? 'https://api-m.sandbox.paypal.com'
+            : 'https://api-m.paypal.com';
+    }
+}
+
+if (!function_exists('gsp_paypal_get_webhook_path')) {
+    function gsp_paypal_get_webhook_path(): string
+    {
+        $path = (string)($GLOBALS['paypal_webhook_path'] ?? '/paypal/webhook.php');
+        return '/' . ltrim($path, '/');
+    }
+}
+
+if (!function_exists('gsp_paypal_get_full_webhook_url')) {
+    function gsp_paypal_get_full_webhook_url(): string
+    {
+        $base = rtrim((string)($GLOBALS['SITE_BASE_URL'] ?? ''), '/');
+        $path = gsp_paypal_get_webhook_path();
+        return $base . $path;
+    }
+}
