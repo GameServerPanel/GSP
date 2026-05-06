@@ -209,86 +209,82 @@ $install_queries[1] = array(
 
 // -----------------------------------------------------------------------
 // db_version 2 — Safe idempotent column migrations for existing installs.
-// Each callable checks whether the column already exists before running
-// ALTER TABLE, so this migration can be re-run without errors.
+// Each callable queries INFORMATION_SCHEMA to confirm the column is absent
+// before issuing ALTER TABLE, so this migration is safe to re-run.
+//
+// NOTE: The 'OGP_DB_PREFIXtable_name' placeholder inside SQL string
+// literals is intentional.  Both $db->query() and $db->resultQuery()
+// call str_replace("OGP_DB_PREFIX", $this->table_prefix, $query) at
+// the PHP level before passing the SQL to MySQL, so the placeholder is
+// resolved to the real prefix (e.g. 'ogp_billing_orders') even when it
+// appears inside a single-quoted string in the SQL text.
 // -----------------------------------------------------------------------
 $install_queries[2] = array(
     // billing_orders: add discount_amount if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_orders` ADD `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER `price`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_orders' AND COLUMN_NAME = 'discount_amount'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_orders` ADD `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER `price`");
     },
     // billing_invoices: add home_id if missing (needed by cron-shop.php join)
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `home_id` INT(11) NOT NULL DEFAULT 0 AFTER `service_id`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'home_id'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `home_id` INT(11) NOT NULL DEFAULT 0 AFTER `service_id`");
     },
     // billing_invoices: add discount_amount if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER `amount`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'discount_amount'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER `amount`");
     },
     // billing_invoices: add billing_status (lifecycle: Active/Invoiced/Expired) if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `billing_status` VARCHAR(16) NOT NULL DEFAULT 'due' AFTER `status`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'billing_status'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `billing_status` VARCHAR(16) NOT NULL DEFAULT 'due' AFTER `status`");
     },
     // billing_invoices: add rate_type enum if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly' AFTER `invoice_duration`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'rate_type'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `rate_type` ENUM('daily','monthly','yearly') NOT NULL DEFAULT 'monthly' AFTER `invoice_duration`");
     },
     // billing_invoices: add rate_per_player if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `rate_per_player` DECIMAL(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'rate_per_player'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `rate_per_player` DECIMAL(15,4) NOT NULL DEFAULT 0 AFTER `rate_type`");
     },
     // billing_invoices: add players if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `players` INT(11) NOT NULL DEFAULT 0 AFTER `rate_per_player`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'players'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `players` INT(11) NOT NULL DEFAULT 0 AFTER `rate_per_player`");
     },
     // billing_invoices: add subtotal if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `subtotal` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `players`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'subtotal'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `subtotal` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `players`");
     },
     // billing_invoices: add total_due if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `total_due` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'total_due'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `total_due` DECIMAL(15,2) NOT NULL DEFAULT 0 AFTER `subtotal`");
     },
     // billing_invoices: add payment_status enum if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `payment_status` ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid' AFTER `currency`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'payment_status'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `payment_status` ENUM('unpaid','paid','cancelled','refunded') NOT NULL DEFAULT 'unpaid' AFTER `currency`");
     },
     // billing_invoices: add coupon_id if missing
     function($db) {
-        if (!$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `coupon_id` INT(11) NOT NULL DEFAULT 0 AFTER `qty`")) {
-            return (stripos((string)$db->getError(), 'Duplicate column') !== false);
-        }
-        return true;
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'coupon_id'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `coupon_id` INT(11) NOT NULL DEFAULT 0 AFTER `qty`");
     },
     // Create billing_config table for cron-shop settings if missing
     "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXbilling_config` (
