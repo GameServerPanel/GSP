@@ -688,7 +688,9 @@ function config_games_render_top_level_editor($home_cfg_id, $configFile)
     }
 
     echo "<h3>Section Editor</h3>";
-    echo "<p class='note'>Edit one top-level section at a time. Validate a block before saving. Required sections cannot be removed. Optional sections can be added or removed safely.</p>";
+    $sectionEditorNote = "Edit one top-level section at a time. Validate a block before saving. "
+        . "Required sections cannot be removed. Optional sections can be added or removed safely.";
+    echo "<p class='note'>{$sectionEditorNote}</p>";
 
     if (!empty($optionalMissing)) {
         echo "<form class='xml-add-section' action='?m=config_games&amp;home_cfg_id=" . (int)$home_cfg_id . "' method='post'>";

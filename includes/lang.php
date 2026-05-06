@@ -131,18 +131,14 @@ function ogp_load_english_fallbacks()
 
 function ogp_include_lang_file_safely($filePath)
 {
-    $previous = set_error_handler(function ($severity, $message) {
+    set_error_handler(function ($severity, $message) {
         if ($severity === E_WARNING && strpos($message, 'already defined') !== false) {
             return true;
         }
         return false;
     });
     include_once($filePath);
-    if ($previous !== null) {
-        restore_error_handler();
-    } else {
-        restore_error_handler();
-    }
+    restore_error_handler();
 }
 
 function get_lang($lang_index)
