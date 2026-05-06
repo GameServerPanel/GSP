@@ -437,7 +437,7 @@ function config_games_render_editor(SimpleXMLElement $xml)
 function config_games_get_config_file_path($db, $home_cfg_id)
 {
     $cfgInfo = $db->getGameCfg((int)$home_cfg_id);
-    if ($cfgInfo === FALSE) {
+    if ($cfgInfo === false) {
         return false;
     }
     return SERVER_CONFIG_LOCATION . $cfgInfo['home_cfg_file'];
@@ -574,7 +574,7 @@ function config_games_save_dom_and_refresh_cfg($db, $configFile, DOMDocument $do
         return array(false, array('Failed to write configuration file.'));
     }
     $config = read_server_config($configFile);
-    if ($config !== FALSE) {
+    if ($config !== false) {
         $db->addGameCfg($config);
     }
     return array(true, array());

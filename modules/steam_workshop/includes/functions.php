@@ -267,10 +267,7 @@ function sw_sync_profiles($db)
 
         $safe_config = $db->realEscapeSingle($config_name);
         $safe_name   = $db->realEscapeSingle($game_name);
-        $insertSql = "INSERT IGNORE INTO " . sw_table('steam_workshop_game_profiles') .
-            " (`config_name`, `game_name`, `enabled`) VALUES ('$safe_config', '$safe_name', 0)";
-
-        $ok = $db->query($insertSql);
+        $ok = $db->query("INSERT IGNORE INTO " . sw_table('steam_workshop_game_profiles') . " (`config_name`, `game_name`, `enabled`) VALUES ('$safe_config', '$safe_name', 0)");
         if ($ok) {
             $created++;
         }
