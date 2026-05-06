@@ -4,3 +4,4 @@
 - Add an admin-facing toggle that makes it clear when the HTML scraper fallback is in use and lets staff force API-only mode if Valve ever objects.
 - Add Workshop result preview thumbnails and author links in the picker for easier browsing.
 - Add a lightweight admin UI report that flags remaining PHP files still relying on legacy PHP 7 constructs not covered by the automated compatibility pass.
+- Add a side-by-side before/after diff preview panel to the config_games top-level XML section editor before section saves.
