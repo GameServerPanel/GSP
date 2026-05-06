@@ -340,7 +340,7 @@ class BillingRepository
             $rawJson = substr($rawJson, 0, 65536) . '…[truncated]';
         }
         $stmt->bind_param(
-            'sssssssss',
+            'ssssssiis',
             $context, $errorCode, $message, $debugId, $orderId, $captureId,
             $billingOrderId, $userId, $rawJson
         );

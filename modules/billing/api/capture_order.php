@@ -132,6 +132,11 @@ cap_log('CAPTURE_RESULT', ['success' => $capture['success'], 'txid' => $capture[
 
 if (!$capture['success']) {
     cap_log('CAPTURE_FAILED', $capture);
+    // Sanitize raw capture data before logging — never store secrets
+    $captureForLog = $capture;
+    foreach (['client_secret', 'access_token', 'refresh_token'] as $_sk) {
+        unset($captureForLog[$_sk]);
+    }
     $repo->logPaypalError([
         'context'         => 'capture_order',
         'error_code'      => $capture['error'] ?? 'capture_failed',
@@ -139,7 +144,7 @@ if (!$capture['success']) {
         'paypal_debug_id' => $capture['debug_id'] ?? null,
         'order_id'        => $paypalOrderId,
         'user_id'         => $userId,
-        'raw_json'        => $capture,
+        'raw_json'        => $captureForLog,
     ]);
     ob_clean();
     echo json_encode([

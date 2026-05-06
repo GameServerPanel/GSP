@@ -634,8 +634,7 @@ rsort($bakFiles); // newest first
   $diag_lv_wh_set    = ($cfgVals['paypal_live_webhook_id']       ?? '') !== '';
   $diag_wh_path      = '/' . ltrim((string)($cfgVals['paypal_webhook_path'] ?? '/paypal/webhook.php'), '/');
   $diag_wh_full_url  = $computedWebhookUrl;
-  // Correct disk path: billing module root + separator + webhook path (no leading slash)
-  $diag_wh_file      = rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($diag_wh_path, '/\\');
+  $diag_wh_file      = rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($diag_wh_path, '/');
   $diag_wh_exists    = file_exists($diag_wh_file);
 
   // Active mode credential check
