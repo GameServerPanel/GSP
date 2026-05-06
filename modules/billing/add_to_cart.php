@@ -204,7 +204,7 @@ $sql = "INSERT INTO {$table_prefix}billing_invoices (
     billing_status, invoice_date, due_date, description, invoice_duration, rate_type, rate_per_player,
     players, period_start, period_end, subtotal, total_due, payment_status, qty, coupon_id
 ) VALUES (
-    0, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, 'USD', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0
+    0, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, 'USD', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0
 )";
 
 $stmt = $db->prepare($sql);
