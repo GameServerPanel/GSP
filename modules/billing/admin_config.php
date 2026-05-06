@@ -626,15 +626,15 @@ rsort($bakFiles); // newest first
   // Gather diagnostics data
   $diag_mode         = $cfgVals['paypal_mode'] ?? 'sandbox';
   $diag_is_sandbox   = $diag_mode !== 'live';
-  $diag_sb_id_set    = $cfgVals['paypal_sandbox_client_id']     !== '';
-  $diag_sb_sec_set   = $cfgVals['paypal_sandbox_client_secret'] !== '';
-  $diag_sb_wh_set    = $cfgVals['paypal_sandbox_webhook_id']    !== '';
-  $diag_lv_id_set    = $cfgVals['paypal_live_client_id']        !== '';
-  $diag_lv_sec_set   = $cfgVals['paypal_live_client_secret']    !== '';
-  $diag_lv_wh_set    = $cfgVals['paypal_live_webhook_id']       !== '';
-  $diag_wh_path      = $cfgVals['paypal_webhook_path']          ?? '/paypal/webhook.php';
+  $diag_sb_id_set    = ($cfgVals['paypal_sandbox_client_id']     ?? '') !== '';
+  $diag_sb_sec_set   = ($cfgVals['paypal_sandbox_client_secret'] ?? '') !== '';
+  $diag_sb_wh_set    = ($cfgVals['paypal_sandbox_webhook_id']    ?? '') !== '';
+  $diag_lv_id_set    = ($cfgVals['paypal_live_client_id']        ?? '') !== '';
+  $diag_lv_sec_set   = ($cfgVals['paypal_live_client_secret']    ?? '') !== '';
+  $diag_lv_wh_set    = ($cfgVals['paypal_live_webhook_id']       ?? '') !== '';
+  $diag_wh_path      = '/' . ltrim((string)($cfgVals['paypal_webhook_path'] ?? '/paypal/webhook.php'), '/');
   $diag_wh_full_url  = $computedWebhookUrl;
-  $diag_wh_file      = __DIR__ . ltrim($diag_wh_path, '/');
+  $diag_wh_file      = rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . ltrim($diag_wh_path, '/');
   $diag_wh_exists    = file_exists($diag_wh_file);
 
   // Active mode credential check
@@ -645,64 +645,213 @@ rsort($bakFiles); // newest first
   function diag_badge(bool $ok, string $yes = 'Yes', string $no = 'No'): string {
       $cls   = $ok ? 'background:#d4edda;color:#155724;border:1px solid #c3e6cb;' : 'background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;';
       $label = $ok ? $yes : $no;
-      return '<span style="' . $cls . 'padding:2px 8px;border-radius:3px;font-size:0.85em;font-weight:600;">' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
+      return '<span style="' . $cls . 'padding:2px 8px;border-radius:3px;font-size:0.85em;font-weight:600;display:inline-block;word-break:break-word;">' . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
   }
 
-  // Last webhook events
+  // Last webhook events + recent PayPal errors
   $diag_recent_events = [];
+  $diag_recent_errors = [];
+  $diag_errors_warning = '';
   try {
       $port_int = intval($db_port ?? 3306) ?: 3306;
       $diag_db  = @mysqli_connect($db_host ?? 'localhost', $db_user ?? '', $db_pass ?? '', $db_name ?? '', $port_int);
       if ($diag_db) {
           $pfx_diag = $table_prefix ?? 'gsp_';
+          mysqli_set_charset($diag_db, 'utf8mb4');
+
           $res = @mysqli_query($diag_db, "SELECT paypal_event_id, event_type, processing_status, created_at FROM `{$pfx_diag}billing_paypal_webhook_events` ORDER BY id DESC LIMIT 5");
           if ($res) {
               while ($row = mysqli_fetch_assoc($res)) {
                   $diag_recent_events[] = $row;
               }
           }
+
+          // Recent PayPal errors — use BillingRepository for safe table creation
+          require_once __DIR__ . '/classes/BillingRepository.php';
+          $diag_repo = new BillingRepository($diag_db, $pfx_diag);
+          if ($diag_repo->ensureBillingPaypalErrorsTable()) {
+              $diag_recent_errors = $diag_repo->getRecentPaypalErrors(10);
+          } else {
+              $diag_errors_warning = 'Could not create billing_paypal_errors table. Check DB permissions.';
+          }
+
           mysqli_close($diag_db);
       }
   } catch (Throwable $e) {
-      // non-fatal
+      $diag_errors_warning = 'Diagnostics DB query failed: ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
   }
   ?>
+  <style>
+    .diag-grid { display:grid; grid-template-columns:1fr; gap:8px; font-size:0.9em; }
+    @media (min-width:600px) { .diag-grid { grid-template-columns:220px 1fr; } }
+    .diag-row { display:contents; }
+    .diag-label { color:#555; font-weight:600; padding:6px 0; border-bottom:1px solid #f0f0f0; word-break:break-word; }
+    .diag-value { padding:6px 0; border-bottom:1px solid #f0f0f0; word-break:break-all; }
+    .diag-sub { font-size:0.85em; color:#888; margin-top:4px; }
+    .diag-sep { grid-column:1/-1; border-top:2px solid #e9ecef; margin:6px 0 2px; }
+    .recent-errors-table { width:100%; border-collapse:collapse; font-size:0.85em; overflow-x:auto; display:block; }
+    .recent-errors-table th { background:#f8f9fa; padding:6px 8px; text-align:left; border-bottom:2px solid #dee2e6; white-space:nowrap; }
+    .recent-errors-table td { padding:5px 8px; border-bottom:1px solid #eee; word-break:break-word; }
+  </style>
   <div class="cfg-section">
     <h2>PayPal Diagnostics</h2>
-    <table style="border-collapse:collapse;width:100%;font-size:0.9em;">
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;width:260px;">Current mode</td><td style="padding:6px 8px;"><strong><?php echo h($diag_mode); ?></strong></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Active Client ID configured</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_active_id_set); ?></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Active Client Secret configured</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_active_sec_set); ?></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Active Webhook ID configured</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_active_wh_set, 'Yes', 'No (signature verification skipped)'); ?></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Sandbox credentials</td><td style="padding:6px 8px;">ID: <?php echo diag_badge($diag_sb_id_set); ?> &nbsp; Secret: <?php echo diag_badge($diag_sb_sec_set); ?> &nbsp; Webhook ID: <?php echo diag_badge($diag_sb_wh_set); ?></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Live credentials</td><td style="padding:6px 8px;">ID: <?php echo diag_badge($diag_lv_id_set); ?> &nbsp; Secret: <?php echo diag_badge($diag_lv_sec_set); ?> &nbsp; Webhook ID: <?php echo diag_badge($diag_lv_wh_set); ?></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Webhook path</td><td style="padding:6px 8px;"><code><?php echo h($diag_wh_path); ?></code></td></tr>
-      <tr style="border-bottom:1px solid #eee;"><td style="padding:6px 8px;color:#555;">Full public webhook URL</td><td style="padding:6px 8px;"><code style="word-break:break-all;"><?php echo h($diag_wh_full_url ?: '(Site Base URL not set)'); ?></code></td></tr>
-      <tr><td style="padding:6px 8px;color:#555;">Webhook file exists on disk</td><td style="padding:6px 8px;"><?php echo diag_badge($diag_wh_exists, 'Yes — ' . h($diag_wh_file), 'No — ' . h($diag_wh_file) . ' not found'); ?></td></tr>
-    </table>
+
+    <!-- Self-check button -->
+    <form method="post" style="margin-bottom:16px;">
+      <input type="hidden" name="csrf"   value="<?php echo h($csrf); ?>">
+      <input type="hidden" name="action" value="self_check">
+      <button type="submit" class="btn-show" style="padding:9px 18px;font-size:0.95em;">🔍 Run Billing Self-Check</button>
+    </form>
+    <?php
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'self_check') {
+        $token = $_POST['csrf'] ?? '';
+        if (hash_equals($csrf, (string)$token)):
+    ?>
+    <div class="status-box status-info" style="font-size:0.9em;">
+      <strong>Self-Check Results:</strong><br>
+      &bull; Mode: <strong><?php echo h($diag_mode ?: '(unknown)'); ?></strong><br>
+      &bull; Active Client ID: <?php echo $diag_active_id_set  ? '✅ configured' : '❌ missing'; ?><br>
+      &bull; Active Client Secret: <?php echo $diag_active_sec_set ? '✅ configured' : '❌ missing'; ?><br>
+      &bull; Active Webhook ID: <?php echo $diag_active_wh_set  ? '✅ configured' : '⚠️ missing (signature verification skipped)'; ?><br>
+      &bull; Webhook file: <?php echo $diag_wh_exists ? '✅ exists' : '❌ not found'; ?> — <code style="word-break:break-all"><?php echo h($diag_wh_file); ?></code><br>
+      &bull; Logs directory: <?php $logDir = __DIR__ . '/logs'; echo (is_dir($logDir) && is_writable($logDir)) ? '✅ writable' : '⚠️ ' . (is_dir($logDir) ? 'not writable' : 'missing'); ?><br>
+      &bull; Data directory: <?php echo (is_dir($SITE_DATA_DIR ?? '') && is_writable($SITE_DATA_DIR ?? '')) ? '✅ writable' : '⚠️ check path'; ?><br>
+      &bull; Config file: <?php echo is_writable($cfgPath) ? '✅ writable' : '⚠️ read-only'; ?><br>
+    </div>
+    <?php endif; } ?>
+
+    <div class="diag-grid">
+      <div class="diag-row">
+        <div class="diag-label">Current mode</div>
+        <div class="diag-value">
+          <strong><?php echo h($diag_mode !== '' ? $diag_mode : '(not set)'); ?></strong>
+          <?php if ($diag_mode === 'sandbox'): ?>
+            <span style="background:#fff3cd;color:#856404;border:1px solid #ffc107;padding:1px 7px;border-radius:3px;font-size:0.8em;margin-left:6px;">test</span>
+          <?php elseif ($diag_mode === 'live'): ?>
+            <span style="background:#d4edda;color:#155724;border:1px solid #c3e6cb;padding:1px 7px;border-radius:3px;font-size:0.8em;margin-left:6px;">live</span>
+          <?php endif; ?>
+        </div>
+      </div>
+
+      <div class="diag-sep"></div>
+
+      <div class="diag-row">
+        <div class="diag-label">Active Client ID</div>
+        <div class="diag-value"><?php echo diag_badge($diag_active_id_set); ?></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Active Client Secret</div>
+        <div class="diag-value"><?php echo diag_badge($diag_active_sec_set); ?></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Active Webhook ID</div>
+        <div class="diag-value"><?php echo diag_badge($diag_active_wh_set, 'Yes', 'No — signature verification skipped'); ?></div>
+      </div>
+
+      <div class="diag-sep"></div>
+
+      <div class="diag-row">
+        <div class="diag-label">Sandbox Client ID</div>
+        <div class="diag-value"><?php echo diag_badge($diag_sb_id_set); ?></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Sandbox Client Secret</div>
+        <div class="diag-value"><?php echo diag_badge($diag_sb_sec_set); ?></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Sandbox Webhook ID</div>
+        <div class="diag-value"><?php echo diag_badge($diag_sb_wh_set); ?></div>
+      </div>
+
+      <div class="diag-sep"></div>
+
+      <div class="diag-row">
+        <div class="diag-label">Live Client ID</div>
+        <div class="diag-value"><?php echo diag_badge($diag_lv_id_set); ?></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Live Client Secret</div>
+        <div class="diag-value"><?php echo diag_badge($diag_lv_sec_set); ?></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Live Webhook ID</div>
+        <div class="diag-value"><?php echo diag_badge($diag_lv_wh_set); ?></div>
+      </div>
+
+      <div class="diag-sep"></div>
+
+      <div class="diag-row">
+        <div class="diag-label">Webhook path</div>
+        <div class="diag-value"><code><?php echo h($diag_wh_path); ?></code></div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Full public webhook URL</div>
+        <div class="diag-value">
+          <code><?php echo h($diag_wh_full_url !== '' ? $diag_wh_full_url : '(Site Base URL not configured)'); ?></code>
+        </div>
+      </div>
+      <div class="diag-row">
+        <div class="diag-label">Webhook file on disk</div>
+        <div class="diag-value">
+          <?php echo diag_badge($diag_wh_exists, 'Found', 'Not found'); ?>
+          <div class="diag-sub"><code><?php echo h($diag_wh_file); ?></code></div>
+        </div>
+      </div>
+    </div>
 
     <?php if (!empty($diag_recent_events)): ?>
-    <h4 style="margin-top:18px;color:#555;">Recent Webhook Events</h4>
-    <table style="border-collapse:collapse;width:100%;font-size:0.85em;">
-      <thead><tr style="background:#f8f9fa;">
-        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">PayPal Event ID</th>
-        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">Type</th>
-        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">Status</th>
-        <th style="padding:6px 8px;text-align:left;border-bottom:2px solid #dee2e6;">Received</th>
+    <h4 style="margin-top:22px;color:#555;">Recent Webhook Events</h4>
+    <div style="overflow-x:auto;">
+    <table class="recent-errors-table">
+      <thead><tr>
+        <th>PayPal Event ID</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Received</th>
       </tr></thead>
       <tbody>
       <?php foreach ($diag_recent_events as $ev): ?>
-        <tr style="border-bottom:1px solid #eee;">
-          <td style="padding:5px 8px;font-family:monospace;font-size:0.85em;"><?php echo h($ev['paypal_event_id'] ?: '—'); ?></td>
-          <td style="padding:5px 8px;"><?php echo h($ev['event_type']); ?></td>
-          <td style="padding:5px 8px;"><?php echo diag_badge($ev['processing_status'] === 'processed', $ev['processing_status'], $ev['processing_status']); ?></td>
-          <td style="padding:5px 8px;"><?php echo h($ev['created_at']); ?></td>
+        <tr>
+          <td><code><?php echo h($ev['paypal_event_id'] ?: '—'); ?></code></td>
+          <td><?php echo h($ev['event_type']); ?></td>
+          <td><?php echo diag_badge($ev['processing_status'] === 'processed', $ev['processing_status'], $ev['processing_status']); ?></td>
+          <td><?php echo h($ev['created_at']); ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>
     </table>
-    <?php elseif (empty($diag_recent_events)): ?>
+    </div>
+    <?php else: ?>
     <p style="color:#888;font-size:0.9em;margin-top:12px;">No webhook events recorded yet. Events will appear here after PayPal delivers the first webhook to <code><?php echo h($diag_wh_full_url ?: $diag_wh_path); ?></code>.</p>
+    <?php endif; ?>
+
+    <h4 style="margin-top:22px;color:#555;">Recent PayPal Errors</h4>
+    <?php if ($diag_errors_warning): ?>
+    <div class="warn-box"><?php echo h($diag_errors_warning); ?></div>
+    <?php elseif (empty($diag_recent_errors)): ?>
+    <p style="color:#888;font-size:0.9em;">No PayPal errors logged yet.</p>
+    <?php else: ?>
+    <div style="overflow-x:auto;">
+    <table class="recent-errors-table">
+      <thead><tr>
+        <th>Time</th><th>Context</th><th>Error Code</th><th>Message</th>
+        <th>Debug ID</th><th>Order ID</th><th>User</th>
+      </tr></thead>
+      <tbody>
+      <?php foreach ($diag_recent_errors as $er): ?>
+        <tr>
+          <td style="white-space:nowrap"><?php echo h($er['created_at']); ?></td>
+          <td><?php echo h($er['context']); ?></td>
+          <td><code><?php echo h($er['error_code']); ?></code></td>
+          <td><?php echo h($er['message']); ?></td>
+          <td><code><?php echo h($er['paypal_debug_id'] ?? '—'); ?></code></td>
+          <td><code><?php echo h($er['order_id'] ?? '—'); ?></code></td>
+          <td><?php echo h($er['user_id'] ?? '—'); ?></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+    </div>
     <?php endif; ?>
   </div>
 

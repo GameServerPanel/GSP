@@ -686,6 +686,36 @@ $siteBase = $protocol . $host;
 
             <?php if ($final_amount > 0.00 && !empty($client_id)): ?>
             <script>
+                function showPaymentError(msg) {
+                    var statusDiv = document.getElementById('status-message');
+                    if (statusDiv) {
+                        statusDiv.textContent = msg;
+                        statusDiv.style.display = 'block';
+                        statusDiv.style.color = '#721c24';
+                        statusDiv.style.background = '#f8d7da';
+                        statusDiv.style.border = '1px solid #f5c6cb';
+                        statusDiv.style.padding = '12px 16px';
+                        statusDiv.style.borderRadius = '4px';
+                    }
+                }
+
+                function logErrorToServer(context, errorCode, message, debugId, orderId) {
+                    try {
+                        fetch('/api/log_error.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                context: context,
+                                error_code: errorCode,
+                                message: message,
+                                paypal_debug_id: debugId || null,
+                                order_id: orderId || null,
+                                timestamp: new Date().toISOString()
+                            })
+                        }).catch(function() {}); // silently ignore logging failures
+                    } catch (e) {}
+                }
+
                 paypal.Buttons({
                     createOrder: function(data, actions) {
                         setStatus('Creating order...');
@@ -712,48 +742,56 @@ $siteBase = $protocol . $host;
                             }]
                         });
                     },
-                    
+
                     onApprove: function(data, actions) {
                         setStatus('Processing payment...');
-                        
-                        // Capture the order via our backend
+
                         return fetch('/api/capture_order.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ order_id: data.orderID })
                         })
                         .then(function(res) {
-                            if (!res.ok) {
-                                return res.text().then(function(text) {
-                                    throw new Error('Payment capture failed: ' + text);
-                                });
-                            }
-                            return res.json();
+                            return res.json().then(function(body) {
+                                return { ok: res.ok, body: body };
+                            }).catch(function() {
+                                return { ok: false, body: { error_code: 'invalid_response', message: 'Server returned non-JSON response (HTTP ' + res.status + ').' } };
+                            });
                         })
-                        .then(function(orderData) {
-                            console.log('Capture result:', orderData);
-                            if (orderData.status === 'COMPLETED') {
+                        .then(function(result) {
+                            if (!result.ok || result.body.success === false) {
+                                var errCode = result.body.error_code || result.body.error || 'capture_failed';
+                                var errMsg  = result.body.message  || 'Payment capture failed. Please try again or contact support.';
+                                var debugId = result.body.debug_id || null;
+                                logErrorToServer('cart_capture', errCode, errMsg, debugId, data.orderID);
+                                showPaymentError('Payment failed: ' + errMsg);
+                                return;
+                            }
+                            // status=COMPLETED is the success indicator
+                            if (result.body.status === 'COMPLETED') {
                                 setStatus('Payment successful! Redirecting...');
-                                window.location.href = '/payment_success.php?order_id=' + data.orderID;
+                                window.location.href = '/payment_success.php?order_id=' + encodeURIComponent(data.orderID);
                             } else {
-                                throw new Error('Unexpected payment status: ' + orderData.status);
+                                var unexpectedMsg = 'Unexpected payment status: ' + (result.body.status || 'unknown');
+                                logErrorToServer('cart_capture', 'unexpected_status', unexpectedMsg, null, data.orderID);
+                                showPaymentError(unexpectedMsg + '. Please contact support.');
                             }
                         })
                         .catch(function(err) {
-                            console.error('Payment error:', err);
-                            setStatus('Error: ' + err.message);
-                            alert('Payment processing failed. Please try again or contact support.');
+                            var errMsg = err && err.message ? err.message : 'Network error during payment capture.';
+                            logErrorToServer('cart_capture', 'fetch_error', errMsg, null, data.orderID);
+                            showPaymentError('Payment error: ' + errMsg);
                         });
                     },
-                    
+
                     onError: function(err) {
-                        console.error('PayPal error:', err);
-                        setStatus('Payment error occurred');
-                        alert('An error occurred during payment. Please try again.');
+                        var errMsg = err && err.message ? err.message : String(err);
+                        logErrorToServer('cart_paypal_sdk', 'sdk_error', errMsg, null, null);
+                        showPaymentError('A PayPal error occurred. Please try again or contact support.');
                     },
-                    
+
                     onCancel: function(data) {
-                        setStatus('Payment cancelled');
+                        setStatus('Payment cancelled.');
                         window.location.href = '/payment_cancel.php';
                     }
                 }).render('#paypal-button-container');

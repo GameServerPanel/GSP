@@ -32,7 +32,13 @@ $rawInput = file_get_contents('php://input');
 $in       = json_decode($rawInput, true);
 if (json_last_error() !== JSON_ERROR_NONE || !$in) {
     http_response_code(400);
-    echo json_encode(['error' => 'invalid_json', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'invalid_json',
+        'message'    => 'Invalid JSON in request body.',
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 
@@ -69,14 +75,28 @@ try {
 } catch (Exception $e) {
     co_log('EXCEPTION', $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => 'gateway_error', 'message' => $e->getMessage(), 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => 'gateway_error',
+        'message'    => $e->getMessage(),
+        'debug_id'   => null,
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 
 if (!$result['success']) {
     co_log('CREATE_FAILED', $result);
     http_response_code(500);
-    echo json_encode(['error' => $result['error'] ?? 'create_failed', 'request_id' => $requestId]);
+    echo json_encode([
+        'success'    => false,
+        'error_code' => $result['error'] ?? 'create_failed',
+        'message'    => $result['message'] ?? 'Failed to create PayPal order.',
+        'debug_id'   => $result['debug_id'] ?? null,
+        'timestamp'  => date('c'),
+        'request_id' => $requestId,
+    ]);
     exit;
 }
 

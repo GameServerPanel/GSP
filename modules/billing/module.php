@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "3.3";
-$db_version = 3;
+$module_version = "3.4";
+$db_version = 4;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -343,6 +343,28 @@ $install_queries[3] = array(
         UNIQUE KEY `uidx_paypal_event_id` (`paypal_event_id`),
         KEY `idx_event_type`          (`event_type`),
         KEY `idx_billing_order_id`    (`billing_order_id`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+);
+
+// -----------------------------------------------------------------------
+// db_version 4 — Add billing_paypal_errors table for checkout error logging.
+// -----------------------------------------------------------------------
+$install_queries[4] = array(
+    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXbilling_paypal_errors` (
+        `id`                INT           NOT NULL AUTO_INCREMENT,
+        `context`           VARCHAR(64)   NOT NULL DEFAULT '',
+        `error_code`        VARCHAR(128)  NOT NULL DEFAULT '',
+        `message`           TEXT          NULL,
+        `paypal_debug_id`   VARCHAR(128)  NULL,
+        `order_id`          VARCHAR(128)  NULL,
+        `capture_id`        VARCHAR(128)  NULL,
+        `billing_order_id`  INT           NULL,
+        `user_id`           INT           NULL,
+        `raw_json`          LONGTEXT      NULL,
+        `created_at`        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (`id`),
+        KEY `idx_context`    (`context`),
+        KEY `idx_created_at` (`created_at`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 );
 
