@@ -9,6 +9,25 @@
  * (at your option) any later version.
  */
 
+function sw_db_prefix()
+{
+    if (defined('DB_PREFIX') && DB_PREFIX !== '') {
+        return DB_PREFIX;
+    }
+    if (isset($GLOBALS['db_prefix']) && $GLOBALS['db_prefix'] !== '') {
+        return $GLOBALS['db_prefix'];
+    }
+    if (isset($GLOBALS['table_prefix']) && $GLOBALS['table_prefix'] !== '') {
+        return $GLOBALS['table_prefix'];
+    }
+    return 'gsp_';
+}
+
+function sw_table($tableName)
+{
+    return '`' . sw_db_prefix() . $tableName . '`';
+}
+
 // ── Profile helpers ───────────────────────────────────────────────────────
 
 /**
@@ -20,7 +39,7 @@
 function sw_get_profiles($db)
 {
     return $db->resultQuery(
-        "SELECT * FROM `OGP_DB_PREFIXsteam_workshop_game_profiles`
+        "SELECT * FROM " . sw_table('steam_workshop_game_profiles') . "
           ORDER BY `game_name` ASC, `config_name` ASC"
     );
 }
@@ -36,7 +55,7 @@ function sw_get_profile_by_id($db, $id)
 {
     $id = (int)$id;
     $rows = $db->resultQuery(
-        "SELECT * FROM `OGP_DB_PREFIXsteam_workshop_game_profiles`
+        "SELECT * FROM " . sw_table('steam_workshop_game_profiles') . "
           WHERE `id` = $id LIMIT 1"
     );
     return ($rows && isset($rows[0])) ? $rows[0] : false;
@@ -53,7 +72,7 @@ function sw_get_profile_by_config_name($db, $config_name)
 {
     $safe = $db->realEscapeSingle($config_name);
     $rows = $db->resultQuery(
-        "SELECT * FROM `OGP_DB_PREFIXsteam_workshop_game_profiles`
+        "SELECT * FROM " . sw_table('steam_workshop_game_profiles') . "
           WHERE `config_name` = '$safe' LIMIT 1"
     );
     return ($rows && isset($rows[0])) ? $rows[0] : false;
@@ -72,11 +91,11 @@ function sw_get_profile_for_home($db, $home_id)
     $home_id = (int)$home_id;
     $rows = $db->resultQuery(
         "SELECT p.*
-           FROM `OGP_DB_PREFIXsteam_workshop_game_profiles` p
-           JOIN `OGP_DB_PREFIXconfig_homes` c
-             ON c.`game_key` = p.`config_name`
-           JOIN `OGP_DB_PREFIXserver_homes` s
-             ON s.`home_cfg_id` = c.`home_cfg_id`
+           FROM " . sw_table('steam_workshop_game_profiles') . " p
+           JOIN " . sw_table('config_homes') . " c
+              ON c.`game_key` = p.`config_name`
+           JOIN " . sw_table('server_homes') . " s
+              ON s.`home_cfg_id` = c.`home_cfg_id`
           WHERE s.`home_id` = $home_id
             AND p.`enabled` = 1
           LIMIT 1"
@@ -97,7 +116,7 @@ function sw_get_server_mods($db, $home_id)
 {
     $home_id = (int)$home_id;
     return $db->resultQuery(
-        "SELECT * FROM `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "SELECT * FROM " . sw_table('steam_workshop_server_mods') . "
           WHERE `home_id` = $home_id
           ORDER BY `sort_order` ASC, `id` ASC"
     );
@@ -114,7 +133,7 @@ function sw_get_mod_by_id($db, $id)
 {
     $id = (int)$id;
     $rows = $db->resultQuery(
-        "SELECT * FROM `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "SELECT * FROM " . sw_table('steam_workshop_server_mods') . "
           WHERE `id` = $id LIMIT 1"
     );
     return ($rows && isset($rows[0])) ? $rows[0] : false;
@@ -135,9 +154,9 @@ function sw_get_home_info($db, $home_id)
     $home_id = (int)$home_id;
     $rows = $db->resultQuery(
         "SELECT s.*, c.`game_key`, c.`game_name`, r.`agent_ip`, r.`agent_port`
-           FROM `OGP_DB_PREFIXserver_homes` s
-           JOIN `OGP_DB_PREFIXconfig_homes` c  ON c.`home_cfg_id` = s.`home_cfg_id`
-           JOIN `OGP_DB_PREFIXremote_servers` r ON r.`remote_server_id` = s.`remote_server_id`
+           FROM " . sw_table('server_homes') . " s
+           JOIN " . sw_table('config_homes') . " c  ON c.`home_cfg_id` = s.`home_cfg_id`
+           JOIN " . sw_table('remote_servers') . " r ON r.`remote_server_id` = s.`remote_server_id`
           WHERE s.`home_id` = $home_id LIMIT 1"
     );
     return ($rows && isset($rows[0])) ? $rows[0] : false;
@@ -167,7 +186,7 @@ function sw_user_owns_home($db, $user_id, $home_id)
 
     // Direct owner
     $rows = $db->resultQuery(
-        "SELECT 1 FROM `OGP_DB_PREFIXserver_homes`
+        "SELECT 1 FROM " . sw_table('server_homes') . "
           WHERE `home_id` = $home_id AND `user_id_main` = $user_id LIMIT 1"
     );
     if ($rows) {
@@ -176,7 +195,7 @@ function sw_user_owns_home($db, $user_id, $home_id)
 
     // Assigned via user_homes
     $rows = $db->resultQuery(
-        "SELECT 1 FROM `OGP_DB_PREFIXuser_homes`
+        "SELECT 1 FROM " . sw_table('user_homes') . "
           WHERE `home_id` = $home_id AND `user_id` = $user_id LIMIT 1"
     );
     if ($rows) {
@@ -185,8 +204,8 @@ function sw_user_owns_home($db, $user_id, $home_id)
 
     // Assigned via group
     $rows = $db->resultQuery(
-        "SELECT 1 FROM `OGP_DB_PREFIXuser_group_homes` ugh
-           JOIN `OGP_DB_PREFIXuser_groups` ug ON ug.`group_id` = ugh.`group_id`
+        "SELECT 1 FROM " . sw_table('user_group_homes') . " ugh
+           JOIN " . sw_table('user_groups') . " ug ON ug.`group_id` = ugh.`group_id`
           WHERE ugh.`home_id` = $home_id AND ug.`user_id` = $user_id LIMIT 1"
     );
     return (bool)$rows;
@@ -250,9 +269,9 @@ function sw_sync_profiles($db)
         $safe_name   = $db->realEscapeSingle($game_name);
 
         $ok = $db->query(
-            "INSERT IGNORE INTO `OGP_DB_PREFIXsteam_workshop_game_profiles`
+            "INSERT IGNORE INTO " . sw_table('steam_workshop_game_profiles') . "
                (`config_name`, `game_name`, `enabled`)
-             VALUES ('$safe_config', '$safe_name', 0)"
+              VALUES ('$safe_config', '$safe_name', 0)"
         );
         if ($ok) {
             $created++;
@@ -363,4 +382,93 @@ function sw_error($msg)
 function sw_h($v)
 {
     return htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+}
+
+function sw_detect_profile_defaults_from_xml($configName)
+{
+    $configName = trim((string)$configName);
+    if ($configName === '') {
+        return array();
+    }
+
+    $matched = null;
+    foreach (sw_get_all_game_configs() as $xml) {
+        if ((string)$xml->game_key === $configName) {
+            $matched = $xml;
+            break;
+        }
+    }
+    if (!$matched) {
+        return array();
+    }
+
+    $steamAppId = '';
+    if (isset($matched->mods->mod)) {
+        foreach ($matched->mods->mod as $mod) {
+            $candidate = trim((string)$mod->installer_name);
+            if ($candidate !== '' && preg_match('/^\d+$/', $candidate)) {
+                $steamAppId = $candidate;
+                break;
+            }
+        }
+    }
+
+    $xmlBlob = $matched->asXML();
+    $workshopAppId = '';
+    if ($xmlBlob !== false && preg_match('/steamapps\/workshop\/content\/(\d+)/i', $xmlBlob, $m)) {
+        $workshopAppId = $m[1];
+    }
+    if ($workshopAppId === '') {
+        $workshopAppId = $steamAppId;
+    }
+
+    return array(
+        'steam_app_id' => $steamAppId,
+        'workshop_app_id' => $workshopAppId,
+        'steamcmd_path' => '/home/gameserver/steamcmd/steamcmd.sh',
+        'server_root_template' => '{SERVER_ROOT}',
+        'workshop_download_dir_template' => '{SERVER_ROOT}/steamapps/workshop/content/{WORKSHOP_APP_ID}',
+        'install_path_template' => '{SERVER_ROOT}/{MOD_FOLDER}',
+    );
+}
+
+function sw_apply_detected_profile_defaults($db, array $profile, array $detected, $overwriteExisting = false)
+{
+    $columns = array(
+        'steam_app_id',
+        'workshop_app_id',
+        'steamcmd_path',
+        'workshop_download_dir_template',
+        'server_root_template',
+        'install_path_template',
+    );
+    $setParts = array();
+    $updated = 0;
+
+    foreach ($columns as $column) {
+        if (!array_key_exists($column, $detected) || $detected[$column] === '') {
+            continue;
+        }
+        $current = trim((string)($profile[$column] ?? ''));
+        if (!$overwriteExisting && $current !== '') {
+            continue;
+        }
+        if ($current === $detected[$column]) {
+            continue;
+        }
+        $setParts[] = "`$column` = '" . $db->realEscapeSingle($detected[$column]) . "'";
+        $updated++;
+    }
+
+    if (empty($setParts)) {
+        return 0;
+    }
+
+    $setParts[] = "`updated_at` = NOW()";
+    $db->query(
+        "UPDATE " . sw_table('steam_workshop_game_profiles') . "
+            SET " . implode(', ', $setParts) . "
+          WHERE `id` = " . (int)$profile['id'] . " LIMIT 1"
+    );
+    return $updated;
 }

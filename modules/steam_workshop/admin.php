@@ -2,18 +2,9 @@
 /*
  * GSP – Steam Workshop: Admin profile management
  * Copyright (C) 2025 WDS / GameServerPanel
- *
- * Accessible via: home.php?m=steam_workshop&p=admin
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
  */
 
 require_once __DIR__ . '/includes/functions.php';
-
-// Load the XML config parser so sw_sync_profiles() can read game configs.
 if (!defined('SERVER_CONFIG_LOCATION')) {
     require_once __DIR__ . '/../../config_games/server_config_parser.php';
 }
@@ -22,23 +13,65 @@ function exec_ogp_module()
 {
     global $db;
 
-    echo '<h2>Steam Workshop – Admin</h2>';
+    echo '<h2>Steam Workshop &ndash; Admin</h2>';
+    sw_admin_print_styles();
 
-    $action = isset($_GET['action']) ? $_GET['action'] : '';
+    $action = $_GET['action'] ?? '';
 
-    // ── POST: save a profile edit ─────────────────────────────────────
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
         sw_admin_save_profile($db);
         return;
     }
 
-    // ── POST: sync profiles from XML configs ──────────────────────────
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sync_profiles'])) {
         $n = sw_sync_profiles($db);
         sw_success("Sync complete. $n new profile(s) created.");
     }
 
-    // ── GET: show edit form for one profile ───────────────────────────
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['detect_defaults'])) {
+        $profile = sw_get_profile_by_id($db, (int)($_POST['id'] ?? 0));
+        if (!$profile) {
+            sw_error('Profile not found.');
+            sw_admin_list($db);
+            return;
+        }
+        $detected = sw_detect_profile_defaults_from_xml($profile['config_name']);
+        if (empty($detected)) {
+            sw_error('No Steam defaults were detected in this game XML. You can still enter values manually.');
+        } else {
+            sw_success('Detected XML defaults. Review and apply when ready.');
+        }
+        sw_admin_edit_form($profile, $detected, true);
+        return;
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_detected_defaults'])) {
+        $profile = sw_get_profile_by_id($db, (int)($_POST['id'] ?? 0));
+        if (!$profile) {
+            sw_error('Profile not found.');
+            sw_admin_list($db);
+            return;
+        }
+        $detected = sw_detect_profile_defaults_from_xml($profile['config_name']);
+        if (empty($detected)) {
+            sw_error('No Steam defaults were detected in this game XML.');
+            sw_admin_edit_form($profile);
+            return;
+        }
+
+        $overwrite = isset($_POST['overwrite_existing']) && $_POST['overwrite_existing'] === '1';
+        $updated = sw_apply_detected_profile_defaults($db, $profile, $detected, $overwrite);
+        if ($updated > 0) {
+            sw_success("Applied $updated detected default value(s)." . ($overwrite ? ' Existing values were allowed to be overwritten.' : ' Existing non-empty values were kept.'));
+        } else {
+            sw_success('No profile values needed updating based on current overwrite setting.');
+        }
+
+        $profile = sw_get_profile_by_id($db, (int)$profile['id']);
+        sw_admin_edit_form($profile, $detected, true);
+        return;
+    }
+
     if ($action === 'edit' && isset($_GET['id'])) {
         $profile = sw_get_profile_by_id($db, (int)$_GET['id']);
         if ($profile) {
@@ -50,18 +83,12 @@ function exec_ogp_module()
         return;
     }
 
-    // ── Default: list all profiles ────────────────────────────────────
     sw_admin_list($db);
 }
-
-// ─────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────
 
 function sw_admin_save_profile($db)
 {
     $id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
-
     if (!$id) {
         sw_error('Invalid profile ID.');
         sw_admin_list($db);
@@ -75,38 +102,34 @@ function sw_admin_save_profile($db)
         return;
     }
 
-    // Collect and sanitize fields from POST.
     $fields = array(
-        'enabled'                         => isset($_POST['enabled'])    ? 1 : 0,
-        'steam_app_id'                    => trim($_POST['steam_app_id']                    ?? ''),
-        'workshop_app_id'                 => trim($_POST['workshop_app_id']                 ?? ''),
-        'steam_login_required'            => isset($_POST['steam_login_required'])          ? 1 : 0,
-        'steamcmd_login_mode'             => $_POST['steamcmd_login_mode'] === 'account' ? 'account' : 'anonymous',
-        'steamcmd_path'                   => trim($_POST['steamcmd_path']                   ?? ''),
-        'workshop_download_dir_template'  => trim($_POST['workshop_download_dir_template']  ?? ''),
-        'server_root_template'            => trim($_POST['server_root_template']            ?? ''),
-        'install_path_template'           => trim($_POST['install_path_template']           ?? ''),
-        'folder_naming_format'            => trim($_POST['folder_naming_format']            ?? ''),
-        'mod_launch_param_template'       => trim($_POST['mod_launch_param_template']       ?? '-mod='),
+        'enabled'                         => isset($_POST['enabled']) ? 1 : 0,
+        'steam_app_id'                    => trim($_POST['steam_app_id'] ?? ''),
+        'workshop_app_id'                 => trim($_POST['workshop_app_id'] ?? ''),
+        'steam_login_required'            => isset($_POST['steam_login_required']) ? 1 : 0,
+        'steamcmd_login_mode'             => (($_POST['steamcmd_login_mode'] ?? 'anonymous') === 'account') ? 'account' : 'anonymous',
+        'steamcmd_path'                   => trim($_POST['steamcmd_path'] ?? ''),
+        'workshop_download_dir_template'  => trim($_POST['workshop_download_dir_template'] ?? ''),
+        'server_root_template'            => trim($_POST['server_root_template'] ?? ''),
+        'install_path_template'           => trim($_POST['install_path_template'] ?? ''),
+        'folder_naming_format'            => trim($_POST['folder_naming_format'] ?? ''),
+        'mod_launch_param_template'       => trim($_POST['mod_launch_param_template'] ?? '-mod='),
         'servermod_launch_param_template' => trim($_POST['servermod_launch_param_template'] ?? '-serverMod='),
-        'install_script_template'         => trim($_POST['install_script_template']         ?? ''),
-        'update_script_template'          => trim($_POST['update_script_template']          ?? ''),
-        'copy_bikeys_enabled'             => isset($_POST['copy_bikeys_enabled'])           ? 1 : 0,
-        'notes'                           => trim($_POST['notes']                           ?? ''),
+        'install_script_template'         => trim($_POST['install_script_template'] ?? ''),
+        'update_script_template'          => trim($_POST['update_script_template'] ?? ''),
+        'copy_bikeys_enabled'             => isset($_POST['copy_bikeys_enabled']) ? 1 : 0,
+        'notes'                           => trim($_POST['notes'] ?? ''),
     );
 
-    $set_parts = array();
+    $setParts = array();
     foreach ($fields as $col => $val) {
-        $safe = $db->realEscapeSingle($val);
-        $set_parts[] = "`$col` = '$safe'";
+        $setParts[] = "`$col` = '" . $db->realEscapeSingle($val) . "'";
     }
-    $set_parts[] = "`updated_at` = NOW()";
-
-    $set_sql = implode(', ', $set_parts);
+    $setParts[] = "`updated_at` = NOW()";
 
     $ok = $db->query(
-        "UPDATE `OGP_DB_PREFIXsteam_workshop_game_profiles`
-            SET $set_sql
+        "UPDATE " . sw_table('steam_workshop_game_profiles') . "
+            SET " . implode(', ', $setParts) . "
           WHERE `id` = $id LIMIT 1"
     );
 
@@ -128,297 +151,177 @@ function sw_admin_list($db)
 {
     $profiles = sw_get_profiles($db);
     ?>
-<p>
-  Each game config XML gets one Workshop profile.
-  Use <strong>Sync Profiles</strong> to auto-create rows for new game configs.
-  Enable and configure each profile to activate Steam Workshop for that game.
-</p>
+<div class="sw-admin-panel">
+  <p class="sw-muted">
+    Profiles map game XML configs to Steam Workshop defaults. Sync to create missing profiles, then edit each profile for game-specific paths and launch templates.
+  </p>
 
-<form method="post" style="display:inline;">
-  <button type="submit" name="sync_profiles" value="1"
-          onclick="return confirm('Sync workshop profiles from all game config XMLs?');"
-          class="button">Sync Profiles from XML Configs</button>
-</form>
+  <form method="post" style="margin-bottom:12px;">
+    <button type="submit" name="sync_profiles" value="1" class="button"
+            onclick="return confirm('Sync workshop profiles from all game config XMLs?');">Sync Profiles from XML Configs</button>
+  </form>
 
-<hr>
-
-<?php if (empty($profiles)): ?>
-<p>No profiles yet. Click <em>Sync Profiles</em> to create them from the installed game configs.</p>
-<?php else: ?>
-<table class="table" width="100%" style="border-collapse:collapse;">
-  <thead>
-    <tr style="background:#f0f0f0;">
-      <th style="padding:6px 8px;text-align:left;">Config Name</th>
-      <th style="padding:6px 8px;text-align:left;">Game Name</th>
-      <th style="padding:6px 8px;text-align:center;">Workshop App ID</th>
-      <th style="padding:6px 8px;text-align:center;">Enabled</th>
-      <th style="padding:6px 8px;text-align:center;">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($profiles as $p): ?>
-    <tr style="border-bottom:1px solid #ddd;">
-      <td style="padding:6px 8px;font-family:monospace;"><?= sw_h($p['config_name']) ?></td>
-      <td style="padding:6px 8px;"><?= sw_h($p['game_name']) ?></td>
-      <td style="padding:6px 8px;text-align:center;"><?= sw_h($p['workshop_app_id']) ?></td>
-      <td style="padding:6px 8px;text-align:center;">
-        <?= $p['enabled'] ? '<span style="color:green;font-weight:bold;">Yes</span>' : '<span style="color:#999;">No</span>' ?>
-      </td>
-      <td style="padding:6px 8px;text-align:center;">
-        <a href="home.php?m=steam_workshop&p=admin&action=edit&id=<?= (int)$p['id'] ?>"
-           class="button small">Edit</a>
-      </td>
-    </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-<?php endif;
+  <?php if (empty($profiles)): ?>
+    <p>No profiles yet. Click <em>Sync Profiles</em> to create them from installed game configs.</p>
+  <?php else: ?>
+    <table class="sw-admin-table" width="100%">
+      <thead>
+        <tr>
+          <th>Config Name</th>
+          <th>Game Name</th>
+          <th style="text-align:center;">Steam App ID</th>
+          <th style="text-align:center;">Workshop App ID</th>
+          <th style="text-align:center;">Enabled</th>
+          <th style="text-align:center;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      <?php foreach ($profiles as $p): ?>
+        <tr>
+          <td><code><?= sw_h($p['config_name']) ?></code></td>
+          <td><?= sw_h($p['game_name']) ?></td>
+          <td style="text-align:center;"><?= sw_h($p['steam_app_id']) ?></td>
+          <td style="text-align:center;"><?= sw_h($p['workshop_app_id']) ?></td>
+          <td style="text-align:center;"><?= $p['enabled'] ? '<span class="sw-state-on">Yes</span>' : '<span class="sw-state-off">No</span>' ?></td>
+          <td style="text-align:center;"><a class="button small" href="home.php?m=steam_workshop&p=admin&action=edit&id=<?= (int)$p['id'] ?>">Edit</a></td>
+        </tr>
+      <?php endforeach; ?>
+      </tbody>
+    </table>
+  <?php endif; ?>
+</div>
+<?php
 }
 
-function sw_admin_edit_form(array $profile)
+function sw_admin_edit_form(array $profile, array $detected = array(), $showDetectedBox = false)
 {
     $id = (int)$profile['id'];
     ?>
 <p><a href="home.php?m=steam_workshop&p=admin">&laquo; Back to profile list</a></p>
-
 <h3>Edit Profile: <?= sw_h($profile['config_name']) ?> &ndash; <?= sw_h($profile['game_name']) ?></h3>
 
-<p style="background:#fff8dc;border:1px solid #e0d090;padding:8px 12px;border-radius:4px;">
-  <strong>Supported placeholders</strong> (use in path/script templates):<br>
-  <code>{HOME_ID}</code> &nbsp;
-  <code>{SERVER_ID}</code> &nbsp;
-  <code>{REMOTE_SERVER_ID}</code> &nbsp;
-  <code>{GAME_NAME}</code> &nbsp;
-  <code>{CONFIG_NAME}</code> &nbsp;
-  <code>{WORKSHOP_ID}</code> &nbsp;
-  <code>{MOD_NAME}</code> &nbsp;
-  <code>{FOLDER_NAME}</code> &nbsp;
-  <code>{STEAM_APP_ID}</code> &nbsp;
-  <code>{WORKSHOP_APP_ID}</code> &nbsp;
-  <code>{STEAMCMD_PATH}</code> &nbsp;
-  <code>{WORKSHOP_DOWNLOAD_DIR}</code> &nbsp;
-  <code>{SERVER_ROOT}</code> &nbsp;
-  <code>{INSTALL_PATH}</code> &nbsp;
-  <code>{MOD_FOLDER}</code>
-</p>
+<div class="sw-admin-panel">
+  <div class="sw-note">
+    <strong>Placeholder tokens:</strong>
+    <code>{SERVER_ROOT}</code> <code>{HOME_ID}</code> <code>{STEAM_APP_ID}</code> <code>{WORKSHOP_APP_ID}</code> <code>{MOD_FOLDER}</code>
+  </div>
 
-<form method="post" action="home.php?m=steam_workshop&p=admin&action=edit&id=<?= $id ?>">
-  <input type="hidden" name="id" value="<?= $id ?>">
+  <div class="sw-section">
+    <h4>XML-Assisted Defaults</h4>
+    <p class="sw-muted">Use values detected from this game XML. Existing values are not overwritten unless you explicitly allow it.</p>
+    <form method="post" action="home.php?m=steam_workshop&p=admin&action=edit&id=<?= $id ?>" style="display:inline-block; margin-right:8px;">
+      <input type="hidden" name="id" value="<?= $id ?>">
+      <button type="submit" name="detect_defaults" value="1" class="button">Detect from XML</button>
+    </form>
 
-  <table width="100%" style="border-collapse:collapse;">
+    <?php if ($showDetectedBox && !empty($detected)): ?>
+      <div class="sw-detected-box">
+        <strong>Detected values:</strong>
+        <ul>
+          <li>Steam App ID: <code><?= sw_h($detected['steam_app_id'] ?? '') ?></code></li>
+          <li>Workshop App ID: <code><?= sw_h($detected['workshop_app_id'] ?? '') ?></code></li>
+          <li>SteamCMD path: <code><?= sw_h($detected['steamcmd_path'] ?? '') ?></code></li>
+          <li>Workshop download dir: <code><?= sw_h($detected['workshop_download_dir_template'] ?? '') ?></code></li>
+          <li>Server root: <code><?= sw_h($detected['server_root_template'] ?? '') ?></code></li>
+          <li>Mod install path: <code><?= sw_h($detected['install_path_template'] ?? '') ?></code></li>
+        </ul>
+        <form method="post" action="home.php?m=steam_workshop&p=admin&action=edit&id=<?= $id ?>">
+          <input type="hidden" name="id" value="<?= $id ?>">
+          <label style="display:block;margin-bottom:8px;">
+            <input type="checkbox" name="overwrite_existing" value="1">
+            Allow overwrite of existing non-empty values.
+          </label>
+          <button type="submit" name="apply_detected_defaults" value="1" class="button">Refresh defaults from XML</button>
+        </form>
+      </div>
+    <?php endif; ?>
+  </div>
 
-    <tr>
-      <td colspan="2" style="background:#eee;padding:6px 8px;font-weight:bold;">General</td>
-    </tr>
+  <form method="post" action="home.php?m=steam_workshop&p=admin&action=edit&id=<?= $id ?>">
+    <input type="hidden" name="id" value="<?= $id ?>">
 
-    <tr>
-      <td style="padding:6px 8px;width:260px;"><label>Enabled</label></td>
-      <td style="padding:6px 8px;">
-        <input type="checkbox" name="enabled" value="1"
-               <?= $profile['enabled'] ? 'checked' : '' ?>>
-        Enable Steam Workshop for this game config
-      </td>
-    </tr>
+    <div class="sw-section">
+      <h4>Global Profile Defaults</h4>
+      <div class="sw-grid">
+        <label><span>Enabled</span><input type="checkbox" name="enabled" value="1" <?= $profile['enabled'] ? 'checked' : '' ?>></label>
+        <label><span>Steam App ID</span><input type="text" name="steam_app_id" value="<?= sw_h($profile['steam_app_id']) ?>" placeholder="Detected from XML when available"></label>
+        <label><span>Workshop App ID</span><input type="text" name="workshop_app_id" value="<?= sw_h($profile['workshop_app_id']) ?>" placeholder="Detected from XML when available"></label>
+        <label><span>SteamCMD Path</span><input type="text" name="steamcmd_path" value="<?= sw_h($profile['steamcmd_path']) ?>" placeholder="/home/gameserver/steamcmd/steamcmd.sh"></label>
+        <label><span>Steam Login Required</span><input type="checkbox" name="steam_login_required" value="1" <?= $profile['steam_login_required'] ? 'checked' : '' ?>></label>
+        <label><span>SteamCMD Login Mode</span>
+          <select name="steamcmd_login_mode">
+            <option value="anonymous" <?= $profile['steamcmd_login_mode'] === 'anonymous' ? 'selected' : '' ?>>anonymous</option>
+            <option value="account" <?= $profile['steamcmd_login_mode'] === 'account' ? 'selected' : '' ?>>account</option>
+          </select>
+        </label>
+      </div>
+    </div>
 
-    <tr>
-      <td colspan="2" style="background:#eee;padding:6px 8px;font-weight:bold;">Steam / SteamCMD</td>
-    </tr>
+    <div class="sw-section">
+      <h4>Path Templates</h4>
+      <p class="sw-muted">Use placeholders so paths stay portable between server homes.</p>
+      <div class="sw-grid">
+        <label><span>Workshop Download Directory</span><input type="text" name="workshop_download_dir_template" value="<?= sw_h($profile['workshop_download_dir_template']) ?>" placeholder="{SERVER_ROOT}/steamapps/workshop/content/{WORKSHOP_APP_ID}"></label>
+        <label><span>Server Root</span><input type="text" name="server_root_template" value="<?= sw_h($profile['server_root_template']) ?>" placeholder="{SERVER_ROOT}"></label>
+        <label><span>Mod Install Path</span><input type="text" name="install_path_template" value="<?= sw_h($profile['install_path_template']) ?>" placeholder="{SERVER_ROOT}/{MOD_FOLDER}"></label>
+      </div>
+    </div>
 
-    <tr>
-      <td style="padding:6px 8px;"><label for="steam_app_id">Steam App ID</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="steam_app_id" name="steam_app_id"
-               value="<?= sw_h($profile['steam_app_id']) ?>"
-               style="width:200px;">
-        <span style="color:#666;font-size:0.9em;">(e.g. 223350 for DayZ Dedicated Server)</span>
-      </td>
-    </tr>
+    <div class="sw-section">
+      <h4>Per-Game Runtime Values</h4>
+      <div class="sw-grid">
+        <label><span>Folder Naming Format</span><input type="text" name="folder_naming_format" value="<?= sw_h($profile['folder_naming_format']) ?>" placeholder="@{MOD_NAME}"></label>
+        <label><span>Client Launch Param</span><input type="text" name="mod_launch_param_template" value="<?= sw_h($profile['mod_launch_param_template']) ?>" placeholder="-mod="></label>
+        <label><span>Server Launch Param</span><input type="text" name="servermod_launch_param_template" value="<?= sw_h($profile['servermod_launch_param_template']) ?>" placeholder="-serverMod="></label>
+        <label><span>Copy .bikey files</span><input type="checkbox" name="copy_bikeys_enabled" value="1" <?= $profile['copy_bikeys_enabled'] ? 'checked' : '' ?>></label>
+      </div>
+    </div>
 
-    <tr>
-      <td style="padding:6px 8px;"><label for="workshop_app_id">Workshop App ID</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="workshop_app_id" name="workshop_app_id"
-               value="<?= sw_h($profile['workshop_app_id']) ?>"
-               style="width:200px;">
-        <span style="color:#666;font-size:0.9em;">(e.g. 221100 for DayZ Workshop content)</span>
-      </td>
-    </tr>
+    <div class="sw-section">
+      <h4>Optional Script Templates</h4>
+      <label><span>Install Script Template</span><textarea name="install_script_template" rows="6"><?= sw_h($profile['install_script_template']) ?></textarea></label>
+      <label><span>Update Script Template</span><textarea name="update_script_template" rows="6"><?= sw_h($profile['update_script_template']) ?></textarea></label>
+    </div>
 
-    <tr>
-      <td style="padding:6px 8px;"><label for="steamcmd_path">SteamCMD Path</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="steamcmd_path" name="steamcmd_path"
-               value="<?= sw_h($profile['steamcmd_path']) ?>"
-               style="width:480px;">
-      </td>
-    </tr>
+    <div class="sw-section">
+      <h4>Notes</h4>
+      <label><textarea name="notes" rows="4"><?= sw_h($profile['notes']) ?></textarea></label>
+    </div>
 
-    <tr>
-      <td style="padding:6px 8px;"><label>Steam Login Required</label></td>
-      <td style="padding:6px 8px;">
-        <input type="checkbox" name="steam_login_required" value="1"
-               <?= $profile['steam_login_required'] ? 'checked' : '' ?>>
-        Requires authenticated Steam login (not anonymous)
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="steamcmd_login_mode">SteamCMD Login Mode</label></td>
-      <td style="padding:6px 8px;">
-        <select id="steamcmd_login_mode" name="steamcmd_login_mode">
-          <option value="anonymous" <?= $profile['steamcmd_login_mode'] === 'anonymous' ? 'selected' : '' ?>>anonymous</option>
-          <option value="account"   <?= $profile['steamcmd_login_mode'] === 'account'   ? 'selected' : '' ?>>account (Steam username/password needed)</option>
-        </select>
-      </td>
-    </tr>
-
-    <tr>
-      <td colspan="2" style="background:#eee;padding:6px 8px;font-weight:bold;">Paths</td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="workshop_download_dir_template">Workshop Download Dir</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="workshop_download_dir_template" name="workshop_download_dir_template"
-               value="<?= sw_h($profile['workshop_download_dir_template']) ?>"
-               style="width:480px;">
-        <br><span style="color:#666;font-size:0.9em;">
-          Where SteamCMD downloads mods.<br>
-          Example: <code>{SERVER_ROOT}/steamapps/workshop/content/{WORKSHOP_APP_ID}</code>
-        </span>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="server_root_template">Server Root</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="server_root_template" name="server_root_template"
-               value="<?= sw_h($profile['server_root_template']) ?>"
-               style="width:480px;">
-        <br><span style="color:#666;font-size:0.9em;">
-          Root directory of the game server. Example: <code>/home/gameserver/servers/{HOME_ID}</code>
-        </span>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="install_path_template">Mod Install Path</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="install_path_template" name="install_path_template"
-               value="<?= sw_h($profile['install_path_template']) ?>"
-               style="width:480px;">
-        <br><span style="color:#666;font-size:0.9em;">
-          Where the renamed mod folder ends up. Example: <code>{SERVER_ROOT}/{MOD_FOLDER}</code>
-        </span>
-      </td>
-    </tr>
-
-    <tr>
-      <td colspan="2" style="background:#eee;padding:6px 8px;font-weight:bold;">Folder &amp; Launch Params</td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="folder_naming_format">Folder Naming Format</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="folder_naming_format" name="folder_naming_format"
-               value="<?= sw_h($profile['folder_naming_format']) ?>"
-               style="width:300px;">
-        <br><span style="color:#666;font-size:0.9em;">
-          Default folder name template. Common values: <code>@{MOD_NAME}</code> or <code>@{WORKSHOP_ID}</code>
-        </span>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="mod_launch_param_template">Client Mod Launch Param</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="mod_launch_param_template" name="mod_launch_param_template"
-               value="<?= sw_h($profile['mod_launch_param_template']) ?>"
-               style="width:200px;">
-        <span style="color:#666;font-size:0.9em;">Prefix for client-required mods (e.g. <code>-mod=</code>)</span>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label for="servermod_launch_param_template">Server-Side Mod Launch Param</label></td>
-      <td style="padding:6px 8px;">
-        <input type="text" id="servermod_launch_param_template" name="servermod_launch_param_template"
-               value="<?= sw_h($profile['servermod_launch_param_template']) ?>"
-               style="width:200px;">
-        <span style="color:#666;font-size:0.9em;">Prefix for server-only mods (e.g. <code>-serverMod=</code>)</span>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;"><label>Copy .bikey Files</label></td>
-      <td style="padding:6px 8px;">
-        <input type="checkbox" name="copy_bikeys_enabled" value="1"
-               <?= $profile['copy_bikeys_enabled'] ? 'checked' : '' ?>>
-        Copy .bikey files from mod keys/ folder into server keys/ folder
-      </td>
-    </tr>
-
-    <tr>
-      <td colspan="2" style="background:#eee;padding:6px 8px;font-weight:bold;">Scripts (optional)</td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;vertical-align:top;"><label for="install_script_template">Install Script Template</label></td>
-      <td style="padding:6px 8px;">
-        <textarea id="install_script_template" name="install_script_template"
-                  rows="6" style="width:100%;font-family:monospace;"
-        ><?= sw_h($profile['install_script_template']) ?></textarea>
-        <span style="color:#666;font-size:0.9em;">
-          Shell commands to run when installing a mod for the first time. Placeholders expanded before execution.
-        </span>
-      </td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;vertical-align:top;"><label for="update_script_template">Update Script Template</label></td>
-      <td style="padding:6px 8px;">
-        <textarea id="update_script_template" name="update_script_template"
-                  rows="6" style="width:100%;font-family:monospace;"
-        ><?= sw_h($profile['update_script_template']) ?></textarea>
-        <span style="color:#666;font-size:0.9em;">
-          Shell commands to run when updating an already-installed mod.
-        </span>
-      </td>
-    </tr>
-
-    <tr>
-      <td colspan="2" style="background:#eee;padding:6px 8px;font-weight:bold;">Notes</td>
-    </tr>
-
-    <tr>
-      <td style="padding:6px 8px;vertical-align:top;"><label for="notes">Notes</label></td>
-      <td style="padding:6px 8px;">
-        <textarea id="notes" name="notes"
-                  rows="4" style="width:100%;"
-        ><?= sw_h($profile['notes']) ?></textarea>
-      </td>
-    </tr>
-
-  </table>
-
-  <p>
-    <button type="submit" name="save_profile" value="1" class="button">Save Profile</button>
-    &nbsp;
-    <a href="home.php?m=steam_workshop&p=admin" class="button">Cancel</a>
-  </p>
-
-</form>
-
-<hr>
-<h4>DayZ Default Values (for reference)</h4>
-<ul>
-  <li><strong>Steam App ID:</strong> 223350 (DayZ Dedicated Server)</li>
-  <li><strong>Workshop App ID:</strong> 221100 (DayZ Workshop)</li>
-  <li><strong>Workshop Download Dir:</strong> <code>{SERVER_ROOT}/steamapps/workshop/content/{WORKSHOP_APP_ID}</code></li>
-  <li><strong>Folder Naming Format:</strong> <code>@{MOD_NAME}</code></li>
-  <li><strong>Client Mod Launch Param:</strong> <code>-mod=</code></li>
-  <li><strong>Server-Side Mod Launch Param:</strong> <code>-serverMod=</code></li>
-  <li><strong>Copy .bikey Files:</strong> Yes</li>
-</ul>
+    <p>
+      <button type="submit" name="save_profile" value="1" class="button">Save Profile</button>
+      <a href="home.php?m=steam_workshop&p=admin" class="button">Cancel</a>
+    </p>
+  </form>
+</div>
 <?php
+}
+
+function sw_admin_print_styles()
+{
+    static $printed = false;
+    if ($printed) {
+        return;
+    }
+    $printed = true;
+    echo '<style>
+    .sw-admin-panel{background:#171717;border:1px solid #2d2d2d;border-radius:6px;padding:14px;margin:10px 0;color:#e7e7e7}
+    .sw-admin-table{border-collapse:collapse;background:#121212}
+    .sw-admin-table th,.sw-admin-table td{border:1px solid #2c2c2c;padding:8px}
+    .sw-admin-table thead th{background:#232323;color:#fff}
+    .sw-state-on{color:#78d978;font-weight:700}
+    .sw-state-off{color:#9a9a9a}
+    .sw-section{margin-top:14px;padding:12px;border:1px solid #2f2f2f;border-radius:4px;background:#111}
+    .sw-section h4{margin:0 0 8px 0;color:#f6f6f6}
+    .sw-note{margin-bottom:10px;background:#202020;border-left:3px solid #3f80d0;padding:10px}
+    .sw-muted{color:#b3b3b3}
+    .sw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+    .sw-grid label, .sw-section > label{display:block}
+    .sw-grid span, .sw-section span{display:block;font-size:12px;color:#bdbdbd;margin-bottom:4px}
+    .sw-grid input[type=text], .sw-grid select, .sw-section textarea{width:100%;box-sizing:border-box;background:#0d0d0d;border:1px solid #3a3a3a;color:#eee;padding:7px;border-radius:4px}
+    .sw-grid input[type=checkbox]{transform:scale(1.1);margin-top:4px}
+    .sw-detected-box{margin-top:10px;padding:10px;background:#1d2a1d;border:1px solid #335933;border-radius:4px}
+    .sw-detected-box ul{margin:8px 0 10px 18px}
+    .sw-detected-box code,.sw-note code{background:#0b0b0b;padding:1px 4px;border-radius:3px;color:#9fd4ff}
+    </style>';
 }

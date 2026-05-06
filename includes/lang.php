@@ -85,6 +85,66 @@ function ogpLang()
     }
 }
 
+function ogp_load_english_fallbacks()
+{
+    static $coreLoaded = false;
+    static $loadedModules = array();
+    global $lang_modules;
+
+    $englishDir = "lang/English";
+    if (!is_dir($englishDir)) {
+        return;
+    }
+
+    if ($coreLoaded === false) {
+        $coreFiles = glob($englishDir . "/*.php");
+        if (is_array($coreFiles)) {
+            foreach ($coreFiles as $coreFile) {
+                ogp_include_lang_file_safely($coreFile);
+            }
+        }
+        $coreLoaded = true;
+    }
+
+    $modulesToLoad = array();
+    if (isset($_REQUEST['m']) && $_REQUEST['m'] !== '') {
+        $modulesToLoad[] = $_REQUEST['m'];
+    }
+    foreach ((array)$lang_modules as $moduleName) {
+        $modulesToLoad[] = $moduleName;
+    }
+
+    foreach (array_unique($modulesToLoad) as $moduleName) {
+        if (!preg_match('/^([a-z]|[0-9]|_|-)+$/i', (string)$moduleName)) {
+            continue;
+        }
+        if (isset($loadedModules[$moduleName])) {
+            continue;
+        }
+        $moduleFile = $englishDir . "/modules/" . $moduleName . ".php";
+        if (is_file($moduleFile)) {
+            ogp_include_lang_file_safely($moduleFile);
+        }
+        $loadedModules[$moduleName] = true;
+    }
+}
+
+function ogp_include_lang_file_safely($filePath)
+{
+    $previous = set_error_handler(function ($severity, $message) {
+        if ($severity === E_WARNING && strpos($message, 'already defined') !== false) {
+            return true;
+        }
+        return false;
+    });
+    include_once($filePath);
+    if ($previous !== null) {
+        restore_error_handler();
+    } else {
+        restore_error_handler();
+    }
+}
+
 function get_lang($lang_index)
 {
 	global $OGPLangPre;
@@ -94,13 +154,26 @@ function get_lang($lang_index)
         return constant($lang_index);
     }
     
-    if(!startsWith($lang_index, $OGPLangPre)){
+	if(!startsWith($lang_index, $OGPLangPre)){
 		$newLangIndex = $OGPLangPre . $lang_index;
 		if (defined($newLangIndex))
 		{
 			return constant($newLangIndex);
 		}
+        ogp_load_english_fallbacks();
+        if (defined($newLangIndex))
+        {
+            return constant($newLangIndex);
+        }
 	}
+    else
+    {
+        ogp_load_english_fallbacks();
+        if (defined($lang_index))
+        {
+            return constant($lang_index);
+        }
+    }
 
     // Any other case is error.
     return "_".$lang_index."_";
@@ -117,13 +190,26 @@ function get_lang_f()
         return vsprintf(constant($lang_index),$args);
     }
     
-    if(!startsWith($lang_index, $OGPLangPre)){
+	if(!startsWith($lang_index, $OGPLangPre)){
 		$newLangIndex = $OGPLangPre . $lang_index;
 		if (defined($newLangIndex))
 		{
 			return vsprintf(constant($newLangIndex),$args);
 		}
+        ogp_load_english_fallbacks();
+        if (defined($newLangIndex))
+        {
+            return vsprintf(constant($newLangIndex),$args);
+        }
 	}
+    else
+    {
+        ogp_load_english_fallbacks();
+        if (defined($lang_index))
+        {
+            return vsprintf(constant($lang_index),$args);
+        }
+    }
 
     return "_".$lang_index."_".implode("_",$args)."_";
 }
