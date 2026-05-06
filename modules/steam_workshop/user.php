@@ -95,7 +95,7 @@ function sw_user_add_mod($db, $home_id, array $profile)
     // Prevent duplicates
     $safe_wid = $db->realEscapeSingle($workshop_id);
     $exists   = $db->resultQuery(
-        "SELECT id FROM `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "SELECT id FROM " . sw_table('steam_workshop_server_mods') . "
           WHERE `home_id` = $home_id AND `workshop_id` = '$safe_wid' LIMIT 1"
     );
     if ($exists) {
@@ -105,7 +105,7 @@ function sw_user_add_mod($db, $home_id, array $profile)
 
     // Determine next sort_order
     $last = $db->resultQuery(
-        "SELECT MAX(`sort_order`) AS m FROM `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "SELECT MAX(`sort_order`) AS m FROM " . sw_table('steam_workshop_server_mods') . "
           WHERE `home_id` = $home_id"
     );
     $sort = ($last && isset($last[0]['m'])) ? ((int)$last[0]['m'] + 1) : 0;
@@ -127,9 +127,9 @@ function sw_user_add_mod($db, $home_id, array $profile)
     $safe_mname = $mod_name; // already escaped above via realEscapeSingle
 
     $ok = $db->query(
-        "INSERT INTO `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "INSERT INTO " . sw_table('steam_workshop_server_mods') . "
            (`home_id`, `profile_id`, `workshop_id`, `mod_name`, `folder_name`,
-            `mod_type`, `sort_order`, `enabled`, `install_status`, `created_at`)
+             `mod_type`, `sort_order`, `enabled`, `install_status`, `created_at`)
          VALUES ($home_id, $profile_id, '$safe_wid', '$safe_mname', '$safe_fname',
                  '$mod_type', $sort, 1, '', NOW())"
     );
@@ -164,7 +164,7 @@ function sw_user_save_mod($db, $home_id)
     }
 
     $ok = $db->query(
-        "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "UPDATE " . sw_table('steam_workshop_server_mods') . "
             SET `mod_name`    = '$mod_name',
                 `folder_name` = '$folder_name',
                 `mod_type`    = '$mod_type',
@@ -193,7 +193,7 @@ function sw_user_delete_mod($db, $home_id)
     }
 
     $db->query(
-        "DELETE FROM `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "DELETE FROM " . sw_table('steam_workshop_server_mods') . "
           WHERE `id` = $mod_id AND `home_id` = $home_id LIMIT 1"
     );
     sw_success('Mod removed from list.');
@@ -214,7 +214,7 @@ function sw_user_toggle_mod($db, $home_id)
 
     $new_state = $mod['enabled'] ? 0 : 1;
     $db->query(
-        "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "UPDATE " . sw_table('steam_workshop_server_mods') . "
             SET `enabled` = $new_state, `updated_at` = NOW()
           WHERE `id` = $mod_id AND `home_id` = $home_id LIMIT 1"
     );
@@ -241,7 +241,7 @@ function sw_user_reorder_mod($db, $home_id, $direction)
     $sorted = array_values($mods);
     foreach ($sorted as $idx => $m) {
         $db->query(
-            "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+            "UPDATE " . sw_table('steam_workshop_server_mods') . "
                 SET `sort_order` = $idx
               WHERE `id` = " . (int)$m['id'] . " AND `home_id` = $home_id LIMIT 1"
         );
@@ -271,12 +271,12 @@ function sw_user_reorder_mod($db, $home_id, $direction)
 
     // Swap sort_order values
     $db->query(
-        "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "UPDATE " . sw_table('steam_workshop_server_mods') . "
             SET `sort_order` = $swap_pos
           WHERE `id` = $mod_id AND `home_id` = $home_id LIMIT 1"
     );
     $db->query(
-        "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "UPDATE " . sw_table('steam_workshop_server_mods') . "
             SET `sort_order` = $pos
           WHERE `id` = $swap_id AND `home_id` = $home_id LIMIT 1"
     );
@@ -286,7 +286,7 @@ function sw_user_queue_update($db, $home_id)
 {
     // Mark all enabled mods as 'queued' so the agent picks them up.
     $db->query(
-        "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+        "UPDATE " . sw_table('steam_workshop_server_mods') . "
             SET `install_status` = 'queued', `updated_at` = NOW()
           WHERE `home_id` = $home_id AND `enabled` = 1"
     );

@@ -273,6 +273,22 @@ function config_games_print_editor_css()
 .xml-node__example code{color:#a0d0a0;background:rgba(30,150,50,0.1);padding:1px 4px;border-radius:3px}
 .xml-jump-link{display:inline-block;margin-bottom:12px;padding:6px 14px;background:#1c6dd0;color:#fff;border-radius:4px;text-decoration:none;font-size:0.9rem}
 .xml-jump-link:hover{background:#1f7aec;text-decoration:none}
+.xml-section-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:18px}
+.xml-section-block{border:1px solid #303030;border-radius:6px;background:#141414;padding:12px}
+.xml-section-block__head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.xml-section-block__title{font-size:1.02rem;color:#f0f0f0;font-weight:600}
+.xml-section-block__meta{font-size:0.8rem;color:#9f9f9f}
+.xml-section-block__desc{font-size:0.86rem;color:#b0b0b0;margin:0 0 10px}
+.xml-section-block textarea{width:100%;min-height:170px;background:#0f0f0f;border:1px solid #3c3c3c;border-radius:4px;color:#f7f7f7;padding:8px;font-family:monospace;font-size:0.84rem}
+.xml-section-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.xml-btn{border:1px solid #3f3f3f;background:#222;color:#fff;padding:6px 10px;border-radius:4px;cursor:pointer}
+.xml-btn:hover{background:#2a2a2a}
+.xml-btn--primary{background:#1c6dd0;border-color:#114b99}
+.xml-btn--primary:hover{background:#1f7aec}
+.xml-btn--danger{background:#6b1f1f;border-color:#8d2d2d}
+.xml-btn--danger:hover{background:#8d2d2d}
+.xml-add-section{border:1px dashed #3a3a3a;border-radius:6px;padding:10px;margin-bottom:16px}
+.xml-add-section select{min-width:260px}
 </style>
 CSS;
 }
@@ -416,6 +432,305 @@ function config_games_render_editor(SimpleXMLElement $xml)
 
     $html .= "</div>";
     return $html;
+}
+
+function config_games_get_config_file_path($db, $home_cfg_id)
+{
+    $cfgInfo = $db->getGameCfg((int)$home_cfg_id);
+    if ($cfgInfo === false) {
+        return false;
+    }
+    return SERVER_CONFIG_LOCATION . $cfgInfo['home_cfg_file'];
+}
+
+function config_games_parse_section_payload($sectionName, $sectionXml)
+{
+    $sectionName = trim((string)$sectionName);
+    if ($sectionName === '' || !preg_match('/^[A-Za-z0-9_\\-]+$/', $sectionName)) {
+        return array(false, 'Invalid section name.');
+    }
+    $sectionXml = trim((string)$sectionXml);
+    if ($sectionXml === '') {
+        return array(false, 'Section XML cannot be empty.');
+    }
+
+    $tmpDom = new DOMDocument();
+    $tmpDom->preserveWhiteSpace = true;
+    $tmpDom->formatOutput = false;
+    $wrapped = '<wrapper>' . $sectionXml . '</wrapper>';
+    $prev = libxml_use_internal_errors(true);
+    libxml_clear_errors();
+    $ok = $tmpDom->loadXML($wrapped);
+    $errors = libxml_get_errors();
+    libxml_clear_errors();
+    libxml_use_internal_errors($prev);
+    if (!$ok) {
+        $msg = 'Section XML is not well-formed.';
+        if (!empty($errors)) {
+            $msg = trim($errors[0]->message) . ' (line ' . $errors[0]->line . ')';
+        }
+        return array(false, $msg);
+    }
+
+    $elements = array();
+    foreach ($tmpDom->documentElement->childNodes as $child) {
+        if ($child instanceof DOMElement) {
+            $elements[] = $child;
+        }
+    }
+    if (count($elements) !== 1) {
+        return array(false, 'Section XML must contain exactly one top-level element.');
+    }
+    if ($elements[0]->tagName !== $sectionName) {
+        return array(false, 'Section XML root tag must be <' . htmlspecialchars($sectionName, ENT_QUOTES, 'UTF-8') . '>.');
+    }
+    return array($elements[0], '');
+}
+
+function config_games_get_top_level_sections($configFile)
+{
+    $sections = array();
+    if (!file_exists($configFile)) {
+        return $sections;
+    }
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = true;
+    $dom->formatOutput = false;
+    if (!$dom->load($configFile)) {
+        return $sections;
+    }
+    $schema = config_games_schema_order();
+    $descriptions = config_games_tag_descriptions();
+    foreach ($dom->documentElement->childNodes as $child) {
+        if (!($child instanceof DOMElement)) {
+            continue;
+        }
+        $name = $child->tagName;
+        $sections[] = array(
+            'name' => $name,
+            'required' => ($schema[$name] ?? null) === true,
+            'optional' => ($schema[$name] ?? null) === false,
+            'xml' => $dom->saveXML($child),
+            'description' => $descriptions[$name]['desc'] ?? 'Top-level configuration section.',
+        );
+    }
+    return $sections;
+}
+
+function config_games_validate_document_or_errors(DOMDocument $dom)
+{
+    $tmp = tempnam(sys_get_temp_dir(), 'gsp_cfg_section_');
+    if ($tmp === false) {
+        return array('Could not create temporary file for validation.');
+    }
+    $dom->save($tmp);
+    $errors = config_games_validate_xml_file($tmp);
+    @unlink($tmp);
+    return $errors;
+}
+
+function config_games_validate_section_update($db, $home_cfg_id, $sectionName, $sectionXml)
+{
+    $configFile = config_games_get_config_file_path($db, $home_cfg_id);
+    if ($configFile === false || !file_exists($configFile)) {
+        return array(false, array('Configuration file not found.'));
+    }
+
+    list($sectionNode, $parseError) = config_games_parse_section_payload($sectionName, $sectionXml);
+    if ($sectionNode === false) {
+        return array(false, array($parseError));
+    }
+
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = true;
+    $dom->formatOutput = false;
+    if ($dom->load($configFile) === false) {
+        return array(false, array('Could not parse configuration XML.'));
+    }
+    $root = $dom->documentElement;
+    $import = $dom->importNode($sectionNode, true);
+    $replaced = false;
+    foreach ($root->childNodes as $child) {
+        if ($child instanceof DOMElement && $child->tagName === $sectionName) {
+            $root->replaceChild($import, $child);
+            $replaced = true;
+            break;
+        }
+    }
+    if (!$replaced) {
+        $root->appendChild($import);
+    }
+
+    $errors = config_games_validate_document_or_errors($dom);
+    if (!empty($errors)) {
+        return array(false, $errors);
+    }
+    return array(true, array());
+}
+
+function config_games_save_dom_and_refresh_cfg($db, $configFile, DOMDocument $dom)
+{
+    if ($dom->save($configFile) === false) {
+        return array(false, array('Failed to write configuration file.'));
+    }
+    $config = read_server_config($configFile);
+    if ($config !== false) {
+        $db->addGameCfg($config);
+    }
+    return array(true, array());
+}
+
+function config_games_upsert_top_level_section($db, $home_cfg_id, $sectionName, $sectionXml)
+{
+    $configFile = config_games_get_config_file_path($db, $home_cfg_id);
+    if ($configFile === false || !file_exists($configFile)) {
+        return array(false, array('Configuration file not found.'));
+    }
+
+    list($sectionNode, $parseError) = config_games_parse_section_payload($sectionName, $sectionXml);
+    if ($sectionNode === false) {
+        return array(false, array($parseError));
+    }
+
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = true;
+    $dom->formatOutput = true;
+    if ($dom->load($configFile) === false) {
+        return array(false, array('Could not parse configuration XML.'));
+    }
+    $import = $dom->importNode($sectionNode, true);
+    $root = $dom->documentElement;
+    $replaced = false;
+    foreach ($root->childNodes as $child) {
+        if ($child instanceof DOMElement && $child->tagName === $sectionName) {
+            $root->replaceChild($import, $child);
+            $replaced = true;
+            break;
+        }
+    }
+
+    if (!$replaced) {
+        $schemaKeys = array_keys(config_games_schema_order());
+        $targetIndex = array_search($sectionName, $schemaKeys, true);
+        $inserted = false;
+        if ($targetIndex !== false) {
+            foreach ($root->childNodes as $child) {
+                if (!($child instanceof DOMElement)) {
+                    continue;
+                }
+                $childIndex = array_search($child->tagName, $schemaKeys, true);
+                if ($childIndex !== false && $childIndex > $targetIndex) {
+                    $root->insertBefore($import, $child);
+                    $inserted = true;
+                    break;
+                }
+            }
+        }
+        if (!$inserted) {
+            $root->appendChild($import);
+        }
+    }
+
+    $errors = config_games_validate_document_or_errors($dom);
+    if (!empty($errors)) {
+        return array(false, $errors);
+    }
+    return config_games_save_dom_and_refresh_cfg($db, $configFile, $dom);
+}
+
+function config_games_remove_optional_section($db, $home_cfg_id, $sectionName)
+{
+    $schema = config_games_schema_order();
+    if (($schema[$sectionName] ?? null) === true) {
+        return array(false, array('Required sections cannot be removed: ' . $sectionName));
+    }
+
+    $configFile = config_games_get_config_file_path($db, $home_cfg_id);
+    if ($configFile === false || !file_exists($configFile)) {
+        return array(false, array('Configuration file not found.'));
+    }
+
+    $dom = new DOMDocument();
+    $dom->preserveWhiteSpace = true;
+    $dom->formatOutput = true;
+    if ($dom->load($configFile) === false) {
+        return array(false, array('Could not parse configuration XML.'));
+    }
+    $root = $dom->documentElement;
+    $removed = false;
+    foreach ($root->childNodes as $child) {
+        if ($child instanceof DOMElement && $child->tagName === $sectionName) {
+            $root->removeChild($child);
+            $removed = true;
+            break;
+        }
+    }
+    if (!$removed) {
+        return array(false, array('Section not found: ' . $sectionName));
+    }
+
+    $errors = config_games_validate_document_or_errors($dom);
+    if (!empty($errors)) {
+        return array(false, $errors);
+    }
+    return config_games_save_dom_and_refresh_cfg($db, $configFile, $dom);
+}
+
+function config_games_render_top_level_editor($home_cfg_id, $configFile)
+{
+    $sections = config_games_get_top_level_sections($configFile);
+    $schema = config_games_schema_order();
+    $presentNames = array_map(function ($section) {
+        return $section['name'];
+    }, $sections);
+    $optionalMissing = array();
+    foreach ($schema as $name => $required) {
+        if ($required === false && !in_array($name, $presentNames, true)) {
+            $optionalMissing[] = $name;
+        }
+    }
+
+    echo "<h3>Section Editor</h3>";
+    $sectionEditorNote = "Edit one top-level section at a time. Validate a block before saving. Required sections cannot be removed. Optional sections can be added or removed safely.";
+    echo "<p class='note'>{$sectionEditorNote}</p>";
+
+    if (!empty($optionalMissing)) {
+        echo "<form class='xml-add-section' action='?m=config_games&amp;home_cfg_id=" . (int)$home_cfg_id . "' method='post'>";
+        echo "<input type='hidden' name='home_cfg_id' value='" . (int)$home_cfg_id . "'>";
+        echo "<label for='new_optional_section'>Add optional section:</label> ";
+        echo "<select id='new_optional_section' name='section_name'>";
+        foreach ($optionalMissing as $missingName) {
+            echo "<option value='" . htmlspecialchars($missingName, ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($missingName, ENT_QUOTES, 'UTF-8') . "</option>";
+        }
+        echo "</select> ";
+        echo "<button class='xml-btn' type='submit' name='add_optional_section' value='1'>Add Section</button>";
+        echo "</form>";
+    }
+
+    echo "<div class='xml-section-grid'>";
+    foreach ($sections as $section) {
+        $safeName = htmlspecialchars($section['name'], ENT_QUOTES, 'UTF-8');
+        $safeXml = htmlspecialchars((string)$section['xml'], ENT_QUOTES, 'UTF-8');
+        $safeDesc = htmlspecialchars((string)$section['description'], ENT_QUOTES, 'UTF-8');
+        $requiredText = $section['required'] ? 'Required' : 'Optional/Custom';
+
+        echo "<form class='xml-section-block' action='?m=config_games&amp;home_cfg_id=" . (int)$home_cfg_id . "' method='post'>";
+        echo "<input type='hidden' name='home_cfg_id' value='" . (int)$home_cfg_id . "'>";
+        echo "<input type='hidden' name='section_name' value='{$safeName}'>";
+        echo "<div class='xml-section-block__head'><div><div class='xml-section-block__title'>{$safeName}</div><div class='xml-section-block__meta'>{$requiredText}</div></div></div>";
+        echo "<p class='xml-section-block__desc'>{$safeDesc}</p>";
+        echo "<textarea name='section_xml'>{$safeXml}</textarea>";
+        echo "<div class='xml-section-actions'>";
+        echo "<button class='xml-btn' type='submit' name='validate_section' value='1'>Validate Section</button>";
+        echo "<button class='xml-btn xml-btn--primary' type='submit' name='save_section' value='1'>Save Section</button>";
+        echo "<button class='xml-btn' type='submit' name='reset_section' value='1'>Reset Section</button>";
+        if (!$section['required']) {
+            echo "<button class='xml-btn xml-btn--danger' type='submit' name='remove_section' value='1' onclick=\"return confirm('Remove optional section {$safeName}?');\">Remove Section</button>";
+        }
+        echo "</div>";
+        echo "</form>";
+    }
+    echo "</div>";
 }
 
 /**
@@ -613,6 +928,68 @@ function exec_ogp_module() {
         print_success(get_lang('configs_updated_ok'));
     }
     
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['home_cfg_id']) &&
+        (isset($_POST['validate_section']) || isset($_POST['save_section']) || isset($_POST['remove_section']) || isset($_POST['add_optional_section']) || isset($_POST['reset_section']))) {
+        $edit_id = (int)$_POST['home_cfg_id'];
+        $sectionName = trim((string)($_POST['section_name'] ?? ''));
+        $sectionXml = (string)($_POST['section_xml'] ?? '');
+
+        if (isset($_POST['reset_section'])) {
+            print_success('Section reset. No changes were saved.');
+        } elseif (isset($_POST['validate_section'])) {
+            list($ok, $errors) = config_games_validate_section_update($db, $edit_id, $sectionName, $sectionXml);
+            if ($ok) {
+                print_success('Section XML is valid.');
+            } else {
+                echo "<div class='xml-validation-errors'><strong>&#x26A0; Section validation failed:</strong><ul>";
+                foreach ($errors as $err) {
+                    echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+                }
+                echo "</ul></div>";
+            }
+        } elseif (isset($_POST['save_section'])) {
+            list($ok, $errors) = config_games_upsert_top_level_section($db, $edit_id, $sectionName, $sectionXml);
+            if ($ok) {
+                print_success(get_lang('configs_updated_ok'));
+            } else {
+                echo "<div class='xml-validation-errors'><strong>&#x26A0; Section save failed:</strong><ul>";
+                foreach ($errors as $err) {
+                    echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+                }
+                echo "</ul></div>";
+            }
+        } elseif (isset($_POST['remove_section'])) {
+            list($ok, $errors) = config_games_remove_optional_section($db, $edit_id, $sectionName);
+            if ($ok) {
+                print_success('Optional section removed.');
+            } else {
+                echo "<div class='xml-validation-errors'><strong>&#x26A0; Could not remove section:</strong><ul>";
+                foreach ($errors as $err) {
+                    echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+                }
+                echo "</ul></div>";
+            }
+        } elseif (isset($_POST['add_optional_section'])) {
+            $schema = config_games_schema_order();
+            if (($schema[$sectionName] ?? null) !== false) {
+                print_failure('Only schema-defined optional sections can be added from this menu.');
+            } else {
+                $newXml = "<{$sectionName}></{$sectionName}>";
+                list($ok, $errors) = config_games_upsert_top_level_section($db, $edit_id, $sectionName, $newXml);
+                if ($ok) {
+                    print_success('Optional section added.');
+                } else {
+                    echo "<div class='xml-validation-errors'><strong>&#x26A0; Could not add section:</strong><ul>";
+                    foreach ($errors as $err) {
+                        echo "<li>" . htmlspecialchars($err, ENT_QUOTES, 'UTF-8') . "</li>";
+                    }
+                    echo "</ul></div>";
+                }
+            }
+        }
+        $_GET['home_cfg_id'] = $edit_id;
+    }
+
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_xml']) && isset($_POST['home_cfg_id'])) {
         $edit_id = (int)$_POST['home_cfg_id'];
 
@@ -755,6 +1132,9 @@ function exec_ogp_module() {
 				} else {
 					$raw_xml_content = htmlspecialchars(file_get_contents($config_file), ENT_QUOTES, 'UTF-8');
 					echo "<div id='xml-editor-section'>";
+					config_games_render_top_level_editor($home_cfg_id, $config_file);
+
+					echo "<details style='margin:18px 0'><summary style='cursor:pointer;color:#9dc7ff'>Open legacy detailed node editor (previous default editor)</summary>";
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
 					echo "<button type='submit' name='save_xml' value='1' class='xml-global-save xml-global-save--top'>".get_lang('save')."</button>";
@@ -762,16 +1142,21 @@ function exec_ogp_module() {
 					echo config_games_render_editor($xml);
 					echo "<div class='xml-actions'><button type='submit' name='save_xml' value='1' class='xml-global-save'>".get_lang('save')."</button></div>";
 					echo "<p class='note'>&#x2605; = required field. Use the action dropdown to remove entire sections. Attribute values left blank will be removed. Script sections such as post_install are fully editable. Changes are validated against the schema before saving.</p>";
+					echo "</form>";
+					echo "</details>";
+
 					// Raw XML editor
 					echo "<hr style='margin:24px 0;border-color:#333'>";
-					echo "<h3 style='margin-bottom:8px'>Raw XML Editor</h3>";
+					echo "<h3 style='margin-bottom:8px'>Full Raw XML Editor</h3>";
 					echo "<div class='xml-raw-warning'>&#x26A0; <strong>Warning:</strong> Saving raw XML bypasses the guided editor. The file will be validated against the schema before saving. Invalid XML will be rejected.</div>";
 					echo "<button type='button' class='xml-raw-toggle' onclick=\"var s=document.getElementById('raw_xml_section');s.style.display=s.style.display==='none'?'block':'none'\">Toggle Raw XML Editor</button>";
 					echo "<div id='raw_xml_section' class='xml-raw-section'>";
+					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
+					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
 					echo "<textarea name='raw_xml_content'>{$raw_xml_content}</textarea>";
 					echo "<div class='xml-actions' style='margin-top:8px'><button type='submit' name='save_xml' value='1' class='xml-global-save'>Save Raw XML</button></div>";
-					echo "</div>";
 					echo "</form>";
+					echo "</div>";
 					echo "</div>"; // #xml-editor-section
 				}
 			}

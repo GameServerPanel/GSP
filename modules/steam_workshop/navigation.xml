@@ -1,7 +1,6 @@
 <navigation>
   <!-- Admin: manage Steam Workshop game profiles -->
   <page key="admin"     file="admin.php" access="admin" />
-  <!-- User: manage per-server mods 
+  <!-- User: manage per-server mods -->
   <page key="user"      file="user.php"  access="admin,user,subuser" />
--->
 </navigation>

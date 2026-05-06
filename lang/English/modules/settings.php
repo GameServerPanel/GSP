@@ -86,6 +86,8 @@ define('LANG_recaptcha_use_login', "Use Recaptcha on Login");
 define('LANG_recaptcha_use_login_info', "If enabled, users will have to solve the Not a Robot Recaptcha when attempting to login.");
 define('LANG_login_attempts_before_banned', "Number of failed login attempts before user is banned");
 define('LANG_login_attempts_before_banned_info', "If a user tries to login with invalid credentials more than this many times, the user will be banned temporarily by the panel.");
+define('LANG_login_ban_time', "Login ban duration (seconds)");
+define('LANG_login_ban_time_info', "How long a user stays temporarily banned after reaching the failed login attempt limit.");
 define('LANG_custom_github_update_username', "GitHub update username");
 define('LANG_custom_github_update_username_info', "Enter your GitHub username ONLY to use your own forked repositories to update OGP. This should only be changed by developers who wish to use their own repos for development rather than checking in possibly buggy code into the main branch.");
 define('LANG_remote_query', "Remote query");
@@ -129,6 +131,16 @@ define('LANG_default_game_server_home_path_prefix', "Default game server home di
 define('LANG_default_game_server_home_path_prefix_info', "Enter a path prefix for where you want game server homes to be created by default. You can use \"{USERNAME}\" in the path which will be replaced with the OGP username the game server is being assigned to.  You can use \"{GAMEKEY}\" in the path which will be replaced with a friendly lowercase name.  You can use \"{SKIPID}\" anywhere in the path to skip appending the home ID to the path.  Example: /ogp/games/{USERNAME}/{GAMEKEY}{SKIPID} will become /ogp/games/username/arkse/.  Example 2:  /ogp/games will become /ogp/games/1 where 1 is the game servers ID.");
 define('LANG_use_authorized_hosts', "Limit API to Defined Authorized Hosts");
 define('LANG_use_authorized_hosts_info', "Enable this setting to only allow API calls from pre-defined and approved IP addresses.&nbsp; Approved addresses can be set on this page once the setting has been enabled.&nbsp; If this setting is disabled, a user using a valid key will have access to the API from any IP address.&nbsp; Users using a valid key will be able to use the API to manage any game server they have permissions to administrate.");
+define('LANG_allow_setting_cpu_affinity', "Allow CPU affinity editing");
+define('LANG_allow_setting_cpu_affinity_info', "Allow users to set CPU affinity values for their game servers when supported by the host.");
+define('LANG_regex_invalid_file_name_chars', "Invalid filename characters regex");
+define('LANG_regex_invalid_file_name_chars_info', "Regular expression used by the file manager to block unsafe filename characters.");
+define('LANG_discord_invite_url', "Discord invite URL");
+define('LANG_discord_invite_url_info', "Invite URL used by panel links that send users to your Discord server.");
+define('LANG_discord_webhook_main', "Discord webhook (main)");
+define('LANG_discord_webhook_main_info', "Webhook URL used for general panel notifications.");
+define('LANG_discord_webhook_admin', "Discord webhook (admin)");
+define('LANG_discord_webhook_admin_info', "Webhook URL used for administrator-specific notifications.");
 define('LANG_setup_api_authorized_hosts', "Setup API authorized hosts");
 define('LANG_autohorized_hosts', "Authorized hosts");
 define('LANG_add', "Add");
@@ -143,6 +155,7 @@ define('LANG_reset_game_server_order_info', "Resets game server ordering back to
 
 // Debug level
 define('LANG_debug_level', "Panel Debug Level");
+define('LANG_debug_level_info', "Controls how much PHP error output is shown in the panel.");
 define('LANG_debug_off', "Off (production)");
 define('LANG_debug_fatal_only', "Fatal errors only (page-breaking)");
 define('LANG_debug_errors_warnings', "Errors & Warnings");
