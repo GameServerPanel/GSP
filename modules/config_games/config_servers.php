@@ -550,6 +550,7 @@ function exec_ogp_module() {
     $game_cfgs = $db->getGameCfgs();
     echo "<h2>".get_lang('game_config_setup')."</h2>\n
           <p>".get_lang_f("modify_configs_info",SERVER_CONFIG_LOCATION)."</p>\n
+          <p><a href='https://gameservers.world/docs/xml_notes.php' target='_blank' rel='noopener noreferrer' class='xml-jump-link'>&#x1F4D6; XML Config Reference Guide</a></p>\n
 		  <form action='?m=config_games' method='post'>\n
           <p><input id='reset_old_configs' type='checkbox' name='clear_old' value='yes' /><label for='reset_old_configs'>".get_lang('reset_old_configs')."</label></p>\n
           <p class='note'>".get_lang('note').": ".get_lang('config_reset_warning')."</p>\n

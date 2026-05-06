@@ -16,11 +16,23 @@ $nav_prefix = '';
 $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
 if (is_string($scriptName) && $scriptName !== '') {
   if (preg_match('#/modules/billing/(.*)$#', $scriptName, $match)) {
+    // Panel-embedded or non-root deployment: depth relative to modules/billing/
     $subPath = $match[1];
     if ($subPath !== '') {
       $depth = substr_count($subPath, '/');
       if ($depth > 0) {
         $nav_prefix = str_repeat('../', $depth);
+      }
+    }
+  } else {
+    // Root deployment: compute prefix from the script's directory depth so that
+    // links such as index.php correctly resolve to /index.php even when the
+    // current page lives in a subdirectory like /docs/.
+    $dir = dirname($scriptName);
+    if ($dir !== '/' && $dir !== '' && $dir !== '.') {
+      $segments = array_filter(explode('/', $dir), static function ($s) { return $s !== ''; });
+      if (!empty($segments)) {
+        $nav_prefix = str_repeat('../', count($segments));
       }
     }
   }

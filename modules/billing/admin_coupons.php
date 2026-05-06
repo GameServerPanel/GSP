@@ -160,29 +160,120 @@ $coupons_result = mysqli_query($db, "SELECT * FROM {$table_prefix}billing_coupon
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="css/header.css">
   <style>
-    .coupon-form { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; }
+    /* Coupon admin — dark-theme overrides */
+    .coupon-form {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
     .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px; box-sizing: border-box; }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #e8e8e8;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 9px 10px;
+      box-sizing: border-box;
+      background: #11141f;
+      color: #f0f0f0;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 5px;
+      font-size: 0.97rem;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102,126,234,0.25);
+    }
     .form-group textarea { min-height: 60px; }
-    .game-checkboxes { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: white; }
-    .game-checkboxes label { display: block; margin: 5px 0; font-weight: normal; }
-    .coupon-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    .coupon-table th, .coupon-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-    .coupon-table th { background: #4CAF50; color: white; }
-    .coupon-table tr:nth-child(even) { background: #f9f9f9; }
-    .btn { padding: 8px 16px; margin: 2px; cursor: pointer; border: none; border-radius: 3px; }
-    .btn-primary { background: #4CAF50; color: white; }
-    .btn-warning { background: #ff9800; color: white; }
-    .btn-danger { background: #f44336; color: white; }
-    .status { padding: 10px; margin: 10px 0; border-radius: 3px; }
-    .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .badge { padding: 3px 8px; border-radius: 3px; font-size: 0.85em; }
-    .badge-active { background: #28a745; color: white; }
-    .badge-inactive { background: #6c757d; color: white; }
-    .badge-onetime { background: #17a2b8; color: white; }
-    .badge-permanent { background: #ffc107; color: black; }
+    .game-checkboxes {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 10px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 5px;
+    }
+    .game-checkboxes label {
+      display: block;
+      margin: 5px 0;
+      font-weight: normal;
+      color: #d0d0d0;
+      cursor: pointer;
+    }
+    .game-checkboxes input[type="checkbox"] {
+      width: auto;
+      margin-right: 6px;
+      background: #11141f;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .coupon-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    .coupon-table th,
+    .coupon-table td {
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 12px;
+      text-align: left;
+      color: #e8e8e8;
+    }
+    .coupon-table th { background: rgba(76,175,80,0.25); color: #fff; }
+    .coupon-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+    .coupon-table tr:hover td { background: rgba(255,255,255,0.06); }
+    .btn { padding: 8px 16px; margin: 2px; cursor: pointer; border: none; border-radius: 4px; font-weight: 600; }
+    .btn-primary { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; }
+    .btn-warning { background: #ff9800; color: #fff; }
+    .btn-danger  { background: #f44336; color: #fff; }
+    .status { padding: 10px 14px; margin: 10px 0; border-radius: 5px; }
+    .status.success { background: rgba(40,167,69,0.2); color: #8dffb0; border: 1px solid rgba(40,167,69,0.35); }
+    .status.error   { background: rgba(220,53,69,0.2); color: #ffb3b8; border: 1px solid rgba(220,53,69,0.35); }
+    .badge { padding: 3px 8px; border-radius: 3px; font-size: 0.85em; font-weight: 600; }
+    .badge-active    { background: #28a745; color: #fff; }
+    .badge-inactive  { background: #6c757d; color: #fff; }
+    .badge-onetime   { background: #17a2b8; color: #fff; }
+    .badge-permanent { background: #ffc107; color: #000; }
+
+    /* Inline select/option elements inside table rows */
+    .coupon-table select { background: #11141f; color: #f0f0f0; border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; padding: 4px 6px; }
+
+    /* Mobile: stack table cells */
+    @media (max-width: 768px) {
+      .coupon-table, .coupon-table thead, .coupon-table tbody,
+      .coupon-table th, .coupon-table td, .coupon-table tr { display: block; }
+      .coupon-table thead tr { display: none; }
+      .coupon-table td {
+        position: relative;
+        padding-left: 45%;
+        border: none;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+      }
+      .coupon-table td::before {
+        position: absolute;
+        left: 10px;
+        width: 40%;
+        white-space: nowrap;
+        font-weight: 600;
+        color: rgba(255,255,255,0.55);
+        font-size: 0.82rem;
+        content: attr(data-label);
+      }
+      .coupon-table tr { border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; margin-bottom: 12px; }
+    }
   </style>
   <script>
     function toggleGameFilter(selectEl) {
@@ -313,35 +404,35 @@ include(__DIR__ . '/includes/menu.php');
         ?>
           <!-- View Row -->
           <tr id="view-row-<?php echo $coupon['coupon_id']; ?>">
-            <td><strong><?php echo h($coupon['code']); ?></strong></td>
-            <td><?php echo h($coupon['name']); ?></td>
-            <td><?php echo h($coupon['discount_percent']); ?>%</td>
-            <td>
+            <td data-label="Code"><strong><?php echo h($coupon['code']); ?></strong></td>
+            <td data-label="Name"><?php echo h($coupon['name']); ?></td>
+            <td data-label="Discount"><?php echo h($coupon['discount_percent']); ?>%</td>
+            <td data-label="Type">
               <span class="badge badge-<?php echo $coupon['usage_type'] === 'permanent' ? 'permanent' : 'onetime'; ?>">
                 <?php echo h(ucfirst(str_replace('_', ' ', $coupon['usage_type']))); ?>
               </span>
             </td>
-            <td>
+            <td data-label="Games">
               <?php if ($coupon['game_filter_type'] === 'all_games'): ?>
                 All Games
               <?php else: ?>
                 <?php echo count((array)$games_filtered); ?> specific games
               <?php endif; ?>
             </td>
-            <td>
+            <td data-label="Uses">
               <?php if ($coupon['max_uses']): ?>
                 <?php echo h($coupon['current_uses']); ?> / <?php echo h($coupon['max_uses']); ?>
               <?php else: ?>
                 <?php echo h($coupon['current_uses']); ?> (unlimited)
               <?php endif; ?>
             </td>
-            <td><?php echo $coupon['expires'] ? h($coupon['expires']) : 'Never'; ?></td>
-            <td>
+            <td data-label="Expires"><?php echo $coupon['expires'] ? h($coupon['expires']) : 'Never'; ?></td>
+            <td data-label="Status">
               <span class="badge badge-<?php echo $coupon['is_active'] ? 'active' : 'inactive'; ?>">
                 <?php echo $coupon['is_active'] ? 'Active' : 'Inactive'; ?>
               </span>
             </td>
-            <td>
+            <td data-label="Actions">
               <button onclick="editCoupon(<?php echo $coupon['coupon_id']; ?>)" class="btn btn-warning">Edit</button>
               <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this coupon?');">
                 <input type="hidden" name="csrf" value="<?php echo h($csrf); ?>">

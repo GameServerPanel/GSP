@@ -509,7 +509,7 @@ $siteBase = $protocol . $host;
     <!-- Favicon -->
     <link rel="icon" href="images/logo-sm.png" type="image/png">
     <link rel="apple-touch-icon" href="images/logo-sm.png">
-    <?php if (!$cart_empty): ?>
+    <?php if (!$cart_empty && !empty($client_id)): ?>
     <script src="https://www.paypal.com/sdk/js?client-id=<?php echo htmlspecialchars($client_id); ?>&currency=USD&intent=capture"></script>
     <?php endif; ?>
 </head>
@@ -643,11 +643,30 @@ $siteBase = $protocol . $host;
             <?php else: ?>
             <div class="checkout-section">
                 <h3>Checkout with PayPal</h3>
+                <?php if (empty($client_id)): ?>
+                <div class="alert alert-error">
+                    <strong>Checkout Unavailable:</strong> PayPal has not been configured for this site.
+                    Please contact the site administrator or try again later.
+                    <?php
+                    // Admin hint: only show config link if the current user is an admin
+                    $cart_user_id_check = intval($_SESSION['website_user_id'] ?? 0);
+                    $cart_is_admin = false;
+                    if ($cart_user_id_check > 0 && $db) {
+                        $ar = mysqli_query($db, "SELECT users_role FROM {$table_prefix}users WHERE user_id = " . $cart_user_id_check . " LIMIT 1");
+                        if ($ar && ($arow = mysqli_fetch_assoc($ar))) {
+                            $cart_is_admin = strtolower($arow['users_role'] ?? '') === 'admin';
+                        }
+                    }
+                    if ($cart_is_admin):
+                    ?>
+                    <br><small><em>Admin: set <code>$paypal_client_id</code> in <a href="/admin_config.php" style="color:inherit;text-decoration:underline;">Site Config</a>.</em></small>
+                    <?php endif; ?>
+                </div>
+                <?php else: ?>
                 <p>Click the button below to complete your purchase securely through PayPal.</p>
-                
                 <div id="paypal-button-container"></div>
                 <div id="status-message" class="status-message"></div>
-                
+                <?php endif; ?>
                 <div class="action-buttons">
                     <a href="/order.php" class="btn btn-secondary">Continue Shopping</a>
                     <a href="/my_account.php" class="btn btn-secondary">My Account</a>
@@ -665,7 +684,7 @@ $siteBase = $protocol . $host;
                 }
             </script>
 
-            <?php if ($final_amount > 0.00): ?>
+            <?php if ($final_amount > 0.00 && !empty($client_id)): ?>
             <script>
                 paypal.Buttons({
                     createOrder: function(data, actions) {
