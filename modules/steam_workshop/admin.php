@@ -62,7 +62,10 @@ function exec_ogp_module()
         $overwrite = isset($_POST['overwrite_existing']) && $_POST['overwrite_existing'] === '1';
         $updated = sw_apply_detected_profile_defaults($db, $profile, $detected, $overwrite);
         if ($updated > 0) {
-            sw_success("Applied $updated detected default value(s)." . ($overwrite ? ' Existing values were allowed to be overwritten.' : ' Existing non-empty values were kept.'));
+            $overwriteMessage = $overwrite
+                ? ' Existing values were allowed to be overwritten.'
+                : ' Existing non-empty values were kept.';
+            sw_success("Applied $updated detected default value(s)." . $overwriteMessage);
         } else {
             sw_success('No profile values needed updating based on current overwrite setting.');
         }

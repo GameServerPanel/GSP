@@ -465,7 +465,10 @@ function config_games_parse_section_payload($sectionName, $sectionXml)
     libxml_clear_errors();
     libxml_use_internal_errors($prev);
     if (!$ok) {
-        $msg = !empty($errors) ? trim($errors[0]->message) . ' (line ' . $errors[0]->line . ')' : 'Section XML is not well-formed.';
+        $msg = 'Section XML is not well-formed.';
+        if (!empty($errors)) {
+            $msg = trim($errors[0]->message) . ' (line ' . $errors[0]->line . ')';
+        }
         return array(false, $msg);
     }
 
@@ -688,8 +691,7 @@ function config_games_render_top_level_editor($home_cfg_id, $configFile)
     }
 
     echo "<h3>Section Editor</h3>";
-    $sectionEditorNote = "Edit one top-level section at a time. Validate a block before saving. "
-        . "Required sections cannot be removed. Optional sections can be added or removed safely.";
+    $sectionEditorNote = "Edit one top-level section at a time. Validate a block before saving. Required sections cannot be removed. Optional sections can be added or removed safely.";
     echo "<p class='note'>{$sectionEditorNote}</p>";
 
     if (!empty($optionalMissing)) {
