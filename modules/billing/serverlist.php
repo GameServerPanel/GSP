@@ -51,7 +51,10 @@ $result_services = $db->query($qry_services);
 if (!$result_services) {
     // config_homes join may not exist on all installs; fall back to services-only query
     $where_clause_fallback = str_replace('bs.', '', $where_clause);
-    $qry_services_fallback = "SELECT *, NULL AS cfg_game_name, NULL AS cfg_game_key
+    $qry_services_fallback = "SELECT service_id, home_cfg_id, enabled, service_name, description,
+                                      img_url, price_monthly, slot_min_qty, slot_max_qty,
+                                      remote_server_id,
+                                      NULL AS cfg_game_name, NULL AS cfg_game_key
                                FROM {$table_prefix}billing_services
                                {$where_clause_fallback}
                                ORDER BY service_name";

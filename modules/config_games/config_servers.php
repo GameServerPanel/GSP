@@ -1155,7 +1155,8 @@ function exec_ogp_module() {
 					echo "<hr style='margin:24px 0;border-color:#333'>";
 					echo "<h3 style='margin-bottom:8px'>Full Raw XML Editor</h3>";
 					echo "<div class='xml-raw-warning'>&#x26A0; <strong>Warning:</strong> Saving raw XML bypasses the guided editor. The file will be validated against the schema before saving. Invalid XML will be rejected.</div>";
-					echo "<button type='button' id='raw_xml_toggle_btn' class='xml-raw-toggle' onclick=\"(function(){var s=document.getElementById('raw_xml_section');var b=document.getElementById('raw_xml_toggle_btn');if(s.style.display!=='block'){s.style.display='block';b.textContent='Hide Raw XML Editor';}else{s.style.display='none';b.textContent='Show Raw XML Editor';}})();\">Show Raw XML Editor</button>";
+					echo "<script>function gspToggleRawXml(){var s=document.getElementById('raw_xml_section');var b=document.getElementById('raw_xml_toggle_btn');if(s.style.display!=='block'){s.style.display='block';b.textContent='Hide Raw XML Editor';}else{s.style.display='none';b.textContent='Show Raw XML Editor';}}</script>";
+					echo "<button type='button' id='raw_xml_toggle_btn' class='xml-raw-toggle' onclick='gspToggleRawXml()'>Show Raw XML Editor</button>";
 					echo "<div id='raw_xml_section' class='xml-raw-section'>";
 					echo "<form action='?m=config_games&amp;home_cfg_id=".$home_cfg_id."' method='post'>";
 					echo "<input type='hidden' name='home_cfg_id' value='".(int)$home_cfg_id."'>";
