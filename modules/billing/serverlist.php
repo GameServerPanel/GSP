@@ -116,8 +116,8 @@ include(__DIR__ . '/includes/menu.php');
         <!-- Order Form -->
         <form method="post" action="order_server.php">
             <input type="hidden" name="service_id" value="<?php echo $row['service_id']; ?>">
-            <input type="hidden" name="remote_control_password" value="ChangeMe">
-            <input type="hidden" name="ftp_password" value="ChangeMe">
+            <input type="hidden" name="remote_control_password" value="">
+            <input type="hidden" name="ftp_password" value="">
             <table class="float-left">
                 <tr>
                     <td align="right"><b>Game Server Name</b></td>

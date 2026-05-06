@@ -25,7 +25,7 @@
 // Module general information
 $module_title = "billing";
 $module_version = "3.4";
-$db_version = 4;
+$db_version = 5;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -203,8 +203,8 @@ $install_queries[1] = array(
         KEY `enabled`  (`enabled`)
     ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
 
-    // Drop legacy mapping table if it still exists from older installs
-    "DROP TABLE IF EXISTS `".OGP_DB_PREFIX."billing_service_remote_servers`"
+    // Legacy mapping table is handled by a later idempotent migration.
+    "SELECT 1"
 );
 
 // -----------------------------------------------------------------------
@@ -366,6 +366,24 @@ $install_queries[4] = array(
         KEY `idx_context`    (`context`),
         KEY `idx_created_at` (`created_at`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+);
+
+// -----------------------------------------------------------------------
+// db_version 5 — Preserve the unused legacy service/node mapping table by
+// renaming it to a *_deprecated_backup table instead of dropping it.
+// -----------------------------------------------------------------------
+$install_queries[5] = array(
+    function($db) {
+        $legacy = 'OGP_DB_PREFIXbilling_service_remote_servers';
+        $backup = 'OGP_DB_PREFIXbilling_service_remote_servers_deprecated_backup';
+        $legacyCheck = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{$legacy}'");
+        if (!$legacyCheck || empty($legacyCheck[0]['cnt']) || (int)$legacyCheck[0]['cnt'] === 0) return true;
+
+        $backupCheck = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '{$backup}'");
+        if ($backupCheck && !empty($backupCheck[0]['cnt']) && (int)$backupCheck[0]['cnt'] > 0) return true;
+
+        return (bool)$db->query("RENAME TABLE `{$legacy}` TO `{$backup}`");
+    }
 );
 
 ?>

@@ -258,19 +258,23 @@ $sandbox   = function_exists('gsp_paypal_is_sandbox')    ? gsp_paypal_is_sandbox
 
 // Prepare PayPal items
 $paypal_items = [];
+$paypal_invoice_ids = [];
 foreach ((array)$invoices as $inv) {
     $game_display = !empty($inv['game_name']) ? $inv['game_name'] : 'Game Server';
     $qty = max(1, intval($inv['qty']));
+    $paypal_invoice_ids[] = intval($inv['invoice_id']);
+    $lineAmount = (float)($inv['total_due'] ?? $inv['amount'] ?? 0);
     $paypal_items[] = [
         'name' => $inv['home_name'] . ' (' . $game_display . ')',
         'description' => $inv['description'] ?? '',
         'quantity' => $qty,
         'unit_amount' => [
             'currency_code' => 'USD',
-            'value' => number_format(floatval($inv['amount']) / $qty, 2, '.', '')
+            'value' => number_format($lineAmount / $qty, 2, '.', '')
         ]
     ];
 }
+$paypal_custom_id = 'cart:' . implode(',', $paypal_invoice_ids);
 
 // Get site base URL
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
@@ -721,6 +725,7 @@ $siteBase = $protocol . $host;
                         setStatus('Creating order...');
                         return actions.order.create({
                             purchase_units: [{
+                                custom_id: '<?php echo htmlspecialchars($paypal_custom_id, ENT_QUOTES, 'UTF-8'); ?>',
                                 amount: {
                                     currency_code: 'USD',
                                     value: '<?php echo number_format($final_amount, 2, '.', ''); ?>',
@@ -845,4 +850,3 @@ $siteBase = $protocol . $host;
     <?php include(__DIR__ . '/includes/footer.php'); ?>
 </body>
 </html>
-

@@ -17,7 +17,7 @@ This file captures how the control panel, storefront, agents, and helper scripts
 
 1. **Auth/session** – Driven by `index.php` (panel) and `modules/billing/login.php` (storefront). Both set `$_SESSION['user_id']`, `users_login`, `users_group`, and `website_user_id`. The shared session cookie `opengamepanel_web` means logging into either surface immediately authenticates the other.
 2. **Catalog** – `modules/config_games` hosts XML definitions. Panel modules (`gamemanager`, `config_games`) and storefront pages (`serverlist.php`, `order.php`, documentation pages, and the XML-notes mirror) parse these files for display and provisioning metadata.
-3. **Provisioning** – Orders land in `gsp_billing_orders`. `modules/billing/includes/provisioner.php` reuses `modules/billing/create_servers.php` logic to allocate homes, assign nodes/IPs, configure mods, and kick off SteamCMD/rsync/manual installers. The same provisioner is invoked by:
+3. **Provisioning** – Orders land in `gsp_billing_orders`. `modules/billing/create_servers.php` allocates homes, assigns nodes/IPs, configures mods, kicks off SteamCMD/rsync/manual installers, and then syncs the resulting `home_id` back into `billing_orders`, `billing_invoices`, and `billing_transactions` so paid services never stay orphaned. The same provisioner is invoked by:
    - PayPal capture endpoint (`modules/billing/api/capture_order.php`).
    - Panel module page `home.php?m=billing&p=provision_servers`.
    - Cron/repair actions in `modules/billing/cron-shop.php`.
@@ -48,7 +48,7 @@ This file captures how the control panel, storefront, agents, and helper scripts
 | Public pages | `index.php`, `serverlist.php`, `order.php`, `cart.php`, `payment_success.php`, `docs.php` | All include `bootstrap.php`, header/footer, shared CSS. Links remain root-relative. |
 | Auth | `login.php`, `register.php`, `reset_password.php`, `forgot_password.php`, `includes/login_required.php`, `includes/admin_auth.php` | Share `opengamepanel_web` session, call into panel DB to validate roles. |
 | Admin | `admin.php`, `adminserverlist.php`, `admin_orders.php`, `admin_coupons.php`, `admin_config.php`, `my_orders_panel.php` | Manage services, coupons, prices, and provisioning. `adminserverlist.php` controls service availability per node. |
-| PayPal API | `api/create_order.php`, `api/capture_order.php`, `webhook.php`, `logs/payment_capture.log` | Implements REST checkout. Once capture is confirmed, writes invoices/orders, updates coupons, and kicks `BillingProvisioner`. |
+| PayPal API | `api/create_order.php`, `api/capture_order.php`, `webhook.php`, `logs/payment_capture.log` | Implements REST checkout. The cart stamps PayPal `custom_id` with the exact invoice IDs being purchased; capture/webhook handlers use that to mark the correct invoices paid, create/extend orders, and kick provisioning idempotently. |
 | Provisioning bridge | `create_servers.php`, `includes/provisioner.php`, `includes/panel_bridge.php` | Shared between panel module and storefront backend. Encapsulates whole server creation/renewal pipeline. |
 | Cron helpers | `cron-shop.php`, `diag_remote.php` | Automations for renewals, diagnostics, health checks. |
 | Documentation | `docs.php`, `docs/*`, `docs/admin_xml_notes.php` (PHP mirror of XML wiki) | Provide guidance for editing XML and game configs directly inside repo. |

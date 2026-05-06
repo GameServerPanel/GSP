@@ -97,17 +97,47 @@ $txid  = 'free-' . time() . '-' . $userId;
 require_once __DIR__ . '/classes/BillingRepository.php';
 require_once __DIR__ . '/classes/BillingService.php';
 
-$repo     = new BillingRepository($db, $table_prefix);
-$svc      = new BillingService($repo);
+$repo = new BillingRepository($db, $table_prefix);
 $newOrderIds = [];
+$durationMeta = static function (array $invoice): array {
+    $duration = strtolower((string)($invoice['invoice_duration'] ?? $invoice['rate_type'] ?? 'month'));
+    switch ($duration) {
+        case 'day':
+        case 'daily':
+            return ['invoice_duration' => 'day', 'rate_type' => 'daily', 'days' => 1];
+        case 'year':
+        case 'yearly':
+            return ['invoice_duration' => 'year', 'rate_type' => 'yearly', 'days' => 365];
+        case 'month':
+        case 'monthly':
+        default:
+            return ['invoice_duration' => 'month', 'rate_type' => 'monthly', 'days' => 31];
+    }
+};
 
 foreach ($invoices as $inv) {
     $invoiceId = intval($inv['invoice_id']);
+    $invoiceBase = round((float)($inv['subtotal'] ?? $inv['total_due'] ?? $inv['amount'] ?? 0), 2);
+    $orderId = intval($inv['order_id'] ?? 0);
+    $meta = $durationMeta($inv);
 
-    // Mark invoice paid (zero-dollar, method=coupon)
-    $repo->markInvoicePaid($invoiceId, $txid, 'coupon', $now);
+    $repo->updateInvoiceFields($invoiceId, [
+        'order_id' => $orderId,
+        'coupon_id' => $couponId,
+        'discount_amount' => $invoiceBase,
+        'subtotal' => $invoiceBase,
+        'amount' => 0.00,
+        'total_due' => 0.00,
+        'status' => 'paid',
+        'billing_status' => 'Active',
+        'payment_status' => 'paid',
+        'payment_txid' => $txid,
+        'payment_method' => 'coupon',
+        'paid_date' => $now,
+        'invoice_duration' => $meta['invoice_duration'],
+        'rate_type' => $meta['rate_type'],
+    ]);
 
-    // Log a $0 transaction for the audit trail
     $repo->logTransaction([
         'invoice_id'              => $invoiceId,
         'user_id'                 => $userId,
@@ -120,40 +150,72 @@ foreach ($invoices as $inv) {
         'raw_response'            => ['coupon_id' => $couponId, 'discount_pct' => $discountPct, 'original_amount' => (float)($inv['amount'] ?? 0)],
     ]);
 
-    // Increment coupon use counter
-    if ($couponId > 0) {
-        mysqli_query($db, "UPDATE {$table_prefix}billing_coupons
-                           SET current_uses = current_uses + 1
-                           WHERE coupon_id = " . intval($couponId));
+    $currentHomeId = 0;
+    $extendFrom = null;
+    if ($orderId > 0) {
+        $order = $repo->getOrder($orderId);
+        if ($order) {
+            $currentHomeId = intval($order['home_id'] ?? 0);
+            $extendFrom = $order['end_date'] ?? null;
+        }
     }
 
-    // Create billing_orders row so the provisioner can run
-    $durMap  = ['daily'=>'+1 day','monthly'=>'+1 month','yearly'=>'+1 year','day'=>'+1 day','month'=>'+1 month','year'=>'+1 year'];
-    $dur     = strtolower($inv['invoice_duration'] ?? 'month');
-    $endDate = date('Y-m-d H:i:s', strtotime($durMap[$dur] ?? '+1 month'));
-
-    $newOrderId = $repo->createOrder([
-        'user_id'                 => intval($inv['user_id']),
-        'service_id'              => intval($inv['service_id']),
-        'home_name'               => $inv['home_name'] ?? '',
-        'ip'                      => (string)($inv['ip'] ?? '0'),
-        'qty'                     => intval($inv['qty'] ?? 1),
-        'invoice_duration'        => $inv['invoice_duration'] ?? 'month',
-        'max_players'             => intval($inv['max_players'] ?? 0),
-        'price'                   => 0.00,
-        'remote_control_password' => $inv['remote_control_password'] ?? '',
-        'ftp_password'            => $inv['ftp_password'] ?? '',
-        'status'                  => 'Active',
-        'end_date'                => $endDate,
-        'payment_txid'            => $txid,
-        'paid_ts'                 => $now,
-        'coupon_id'               => $couponId,
-    ]);
-
-    if ($newOrderId > 0) {
-        $repo->updateInvoiceOrderId($invoiceId, $newOrderId);
-        $newOrderIds[] = $newOrderId;
+    $baseTs = time();
+    if (!empty($extendFrom)) {
+        $extendTs = strtotime($extendFrom);
+        if ($extendTs !== false && $extendTs > time()) {
+            $baseTs = $extendTs;
+        }
     }
+    $endDate = date('Y-m-d H:i:s', $baseTs + ($meta['days'] * max(1, intval($inv['qty'] ?? 1)) * 86400));
+
+    if ($orderId > 0) {
+        $repo->updateOrderFields($orderId, [
+            'status' => 'Active',
+            'end_date' => $endDate,
+            'payment_txid' => $txid,
+            'paid_ts' => $now,
+            'price' => 0.00,
+            'discount_amount' => $invoiceBase,
+            'coupon_id' => $couponId,
+        ]);
+        if ($currentHomeId > 0) {
+            $repo->updateInvoiceFields($invoiceId, ['home_id' => $currentHomeId]);
+        } else {
+            $newOrderIds[] = $orderId;
+        }
+    } else {
+        $newOrderId = $repo->createOrder([
+            'user_id'                 => intval($inv['user_id']),
+            'service_id'              => intval($inv['service_id']),
+            'home_name'               => $inv['home_name'] ?? '',
+            'ip'                      => (string)($inv['ip'] ?? '0'),
+            'qty'                     => intval($inv['qty'] ?? 1),
+            'invoice_duration'        => $meta['invoice_duration'],
+            'max_players'             => intval($inv['max_players'] ?? 0),
+            'price'                   => 0.00,
+            'discount_amount'         => $invoiceBase,
+            'remote_control_password' => $inv['remote_control_password'] ?? '',
+            'ftp_password'            => $inv['ftp_password'] ?? '',
+            'status'                  => 'Active',
+            'end_date'                => $endDate,
+            'payment_txid'            => $txid,
+            'paid_ts'                 => $now,
+            'coupon_id'               => $couponId,
+        ]);
+
+        if ($newOrderId > 0) {
+            $repo->updateInvoiceOrderId($invoiceId, $newOrderId);
+            $repo->updateInvoiceFields($invoiceId, ['order_id' => $newOrderId]);
+            $newOrderIds[] = $newOrderId;
+        }
+    }
+}
+
+if ($couponId > 0 && !empty($invoices)) {
+    mysqli_query($db, "UPDATE {$table_prefix}billing_coupons
+                       SET current_uses = current_uses + 1
+                       WHERE coupon_id = " . intval($couponId));
 }
 
 // Clear coupon from session

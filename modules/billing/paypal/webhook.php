@@ -428,6 +428,27 @@ function wh_fetch_paypal_order(string $api_base, string $access_token, string $o
  * Match the PayPal capture to a billing invoice, mark it paid, create/extend billing_orders,
  * and trigger server provisioning. Returns the billing_order_id or 0.
  */
+function wh_invoice_ids_from_custom_id($custom_id): array
+{
+    if (!is_string($custom_id) || $custom_id === '') {
+        return [];
+    }
+    if (ctype_digit($custom_id)) {
+        return [intval($custom_id)];
+    }
+    if (stripos($custom_id, 'cart:') !== 0) {
+        return [];
+    }
+    $invoice_ids = [];
+    foreach (explode(',', substr($custom_id, 5)) as $part) {
+        $part = trim($part);
+        if ($part !== '' && ctype_digit($part)) {
+            $invoice_ids[] = intval($part);
+        }
+    }
+    return array_values(array_unique($invoice_ids));
+}
+
 function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $billing_dir = ''): int
 {
     $txid        = $payment['capture_id']      ?? '';
@@ -441,7 +462,17 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
     $invoices = [];
 
     // 1) Match by numeric custom_id (which we set to invoice_id when creating the PayPal order)
-    if (!empty($custom_id) && ctype_digit((string)$custom_id)) {
+    $custom_invoice_ids = wh_invoice_ids_from_custom_id($custom_id);
+    if (!empty($custom_invoice_ids)) {
+        $id_list = implode(',', array_map('intval', $custom_invoice_ids));
+        $res = mysqli_query($db, "SELECT * FROM `{$pfx}billing_invoices` WHERE invoice_id IN ({$id_list}) AND status = 'due' ORDER BY invoice_id ASC");
+        if ($res) {
+            while ($row = mysqli_fetch_assoc($res)) {
+                $invoices[] = $row;
+            }
+        }
+    }
+    elseif (!empty($custom_id) && ctype_digit((string)$custom_id)) {
         $inv_id = intval($custom_id);
         $res = mysqli_query($db, "SELECT * FROM `{$pfx}billing_invoices` WHERE invoice_id = {$inv_id} AND status = 'due' LIMIT 1");
         if ($res && $row = mysqli_fetch_assoc($res)) {
@@ -477,6 +508,7 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
     }
 
     $last_order_id = 0;
+    $applied_coupon_id = 0;
 
     foreach ($invoices as $inv) {
         $invoice_id = intval($inv['invoice_id']);
@@ -497,15 +529,14 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
         // Increment coupon usage if applicable
         $coupon_id = intval($inv['coupon_id'] ?? 0);
         if ($coupon_id > 0) {
-            mysqli_query($db, "UPDATE `{$pfx}billing_coupons` SET current_uses = current_uses + 1 WHERE coupon_id = {$coupon_id}");
+            $applied_coupon_id = $coupon_id;
         }
 
-        // Duration → months
-        $months = 1;
-        if (stripos($duration, 'year') !== false) {
-            $months = $qty * 12;
-        } else {
-            $months = $qty;
+        $duration_days = 31 * $qty;
+        if (stripos($duration, 'day') !== false) {
+            $duration_days = $qty;
+        } elseif (stripos($duration, 'year') !== false) {
+            $duration_days = 365 * $qty;
         }
 
         if ($order_id > 0) {
@@ -515,7 +546,7 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
                 $current_end  = $row['end_date'] ?? $now;
                 $extend_from  = (strtotime($current_end) > time()) ? $current_end : $now;
                 $dt           = new DateTime($extend_from);
-                $dt->modify('+' . $months . ' months');
+                $dt->modify('+' . $duration_days . ' days');
                 $new_end      = $dt->format('Y-m-d H:i:s');
 
                 $stmt = mysqli_prepare($db, "UPDATE `{$pfx}billing_orders` SET end_date=?, status='Active', payment_txid=?, paid_ts=? WHERE order_id=? LIMIT 1");
@@ -530,7 +561,7 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
         } else {
             // New order: create billing_orders row
             $dt      = new DateTime($now);
-            $dt->modify('+' . $months . ' months');
+            $dt->modify('+' . $duration_days . ' days');
             $end_date = $dt->format('Y-m-d H:i:s');
             $invoice_amount = floatval($inv['amount'] ?? $inv['total_due'] ?? 0);
             $price   = number_format($invoice_amount, 2, '.', '');
@@ -570,6 +601,10 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
                 wh_log('error', 'order_insert_failed', ['db_error' => mysqli_error($db), 'invoice_id' => $invoice_id]);
             }
         }
+    }
+
+    if ($applied_coupon_id > 0) {
+        mysqli_query($db, "UPDATE `{$pfx}billing_coupons` SET current_uses = current_uses + 1 WHERE coupon_id = {$applied_coupon_id}");
     }
 
     return $last_order_id;

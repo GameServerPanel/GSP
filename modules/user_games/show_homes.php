@@ -90,9 +90,9 @@ function exec_ogp_module()
 		echo empty($row['home_name']) ? get_lang('not_available') : htmlentities($row['home_name']);
 		$expiration_date = $row['server_expiration_date'] == "X" ? "X" : date('d/m/Y H:i:s', is_numeric($row['server_expiration_date']) ? (int)$row['server_expiration_date'] : strtotime($row['server_expiration_date']));
 		echo "</td><td>".$expiration_date."</td><td>
-			<a href='?m=user_games&amp;p=del&amp;home_id=$row[home_id]'>[".get_lang('delete')."]</a>
-			<a href='?m=user_games&amp;p=edit&amp;home_id=$row[home_id]'>[".get_lang('edit')."]</a>
-			<a href='?m=user_games&amp;p=migrate&amp;home_id=$row[home_id]'>[".get_lang('migrate')."]</a>
+			<a class='btn btn-danger btn-xs' href='?m=user_games&amp;p=del&amp;home_id=$row[home_id]'>".get_lang('delete')."</a>
+			<a class='btn btn-primary btn-xs' href='?m=user_games&amp;p=edit&amp;home_id=$row[home_id]'>".get_lang('edit')."</a>
+			<a class='btn btn-info btn-xs' href='?m=user_games&amp;p=migrate&amp;home_id=$row[home_id]'>".get_lang('migrate')."</a>
 			</td></tr>";
 	}
 	

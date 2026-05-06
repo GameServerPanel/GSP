@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-06
+- **Billing/admin provisioning hardening:** Styled the panel Migrate action like the other server action buttons, switched admin-created billing rows to the canonical monthly/31-day default, and made paid checkout fulfillment sync `billing_orders.home_id`, `billing_invoices.home_id`, and `billing_transactions.home_id` after provisioning so paid orders no longer stay at `home_id = 0`.
+- **Billing cart data correctness:** `add_to_cart.php` now calculates invoice amounts from the selected slot count and duration, stores `subtotal`/`total_due` metadata, and replaces `ChangeMe` placeholders with securely generated passwords before anything is written to billing tables.
+- **PayPal/coupon idempotency:** Cart checkout now stamps PayPal `custom_id` with the exact invoice IDs being purchased, capture/free/webhook handlers normalize month=31-day renewals, avoid duplicate transaction logs, and queue provisioning only for orders that still lack a home.
+
 ## 2026-05-05
 - **Billing checkout — automatic server provisioning after payment:** Fixed the core provisioning gap where `capture_order.php` never populated `$newOrderIds`, so the auto-provisioner was always skipped. After a successful PayPal capture (or zero-dollar checkout), a `billing_orders` row is now created for each paid invoice and passed to `billing_invoke_provision()` so the game server is created/installed immediately without manual admin action.
 - **Billing checkout — duplicate provisioning prevention:** Invoice→Order linkage is written atomically (`billing_invoices.order_id` updated after order creation). Because `getUnpaidInvoicesForUser()` filters on `payment_status NOT IN ('paid',…)`, a retried PayPal capture will find no invoices and skip all processing — preventing duplicate servers.
