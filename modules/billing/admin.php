@@ -3,32 +3,9 @@
 require_once(__DIR__ . '/includes/admin_auth.php');
 require_once(__DIR__ . '/includes/config_loader.php');
 
-// Ensure site variables are defined regardless of which config was loaded.
-// The panel config (loaded first by config_loader) does not define these billing-specific
-// variables. Try loading them from the billing config.inc.php if not already set.
-if (!isset($SITE_BASE_URL) || !isset($SITE_DATA_DIR)) {
-    $billingLocalCfg = __DIR__ . '/includes/config.inc.php';
-    if (is_readable($billingLocalCfg) && defined('BILLING_CONFIG_PATH') && BILLING_CONFIG_PATH !== $billingLocalCfg) {
-        // Panel config was loaded; read billing config vars without re-running DB setup.
-        // Use a temporary scope to avoid overwriting DB credentials.
-        $__billing_cfg_vars = (static function() use ($billingLocalCfg) {
-            $SITE_BASE_URL = '';
-            $SITE_DATA_DIR = '';
-            @include $billingLocalCfg;
-            return ['base' => $SITE_BASE_URL ?? '', 'data' => $SITE_DATA_DIR ?? ''];
-        })();
-        if (!isset($SITE_BASE_URL)) $SITE_BASE_URL = $__billing_cfg_vars['base'];
-        if (!isset($SITE_DATA_DIR)) $SITE_DATA_DIR = $__billing_cfg_vars['data'];
-        unset($__billing_cfg_vars, $billingLocalCfg);
-    }
-}
-// Final safe defaults if still not set.
-if (!isset($SITE_BASE_URL)) {
-    $SITE_BASE_URL = '';
-}
-if (!isset($SITE_DATA_DIR)) {
-    $SITE_DATA_DIR = realpath(__DIR__ . '/data') ?: (__DIR__ . '/data');
-}
+// config_loader.php now always loads billing/includes/config.inc.php first (which contains
+// SITE_BASE_URL, SITE_DATA_DIR, PayPal settings, etc.) and then overlays panel DB settings
+// when inside a GSP panel tree.  Safe defaults are applied by the loader for any missing vars.
 
 include(__DIR__ . '/includes/top.php');
 include(__DIR__ . '/includes/menu.php');

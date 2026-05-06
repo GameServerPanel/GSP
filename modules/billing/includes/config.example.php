@@ -41,3 +41,7 @@ $paypal_sandbox       = true;   // Set to false for live payments
 $paypal_client_id     = '';     // Your PayPal Client ID
 $paypal_client_secret = '';     // Your PayPal Client Secret
 $paypal_webhook_id    = '';     // Your PayPal Webhook ID (for webhook signature verification)
+
+# --- Admin config backup retention ---
+# Number of config backups to keep (1–10). Oldest backups beyond this limit are deleted.
+$SITE_CONFIG_BACKUP_RETENTION = 5;
