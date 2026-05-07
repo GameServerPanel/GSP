@@ -68,6 +68,21 @@ function order_game_key_os(string $gameKey): string
     return 'any';
 }
 
+function order_price_is_free($value): bool
+{
+    return ((int) round(((float)$value) * 100)) === 0;
+}
+
+function order_canonical_game_key(string $gameKey): string
+{
+    $gameKey = strtolower(trim($gameKey));
+    if ($gameKey === '') {
+        return '';
+    }
+    $canonical = preg_replace('/_(linux|linux32|linux64|win|win32|win64|windows|windows32|windows64)$/i', '', $gameKey);
+    return $canonical !== '' ? $canonical : $gameKey;
+}
+
 // --- Fetch the requested service with config_homes join for canonical game info ---
 $req_service_id = intval($_REQUEST['service_id'] ?? 0);
 if ($req_service_id !== 0) {
@@ -146,7 +161,7 @@ if ($imgSrc === '') { $imgSrc = '/images/games/default_server.png'; }
 <?php echo htmlspecialchars((string)($row['cfg_game_name'] ?? $row['service_name']), ENT_QUOTES, 'UTF-8'); ?>
 <br>
 <?php
-if (floatval($row['price_monthly']) == 0.0) {
+if (order_price_is_free($row['price_monthly'] ?? 0)) {
 echo "FREE";
 } else {
 echo "$" . number_format(floatval($row['price_monthly']), 2) . " Monthly";
@@ -164,20 +179,30 @@ echo "$" . number_format(floatval($row['price_monthly']), 2) . " Monthly";
 $svcGameKey = (string)($row['cfg_game_key'] ?? '');
 $svcGameOs  = order_game_key_os($svcGameKey);
 $canonicalGameName = (string)($row['cfg_game_name'] ?? $row['service_name']);
+$canonicalGameKey = order_canonical_game_key($svcGameKey);
 
 // Build map of OS variant service IDs for JS-based automatic selection.
 // Look for sibling services that share the same cfg_game_name (canonical) but differ in OS.
 // e.g. if current service is arma3_linux64, find the arma3_win64 service too.
 $osServiceMap = []; // ['linux' => service_id, 'windows' => service_id]
-if ($svcGameOs !== 'any' && !empty($canonicalGameName)) {
-$escapedName = $db->real_escape_string($canonicalGameName);
-$siblingQuery = "SELECT bs.service_id, ch.game_key AS cfg_game_key
-                 FROM {$table_prefix}billing_services bs
-                 LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
-                 WHERE bs.enabled = 1 AND ch.game_name = '{$escapedName}'";
+if ($svcGameOs !== 'any' && (!empty($canonicalGameName) || !empty($canonicalGameKey))) {
+$siblingQuery = "SELECT bs.service_id, ch.game_key AS cfg_game_key, ch.game_name AS cfg_game_name
+                  FROM {$table_prefix}billing_services bs
+                  LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
+                  WHERE bs.enabled = 1";
 $siblingResult = $db->query($siblingQuery);
 if ($siblingResult) {
 while ($sib = $siblingResult->fetch_assoc()) {
+$sibGameKey = (string)($sib['cfg_game_key'] ?? '');
+$sibCanonical = order_canonical_game_key($sibGameKey);
+$sibName = (string)($sib['cfg_game_name'] ?? '');
+if ($canonicalGameKey !== '') {
+if ($sibCanonical !== $canonicalGameKey) {
+continue;
+}
+} elseif ($canonicalGameName !== '' && strcasecmp($sibName, $canonicalGameName) !== 0) {
+continue;
+}
 $sibOs = order_game_key_os((string)($sib['cfg_game_key'] ?? ''));
 $osServiceMap[$sibOs] = (int)$sib['service_id'];
 }

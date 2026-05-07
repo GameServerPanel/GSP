@@ -584,7 +584,7 @@ function sw_user_render($db, $home_id, array $home, array $profile)
         <td style="padding:8px;">
           <select name="update_mode" style="width:100%;">
             <option value="manual"      <?= ($settings['update_mode'] === 'manual')       ? 'selected' : '' ?>>Manual only</option>
-            <option value="on_restart"  <?= ($settings['update_mode'] === 'on_restart')   ? 'selected' : '' ?>>On next server restart</option>
+            <option value="on_restart"  <?= ($settings['update_mode'] === 'on_restart')   ? 'selected' : '' ?>>On next restart</option>
             <option value="before_start" <?= ($settings['update_mode'] === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
             <option value="scheduled"   <?= ($settings['update_mode'] === 'scheduled')    ? 'selected' : '' ?>>Scheduled update check</option>
           </select>
@@ -602,8 +602,8 @@ function sw_user_render($db, $home_id, array $home, array $profile)
         <td style="padding:8px;">
           <select name="restart_behavior" style="width:100%;">
             <option value="none"         <?= ($settings['restart_behavior'] === 'none')         ? 'selected' : '' ?>>Do not restart automatically</option>
-            <option value="if_empty"     <?= ($settings['restart_behavior'] === 'if_empty')     ? 'selected' : '' ?>>Restart only if server is empty</option>
-            <option value="immediate"    <?= ($settings['restart_behavior'] === 'immediate')    ? 'selected' : '' ?>>Restart immediately after warning</option>
+            <option value="if_empty"     <?= ($settings['restart_behavior'] === 'if_empty')     ? 'selected' : '' ?>>Restart if empty</option>
+            <option value="immediate"    <?= ($settings['restart_behavior'] === 'immediate')    ? 'selected' : '' ?>>Restart after warning</option>
             <option value="next_restart" <?= ($settings['restart_behavior'] === 'next_restart') ? 'selected' : '' ?>>Install on next manual restart only</option>
           </select>
         </td>

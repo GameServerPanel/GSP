@@ -14,6 +14,16 @@ if (session_status() === PHP_SESSION_NONE) {
 // Load configuration
 require_once(__DIR__ . '/bootstrap.php');
 
+function billing_cart_money_to_cents(float $amount): int
+{
+    return (int) round($amount * 100);
+}
+
+function billing_cart_cents_to_money(int $cents): float
+{
+    return $cents / 100;
+}
+
 // Variables from config.inc.php (helps IDEs understand scope)
 /** @var string $db_host Database host */
 /** @var string $db_user Database user */
@@ -45,7 +55,9 @@ $db_error = '';
 // Initialize variables
 $invoices = [];
 $total_amount = 0.00;
+$total_amount_cents = 0;
 $discount_amount = 0.00;
+$discount_amount_cents = 0;
 $coupon_discount_percent = 0;
 $applied_coupon = null;
 $error_message = '';
@@ -69,12 +81,14 @@ if (!$db) {
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
             $invoices[] = $row;
-            $total_amount += floatval($row['amount']);
+            $lineAmount = (float)($row['total_due'] ?? $row['amount'] ?? 0);
+            $total_amount_cents += billing_cart_money_to_cents($lineAmount);
         }
         mysqli_free_result($result);
     }
 
     $cart_empty = (count((array)$invoices) === 0);
+    $total_amount = billing_cart_cents_to_money($total_amount_cents);
 }
 
 // Handle coupon application
@@ -165,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_coupon'])) {
 }
 
 // Re-validate coupon from session if present
-if (empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
+if ($db && empty($applied_coupon) && isset($_SESSION['cart_coupon_code'])) {
     $coupon_code = $_SESSION['cart_coupon_code'];
     $safe_code = mysqli_real_escape_string($db, $coupon_code);
     $coupon_query = "SELECT * FROM {$table_prefix}billing_coupons 
@@ -247,10 +261,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['remove_invoice']) && 
 
 // Calculate discount
 if ($applied_coupon && $coupon_discount_percent > 0) {
-    $discount_amount = $total_amount * ($coupon_discount_percent / 100);
+    $discount_amount_cents = (int) round($total_amount_cents * ($coupon_discount_percent / 100));
+    $discount_amount_cents = min($discount_amount_cents, $total_amount_cents);
 }
 
-$final_amount = $total_amount - $discount_amount;
+$discount_amount = billing_cart_cents_to_money($discount_amount_cents);
+$final_amount_cents = max(0, $total_amount_cents - $discount_amount_cents);
+$final_amount = billing_cart_cents_to_money($final_amount_cents);
 
 // PayPal configuration (from config)
 $client_id = function_exists('gsp_paypal_get_client_id') ? gsp_paypal_get_client_id() : ($paypal_client_id ?? '');
@@ -263,7 +280,8 @@ foreach ((array)$invoices as $inv) {
     $game_display = !empty($inv['game_name']) ? $inv['game_name'] : 'Game Server';
     $qty = max(1, intval($inv['qty']));
     $paypal_invoice_ids[] = intval($inv['invoice_id']);
-    $lineAmount = (float)($inv['total_due'] ?? $inv['amount'] ?? 0);
+    $lineAmountCents = billing_cart_money_to_cents((float)($inv['total_due'] ?? $inv['amount'] ?? 0));
+    $lineAmount = billing_cart_cents_to_money($lineAmountCents);
     $paypal_items[] = [
         'name' => $inv['home_name'] . ' (' . $game_display . ')',
         'description' => $inv['description'] ?? '',
@@ -626,7 +644,7 @@ $siteBase = $protocol . $host;
             </div>
 
             <!-- Checkout Section -->
-            <?php if ($final_amount <= 0.00): ?>
+            <?php if ($final_amount_cents === 0): ?>
             <!-- Zero-dollar checkout: coupon covers the full amount, no PayPal needed -->
             <div class="checkout-section">
                 <h3>🎉 Complete Your Free Order</h3>
@@ -688,7 +706,7 @@ $siteBase = $protocol . $host;
                 }
             </script>
 
-            <?php if ($final_amount > 0.00 && !empty($client_id)): ?>
+            <?php if ($final_amount_cents > 0 && !empty($client_id)): ?>
             <script>
                 function showPaymentError(msg) {
                     var statusDiv = document.getElementById('status-message');
