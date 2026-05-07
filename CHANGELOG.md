@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-05-07
+- **Billing/cart/storefront stability pass:** Hardened `add_to_cart.php` to build schema-compatible invoice inserts dynamically (including legacy installs missing `period_start`), fixed free-checkout DB close handling so wrapper objects are never passed to `mysqli_close()`, switched cart/free-total decisions to cent-based math so low nonzero prices (e.g. $0.02) never show as FREE, improved canonical game deduplication + OS variant matching in storefront list/order pages, and aligned Steam Workshop behavior labels with the new restart/update wording.
+
 ## 2026-05-06
 - **Panel settings language defaults:** Added missing English labels/help text for `login_ban_time`, `allow_setting_cpu_affinity`, `regex_invalid_file_name_chars`, `discord_invite_url`, `discord_webhook_main`, and `discord_webhook_admin`; language lookup now loads English fallback strings when the active locale is missing a key so settings pages stop rendering raw `_key_` tokens.
 - **Config XML section editor redesign:** Added a top-level section-based XML editor in `config_games` with per-section Validate/Save/Reset actions, optional-section add/remove controls, required-section removal protection, and schema validation for section updates; kept the existing detailed node editor and full raw XML editor for advanced edits.

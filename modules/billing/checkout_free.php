@@ -17,6 +17,11 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/includes/login_required.php';
 
+function billing_free_money_to_cents(float $amount): int
+{
+    return (int) round($amount * 100);
+}
+
 $userId = intval($_SESSION['website_user_id'] ?? $_SESSION['user_id'] ?? 0);
 if ($userId <= 0) {
     header('Location: /login.php');
@@ -30,15 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // DB connection
-$db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
-if (!$db) {
-    die('<p>Database connection failed. Please <a href="/order.php">return to the shop</a> or contact support.</p>');
+$mysqli = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
+if (!$mysqli) {
+    die('<p>Database connection failed. Please <a href="/serverlist.php">return to the shop</a> or contact support.</p>');
 }
-mysqli_set_charset($db, 'utf8mb4');
+mysqli_set_charset($mysqli, 'utf8mb4');
 
 // Fetch unpaid invoices for this user (prepared statement)
 $invoices = [];
-$stmt = mysqli_prepare($db, "SELECT * FROM {$table_prefix}billing_invoices
+$stmt = mysqli_prepare($mysqli, "SELECT * FROM {$table_prefix}billing_invoices
                              WHERE user_id = ?
                                AND (status = 'due' OR status = '')
                                AND (payment_status IS NULL OR payment_status NOT IN ('paid','cancelled','refunded'))
@@ -54,7 +59,9 @@ if ($stmt) {
 }
 
 if (empty($invoices)) {
-    mysqli_close($db);
+    if ($mysqli instanceof mysqli) {
+        mysqli_close($mysqli);
+    }
     header('Location: /cart.php?msg=empty');
     exit;
 }
@@ -65,8 +72,8 @@ $couponCode = trim($_POST['coupon_code'] ?? $_SESSION['cart_coupon_code'] ?? '')
 $discountPct = 0.0;
 
 if ($couponCode !== '') {
-    $safe = mysqli_real_escape_string($db, $couponCode);
-    $cr   = mysqli_query($db, "SELECT * FROM {$table_prefix}billing_coupons
+    $safe = mysqli_real_escape_string($mysqli, $couponCode);
+    $cr   = mysqli_query($mysqli, "SELECT * FROM {$table_prefix}billing_coupons
                                WHERE code = '$safe' AND is_active = 1 LIMIT 1");
     if ($cr && mysqli_num_rows($cr) === 1) {
         $coupon      = mysqli_fetch_assoc($cr);
@@ -76,16 +83,20 @@ if ($couponCode !== '') {
 }
 
 // Calculate total and verify it is $0 after discount
-$totalAmount = 0.0;
+$totalAmountCents = 0;
 foreach ($invoices as $inv) {
-    $totalAmount += (float)($inv['amount'] ?? 0);
+    $lineAmount = (float)($inv['amount'] ?? 0);
+    $totalAmountCents += billing_free_money_to_cents($lineAmount);
 }
-$discountAmount = $totalAmount * ($discountPct / 100.0);
-$finalAmount    = round($totalAmount - $discountAmount, 2);
+$discountAmountCents = (int) round($totalAmountCents * ($discountPct / 100.0));
+$discountAmountCents = min($discountAmountCents, $totalAmountCents);
+$finalAmountCents = max(0, $totalAmountCents - $discountAmountCents);
 
-if ($finalAmount > 0.00) {
+if ($finalAmountCents !== 0) {
     // Coupon no longer covers the full amount — redirect to cart
-    mysqli_close($db);
+    if ($mysqli instanceof mysqli) {
+        mysqli_close($mysqli);
+    }
     header('Location: /cart.php?msg=coupon_insufficient');
     exit;
 }
@@ -97,7 +108,7 @@ $txid  = 'free-' . time() . '-' . $userId;
 require_once __DIR__ . '/classes/BillingRepository.php';
 require_once __DIR__ . '/classes/BillingService.php';
 
-$repo = new BillingRepository($db, $table_prefix);
+$repo = new BillingRepository($mysqli, $table_prefix);
 $newOrderIds = [];
 $duration_meta = static function (array $invoice): array {
     $duration = strtolower((string)($invoice['invoice_duration'] ?? $invoice['rate_type'] ?? 'month'));
@@ -213,7 +224,7 @@ foreach ($invoices as $inv) {
 }
 
 if ($couponId > 0 && !empty($invoices)) {
-    mysqli_query($db, "UPDATE {$table_prefix}billing_coupons
+    mysqli_query($mysqli, "UPDATE {$table_prefix}billing_coupons
                        SET current_uses = current_uses + 1
                        WHERE coupon_id = " . intval($couponId));
 }
@@ -234,7 +245,9 @@ if (!empty($newOrderIds)) {
     // If panel bootstrap fails the order is Active and admins can provision via the orders panel.
 }
 
-mysqli_close($db);
+if ($mysqli instanceof mysqli) {
+    mysqli_close($mysqli);
+}
 
 header('Location: /payment_success.php?order_id=' . urlencode($txid));
 exit;

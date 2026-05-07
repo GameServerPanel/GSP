@@ -314,7 +314,7 @@ function sw_admin_edit_form(array $profile, array $detected = array(), $showDete
           <span>Default Install / Update Mode</span>
           <select name="default_update_mode">
             <option value="manual"       <?= (($profile['default_update_mode'] ?? 'manual') === 'manual')       ? 'selected' : '' ?>>Manual only (safe default)</option>
-            <option value="on_restart"   <?= (($profile['default_update_mode'] ?? 'manual') === 'on_restart')   ? 'selected' : '' ?>>On next server restart</option>
+            <option value="on_restart"   <?= (($profile['default_update_mode'] ?? 'manual') === 'on_restart')   ? 'selected' : '' ?>>On next restart</option>
             <option value="before_start" <?= (($profile['default_update_mode'] ?? 'manual') === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
             <option value="scheduled"    <?= (($profile['default_update_mode'] ?? 'manual') === 'scheduled')    ? 'selected' : '' ?>>Scheduled update check</option>
           </select>
@@ -323,8 +323,8 @@ function sw_admin_edit_form(array $profile, array $detected = array(), $showDete
           <span>Default Restart Behavior</span>
           <select name="default_restart_behavior">
             <option value="none"         <?= (($profile['default_restart_behavior'] ?? 'none') === 'none')         ? 'selected' : '' ?>>Do not restart automatically (safe default)</option>
-            <option value="if_empty"     <?= (($profile['default_restart_behavior'] ?? 'none') === 'if_empty')     ? 'selected' : '' ?>>Restart only if server is empty</option>
-            <option value="immediate"    <?= (($profile['default_restart_behavior'] ?? 'none') === 'immediate')    ? 'selected' : '' ?>>Restart immediately after warning</option>
+            <option value="if_empty"     <?= (($profile['default_restart_behavior'] ?? 'none') === 'if_empty')     ? 'selected' : '' ?>>Restart if empty</option>
+            <option value="immediate"    <?= (($profile['default_restart_behavior'] ?? 'none') === 'immediate')    ? 'selected' : '' ?>>Restart after warning</option>
             <option value="next_restart" <?= (($profile['default_restart_behavior'] ?? 'none') === 'next_restart') ? 'selected' : '' ?>>Install on next manual restart only</option>
           </select>
         </label>

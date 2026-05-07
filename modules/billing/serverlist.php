@@ -23,6 +23,22 @@ if (!$db) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+function billing_service_price_is_free($value): bool
+{
+    return ((int) round(((float)$value) * 100)) === 0;
+}
+
+function billing_canonical_game_identity(array $row): string
+{
+    $gameKey = strtolower(trim((string)($row['cfg_game_key'] ?? '')));
+    if ($gameKey !== '') {
+        $canonicalKey = preg_replace('/_(linux|linux32|linux64|win|win32|win64|windows|windows32|windows64)$/i', '', $gameKey);
+        return 'key:' . ($canonicalKey !== '' ? $canonicalKey : $gameKey);
+    }
+    $gameName = strtolower(trim((string)($row['cfg_game_name'] ?? $row['service_name'] ?? '')));
+    return 'name:' . $gameName;
+}
+
 // Save new description if admin
 if (isset($_POST['save']) && !empty($_POST['description'])) {
     $new_description = str_replace("\\r\\n", "<br>", $_POST['description']);
@@ -80,15 +96,12 @@ while ($row = $result_services->fetch_assoc()) {
     }
     // Derive canonical display name: prefer config_homes game_name (consistent across OS
     // variants), fall back to service_name.
-    $canonicalName = !empty($row['cfg_game_name'])
-        ? $row['cfg_game_name']
-        : $row['service_name'];
-
-    if (isset($seenCanonical[$canonicalName])) {
+    $canonicalIdentity = billing_canonical_game_identity($row);
+    if (isset($seenCanonical[$canonicalIdentity])) {
         // Already have this game — skip the duplicate OS variant
         continue;
     }
-    $seenCanonical[$canonicalName] = true;
+    $seenCanonical[$canonicalIdentity] = true;
     $serviceRows[] = $row;
 }
 $result_services->free();
@@ -115,7 +128,7 @@ include(__DIR__ . '/includes/menu.php');
                  onerror="this.src='/images/games/default_server.png'; this.onerror=null;"><br>
             <strong><?php echo htmlspecialchars((string)($row['cfg_game_name'] ?? $row['service_name']), ENT_QUOTES, 'UTF-8'); ?></strong><br>
             <?php
-            echo (floatval($row['price_monthly']) == 0.0) ? "FREE" : "$" . number_format(floatval($row['price_monthly']), 2) . " Monthly";
+            echo billing_service_price_is_free($row['price_monthly'] ?? 0) ? "FREE" : "$" . number_format((float)$row['price_monthly'], 2) . " Monthly";
             ?>
             <br>
                         

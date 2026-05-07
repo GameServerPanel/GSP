@@ -44,6 +44,23 @@ function billing_normalize_duration(string $duration): array
     }
 }
 
+function billing_money_to_cents(float $amount): int
+{
+    return (int) round($amount * 100);
+}
+
+function billing_cents_to_money(int $cents): float
+{
+    return $cents / 100;
+}
+
+function billing_fail_add_to_cart(string $message, array $context = []): void
+{
+    site_log_error('add_to_cart_failed', array_merge(['message' => $message], $context));
+    header('Location: /cart.php?error=add_to_cart');
+    exit;
+}
+
 // Immediate request tracing log (helps confirm the script is hit)
 @mkdir(__DIR__ . '/logs', 0775, true);
 $trace_file = __DIR__ . '/logs/add_to_cart_requests.log';
@@ -86,12 +103,13 @@ $ftp_password = isset($_POST['ftp_password']) ? trim((string)$_POST['ftp_passwor
 // Price lookup: try to find service price_monthly
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
 if (!$db) {
-    // Log connection error and exit
+    // Log connection error and return user to cart with a friendly error flag
     @mkdir(__DIR__ . '/logs', 0775, true);
     $trace = __DIR__ . '/logs/add_to_cart.log';
     file_put_contents($trace, date('c') . " - mysqli_connect failed: " . mysqli_connect_error() . "\n", FILE_APPEND);
-    die('DB connection failed');
+    billing_fail_add_to_cart('DB connection failed');
 } else {
+    mysqli_set_charset($db, 'utf8mb4');
     // Log that config was loaded (mask password)
     @mkdir(__DIR__ . '/logs', 0775, true);
     $trace = __DIR__ . '/logs/add_to_cart.log';
@@ -163,7 +181,8 @@ $status = 'due'; // Invoice status: due (unpaid), paid
 $payment_status = 'unpaid';
 $qty = max(1, $qty);
 $max_players = max(1, $max_players);
-$subtotal = round($base_rate * $max_players * $qty, 2);
+$subtotal_cents = billing_money_to_cents((float)$base_rate * $max_players * $qty);
+$subtotal = billing_cents_to_money($subtotal_cents);
 $amount = $subtotal;
 $period_end = date('Y-m-d H:i:s', strtotime('+' . ($durationInfo['days'] * $qty) . ' days'));
 
@@ -193,55 +212,89 @@ $due_date = $due_dt->format('Y-m-d H:i:s');
 // Escape values
 $esc_user_id = intval($user_id);
 $esc_service_id = intval($service_id);
-$esc_home_name = mysqli_real_escape_string($db, $home_name);
 $esc_ip_id = intval($ip_id);
 $esc_max_players = intval($max_players);
 $esc_qty = intval($qty);
 $description = trim(($service_name !== '' ? $service_name : 'Game Server') . ': ' . $home_name);
-$sql = "INSERT INTO {$table_prefix}billing_invoices (
-    order_id, user_id, service_id, home_id, home_name, ip, max_players, remote_control_password,
-    ftp_password, customer_name, customer_email, amount, discount_amount, currency, status,
-    billing_status, invoice_date, due_date, description, invoice_duration, rate_type, rate_per_player,
-    players, period_start, period_end, subtotal, total_due, payment_status, qty, coupon_id
-) VALUES (
-    0, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, 0.00, 'USD', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0
-)";
+$invoiceTable = $table_prefix . 'billing_invoices';
+$invoiceColumns = [];
+$columnsResult = mysqli_query($db, "SHOW COLUMNS FROM `{$invoiceTable}`");
+if (!$columnsResult) {
+    billing_fail_add_to_cart('Could not inspect billing invoice schema', ['table' => $invoiceTable, 'error' => mysqli_error($db)]);
+}
+while ($col = mysqli_fetch_assoc($columnsResult)) {
+    $invoiceColumns[$col['Field']] = true;
+}
+mysqli_free_result($columnsResult);
+
+$invoice_duration = $durationInfo['invoice_duration'];
+$rate_type = $durationInfo['rate_type'];
+$rowData = [
+    'order_id' => 0,
+    'user_id' => $esc_user_id,
+    'service_id' => $esc_service_id,
+    'home_id' => 0,
+    'home_name' => $home_name,
+    'ip' => $esc_ip_id,
+    'max_players' => $esc_max_players,
+    'remote_control_password' => $remote_control_password,
+    'ftp_password' => $ftp_password,
+    'customer_name' => $customer_name,
+    'customer_email' => $customer_email,
+    'amount' => $amount,
+    'discount_amount' => 0.00,
+    'currency' => 'USD',
+    'status' => $status,
+    'billing_status' => $status,
+    'invoice_date' => $now,
+    'due_date' => $due_date,
+    'description' => $description,
+    'invoice_duration' => $invoice_duration,
+    'rate_type' => $rate_type,
+    'rate_per_player' => (float)$base_rate,
+    'players' => $max_players,
+    'period_start' => $now,
+    'period_end' => $period_end,
+    'subtotal' => $subtotal,
+    'total_due' => $amount,
+    'payment_status' => $payment_status,
+    'qty' => $esc_qty,
+    'coupon_id' => 0,
+];
+
+$insertColumns = [];
+$placeholders = [];
+$bindTypes = '';
+$bindValues = [];
+foreach ($rowData as $column => $value) {
+    if (!isset($invoiceColumns[$column])) {
+        continue;
+    }
+    $insertColumns[] = "`{$column}`";
+    $placeholders[] = '?';
+    if (is_int($value)) {
+        $bindTypes .= 'i';
+    } elseif (is_float($value)) {
+        $bindTypes .= 'd';
+    } else {
+        $bindTypes .= 's';
+    }
+    $bindValues[] = $value;
+}
+
+if (empty($insertColumns)) {
+    billing_fail_add_to_cart('No compatible invoice columns were found for insert', ['table' => $invoiceTable]);
+}
+
+$sql = "INSERT INTO `{$invoiceTable}` (" . implode(', ', $insertColumns) . ")
+        VALUES (" . implode(', ', $placeholders) . ")";
 
 $stmt = $db->prepare($sql);
 $res = false;
 $err_no = 0;
 $err = '';
 if ($stmt) {
-    $invoice_duration = $durationInfo['invoice_duration'];
-    $rate_type = $durationInfo['rate_type'];
-    $stmt->bind_param(
-        'iisiissssdsssssssdissddsi',
-        $esc_user_id,
-        $esc_service_id,
-        $home_name,
-        $esc_ip_id,
-        $esc_max_players,
-        $remote_control_password,
-        $ftp_password,
-        $customer_name,
-        $customer_email,
-        $amount,
-        $status,
-        $status,
-        $now,
-        $due_date,
-        $description,
-        $invoice_duration,
-        $rate_type,
-        $base_rate,
-        $max_players,
-        $now,
-        $period_end,
-        $subtotal,
-        $amount,
-        $payment_status,
-        $esc_qty
-    );
+    $stmt->bind_param($bindTypes, ...$bindValues);
     $res = @$stmt->execute();
     $err_no = mysqli_errno($db);
     $err = mysqli_error($db);
@@ -272,8 +325,7 @@ if (!$res || $err_no > 0) {
     site_log_warn('billing_invoices_exists', ['exists'=>$tbl_exists]);
     file_put_contents($logfile, date('c') . " - Table exists check: {$tbl_exists}\n", FILE_APPEND);
     
-    // Show user-friendly error
-    die("Error adding to cart: " . htmlspecialchars($err) . ". Please contact support.");
+    billing_fail_add_to_cart('Invoice insert failed', ['errno' => $err_no, 'error' => $err]);
 } else {
     $insert_id = mysqli_insert_id($db);
     $affected = mysqli_affected_rows($db);
