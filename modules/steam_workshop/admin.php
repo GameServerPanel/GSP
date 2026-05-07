@@ -124,6 +124,17 @@ function sw_admin_save_profile($db)
         'notes'                           => trim($_POST['notes'] ?? ''),
     );
 
+    // Per-profile default behavior fields
+    $valid_update_modes      = array('manual', 'on_restart', 'before_start', 'scheduled');
+    $valid_restart_behaviors = array('none', 'if_empty', 'immediate', 'next_restart');
+    $valid_hot_load          = array('disabled', 'attempt');
+    $posted_um  = $_POST['default_update_mode']      ?? 'manual';
+    $posted_rb  = $_POST['default_restart_behavior'] ?? 'none';
+    $posted_hl  = $_POST['default_hot_load']         ?? 'disabled';
+    $fields['default_update_mode']      = in_array($posted_um, $valid_update_modes,      true) ? $posted_um : 'manual';
+    $fields['default_restart_behavior'] = in_array($posted_rb, $valid_restart_behaviors, true) ? $posted_rb : 'none';
+    $fields['default_hot_load']         = in_array($posted_hl, $valid_hot_load,          true) ? $posted_hl : 'disabled';
+
     $setParts = array();
     foreach ($fields as $col => $val) {
         $setParts[] = "`$col` = '" . $db->realEscapeSingle($val) . "'";
@@ -289,6 +300,42 @@ function sw_admin_edit_form(array $profile, array $detected = array(), $showDete
     <div class="sw-section">
       <h4>Notes</h4>
       <label><textarea name="notes" rows="4"><?= sw_h($profile['notes']) ?></textarea></label>
+    </div>
+
+    <div class="sw-section">
+      <h4>Default Workshop Behavior for New Servers</h4>
+      <p class="sw-muted">
+        These defaults are applied when a user enables Workshop on a server that has no saved behavior settings yet.
+        Users can always override them on their own server pages.
+        All defaults are intentionally set to the safest option (manual / no auto-restart / hot-load off).
+      </p>
+      <div class="sw-grid">
+        <label>
+          <span>Default Install / Update Mode</span>
+          <select name="default_update_mode">
+            <option value="manual"       <?= (($profile['default_update_mode'] ?? 'manual') === 'manual')       ? 'selected' : '' ?>>Manual only (safe default)</option>
+            <option value="on_restart"   <?= (($profile['default_update_mode'] ?? 'manual') === 'on_restart')   ? 'selected' : '' ?>>On next server restart</option>
+            <option value="before_start" <?= (($profile['default_update_mode'] ?? 'manual') === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
+            <option value="scheduled"    <?= (($profile['default_update_mode'] ?? 'manual') === 'scheduled')    ? 'selected' : '' ?>>Scheduled update check</option>
+          </select>
+        </label>
+        <label>
+          <span>Default Restart Behavior</span>
+          <select name="default_restart_behavior">
+            <option value="none"         <?= (($profile['default_restart_behavior'] ?? 'none') === 'none')         ? 'selected' : '' ?>>Do not restart automatically (safe default)</option>
+            <option value="if_empty"     <?= (($profile['default_restart_behavior'] ?? 'none') === 'if_empty')     ? 'selected' : '' ?>>Restart only if server is empty</option>
+            <option value="immediate"    <?= (($profile['default_restart_behavior'] ?? 'none') === 'immediate')    ? 'selected' : '' ?>>Restart immediately after warning</option>
+            <option value="next_restart" <?= (($profile['default_restart_behavior'] ?? 'none') === 'next_restart') ? 'selected' : '' ?>>Install on next manual restart only</option>
+          </select>
+        </label>
+        <label>
+          <span>Default Hot-Load</span>
+          <select name="default_hot_load">
+            <option value="disabled" <?= (($profile['default_hot_load'] ?? 'disabled') === 'disabled') ? 'selected' : '' ?>>Disabled (safe default)</option>
+            <option value="attempt"  <?= (($profile['default_hot_load'] ?? 'disabled') === 'attempt')  ? 'selected' : '' ?>>Attempt hot-load if game supports it</option>
+          </select>
+        </label>
+      </div>
     </div>
 
     <p>

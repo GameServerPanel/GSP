@@ -24,8 +24,8 @@
 
 // Module general information
 $module_title = "billing";
-$module_version = "3.5";
-$db_version = 6;
+$module_version = "3.6";
+$db_version = 7;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -397,6 +397,29 @@ $install_queries[6] = array(
         if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
         return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXremote_servers` ADD `server_os` ENUM('linux','windows','any') NOT NULL DEFAULT 'linux' AFTER `display_public_ip`");
     }
+);
+
+// -----------------------------------------------------------------------
+// db_version 7 — Ensure period_start and period_end columns exist in
+// billing_invoices.  These columns were defined in the baseline CREATE TABLE
+// (db_version 1) but no migration was provided for existing installations
+// that created the table before those columns were added, causing a fatal
+// "Unknown column 'period_start'" error in add_to_cart.php.
+// Each callable uses INFORMATION_SCHEMA so it is safe to re-run.
+// -----------------------------------------------------------------------
+$install_queries[7] = array(
+    // billing_invoices: add period_start if missing
+    function($db) {
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'period_start'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `period_start` DATETIME NULL AFTER `players`");
+    },
+    // billing_invoices: add period_end if missing
+    function($db) {
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'period_end'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `period_end` DATETIME NULL AFTER `period_start`");
+    },
 );
 
 ?>
