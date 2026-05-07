@@ -6,7 +6,8 @@
 
 function exec_ogp_module()
 {
-	global $db, $view;
+	global $db, $view, $table_prefix;
+	$db_prefix = isset($table_prefix) ? $table_prefix : '';
 	$user_id = $_SESSION['user_id'];
 	$isAdmin = $db->isAdmin($user_id);
 	
@@ -14,7 +15,28 @@ function exec_ogp_module()
 		echo "<div class='failure'><p>Access Denied: Admin privileges required.</p></div>";
 		return;
 	}
-	
+
+	// -------------------------------------------------------------------
+	// Handle "Retry Provisioning" for a single order
+	// -------------------------------------------------------------------
+	if (isset($_POST['retry_provision_order']) && !empty($_POST['retry_order_id'])) {
+		$retry_id = intval($_POST['retry_order_id']);
+		require_once __DIR__ . '/create_servers.php';
+		$retryResult = billing_invoke_provision([
+			'order_ids' => [$retry_id],
+			'user_id'   => $user_id,
+			'is_admin'  => true,
+		]);
+		if (!empty($retryResult['provisioned_count'])) {
+			echo "<div class='success'><p>Retry provisioning succeeded for order #{$retry_id}.</p></div>";
+		} elseif (!empty($retryResult['output'])) {
+			echo "<div class='failure'><p>Retry provisioning for order #{$retry_id} did not succeed. See details below.</p>"
+			   . "<pre>" . htmlspecialchars($retryResult['output']) . "</pre></div>";
+		} else {
+			echo "<div class='failure'><p>Retry provisioning for order #{$retry_id}: no result returned. Check server logs.</p></div>";
+		}
+	}
+
 	// Handle bulk actions
 	if (isset($_POST['bulk_action']) && isset($_POST['selected_orders'])) {
 		$action = $_POST['bulk_action'];
@@ -30,13 +52,13 @@ function exec_ogp_module()
 					exit;
 					break;
 				case 'expire':
-					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='Expired' WHERE order_id=".$order_id);
+					$db->query("UPDATE `{$db_prefix}billing_orders` SET status='Expired' WHERE order_id=".$order_id);
 					break;
 				case 'activate':
-					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='Active' WHERE order_id=".$order_id);
+					$db->query("UPDATE `{$db_prefix}billing_orders` SET status='Active' WHERE order_id=".$order_id);
 					break;
 				case 'invoice':
-					$db->query("UPDATE OGP_DB_PREFIXbilling_orders SET status='Invoiced' WHERE order_id=".$order_id);
+					$db->query("UPDATE `{$db_prefix}billing_orders` SET status='Invoiced' WHERE order_id=".$order_id);
 					break;
 			}
 		}
@@ -66,9 +88,9 @@ function exec_ogp_module()
 	
 	// Build query
 	$query = "SELECT o.*, s.service_name, u.users_login, u.users_email 
-			  FROM OGP_DB_PREFIXbilling_orders o
-			  LEFT JOIN OGP_DB_PREFIXbilling_services s ON o.service_id = s.service_id
-			  LEFT JOIN OGP_DB_PREFIXusers u ON o.user_id = u.user_id
+			  FROM `{$db_prefix}billing_orders` o
+			  LEFT JOIN `{$db_prefix}billing_services` s ON o.service_id = s.service_id
+			  LEFT JOIN `{$db_prefix}users` u ON o.user_id = u.user_id
 			  WHERE 1=1";
 	
 	if ($status_filter != 'all') {
@@ -90,6 +112,17 @@ function exec_ogp_module()
 	if (empty($orders)) {
 		echo "<div class='info'><p>No orders found matching your filters.</p></div>";
 		return;
+	}
+
+	// Pre-fetch provisioning error counts per order for display
+	$errorCounts = [];
+	$errCountRows = $db->resultQuery(
+		"SELECT billing_order_id, COUNT(*) AS cnt
+		   FROM `{$db_prefix}billing_provisioning_errors`
+		  GROUP BY billing_order_id"
+	);
+	foreach ((array)$errCountRows as $ecr) {
+		$errorCounts[intval($ecr['billing_order_id'])] = intval($ecr['cnt']);
 	}
 	
 	echo "<form method='post' action='home.php?m=billing&p=admin_orders'>";
@@ -130,45 +163,97 @@ function exec_ogp_module()
 			case 'Expired':  $status_class = 'label-danger';  break;
 			default:         $status_class = 'label-info';
 		}
+
+		$oid = intval($order['order_id']);
+		$errCount = $errorCounts[$oid] ?? 0;
 		
 		echo "<tr>";
-		echo "<td><input type='checkbox' name='selected_orders[]' value='".$order['order_id']."'></td>";
-		echo "<td>".$order['order_id']."</td>";
-		echo "<td>".$order['users_login']."<br><small>".$order['users_email']."</small></td>";
-		echo "<td>".$order['home_name']."</td>";
-		echo "<td>".$order['service_name']."</td>";
+		echo "<td><input type='checkbox' name='selected_orders[]' value='".$oid."'></td>";
+		echo "<td>".$oid."</td>";
+		echo "<td>".htmlspecialchars($order['users_login'] ?? '')."<br><small>".htmlspecialchars($order['users_email'] ?? '')."</small></td>";
+		echo "<td>".htmlspecialchars($order['home_name'] ?? '')."</td>";
+		echo "<td>".htmlspecialchars($order['service_name'] ?? '')."</td>";
 		echo "<td>".$order['max_players']."</td>";
 		echo "<td>$".number_format($order['price'], 2)."</td>";
 		echo "<td>".$order['qty']." ".$order['invoice_duration']."(s)</td>";
-		echo "<td><span class='label ".$status_class."'>".$order['status']."</span></td>";
+		echo "<td><span class='label ".$status_class."'>".$order['status']."</span>";
+		if ($errCount > 0) {
+			echo " <span class='label label-warning' title='Provisioning errors'>" . $errCount . " error(s)</span>";
+		}
+		echo "</td>";
 		echo "<td>".date('Y-m-d H:i', strtotime($order['order_date']))."</td>";
 		echo "<td>".($order['end_date'] ? date('Y-m-d', strtotime($order['end_date'])) : 'N/A')."</td>";
 		echo "<td>".($order['home_id'] ? $order['home_id'] : 'N/A')."</td>";
 		echo "<td>";
 		
 		if ($order['status'] == 'Active' && !$order['home_id']) {
-			echo "<a href='home.php?m=billing&p=provision_servers&order_id=".$order['order_id']."' class='btn btn-sm'>Provision</a> ";
+			echo "<a href='home.php?m=billing&p=provision_servers&order_id=".$oid."' class='btn btn-sm'>Provision</a> ";
+			// Retry provisioning button (inline POST form)
+			echo "<form method='post' action='home.php?m=billing&p=admin_orders' style='display:inline;'>";
+			echo "<input type='hidden' name='retry_provision_order' value='1'>";
+			echo "<input type='hidden' name='retry_order_id' value='".$oid."'>";
+			echo "<button type='submit' class='btn btn-sm btn-warning'>Retry Provisioning</button>";
+			echo "</form> ";
 		}
 		
 		if ($order['status'] == 'Active' && $order['home_id']) {
 			echo "<a href='home.php?m=gamemanager&p=game_monitor&home_id-mod_id-ip=".$order['home_id']."' class='btn btn-sm'>View Server</a> ";
 		}
-		
-		echo "<a href='#' onclick='viewOrder(".$order['order_id'].")' class='btn btn-sm'>Details</a>";
+
+		if ($errCount > 0) {
+			echo "<a href='#' onclick='toggleErrors(".$oid.")' class='btn btn-sm btn-danger'>Errors</a> ";
+		}
+
+		echo "<a href='#' onclick='viewOrder(".$oid.")' class='btn btn-sm'>Details</a>";
 		echo "</td>";
 		echo "</tr>";
+
+		// Collapsible provisioning error rows
+		if ($errCount > 0) {
+			echo "<tr id='errors_".$oid."' style='display:none;background:#fff8f8;'>";
+			echo "<td colspan='13'>";
+			$errRows = $db->resultQuery(
+				"SELECT * FROM `{$db_prefix}billing_provisioning_errors`
+				  WHERE billing_order_id=" . $oid . "
+				  ORDER BY created_at DESC LIMIT 20"
+			);
+			if (!empty($errRows)) {
+				echo "<table style='width:100%;font-size:0.9em;'>";
+				echo "<thead><tr><th>Time</th><th>Remote Srv</th><th>IP ID</th><th>Port</th><th>Mod</th><th>Message</th></tr></thead><tbody>";
+				foreach ($errRows as $er) {
+					echo "<tr>";
+					echo "<td>".htmlspecialchars($er['created_at'])."</td>";
+					echo "<td>".intval($er['remote_server_id'])."</td>";
+					echo "<td>".intval($er['ip_id'])."</td>";
+					echo "<td>".intval($er['attempted_port'])."</td>";
+					echo "<td>".intval($er['mod_cfg_id'])."</td>";
+					echo "<td>".htmlspecialchars($er['failure_message'])."</td>";
+					echo "</tr>";
+				}
+				echo "</tbody></table>";
+			}
+			echo "</td></tr>";
+		}
 	}
 	
 	echo "</tbody></table>";
 	echo "</form>";
 	
-	// JavaScript for checkbox toggle
+	// JavaScript for checkbox toggle and error panel
 	echo "<script>
 	function toggleAll(checkbox) {
 		var checkboxes = document.getElementsByName('selected_orders[]');
 		for (var i = 0; i < checkboxes.length; i++) {
 			checkboxes[i].checked = checkbox.checked;
 		}
+	}
+
+	function toggleErrors(orderId) {
+		var row = document.getElementById('errors_' + orderId);
+		if (row) {
+			row.style.display = (row.style.display === 'none') ? 'table-row' : 'none';
+		}
+		return false;
 	}
 	
 	function viewOrder(orderId) {
@@ -178,9 +263,11 @@ function exec_ogp_module()
 	</script>";
 	
 	// Summary stats
-	$stats = $db->resultQuery("SELECT status, COUNT(*) as count, SUM(price) as total 
-							   FROM OGP_DB_PREFIXbilling_orders 
-							   GROUP BY status");
+	$stats = $db->resultQuery(
+		"SELECT status, COUNT(*) as count, SUM(price) as total 
+		   FROM `{$db_prefix}billing_orders` 
+		  GROUP BY status"
+	);
 	
 	echo "<div style='margin-top: 30px;'>";
 	echo "<h3>Order Statistics</h3>";
@@ -204,8 +291,8 @@ function exec_ogp_module()
 	// are the reason the game monitor may show "No expiration date found".
 	$orphans = $db->resultQuery(
 		"SELECT o.order_id, o.user_id, o.home_name, o.home_id, o.status, o.end_date
-		   FROM OGP_DB_PREFIXbilling_orders o
-		   LEFT JOIN OGP_DB_PREFIXserver_homes sh ON sh.home_id = o.home_id
+		   FROM `{$db_prefix}billing_orders` o
+		   LEFT JOIN `{$db_prefix}server_homes` sh ON sh.home_id = o.home_id
 		  WHERE o.home_id != '0'
 		    AND o.home_id != ''
 		    AND sh.home_id IS NULL
@@ -214,9 +301,9 @@ function exec_ogp_module()
 
 	echo "<div style='margin-top: 30px;'>";
 	echo "<h3>Orphaned home_id Diagnostics</h3>";
-	echo "<p style='color:#666;'>Billing orders that reference a <code>home_id</code> which no longer exists in <code>gsp_server_homes</code>. ";
+	echo "<p style='color:#666;'>Billing orders that reference a <code>home_id</code> which no longer exists in <code>server_homes</code>. ";
 	echo "These orders will not show an expiration date on the game monitor. ";
-	echo "Reset <code>home_id</code> to <code>0</code> or re-provision these orders to fix them. ";
+	echo "Reset <code>home_id</code> to <code>0</code> and use the Retry Provisioning button to re-provision them. ";
 	echo "Run <code>normalize_billing_order_status.sql</code> to standardize any legacy status values.</p>";
 
 	if (empty($orphans)) {
@@ -232,6 +319,40 @@ function exec_ogp_module()
 			echo "<td style='color:red;'>".htmlspecialchars($row['home_id'] ?? '')."</td>";
 			echo "<td>".htmlspecialchars($row['status'] ?? '')."</td>";
 			echo "<td>".htmlspecialchars($row['end_date'] ?? 'NULL')."</td>";
+			echo "</tr>";
+		}
+		echo "</tbody></table>";
+	}
+	echo "</div>";
+
+	// Recent provisioning errors (all orders) ————————————————————————————
+	$recentErrors = $db->resultQuery(
+		"SELECT e.*, o.home_name, u.users_login
+		   FROM `{$db_prefix}billing_provisioning_errors` e
+		   LEFT JOIN `{$db_prefix}billing_orders` o ON o.order_id = e.billing_order_id
+		   LEFT JOIN `{$db_prefix}users` u ON u.user_id = e.user_id
+		  ORDER BY e.created_at DESC
+		  LIMIT 50"
+	);
+
+	echo "<div style='margin-top: 30px;'>";
+	echo "<h3>Recent Provisioning Errors</h3>";
+	if (empty($recentErrors)) {
+		echo "<p style='color:green;'>&#10003; No provisioning errors recorded.</p>";
+	} else {
+		echo "<table class='tablesorter' style='width:100%;'>";
+		echo "<thead><tr><th>Time</th><th>Order ID</th><th>User</th><th>Server Name</th><th>Remote Srv</th><th>IP ID</th><th>Port</th><th>Mod</th><th>Message</th></tr></thead><tbody>";
+		foreach ($recentErrors as $er) {
+			echo "<tr>";
+			echo "<td>".htmlspecialchars($er['created_at'])."</td>";
+			echo "<td>".intval($er['billing_order_id'])."</td>";
+			echo "<td>".htmlspecialchars($er['users_login'] ?? ('uid:'.intval($er['user_id'])))."</td>";
+			echo "<td>".htmlspecialchars($er['home_name'] ?? '')."</td>";
+			echo "<td>".intval($er['remote_server_id'])."</td>";
+			echo "<td>".intval($er['ip_id'])."</td>";
+			echo "<td>".intval($er['attempted_port'])."</td>";
+			echo "<td>".intval($er['mod_cfg_id'])."</td>";
+			echo "<td>".htmlspecialchars($er['failure_message'])."</td>";
 			echo "</tr>";
 		}
 		echo "</tbody></table>";

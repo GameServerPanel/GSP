@@ -13,6 +13,10 @@ These pages are accessible within the panel for server provisioning and manageme
 		<menu>My Orders</menu>
 	</page>
 	
+	<page key="admin_game_defaults" file="admin_game_defaults.php" access="admin">
+		<menu>Game Mod Defaults</menu>
+	</page>
+	
 	<page key="admin_orders" file="admin_orders.php" access="admin">
 		<menu>Manage All Orders</menu>
 	</page>

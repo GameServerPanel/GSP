@@ -25,7 +25,7 @@
 // Module general information
 $module_title = "billing";
 $module_version = "3.6";
-$db_version = 7;
+$db_version = 8;
 $module_required = FALSE;
 // Module description
 $module_description = "Billing storefront / provisioning integration. Public ordering runs as a standalone site; panel pages provide provisioning and admin order management.";
@@ -419,6 +419,41 @@ $install_queries[7] = array(
         $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXbilling_invoices' AND COLUMN_NAME = 'period_end'");
         if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
         return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXbilling_invoices` ADD `period_end` DATETIME NULL AFTER `period_start`");
+    },
+);
+
+// -----------------------------------------------------------------------
+// db_version 8 — Provisioning error logging and default mod/build support.
+//   (a) billing_provisioning_errors: records every failed auto-provision
+//       attempt so admins can diagnose port/mod issues without digging
+//       through PHP logs.
+//   (b) config_mods.is_default_for_billing: admins can mark exactly one
+//       mod/build per game as the automatic billing install default.
+// Both changes are safe to re-run (IF NOT EXISTS / INFORMATION_SCHEMA).
+// -----------------------------------------------------------------------
+$install_queries[8] = array(
+    // (a) Create billing_provisioning_errors table
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."billing_provisioning_errors` (
+        `error_id`           INT(11)      NOT NULL AUTO_INCREMENT,
+        `billing_order_id`   INT(11)      NOT NULL DEFAULT 0,
+        `home_id`            INT(11)      NOT NULL DEFAULT 0,
+        `user_id`            INT(11)      NOT NULL DEFAULT 0,
+        `remote_server_id`   INT(11)      NOT NULL DEFAULT 0,
+        `ip_id`              INT(11)      NOT NULL DEFAULT 0,
+        `attempted_port`     INT(11)      NOT NULL DEFAULT 0,
+        `mod_cfg_id`         INT(11)      NOT NULL DEFAULT 0,
+        `failure_message`    TEXT         NOT NULL,
+        `created_at`         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (`error_id`),
+        KEY `billing_order_id` (`billing_order_id`),
+        KEY `created_at`       (`created_at`)
+    ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;",
+
+    // (b) Add is_default_for_billing to config_mods if missing
+    function($db) {
+        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXconfig_mods' AND COLUMN_NAME = 'is_default_for_billing'");
+        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
+        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXconfig_mods` ADD `is_default_for_billing` TINYINT(1) NOT NULL DEFAULT 0");
     },
 );
 
