@@ -27,6 +27,45 @@ if (!function_exists('billing_invoke_provision')) {
 	}
 }
 
+/**
+ * Log a provisioning failure to billing_provisioning_errors.
+ * All parameters are sanitised inside this function.
+ */
+if (!function_exists('billing_log_provision_error')) {
+	function billing_log_provision_error(
+		$db,
+		string $db_prefix,
+		int $billing_order_id,
+		int $home_id,
+		int $user_id,
+		int $remote_server_id,
+		int $ip_id,
+		int $attempted_port,
+		int $mod_cfg_id,
+		string $failure_message
+	): void {
+		try {
+			$db->query(
+				"INSERT INTO `{$db_prefix}billing_provisioning_errors`
+				 (`billing_order_id`,`home_id`,`user_id`,`remote_server_id`,`ip_id`,`attempted_port`,`mod_cfg_id`,`failure_message`,`created_at`)
+				 VALUES ("
+				. intval($billing_order_id) . ","
+				. intval($home_id) . ","
+				. intval($user_id) . ","
+				. intval($remote_server_id) . ","
+				. intval($ip_id) . ","
+				. intval($attempted_port) . ","
+				. intval($mod_cfg_id) . ","
+				. "'" . $db->realEscapeSingle($failure_message) . "',"
+				. "NOW())"
+			);
+		} catch (Throwable $e) {
+			// Never let logging itself break provisioning
+			error_log('billing_log_provision_error: ' . $e->getMessage());
+		}
+	}
+}
+
 function exec_ogp_module()
 {
 	global $db,$view,$settings,$table_prefix;
@@ -183,24 +222,144 @@ function exec_ogp_module()
 				$extra_params = "";//no extra params defined by default
 				$cpu_affinity = "NA";//Affinity to one core/thread of the cpu by number, use NA to disable it
 				$nice = "0";//Min priority=19 Max Priority=-19
-				
+
+				// ---------------------------------------------------------------
+				// Resolve IP: find the first IP address configured for this
+				// remote server.  The order.ip column stores remote_server_id.
+				// ---------------------------------------------------------------
+				$resolved_remote_server_id = intval($remote_server_id);
+				$ip_id = null;
+				$ipRows = $db->resultQuery(
+					"SELECT ip_id FROM `{$db_prefix}remote_server_ips`
+					 WHERE remote_server_id=" . $resolved_remote_server_id . "
+					 ORDER BY ip_id ASC LIMIT 1"
+				);
+				if (!empty($ipRows[0]['ip_id'])) {
+					$ip_id = intval($ipRows[0]['ip_id']);
+				}
+				if ($ip_id === null) {
+					$errMsg = "No IP address configured for remote server ID {$resolved_remote_server_id} (order_id={$order_id}). "
+					        . "Please add an IP to that remote server in the panel.";
+					billing_log_provision_error($db, $db_prefix, intval($order_id), 0, intval($user_id), $resolved_remote_server_id, 0, 0, intval($mod_cfg_id), $errMsg);
+					echo "<div class='failure'><p><strong>Provisioning failed for order #" . intval($order_id) . ":</strong> " . htmlspecialchars($errMsg) . "</p></div>";
+					$failed_count++;
+					continue;
+				}
+
+				// ---------------------------------------------------------------
+				// Resolve mod/build in priority order:
+				//   1. Explicit mod_cfg_id from billing_services (if > 0 and valid)
+				//   2. Admin-configured is_default_for_billing on config_mods
+				//   3. Only one mod available for this game — use it automatically
+				//   4. Fail gracefully with an admin-visible error
+				// ---------------------------------------------------------------
+				$resolved_mod_cfg_id = null;
+
+				if (!empty($mod_cfg_id) && intval($mod_cfg_id) > 0) {
+					$modCheck = $db->resultQuery(
+						"SELECT mod_cfg_id FROM `{$db_prefix}config_mods`
+						 WHERE mod_cfg_id=" . intval($mod_cfg_id) . "
+						   AND home_cfg_id=" . intval($home_cfg_id)
+					);
+					if (!empty($modCheck[0]['mod_cfg_id'])) {
+						$resolved_mod_cfg_id = intval($modCheck[0]['mod_cfg_id']);
+					}
+				}
+
+				if ($resolved_mod_cfg_id === null) {
+					$defaultModRow = $db->resultQuery(
+						"SELECT mod_cfg_id FROM `{$db_prefix}config_mods`
+						 WHERE home_cfg_id=" . intval($home_cfg_id) . "
+						   AND is_default_for_billing=1
+						 LIMIT 1"
+					);
+					if (!empty($defaultModRow[0]['mod_cfg_id'])) {
+						$resolved_mod_cfg_id = intval($defaultModRow[0]['mod_cfg_id']);
+					}
+				}
+
+				if ($resolved_mod_cfg_id === null) {
+					$allMods = $db->resultQuery(
+						"SELECT mod_cfg_id FROM `{$db_prefix}config_mods`
+						 WHERE home_cfg_id=" . intval($home_cfg_id)
+					);
+					if (!empty($allMods) && count($allMods) === 1) {
+						$resolved_mod_cfg_id = intval($allMods[0]['mod_cfg_id']);
+					}
+				}
+
+				if ($resolved_mod_cfg_id === null) {
+					$errMsg = "No default mod/build configured for game type (home_cfg_id={$home_cfg_id}, order_id={$order_id}). "
+					        . "Visit Admin -> Game Defaults to mark a mod/build as the billing default.";
+					billing_log_provision_error($db, $db_prefix, intval($order_id), 0, intval($user_id), $resolved_remote_server_id, $ip_id, 0, 0, $errMsg);
+					echo "<div class='failure'><p><strong>Provisioning failed for order #" . intval($order_id) . ":</strong> " . htmlspecialchars($errMsg) . "</p></div>";
+					$failed_count++;
+					continue;
+				}
+
+				// Use resolved values for the rest of the provisioning flow
+				$mod_cfg_id = $resolved_mod_cfg_id;
+
 				//Add Game home to database
 				//HARD CODE TO /home/gameserver/
-				$rserver = $db->getRemoteServer($remote_server_id);
+				$rserver = $db->getRemoteServer($resolved_remote_server_id);
 				$game_path = "/home/gameserver/";
-				$home_id = $db->addGameHome( $remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
-				
-				//Add IP:Port Pair to the Game Home
-			//need to get the IP_ID for this remote server.
-				$result = $db->resultQuery("SELECT ip_id FROM `{$db_prefix}remote_server_ips` WHERE remote_server_id=".$ip);
-			    	foreach ((array)$result as $rs)
-			{
-				$ip_id = $rs['ip_id'];
-			}
-				$add_port = $db->addGameIpPort( $home_id, $ip_id, $db->getNextAvailablePort($ip_id,$home_cfg_id) );
+				$home_id = $db->addGameHome( $resolved_remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
+
+				if (!$home_id) {
+					$errMsg = "Failed to create game home record for order_id={$order_id}, user_id={$user_id}, home_cfg_id={$home_cfg_id}.";
+					billing_log_provision_error($db, $db_prefix, intval($order_id), 0, intval($user_id), $resolved_remote_server_id, $ip_id, 0, $mod_cfg_id, $errMsg);
+					echo "<div class='failure'><p><strong>Provisioning failed for order #" . intval($order_id) . ":</strong> " . htmlspecialchars($errMsg) . "</p></div>";
+					$failed_count++;
+					continue;
+				}
+
+				// ---------------------------------------------------------------
+				// Assign next available port to the new server home.
+				// ---------------------------------------------------------------
+				$next_port = $db->getNextAvailablePort($ip_id, $home_cfg_id);
+				if ($next_port === false || $next_port === null) {
+					$errMsg = "No available port for ip_id={$ip_id}, home_cfg_id={$home_cfg_id} (order_id={$order_id}). "
+					        . "Configure a port range for this IP/game type in the panel.";
+					$db->deleteGameHome($home_id);
+					billing_log_provision_error($db, $db_prefix, intval($order_id), 0, intval($user_id), $resolved_remote_server_id, $ip_id, 0, $mod_cfg_id, $errMsg);
+					echo "<div class='failure'><p><strong>Provisioning failed for order #" . intval($order_id) . ":</strong> " . htmlspecialchars($errMsg) . "</p></div>";
+					$failed_count++;
+					continue;
+				}
+
+				$add_port = $db->addGameIpPort($home_id, $ip_id, $next_port);
+				if (!$add_port) {
+					$errMsg = "Failed to assign port {$next_port} to home_id={$home_id} (ip_id={$ip_id}, order_id={$order_id}).";
+					$db->deleteGameHome($home_id);
+					billing_log_provision_error($db, $db_prefix, intval($order_id), 0, intval($user_id), $resolved_remote_server_id, $ip_id, $next_port, $mod_cfg_id, $errMsg);
+					echo "<div class='failure'><p><strong>Provisioning failed for order #" . intval($order_id) . ":</strong> " . htmlspecialchars($errMsg) . "</p></div>";
+					$failed_count++;
+					continue;
+				}
 				
 				//Assign the Game Mod to the Game Home
 				$mod_id = $db->addModToGameHome( $home_id, $mod_cfg_id );
+				if (!$mod_id) {
+					$errMsg = "Failed to assign mod_cfg_id={$mod_cfg_id} to home_id={$home_id} (order_id={$order_id}). The mod may already be assigned or does not exist.";
+					// Try to recover the mod_id if it already exists (e.g. duplicate provisioning attempt)
+					$existingMod = $db->resultQuery(
+						"SELECT mod_id FROM `{$db_prefix}game_mods`
+						 WHERE home_id=" . intval($home_id) . "
+						   AND mod_cfg_id=" . intval($mod_cfg_id) . "
+						 LIMIT 1"
+					);
+					if (!empty($existingMod[0]['mod_id'])) {
+						$mod_id = intval($existingMod[0]['mod_id']);
+					} else {
+						$db->delGameIpPort($home_id, $ip_id, $next_port);
+						$db->deleteGameHome($home_id);
+						billing_log_provision_error($db, $db_prefix, intval($order_id), intval($home_id), intval($user_id), $resolved_remote_server_id, $ip_id, $next_port, $mod_cfg_id, $errMsg);
+						echo "<div class='failure'><p><strong>Provisioning failed for order #" . intval($order_id) . ":</strong> " . htmlspecialchars($errMsg) . "</p></div>";
+						$failed_count++;
+						continue;
+					}
+				}
 				$db->updateGameModParams( $max_players, $extra_params, $cpu_affinity, $nice, $home_id, $mod_cfg_id );
 				$db->assignHomeTo( "user", $user_id, $home_id, $access_rights );
 				
@@ -368,8 +527,8 @@ function exec_ogp_module()
 					$current_end = time(); // fallback to now if date is invalid
 				}
                 $end_date = strtotime('+'.$order['qty'].' year', $current_end); 
-				
-				}	
+			
+			}	
 				
 			}
 			if (!isset($end_date_str)) {
@@ -445,5 +604,3 @@ function exec_ogp_module()
 	);
 }
 ?>
-
-
