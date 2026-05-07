@@ -73,6 +73,9 @@ function exec_ogp_module()
             case 'queue_update':
                 sw_user_queue_update($db, $home_id);
                 break;
+            case 'save_settings':
+                sw_user_save_settings($db, $home_id);
+                break;
         }
     }
 
@@ -293,6 +296,23 @@ function sw_user_queue_update($db, $home_id)
     sw_success('All enabled mods queued for update. Run the agent to process downloads.');
 }
 
+function sw_user_save_settings($db, $home_id)
+{
+    $ok = sw_save_server_settings($db, $home_id, array(
+        'update_mode'       => $_POST['update_mode']       ?? 'manual',
+        'restart_behavior'  => $_POST['restart_behavior']  ?? 'none',
+        'hot_load'          => $_POST['hot_load']          ?? 'disabled',
+        'warning_minutes'   => $_POST['warning_minutes']   ?? 10,
+        'schedule_interval' => $_POST['schedule_interval'] ?? 'daily',
+    ));
+
+    if ($ok) {
+        sw_success('Workshop behavior settings saved.');
+    } else {
+        sw_error('Failed to save settings.');
+    }
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Render
 // ─────────────────────────────────────────────────────────────────────────
@@ -300,6 +320,7 @@ function sw_user_queue_update($db, $home_id)
 function sw_user_render($db, $home_id, array $home, array $profile)
 {
     $mods = sw_get_server_mods($db, $home_id) ?: array();
+    $settings = sw_get_server_settings($db, $home_id);
 
     // Generate launch params from enabled mods
     $enabled_mods = array_filter($mods, function ($m) {
@@ -529,6 +550,122 @@ function sw_user_render($db, $home_id, array $home, array $profile)
           onclick="return confirm('Queue all enabled mods for update?');">
     Queue Update for All Enabled Mods
   </button>
+</form>
+
+<hr>
+
+<!-- Workshop Behavior Settings -->
+<h3>Workshop Behavior Settings</h3>
+<p style="color:#888;font-size:0.9em;">
+  Configure how Workshop mods are installed and updated for this server.
+  All options default to the safest setting (manual only, no automatic restarts).
+</p>
+
+<form method="post" action="<?= sw_h($base_url) ?>">
+  <input type="hidden" name="action" value="save_settings">
+
+  <table style="border-collapse:collapse;width:100%;max-width:720px;">
+    <colgroup>
+      <col style="width:220px;">
+      <col>
+      <col style="width:340px;">
+    </colgroup>
+    <thead>
+      <tr style="background:#f0f0f0;">
+        <th style="padding:6px 8px;text-align:left;">Setting</th>
+        <th style="padding:6px 8px;text-align:left;">Value</th>
+        <th style="padding:6px 8px;text-align:left;">Help</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr style="border-bottom:1px solid #ddd;">
+        <td style="padding:8px;font-weight:bold;">Install / Update Mode</td>
+        <td style="padding:8px;">
+          <select name="update_mode" style="width:100%;">
+            <option value="manual"      <?= ($settings['update_mode'] === 'manual')       ? 'selected' : '' ?>>Manual only</option>
+            <option value="on_restart"  <?= ($settings['update_mode'] === 'on_restart')   ? 'selected' : '' ?>>On next server restart</option>
+            <option value="before_start"<?= ($settings['update_mode'] === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
+            <option value="scheduled"   <?= ($settings['update_mode'] === 'scheduled')    ? 'selected' : '' ?>>Scheduled update check</option>
+          </select>
+        </td>
+        <td style="padding:8px;font-size:0.85em;color:#555;">
+          <strong>Manual only</strong> – mods are only updated when you click &ldquo;Queue Update&rdquo; above.<br>
+          <strong>On next restart</strong> – queued updates are applied the next time the server restarts.<br>
+          <strong>Before every start</strong> – the update check runs automatically each time the server starts.<br>
+          <strong>Scheduled</strong> – the update check runs on the interval set below (requires cron / agent).
+        </td>
+      </tr>
+
+      <tr style="border-bottom:1px solid #ddd;">
+        <td style="padding:8px;font-weight:bold;">Restart Behavior</td>
+        <td style="padding:8px;">
+          <select name="restart_behavior" style="width:100%;">
+            <option value="none"         <?= ($settings['restart_behavior'] === 'none')         ? 'selected' : '' ?>>Do not restart automatically</option>
+            <option value="if_empty"     <?= ($settings['restart_behavior'] === 'if_empty')     ? 'selected' : '' ?>>Restart only if server is empty</option>
+            <option value="immediate"    <?= ($settings['restart_behavior'] === 'immediate')    ? 'selected' : '' ?>>Restart immediately after warning</option>
+            <option value="next_restart" <?= ($settings['restart_behavior'] === 'next_restart') ? 'selected' : '' ?>>Install on next manual restart only</option>
+          </select>
+        </td>
+        <td style="padding:8px;font-size:0.85em;color:#555;">
+          Controls what happens when new mod updates are found.<br>
+          <strong>Do not restart</strong> – updates are staged but the server keeps running (safe default).<br>
+          <strong>If empty</strong> – the server is restarted only when there are zero players connected.<br>
+          <strong>Immediate with warning</strong> – a countdown warning is broadcast, then the server restarts.<br>
+          <strong>Next manual restart</strong> – updates are installed the next time you manually stop/start the server.
+        </td>
+      </tr>
+
+      <tr style="border-bottom:1px solid #ddd;">
+        <td style="padding:8px;font-weight:bold;">Hot-Load</td>
+        <td style="padding:8px;">
+          <select name="hot_load" style="width:100%;">
+            <option value="disabled" <?= ($settings['hot_load'] === 'disabled') ? 'selected' : '' ?>>Disabled</option>
+            <option value="attempt"  <?= ($settings['hot_load'] === 'attempt')  ? 'selected' : '' ?>>Attempt hot-load if game supports it</option>
+          </select>
+        </td>
+        <td style="padding:8px;font-size:0.85em;color:#555;">
+          <strong>Disabled</strong> – no hot-loading; mod changes take effect only after a server restart (safe default).<br>
+          <strong>Attempt</strong> – if the game supports live mod reloading (e.g. via RCON), try to hot-load instead of restarting.
+        </td>
+      </tr>
+
+      <tr style="border-bottom:1px solid #ddd;">
+        <td style="padding:8px;font-weight:bold;">Warning Countdown</td>
+        <td style="padding:8px;">
+          <input type="number" name="warning_minutes" min="1" max="120"
+                 value="<?= (int)$settings['warning_minutes'] ?>"
+                 style="width:80px;"> minutes
+        </td>
+        <td style="padding:8px;font-size:0.85em;color:#555;">
+          Minutes of advance warning broadcast to players before an automatic restart.<br>
+          Only used when <em>Restart Behavior</em> is set to <strong>Restart immediately after warning</strong>.<br>
+          Default: 10 minutes.
+        </td>
+      </tr>
+
+      <tr style="border-bottom:1px solid #ddd;">
+        <td style="padding:8px;font-weight:bold;">Scheduled Check Interval</td>
+        <td style="padding:8px;">
+          <select name="schedule_interval" style="width:100%;">
+            <option value="hourly" <?= ($settings['schedule_interval'] === 'hourly') ? 'selected' : '' ?>>Hourly</option>
+            <option value="daily"  <?= ($settings['schedule_interval'] === 'daily')  ? 'selected' : '' ?>>Daily (default)</option>
+            <option value="weekly" <?= ($settings['schedule_interval'] === 'weekly') ? 'selected' : '' ?>>Weekly</option>
+          </select>
+        </td>
+        <td style="padding:8px;font-size:0.85em;color:#555;">
+          How often the scheduled update check runs.<br>
+          Only used when <em>Install / Update Mode</em> is set to <strong>Scheduled update check</strong>.<br>
+          Requires the Workshop agent to be running via cron on the game server host.
+        </td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <p style="margin-top:12px;">
+    <button type="submit" class="button">Save Behavior Settings</button>
+  </p>
 </form>
 
 <?php

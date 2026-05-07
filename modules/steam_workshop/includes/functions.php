@@ -342,6 +342,82 @@ function sw_generate_launch_params(array $mods, array $profile)
     );
 }
 
+// ── Server behavior settings helpers ─────────────────────────────────────
+
+/**
+ * Return the workshop behavior settings row for a home, or an array of
+ * safe defaults when no row exists yet.
+ *
+ * @param  OGPDatabase $db
+ * @param  int         $home_id
+ * @return array
+ */
+function sw_get_server_settings($db, $home_id)
+{
+    $home_id = (int)$home_id;
+    $rows = $db->resultQuery(
+        "SELECT * FROM " . sw_table('steam_workshop_server_settings') . "
+          WHERE `home_id` = $home_id LIMIT 1"
+    );
+    if ($rows && isset($rows[0])) {
+        return $rows[0];
+    }
+    // Safe defaults – manual only, no automatic restarts, hot-load off
+    return array(
+        'home_id'           => $home_id,
+        'update_mode'       => 'manual',
+        'restart_behavior'  => 'none',
+        'hot_load'          => 'disabled',
+        'warning_minutes'   => 10,
+        'schedule_interval' => 'daily',
+    );
+}
+
+/**
+ * Upsert the workshop behavior settings for a server home.
+ *
+ * @param  OGPDatabase $db
+ * @param  int         $home_id
+ * @param  array       $data  keys: update_mode, restart_behavior, hot_load,
+ *                             warning_minutes, schedule_interval
+ * @return bool
+ */
+function sw_save_server_settings($db, $home_id, array $data)
+{
+    $home_id = (int)$home_id;
+
+    $valid_update_modes      = array('manual', 'on_restart', 'before_start', 'scheduled');
+    $valid_restart_behaviors = array('none', 'if_empty', 'immediate', 'next_restart');
+    $valid_hot_load          = array('disabled', 'attempt');
+    $valid_intervals         = array('hourly', 'daily', 'weekly');
+
+    $update_mode      = in_array($data['update_mode']      ?? '', $valid_update_modes,      true) ? $data['update_mode']      : 'manual';
+    $restart_behavior = in_array($data['restart_behavior'] ?? '', $valid_restart_behaviors, true) ? $data['restart_behavior'] : 'none';
+    $hot_load         = in_array($data['hot_load']         ?? '', $valid_hot_load,          true) ? $data['hot_load']         : 'disabled';
+    $warning_minutes  = max(1, min(120, (int)($data['warning_minutes'] ?? 10)));
+    $schedule_interval = in_array($data['schedule_interval'] ?? '', $valid_intervals, true) ? $data['schedule_interval'] : 'daily';
+
+    $safe_um  = $db->realEscapeSingle($update_mode);
+    $safe_rb  = $db->realEscapeSingle($restart_behavior);
+    $safe_hl  = $db->realEscapeSingle($hot_load);
+    $safe_si  = $db->realEscapeSingle($schedule_interval);
+
+    return (bool)$db->query(
+        "INSERT INTO " . sw_table('steam_workshop_server_settings') . "
+           (`home_id`, `update_mode`, `restart_behavior`, `hot_load`,
+            `warning_minutes`, `schedule_interval`, `created_at`, `updated_at`)
+         VALUES ($home_id, '$safe_um', '$safe_rb', '$safe_hl',
+                 $warning_minutes, '$safe_si', NOW(), NOW())
+         ON DUPLICATE KEY UPDATE
+           `update_mode`       = '$safe_um',
+           `restart_behavior`  = '$safe_rb',
+           `hot_load`          = '$safe_hl',
+           `warning_minutes`   = $warning_minutes,
+           `schedule_interval` = '$safe_si',
+           `updated_at`        = NOW()"
+    );
+}
+
 // ── Output helpers ────────────────────────────────────────────────────────
 
 /**
