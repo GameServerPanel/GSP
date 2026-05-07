@@ -85,7 +85,7 @@ if ($couponCode !== '') {
 // Calculate total and verify it is $0 after discount
 $totalAmountCents = 0;
 foreach ($invoices as $inv) {
-    $lineAmount = (float)($inv['amount'] ?? 0);
+    $lineAmount = (float)($inv['total_due'] ?? $inv['amount'] ?? 0);
     $totalAmountCents += billing_free_money_to_cents($lineAmount);
 }
 $discountAmountCents = (int) round($totalAmountCents * ($discountPct / 100.0));

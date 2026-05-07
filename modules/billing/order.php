@@ -4,6 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Server - GameServers.World</title>
+    <link rel="stylesheet" href="css/header.css">
+    <style>
+        body { margin: 0; padding: 0; }
+        .order-shell { width: min(1100px, 100% - 24px); margin: 20px auto 28px; }
+        .order-catalog-item { margin: 0 0 20px; }
+        .order-layout { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+        .order-media { flex: 0 1 310px; max-width: 100%; }
+        .order-media img { width: 100%; max-width: 280px; height: auto; border-radius: 8px; display: block; }
+        .order-media-title { margin: 10px 0 6px; text-align: center; }
+        .order-media-desc { color: #c6c6c6; max-width: 100%; word-break: break-word; }
+        .order-form-card { flex: 1 1 500px; max-width: 100%; background: rgba(0,0,0,0.25); border-radius: 10px; padding: 14px; }
+        .order-form-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .order-form-table td { padding: 8px 6px; vertical-align: top; }
+        .order-form-table td:first-child { width: 34%; }
+        .order-form-table input[type="text"],
+        .order-form-table input[type="number"],
+        .order-form-table select,
+        .order-form-table textarea {
+            width: 100%;
+            min-height: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 10px;
+        }
+        .order-form-table input[type="radio"] { margin-right: 8px; }
+        .location-option { margin-bottom: 8px; }
+        .slidecontainer { max-width: 100%; }
+        .slidecontainer .slider { width: 100%; }
+        .order-pricing { line-height: 1.5; word-break: break-word; }
+        .order-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .order-actions .gsw-btn,
+        .order-actions .gsw-btn-secondary { width: auto; }
+        .order-back-form { margin: 0; }
+
+        @media (max-width: 768px) {
+            .order-shell { width: min(100%, calc(100% - 16px)); margin: 12px auto 20px; }
+            .order-layout { gap: 12px; }
+            .order-media { flex: 1 1 100%; display: flex; flex-direction: column; align-items: center; }
+            .order-media img { max-width: min(100%, 260px); }
+            .order-form-card { flex: 1 1 100%; padding: 10px; }
+            .order-form-table,
+            .order-form-table tbody,
+            .order-form-table tr,
+            .order-form-table td { display: block; width: 100%; }
+            .order-form-table td:first-child { width: 100%; padding-bottom: 2px; }
+            .order-form-table td { padding: 6px 4px; }
+            .order-actions { flex-direction: column; }
+            .order-actions .gsw-btn,
+            .order-actions .gsw-btn-secondary { width: 100%; text-align: center; }
+        }
+    </style>
 </head>
 <body>
 <?php
@@ -143,6 +194,7 @@ if ($osColCheck && $osColCheck->num_rows > 0) {
 }
 
 ?>
+<div class="order-shell">
 <div class="clearfix">
 <?php
 foreach ($serviceRows as $row)
@@ -150,7 +202,7 @@ foreach ($serviceRows as $row)
 if (!isset($_REQUEST['service_id']))
 {
 ?>
-<div class="float-left p-30-20">
+<div class="float-left p-30-20 order-catalog-item">
 <?php
 $imgSrc = billing_image_url((string)($row['img_url'] ?? ''));
 if ($imgSrc === '') { $imgSrc = '/images/games/default_server.png'; }
@@ -216,14 +268,15 @@ $osServiceMap[$svcGameOs] = (int)$row['service_id'];
 $osServiceMapJson = json_encode($osServiceMap, JSON_THROW_ON_ERROR);
 
 ?>
-<div class="float-left decorative-bottom">
+<div class="order-layout">
+<div class="order-media decorative-bottom">
 <?php
 $imgSrc = billing_image_url((string)($row['img_url'] ?? ''));
 if ($imgSrc === '') { $imgSrc = '/images/games/default_server.png'; }
 ?>
-<img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" width="230" height="112"
+<img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($canonicalGameName, ENT_QUOTES, 'UTF-8'); ?>"
      onerror="this.src='/images/games/default_server.png'; this.onerror=null;">
-<center><b><?php echo htmlspecialchars($canonicalGameName, ENT_QUOTES, 'UTF-8'); ?></b></center>
+<center class="order-media-title"><b><?php echo htmlspecialchars($canonicalGameName, ENT_QUOTES, 'UTF-8'); ?></b></center>
 <?php
 $isAdmin = false;
 if ($isAdmin) {
@@ -242,16 +295,20 @@ echo "<form action='' method='post'>"
    . "</form>";
 }
 } else {
-echo "<p style='color:gray;width:280px;'>" . htmlspecialchars((string)($row['description'] ?? ''), ENT_QUOTES, 'UTF-8') . "</p>";
+echo "<p class='order-media-desc'>" . htmlspecialchars((string)($row['description'] ?? ''), ENT_QUOTES, 'UTF-8') . "</p>";
 }
 ?>
 </div>
-<table class="float-left">
+<div class="order-form-card">
+<table class="order-form-table">
 <form method="post" action="add_to_cart.php">
     <!-- service_id is updated by JS when the location OS changes -->
     <input type="hidden" id="order_service_id" name="service_id" value="<?php echo intval($row['service_id']); ?>">
+    <input type="hidden" name="display_service_id" value="<?php echo intval($row['service_id']); ?>">
     <input type="hidden" name="remote_control_password" value="">
-<input type="hidden" name="ftp_password" value="">
+    <input type="hidden" name="ftp_password" value="">
+    <input type="hidden" name="display_rate" id="displayRateInput" value="<?php echo number_format(floatval($row['price_monthly']), 2, '.', ''); ?>">
+    <input type="hidden" name="calculated_total" id="calculatedTotalInput" value="">
 <tr>
 <td align="right"><b>Game Server Name</b> </td>
 <td align="left">
@@ -318,7 +375,7 @@ continue; // Incompatible OS variant with no fallback service
 $available_server = true;
 $firstServer = false;
 $safeOs = htmlspecialchars($rsOs, ENT_QUOTES, 'UTF-8');
-echo "<div>\n"
+echo "<div class='location-option'>\n"
    . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' data-os='{$safeOs}' required{$checked} onchange='gspUpdateServiceId(this)'>\n"
    . "  <label for='rs_{$rsID}'>{$rsNAME}</label>\n"
    . "</div>\n";
@@ -338,7 +395,7 @@ $rsResult->free();
  <center><b>Months</b></center>
  <input type="range" name="qty" min="1" max="24" value="1" class="slider" id="invoiceRange">
 
-<p>Player Slots: <span id="playerSlots"></span><br>
+<p class="order-pricing">Player Slots: <span id="playerSlots"></span><br>
 <span>Price: $<?php echo number_format(floatval($row['price_monthly']), 2); ?> USD</span><br>
 <span id="invoiceDuration"></span><br>
 <span id="totalPrice"></span></p>
@@ -361,7 +418,12 @@ var slots = parseInt(slider.value, 10);
 var months = parseInt(invoiceslider.value, 10);
 output.innerHTML = slots;
 invoiceDuration.innerHTML = "Duration: " + months + " month" + (months !== 1 ? "s" : "");
-price.innerHTML = "Total Price: $" + (slots * months * pricePerSlot).toFixed(2);
+var total = (slots * months * pricePerSlot).toFixed(2);
+price.innerHTML = "Total Price: $" + total;
+var totalInput = document.getElementById("calculatedTotalInput");
+if (totalInput) {
+totalInput.value = total;
+}
 }
 recalc();
 slider.oninput = recalc;
@@ -398,7 +460,9 @@ if (checked) { window.gspUpdateServiceId(checked); }
 $is_logged_in = (isset($_SESSION['website_user_id']) && !empty($_SESSION['website_user_id'])) || (isset($_SESSION['website_username']) && !empty($_SESSION['website_username']));
 ?>
 <?php if ($available_server && $is_logged_in): ?>
+<div class="order-actions">
 <button type="submit" name="add_to_cart" class="gsw-btn">Add to Cart</button>
+</div>
 <?php elseif (!$is_logged_in): ?>
 <div class="login-placeholder">Please <a href="login.php">login</a> to order</div>
 <?php else: ?>
@@ -409,16 +473,21 @@ $is_logged_in = (isset($_SESSION['website_user_id']) && !empty($_SESSION['websit
 </tr>
 <tr>
 <td align="left" colspan="2">
-<form action="serverlist.php" method="GET">
+<form action="serverlist.php" method="GET" class="order-back-form">
+<div class="order-actions">
 <button class="gsw-btn-secondary">Back to List</button>
+</div>
 </form>
 </td>
 </tr>
 </table>
+</div>
+</div>
 <?php
 }
 }
 ?>
+</div>
 </div>
 <?php
 // Close database connection

@@ -54,6 +54,35 @@ function billing_cents_to_money(int $cents): float
     return $cents / 100;
 }
 
+function billing_rate_from_service(mysqli $db, string $table_prefix, int $service_id, string $rate_type): float
+{
+    if ($service_id <= 0) {
+        return 0.0;
+    }
+
+    $stmt = $db->prepare("SELECT price_daily, price_monthly, price_year FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
+    if (!$stmt) {
+        return 0.0;
+    }
+
+    $stmt->bind_param('i', $service_id);
+    $stmt->execute();
+    $stmt->bind_result($price_daily, $price_monthly, $price_year);
+    $rate = 0.0;
+    if ($stmt->fetch()) {
+        if ($rate_type === 'daily') {
+            $rate = floatval($price_daily);
+        } elseif ($rate_type === 'yearly') {
+            $rate = floatval($price_year);
+        } else {
+            $rate = floatval($price_monthly);
+        }
+    }
+    $stmt->close();
+
+    return $rate;
+}
+
 function billing_fail_add_to_cart(string $message, array $context = []): void
 {
     site_log_error('add_to_cart_failed', array_merge(['message' => $message], $context));
@@ -97,6 +126,9 @@ $ip_id = isset($_POST['ip_id']) ? intval($_POST['ip_id']) : 0;
 $max_players = isset($_POST['max_players']) ? intval($_POST['max_players']) : 0;
 $qty = isset($_POST['qty']) ? intval($_POST['qty']) : 1;
 $invoice_duration = isset($_POST['invoice_duration']) ? $_POST['invoice_duration'] : 'month';
+$display_service_id = isset($_POST['display_service_id']) ? intval($_POST['display_service_id']) : 0;
+$display_rate = isset($_POST['display_rate']) ? floatval($_POST['display_rate']) : 0.0;
+$posted_total = isset($_POST['calculated_total']) ? floatval($_POST['calculated_total']) : 0.0;
 $remote_control_password = isset($_POST['remote_control_password']) ? trim((string)$_POST['remote_control_password']) : '';
 $ftp_password = isset($_POST['ftp_password']) ? trim((string)$_POST['ftp_password']) : '';
 
@@ -168,6 +200,17 @@ if ($service_id > 0) {
     }
 }
 
+if ($base_rate <= 0 && $display_service_id > 0) {
+    $fallback_rate = billing_rate_from_service($db, $table_prefix, $display_service_id, $durationInfo['rate_type']);
+    if ($fallback_rate > 0) {
+        $base_rate = $fallback_rate;
+    }
+}
+
+if ($base_rate <= 0 && $display_rate > 0) {
+    $base_rate = $display_rate;
+}
+
 if ($remote_control_password === '' || strcasecmp($remote_control_password, 'ChangeMe') === 0) {
     $remote_control_password = billing_generate_password();
 }
@@ -181,7 +224,12 @@ $status = 'due'; // Invoice status: due (unpaid), paid
 $payment_status = 'unpaid';
 $qty = max(1, $qty);
 $max_players = max(1, $max_players);
-$subtotal_cents = billing_money_to_cents((float)$base_rate * $max_players * $qty);
+$rate_per_player_cents = max(0, billing_money_to_cents($base_rate));
+$subtotal_cents = $rate_per_player_cents * $max_players * $qty;
+$posted_total_cents = max(0, billing_money_to_cents($posted_total));
+if ($subtotal_cents <= 0 && $posted_total_cents > 0 && $base_rate > 0) {
+    $subtotal_cents = $posted_total_cents;
+}
 $subtotal = billing_cents_to_money($subtotal_cents);
 $amount = $subtotal;
 $period_end = date('Y-m-d H:i:s', strtotime('+' . ($durationInfo['days'] * $qty) . ' days'));
