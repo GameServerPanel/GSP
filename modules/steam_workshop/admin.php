@@ -131,9 +131,9 @@ function sw_admin_save_profile($db)
     $posted_um  = $_POST['default_update_mode']      ?? 'manual';
     $posted_rb  = $_POST['default_restart_behavior'] ?? 'none';
     $posted_hl  = $_POST['default_hot_load']         ?? 'disabled';
-    $fields['default_update_mode']      = in_array($posted_um, $valid_update_modes,      true) ? $posted_um  : 'manual';
-    $fields['default_restart_behavior'] = in_array($posted_rb, $valid_restart_behaviors, true) ? $posted_rb  : 'none';
-    $fields['default_hot_load']         = in_array($posted_hl, $valid_hot_load,          true) ? $posted_hl  : 'disabled';
+    $fields['default_update_mode']      = in_array($posted_um, $valid_update_modes,      true) ? $posted_um : 'manual';
+    $fields['default_restart_behavior'] = in_array($posted_rb, $valid_restart_behaviors, true) ? $posted_rb : 'none';
+    $fields['default_hot_load']         = in_array($posted_hl, $valid_hot_load,          true) ? $posted_hl : 'disabled';
 
     $setParts = array();
     foreach ($fields as $col => $val) {

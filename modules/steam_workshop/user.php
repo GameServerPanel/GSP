@@ -585,7 +585,7 @@ function sw_user_render($db, $home_id, array $home, array $profile)
           <select name="update_mode" style="width:100%;">
             <option value="manual"      <?= ($settings['update_mode'] === 'manual')       ? 'selected' : '' ?>>Manual only</option>
             <option value="on_restart"  <?= ($settings['update_mode'] === 'on_restart')   ? 'selected' : '' ?>>On next server restart</option>
-            <option value="before_start"<?= ($settings['update_mode'] === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
+            <option value="before_start" <?= ($settings['update_mode'] === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
             <option value="scheduled"   <?= ($settings['update_mode'] === 'scheduled')    ? 'selected' : '' ?>>Scheduled update check</option>
           </select>
         </td>
