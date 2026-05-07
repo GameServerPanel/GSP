@@ -1,6 +1,19 @@
 /* Global font family - legible sans-serif stack */
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+#gsw-site {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 .gsw-top{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#fff;border-bottom:1px solid rgba(0,0,0,0.05);}
@@ -12,7 +25,7 @@ body {
 .gsw-header{display:flex;flex-direction:column;align-items:stretch;padding:0;background:transparent;margin-bottom:18px;}
 
 /* Top row: contains left (logo/title) and right (login) divs as separate blocks */
-#gsw-site .gsw-header-top{display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:12px 20px;background:#0b3b6f !important;backdrop-filter:blur(6px);box-shadow:0 2px 6px rgba(0,0,0,0.18);width:100%;}
+#gsw-site .gsw-header-top{display:flex;flex-direction:row;justify-content:space-between;align-items:center;padding:12px 20px;background:#0b3b6f !important;backdrop-filter:blur(6px);box-shadow:0 2px 6px rgba(0,0,0,0.18);width:100%;max-width:100%;}
 
 /* Left div: logo + title, takes up available space */
 #gsw-site .gsw-header-left{flex:1 1 auto;display:flex;align-items:center;font-weight:700;font-size:1.4rem;color:#fff;padding-left:8px;}
@@ -25,8 +38,8 @@ body {
 .gsw-header-left a{color:#fff;text-decoration:none;}
 
 /* Bottom row: centered navigation menu */
-#gsw-site .gsw-header-bottom{display:flex;justify-content:center;padding:10px 20px;background:#0b3b6f !important;width:100%;}
-.gsw-header-nav{display:flex;gap:22px;align-items:center;}
+#gsw-site .gsw-header-bottom{display:flex;justify-content:center;padding:10px 20px;background:#0b3b6f !important;width:100%;max-width:100%;}
+.gsw-header-nav{display:flex;gap:22px;align-items:center;max-width:100%;}
 .gsw-nav-link{color:#fff;text-decoration:none;font-size:0.98rem;transition:opacity 0.2s;padding:6px 8px;border-radius:6px;}
 .gsw-nav-link:hover{opacity:0.9;text-decoration:underline;background:rgba(255,255,255,0.03);}
 /* My Account link styling - larger font in middle of menu */
@@ -79,7 +92,7 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 .cart-total-value{padding:1rem 1.5rem; text-align:left; border-top:2px solid rgba(255,255,255,0.06); font-weight:600; color:#fff; font-size:1.1rem}
 
 /* Utility classes */
-.container-wide{width:100%; max-width:1000px; margin:28px auto;}
+.container-wide{width:100%; max-width:1000px; margin:28px auto; padding-inline:12px; box-sizing:border-box;}
 .panel{background:rgba(0,0,0,0.25); padding:16px; border-radius:8px}
 .muted{color:rgba(255,255,255,0.6)}
 .center{text-align:center}
@@ -243,12 +256,12 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 
     /* Navigation: wrap and stack for easier tapping */
     #gsw-site .gsw-header-bottom{padding:8px 12px}
-    .gsw-header-nav{flex-direction:column;align-items:stretch;gap:10px;width:100%}
+    .gsw-header-nav{flex-direction:column;align-items:stretch;gap:10px;width:100%;max-width:100%}
     .gsw-nav-link{display:block;padding:12px 10px;border-radius:8px}
     .gsw-nav-link-myaccount{font-size:1rem}
 
     /* Make main panel use full width with reduced padding */
-    .site-panel{padding:0.75rem;margin:8px;border-radius:0.5rem}
+    .site-panel{padding:0.75rem;margin:8px;border-radius:0.5rem;max-width:100%}
 
     /* Tables and cart spacing adjustments */
     .cart-table th, .cart-table td{padding:0.6rem 0.8rem}
@@ -264,7 +277,7 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
     .server-item{padding:12px}
 
     /* Forms: make inputs and action buttons full width */
-    .form-group input, .form-group textarea, .form-group select{width:100%;box-sizing:border-box}
+    .form-group input, .form-group textarea, .form-group select{width:100%;box-sizing:border-box;max-width:100%}
 
     /* Invoice items: stack label and amount for readability */
     .invoice-item{flex-direction:column;align-items:flex-start;gap:8px}
@@ -385,3 +398,26 @@ input, textarea, select, button { color: #fff; background: #11141f; border: 1px 
 #gsw-site .server-card img,
 .server-list img{max-width:100%;height:auto;display:block;object-fit:cover}
 
+#gsw-site img,
+#gsw-site video,
+#gsw-site iframe,
+#gsw-site canvas,
+#gsw-site svg {
+    max-width: 100%;
+    height: auto;
+}
+
+#gsw-site table {
+    max-width: 100%;
+}
+
+#gsw-site input,
+#gsw-site select,
+#gsw-site textarea,
+#gsw-site button,
+#gsw-site .btn,
+#gsw-site .gsw-btn,
+#gsw-site .gsw-btn-secondary {
+    max-width: 100%;
+    box-sizing: border-box;
+}

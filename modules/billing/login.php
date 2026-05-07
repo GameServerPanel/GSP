@@ -2,10 +2,6 @@
 // Start a separate session for the website (not the panel session)
 session_name("opengamepanel_web");
 session_start();
-// Enable error display for debugging the white screen issue. Remove or gate in production.
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 // We'll compute a site root below (up to /_website) and define a strict sanitizer after config is loaded
 
@@ -144,21 +140,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-sizing: border-box;
         }
         
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: block;
-            padding: 0; /* we'll handle padding in content wrapper */
+            margin: 0;
+            padding: 0;
         }
 
-        /* content area below the top/menu; aligns the login box to the right */
         .content{
             display:flex;
             align-items:center;
-            justify-content:flex-end;
-            min-height: calc(100vh - 140px); /* leave room for header/menu */
-            padding:20px;
+            justify-content:center;
+            min-height: calc(100vh - 220px);
+            padding: 24px 16px 32px;
         }
         
         .login-container {
@@ -167,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
             width: 100%;
             max-width: 420px;
-            padding: 40px;
+            padding: 32px 28px;
             border: 1px solid rgba(0,0,0,0.06);
         }
 
@@ -261,6 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .footer-links {
             margin-top: 24px;
             text-align: center;
+            word-break: break-word;
         }
         
         .footer-links a {
@@ -278,6 +282,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             color: #999;
             font-size: 0.85rem;
+        }
+
+        .login-links {
+            margin-top: 12px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px 10px;
+            line-height: 1.5;
+        }
+
+        .login-links a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                min-height: auto;
+                padding: 14px 10px 20px;
+            }
+
+            .login-container {
+                max-width: 100%;
+                padding: 20px 16px;
+                border-radius: 10px;
+            }
+
+            .login-header {
+                margin-bottom: 18px;
+            }
+
+            .login-header h1 {
+                font-size: 1.35rem;
+            }
+
+            .login-header p,
+            .form-group label,
+            .form-group input,
+            .btn-login {
+                font-size: 0.95rem;
+            }
+
+            .form-group {
+                margin-bottom: 14px;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+            }
+
+            .btn-login {
+                padding: 11px 12px;
+            }
         }
     </style>
 </head>
@@ -319,8 +382,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <button type="submit" name="login" class="btn-login">Sign In</button>
         </form>
-    <div class="center mt-12">
-            <a href="register.php">Register</a> | 
+        <div class="login-links">
+            <a href="register.php">Register</a>
+            <span aria-hidden="true">|</span>
             <a href="forgot_password.php">Forgot Password?</a>
         </div>
         
@@ -335,4 +399,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 <?php include(__DIR__ . '/includes/footer.php'); ?>
 </html>
-

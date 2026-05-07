@@ -317,11 +317,13 @@ $siteBase = $protocol . $host;
         }
         .cart-container {
             max-width: 900px;
-            margin: 40px auto;
+            margin: 24px auto;
             background: white;
-            padding: 30px;
+            padding: 24px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: min(100%, calc(100% - 24px));
+            box-sizing: border-box;
         }
         h1 {
             color: #333;
@@ -359,6 +361,7 @@ $siteBase = $protocol . $host;
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+            table-layout: fixed;
         }
         .cart-table th {
             background: #f8f9fa;
@@ -418,6 +421,7 @@ $siteBase = $protocol . $host;
             display: flex;
             gap: 10px;
             align-items: flex-end;
+            flex-wrap: wrap;
         }
         .coupon-form > div {
             flex: 1;
@@ -524,6 +528,86 @@ $siteBase = $protocol . $host;
         }
         .action-buttons {
             margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .cart-table-wrap {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        @media (max-width: 768px) {
+            .cart-container {
+                width: min(100%, calc(100% - 12px));
+                padding: 14px;
+                margin: 12px auto;
+            }
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 18px;
+            }
+            .cart-table thead {
+                display: none;
+            }
+            .cart-table,
+            .cart-table tbody,
+            .cart-table tr,
+            .cart-table td {
+                display: block;
+                width: 100%;
+            }
+            .cart-table tr {
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                margin-bottom: 12px;
+                padding: 6px 8px;
+                background: #fff;
+            }
+            .cart-table td {
+                border: 0;
+                padding: 6px 4px;
+                text-align: left !important;
+            }
+            .cart-table td[data-label]::before {
+                content: attr(data-label) ": ";
+                font-weight: 600;
+                color: #495057;
+            }
+            .coupon-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .coupon-form button {
+                width: 100%;
+            }
+            .coupon-applied {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .cart-total {
+                text-align: left;
+            }
+            .cart-total-row {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+            }
+            .cart-total-label,
+            .cart-total-amount,
+            .subtotal-amount,
+            .discount-amount {
+                font-size: 1rem;
+                margin-right: 0;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .action-buttons {
+                margin-top: 16px;
+            }
         }
     </style>
     <?php // Font Awesome for small icon buttons ?>
@@ -562,6 +646,7 @@ $siteBase = $protocol . $host;
                 <a href="/serverlist.php" class="btn">Browse Servers</a>
             </div>
         <?php else: ?>
+            <div class="cart-table-wrap">
             <table class="cart-table">
                 <thead>
                     <tr>
@@ -576,20 +661,20 @@ $siteBase = $protocol . $host;
                 <tbody>
                     <?php foreach ((array)$invoices as $inv): ?>
                     <tr>
-                        <td>
+                        <td data-label="Game Server">
                             <div class="game-name"><?php echo htmlspecialchars($inv['game_name'] ?? 'Game Server'); ?></div>
                             <div class="server-name"><?php echo htmlspecialchars($inv['home_name']); ?></div>
                             <?php if (!empty($inv['description'])): ?>
                             <div class="description"><?php echo htmlspecialchars($inv['description']); ?></div>
                             <?php endif; ?>
                         </td>
-                                <td><?php echo htmlspecialchars($inv['invoice_duration']); ?></td>
-                                <td><?php echo intval($inv['qty']); ?>x</td>
-                                <td><span class="status-badge"><?php echo htmlspecialchars(strtoupper($inv['status'])); ?></span></td>
-                                <td style="text-align: right;">
-                                    <span class="price">$<?php echo number_format(floatval($inv['amount']), 2); ?></span>
+                                <td data-label="Duration"><?php echo htmlspecialchars((string)($inv['invoice_duration'] ?? 'month')); ?></td>
+                                <td data-label="Quantity"><?php echo intval($inv['qty'] ?? 1); ?>x</td>
+                                <td data-label="Status"><span class="status-badge"><?php echo htmlspecialchars(strtoupper((string)($inv['status'] ?? 'due'))); ?></span></td>
+                                <td data-label="Price" style="text-align: right;">
+                                    <span class="price">$<?php echo number_format(floatval($inv['total_due'] ?? $inv['amount'] ?? 0), 2); ?></span>
                                 </td>
-                                <td style="text-align: right;">
+                                <td data-label="Action" style="text-align: right;">
                                     <button type="button" class="btn btn-secondary btn-small" title="Remove" onclick="removeInvoice(<?php echo intval($inv['invoice_id']); ?>)">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
@@ -598,6 +683,7 @@ $siteBase = $protocol . $host;
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
 
             <!-- Coupon Section -->
             <div class="coupon-section">
