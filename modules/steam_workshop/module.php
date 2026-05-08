@@ -33,13 +33,6 @@ if (!function_exists('sw_module_db_prefix')) {
     }
 }
 
-if (!function_exists('sw_module_table')) {
-    function sw_module_table($table)
-    {
-        return '`' . sw_module_table_name($table) . '`';
-    }
-}
-
 if (!function_exists('sw_module_table_name')) {
     function sw_module_table_name($table)
     {
@@ -49,6 +42,13 @@ if (!function_exists('sw_module_table_name')) {
             $prefix = 'gsp_';
         }
         return $prefix . $name;
+    }
+}
+
+if (!function_exists('sw_module_table')) {
+    function sw_module_table($table)
+    {
+        return '`' . sw_module_table_name($table) . '`';
     }
 }
 

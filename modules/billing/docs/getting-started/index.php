@@ -12,7 +12,7 @@
 <p>Once your payment is processed, you'll receive:</p>
 <ul>
     <li>A confirmation email with your server details</li>
-    <li>Access to your control panel login URL (provided in your service email)</li>
+    <li>Access to your control panel login URL (provided in your confirmation email)</li>
     <li>FTP credentials for file management</li>
     <li>Server IP address and port</li>
 </ul>

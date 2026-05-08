@@ -362,6 +362,8 @@ function sw_get_server_settings($db, $home_id)
     if ($rows && isset($rows[0]) && is_array($rows[0])) {
         $settings = $rows[0];
 
+        // Runtime normalization is kept as a fallback for legacy/manual rows that
+        // were not updated via module migrations.
         $legacyUpdateMap = array(
             'scheduled' => 'manual',
         );
