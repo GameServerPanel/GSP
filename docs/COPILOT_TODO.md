@@ -8,3 +8,4 @@
 - Add an integration smoke test that exercises paid checkout, free checkout, and add-to-cart on installs with/without `period_start` to prevent billing schema drift regressions.
 - Add a storefront visual-regression check at 375px and 430px breakpoints covering login, order, and cart pages to prevent mobile overflow regressions.
 - Complete a full pass over all `modules/billing/docs/*` game guides to standardize OS/Workshop/RCON capability statements against current XML-backed server support.
+- Add an automated billing provisioning integration test fixture that verifies arrange_ports exact/fallback allocation, duplicate-port protection, and home_id linkage after paid/free checkout.

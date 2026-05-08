@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: radial-gradient(circle at top, #1f3551 0%, #0f1724 58%, #0b111b 100%);
             min-height: 100vh;
             display: block;
             margin: 0;
@@ -165,13 +165,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .login-container {
-            background: #ffffff; /* explicit white */
+            background: #f8fbff;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
             width: 100%;
             max-width: 420px;
             padding: 32px 28px;
-            border: 1px solid rgba(0,0,0,0.06);
+            border: 1px solid rgba(40,70,110,0.25);
         }
 
         .login-header {
@@ -223,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-login {
             width: 100%;
             padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3168a4 0%, #214978 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -235,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(38, 84, 136, 0.4);
         }
         
         .btn-login:active {
@@ -268,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         .footer-links a {
-            color: #667eea;
+            color: #3168a4;
             text-decoration: none;
             font-size: 0.9rem;
         }
@@ -295,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .login-links a {
-            color: #667eea;
+            color: #3168a4;
             text-decoration: none;
         }
 

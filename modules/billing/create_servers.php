@@ -27,6 +27,137 @@ if (!function_exists('billing_invoke_provision')) {
 	}
 }
 
+if (!function_exists('billing_get_remote_ip_ids')) {
+	function billing_get_remote_ip_ids($db, string $db_prefix, int $remote_server_id): array
+	{
+		$rows = $db->resultQuery(
+			"SELECT ip_id FROM `{$db_prefix}remote_server_ips` WHERE remote_server_id=" . $db->realEscapeSingle($remote_server_id) . " ORDER BY ip_id ASC"
+		);
+		$ipIds = array();
+		foreach ((array)$rows as $row) {
+			$ipId = intval($row['ip_id'] ?? 0);
+			if ($ipId > 0) {
+				$ipIds[] = $ipId;
+			}
+		}
+		return $ipIds;
+	}
+}
+
+if (!function_exists('billing_allocate_home_port')) {
+	function billing_allocate_home_port($db, string $db_prefix, int $home_id, int $remote_server_id, int $home_cfg_id): array
+	{
+		$ipIds = billing_get_remote_ip_ids($db, $db_prefix, $remote_server_id);
+		if (empty($ipIds)) {
+			return array('ok' => false, 'error' => "No IP addresses are configured for remote server #{$remote_server_id}.");
+		}
+
+		foreach ($ipIds as $ipId) {
+			$ranges = $db->resultQuery(
+				"SELECT start_port, end_port, port_increment
+				 FROM `{$db_prefix}arrange_ports`
+				 WHERE ip_id=" . $db->realEscapeSingle($ipId) . "
+				   AND home_cfg_id=" . $db->realEscapeSingle($home_cfg_id) . "
+				 ORDER BY range_id ASC"
+			);
+			if (empty($ranges)) {
+				$ranges = $db->resultQuery(
+					"SELECT start_port, end_port, port_increment
+					 FROM `{$db_prefix}arrange_ports`
+					 WHERE ip_id=" . $db->realEscapeSingle($ipId) . "
+					   AND home_cfg_id=0
+					 ORDER BY range_id ASC"
+				);
+			}
+			if (empty($ranges)) {
+				continue;
+			}
+
+			$usedRows = $db->resultQuery(
+				"SELECT port FROM `{$db_prefix}home_ip_ports` WHERE ip_id=" . $db->realEscapeSingle($ipId)
+			);
+			$usedPorts = array();
+			foreach ((array)$usedRows as $usedRow) {
+				$usedPorts[intval($usedRow['port'] ?? 0)] = true;
+			}
+
+			foreach ((array)$ranges as $range) {
+				$start = intval($range['start_port'] ?? 0);
+				$end = intval($range['end_port'] ?? 0);
+				$increment = max(1, intval($range['port_increment'] ?? 1));
+				if ($start <= 0 || $end <= 0 || $start > $end) {
+					continue;
+				}
+
+				for ($port = $start; $port <= $end; $port += $increment) {
+					if (isset($usedPorts[$port])) {
+						continue;
+					}
+					$safeIpId = $db->realEscapeSingle($ipId);
+					$safePort = $db->realEscapeSingle($port);
+					$safeHome = $db->realEscapeSingle($home_id);
+					$insertOk = $db->query(
+						"INSERT INTO `{$db_prefix}home_ip_ports` (`ip_id`, `port`, `home_id`)
+						 SELECT {$safeIpId}, {$safePort}, {$safeHome}
+						 FROM DUAL
+						 WHERE NOT EXISTS (
+							SELECT 1
+							FROM `{$db_prefix}home_ip_ports`
+							WHERE ip_id = {$safeIpId}
+							  AND port = {$safePort}
+						 )"
+					);
+					if (!$insertOk) {
+						continue;
+					}
+					$verify = $db->resultQuery(
+						"SELECT home_id FROM `{$db_prefix}home_ip_ports`
+						 WHERE ip_id = {$safeIpId}
+						   AND port = {$safePort}
+						   AND home_id = {$safeHome}
+						 LIMIT 1"
+					);
+					if (!empty($verify)) {
+						return array('ok' => true, 'ip_id' => $ipId, 'port' => intval($port));
+					}
+				}
+			}
+		}
+
+		return array('ok' => false, 'error' => "No available port in arrange_ports for remote server #{$remote_server_id} and home_cfg_id #{$home_cfg_id}.");
+	}
+}
+
+if (!function_exists('billing_resolve_mod_cfg_id')) {
+	function billing_resolve_mod_cfg_id($db, int $home_cfg_id, int $preferred_mod_cfg_id): array
+	{
+		$mods = $db->getCfgMods($home_cfg_id);
+		if (empty($mods)) {
+			return array('ok' => false, 'error' => "No config_mods rows found for home_cfg_id #{$home_cfg_id}.");
+		}
+
+		$first = null;
+		foreach ((array)$mods as $mod) {
+			$modCfgId = intval($mod['mod_cfg_id'] ?? 0);
+			if ($modCfgId <= 0) {
+				continue;
+			}
+			if ($first === null) {
+				$first = $modCfgId;
+			}
+			if ($preferred_mod_cfg_id > 0 && $modCfgId === $preferred_mod_cfg_id) {
+				return array('ok' => true, 'mod_cfg_id' => $modCfgId);
+			}
+		}
+
+		if ($first !== null) {
+			return array('ok' => true, 'mod_cfg_id' => $first);
+		}
+
+		return array('ok' => false, 'error' => "No usable mod_cfg_id found for home_cfg_id #{$home_cfg_id}.");
+	}
+}
+
 function exec_ogp_module()
 {
 	global $db,$view,$settings,$table_prefix;
@@ -84,9 +215,13 @@ function exec_ogp_module()
 	{
 		$provisioned_count = 0;
 		$failed_count = 0;
+		$failed_messages = array();
 		
 		foreach ((array)$orders as $order)
 		{
+			$home_id = 0;
+			$order_failed = false;
+			$order_failure_reason = '';
 			$end_date = null;
 			$end_date_str = null;
 			$order_id = $order['order_id'];
@@ -125,13 +260,16 @@ function exec_ogp_module()
 				$access_rights = $service[0]['access_rights'];
 			}
 			else
-				return;
+			{
+				$order_failed = true;
+				$order_failure_reason = "Service ID {$service_id} not found.";
+			}
 						
-			if($alreadyProvisioned)
+			if(!$order_failed && $alreadyProvisioned)
 			{
 				$home_id = intval($order['home_id']);
 			}
-			elseif($extended)
+			elseif(!$order_failed && $extended)
 			{
 				$home_id = $order['home_id'];
 				
@@ -177,7 +315,7 @@ function exec_ogp_module()
                //end WEBHOOK Discord
 
 			}
-			else
+			elseif(!$order_failed)
 			{
 				//OPTIONS, change it at your choice;
 				$extra_params = "";//no extra params defined by default
@@ -189,59 +327,125 @@ function exec_ogp_module()
 				$rserver = $db->getRemoteServer($remote_server_id);
 				$game_path = "/home/gameserver/";
 				$home_id = $db->addGameHome( $remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
+				if (!$home_id || intval($home_id) <= 0) {
+					$order_failed = true;
+					$order_failure_reason = "Could not create server_homes row for order #{$order_id}.";
+				}
 				
-				//Add IP:Port Pair to the Game Home
-			//need to get the IP_ID for this remote server.
-				$result = $db->resultQuery("SELECT ip_id FROM `{$db_prefix}remote_server_ips` WHERE remote_server_id=".$ip);
-			    	foreach ((array)$result as $rs)
-			{
-				$ip_id = $rs['ip_id'];
-			}
-				$add_port = $db->addGameIpPort( $home_id, $ip_id, $db->getNextAvailablePort($ip_id,$home_cfg_id) );
+				// Add IP:Port pair with arrange_ports exact home_cfg_id preference and home_cfg_id=0 fallback.
+				if (!$order_failed) {
+					$allocatedPort = billing_allocate_home_port($db, $db_prefix, intval($home_id), intval($remote_server_id), intval($home_cfg_id));
+					if (empty($allocatedPort['ok'])) {
+						$order_failed = true;
+						$order_failure_reason = (string)($allocatedPort['error'] ?? 'Port allocation failed.');
+						$db->logger("Provisioning pending install for order #{$order_id}: {$order_failure_reason}");
+					}
+				}
 				
 				//Assign the Game Mod to the Game Home
-				$mod_id = $db->addModToGameHome( $home_id, $mod_cfg_id );
-				$db->updateGameModParams( $max_players, $extra_params, $cpu_affinity, $nice, $home_id, $mod_cfg_id );
-				$db->assignHomeTo( "user", $user_id, $home_id, $access_rights );
+				$resolved_mod_cfg_id = intval($mod_cfg_id);
+				if (!$order_failed) {
+					$modResolution = billing_resolve_mod_cfg_id($db, intval($home_cfg_id), intval($mod_cfg_id));
+					if (empty($modResolution['ok'])) {
+						$order_failed = true;
+						$order_failure_reason = (string)($modResolution['error'] ?? 'No mod profile available for base install.');
+					} else {
+						$resolved_mod_cfg_id = intval($modResolution['mod_cfg_id']);
+					}
+				}
+				$mod_id = false;
+				if (!$order_failed) {
+					$mod_id = $db->addModToGameHome( $home_id, $resolved_mod_cfg_id );
+					if ($mod_id === false) {
+						$order_failed = true;
+						$order_failure_reason = "Could not attach mod_cfg_id {$resolved_mod_cfg_id} to home #{$home_id}.";
+					}
+				}
+				if (!$order_failed) {
+					$db->updateGameModParams( $max_players, $extra_params, $cpu_affinity, $nice, $home_id, $resolved_mod_cfg_id );
+					$db->assignHomeTo( "user", $user_id, $home_id, $access_rights );
+				}
 				
 				//Get The home info without mods in 1 array (Necesary for remote connection).
-				$home_info = $db->getGameHomeWithoutMods($home_id);
+				if (!$order_failed) {
+					$home_info = $db->getGameHomeWithoutMods($home_id);
+					if (empty($home_info)) {
+						$order_failed = true;
+						$order_failure_reason = "Could not load home info for home #{$home_id}.";
+					}
+				}
 				
 				//Create the remote connection
-				$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+				if (!$order_failed) {
+					$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+				}
 								
 				//Get Full home info in 1 array
-				$home_info = $db->getGameHome($home_id);
+				if (!$order_failed) {
+					$home_info = $db->getGameHome($home_id);
+					if (empty($home_info) || empty($home_info['mods'])) {
+						$order_failed = true;
+						$order_failure_reason = "Mods are not configured for home #{$home_id}; base install profile could not be resolved.";
+					}
+				}
 				
 				//Read the Game Config from the XML file
-				$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
+				if (!$order_failed) {
+					$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
+					if ($server_xml === false) {
+						$order_failed = true;
+						$order_failure_reason = "Could not read server XML for home #{$home_id}.";
+					}
+				}
 				
 				//Get Values from XML
-				$modkey = $home_info['mods'][$mod_id]['mod_key'];
-				$mod_xml = xml_get_mod($server_xml, $modkey);
-				$installer_name = $mod_xml->installer_name;
-				$mod_cfg_id = $home_info['mods'][$mod_id]['mod_cfg_id'];
+				$mod_xml = false;
+				$modkey = '';
+				$installer_name = '';
+				if (!$order_failed) {
+					$selected_mod = $home_info['mods'][$mod_id] ?? reset($home_info['mods']);
+					if (empty($selected_mod) || empty($selected_mod['mod_key'])) {
+						$order_failed = true;
+						$order_failure_reason = "No valid mod profile found for home #{$home_id}.";
+					} else {
+						$modkey = (string)$selected_mod['mod_key'];
+						$mod_xml = xml_get_mod($server_xml, $modkey);
+						if ($mod_xml === false && isset($server_xml->mods->mod[0])) {
+							$mod_xml = $server_xml->mods->mod[0];
+							$modkey = (string)$mod_xml['key'];
+						}
+						if ($mod_xml === false) {
+							$order_failed = true;
+							$order_failure_reason = "No installable mod profile exists in XML for home #{$home_id}.";
+						} else {
+							$installer_name = (string)$mod_xml->installer_name;
+							$resolved_mod_cfg_id = intval($selected_mod['mod_cfg_id'] ?? $resolved_mod_cfg_id);
+						}
+					}
+				}
 				
 			//Get Preinstall commands from xml
-				$precmd = $server_xml->pre_install;
+				$precmd = !$order_failed ? $server_xml->pre_install : '';
 
 					
 				//Get Postinstall commands from xml
-				$postcmd = $server_xml->post_install; 
+				$postcmd = !$order_failed ? $server_xml->post_install : ''; 
 
 
 				//Enable FTP account in remote server
-				if ($ftp == "enabled")
+				if (!$order_failed && $ftp == "enabled")
 				{
 					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $home_info['home_path']);
 					$db->changeFtpStatus('enabled',$home_info['home_id']);
 				}
 				
 				//Install files for this service in the remote server
-				$exec_folder_path = clean_path($home_info['home_path'] . "/" . $server_xml->exe_location );
-				$exec_path = clean_path($exec_folder_path . "/" . $server_xml->server_exec_name );
+				if (!$order_failed) {
+					$exec_folder_path = clean_path($home_info['home_path'] . "/" . $server_xml->exe_location );
+					$exec_path = clean_path($exec_folder_path . "/" . $server_xml->server_exec_name );
+				}
 
-				if ( (string)$server_xml->installer === "steamcmd" && !empty((string)$installer_name) )
+				if (!$order_failed && (string)$server_xml->installer === "steamcmd" && !empty((string)$installer_name) )
 				{
 					if( preg_match("/win32/", $server_xml->game_key) OR preg_match("/win64/", $server_xml->game_key) ) 
 						$cfg_os = "windows";
@@ -249,7 +453,7 @@ function exec_ogp_module()
 						$cfg_os = "linux";
 					
 					// Some games like L4D2 require anonymous login
-					if($mod_xml->installer_login){
+					if(!empty($mod_xml->installer_login)){
 						$login = $mod_xml->installer_login;
 						$pass = '';
 					}else{
@@ -266,7 +470,7 @@ function exec_ogp_module()
 										$betaname,$betapwd,$login,$pass,$settings['steam_guard'],
 										$exec_folder_path,$exec_path,$precmd,$postcmd,$cfg_os,'',$arch); 
 				}
-				else
+				elseif (!$order_failed)
 				{
 					// No SteamCMD installer — run pre/post install scripts only.
 					if (!empty((string)$precmd)) {
@@ -280,11 +484,13 @@ function exec_ogp_module()
 							$db->logger("Script-only install: post_install script returned no output for home_id $home_id");
 					}
 				}
-				echo "<h4><br><p>".get_lang('starting_installations')."</p></h4><br>";
-				//PANEL LOG 
-                                $db->logger( "CREATED NEW SERVER " . $home_id);
+				if (!$order_failed) {
+					echo "<h4><br><p>".get_lang('starting_installations')."</p></h4><br>";
+					//PANEL LOG 
+	                                $db->logger( "CREATED NEW SERVER " . $home_id);
+				}
 				// SEND EMAIL to new server only
-				if($order['end_date'] == 0){
+				if(!$order_failed && $order['end_date'] == 0){
 					$settings = $db->getSettings();
 					 $subject = "New Gameserver installed at " . $settings['panel_name'];
 					  $email = $db->resultQuery("   SELECT DISTINCT users_email
@@ -376,7 +582,14 @@ function exec_ogp_module()
 				$end_date_str = date('Y-m-d H:i:s', $end_date);
 			}
 
-			// Set order status to 'Active' (server provisioned and current)
+			if ($home_id <= 0) {
+				$order_failed = true;
+				if ($order_failure_reason === '') {
+					$order_failure_reason = "No home_id was produced for order #{$order_id}.";
+				}
+			}
+
+			// Set order status to 'Active' (billing active even if install is pending)
 			$db->query("UPDATE `{$db_prefix}billing_orders`
 						SET status='Active' 
 						WHERE order_id=".$db->realEscapeSingle($order_id));
@@ -394,25 +607,38 @@ function exec_ogp_module()
 
 			$db->query("UPDATE `{$db_prefix}billing_invoices`
 						SET home_id=" . $db->realEscapeSingle($home_id) . ",
-							billing_status='Active'
+							billing_status='Active',
+							status='paid'
 						WHERE order_id=" . $db->realEscapeSingle($order_id));
 
 			$db->query("UPDATE `{$db_prefix}billing_transactions`
 						SET home_id=" . $db->realEscapeSingle($home_id) . "
 						WHERE invoice_id IN (SELECT invoice_id FROM `{$db_prefix}billing_invoices` WHERE order_id=" . $db->realEscapeSingle($order_id) . ")");
 
-			// Set billing_status and next_invoice_date on server_homes
-			$db->query("UPDATE `{$db_prefix}server_homes`
-						SET billing_status     = 'Active',
-							next_invoice_date  = '" . $db->realEscapeSingle($end_date_str) . "',
-							billing_enabled    = 1
-						WHERE home_id = " . $db->realEscapeSingle($home_id));
-			
-			$provisioned_count++;
+			if ($home_id > 0) {
+				$db->query("UPDATE `{$db_prefix}game_mods`
+							SET max_players=" . $db->realEscapeSingle($max_players) . "
+							WHERE home_id=" . $db->realEscapeSingle($home_id));
+			}
+
+			if ($home_id > 0) {
+				// Set billing_status and next_invoice_date on server_homes
+				$db->query("UPDATE `{$db_prefix}server_homes`
+							SET billing_status     = 'Active',
+								next_invoice_date  = '" . $db->realEscapeSingle($end_date_str) . "',
+								billing_enabled    = 1
+							WHERE home_id = " . $db->realEscapeSingle($home_id));
+			}
+
+			if ($order_failed) {
+				$failed_count++;
+				$failed_messages[] = "Order #{$order_id}: {$order_failure_reason}";
+				$db->logger("Provisioning pending install for order #{$order_id}: {$order_failure_reason}");
+			} else {
+				$provisioned_count++;
+			}
 						
 		}
-					
-        $db->query( "UPDATE `{$db_prefix}game_mods` SET max_players= ".$order['max_players']." WHERE home_id=".$db->realEscapeSingle($home_id));
 
 	// Show results and redirect
 	if ($provisioned_count > 0) {
@@ -420,13 +646,29 @@ function exec_ogp_module()
 		echo "<h3>Server Provisioning Complete</h3>";
 		echo "<p>Successfully provisioned $provisioned_count server(s). Your server(s) are now active.</p>";
 		echo "</div>";
+		if ($failed_count > 0) {
+			echo "<div class='failure'>";
+			echo "<p>{$failed_count} order(s) were linked but left pending install:</p><ul>";
+			foreach ((array)$failed_messages as $failed_message) {
+				echo "<li>" . htmlspecialchars($failed_message, ENT_QUOTES, 'UTF-8') . "</li>";
+			}
+			echo "</ul></div>";
+		}
 		echo "<p><a href='home.php?m=gamemanager&p=game_monitor' class='btn'>View My Servers</a></p>";
 		// Auto-redirect after 3 seconds
 		echo "<script>setTimeout(function(){ window.location.href='home.php?m=gamemanager&p=game_monitor'; }, 3000);</script>";
 	} else {
-		echo "<div class='info'>";
-		echo "<p>No servers to provision. All orders have already been processed.</p>";
-		echo "</div>";
+		if ($failed_count > 0) {
+			echo "<div class='failure'><p>No servers were auto-installed. Orders are active but pending install:</p><ul>";
+			foreach ((array)$failed_messages as $failed_message) {
+				echo "<li>" . htmlspecialchars($failed_message, ENT_QUOTES, 'UTF-8') . "</li>";
+			}
+			echo "</ul></div>";
+		} else {
+			echo "<div class='info'>";
+			echo "<p>No servers to provision. All orders have already been processed.</p>";
+			echo "</div>";
+		}
 		echo "<p><a href='home.php?m=billing&p=my_orders' class='btn'>View My Orders</a></p>";
 	}
 	
@@ -445,5 +687,3 @@ function exec_ogp_module()
 	);
 }
 ?>
-
-

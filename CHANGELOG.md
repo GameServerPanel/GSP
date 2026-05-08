@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-05-08
+- **Provisioning + billing admin UX reliability pass:** Hardened automatic server provisioning to reserve ports from `arrange_ports` (exact `home_cfg_id`, then `home_cfg_id=0` fallback), prevent duplicate `home_ip_ports` assignment, keep order/invoice/home linkage intact even when install is pending, and apply safe default mod resolution so base installs are not blocked by missing explicit mod choices. Refreshed billing admin service management with row-level save actions, sortable columns (including Game Name enabled-first toggle), clearer save feedback, cleaner unstable-update caution styling, login theme polish, and updated storefront timestamp footer metadata.
 - **Steam Workshop reliability + UI simplification:** Removed customer CLI/update scripting instructions from Workshop user flow, reduced per-server behavior options to supported modes only, switched remaining Steam Workshop SQL references to prefix helpers (no `OGP_DB_PREFIX` strings), hardened queued-update agent processing (`queued → updating → installed/failed`) with clearer error persistence, and refreshed monitor/support documentation links to open game-specific docs (fallback to docs index) in a new tab.
 - **Billing docs routing refresh:** Updated docs browser links/icons to root-relative storefront paths (`/docs.php`, `/docs/...`) and removed stale hardcoded panel host guidance from getting-started documentation.
 

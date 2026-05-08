@@ -6,9 +6,9 @@
     <title>Admin Service Configuration - GSP</title>
     <style>
     .svc-table { border-collapse: collapse; width: 100%; }
-    .svc-table th, .svc-table td { border: 1px solid #4a6080; padding: 6px 8px; vertical-align: middle; }
+    .svc-table th, .svc-table td { border: 1px solid rgba(86,105,130,0.6); padding: 8px 10px; vertical-align: middle; }
     /* Sticky header: stays visible while scrolling; dark background with light text for readability */
-    .svc-table thead th { position: sticky; top: 0; z-index: 10; background: #2c3e50; color: #f0f0f0; white-space: nowrap; text-align: center; }
+    .svc-table thead th { position: sticky; top: 0; z-index: 10; background: #26354a; color: #f0f0f0; white-space: nowrap; text-align: center; }
     .svc-table thead th.game-name { text-align: left; }
     .svc-table td.game-name { text-align: left; white-space: nowrap; }
     .price-input { width: 80px; }
@@ -19,10 +19,28 @@
     .img-fallback { display: none; max-width: 180px; margin-top: 4px; }
     .img-fallback.img-fallback-visible { display: block; }
     .muted { color: #999; font-size: 0.85em; }
-    .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #155724; }
-    .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 8px 12px; margin-bottom: 10px; border-radius: 4px; color: #721c24; }
+    .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; color: #155724; }
+    .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; color: #721c24; }
     .servers-cell { text-align: left; }
     .server-cb-label { display: block; white-space: nowrap; margin: 2px 0; }
+    .action-cell { text-align: center; min-width: 120px; }
+    .btn-row-save, .btn-save-all {
+      border: 1px solid #3e7ab8;
+      border-radius: 6px;
+      background: #2f6dac;
+      color: #fff;
+      font-weight: 600;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .btn-save-all {
+      padding: 9px 14px;
+      font-size: 0.95rem;
+    }
+    .btn-row-save:hover, .btn-save-all:hover { background: #25598d; }
+    .sort-link { color: #d8e7ff; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .sort-link:hover { text-decoration: underline; }
+    .sort-active { color: #ffffff; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -53,6 +71,10 @@
 
 require_once(__DIR__ . '/bootstrap.php');
 require_once(__DIR__ . '/includes/admin_auth.php');
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('opengamepanel_web');
+    session_start();
+}
 
 function h(mixed $s): string
 {
@@ -285,13 +307,47 @@ $syncMessages = sync_billing_services($db, $table_prefix);
 
 $flash     = [];
 $flashType = 'ok';
+$sort = strtolower((string)($_GET['sort'] ?? $_POST['sort'] ?? 'game'));
+$dir = strtolower((string)($_GET['dir'] ?? $_POST['dir'] ?? 'asc')) === 'desc' ? 'desc' : 'asc';
+$gameMode = strtolower((string)($_GET['game_mode'] ?? $_POST['game_mode'] ?? 'name'));
+if (!in_array($sort, ['game', 'config', 'enabled', 'day', 'month', 'year', 'servers'], true)) {
+    $sort = 'game';
+}
+if (!in_array($gameMode, ['name', 'enabled'], true)) {
+    $gameMode = 'name';
+}
+$sortQuery = http_build_query([
+    'sort' => $sort,
+    'dir' => $dir,
+    'game_mode' => $gameMode,
+]);
+
+function sort_link_params(string $column, string $sort, string $dir, string $gameMode): array
+{
+    $nextDir = ($sort === $column && $dir === 'asc') ? 'desc' : 'asc';
+    $nextGameMode = $gameMode;
+    if ($column === 'game' && $sort === 'game' && $gameMode === 'name') {
+        $nextGameMode = 'enabled';
+        $nextDir = 'asc';
+    } elseif ($column === 'game' && $sort === 'game' && $gameMode === 'enabled') {
+        $nextGameMode = 'name';
+        $nextDir = 'asc';
+    } elseif ($column !== 'game') {
+        $nextGameMode = 'name';
+    }
+    return [
+        'sort' => $column,
+        'dir' => $nextDir,
+        'game_mode' => $nextGameMode,
+    ];
+}
 
 /* -----------------------------------------------------------------------
    SAVE: service configuration form submitted
    Only admin-editable fields are updated; service_name and home_cfg_id
    are never overwritten here.
 ----------------------------------------------------------------------- */
-if (isset($_POST['save_services'])) {
+if (isset($_POST['save_services']) || isset($_POST['save_row'])) {
     // Load valid remote server IDs for validation
     $validServerIds = [];
     $rsRes = $db->query("SELECT remote_server_id FROM `{$table_prefix}remote_servers`");
@@ -302,9 +358,14 @@ if (isset($_POST['save_services'])) {
 
     $postedServices = $_POST['svc'] ?? [];
     $postedServers  = $_POST['servers'] ?? [];
+    $rowOnlyServiceId = isset($_POST['save_row']) ? (int)$_POST['save_row'] : 0;
+    $updatedCount = 0;
 
     foreach ((array)$postedServices as $sid => $svcData) {
         $sid          = (int)$sid;
+        if ($rowOnlyServiceId > 0 && $sid !== $rowOnlyServiceId) {
+            continue;
+        }
         $enabled      = isset($svcData['enabled']) ? 1 : 0;
         $priceDaily   = number_format((float)($svcData['price_daily']   ?? 0), 2, '.', '');
         $priceMonthly = number_format((float)($svcData['price_monthly'] ?? 0), 2, '.', '');
@@ -332,7 +393,7 @@ if (isset($_POST['save_services'])) {
         }
         $remoteServerIdStr = $db->real_escape_string(implode(',', $checkedIds));
 
-        $db->query(
+        $ok = $db->query(
             "UPDATE `{$table_prefix}billing_services`
              SET enabled          = {$enabled},
                  price_daily      = '{$priceDaily}',
@@ -342,12 +403,38 @@ if (isset($_POST['save_services'])) {
                  slot_max_qty     = {$slotMax},
                  description      = '{$description}',
                  img_url          = '{$imgUrl}',
-                 remote_server_id = '{$remoteServerIdStr}'
-             WHERE service_id = {$sid}"
+                  remote_server_id = '{$remoteServerIdStr}'
+              WHERE service_id = {$sid}"
         );
+        if ($ok) {
+            $updatedCount++;
+        }
     }
 
-    $flash[] = "Services saved.";
+    if ($updatedCount > 0) {
+        if ($rowOnlyServiceId > 0) {
+            $flash[] = "Service row #{$rowOnlyServiceId} saved.";
+        } else {
+            $flash[] = "{$updatedCount} service row(s) saved.";
+        }
+    } else {
+        $flashType = 'err';
+        if ($rowOnlyServiceId > 0) {
+            $flash[] = "No changes were saved for service row #{$rowOnlyServiceId}.";
+        } else {
+            $flash[] = "No service rows were updated.";
+        }
+    }
+    $_SESSION['billing_adminserverlist_flash'] = ['type' => $flashType, 'messages' => $flash];
+    header("Location: /adminserverlist.php?{$sortQuery}");
+    exit;
+}
+
+if (!empty($_SESSION['billing_adminserverlist_flash'])) {
+    $flashData = $_SESSION['billing_adminserverlist_flash'];
+    unset($_SESSION['billing_adminserverlist_flash']);
+    $flashType = ($flashData['type'] ?? 'ok') === 'err' ? 'err' : 'ok';
+    $flash = array_values(array_filter((array)($flashData['messages'] ?? []), 'is_string'));
 }
 
 /* -----------------------------------------------------------------------
@@ -371,11 +458,53 @@ $svcRes = $db->query(
             bs.remote_server_id, bs.description, bs.img_url,
             ch.home_cfg_file
      FROM `{$table_prefix}billing_services` bs
-     LEFT JOIN `{$table_prefix}config_homes` ch ON ch.home_cfg_id = bs.home_cfg_id
+      LEFT JOIN `{$table_prefix}config_homes` ch ON ch.home_cfg_id = bs.home_cfg_id
      ORDER BY bs.service_name"
 );
 while ($svcRes && ($row = $svcRes->fetch_assoc())) {
     $services[] = $row;
+}
+if (!empty($services)) {
+    usort($services, function (array $a, array $b) use ($sort, $dir, $gameMode): int {
+        $cmp = 0;
+        switch ($sort) {
+            case 'config':
+                $cmp = strcasecmp((string)($a['home_cfg_file'] ?? ''), (string)($b['home_cfg_file'] ?? ''));
+                break;
+            case 'enabled':
+                $cmp = ((int)($a['enabled'] ?? 0)) <=> ((int)($b['enabled'] ?? 0));
+                break;
+            case 'day':
+                $cmp = ((float)($a['price_daily'] ?? 0)) <=> ((float)($b['price_daily'] ?? 0));
+                break;
+            case 'month':
+                $cmp = ((float)($a['price_monthly'] ?? 0)) <=> ((float)($b['price_monthly'] ?? 0));
+                break;
+            case 'year':
+                $cmp = ((float)($a['price_year'] ?? 0)) <=> ((float)($b['price_year'] ?? 0));
+                break;
+            case 'servers':
+                $countA = trim((string)($a['remote_server_id'] ?? '')) === '' ? 0 : count(array_filter(explode(',', (string)$a['remote_server_id']), 'strlen'));
+                $countB = trim((string)($b['remote_server_id'] ?? '')) === '' ? 0 : count(array_filter(explode(',', (string)$b['remote_server_id']), 'strlen'));
+                $cmp = $countA <=> $countB;
+                break;
+            case 'game':
+            default:
+                if ($gameMode === 'enabled') {
+                    $cmp = ((int)($b['enabled'] ?? 0)) <=> ((int)($a['enabled'] ?? 0));
+                    if ($cmp === 0) {
+                        $cmp = strcasecmp((string)($a['service_name'] ?? ''), (string)($b['service_name'] ?? ''));
+                    }
+                } else {
+                    $cmp = strcasecmp((string)($a['service_name'] ?? ''), (string)($b['service_name'] ?? ''));
+                }
+                break;
+        }
+        if ($cmp === 0) {
+            $cmp = ((int)($a['service_id'] ?? 0)) <=> ((int)($b['service_id'] ?? 0));
+        }
+        return $dir === 'desc' ? -$cmp : $cmp;
+    });
 }
 ?>
 
@@ -398,22 +527,47 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
 
 <form method="post" action="">
   <input type="hidden" name="save_services" value="1">
+  <input type="hidden" name="sort" value="<?php echo h($sort); ?>">
+  <input type="hidden" name="dir" value="<?php echo h($dir); ?>">
+  <input type="hidden" name="game_mode" value="<?php echo h($gameMode); ?>">
 
   <div style="overflow-x:auto;">
   <table class="svc-table">
     <thead>
       <tr>
-        <th class="game-name">Game Name</th>
-        <th>Config XML</th>
-        <th>Enabled</th>
+        <th class="game-name">
+          <?php $p = sort_link_params('game', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'game' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Game Name</a>
+        </th>
+        <th>
+          <?php $p = sort_link_params('config', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'config' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Config XML</a>
+        </th>
+        <th>
+          <?php $p = sort_link_params('enabled', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'enabled' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Enabled</a>
+        </th>
         <th>Min Slots</th>
         <th>Max Slots</th>
-        <th>Price / Day ($)</th>
-        <th>Price / Month ($)</th>
-        <th>Price / Year ($)</th>
+        <th>
+          <?php $p = sort_link_params('day', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'day' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Price / Day ($)</a>
+        </th>
+        <th>
+          <?php $p = sort_link_params('month', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'month' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Price / Month ($)</a>
+        </th>
+        <th>
+          <?php $p = sort_link_params('year', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'year' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Price / Year ($)</a>
+        </th>
         <th>Description</th>
         <th>Image</th>
-        <th>Available Servers</th>
+        <th>
+          <?php $p = sort_link_params('servers', $sort, $dir, $gameMode); ?>
+          <a class="sort-link <?php echo $sort === 'servers' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Available Servers</a>
+        </th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -541,6 +695,9 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
             <?php endforeach; ?>
           <?php endif; ?>
         </td>
+        <td class="action-cell">
+          <button type="submit" class="btn-row-save" name="save_row" value="<?php echo $sid; ?>">Save Row</button>
+        </td>
       </tr>
     <?php endforeach; ?>
     </tbody>
@@ -548,7 +705,7 @@ while ($svcRes && ($row = $svcRes->fetch_assoc())) {
   </div>
 
   <div style="margin-top:14px;">
-    <button type="submit">Save Services</button>
+    <button type="submit" class="btn-save-all">Save All Services</button>
   </div>
 </form>
 
