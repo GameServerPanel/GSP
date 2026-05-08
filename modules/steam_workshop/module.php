@@ -36,14 +36,19 @@ if (!function_exists('sw_module_db_prefix')) {
 if (!function_exists('sw_module_table')) {
     function sw_module_table($table)
     {
-        return '`' . sw_module_db_prefix() . $table . '`';
+        return '`' . sw_module_table_name($table) . '`';
     }
 }
 
 if (!function_exists('sw_module_table_name')) {
     function sw_module_table_name($table)
     {
-        return sw_module_db_prefix() . $table;
+        $prefix = preg_replace('/[^a-zA-Z0-9_]/', '', (string)sw_module_db_prefix());
+        $name = preg_replace('/[^a-zA-Z0-9_]/', '', (string)$table);
+        if ($prefix === '') {
+            $prefix = 'gsp_';
+        }
+        return $prefix . $name;
     }
 }
 

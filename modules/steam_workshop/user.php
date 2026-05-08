@@ -476,6 +476,14 @@ function sw_user_render($db, $home_id, array $home, array $profile)
         </thead>
         <tbody>
         <?php foreach ($mods as $idx => $mod): ?>
+          <?php
+          $shortError = '';
+          if (!empty($mod['last_error'])) {
+              $shortError = (strlen($mod['last_error']) > 70)
+                  ? (substr($mod['last_error'], 0, 67) . '...')
+                  : $mod['last_error'];
+          }
+          ?>
           <tr style="<?= !$mod['enabled'] ? 'opacity:0.55;' : '' ?>">
             <td><?= $idx + 1 ?></td>
             <td style="font-family:monospace;"><?= sw_h($mod['workshop_id']) ?></td>
@@ -518,7 +526,6 @@ function sw_user_render($db, $home_id, array $home, array $profile)
               ?>
             </td>
             <td><?= !empty($mod['last_updated_at']) ? sw_h($mod['last_updated_at']) : '-' ?></td>
-            <?php $shortError = !empty($mod['last_error']) ? (strlen($mod['last_error']) > 70 ? (substr($mod['last_error'], 0, 67) . '...') : $mod['last_error']) : ''; ?>
             <td title="<?= sw_h($mod['last_error'] ?? '') ?>"><?= $shortError !== '' ? sw_h($shortError) : '-' ?></td>
             <td style="white-space:nowrap;">
               <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
