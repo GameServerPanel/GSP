@@ -111,19 +111,7 @@ require_once __DIR__ . '/classes/BillingService.php';
 $repo = new BillingRepository($mysqli, $table_prefix);
 $newOrderIds = [];
 $duration_meta = static function (array $invoice): array {
-    $duration = strtolower((string)($invoice['invoice_duration'] ?? $invoice['rate_type'] ?? 'month'));
-    switch ($duration) {
-        case 'day':
-        case 'daily':
-            return ['invoice_duration' => 'day', 'rate_type' => 'daily', 'days' => 1];
-        case 'year':
-        case 'yearly':
-            return ['invoice_duration' => 'year', 'rate_type' => 'yearly', 'days' => 365];
-        case 'month':
-        case 'monthly':
-        default:
-            return ['invoice_duration' => 'month', 'rate_type' => 'monthly', 'days' => 31];
-    }
+    return ['invoice_duration' => 'month', 'rate_type' => 'monthly', 'days' => 31];
 };
 
 foreach ($invoices as $inv) {

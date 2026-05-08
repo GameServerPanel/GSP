@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../includes/lib_remote.php';
 require_once __DIR__ . '/../config_games/server_config_parser.php';
+require_once __DIR__ . '/../gamemanager/update_actions.php';
 
 if (!function_exists('billing_generate_provision_password')) {
 	function billing_generate_provision_password(int $bytes = 12)
@@ -389,99 +390,24 @@ function exec_ogp_module()
 					}
 				}
 				
-				//Read the Game Config from the XML file
-				if (!$order_failed) {
-					$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
-					if ($server_xml === false) {
-						$order_failed = true;
-						$order_failure_reason = "Could not read server XML for home #{$home_id}.";
-					}
-				}
-				
-				//Get Values from XML
-				$mod_xml = false;
-				$modkey = '';
-				$installer_name = '';
-				if (!$order_failed) {
-					$selected_mod = $home_info['mods'][$mod_id] ?? reset($home_info['mods']);
-					if (empty($selected_mod) || empty($selected_mod['mod_key'])) {
-						$order_failed = true;
-						$order_failure_reason = "No valid mod profile found for home #{$home_id}.";
-					} else {
-						$modkey = (string)$selected_mod['mod_key'];
-						$mod_xml = xml_get_mod($server_xml, $modkey);
-						if ($mod_xml === false && isset($server_xml->mods->mod[0])) {
-							$mod_xml = $server_xml->mods->mod[0];
-							$modkey = (string)$mod_xml['key'];
-						}
-						if ($mod_xml === false) {
-							$order_failed = true;
-							$order_failure_reason = "No installable mod profile exists in XML for home #{$home_id}.";
-						} else {
-							$installer_name = (string)$mod_xml->installer_name;
-							$resolved_mod_cfg_id = intval($selected_mod['mod_cfg_id'] ?? $resolved_mod_cfg_id);
-						}
-					}
-				}
-				
-			//Get Preinstall commands from xml
-				$precmd = !$order_failed ? $server_xml->pre_install : '';
-
-					
-				//Get Postinstall commands from xml
-				$postcmd = !$order_failed ? $server_xml->post_install : ''; 
-
-
 				//Enable FTP account in remote server
 				if (!$order_failed && $ftp == "enabled")
 				{
 					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $home_info['home_path']);
 					$db->changeFtpStatus('enabled',$home_info['home_id']);
 				}
-				
-				//Install files for this service in the remote server
-				if (!$order_failed) {
-					$exec_folder_path = clean_path($home_info['home_path'] . "/" . $server_xml->exe_location );
-					$exec_path = clean_path($exec_folder_path . "/" . $server_xml->server_exec_name );
-				}
 
-				if (!$order_failed && (string)$server_xml->installer === "steamcmd" && !empty((string)$installer_name) )
-				{
-					if( preg_match("/win32/", $server_xml->game_key) OR preg_match("/win64/", $server_xml->game_key) ) 
-						$cfg_os = "windows";
-					elseif( preg_match("/linux/", $server_xml->game_key) )
-						$cfg_os = "linux";
-					
-					// Some games like L4D2 require anonymous login
-					if(!empty($mod_xml->installer_login)){
-						$login = $mod_xml->installer_login;
-						$pass = '';
-					}else{
-						$login = $settings['steam_user'];
-						$pass = $settings['steam_pass'];
-					}
-					
-					$modname = ( $installer_name == '90' and !preg_match("/(cstrike|valve)/", $modkey) ) ? $modkey : '';
-					$betaname = isset($mod_xml->betaname) ? $mod_xml->betaname : '';
-					$betapwd = isset($mod_xml->betapwd) ? $mod_xml->betapwd : '';
-					$arch = isset($mod_xml->steam_bitness) ? $mod_xml->steam_bitness : '';
-					
-					$remote->steam_cmd( $home_id,$home_info['home_path'],$installer_name,$modname,
-										$betaname,$betapwd,$login,$pass,$settings['steam_guard'],
-										$exec_folder_path,$exec_path,$precmd,$postcmd,$cfg_os,'',$arch); 
-				}
-				elseif (!$order_failed)
-				{
-					// No SteamCMD installer — run pre/post install scripts only.
-					if (!empty((string)$precmd)) {
-						$result = $remote->exec((string)$precmd);
-						if ($result === NULL)
-							$db->logger("Script-only install: pre_install script returned no output for home_id $home_id");
-					}
-					if (!empty((string)$postcmd)) {
-						$result = $remote->exec((string)$postcmd);
-						if ($result === NULL)
-							$db->logger("Script-only install: post_install script returned no output for home_id $home_id");
+				if (!$order_failed) {
+					$autoInstall = gamemanager_trigger_update_install(
+						$db,
+						$home_info,
+						intval($mod_id),
+						array('settings' => $settings)
+					);
+					$mod_id = intval($autoInstall['mod_id'] ?? $mod_id);
+					if (empty($autoInstall['ok'])) {
+						$order_failed = true;
+						$order_failure_reason = "Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.');
 					}
 				}
 				if (!$order_failed) {
@@ -529,54 +455,18 @@ function exec_ogp_module()
 				}
 				$end_date_str = date('Y-m-d H:i:s', $existing_end);
 			}
-			elseif ($order['invoice_duration'] == "day")
+			else
 			{
-				
-				if(empty($order['end_date']) || $order['end_date'] === NULL){
-				$end_date = strtotime('+'.$order['qty'].' day'); 
+				$qty_days = max(1, intval($order['qty'])) * 31;
+				if (empty($order['end_date']) || $order['end_date'] === NULL) {
+					$end_date = strtotime('+' . $qty_days . ' day');
+				} else {
+					$current_end = strtotime($order['end_date']);
+					if ($current_end === false) {
+						$current_end = time();
+					}
+					$end_date = strtotime('+' . $qty_days . ' day', $current_end);
 				}
-			else{
-			//this is a renewel, start from end of previous order
-				$current_end = strtotime($order['end_date']);
-				if ($current_end === false) {
-					$current_end = time(); // fallback to now if date is invalid
-				}
-				$end_date = strtotime('+'.$order['qty'].' day', $current_end); 		
-				}	
-				
-			}
-			elseif ($order['invoice_duration'] == "month")
-			{
-			// this is a new order
-			if(empty($order['end_date']) || $order['end_date'] === NULL){
-				$end_date = strtotime('+'.(intval($order['qty']) * 31).' day'); 
-
-				}
-			else{
-			//this is a renewel, start from end of previous order
-				$current_end = strtotime($order['end_date']);
-				if ($current_end === false) {
-					$current_end = time(); // fallback to now if date is invalid
-				}
-				$end_date = strtotime('+'.(intval($order['qty']) * 31).' day', $current_end); 
-				}	
-			}
-			elseif ($order['invoice_duration'] == "year")
-			{
-				// this is a new order
-			if(empty($order['end_date']) || $order['end_date'] === NULL){
-				$end_date = strtotime('+'.$order['qty'].' year'); 
-				}
-			else{
-			//this is a renewel, start from end of previous order
-				$current_end = strtotime($order['end_date']);
-				if ($current_end === false) {
-					$current_end = time(); // fallback to now if date is invalid
-				}
-                $end_date = strtotime('+'.$order['qty'].' year', $current_end); 
-				
-				}	
-				
 			}
 			if (!isset($end_date_str)) {
 				$end_date_str = date('Y-m-d H:i:s', $end_date);

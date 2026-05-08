@@ -64,16 +64,30 @@ function exec_ogp_module()
 	
 	// We must always add the home directory to the fm_cwd so that user
 	// can not go out of the homedir.
-	$path = clean_path($home_cfg['home_path']."/".@$_SESSION['fm_cwd_'.$home_id]);
+	$cwd_session_key = 'fm_cwd_' . $home_id;
+	if (!isset($_SESSION[$cwd_session_key]) || !is_string($_SESSION[$cwd_session_key])) {
+		$_SESSION[$cwd_session_key] = '';
+	}
+	$path = clean_path($home_cfg['home_path']."/".$_SESSION[$cwd_session_key]);
 	if (!$remote->rfile_exists($path))
 	{
 		while(!$remote->rfile_exists($path))
 		{
-			$_SESSION['fm_cwd_'.$home_id] = dirname($_SESSION['fm_cwd_'.$home_id]);
-			$path = clean_path($home_cfg['home_path']."/".@$_SESSION['fm_cwd_'.$home_id]);
+			$current_cwd = isset($_SESSION[$cwd_session_key]) ? (string)$_SESSION[$cwd_session_key] : '';
+			if ($current_cwd === '' || $current_cwd === '.' || $current_cwd === DIRECTORY_SEPARATOR) {
+				print_failure("Server files have not been installed yet.");
+				echo "<table class='center'><tr><td><a href='?m=gamemanager&amp;p=game_monitor&amp;home_id=".$home_cfg['home_id']."'><< ".get_lang('back')."</a></td></tr></table>";
+				return;
+			}
+			$parent_cwd = dirname($current_cwd);
+			if (!is_string($parent_cwd) || $parent_cwd === '.' || $parent_cwd === DIRECTORY_SEPARATOR) {
+				$parent_cwd = '';
+			}
+			$_SESSION[$cwd_session_key] = $parent_cwd;
+			$path = clean_path($home_cfg['home_path']."/".$_SESSION[$cwd_session_key]);
 			if($path == clean_path($home_cfg['home_path']."/"))
 			{
-				print_failure(get_lang_f("dir_not_found",$path));
+				print_failure("Server files have not been installed yet.");
 				echo "<table class='center'><tr><td><a href='?m=gamemanager&amp;p=game_monitor&amp;home_id=".$home_cfg['home_id']."'><< ".get_lang('back')."</a></td></tr></table>";
 				return;
 			}
@@ -214,7 +228,7 @@ function exec_ogp_module()
 			{
 				$remote->shell_action('remove_recursive', $files);
 				$files = str_replace('" "','"<br>"',$files);
-				$db->logger( get_lang("remove") . ": ${files}" );
+				$db->logger( get_lang("remove") . ": {$files}" );
 			}
 		}
 	}
@@ -349,7 +363,7 @@ function exec_ogp_module()
 		if($items != '')
 		{
 			$retval = $remote->compress_files($items,$path,$archive_name,$archive_type);
-			$archive = clean_path( "${path}/${archive_name}.${archive_type}" );
+			$archive = clean_path( "{$path}/{$archive_name}.{$archive_type}" );
 			if( $retval == 0 )
 			{
 				do{

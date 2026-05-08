@@ -33,23 +33,9 @@ class BillingService
     {
         $qty    = max(1, $qty);
         $players = max(1, $players);
-
-        switch ($rateType) {
-            case 'daily':
-                $basePrice  = (float)($service['price_daily'] ?? 0);
-                $periodDays = $qty;
-                break;
-            case 'yearly':
-                $basePrice  = (float)($service['price_year'] ?? 0);
-                $periodDays = $qty * 365;
-                break;
-            case 'monthly':
-            default:
-                $rateType   = 'monthly';
-                $basePrice  = (float)($service['price_monthly'] ?? 0);
-                $periodDays = $qty * 31;
-                break;
-        }
+        $rateType   = 'monthly';
+        $basePrice  = (float)($service['price_monthly'] ?? 0);
+        $periodDays = $qty * 31;
 
         // price_monthly etc is the per-player per-period rate
         $ratePerPlayer = $basePrice;
@@ -163,9 +149,7 @@ class BillingService
         $periodEnd = $invoiceRow['period_end'] ?? null;
 
         if (!$periodEnd) {
-            $rateType  = $invoiceRow['rate_type'] ?? 'monthly';
-            $periodMap = ['daily' => '+1 day', 'monthly' => '+31 days', 'yearly' => '+365 days'];
-            $periodEnd = date('Y-m-d H:i:s', strtotime($periodMap[$rateType] ?? '+31 days'));
+            $periodEnd = date('Y-m-d H:i:s', strtotime('+31 days'));
         }
 
         // If current expiry is in the future, extend from it; otherwise reset from period_end
@@ -177,9 +161,7 @@ class BillingService
             if ($periodStart && $periodEndVal) {
                 $currentPeriodSecs = strtotime($periodEndVal) - strtotime($periodStart);
             } else {
-                $rateType2   = $invoiceRow['rate_type'] ?? 'monthly';
-                $periodSecMap = ['daily' => 86400, 'monthly' => 31 * 86400, 'yearly' => 365 * 86400];
-                $currentPeriodSecs = $periodSecMap[$rateType2] ?? (31 * 86400);
+                $currentPeriodSecs = 31 * 86400;
             }
             $newExpiry = date('Y-m-d H:i:s', strtotime($currentExpiry) + max(86400, $currentPeriodSecs));
         } else {
