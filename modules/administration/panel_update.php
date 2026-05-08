@@ -1302,8 +1302,9 @@ function gsp_panel_update_section()
 	// ---- GitHub Unstable -----------------------------------------------------
 	echo "<h3>GitHub Unstable</h3>\n";
 	echo "<p>GitHub Unstable represents the latest development branch and may be unstable.</p>\n";
-	echo "<p class='failure' style='display:inline-block;padding:5px 10px;'>"
-	   . "&#9888; Warning: GitHub Unstable may contain bugs or incomplete features. Use with caution in production.</p><br><br>\n";
+	echo "<p style='display:inline-block;margin:4px 0 10px;padding:6px 10px;border-radius:6px;"
+	   . "border:1px solid #d9b55a;background:#fff8e6;color:#6b5420;font-size:0.92em;'>"
+	   . "&#9888; Cutting-edge updates may include unfinished changes. Use stable releases for production.</p><br>\n";
 	echo "<form method='POST'>\n";
 	echo "<input type='hidden' name='gsp_update_action' value='update_unstable'>\n";
 	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
