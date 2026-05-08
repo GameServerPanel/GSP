@@ -29,19 +29,7 @@ function billing_generate_password(int $bytes = 12): string
 
 function billing_normalize_duration(string $duration): array
 {
-    $duration = strtolower(trim($duration));
-    switch ($duration) {
-        case 'day':
-        case 'daily':
-            return ['invoice_duration' => 'day', 'rate_type' => 'daily', 'days' => 1];
-        case 'year':
-        case 'yearly':
-            return ['invoice_duration' => 'year', 'rate_type' => 'yearly', 'days' => 365];
-        case 'month':
-        case 'monthly':
-        default:
-            return ['invoice_duration' => 'month', 'rate_type' => 'monthly', 'days' => 31];
-    }
+    return ['invoice_duration' => 'month', 'rate_type' => 'monthly', 'days' => 31];
 }
 
 function billing_money_to_cents(float $amount): int
@@ -60,23 +48,17 @@ function billing_rate_from_service(mysqli $db, string $table_prefix, int $servic
         return 0.0;
     }
 
-    $stmt = $db->prepare("SELECT price_daily, price_monthly, price_year FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
+    $stmt = $db->prepare("SELECT price_monthly FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
     if (!$stmt) {
         return 0.0;
     }
 
     $stmt->bind_param('i', $service_id);
     $stmt->execute();
-    $stmt->bind_result($price_daily, $price_monthly, $price_year);
+    $stmt->bind_result($price_monthly);
     $rate = 0.0;
     if ($stmt->fetch()) {
-        if ($rate_type === 'daily') {
-            $rate = floatval($price_daily);
-        } elseif ($rate_type === 'yearly') {
-            $rate = floatval($price_year);
-        } else {
-            $rate = floatval($price_monthly);
-        }
+        $rate = floatval($price_monthly);
     }
     $stmt->close();
 
@@ -179,19 +161,13 @@ $slot_min_qty = 1;
 $slot_max_qty = 1;
 $durationInfo = billing_normalize_duration($invoice_duration);
 if ($service_id > 0) {
-    $stmt = $db->prepare("SELECT service_name, price_daily, price_monthly, price_year, slot_min_qty, slot_max_qty FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
+    $stmt = $db->prepare("SELECT service_name, price_monthly, slot_min_qty, slot_max_qty FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
     if ($stmt) {
         $stmt->bind_param('i', $service_id);
         $stmt->execute();
-        $stmt->bind_result($service_name, $price_daily, $price_monthly, $price_year, $slot_min_qty, $slot_max_qty);
+        $stmt->bind_result($service_name, $price_monthly, $slot_min_qty, $slot_max_qty);
         if ($stmt->fetch()) {
-            if ($durationInfo['rate_type'] === 'daily') {
-                $base_rate = floatval($price_daily);
-            } elseif ($durationInfo['rate_type'] === 'yearly') {
-                $base_rate = floatval($price_year);
-            } else {
-                $base_rate = floatval($price_monthly);
-            }
+            $base_rate = floatval($price_monthly);
             // constrain slots
             if ($max_players < $slot_min_qty) $max_players = $slot_min_qty;
             if ($max_players > $slot_max_qty) $max_players = $slot_max_qty;

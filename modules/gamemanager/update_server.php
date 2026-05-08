@@ -24,6 +24,7 @@
 
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
+require_once("modules/gamemanager/update_actions.php");
 
 function exec_ogp_module() {
 
@@ -90,110 +91,26 @@ function exec_ogp_module() {
 		// Start update.
 		else if ($_GET['update'] == 'update' && $update_active != 1)
 		{
-			$installer_name = $modkey;
-
-			if ( isset( $mod_xml->installer_name ) )
-			{
-				$installer_name = $mod_xml->installer_name;
+			$start_result = gamemanager_trigger_update_install(
+				$db,
+				$home_info,
+				intval($mod_id),
+				array(
+					'master_server_home_id' => isset($_REQUEST['master_server_home_id']) ? intval($_REQUEST['master_server_home_id']) : 0,
+					'settings' => $db->getSettings(),
+				)
+			);
+			$mod_id = intval($start_result['mod_id'] ?? $mod_id);
+			if (empty($start_result['ok'])) {
+				print_failure(!empty($start_result['message']) ? $start_result['message'] : get_lang("failed_to_start_steam_update"));
+				return;
 			}
-			
-			$precmd = $home_info['mods'][$mod_id]['precmd'] == "" ? 
-				( $home_info['mods'][$mod_id]['def_precmd'] == "" ? $server_xml->pre_install : 
-				  $home_info['mods'][$mod_id]['def_precmd'] ) : $home_info['mods'][$mod_id]['precmd'];
-			
-			$postcmd = $home_info['mods'][$mod_id]['postcmd'] == "" ?
-				(  $home_info['mods'][$mod_id]['def_postcmd'] == "" ? $server_xml->post_install : 
-					$home_info['mods'][$mod_id]['def_precmd'] ) : $home_info['mods'][$mod_id]['postcmd'];
-			
-			$exec_folder_path = clean_path($home_info['home_path'] . "/" . $server_xml->exe_location );
-			$exec_path = clean_path($exec_folder_path . "/" . $server_xml->server_exec_name );
-			
-			if( isset( $_REQUEST['master_server_home_id'] ) )
-			{
-				$ms_home_id = $_REQUEST['master_server_home_id'];
-				
-				if ($db->getMasterServer($home_info['remote_server_id'], $home_info['home_cfg_id']) == $ms_home_id) {
-					if ($ms_home_id !== $home_id) {
-						$ms_info = $db->getGameHome($ms_home_id);
-						$steam_out = $remote->masterServerUpdate( $home_id,$home_info['home_path'],$ms_home_id,$ms_info['home_path'],$exec_folder_path,$exec_path,$precmd,$postcmd );
-					} else {
-						print_failure(get_lang('cannot_update_from_own_self'));
-						$view->refresh('?m=gamemanager&p=game_monitor', 2);
-						
-						return;
-					}
-				} else {
-					$db->logger(get_lang_f('update_attempt_from_nonmaster_server', $_SESSION['users_login'], $home_id, $ms_home_id));
-					print_failure(get_lang('attempting_nonmaster_update'));
-					$view->refresh('?m=gamemanager&p=game_monitor', 2);
-
-					return;
-				}
-				
-			}
-			elseif ($use_steamcmd && !empty((string)$installer_name))
-			{
-				if( preg_match("/win32/", $server_xml->game_key) OR preg_match("/win64/", $server_xml->game_key) ) 
-					$cfg_os = "windows";
-				elseif( preg_match("/linux/", $server_xml->game_key) )
-					$cfg_os = "linux";
-				
-				$settings = $db->getSettings();
-				
-				// Some games like L4D2 require anonymous login
-				if($mod_xml->installer_login){
-					$login = $mod_xml->installer_login;
-					$pass = '';
-				}else{
-					$login = $settings['steam_user'];
-					$pass = $settings['steam_pass'];
-				}
-				
-				$modname = ( $installer_name == '90' ) ? $modkey : '';
-				$betaname = isset($mod_xml->betaname) ? $mod_xml->betaname : '';
-				$betapwd = isset($mod_xml->betapwd) ? $mod_xml->betapwd : '';
-				$arch = isset($mod_xml->steam_bitness) ? $mod_xml->steam_bitness : '';
-				
-				// Additional files to lock
-				if(isset($server_xml->lock_files) && !empty($server_xml->lock_files)){
-					$lockFiles = trim($server_xml->lock_files);
-				}else{
-					$lockFiles = "";
-				}
-				
-				$steam_out = $remote->steam_cmd( $home_id,$home_info['home_path'],$installer_name,$modname,
-												 $betaname,$betapwd,$login,$pass,$settings['steam_guard'],
-												 $exec_folder_path,$exec_path,$precmd,$postcmd,$cfg_os,$lockFiles,$arch);
-			}
-			else
-			{
-				// No SteamCMD installer — run pre/post install scripts only.
-				$ran_scripts = false;
-				if (!empty((string)$precmd)) {
-					$remote->exec((string)$precmd);
-					$ran_scripts = true;
-				}
-				if (!empty((string)$postcmd)) {
-					$remote->exec((string)$postcmd);
-					$ran_scripts = true;
-				}
-				if ($ran_scripts) {
-					print_success( get_lang("update_started") );
-				} else {
-					print_success( get_lang("update_completed") );
-				}
+			if (!empty($start_result['started'])) {
+				print_success(get_lang("update_started"));
+			} else {
+				print_success(get_lang("update_completed"));
 				$view->refresh("?m=gamemanager&amp;p=game_monitor&amp;home_id=$home_id", 3);
 				return;
-			}
-			
-			if( $steam_out === 0 )
-			{
-				print_failure( get_lang("failed_to_start_steam_update") );
-				return;
-			}
-			else if ( $steam_out === 1 )
-			{
-				print_success( get_lang("update_started") );
 			}
 		}
 		// Refresh update page.

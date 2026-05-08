@@ -21,8 +21,8 @@
     .muted { color: #999; font-size: 0.85em; }
     .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; color: #155724; }
     .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; color: #721c24; }
-    .servers-cell { text-align: left; }
-    .server-cb-label { display: block; white-space: nowrap; margin: 2px 0; }
+    .servers-cell { text-align: left; min-width: 240px; max-width: 280px; }
+    .server-cb-label { display: block; white-space: normal; margin: 2px 0; }
     .action-cell { text-align: center; min-width: 120px; }
     .btn-row-save, .btn-save-all {
       border: 1px solid #3e7ab8;
@@ -65,7 +65,7 @@
  *
  * Columns that are admin-editable and NEVER overwritten by sync:
  *   enabled, slot_min_qty, slot_max_qty,
- *   price_daily, price_monthly, price_year,
+ *   price_monthly,
  *   remote_server_id, description, img_url
  */
 
@@ -310,7 +310,7 @@ $flashType = 'ok';
 $sort = strtolower((string)($_GET['sort'] ?? $_POST['sort'] ?? 'game'));
 $dir = strtolower((string)($_GET['dir'] ?? $_POST['dir'] ?? 'asc')) === 'desc' ? 'desc' : 'asc';
 $gameMode = strtolower((string)($_GET['game_mode'] ?? $_POST['game_mode'] ?? 'name'));
-if (!in_array($sort, ['game', 'config', 'enabled', 'day', 'month', 'year', 'servers'], true)) {
+if (!in_array($sort, ['game', 'config', 'enabled', 'month', 'servers'], true)) {
     $sort = 'game';
 }
 if (!in_array($gameMode, ['name', 'enabled'], true)) {
@@ -367,9 +367,7 @@ if (isset($_POST['save_services']) || isset($_POST['save_row'])) {
             continue;
         }
         $enabled      = isset($svcData['enabled']) ? 1 : 0;
-        $priceDaily   = number_format((float)($svcData['price_daily']   ?? 0), 2, '.', '');
         $priceMonthly = number_format((float)($svcData['price_monthly'] ?? 0), 2, '.', '');
-        $priceYear    = number_format((float)($svcData['price_year']    ?? 0), 2, '.', '');
         $slotMin      = max(1, (int)($svcData['slot_min_qty'] ?? 1));
         $slotMax      = max(1, (int)($svcData['slot_max_qty'] ?? 1));
         if ($slotMax < $slotMin) { $slotMax = $slotMin; }
@@ -396,9 +394,7 @@ if (isset($_POST['save_services']) || isset($_POST['save_row'])) {
         $ok = $db->query(
             "UPDATE `{$table_prefix}billing_services`
              SET enabled          = {$enabled},
-                 price_daily      = '{$priceDaily}',
                  price_monthly    = '{$priceMonthly}',
-                 price_year       = '{$priceYear}',
                  slot_min_qty     = {$slotMin},
                  slot_max_qty     = {$slotMax},
                  description      = '{$description}',
@@ -453,7 +449,7 @@ while ($rsRes && ($row = $rsRes->fetch_assoc())) {
 $services = [];
 $svcRes = $db->query(
     "SELECT bs.service_id, bs.service_name, bs.enabled,
-            bs.price_daily, bs.price_monthly, bs.price_year,
+            bs.price_monthly,
             bs.slot_min_qty, bs.slot_max_qty,
             bs.remote_server_id, bs.description, bs.img_url,
             ch.home_cfg_file
@@ -474,14 +470,8 @@ if (!empty($services)) {
             case 'enabled':
                 $cmp = ((int)($a['enabled'] ?? 0)) <=> ((int)($b['enabled'] ?? 0));
                 break;
-            case 'day':
-                $cmp = ((float)($a['price_daily'] ?? 0)) <=> ((float)($b['price_daily'] ?? 0));
-                break;
             case 'month':
                 $cmp = ((float)($a['price_monthly'] ?? 0)) <=> ((float)($b['price_monthly'] ?? 0));
-                break;
-            case 'year':
-                $cmp = ((float)($a['price_year'] ?? 0)) <=> ((float)($b['price_year'] ?? 0));
                 break;
             case 'servers':
                 $countA = trim((string)($a['remote_server_id'] ?? '')) === '' ? 0 : count(array_filter(explode(',', (string)$a['remote_server_id']), 'strlen'));
@@ -550,16 +540,8 @@ if (!empty($services)) {
         <th>Min Slots</th>
         <th>Max Slots</th>
         <th>
-          <?php $p = sort_link_params('day', $sort, $dir, $gameMode); ?>
-          <a class="sort-link <?php echo $sort === 'day' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Price / Day ($)</a>
-        </th>
-        <th>
           <?php $p = sort_link_params('month', $sort, $dir, $gameMode); ?>
           <a class="sort-link <?php echo $sort === 'month' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Price / Month ($)</a>
-        </th>
-        <th>
-          <?php $p = sort_link_params('year', $sort, $dir, $gameMode); ?>
-          <a class="sort-link <?php echo $sort === 'year' ? 'sort-active' : ''; ?>" href="/adminserverlist.php?<?php echo h(http_build_query($p)); ?>">Price / Year ($)</a>
         </th>
         <th>Description</th>
         <th>Image</th>
@@ -617,20 +599,8 @@ if (!empty($services)) {
 
         <td>
           <input type="number" step="0.01" min="0" class="price-input"
-                 name="svc[<?php echo $sid; ?>][price_daily]"
-                 value="<?php echo h(number_format((float)$svc['price_daily'], 2, '.', '')); ?>">
-        </td>
-
-        <td>
-          <input type="number" step="0.01" min="0" class="price-input"
                  name="svc[<?php echo $sid; ?>][price_monthly]"
                  value="<?php echo h(number_format((float)$svc['price_monthly'], 2, '.', '')); ?>">
-        </td>
-
-        <td>
-          <input type="number" step="0.01" min="0" class="price-input"
-                 name="svc[<?php echo $sid; ?>][price_year]"
-                 value="<?php echo h(number_format((float)$svc['price_year'], 2, '.', '')); ?>">
         </td>
 
         <td>
@@ -716,6 +686,7 @@ if (!empty($services)) {
   <ul>
     <li>A service will only appear in the store when <strong>Enabled</strong> is checked
         <em>and</em> at least one server is selected.</li>
+    <li><strong>Price / Month ($)</strong> is the canonical billing price used by cart, checkout, and provisioning.</li>
     <li>The <strong>Game Name</strong> and <strong>Config XML</strong> columns are sourced
         from <code><?php echo h("{$table_prefix}config_homes"); ?></code> and are read-only
         here.  To change them, update the game XML config in the panel.</li>

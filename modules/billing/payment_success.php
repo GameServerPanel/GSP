@@ -176,7 +176,7 @@ if ($db && $user_id > 0) {
             <h3>What Happens Next?</h3>
             <ul>
                 <li><strong>✓ Payment Confirmed:</strong> Your payment has been captured by PayPal</li>
-                <li><strong>⚙️ Server Provisioning:</strong> Your game server(s) will be automatically created when you log into the panel</li>
+                <li><strong>⚙️ Server Provisioning:</strong> Your game server(s) are queued for automatic install now; if a node is unavailable they remain clearly marked as pending install</li>
                 <li><strong>📧 Email Notification:</strong> You'll receive a confirmation email with your order details</li>
                 <li><strong>🎮 Access Your Servers:</strong> Log into the Game Server Panel to manage your new servers</li>
             </ul>
