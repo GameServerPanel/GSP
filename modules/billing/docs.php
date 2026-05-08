@@ -20,7 +20,7 @@ $docsDir = __DIR__ . '/docs';
 $action = $_GET['action'] ?? 'list';
 $doc = $_GET['doc'] ?? '';
 $docsPagePath = '/docs.php';
-$pageTitle = $action === 'view' ? 'Documentation' : 'Documentation - GSP';
+$pageTitle = 'Documentation - GSP';
 
 /**
  * Get all documentation folders with their metadata

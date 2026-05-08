@@ -354,9 +354,7 @@ function sw_agent_steamcmd_download(array $mod, array $profile, array $tpl_vars,
 
     // Validate that steamcmd exists
     if (!$dry_run) {
-        if (!is_file($steamcmd)) {
-            return array('ok' => false, 'error' => "SteamCMD not found: $steamcmd");
-        } elseif (!is_executable($steamcmd)) {
+        if (!is_executable($steamcmd)) {
             return array('ok' => false, 'error' => "SteamCMD is not executable: $steamcmd");
         }
     }
