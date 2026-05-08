@@ -353,8 +353,11 @@ function sw_agent_steamcmd_download(array $mod, array $profile, array $tpl_vars,
     }
 
     // Validate that steamcmd exists
-    if (!$dry_run && (!is_file($steamcmd) || !is_executable($steamcmd))) {
-        return array('ok' => false, 'error' => "SteamCMD not found or not executable: $steamcmd");
+    if (!$dry_run && !is_file($steamcmd)) {
+        return array('ok' => false, 'error' => "SteamCMD not found: $steamcmd");
+    }
+    if (!$dry_run && !is_executable($steamcmd)) {
+        return array('ok' => false, 'error' => "SteamCMD is not executable: $steamcmd");
     }
 
     // Build argument list; escape each argument individually.
