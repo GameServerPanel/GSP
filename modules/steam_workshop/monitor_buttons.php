@@ -15,15 +15,38 @@
 
 $module_buttons = array();
 
+if (!function_exists('sw_monitor_db_prefix')) {
+    function sw_monitor_db_prefix()
+    {
+        if (defined('DB_PREFIX') && DB_PREFIX !== '') {
+            return DB_PREFIX;
+        }
+        if (isset($GLOBALS['db_prefix']) && $GLOBALS['db_prefix'] !== '') {
+            return $GLOBALS['db_prefix'];
+        }
+        if (isset($GLOBALS['table_prefix']) && $GLOBALS['table_prefix'] !== '') {
+            return $GLOBALS['table_prefix'];
+        }
+        return 'gsp_';
+    }
+}
+
+if (!function_exists('sw_monitor_table')) {
+    function sw_monitor_table($name)
+    {
+        return '`' . sw_monitor_db_prefix() . $name . '`';
+    }
+}
+
 // Only show the button when a Workshop profile is enabled for this game config.
 $_sw_profile = $db->resultQuery(
-    "SELECT p.id
-       FROM OGP_DB_PREFIXsteam_workshop_game_profiles p
-       JOIN OGP_DB_PREFIXconfig_homes c ON c.game_key = p.config_name
-       JOIN OGP_DB_PREFIXserver_homes s ON s.home_cfg_id = c.home_cfg_id
+    "SELECT p.`id`
+       FROM " . sw_monitor_table('steam_workshop_game_profiles') . " p
+       JOIN " . sw_monitor_table('config_homes') . " c ON c.`game_key` = p.`config_name`
+       JOIN " . sw_monitor_table('server_homes') . " s ON s.`home_cfg_id` = c.`home_cfg_id`
       WHERE s.home_id = " . (int)$server_home['home_id'] . "
-        AND p.enabled = 1
-      LIMIT 1"
+         AND p.enabled = 1
+       LIMIT 1"
 );
 
 if (!empty($_sw_profile)) {

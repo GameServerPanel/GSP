@@ -42,8 +42,7 @@ function exec_ogp_module()
     // Find matching Workshop profile
     $profile = sw_get_profile_for_home($db, $home_id);
     if (!$profile) {
-        echo '<p>Steam Workshop is not enabled for this game type (<strong>'
-           . sw_h($home['game_name']) . '</strong>).</p>';
+        echo '<p>Steam Workshop is not enabled for this game.</p>';
         echo '<p>An administrator must enable Workshop support for this game under '
            . '<em>Steam Workshop &rsaquo; Admin</em>.</p>';
         return;
@@ -293,7 +292,7 @@ function sw_user_queue_update($db, $home_id)
             SET `install_status` = 'queued', `updated_at` = NOW()
           WHERE `home_id` = $home_id AND `enabled` = 1"
     );
-    sw_success('All enabled mods queued for update. Run the agent to process downloads.');
+    sw_success('All enabled mods were queued. Updates are processed automatically by the server agent.');
 }
 
 function sw_user_save_settings($db, $home_id)
@@ -301,9 +300,7 @@ function sw_user_save_settings($db, $home_id)
     $ok = sw_save_server_settings($db, $home_id, array(
         'update_mode'       => $_POST['update_mode']       ?? 'manual',
         'restart_behavior'  => $_POST['restart_behavior']  ?? 'none',
-        'hot_load'          => $_POST['hot_load']          ?? 'disabled',
-        'warning_minutes'   => $_POST['warning_minutes']   ?? 10,
-        'schedule_interval' => $_POST['schedule_interval'] ?? 'daily',
+        'schedule_interval' => $_POST['schedule_interval'] ?? 'disabled',
     ));
 
     if ($ok) {
@@ -321,352 +318,234 @@ function sw_user_render($db, $home_id, array $home, array $profile)
 {
     $mods = sw_get_server_mods($db, $home_id) ?: array();
     $settings = sw_get_server_settings($db, $home_id);
-
-    // Generate launch params from enabled mods
-    $enabled_mods = array_filter($mods, function ($m) {
-        return !empty($m['enabled']);
-    });
-    $params = sw_generate_launch_params(array_values($enabled_mods), $profile);
+    $queuedCount = 0;
+    $failedCount = 0;
+    $installedCount = 0;
+    $latestUpdateAt = '';
+    $latestError = '';
+    foreach ($mods as $mod) {
+        if (($mod['install_status'] ?? '') === 'queued') {
+            $queuedCount++;
+        } elseif (($mod['install_status'] ?? '') === 'failed') {
+            $failedCount++;
+        } elseif (($mod['install_status'] ?? '') === 'installed') {
+            $installedCount++;
+        }
+        if (!empty($mod['last_updated_at']) && $mod['last_updated_at'] > $latestUpdateAt) {
+            $latestUpdateAt = $mod['last_updated_at'];
+        }
+        if (($mod['install_status'] ?? '') === 'failed' && !empty($mod['last_error']) && $latestError === '') {
+            $latestError = $mod['last_error'];
+        }
+    }
 
     $base_url = 'home.php?m=steam_workshop&p=user&home_id=' . $home_id;
     ?>
+<style>
+.sw-user-panel{background:#161616;border:1px solid #2f2f2f;border-radius:6px;padding:14px;margin:10px 0;color:#ececec}
+.sw-user-panel h3{margin:0 0 10px 0;color:#fff}
+.sw-user-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.sw-user-grid label{display:block}
+.sw-user-grid span{display:block;font-size:12px;color:#bebebe;margin-bottom:4px}
+.sw-user-grid input[type=text],.sw-user-grid select{width:100%;box-sizing:border-box;background:#0d0d0d;border:1px solid #3a3a3a;color:#f0f0f0;padding:7px;border-radius:4px}
+.sw-user-table-wrap{overflow-x:auto}
+.sw-user-table{width:100%;border-collapse:collapse;min-width:860px}
+.sw-user-table th,.sw-user-table td{border:1px solid #353535;padding:8px;vertical-align:middle}
+.sw-user-table th{background:#202020;text-align:left;color:#fff}
+.sw-status-ok{color:#7cdc7c;font-weight:700}
+.sw-status-queued{color:#ffca63;font-weight:700}
+.sw-status-failed{color:#ff8484;font-weight:700}
+.sw-status-progress{color:#8cc7ff;font-weight:700}
+.sw-muted{color:#b4b4b4}
+</style>
 
-<p>
-  <strong>Server:</strong> <?= sw_h($home['home_name']) ?>
-  &nbsp;&nbsp;
-  <strong>Game:</strong> <?= sw_h($home['game_name']) ?>
-  &nbsp;&nbsp;
-  <strong>Workshop Profile:</strong> <?= sw_h($profile['config_name']) ?>
-</p>
-
-<!-- Add Mod form -->
-<h3>Add Workshop Mod</h3>
-<form method="post" action="<?= sw_h($base_url) ?>">
-  <input type="hidden" name="action" value="add_mod">
-  <table>
-    <tr>
-      <td style="padding:4px 8px;"><label for="workshop_id">Workshop ID</label></td>
-      <td style="padding:4px 8px;">
-        <input type="text" id="workshop_id" name="workshop_id" value=""
-               placeholder="e.g. 2863534533" style="width:180px;" required>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:4px 8px;"><label for="add_mod_name">Display Name (optional)</label></td>
-      <td style="padding:4px 8px;">
-        <input type="text" id="add_mod_name" name="mod_name" value=""
-               placeholder="e.g. CF" style="width:180px;">
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:4px 8px;"><label for="add_mod_type">Mod Type</label></td>
-      <td style="padding:4px 8px;">
-        <select id="add_mod_type" name="mod_type">
-          <option value="client">Client mod (-mod=)</option>
-          <option value="server">Server-side only (-serverMod=)</option>
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td style="padding:4px 8px;">
-        <button type="submit" class="button">Add Mod</button>
-      </td>
-    </tr>
-  </table>
-</form>
-
-<hr>
-
-<!-- Mod list -->
-<h3>Installed Mods (<?= count($mods) ?>)</h3>
-
-<?php if (empty($mods)): ?>
-<p>No mods added yet. Use the form above to add Workshop IDs.</p>
-<?php else: ?>
-<form method="post" action="<?= sw_h($base_url) ?>">
-  <table width="100%" style="border-collapse:collapse;">
-    <thead>
-      <tr style="background:#f0f0f0;">
-        <th style="padding:6px 8px;text-align:center;">#</th>
-        <th style="padding:6px 8px;text-align:left;">Workshop ID</th>
-        <th style="padding:6px 8px;text-align:left;">Mod Name</th>
-        <th style="padding:6px 8px;text-align:left;">Folder Name</th>
-        <th style="padding:6px 8px;text-align:center;">Type</th>
-        <th style="padding:6px 8px;text-align:center;">Enabled</th>
-        <th style="padding:6px 8px;text-align:center;">Status</th>
-        <th style="padding:6px 8px;text-align:center;">Order</th>
-        <th style="padding:6px 8px;text-align:center;">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($mods as $idx => $mod): ?>
-      <tr style="border-bottom:1px solid #ddd;<?= !$mod['enabled'] ? 'opacity:0.55;' : '' ?>">
-        <td style="padding:6px 8px;text-align:center;"><?= $idx + 1 ?></td>
-
-        <td style="padding:6px 8px;font-family:monospace;"><?= sw_h($mod['workshop_id']) ?></td>
-
-        <!-- Inline edit: name -->
-        <td style="padding:6px 8px;">
-          <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
-            <input type="hidden" name="action"  value="save_mod">
-            <input type="hidden" name="mod_id"  value="<?= (int)$mod['id'] ?>">
-            <input type="hidden" name="folder_name" value="<?= sw_h($mod['folder_name']) ?>">
-            <input type="hidden" name="mod_type"    value="<?= sw_h($mod['mod_type']) ?>">
-            <input type="text" name="mod_name" value="<?= sw_h($mod['mod_name']) ?>"
-                   style="width:120px;" title="Click Save to apply">
-        </td>
-
-        <!-- Inline edit: folder name -->
-        <td style="padding:6px 8px;">
-            <input type="text" name="folder_name" value="<?= sw_h($mod['folder_name']) ?>"
-                   style="width:140px;" title="Folder name inside server root">
-        </td>
-
-        <!-- Inline edit: mod type -->
-        <td style="padding:6px 8px;text-align:center;">
-            <select name="mod_type" style="width:100px;">
-              <option value="client" <?= $mod['mod_type'] === 'client' ? 'selected' : '' ?>>-mod=</option>
-              <option value="server" <?= $mod['mod_type'] === 'server' ? 'selected' : '' ?>>-serverMod=</option>
-            </select>
-            <button type="submit" class="button small" title="Save changes">Save</button>
-          </form>
-        </td>
-
-        <!-- Toggle enabled -->
-        <td style="padding:6px 8px;text-align:center;">
-          <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
-            <input type="hidden" name="action" value="toggle_mod">
-            <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
-            <button type="submit" class="button small"
-                    style="<?= $mod['enabled'] ? 'background:#5cb85c;color:#fff;' : '' ?>"
-                    title="<?= $mod['enabled'] ? 'Click to disable' : 'Click to enable' ?>">
-              <?= $mod['enabled'] ? 'On' : 'Off' ?>
-            </button>
-          </form>
-        </td>
-
-        <!-- Install status -->
-        <td style="padding:6px 8px;text-align:center;font-size:0.85em;">
-          <?php
-          $s = $mod['install_status'];
-          if ($s === 'installed') {
-              echo '<span style="color:green;">Installed</span>';
-          } elseif ($s === 'queued') {
-              echo '<span style="color:orange;">Queued</span>';
-          } elseif ($s === 'failed') {
-              echo '<span style="color:red;" title="' . sw_h($mod['last_error']) . '">Failed</span>';
-          } elseif ($s === 'updating') {
-              echo '<span style="color:blue;">Updating</span>';
-          } else {
-              echo '<span style="color:#999;">Not installed</span>';
-          }
-          ?>
-        </td>
-
-        <!-- Order buttons -->
-        <td style="padding:6px 8px;text-align:center;white-space:nowrap;">
-          <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
-            <input type="hidden" name="action" value="move_up">
-            <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
-            <button type="submit" class="button small" <?= $idx === 0 ? 'disabled' : '' ?>>&#9650;</button>
-          </form>
-          <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
-            <input type="hidden" name="action" value="move_down">
-            <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
-            <button type="submit" class="button small"
-                    <?= $idx === (count($mods) - 1) ? 'disabled' : '' ?>>&#9660;</button>
-          </form>
-        </td>
-
-        <!-- Delete -->
-        <td style="padding:6px 8px;text-align:center;">
-          <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
-            <input type="hidden" name="action" value="delete_mod">
-            <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
-            <button type="submit" class="button small danger"
-                    onclick="return confirm('Remove this mod from the list?');"
-                    style="background:#d9534f;color:#fff;">Remove</button>
-          </form>
-        </td>
-      </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-</form>
-<?php endif; ?>
-
-<hr>
-
-<!-- Launch params display -->
-<h3>Generated Launch Parameters</h3>
-<p style="color:#666;font-size:0.9em;">
-  Based on the enabled mods above (sorted by order). Copy these into your server startup command.
-</p>
-
-<?php if (empty($enabled_mods)): ?>
-<p>No enabled mods – launch parameters will be empty.</p>
-<?php else: ?>
-<?php if ($params['mod']): ?>
-<p>
-  <strong>Client mods (<code>-mod=</code>):</strong><br>
-  <input type="text" value="<?= sw_h($params['mod']) ?>"
-         readonly style="width:100%;font-family:monospace;"
-         onclick="this.select();">
-</p>
-<?php endif; ?>
-<?php if ($params['servermod']): ?>
-<p>
-  <strong>Server-side mods (<code>-serverMod=</code>):</strong><br>
-  <input type="text" value="<?= sw_h($params['servermod']) ?>"
-         readonly style="width:100%;font-family:monospace;"
-         onclick="this.select();">
-</p>
-<?php endif; ?>
-<p>
-  <strong>Combined:</strong><br>
-  <input type="text" value="<?= sw_h($params['combined']) ?>"
-         readonly style="width:100%;font-family:monospace;"
-         onclick="this.select();">
-</p>
-<?php endif; ?>
-
-<hr>
-
-<!-- Install/Update -->
-<h3>Install / Update Mods</h3>
-<p>
-  Clicking <strong>Queue Update</strong> marks all enabled mods as <em>queued</em>.
-  Then run the agent <strong>on the game server host</strong> (where SteamCMD and the game files are located)
-  to download and install the mods. Adjust the path to the panel's
-  <code>modules/steam_workshop/agent_update_workshop.php</code> for your server:
-</p>
-<pre style="background:#222;color:#eee;padding:10px 14px;border-radius:4px;overflow-x:auto;"
->php /path/to/panel/modules/steam_workshop/agent_update_workshop.php --home-id=<?= $home_id ?></pre>
-
-<form method="post" action="<?= sw_h($base_url) ?>">
-  <input type="hidden" name="action" value="queue_update">
-  <button type="submit" class="button"
-          onclick="return confirm('Queue all enabled mods for update?');">
-    Queue Update for All Enabled Mods
-  </button>
-</form>
-
-<hr>
-
-<!-- Workshop Behavior Settings -->
-<h3>Workshop Behavior Settings</h3>
-<p style="color:#888;font-size:0.9em;">
-  Configure how Workshop mods are installed and updated for this server.
-  All options default to the safest setting (manual only, no automatic restarts).
-</p>
-
-<form method="post" action="<?= sw_h($base_url) ?>">
-  <input type="hidden" name="action" value="save_settings">
-
-  <table style="border-collapse:collapse;width:100%;max-width:720px;">
-    <colgroup>
-      <col style="width:220px;">
-      <col>
-      <col style="width:340px;">
-    </colgroup>
-    <thead>
-      <tr style="background:#f0f0f0;">
-        <th style="padding:6px 8px;text-align:left;">Setting</th>
-        <th style="padding:6px 8px;text-align:left;">Value</th>
-        <th style="padding:6px 8px;text-align:left;">Help</th>
-      </tr>
-    </thead>
-    <tbody>
-
-      <tr style="border-bottom:1px solid #ddd;">
-        <td style="padding:8px;font-weight:bold;">Install / Update Mode</td>
-        <td style="padding:8px;">
-          <select name="update_mode" style="width:100%;">
-            <option value="manual"      <?= ($settings['update_mode'] === 'manual')       ? 'selected' : '' ?>>Manual only</option>
-            <option value="on_restart"  <?= ($settings['update_mode'] === 'on_restart')   ? 'selected' : '' ?>>On next restart</option>
-            <option value="before_start" <?= ($settings['update_mode'] === 'before_start') ? 'selected' : '' ?>>Before every server start</option>
-            <option value="scheduled"   <?= ($settings['update_mode'] === 'scheduled')    ? 'selected' : '' ?>>Scheduled update check</option>
-          </select>
-        </td>
-        <td style="padding:8px;font-size:0.85em;color:#555;">
-          <strong>Manual only</strong> – mods are only updated when you click &ldquo;Queue Update&rdquo; above.<br>
-          <strong>On next restart</strong> – queued updates are applied the next time the server restarts.<br>
-          <strong>Before every start</strong> – the update check runs automatically each time the server starts.<br>
-          <strong>Scheduled</strong> – the update check runs on the interval set below (requires cron / agent).
-        </td>
-      </tr>
-
-      <tr style="border-bottom:1px solid #ddd;">
-        <td style="padding:8px;font-weight:bold;">Restart Behavior</td>
-        <td style="padding:8px;">
-          <select name="restart_behavior" style="width:100%;">
-            <option value="none"         <?= ($settings['restart_behavior'] === 'none')         ? 'selected' : '' ?>>Do not restart automatically</option>
-            <option value="if_empty"     <?= ($settings['restart_behavior'] === 'if_empty')     ? 'selected' : '' ?>>Restart if empty</option>
-            <option value="immediate"    <?= ($settings['restart_behavior'] === 'immediate')    ? 'selected' : '' ?>>Restart after warning</option>
-            <option value="next_restart" <?= ($settings['restart_behavior'] === 'next_restart') ? 'selected' : '' ?>>Install on next manual restart only</option>
-          </select>
-        </td>
-        <td style="padding:8px;font-size:0.85em;color:#555;">
-          Controls what happens when new mod updates are found.<br>
-          <strong>Do not restart</strong> – updates are staged but the server keeps running (safe default).<br>
-          <strong>If empty</strong> – the server is restarted only when there are zero players connected.<br>
-          <strong>Immediate with warning</strong> – a countdown warning is broadcast, then the server restarts.<br>
-          <strong>Next manual restart</strong> – updates are installed the next time you manually stop/start the server.
-        </td>
-      </tr>
-
-      <tr style="border-bottom:1px solid #ddd;">
-        <td style="padding:8px;font-weight:bold;">Hot-Load</td>
-        <td style="padding:8px;">
-          <select name="hot_load" style="width:100%;">
-            <option value="disabled" <?= ($settings['hot_load'] === 'disabled') ? 'selected' : '' ?>>Disabled</option>
-            <option value="attempt"  <?= ($settings['hot_load'] === 'attempt')  ? 'selected' : '' ?>>Attempt hot-load if game supports it</option>
-          </select>
-        </td>
-        <td style="padding:8px;font-size:0.85em;color:#555;">
-          <strong>Disabled</strong> – no hot-loading; mod changes take effect only after a server restart (safe default).<br>
-          <strong>Attempt</strong> – if the game supports live mod reloading (e.g. via RCON), try to hot-load instead of restarting.
-        </td>
-      </tr>
-
-      <tr style="border-bottom:1px solid #ddd;">
-        <td style="padding:8px;font-weight:bold;">Warning Countdown</td>
-        <td style="padding:8px;">
-          <input type="number" name="warning_minutes" min="1" max="120"
-                 value="<?= (int)$settings['warning_minutes'] ?>"
-                 style="width:80px;"> minutes
-        </td>
-        <td style="padding:8px;font-size:0.85em;color:#555;">
-          Minutes of advance warning broadcast to players before an automatic restart.<br>
-          Only used when <em>Restart Behavior</em> is set to <strong>Restart immediately after warning</strong>.<br>
-          Default: 10 minutes.
-        </td>
-      </tr>
-
-      <tr style="border-bottom:1px solid #ddd;">
-        <td style="padding:8px;font-weight:bold;">Scheduled Check Interval</td>
-        <td style="padding:8px;">
-          <select name="schedule_interval" style="width:100%;">
-            <option value="hourly" <?= ($settings['schedule_interval'] === 'hourly') ? 'selected' : '' ?>>Hourly</option>
-            <option value="daily"  <?= ($settings['schedule_interval'] === 'daily')  ? 'selected' : '' ?>>Daily (default)</option>
-            <option value="weekly" <?= ($settings['schedule_interval'] === 'weekly') ? 'selected' : '' ?>>Weekly</option>
-          </select>
-        </td>
-        <td style="padding:8px;font-size:0.85em;color:#555;">
-          How often the scheduled update check runs.<br>
-          Only used when <em>Install / Update Mode</em> is set to <strong>Scheduled update check</strong>.<br>
-          Requires the Workshop agent to be running via cron on the game server host.
-        </td>
-      </tr>
-
-    </tbody>
-  </table>
-
-  <p style="margin-top:12px;">
-    <button type="submit" class="button">Save Behavior Settings</button>
+<div class="sw-user-panel">
+  <p>
+    <strong>Server:</strong> <?= sw_h($home['home_name']) ?>
+    &nbsp;&nbsp;<strong>Game:</strong> <?= sw_h($home['game_name']) ?>
+    &nbsp;&nbsp;<strong>Workshop Profile:</strong> <?= sw_h($profile['config_name']) ?>
   </p>
-</form>
+  <p class="sw-muted" style="margin-bottom:0;">
+    Queue updates from this page. The server agent applies queued updates automatically.
+  </p>
+</div>
+
+<div class="sw-user-panel">
+  <h3>Add Workshop Mod</h3>
+  <form method="post" action="<?= sw_h($base_url) ?>">
+    <input type="hidden" name="action" value="add_mod">
+    <div class="sw-user-grid">
+      <label>
+        <span>Workshop ID</span>
+        <input type="text" id="workshop_id" name="workshop_id" placeholder="e.g. 2863534533" required>
+      </label>
+      <label>
+        <span>Display Name (optional)</span>
+        <input type="text" id="add_mod_name" name="mod_name" placeholder="e.g. CF">
+      </label>
+      <label>
+        <span>Mod Type</span>
+        <select id="add_mod_type" name="mod_type">
+          <option value="client">Client mod</option>
+          <option value="server">Server-side only</option>
+        </select>
+      </label>
+    </div>
+    <p style="margin:12px 0 0;">
+      <button type="submit" class="button">Add Mod</button>
+    </p>
+  </form>
+</div>
+
+<div class="sw-user-panel">
+  <h3>Update Queue &amp; Last Result</h3>
+  <p>
+    <strong>Enabled mods:</strong> <?= count(array_filter($mods, function ($m) { return !empty($m['enabled']); })) ?>
+    &nbsp;&nbsp;<strong>Queued:</strong> <?= $queuedCount ?>
+    &nbsp;&nbsp;<strong>Installed:</strong> <?= $installedCount ?>
+    &nbsp;&nbsp;<strong>Failed:</strong> <?= $failedCount ?>
+  </p>
+  <p>
+    <strong>Last update time:</strong> <?= $latestUpdateAt ? sw_h($latestUpdateAt) : 'Never' ?>
+  </p>
+  <?php if ($latestError !== ''): ?>
+    <p><strong>Last error:</strong> <?= sw_h($latestError) ?></p>
+  <?php endif; ?>
+  <form method="post" action="<?= sw_h($base_url) ?>">
+    <input type="hidden" name="action" value="queue_update">
+    <button type="submit" class="button" onclick="return confirm('Queue all enabled mods for update?');">Queue Update for All Enabled Mods</button>
+  </form>
+</div>
+
+<div class="sw-user-panel">
+  <h3>Workshop Behavior Settings</h3>
+  <form method="post" action="<?= sw_h($base_url) ?>">
+    <input type="hidden" name="action" value="save_settings">
+    <div class="sw-user-grid">
+      <label>
+        <span>Update Mode</span>
+        <select name="update_mode">
+          <option value="manual" <?= ($settings['update_mode'] === 'manual') ? 'selected' : '' ?>>Manual only</option>
+          <option value="on_restart" <?= ($settings['update_mode'] === 'on_restart') ? 'selected' : '' ?>>On next restart</option>
+          <option value="before_start" <?= ($settings['update_mode'] === 'before_start') ? 'selected' : '' ?>>Before server start</option>
+        </select>
+      </label>
+      <label>
+        <span>Restart Behavior</span>
+        <select name="restart_behavior">
+          <option value="none" <?= ($settings['restart_behavior'] === 'none') ? 'selected' : '' ?>>Never restart automatically</option>
+          <option value="if_stopped" <?= ($settings['restart_behavior'] === 'if_stopped') ? 'selected' : '' ?>>Restart only if server is stopped</option>
+        </select>
+      </label>
+      <label>
+        <span>Scheduled Checks</span>
+        <select name="schedule_interval">
+          <option value="disabled" <?= ($settings['schedule_interval'] === 'disabled') ? 'selected' : '' ?>>Disabled</option>
+          <option value="daily" <?= ($settings['schedule_interval'] === 'daily') ? 'selected' : '' ?>>Daily</option>
+          <option value="weekly" <?= ($settings['schedule_interval'] === 'weekly') ? 'selected' : '' ?>>Weekly</option>
+        </select>
+      </label>
+    </div>
+    <p style="margin:12px 0 0;">
+      <button type="submit" class="button">Save Behavior Settings</button>
+    </p>
+  </form>
+</div>
+
+<div class="sw-user-panel">
+  <h3>Installed Mods (<?= count($mods) ?>)</h3>
+  <?php if (empty($mods)): ?>
+    <p>No mods added yet. Use the form above to add Workshop IDs.</p>
+  <?php else: ?>
+    <div class="sw-user-table-wrap">
+      <table class="sw-user-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Workshop ID</th>
+            <th>Mod Name</th>
+            <th>Folder Name</th>
+            <th>Type</th>
+            <th>Enabled</th>
+            <th>Status</th>
+            <th>Last Update</th>
+            <th>Last Error</th>
+            <th>Order</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($mods as $idx => $mod): ?>
+          <tr style="<?= !$mod['enabled'] ? 'opacity:0.55;' : '' ?>">
+            <td><?= $idx + 1 ?></td>
+            <td style="font-family:monospace;"><?= sw_h($mod['workshop_id']) ?></td>
+            <td>
+              <form method="post" action="<?= sw_h($base_url) ?>" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <input type="hidden" name="action" value="save_mod">
+                <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
+                <input type="text" name="mod_name" value="<?= sw_h($mod['mod_name']) ?>" style="width:120px;">
+            </td>
+            <td><input type="text" name="folder_name" value="<?= sw_h($mod['folder_name']) ?>" style="width:120px;"></td>
+            <td>
+                <select name="mod_type" style="width:120px;">
+                  <option value="client" <?= $mod['mod_type'] === 'client' ? 'selected' : '' ?>>Client</option>
+                  <option value="server" <?= $mod['mod_type'] === 'server' ? 'selected' : '' ?>>Server</option>
+                </select>
+                <button type="submit" class="button small">Save</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
+                <input type="hidden" name="action" value="toggle_mod">
+                <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
+                <button type="submit" class="button small" style="<?= $mod['enabled'] ? 'background:#5cb85c;color:#fff;' : '' ?>"><?= $mod['enabled'] ? 'On' : 'Off' ?></button>
+              </form>
+            </td>
+            <td>
+              <?php
+              $s = $mod['install_status'];
+              if ($s === 'installed') {
+                  echo '<span class="sw-status-ok">Installed</span>';
+              } elseif ($s === 'queued') {
+                  echo '<span class="sw-status-queued">Queued</span>';
+              } elseif ($s === 'failed') {
+                  echo '<span class="sw-status-failed">Failed</span>';
+              } elseif ($s === 'updating') {
+                  echo '<span class="sw-status-progress">Updating</span>';
+              } else {
+                  echo '<span class="sw-muted">Not installed</span>';
+              }
+              ?>
+            </td>
+            <td><?= !empty($mod['last_updated_at']) ? sw_h($mod['last_updated_at']) : '-' ?></td>
+            <?php $shortError = !empty($mod['last_error']) ? (strlen($mod['last_error']) > 70 ? (substr($mod['last_error'], 0, 67) . '...') : $mod['last_error']) : ''; ?>
+            <td title="<?= sw_h($mod['last_error'] ?? '') ?>"><?= $shortError !== '' ? sw_h($shortError) : '-' ?></td>
+            <td style="white-space:nowrap;">
+              <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
+                <input type="hidden" name="action" value="move_up">
+                <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
+                <button type="submit" class="button small" <?= $idx === 0 ? 'disabled' : '' ?>>&#9650;</button>
+              </form>
+              <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
+                <input type="hidden" name="action" value="move_down">
+                <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
+                <button type="submit" class="button small" <?= $idx === (count($mods) - 1) ? 'disabled' : '' ?>>&#9660;</button>
+              </form>
+            </td>
+            <td>
+              <form method="post" action="<?= sw_h($base_url) ?>" style="display:inline;">
+                <input type="hidden" name="action" value="delete_mod">
+                <input type="hidden" name="mod_id" value="<?= (int)$mod['id'] ?>">
+                <button type="submit" class="button small danger" onclick="return confirm('Remove this mod from the list?');" style="background:#d9534f;color:#fff;">Remove</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+        </tbody>
+      </table>
+    </div>
+  <?php endif; ?>
+</div>
 
 <?php
 }

@@ -154,6 +154,18 @@ function get_sync_name($server_xml)
 	return $sync_name;
 }
 
+function gsp_docs_url_for_game_key($game_key)
+{
+	$game_key = trim((string)$game_key);
+	if ($game_key !== '') {
+		$docPath = __DIR__ . '/../billing/docs/' . $game_key . '/index.php';
+		if (is_file($docPath)) {
+			return '/docs.php?action=view&doc=' . rawurlencode($game_key);
+		}
+	}
+	return '/docs.php';
+}
+
 function exec_ogp_module() {
 	global $db, $settings, $loggedInUserInfo;
 	echo "<h2 class='gameMonitor " . ($db->isAdmin( $_SESSION['user_id'] ) ? "isAdminUser" : "") . "'>". get_lang("game_monitor") ."</h2>";
@@ -259,6 +271,15 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 		create_home_selector($_GET['m'], $_GET['p'], "show_all");
 		$show_all = FALSE;
 	}
+
+	$docsTarget = '/docs.php';
+	if (is_array($home_info) && !empty($home_info['game_key'])) {
+		$docsTarget = gsp_docs_url_for_game_key($home_info['game_key']);
+	}
+	echo "<div style='margin:10px 0 16px 0;padding:10px 12px;border:1px solid #2d2d2d;border-radius:6px;background:#171717;'>"
+		. "<a href='" . htmlspecialchars($docsTarget, ENT_QUOTES, 'UTF-8') . "' target='_blank' rel='noopener noreferrer' style='color:#8cb9ff;text-decoration:none;font-weight:600;'>Game Documentation</a>"
+		. "<span style='color:#a9a9a9;margin-left:8px;'>Opens setup and troubleshooting docs in a new tab.</span>"
+		. "</div>";
 
 	require("protocol/lgsl/lgsl_protocol.php");
 
