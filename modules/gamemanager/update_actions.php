@@ -57,7 +57,7 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 			? ($home_info['mods'][$mod_id]['def_precmd'] == "" ? $server_xml->pre_install : $home_info['mods'][$mod_id]['def_precmd'])
 			: $home_info['mods'][$mod_id]['precmd'];
 		$postcmd = $home_info['mods'][$mod_id]['postcmd'] == ""
-			? ($home_info['mods'][$mod_id]['def_postcmd'] == "" ? $server_xml->post_install : $home_info['mods'][$mod_id]['def_precmd'])
+			? ($home_info['mods'][$mod_id]['def_postcmd'] == "" ? $server_xml->post_install : $home_info['mods'][$mod_id]['def_postcmd'])
 			: $home_info['mods'][$mod_id]['postcmd'];
 		$exec_folder_path = clean_path($home_info['home_path'] . "/" . $server_xml->exe_location);
 		$exec_path = clean_path($exec_folder_path . "/" . $server_xml->server_exec_name);
@@ -128,4 +128,3 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 		);
 	}
 }
-
