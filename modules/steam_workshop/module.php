@@ -173,6 +173,8 @@ $install_queries[5] = array(
                       ELSE `schedule_interval`
                     END"
         );
+        // The simplified workflow intentionally hard-disables these legacy fields
+        // for every row so old unsupported behaviors cannot be re-enabled.
         $ok = $ok && (bool)$db->query(
             "UPDATE " . sw_module_table('steam_workshop_server_settings') . "
                 SET `hot_load` = 'disabled', `warning_minutes` = 0"

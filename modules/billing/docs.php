@@ -20,6 +20,7 @@ $docsDir = __DIR__ . '/docs';
 $action = $_GET['action'] ?? 'list';
 $doc = $_GET['doc'] ?? '';
 $docsPagePath = '/docs.php';
+$pageTitle = $action === 'view' ? 'Documentation' : 'Documentation - GSP';
 
 /**
  * Get all documentation folders with their metadata
@@ -138,7 +139,7 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title><?php echo $action === 'view' ? 'Documentation' : 'Documentation - GSP'; ?></title>
+    <title><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
