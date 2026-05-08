@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-05-08
+- **Steam Workshop reliability + UI simplification:** Removed customer CLI/update scripting instructions from Workshop user flow, reduced per-server behavior options to supported modes only, switched remaining Steam Workshop SQL references to prefix helpers (no `OGP_DB_PREFIX` strings), hardened queued-update agent processing (`queued → updating → installed/failed`) with clearer error persistence, and refreshed monitor/support documentation links to open game-specific docs (fallback to docs index) in a new tab.
+- **Billing docs routing refresh:** Updated docs browser links/icons to root-relative storefront paths (`/docs.php`, `/docs/...`) and removed stale hardcoded panel host guidance from getting-started documentation.
+
 ## 2026-05-07
 - **README + storefront mobile/cart pricing fixes:** Rewrote the root README for GSP positioning, hardened storefront mobile responsiveness (login, order, cart, shared header guardrails), fixed add-to-cart price persistence for low-decimal paid items, aligned cart/free-checkout math to `total_due` values, and refreshed the canonical storefront footer timestamp.
 - **Billing/cart/storefront stability pass:** Hardened `add_to_cart.php` to build schema-compatible invoice inserts dynamically (including legacy installs missing `period_start`), fixed free-checkout DB close handling so wrapper objects are never passed to `mysqli_close()`, switched cart/free-total decisions to cent-based math so low nonzero prices (e.g. $0.02) never show as FREE, improved canonical game deduplication + OS variant matching in storefront list/order pages, and aligned Steam Workshop behavior labels with the new restart/update wording.

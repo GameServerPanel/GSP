@@ -12,7 +12,7 @@
 <p>Once your payment is processed, you'll receive:</p>
 <ul>
     <li>A confirmation email with your server details</li>
-    <li>Access to the control panel at <a href="http://panel.iaregamer.com" target="_blank">panel.iaregamer.com</a></li>
+    <li>Access to your control panel login URL (provided in your confirmation email)</li>
     <li>FTP credentials for file management</li>
     <li>Server IP address and port</li>
 </ul>
@@ -21,7 +21,7 @@
 
 <h3>Control Panel</h3>
 <ol>
-    <li>Visit <a href="http://panel.iaregamer.com" target="_blank">panel.iaregamer.com</a></li>
+    <li>Open your panel login URL (provided in your service welcome message)</li>
     <li>Log in with your account credentials</li>
     <li>Select your server from "My Servers"</li>
     <li>Use the control panel to start, stop, restart, and configure your server</li>
@@ -80,7 +80,7 @@
 <ul>
     <li>Check the game-specific documentation for your server type</li>
     <li>Review the troubleshooting guides</li>
-    <li>Contact support through your account dashboard</li>
+    <li>Open a support request from the panel support page</li>
     <li>Check our community forums for tips and solutions</li>
 </ul>
 

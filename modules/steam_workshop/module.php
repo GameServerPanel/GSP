@@ -9,29 +9,60 @@
  * (at your option) any later version.
  */
 
-// ── Module metadata ──────────────────────────────────────────────────────
 $module_title   = "Steam Workshop";
-$module_version = "3.1";
-$db_version     = 4;
+$module_version = "3.2";
+$db_version     = 5;
 $module_required = FALSE;
 $module_menus   = array(
     array('subpage' => 'admin', 'name' => 'Steam Workshop', 'group' => 'admin'),
 );
 
-// ── SQL helpers ──────────────────────────────────────────────────────────
-// All OGP_DB_PREFIX tokens are replaced at runtime by $db->query() /
-// $db->resultQuery() before the SQL reaches MySQL.  Do not replace them
-// here with literal strings.
+if (!function_exists('sw_module_db_prefix')) {
+    function sw_module_db_prefix()
+    {
+        if (defined('DB_PREFIX') && DB_PREFIX !== '') {
+            return DB_PREFIX;
+        }
+        if (isset($GLOBALS['db_prefix']) && $GLOBALS['db_prefix'] !== '') {
+            return $GLOBALS['db_prefix'];
+        }
+        if (isset($GLOBALS['table_prefix']) && $GLOBALS['table_prefix'] !== '') {
+            return $GLOBALS['table_prefix'];
+        }
+        return 'gsp_';
+    }
+}
 
-$_sw_drop_old = array(
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXworkshop_game_profiles`",
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXworkshop_cache`",
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXserver_workshop_mods`",
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXserver_workshop_settings`",
+if (!function_exists('sw_module_table_name')) {
+    function sw_module_table_name($table)
+    {
+        $prefix = preg_replace('/[^a-zA-Z0-9_]/', '', (string)sw_module_db_prefix());
+        $name = preg_replace('/[^a-zA-Z0-9_]/', '', (string)$table);
+        if ($prefix === '') {
+            $prefix = 'gsp_';
+        }
+        return $prefix . $name;
+    }
+}
+
+if (!function_exists('sw_module_table')) {
+    function sw_module_table($table)
+    {
+        return '`' . sw_module_table_name($table) . '`';
+    }
+}
+
+$install_queries = array();
+
+$legacyDrops = array(
+    "DROP TABLE IF EXISTS " . sw_module_table('workshop_game_profiles'),
+    "DROP TABLE IF EXISTS " . sw_module_table('workshop_cache'),
+    "DROP TABLE IF EXISTS " . sw_module_table('server_workshop_mods'),
+    "DROP TABLE IF EXISTS " . sw_module_table('server_workshop_settings'),
 );
 
-$_sw_create_new = array(
-    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXsteam_workshop_game_profiles` (
+$schemaCreate = array(
+    "CREATE TABLE IF NOT EXISTS " . sw_module_table('steam_workshop_game_profiles') . " (
       `id`                              INT           NOT NULL AUTO_INCREMENT,
       `config_name`                     VARCHAR(100)  NOT NULL,
       `game_name`                       VARCHAR(255)  NOT NULL DEFAULT '',
@@ -51,8 +82,8 @@ $_sw_create_new = array(
       `update_script_template`          TEXT          NULL,
       `copy_bikeys_enabled`             TINYINT(1)    NOT NULL DEFAULT 1,
       `notes`                           TEXT          NULL,
-      `default_update_mode`             ENUM('manual','on_restart','before_start','scheduled') NOT NULL DEFAULT 'manual',
-      `default_restart_behavior`        ENUM('none','if_empty','immediate','next_restart') NOT NULL DEFAULT 'none',
+      `default_update_mode`             ENUM('manual','on_restart','before_start') NOT NULL DEFAULT 'manual',
+      `default_restart_behavior`        ENUM('none','if_stopped') NOT NULL DEFAULT 'none',
       `default_hot_load`                ENUM('disabled','attempt') NOT NULL DEFAULT 'disabled',
       `created_at`                      DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `updated_at`                      DATETIME      NULL,
@@ -60,7 +91,7 @@ $_sw_create_new = array(
       UNIQUE KEY `uniq_config_name` (`config_name`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 
-    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXsteam_workshop_server_mods` (
+    "CREATE TABLE IF NOT EXISTS " . sw_module_table('steam_workshop_server_mods') . " (
       `id`               INT          NOT NULL AUTO_INCREMENT,
       `home_id`          INT          NOT NULL,
       `profile_id`       INT          NOT NULL,
@@ -80,95 +111,135 @@ $_sw_create_new = array(
       UNIQUE KEY `uniq_home_workshop` (`home_id`, `workshop_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 
-    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXsteam_workshop_server_settings` (
+    "CREATE TABLE IF NOT EXISTS " . sw_module_table('steam_workshop_server_settings') . " (
       `home_id`            INT          NOT NULL,
-      `update_mode`        ENUM('manual','on_restart','before_start','scheduled')
+      `update_mode`        ENUM('manual','on_restart','before_start')
                                         NOT NULL DEFAULT 'manual',
-      `restart_behavior`   ENUM('none','if_empty','immediate','next_restart')
+      `restart_behavior`   ENUM('none','if_stopped')
                                         NOT NULL DEFAULT 'none',
       `hot_load`           ENUM('disabled','attempt')
                                         NOT NULL DEFAULT 'disabled',
-      `warning_minutes`    INT          NOT NULL DEFAULT 10,
-      `schedule_interval`  VARCHAR(32)  NOT NULL DEFAULT 'daily',
+      `warning_minutes`    INT          NOT NULL DEFAULT 0,
+      `schedule_interval`  ENUM('disabled','daily','weekly') NOT NULL DEFAULT 'disabled',
       `created_at`         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
       `updated_at`         DATETIME     NULL,
       PRIMARY KEY (`home_id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 );
 
-// ── Install queries ──────────────────────────────────────────────────────
-//
-// $install_queries[0]  – runs on fresh install (module manager iterates all keys).
-//                        Drops any legacy tables and creates the new schema.
-// $install_queries[3]  – runs when upgrading from db_version 2 → 3.
-//                        Same content; idempotent because of IF [NOT] EXISTS.
-// $install_queries[4]  – runs when upgrading from db_version 3 → 4.
-//                        Adds steam_workshop_server_settings table and default
-//                        behavior columns on steam_workshop_game_profiles.
-//
-// Note: the module manager loops $install_queries[$i+1] for each step from
-// current db_version up to target.  Keys 1 and 2 are intentionally absent;
-// the manager safely skips undefined keys (PHP returns NULL → empty array).
+$install_queries[0] = array_merge($legacyDrops, $schemaCreate);
+$install_queries[3] = array_merge($legacyDrops, $schemaCreate);
+$install_queries[4] = array();
 
-$install_queries = array();
+$install_queries[5] = array(
+    function ($db) {
+        $table = sw_module_table_name('steam_workshop_server_settings');
+        $exists = $db->resultQuery(
+            "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '" . $db->realEscapeSingle($table) . "'"
+        );
+        if (!$exists || (int)($exists[0]['cnt'] ?? 0) === 0) {
+            return (bool)$db->query(
+                "CREATE TABLE IF NOT EXISTS " . sw_module_table('steam_workshop_server_settings') . " (
+                  `home_id`            INT          NOT NULL,
+                  `update_mode`        ENUM('manual','on_restart','before_start') NOT NULL DEFAULT 'manual',
+                  `restart_behavior`   ENUM('none','if_stopped') NOT NULL DEFAULT 'none',
+                  `hot_load`           ENUM('disabled','attempt') NOT NULL DEFAULT 'disabled',
+                  `warning_minutes`    INT          NOT NULL DEFAULT 0,
+                  `schedule_interval`  ENUM('disabled','daily','weekly') NOT NULL DEFAULT 'disabled',
+                  `created_at`         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  `updated_at`         DATETIME     NULL,
+                  PRIMARY KEY (`home_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+            );
+        }
 
-$install_queries[0] = array_merge($_sw_drop_old, $_sw_create_new);
-$install_queries[3] = array_merge($_sw_drop_old, $_sw_create_new);
+        $ok = true;
+        $ok = $ok && (bool)$db->query(
+            "UPDATE " . sw_module_table('steam_workshop_server_settings') . "
+                SET `update_mode` = CASE
+                      WHEN `update_mode` = 'scheduled' THEN 'manual'
+                      ELSE `update_mode`
+                    END"
+        );
+        $ok = $ok && (bool)$db->query(
+            "UPDATE " . sw_module_table('steam_workshop_server_settings') . "
+                SET `restart_behavior` = CASE
+                      WHEN `restart_behavior` IN ('if_empty','next_restart') THEN 'if_stopped'
+                      WHEN `restart_behavior` = 'immediate' THEN 'none'
+                      ELSE `restart_behavior`
+                    END"
+        );
+        $ok = $ok && (bool)$db->query(
+            "UPDATE " . sw_module_table('steam_workshop_server_settings') . "
+                SET `schedule_interval` = CASE
+                      WHEN `schedule_interval` = 'hourly' THEN 'daily'
+                      WHEN `schedule_interval` IS NULL OR `schedule_interval` = '' THEN 'disabled'
+                      ELSE `schedule_interval`
+                    END"
+        );
+        // The simplified workflow intentionally hard-disables these legacy fields
+        // for every row so old unsupported behaviors cannot be re-enabled.
+        $ok = $ok && (bool)$db->query(
+            "UPDATE " . sw_module_table('steam_workshop_server_settings') . "
+                SET `hot_load` = 'disabled', `warning_minutes` = 0"
+        );
+        $ok = $ok && (bool)$db->query(
+            "ALTER TABLE " . sw_module_table('steam_workshop_server_settings') . "
+             MODIFY `update_mode` ENUM('manual','on_restart','before_start') NOT NULL DEFAULT 'manual'"
+        );
+        $ok = $ok && (bool)$db->query(
+            "ALTER TABLE " . sw_module_table('steam_workshop_server_settings') . "
+             MODIFY `restart_behavior` ENUM('none','if_stopped') NOT NULL DEFAULT 'none'"
+        );
+        $ok = $ok && (bool)$db->query(
+            "ALTER TABLE " . sw_module_table('steam_workshop_server_settings') . "
+             MODIFY `schedule_interval` ENUM('disabled','daily','weekly') NOT NULL DEFAULT 'disabled'"
+        );
 
-unset($_sw_drop_old, $_sw_create_new);
-
-// ── db_version 4: per-server behavior settings + per-profile defaults ────
-//
-// New table: steam_workshop_server_settings
-//   Stores update/restart/hot-load preferences per server home.
-//   Defaults are safe (manual-only, no auto-restart, hot-load disabled).
-//
-// Altered table: steam_workshop_game_profiles
-//   Adds default_update_mode, default_restart_behavior, default_hot_load so
-//   admins can configure defaults per game profile.
-//
-// All callables check INFORMATION_SCHEMA before ALTER so this is re-runnable.
-
-$install_queries[4] = array(
-    // Create per-server settings table
-    "CREATE TABLE IF NOT EXISTS `OGP_DB_PREFIXsteam_workshop_server_settings` (
-      `home_id`            INT          NOT NULL,
-      `update_mode`        ENUM('manual','on_restart','before_start','scheduled')
-                                        NOT NULL DEFAULT 'manual',
-      `restart_behavior`   ENUM('none','if_empty','immediate','next_restart')
-                                        NOT NULL DEFAULT 'none',
-      `hot_load`           ENUM('disabled','attempt')
-                                        NOT NULL DEFAULT 'disabled',
-      `warning_minutes`    INT          NOT NULL DEFAULT 10,
-      `schedule_interval`  VARCHAR(32)  NOT NULL DEFAULT 'daily',
-      `created_at`         DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      `updated_at`         DATETIME     NULL,
-      PRIMARY KEY (`home_id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
-
-    // Add default_update_mode to game_profiles if missing
-    function($db) {
-        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXsteam_workshop_game_profiles' AND COLUMN_NAME = 'default_update_mode'");
-        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
-        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXsteam_workshop_game_profiles` ADD `default_update_mode` ENUM('manual','on_restart','before_start','scheduled') NOT NULL DEFAULT 'manual' AFTER `notes`");
+        return $ok;
     },
-    // Add default_restart_behavior to game_profiles if missing
-    function($db) {
-        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXsteam_workshop_game_profiles' AND COLUMN_NAME = 'default_restart_behavior'");
-        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
-        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXsteam_workshop_game_profiles` ADD `default_restart_behavior` ENUM('none','if_empty','immediate','next_restart') NOT NULL DEFAULT 'none' AFTER `default_update_mode`");
-    },
-    // Add default_hot_load to game_profiles if missing
-    function($db) {
-        $r = $db->resultQuery("SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'OGP_DB_PREFIXsteam_workshop_game_profiles' AND COLUMN_NAME = 'default_hot_load'");
-        if ($r && isset($r[0]['cnt']) && (int)$r[0]['cnt'] > 0) return true;
-        return (bool)$db->query("ALTER TABLE `OGP_DB_PREFIXsteam_workshop_game_profiles` ADD `default_hot_load` ENUM('disabled','attempt') NOT NULL DEFAULT 'disabled' AFTER `default_restart_behavior`");
+    function ($db) {
+        $profileTable = sw_module_table_name('steam_workshop_game_profiles');
+        $exists = $db->resultQuery(
+            "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '" . $db->realEscapeSingle($profileTable) . "'"
+        );
+        if (!$exists || (int)($exists[0]['cnt'] ?? 0) === 0) {
+            return true;
+        }
+
+        $ok = true;
+        $ok = $ok && (bool)$db->query(
+            "UPDATE " . sw_module_table('steam_workshop_game_profiles') . "
+                SET `default_update_mode` = CASE
+                      WHEN `default_update_mode` = 'scheduled' THEN 'manual'
+                      ELSE `default_update_mode`
+                    END"
+        );
+        $ok = $ok && (bool)$db->query(
+            "UPDATE " . sw_module_table('steam_workshop_game_profiles') . "
+                SET `default_restart_behavior` = CASE
+                      WHEN `default_restart_behavior` IN ('if_empty','next_restart') THEN 'if_stopped'
+                      WHEN `default_restart_behavior` = 'immediate' THEN 'none'
+                      ELSE `default_restart_behavior`
+                    END"
+        );
+        $ok = $ok && (bool)$db->query(
+            "ALTER TABLE " . sw_module_table('steam_workshop_game_profiles') . "
+             MODIFY `default_update_mode` ENUM('manual','on_restart','before_start') NOT NULL DEFAULT 'manual'"
+        );
+        $ok = $ok && (bool)$db->query(
+            "ALTER TABLE " . sw_module_table('steam_workshop_game_profiles') . "
+             MODIFY `default_restart_behavior` ENUM('none','if_stopped') NOT NULL DEFAULT 'none'"
+        );
+
+        return $ok;
     },
 );
 
-// ── Uninstall queries ─────────────────────────────────────────────────────
 $uninstall_queries = array(
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXsteam_workshop_server_settings`",
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXsteam_workshop_server_mods`",
-    "DROP TABLE IF EXISTS `OGP_DB_PREFIXsteam_workshop_game_profiles`",
+    "DROP TABLE IF EXISTS " . sw_module_table('steam_workshop_server_settings'),
+    "DROP TABLE IF EXISTS " . sw_module_table('steam_workshop_server_mods'),
+    "DROP TABLE IF EXISTS " . sw_module_table('steam_workshop_game_profiles'),
 );

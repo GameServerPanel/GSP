@@ -19,6 +19,7 @@ $docsDir = __DIR__ . '/docs';
 // Get action and doc parameters
 $action = $_GET['action'] ?? 'list';
 $doc = $_GET['doc'] ?? '';
+$docsPagePath = '/docs.php';
 
 /**
  * Get all documentation folders with their metadata
@@ -63,9 +64,9 @@ function getDocCategories($docsDir) {
         // Find icon file
         $icon = '';
         if (file_exists($folderPath . '/icon.png')) {
-            $icon = 'docs/' . $folder . '/icon.png';
+            $icon = '/docs/' . $folder . '/icon.png';
         } elseif (file_exists($folderPath . '/icon.jpg')) {
-            $icon = 'docs/' . $folder . '/icon.jpg';
+            $icon = '/docs/' . $folder . '/icon.jpg';
         }
         
         $categories[] = [
@@ -137,7 +138,7 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title><?php echo $action === 'view' ? 'Documentation' : 'Documentation - GameServers.World'; ?></title>
+    <title><?php echo htmlspecialchars('Documentation - GSP', ENT_QUOTES, 'UTF-8'); ?></title>
     <link rel="stylesheet" href="css/header.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -351,7 +352,7 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
     <div class="container">
         <?php if ($action === 'view' && !empty($doc)): ?>
             <!-- View specific documentation -->
-            <a href="docs.php" class="back-button">← Back to Documentation List</a>
+            <a href="<?php echo htmlspecialchars($docsPagePath, ENT_QUOTES, 'UTF-8'); ?>" class="back-button">← Back to Documentation List</a>
             
             <div class="doc-view-container">
                 <?php
@@ -401,7 +402,7 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
                         
                         <div class="docs-grid">
                             <?php foreach ((array)$docs as $doc): ?>
-                                <a href="docs.php?action=view&doc=<?php echo urlencode($doc['folder']); ?>" class="doc-card">
+                                <a href="<?php echo htmlspecialchars($docsPagePath . '?action=view&doc=' . urlencode($doc['folder']), ENT_QUOTES, 'UTF-8'); ?>" class="doc-card">
                                     <div class="doc-icon-wrapper">
                                         <?php if (!empty($doc['icon'])): ?>
                                             <img src="<?php echo htmlspecialchars($doc['icon']); ?>" alt="" class="doc-icon">
@@ -428,4 +429,3 @@ uksort($grouped, function($a, $b) use ($categoryOrder) {
     </div>
 </body>
 </html>
-

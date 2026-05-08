@@ -87,12 +87,12 @@ if ($dry_run) {
 
 // ── Collect home IDs to process ───────────────────────────────────────────
 if ($do_all) {
-    // Find all home_ids that have at least one enabled mod with a valid enabled profile.
+    // Find all home_ids that have at least one enabled queued mod with an enabled profile.
     $rows = $db->resultQuery(
         "SELECT DISTINCT m.home_id
-           FROM `OGP_DB_PREFIXsteam_workshop_server_mods` m
-           JOIN `OGP_DB_PREFIXsteam_workshop_game_profiles` p ON p.id = m.profile_id
-          WHERE m.enabled = 1 AND p.enabled = 1"
+           FROM " . sw_table('steam_workshop_server_mods') . " m
+           JOIN " . sw_table('steam_workshop_game_profiles') . " p ON p.id = m.profile_id
+          WHERE m.enabled = 1 AND p.enabled = 1 AND m.install_status = 'queued'"
     );
     $home_ids = $rows ? array_column($rows, 'home_id') : array();
 } else {
@@ -159,14 +159,11 @@ function sw_agent_process_home($db, $home_id, $dry_run)
     );
     $server_root = rtrim($server_root, '/');
 
-    // Load enabled mods, sorted by sort_order
-    $mods = sw_get_server_mods($db, $home_id) ?: array();
-    $mods = array_filter($mods, function ($m) {
-        return !empty($m['enabled']);
-    });
+    // Load queued+enabled mods, sorted by sort_order
+    $mods = sw_agent_get_queued_mods($db, $home_id);
 
     if (empty($mods)) {
-        echo "  No enabled mods.\n";
+        echo "  No queued Workshop updates for this server.\n";
         return true;
     }
 
@@ -185,7 +182,7 @@ function sw_agent_process_home($db, $home_id, $dry_run)
         // Mark as updating
         if (!$dry_run) {
             $db->query(
-                "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+                "UPDATE " . sw_table('steam_workshop_server_mods') . "
                     SET `install_status` = 'updating', `last_error` = NULL, `updated_at` = NOW()
                   WHERE `id` = $mod_id LIMIT 1"
             );
@@ -224,7 +221,7 @@ function sw_agent_process_home($db, $home_id, $dry_run)
             if (!$dry_run) {
                 $safe_err = $db->realEscapeSingle($err);
                 $db->query(
-                    "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+                    "UPDATE " . sw_table('steam_workshop_server_mods') . "
                         SET `install_status` = 'failed', `last_error` = '$safe_err', `updated_at` = NOW()
                       WHERE `id` = $mod_id LIMIT 1"
                 );
@@ -246,7 +243,7 @@ function sw_agent_process_home($db, $home_id, $dry_run)
             if (!$dry_run) {
                 $safe_err = $db->realEscapeSingle($err);
                 $db->query(
-                    "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+                    "UPDATE " . sw_table('steam_workshop_server_mods') . "
                         SET `install_status` = 'failed', `last_error` = '$safe_err', `updated_at` = NOW()
                       WHERE `id` = $mod_id LIMIT 1"
                 );
@@ -263,7 +260,7 @@ function sw_agent_process_home($db, $home_id, $dry_run)
         // 4. Mark as installed
         if (!$dry_run) {
             $db->query(
-                "UPDATE `OGP_DB_PREFIXsteam_workshop_server_mods`
+                "UPDATE " . sw_table('steam_workshop_server_mods') . "
                     SET `install_status`    = 'installed',
                         `last_installed_at` = NOW(),
                         `last_updated_at`   = NOW(),
@@ -276,25 +273,20 @@ function sw_agent_process_home($db, $home_id, $dry_run)
         echo "    [OK] Installed → $install_path\n";
     }
 
-    // 5. Print launch parameters
-    $enabled_mods = array_values(array_filter(
-        sw_get_server_mods($db, $home_id) ?: array(),
-        function ($m) { return !empty($m['enabled']); }
-    ));
-    $params = sw_generate_launch_params($enabled_mods, $profile);
-
-    echo "\n  Generated launch parameters:\n";
-    if ($params['mod']) {
-        echo "    " . $params['mod'] . "\n";
-    }
-    if ($params['servermod']) {
-        echo "    " . $params['servermod'] . "\n";
-    }
-    if (!$params['mod'] && !$params['servermod']) {
-        echo "    (none)\n";
-    }
-
     return $all_ok;
+}
+
+function sw_agent_get_queued_mods($db, $home_id)
+{
+    $home_id = (int)$home_id;
+    $rows = $db->resultQuery(
+        "SELECT * FROM " . sw_table('steam_workshop_server_mods') . "
+          WHERE `home_id` = $home_id
+            AND `enabled` = 1
+            AND `install_status` = 'queued'
+          ORDER BY `sort_order` ASC, `id` ASC"
+    );
+    return $rows ? $rows : array();
 }
 
 /**
@@ -361,8 +353,13 @@ function sw_agent_steamcmd_download(array $mod, array $profile, array $tpl_vars,
     }
 
     // Validate that steamcmd exists
-    if (!$dry_run && !is_file($steamcmd) && !is_executable($steamcmd)) {
-        return array('ok' => false, 'error' => "SteamCMD not found or not executable: $steamcmd");
+    if (!$dry_run) {
+        if (!is_file($steamcmd)) {
+            return array('ok' => false, 'error' => "SteamCMD not found: $steamcmd");
+        }
+        if (!is_executable($steamcmd)) {
+            return array('ok' => false, 'error' => "SteamCMD is not executable: $steamcmd");
+        }
     }
 
     // Build argument list; escape each argument individually.

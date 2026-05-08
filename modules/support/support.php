@@ -22,6 +22,18 @@
  *
  */
 
+function gsp_support_docs_url_for_game_key($game_key)
+{
+	$game_key = trim((string)$game_key);
+	if ($game_key !== '') {
+		$docPath = __DIR__ . '/../billing/docs/' . $game_key . '/index.php';
+		if (is_file($docPath)) {
+			return '/docs.php?action=view&doc=' . rawurlencode($game_key);
+		}
+	}
+	return '/docs.php';
+}
+
 function exec_ogp_module() {
 
 	global $db, $settings;
@@ -81,6 +93,19 @@ if (!empty($webhook)) {
 	} // end if submit
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />';
 	echo "<h2>".get_lang('support')."</h2>";
+	$defaultDocsUrl = '/docs.php';
+	if (!empty($server_homes) && is_array($server_homes)) {
+		foreach ((array)$server_homes as $server_home_row) {
+			if (!empty($server_home_row['game_key'])) {
+				$defaultDocsUrl = gsp_support_docs_url_for_game_key($server_home_row['game_key']);
+				break;
+			}
+		}
+	}
+	echo "<div style='margin:0 auto 16px auto;max-width:600px;padding:10px 12px;border:1px solid #2d2d2d;border-radius:6px;background:#171717;'>"
+		. "<a id='support-doc-link' href='" . htmlspecialchars($defaultDocsUrl, ENT_QUOTES) . "' target='_blank' rel='noopener noreferrer' style='color:#8cb9ff;text-decoration:none;font-weight:600;'>Game Documentation</a>"
+		. "<span style='color:#a9a9a9;margin-left:8px;'>Open setup and troubleshooting docs in a new tab.</span>"
+		. "</div>";
 	echo '
 	<div style="background:#5865F2;border-radius:8px;padding:14px 20px;margin:0 auto 20px auto;max-width:600px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(0,0,0,0.18);">
 		<i class="fa-brands fa-discord" style="font-size:2.4em;color:#fff;flex-shrink:0;"></i>
@@ -97,7 +122,8 @@ if (!empty($webhook)) {
 	echo get_lang('select_server').":<br /><select name='gameserver' id='gameserver'>";
 	foreach ((array)$server_homes as $server_home)
 	{
-		echo "<option value='".$server_home['home_name']."'>".$server_home['home_name']."</option>";
+		$docUrl = gsp_support_docs_url_for_game_key($server_home['game_key'] ?? '');
+		echo "<option value='".htmlspecialchars($server_home['home_name'], ENT_QUOTES)."' data-doc-url='".htmlspecialchars($docUrl, ENT_QUOTES)."'>".htmlspecialchars($server_home['home_name'], ENT_QUOTES)."</option>";
 	}
 	echo "</select><br /><br />";
 		
@@ -138,6 +164,15 @@ if (!empty($webhook)) {
 			return false;
 		}
 	}
+	$(document).ready(function(){
+		function updateSupportDocLink(){
+			var selected = $('#gameserver option:selected');
+			var url = selected.data('doc-url') || '/docs.php';
+			$('#support-doc-link').attr('href', url);
+		}
+		$('#gameserver').on('change', updateSupportDocLink);
+		updateSupportDocLink();
+	});
 	</script>
 	<?php 
 } // End function
