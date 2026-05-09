@@ -229,9 +229,13 @@ if (!function_exists('billing_detect_install_state')) {
 		$state['exec_path'] = $execPath;
 		$state['exec_exists'] = ($remote->rfile_exists($execPath) === 1);
 		$state['complete'] = $state['exec_exists'];
-		$state['reason'] = $state['exec_exists']
-			? 'Expected executable already exists on the remote server.'
-			: 'Expected executable is missing on the remote server.';
+		if ($state['exec_exists']) {
+			$state['reason'] = 'Expected executable already exists on the remote server.';
+		} elseif (!empty($state['update_active'])) {
+			$state['reason'] = 'Server installation is in progress.';
+		} else {
+			$state['reason'] = 'Expected executable is missing on the remote server.';
+		}
 		return $state;
 	}
 }
@@ -285,6 +289,53 @@ if (!function_exists('billing_agent_offline_reason')) {
 	function billing_agent_offline_reason(int $remote_server_id, array $home_info): string
 	{
 		return "Agent is offline for remote server #{$remote_server_id} (" . ($home_info['agent_ip'] ?? 'unknown') . ":" . ($home_info['agent_port'] ?? 'unknown') . ").";
+	}
+}
+
+if (!function_exists('billing_detect_service_os')) {
+	function billing_detect_service_os(string $cfg_file, string $game_key): string
+	{
+		$haystack = strtolower(trim($cfg_file !== '' ? $cfg_file : $game_key));
+		if ($haystack === '') {
+			return 'any';
+		}
+		if (preg_match('/(?:^|[_\\-])(win|windows)(?:[_\\-]|$)/i', $haystack)) {
+			return 'windows';
+		}
+		if (preg_match('/(?:^|[_\\-])linux(?:[_\\-]|$)/i', $haystack)) {
+			return 'linux';
+		}
+		return 'any';
+	}
+}
+
+if (!function_exists('billing_normalize_node_os')) {
+	function billing_normalize_node_os(string $server_os): string
+	{
+		$value = strtolower(trim($server_os));
+		if ($value === '' || $value === 'any') {
+			return 'any';
+		}
+		if (str_starts_with($value, 'win')) {
+			return 'windows';
+		}
+		if (str_starts_with($value, 'lin')) {
+			return 'linux';
+		}
+		return $value;
+	}
+}
+
+if (!function_exists('billing_remote_servers_has_os_column')) {
+	function billing_remote_servers_has_os_column($db, string $db_prefix): bool
+	{
+		static $cache = array();
+		if (isset($cache[$db_prefix])) {
+			return $cache[$db_prefix];
+		}
+		$rows = $db->resultQuery("SHOW COLUMNS FROM `{$db_prefix}remote_servers` LIKE 'server_os'");
+		$cache[$db_prefix] = !empty($rows);
+		return $cache[$db_prefix];
 	}
 }
 
@@ -681,6 +732,11 @@ function exec_ogp_module()
 			$selected_port = 0;
 			$selected_mod_id = 0;
 			$resolved_mod_cfg_id = 0;
+			$home_cfg_id = 0;
+			$mod_cfg_id = 0;
+			$selected_config_xml = '';
+			$selected_game_key = '';
+			$selected_service_os = 'any';
 			$install_mechanism = BILLING_INSTALL_MECHANISM;
 			$install_result = 'pending';
 			$install_message = '';
@@ -704,9 +760,12 @@ function exec_ogp_module()
 			}
 			billing_provision_trace('Resolved latest invoice row for order.', array('invoice_row' => $invoiceRow));
 			//Query service info	
-			$service = $db->resultQuery( "SELECT * 
-							   FROM `{$db_prefix}billing_services` 
-							   WHERE service_id=".$db->realEscapeSingle($service_id) );
+			$service = $db->resultQuery(
+				"SELECT bs.*, ch.home_cfg_file, ch.game_key
+				 FROM `{$db_prefix}billing_services` bs
+				 LEFT JOIN `{$db_prefix}config_homes` ch ON ch.home_cfg_id = bs.home_cfg_id
+				 WHERE bs.service_id=" . $db->realEscapeSingle($service_id)
+			);
 			billing_provision_trace('Loaded billing service row.', array(
 				'service_id' => intval($service_id),
 				'service_row_found' => !empty($service[0]),
@@ -717,6 +776,9 @@ function exec_ogp_module()
 			{
 				$home_cfg_id = $service[0]['home_cfg_id'];
 				$mod_cfg_id = $service[0]['mod_cfg_id'];
+				$selected_config_xml = (string)($service[0]['home_cfg_file'] ?? '');
+				$selected_game_key = (string)($service[0]['game_key'] ?? '');
+				$selected_service_os = billing_detect_service_os($selected_config_xml, $selected_game_key);
 				//remote_server_id has been stored in IP_ID
 				//$remote_server_id = $service[0]['remote_server_id'];
 				$remote_server_id = $order['ip'];	
@@ -730,6 +792,8 @@ function exec_ogp_module()
 					'order_status' => $order['status'] ?? '',
 					'order_home_id_before_provisioning' => intval($order['home_id'] ?? 0),
 					'selected_home_cfg_id' => intval($home_cfg_id),
+					'selected_config_xml' => $selected_config_xml,
+					'selected_service_os' => $selected_service_os,
 					'selected_remote_server_id' => intval($remote_server_id),
 				));
 				if (intval($home_cfg_id) <= 0) {
@@ -739,6 +803,44 @@ function exec_ogp_module()
 				if (!$order_failed && intval($remote_server_id) <= 0) {
 					$order_failed = true;
 					$order_failure_reason = "Invalid remote server selection '{$remote_server_id}' on order #{$order_id} for service_id {$service_id}.";
+				}
+				if (!$order_failed) {
+					$allowedRemote = array();
+					foreach (explode(',', (string)($service[0]['remote_server_id'] ?? '')) as $part) {
+						$part = trim($part);
+						if ($part !== '' && ctype_digit($part)) {
+							$allowedRemote[(int)$part] = true;
+						}
+					}
+					if (!empty($allowedRemote) && !isset($allowedRemote[intval($remote_server_id)])) {
+						$order_failed = true;
+						$order_failure_reason = "Selected remote server #{$remote_server_id} is not enabled for service_id {$service_id}.";
+					}
+				}
+				if (!$order_failed && billing_remote_servers_has_os_column($db, $db_prefix)) {
+					$remoteRow = $db->resultQuery(
+						"SELECT remote_server_id, remote_server_name, server_os
+						 FROM `{$db_prefix}remote_servers`
+						 WHERE remote_server_id=" . $db->realEscapeSingle($remote_server_id) . "
+						 LIMIT 1"
+					);
+					if (empty($remoteRow[0])) {
+						$order_failed = true;
+						$order_failure_reason = "Remote server #{$remote_server_id} not found for order #{$order_id} (service_id {$service_id}).";
+					} else {
+						$node_os = billing_normalize_node_os((string)($remoteRow[0]['server_os'] ?? 'any'));
+						billing_provision_trace('Resolved remote server OS for compatibility check.', array(
+							'selected_remote_server_id' => intval($remote_server_id),
+							'selected_node_os' => $node_os,
+							'selected_service_os' => $selected_service_os,
+						));
+						if ($selected_service_os !== 'any' && $node_os !== 'any' && $selected_service_os !== $node_os) {
+							$order_failed = true;
+							$order_failure_reason = $selected_service_os === 'windows'
+								? 'This service requires a Windows server location.'
+								: 'This service requires a Linux server location.';
+						}
+					}
 				}
 			}
 			else
@@ -1291,8 +1393,10 @@ function exec_ogp_module()
 				'order_id' => intval($order_id),
 				'invoice_id' => intval($provision_invoice_id),
 				'user_id' => intval($user_id),
+				'service_id' => intval($service_id),
 				'home_id' => intval($home_id),
 				'home_cfg_id' => intval($home_cfg_id ?? 0),
+				'config_xml' => (string)$selected_config_xml,
 				'mod_id' => intval($selected_mod_id),
 				'ip_id' => intval($selected_ip_id),
 				'port' => intval($selected_port),
@@ -1307,8 +1411,10 @@ function exec_ogp_module()
 				'BILLING PROVISION RESULT order_id=' . intval($order_id)
 				. ' invoice_id=' . intval($provision_invoice_id)
 				. ' user_id=' . intval($user_id)
+				. ' service_id=' . intval($service_id)
 				. ' home_id=' . intval($home_id)
 				. ' home_cfg_id=' . intval($home_cfg_id ?? 0)
+				. ' config_xml=' . (string)$selected_config_xml
 				. ' mod_id=' . intval($selected_mod_id)
 				. ' ip_id=' . intval($selected_ip_id)
 				. ' port=' . intval($selected_port)

@@ -93,7 +93,16 @@ function exec_ogp_module()
     {
 		// Force log file contents to be UTF-8 (fixes http://www.opengamepanel.org/forum/viewthread.php?thread_id=5379)
 		if(hasValue($home_log)){
-			$home_log = utf8_encode($home_log);
+			if (function_exists('mb_check_encoding') && function_exists('mb_convert_encoding')) {
+				if (!mb_check_encoding($home_log, 'UTF-8')) {
+					$home_log = mb_convert_encoding($home_log, 'UTF-8', 'ISO-8859-1');
+				}
+			} elseif (function_exists('iconv')) {
+				$converted = @iconv('ISO-8859-1', 'UTF-8//IGNORE', $home_log);
+				if ($converted !== false) {
+					$home_log = $converted;
+				}
+			}
 		}
 		
 		// Using the refreshed class

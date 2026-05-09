@@ -13,3 +13,4 @@
 - Add an admin billing orders "provisioning details" drawer that reads `modules/billing/logs/provisioning.log` and shows the latest mechanism/result/error per order without leaving the panel.
 - Add an automated end-to-end check that verifies `create_servers.php` skips already-installed homes while still retrying existing-home orders with missing executable/IP-port/mod prerequisites.
 - Add a repeatable QA fixture that exercises `modules/billing/logs/provisioning_trace.log` writability failures and verifies payment success pages surface the traced provision result for paid and free orders.
+- Add an admin/serverlist UI badge that shows detected service OS variant (Windows/Linux/Any) from XML metadata next to each purchasable service row.

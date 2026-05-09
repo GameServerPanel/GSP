@@ -64,9 +64,8 @@ This is the "order gameserver" page. It displays the options for a single specif
 has the "Add to Cart" button. The gameserver selected is passed from the serverlist page by a GET
 of the service_id. When the user clicks "Add to Cart", the next page is add_to_cart.php.
 
-OS-aware selection: if both a Linux and a Windows variant of the same game exist as separate
-billing_services entries, the system automatically detects the selected location's OS (from
-remote_servers.server_os) and routes the cart add to the correct service variant.
+Each enabled billing service row is listed and purchased as its own exact variant.
+The selected service_id remains the source of truth for checkout and provisioning.
 */
 
 // Require login for ordering
@@ -103,35 +102,35 @@ if (isset($_POST['save']) && !empty($_POST['description'])) {
     }
 }
 
-/**
- * Derive OS ('linux'|'windows'|'any') from a game_key string.
- * Checks for _win / _windows substrings; then _linux; else 'any'.
- */
-function order_game_key_os(string $gameKey): string
-{
-    $lk = strtolower($gameKey);
-    if (str_contains($lk, '_win')) {
-        return 'windows';
-    }
-    if (str_contains($lk, '_linux')) {
-        return 'linux';
-    }
-    return 'any';
-}
-
 function order_price_is_free($value): bool
 {
     return ((int) round(((float)$value) * 100)) === 0;
 }
 
-function order_canonical_game_key(string $gameKey): string
+function order_detect_service_os(string $cfgFile, string $gameKey): string
 {
-    $gameKey = strtolower(trim($gameKey));
-    if ($gameKey === '') {
-        return '';
+    $haystack = strtolower(trim($cfgFile !== '' ? $cfgFile : $gameKey));
+    if ($haystack === '') {
+        return 'any';
     }
-    $canonical = preg_replace('/_(linux|linux32|linux64|win|win32|win64|windows|windows32|windows64)$/i', '', $gameKey);
-    return $canonical !== '' ? $canonical : $gameKey;
+    if (preg_match('/(?:^|[_\\-])(win|windows)(?:[_\\-]|$)/i', $haystack)) {
+        return 'windows';
+    }
+    if (preg_match('/(?:^|[_\\-])linux(?:[_\\-]|$)/i', $haystack)) {
+        return 'linux';
+    }
+    return 'any';
+}
+
+function order_variant_label(string $serviceOs): string
+{
+    if ($serviceOs === 'windows') {
+        return 'Windows';
+    }
+    if ($serviceOs === 'linux') {
+        return 'Linux';
+    }
+    return '';
 }
 
 // --- Fetch the requested service with config_homes join for canonical game info ---
@@ -142,7 +141,7 @@ if ($req_service_id !== 0) {
     $where_service_id = " WHERE bs.enabled = 1";
 }
 
-$qry_services = "SELECT bs.*, ch.game_name AS cfg_game_name, ch.game_key AS cfg_game_key
+$qry_services = "SELECT bs.*, ch.game_name AS cfg_game_name, ch.game_key AS cfg_game_key, ch.home_cfg_file AS cfg_file
                  FROM {$table_prefix}billing_services bs
                  LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
                  {$where_service_id}
@@ -152,10 +151,10 @@ $services_result = $db->query($qry_services);
 if ($services_result === false) {
     // Fallback: query without join if config_homes doesn't exist in this context
     $where_service_id_simple = str_replace('bs.', '', $where_service_id);
-    $qry_services = "SELECT *, NULL AS cfg_game_name, NULL AS cfg_game_key
-                     FROM {$table_prefix}billing_services
-                     {$where_service_id_simple}
-                     ORDER BY service_name";
+    $qry_services = "SELECT *, NULL AS cfg_game_name, NULL AS cfg_game_key, NULL AS cfg_file
+                      FROM {$table_prefix}billing_services
+                      {$where_service_id_simple}
+                      ORDER BY service_name";
     $services_result = $db->query($qry_services);
 }
 
@@ -193,6 +192,8 @@ if ($osColCheck && $osColCheck->num_rows > 0) {
     $osColCheck->free();
 }
 
+$order_error_message = isset($_GET['error_message']) ? trim((string)$_GET['error_message']) : '';
+
 ?>
 <div class="order-shell">
 <div class="clearfix">
@@ -227,45 +228,16 @@ echo "$" . number_format(floatval($row['price_monthly']), 2) . " Monthly";
 }else
 // THIS IS THE SERVER WE WANT TO ORDER
 {
-// Determine canonical game name and OS for this service
+// Determine exact selected service display and OS label from config metadata.
 $svcGameKey = (string)($row['cfg_game_key'] ?? '');
-$svcGameOs  = order_game_key_os($svcGameKey);
+$cfgFile = (string)($row['cfg_file'] ?? '');
+$svcGameOs  = order_detect_service_os($cfgFile, $svcGameKey);
 $canonicalGameName = (string)($row['cfg_game_name'] ?? $row['service_name']);
-$canonicalGameKey = order_canonical_game_key($svcGameKey);
-
-// Build map of OS variant service IDs for JS-based automatic selection.
-// Look for sibling services that share the same cfg_game_name (canonical) but differ in OS.
-// e.g. if current service is arma3_linux64, find the arma3_win64 service too.
-$osServiceMap = []; // ['linux' => service_id, 'windows' => service_id]
-if ($svcGameOs !== 'any' && (!empty($canonicalGameName) || !empty($canonicalGameKey))) {
-$siblingQuery = "SELECT bs.service_id, ch.game_key AS cfg_game_key, ch.game_name AS cfg_game_name
-                  FROM {$table_prefix}billing_services bs
-                  LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
-                  WHERE bs.enabled = 1";
-$siblingResult = $db->query($siblingQuery);
-if ($siblingResult) {
-while ($sib = $siblingResult->fetch_assoc()) {
-$sibGameKey = (string)($sib['cfg_game_key'] ?? '');
-$sibCanonical = order_canonical_game_key($sibGameKey);
-$sibName = (string)($sib['cfg_game_name'] ?? '');
-if ($canonicalGameKey !== '') {
-if ($sibCanonical !== $canonicalGameKey) {
-continue;
+$variantLabel = order_variant_label($svcGameOs);
+$displayName = $canonicalGameName;
+if ($variantLabel !== '' && stripos($displayName, $variantLabel) === false) {
+    $displayName .= ' - ' . $variantLabel;
 }
-} elseif ($canonicalGameName !== '' && strcasecmp($sibName, $canonicalGameName) !== 0) {
-continue;
-}
-$sibOs = order_game_key_os((string)($sib['cfg_game_key'] ?? ''));
-$osServiceMap[$sibOs] = (int)$sib['service_id'];
-}
-$siblingResult->free();
-}
-}
-// Always include the current service as a fallback
-if (!isset($osServiceMap[$svcGameOs]) || $svcGameOs === 'any') {
-$osServiceMap[$svcGameOs] = (int)$row['service_id'];
-}
-$osServiceMapJson = json_encode($osServiceMap, JSON_THROW_ON_ERROR);
 
 ?>
 <div class="order-layout">
@@ -274,9 +246,9 @@ $osServiceMapJson = json_encode($osServiceMap, JSON_THROW_ON_ERROR);
 $imgSrc = billing_image_url((string)($row['img_url'] ?? ''));
 if ($imgSrc === '') { $imgSrc = '/images/games/default_server.png'; }
 ?>
-<img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($canonicalGameName, ENT_QUOTES, 'UTF-8'); ?>"
+<img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'); ?>"
      onerror="this.src='/images/games/default_server.png'; this.onerror=null;">
-<center class="order-media-title"><b><?php echo htmlspecialchars($canonicalGameName, ENT_QUOTES, 'UTF-8'); ?></b></center>
+<center class="order-media-title"><b><?php echo htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'); ?></b></center>
 <?php
 $isAdmin = false;
 if ($isAdmin) {
@@ -300,9 +272,11 @@ echo "<p class='order-media-desc'>" . htmlspecialchars((string)($row['descriptio
 ?>
 </div>
 <div class="order-form-card">
+<?php if ($order_error_message !== ''): ?>
+<p class="error"><?php echo htmlspecialchars($order_error_message, ENT_QUOTES, 'UTF-8'); ?></p>
+<?php endif; ?>
 <table class="order-form-table">
 <form method="post" action="add_to_cart.php">
-    <!-- service_id is updated by JS when the location OS changes -->
     <input type="hidden" id="order_service_id" name="service_id" value="<?php echo intval($row['service_id']); ?>">
     <input type="hidden" name="display_service_id" value="<?php echo intval($row['service_id']); ?>">
     <input type="hidden" name="remote_control_password" value="">
@@ -318,35 +292,14 @@ echo "<p class='order-media-desc'>" . htmlspecialchars((string)($row['descriptio
   <td align="right"><b>Location</b></td>
   <td align="left">
 <?php
-// Fetch servers available for this game from billing_services.remote_server_id
-// (a comma-separated list of numeric remote server IDs, e.g. "1,3,7").
-// When OS-aware: also collect sibling service's allowed IDs to show all compatible locations.
+// Fetch servers available for this exact selected service from billing_services.remote_server_id.
 $available_server = false;
 $remoteIdsCsv = (string)($row['remote_server_id'] ?? '');
-
-// Also gather allowed IDs from sibling OS-variant services
 $allAllowedIds = [];
 foreach (explode(',', $remoteIdsCsv) as $part) {
 $part = trim($part);
 if ($part !== '' && ctype_digit($part)) {
 $allAllowedIds[] = (int)$part;
-}
-}
-// Add IDs from sibling service variants so locations appear regardless of which
-// service variant is the "primary" one shown to the user.
-if (count($osServiceMap) > 1) {
-foreach ($osServiceMap as $_os => $sibSvcId) {
-if ($sibSvcId === (int)$row['service_id']) continue;
-$sibRow = $db->query("SELECT remote_server_id FROM {$table_prefix}billing_services WHERE service_id = " . intval($sibSvcId) . " LIMIT 1");
-if ($sibRow && ($sibData = $sibRow->fetch_assoc())) {
-foreach (explode(',', (string)($sibData['remote_server_id'] ?? '')) as $part) {
-$part = trim($part);
-if ($part !== '' && ctype_digit($part)) {
-$allAllowedIds[] = (int)$part;
-}
-}
-$sibRow->free();
-}
 }
 }
 $allAllowedIds = array_unique($allAllowedIds);
@@ -365,18 +318,17 @@ $firstServer = true;
 while ($rs = $rsResult->fetch_assoc()) {
 $rsID    = (int)$rs['remote_server_id'];
 $rsNAME  = htmlspecialchars((string)$rs['remote_server_name'], ENT_QUOTES, 'UTF-8');
-$rsOs    = (string)($rs['server_os'] ?? 'any');
+$rsOsRaw = strtolower((string)($rs['server_os'] ?? 'any'));
+$rsOs = str_starts_with($rsOsRaw, 'win') ? 'windows' : (str_starts_with($rsOsRaw, 'lin') ? 'linux' : ($rsOsRaw === '' ? 'any' : $rsOsRaw));
 $checked = $firstServer ? ' checked' : '';
-// Skip this location if we know the service is OS-specific and the
-// node OS is incompatible AND no sibling service covers this OS.
-if ($svcGameOs !== 'any' && $rsOs !== 'any' && $rsOs !== $svcGameOs && !isset($osServiceMap[$rsOs])) {
-continue; // Incompatible OS variant with no fallback service
+if ($svcGameOs !== 'any' && $rsOs !== 'any' && $rsOs !== $svcGameOs) {
+continue;
 }
 $available_server = true;
 $firstServer = false;
 $safeOs = htmlspecialchars($rsOs, ENT_QUOTES, 'UTF-8');
 echo "<div class='location-option'>\n"
-   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' data-os='{$safeOs}' required{$checked} onchange='gspUpdateServiceId(this)'>\n"
+   . "  <input type='radio' name='ip_id' id='rs_{$rsID}' value='{$rsID}' data-os='{$safeOs}' required{$checked}>\n"
    . "  <label for='rs_{$rsID}'>{$rsNAME}</label>\n"
    . "</div>\n";
 }
@@ -410,9 +362,6 @@ var price = document.getElementById("totalPrice");
 var invoiceDuration = document.getElementById("invoiceDuration");
 var pricePerSlot = <?php echo number_format(floatval($row['price_monthly']), 2, '.', ''); ?>;
 
-// OS-aware service variant map: {os: service_id}
-var osServiceMap = <?php echo $osServiceMapJson; ?>;
-
 function recalc() {
 var slots = parseInt(slider.value, 10);
 var months = parseInt(invoiceslider.value, 10);
@@ -428,24 +377,6 @@ totalInput.value = total;
 recalc();
 slider.oninput = recalc;
 invoiceslider.oninput = recalc;
-
-// Update the hidden service_id based on the selected location's OS.
-window.gspUpdateServiceId = function(radio) {
-var os = radio.getAttribute('data-os') || 'any';
-var svcInput = document.getElementById('order_service_id');
-if (!svcInput) return;
-// Pick the service for this OS, fall back to 'any', then first available
-if (osServiceMap[os] !== undefined) {
-svcInput.value = osServiceMap[os];
-} else if (osServiceMap['any'] !== undefined) {
-svcInput.value = osServiceMap['any'];
-}
-// else keep the current value
-};
-
-// Trigger on page load for the pre-checked radio
-var checked = document.querySelector('input[name="ip_id"]:checked');
-if (checked) { window.gspUpdateServiceId(checked); }
 })();
 </script>
   
@@ -466,7 +397,17 @@ $is_logged_in = (isset($_SESSION['website_user_id']) && !empty($_SESSION['websit
 <?php elseif (!$is_logged_in): ?>
 <div class="login-placeholder">Please <a href="login.php">login</a> to order</div>
 <?php else: ?>
-<p class="error">No available server locations for this game.</p>
+<p class="error">
+<?php
+if ($svcGameOs === 'windows') {
+echo 'This service requires a Windows server location.';
+} elseif ($svcGameOs === 'linux') {
+echo 'This service requires a Linux server location.';
+} else {
+echo 'No available server locations for this service.';
+}
+?>
+</p>
 <?php endif; ?>
 </form>
 </td>

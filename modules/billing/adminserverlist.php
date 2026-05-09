@@ -21,7 +21,7 @@
     .muted { color: #999; font-size: 0.85em; }
     .flash-ok  { background: #d4edda; border: 1px solid #c3e6cb; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; color: #155724; }
     .flash-err { background: #f8d7da; border: 1px solid #f5c6cb; padding: 10px 12px; margin-bottom: 10px; border-radius: 6px; color: #721c24; }
-    .servers-cell { text-align: left; min-width: 240px; max-width: 280px; }
+    .servers-cell { text-align: left; min-width: 160px; max-width: 220px; width: 220px; }
     .server-cb-label { display: block; white-space: normal; margin: 2px 0; }
     .action-cell { text-align: center; min-width: 120px; }
     .btn-row-save, .btn-save-all {
