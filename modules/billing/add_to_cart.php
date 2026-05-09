@@ -71,10 +71,41 @@ function billing_rate_from_service(mysqli $db, string $table_prefix, int $servic
     return $rate;
 }
 
-function billing_fail_add_to_cart(string $message, array $context = []): void
+function billing_detect_service_os(string $cfgFile, string $gameKey): string
+{
+    $haystack = strtolower(trim($cfgFile !== '' ? $cfgFile : $gameKey));
+    if ($haystack === '') {
+        return 'any';
+    }
+    if (preg_match('/(?:^|[_\\-])(win|windows)(?:[_\\-]|$)/i', $haystack)) {
+        return 'windows';
+    }
+    if (preg_match('/(?:^|[_\\-])linux(?:[_\\-]|$)/i', $haystack)) {
+        return 'linux';
+    }
+    return 'any';
+}
+
+function billing_normalize_node_os(string $serverOs): string
+{
+    $value = strtolower(trim($serverOs));
+    if ($value === '' || $value === 'any') {
+        return 'any';
+    }
+    if (str_starts_with($value, 'win')) {
+        return 'windows';
+    }
+    if (str_starts_with($value, 'lin')) {
+        return 'linux';
+    }
+    return $value;
+}
+
+function billing_fail_add_to_cart(string $message, array $context = [], ?string $redirect = null): void
 {
     site_log_error('add_to_cart_failed', array_merge(['message' => $message], $context));
-    header('Location: /cart.php?error=add_to_cart');
+    $target = $redirect ?? '/cart.php?error=add_to_cart';
+    header('Location: ' . $target);
     exit;
 }
 
@@ -165,13 +196,21 @@ $service_name = '';
 $base_rate = 0.0;
 $slot_min_qty = 1;
 $slot_max_qty = 1;
+$service_home_cfg_id = 0;
+$service_remote_server_csv = '';
+$service_cfg_file = '';
+$service_game_key = '';
 $durationInfo = billing_normalize_duration($invoice_duration);
 if ($service_id > 0) {
-    $stmt = $db->prepare("SELECT service_name, price_monthly, slot_min_qty, slot_max_qty FROM {$table_prefix}billing_services WHERE service_id = ? LIMIT 1");
+    $stmt = $db->prepare("SELECT bs.service_name, bs.price_monthly, bs.slot_min_qty, bs.slot_max_qty, bs.home_cfg_id, bs.remote_server_id, ch.home_cfg_file, ch.game_key
+        FROM {$table_prefix}billing_services bs
+        LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
+        WHERE bs.service_id = ? AND bs.enabled = 1
+        LIMIT 1");
     if ($stmt) {
         $stmt->bind_param('i', $service_id);
         $stmt->execute();
-        $stmt->bind_result($service_name, $price_monthly, $slot_min_qty, $slot_max_qty);
+        $stmt->bind_result($service_name, $price_monthly, $slot_min_qty, $slot_max_qty, $service_home_cfg_id, $service_remote_server_csv, $service_cfg_file, $service_game_key);
         if ($stmt->fetch()) {
             $base_rate = floatval($price_monthly);
             // constrain slots
@@ -179,6 +218,61 @@ if ($service_id > 0) {
             if ($max_players > $slot_max_qty) $max_players = $slot_max_qty;
         }
         $stmt->close();
+    }
+}
+
+if ($service_id <= 0 || $base_rate < 0) {
+    billing_fail_add_to_cart('Invalid service selection', ['service_id' => $service_id]);
+}
+
+if ($service_name === '') {
+    billing_fail_add_to_cart('Selected service is not available', ['service_id' => $service_id], '/serverlist.php');
+}
+
+if ($ip_id <= 0) {
+    billing_fail_add_to_cart('No location selected', ['service_id' => $service_id], '/order.php?service_id=' . intval($service_id) . '&error_message=' . rawurlencode('Please select a server location.'));
+}
+
+$allowedServerIds = [];
+foreach (explode(',', (string)$service_remote_server_csv) as $part) {
+    $part = trim($part);
+    if ($part !== '' && ctype_digit($part)) {
+        $allowedServerIds[(int)$part] = true;
+    }
+}
+if (!isset($allowedServerIds[$ip_id])) {
+    billing_fail_add_to_cart('Selected location is not allowed for this service', [
+        'service_id' => $service_id,
+        'ip_id' => $ip_id,
+        'remote_server_csv' => $service_remote_server_csv,
+    ], '/order.php?service_id=' . intval($service_id) . '&error_message=' . rawurlencode('Selected location is not available for this service.'));
+}
+
+$hasServerOsColumn = false;
+$osColCheck = mysqli_query($db, "SHOW COLUMNS FROM {$table_prefix}remote_servers LIKE 'server_os'");
+if ($osColCheck && mysqli_num_rows($osColCheck) > 0) {
+    $hasServerOsColumn = true;
+}
+
+if ($hasServerOsColumn) {
+    $rsQuery = mysqli_query($db, "SELECT remote_server_id, server_os FROM {$table_prefix}remote_servers WHERE remote_server_id = " . intval($ip_id) . " LIMIT 1");
+    if ($rsQuery && mysqli_num_rows($rsQuery) === 1) {
+        $rsRow = mysqli_fetch_assoc($rsQuery);
+        $serviceOs = billing_detect_service_os((string)$service_cfg_file, (string)$service_game_key);
+        $nodeOs = billing_normalize_node_os((string)($rsRow['server_os'] ?? 'any'));
+        if ($serviceOs !== 'any' && $nodeOs !== 'any' && $serviceOs !== $nodeOs) {
+            $message = $serviceOs === 'windows'
+                ? 'This service requires a Windows server location.'
+                : 'This service requires a Linux server location.';
+            billing_fail_add_to_cart('Service and node OS mismatch', [
+                'service_id' => $service_id,
+                'home_cfg_id' => $service_home_cfg_id,
+                'cfg_file' => $service_cfg_file,
+                'node_os' => $nodeOs,
+            ], '/order.php?service_id=' . intval($service_id) . '&error_message=' . rawurlencode($message));
+        }
+    } else {
+        billing_fail_add_to_cart('Selected remote server not found', ['service_id' => $service_id, 'ip_id' => $ip_id], '/order.php?service_id=' . intval($service_id) . '&error_message=' . rawurlencode('Selected server location no longer exists.'));
     }
 }
 

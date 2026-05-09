@@ -28,15 +28,19 @@ function billing_service_price_is_free($value): bool
     return ((int) round(((float)$value) * 100)) === 0;
 }
 
-function billing_canonical_game_identity(array $row): string
+function billing_detect_variant_label(array $row): string
 {
-    $gameKey = strtolower(trim((string)($row['cfg_game_key'] ?? '')));
-    if ($gameKey !== '') {
-        $canonicalKey = preg_replace('/_(linux|linux32|linux64|win|win32|win64|windows|windows32|windows64)$/i', '', $gameKey);
-        return 'key:' . ($canonicalKey !== '' ? $canonicalKey : $gameKey);
+    $haystack = strtolower(trim((string)($row['cfg_file'] ?? $row['cfg_game_key'] ?? '')));
+    if ($haystack === '') {
+        return '';
     }
-    $gameName = strtolower(trim((string)($row['cfg_game_name'] ?? $row['service_name'] ?? '')));
-    return 'name:' . $gameName;
+    if (preg_match('/(?:^|[_\-])(win|windows)(?:[_\-]|$)/i', $haystack)) {
+        return 'Windows';
+    }
+    if (preg_match('/(?:^|[_\-])linux(?:[_\-]|$)/i', $haystack)) {
+        return 'Linux';
+    }
+    return '';
 }
 
 // Save new description if admin
@@ -49,17 +53,16 @@ if (isset($_POST['save']) && !empty($_POST['description'])) {
     $stmt->close();
 }
 
-// Fetch services, joining config_homes to get canonical game_name and game_key for OS detection.
-// LEFT JOIN so services without a linked config_homes entry still appear.
+// Fetch enabled services, keeping one row per billing service.
 $service_id = isset($_REQUEST['service_id']) ? intval($_REQUEST['service_id']) : 0;
 if ($service_id !== 0) {
     $where_clause = "WHERE bs.enabled = 1 AND bs.service_id = {$service_id} AND bs.remote_server_id != '' AND bs.remote_server_id IS NOT NULL";
 } else {
     $where_clause = "WHERE bs.enabled = 1 AND bs.remote_server_id != '' AND bs.remote_server_id IS NOT NULL";
 }
-$qry_services = "SELECT bs.*, ch.game_name AS cfg_game_name, ch.game_key AS cfg_game_key
+$qry_services = "SELECT bs.*, ch.game_name AS cfg_game_name, ch.game_key AS cfg_game_key, ch.home_cfg_file AS cfg_file
                  FROM {$table_prefix}billing_services bs
-                 LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
+                  LEFT JOIN {$table_prefix}config_homes ch ON ch.home_cfg_id = bs.home_cfg_id
                  {$where_clause}
                  ORDER BY bs.service_name";
 $result_services = $db->query($qry_services);
@@ -70,10 +73,10 @@ if (!$result_services) {
     $qry_services_fallback = "SELECT service_id, home_cfg_id, enabled, service_name, description,
                                       img_url, price_monthly, slot_min_qty, slot_max_qty,
                                       remote_server_id,
-                                      NULL AS cfg_game_name, NULL AS cfg_game_key
+                                      NULL AS cfg_game_name, NULL AS cfg_game_key, NULL AS cfg_file
                                FROM {$table_prefix}billing_services
-                               {$where_clause_fallback}
-                               ORDER BY service_name";
+                                {$where_clause_fallback}
+                                ORDER BY service_name";
     $result_services = $db->query($qry_services_fallback);
 }
 
@@ -83,25 +86,8 @@ if (!$result_services) {
     return;
 }
 
-// Fetch all service rows and deduplicate by canonical game name so that
-// arma3_linux64 and arma3_win64 (both named "Arma 3") appear only once.
-// When a specific service_id is requested we skip deduplication.
 $serviceRows = [];
-$seenCanonical = [];
 while ($row = $result_services->fetch_assoc()) {
-    if ($service_id !== 0) {
-        // Single-service detail view: always include without deduplication
-        $serviceRows[] = $row;
-        continue;
-    }
-    // Derive canonical display name: prefer config_homes game_name (consistent across OS
-    // variants), fall back to service_name.
-    $canonicalIdentity = billing_canonical_game_identity($row);
-    if (isset($seenCanonical[$canonicalIdentity])) {
-        // Already have this game — skip the duplicate OS variant
-        continue;
-    }
-    $seenCanonical[$canonicalIdentity] = true;
     $serviceRows[] = $row;
 }
 $result_services->free();
@@ -126,7 +112,14 @@ include(__DIR__ . '/includes/menu.php');
             ?>
             <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" width="460" height="225"
                  onerror="this.src='/images/games/default_server.png'; this.onerror=null;"><br>
-            <strong><?php echo htmlspecialchars((string)($row['cfg_game_name'] ?? $row['service_name']), ENT_QUOTES, 'UTF-8'); ?></strong><br>
+            <?php
+            $serviceDisplayName = (string)($row['cfg_game_name'] ?? $row['service_name']);
+            $variantLabel = billing_detect_variant_label($row);
+            if ($variantLabel !== '' && stripos($serviceDisplayName, $variantLabel) === false) {
+                $serviceDisplayName .= ' - ' . $variantLabel;
+            }
+            ?>
+            <strong><?php echo htmlspecialchars($serviceDisplayName, ENT_QUOTES, 'UTF-8'); ?></strong><br>
             <?php
             echo billing_service_price_is_free($row['price_monthly'] ?? 0) ? "FREE" : "$" . number_format((float)$row['price_monthly'], 2) . " Monthly";
             ?>
@@ -145,7 +138,14 @@ include(__DIR__ . '/includes/menu.php');
             ?>
             <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" width="230" height="112"
                  onerror="this.src='/images/games/default_server.png'; this.onerror=null;"><br>
-            <center><b><?php echo htmlspecialchars((string)($row['cfg_game_name'] ?? $row['service_name']), ENT_QUOTES, 'UTF-8'); ?></b></center>
+            <?php
+            $detailDisplayName = (string)($row['cfg_game_name'] ?? $row['service_name']);
+            $detailVariantLabel = billing_detect_variant_label($row);
+            if ($detailVariantLabel !== '' && stripos($detailDisplayName, $detailVariantLabel) === false) {
+                $detailDisplayName .= ' - ' . $detailVariantLabel;
+            }
+            ?>
+            <center><b><?php echo htmlspecialchars($detailDisplayName, ENT_QUOTES, 'UTF-8'); ?></b></center>
 
             <?php
             $isAdmin = false;
