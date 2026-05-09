@@ -14,9 +14,9 @@ if (!defined('BILLING_NICE_DEFAULT')) {
 }
 
 if (!function_exists('billing_generate_provision_password')) {
-	function billing_generate_provision_password(int $length = 6)
+	function billing_generate_provision_password()
 	{
-		$length = max(6, $length);
+		$length = 6;
 		$alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 		$alphabetLen = strlen($alphabet);
 		$password = '';
@@ -38,6 +38,13 @@ if (!function_exists('billing_is_valid_provision_password')) {
 	function billing_is_valid_provision_password($value): bool
 	{
 		return is_string($value) && preg_match('/^[A-Za-z0-9]{6}$/', $value) === 1;
+	}
+}
+
+if (!function_exists('billing_should_regenerate_provision_password')) {
+	function billing_should_regenerate_provision_password($value): bool
+	{
+		return !billing_is_valid_provision_password($value) || strcasecmp((string)$value, 'ChangeMe') === 0;
 	}
 }
 
@@ -308,10 +315,10 @@ function exec_ogp_module()
 			$home_name = $order['home_name'];
 			$remote_control_password = $order['remote_control_password'];
 			$ftp_password = $order['ftp_password'];
-			if (!billing_is_valid_provision_password($remote_control_password) || strcasecmp((string)$remote_control_password, 'ChangeMe') === 0) {
+			if (billing_should_regenerate_provision_password($remote_control_password)) {
 				$remote_control_password = billing_generate_provision_password();
 			}
-			if (!billing_is_valid_provision_password($ftp_password) || strcasecmp((string)$ftp_password, 'ChangeMe') === 0) {
+			if (billing_should_regenerate_provision_password($ftp_password)) {
 				$ftp_password = billing_generate_provision_password();
 			}
 			$ip = $order['ip'];
