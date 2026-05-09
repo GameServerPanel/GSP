@@ -486,15 +486,14 @@ function exec_ogp_module()
 				}
 				$game_path = "/home/gameserver/";
 				if (!$order_failed) {
-					$home_id = $db->addGameHome( $remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
+					$home_id = $db->addGameHome($remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
 				}
 				if (!$order_failed && (!$home_id || intval($home_id) <= 0)) {
 					$order_failed = true;
 					$order_failure_reason = "Could not create server_homes row for order #{$order_id}.";
 				}
 				if (!$order_failed) {
-					// Billing storefront defaults to FTP enabled for newly provisioned homes
-					// so panel/account flows remain consistent immediately after checkout.
+					// Billing storefront defaults FTP to enabled for newly provisioned homes so panel/account flows stay consistent after checkout.
 					$db->changeFtpStatus('enabled', intval($home_id));
 				}
 				
