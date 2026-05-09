@@ -446,6 +446,27 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			$btns = get_monitor_buttons($server_home, $server_xml);
 			
 			//End
+			if (empty($server_home['ip']) || empty($server_home['port'])) {
+				$home_ip_ports = $db->getHomeIpPorts(intval($server_home['home_id']));
+				if (!empty($home_ip_ports) && is_array($home_ip_ports)) {
+					$fallback_ip_port = null;
+					foreach ((array)$home_ip_ports as $ip_port_row) {
+						if (intval($ip_port_row['force_mod_id'] ?? 0) === intval($server_home['mod_id'] ?? 0)) {
+							$fallback_ip_port = $ip_port_row;
+							break;
+						}
+						if ($fallback_ip_port === null && intval($ip_port_row['force_mod_id'] ?? 0) === 0) {
+							$fallback_ip_port = $ip_port_row;
+						}
+					}
+					if ($fallback_ip_port === null) {
+						$fallback_ip_port = $home_ip_ports[0];
+					}
+					$server_home['ip'] = $fallback_ip_port['ip'] ?? $server_home['ip'];
+					$server_home['port'] = $fallback_ip_port['port'] ?? $server_home['port'];
+					$server_home['ip_id'] = $fallback_ip_port['ip_id'] ?? ($server_home['ip_id'] ?? 0);
+				}
+			}
 
 			$remote = new OGPRemoteLibrary($server_home['agent_ip'], $server_home['agent_port'], $server_home['encryption_key'], $server_home['timeout']);
 			$host_stat = $remote->status_chk();
