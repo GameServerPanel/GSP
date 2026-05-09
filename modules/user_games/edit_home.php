@@ -710,14 +710,12 @@ function exec_ogp_module()
 	echo "<input type=submit name='change_name' value='". get_lang("change_name") ."' />";
 	echo "</form></td></tr>";
 	echo "<tr><td colspan='2' class='info'>". get_lang("change_name_info") ."</td></tr>";
-	$copy_password_js = "if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(this.form[this.getAttribute('data-copy-field')].value);}else{this.form[this.getAttribute('data-copy-field')].select();document.execCommand('copy');}";
-
 	// Form to edit control password
 	echo "<tr><td class='right'>". get_lang("game_control_password") .":</td><td class='left'>";
 	echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>";
 	echo "<input type='hidden' name='home_id' value=\"$home_id\" />\n";
 	echo "<input type='text' size='30' name='control_password' value=\"".str_replace('"', "&quot;", $home_info['control_password'])."\" />";
-	echo "<button type='button' data-copy-field='control_password' aria-label=\"".str_replace('"', "&quot;", get_lang("copy")." ".get_lang("game_control_password"))."\" onclick=\"".$copy_password_js."\">". get_lang("copy") ."</button>";
+	echo "<button type='button' class='copy-credential-btn' data-copy-field='control_password' aria-label=\"".str_replace('"', "&quot;", get_lang("copy")." ".get_lang("game_control_password"))."\">". get_lang("copy") ."</button>";
 	echo "<input type='submit' name='change_control_password' value='". get_lang("change_control_password") ."' />";
 	echo "</form></td></tr>";
 	echo "<tr><td colspan='2' class='info'>". get_lang("change_control_password_info") ."</td></tr>";
@@ -757,11 +755,46 @@ function exec_ogp_module()
 		echo "<tr><td class='right'>". get_lang("server_ftp_password") .":</td><td class='left'>";
 		echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>";
 		echo "<input type='text' size='30' name='ftp_password' value=\"".str_replace('"', "&quot;", $home_info['ftp_password'])."\" />";
-		echo "<button type='button' data-copy-field='ftp_password' aria-label=\"".str_replace('"', "&quot;", get_lang("copy")." ".get_lang("server_ftp_password"))."\" onclick=\"".$copy_password_js."\">". get_lang("copy") ."</button>";
+		echo "<button type='button' class='copy-credential-btn' data-copy-field='ftp_password' aria-label=\"".str_replace('"', "&quot;", get_lang("copy")." ".get_lang("server_ftp_password"))."\">". get_lang("copy") ."</button>";
 		echo "<input type='submit' name='change_ftp_password' value='". get_lang("change_ftp_password") ."' />";
 		echo "</form></td></tr>";
 		echo "<tr><td  colspan='2' class='info'>". get_lang("change_ftp_password_info") ."</td></tr>";
 	}
+	$copy_label_json = json_encode(get_lang("copy"), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+	echo "<script type='text/javascript'>
+document.addEventListener('DOMContentLoaded', function() {
+	var copyButtons = document.querySelectorAll('.copy-credential-btn');
+	var copiedLabel = '✓';
+	var copyLabel = ".$copy_label_json.";
+	function showCopyState(button, successful) {
+		button.textContent = successful ? copiedLabel : copyLabel;
+		if (successful) {
+			setTimeout(function() {
+				button.textContent = copyLabel;
+			}, 1500);
+		}
+	}
+	Array.prototype.forEach.call(copyButtons, function(copyButton) {
+		copyButton.addEventListener('click', function() {
+			var fieldName = this.getAttribute('data-copy-field');
+			if (!this.form || !fieldName || !this.form[fieldName]) {
+				return;
+			}
+			var field = this.form[fieldName];
+			var copyValue = field.value;
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(copyValue)
+					.then(showCopyState.bind(null, this, true))
+					.catch(showCopyState.bind(null, this, false));
+			} else {
+				field.focus();
+				field.select();
+				showCopyState(this, document.execCommand('copy'));
+			}
+		});
+	});
+});
+</script>";
 		
 	if ( $isAdmin )
 	{
