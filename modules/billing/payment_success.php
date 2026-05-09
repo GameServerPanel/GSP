@@ -4,7 +4,10 @@
  * Shows order confirmation after successful PayPal payment
  * Standalone billing module - uses only standard PHP mysqli
  */
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('opengamepanel_web');
+    session_start();
+}
 require_once(__DIR__ . '/includes/config_loader.php');
 
 // Variables from config.inc.php (helps IDEs understand scope)
@@ -16,10 +19,13 @@ require_once(__DIR__ . '/includes/config_loader.php');
 
 // Get PayPal order ID from URL
 $paypal_order_id = isset($_GET['order_id']) ? trim($_GET['order_id']) : '';
+$success_source = isset($_GET['source']) ? trim($_GET['source']) : '';
 
 // Get user ID from session
 $user_id = isset($_SESSION['website_user_id']) ? intval($_SESSION['website_user_id']) : 
            (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
+$is_admin_viewer = strtolower((string)($_SESSION['users_group'] ?? '')) === 'admin';
+$provision_summary = $_SESSION['billing_provision_results'][$paypal_order_id] ?? null;
 
 // Connect to database
 $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (int)$db_port : null);
@@ -44,6 +50,19 @@ function billing_payment_success_provision_state(array $order): array
         return ['label' => 'PENDING', 'message' => 'Server created; install is pending final IP/mod setup.', 'class' => 'status-badge status-pending'];
     }
     return ['label' => 'INSTALL STARTED', 'message' => 'Server created and install/update trigger has been started or queued.', 'class' => 'status-badge'];
+}
+
+function billing_payment_success_banner(array $summary, array $orders): array
+{
+    if (!empty($summary['result']['failed_count'])) {
+        return ['class' => 'status-failed', 'message' => 'Provisioning failed; support has been notified.'];
+    }
+    foreach ($orders as $order) {
+        if (($order['provision_state']['label'] ?? '') === 'FAILED') {
+            return ['class' => 'status-failed', 'message' => 'Provisioning failed; support has been notified.'];
+        }
+    }
+    return ['class' => 'status-pending', 'message' => 'Your server is being installed.'];
 }
 
 if ($db && $user_id > 0) {
@@ -163,6 +182,37 @@ if ($db && $user_id > 0) {
         .status-failed {
             background: #d9534f;
         }
+        .provision-banner {
+            margin: 20px 0 0;
+            padding: 14px 18px;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: 600;
+        }
+        .provision-debug {
+            margin-top: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 14px 16px;
+            background: #f8f9fa;
+        }
+        .provision-debug summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .provision-debug-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+        .provision-debug-table th,
+        .provision-debug-table td {
+            border-bottom: 1px solid #dee2e6;
+            padding: 8px 6px;
+            text-align: left;
+            font-size: 0.92em;
+            vertical-align: top;
+        }
         .btn {
             display: inline-block;
             padding: 12px 24px;
@@ -191,6 +241,7 @@ if ($db && $user_id > 0) {
     </style>
 </head>
 <body>
+    <?php $banner = billing_payment_success_banner((array)$provision_summary, $orders); ?>
     <div class="container">
         <div class="success-header">
             <div class="success-icon">✓</div>
@@ -211,6 +262,49 @@ if ($db && $user_id > 0) {
                 <li><strong>📧 Email Notification:</strong> You'll receive a confirmation email with your order details</li>
                 <li><strong>🎮 Access Your Servers:</strong> Log into the Game Server Panel to manage your new servers</li>
             </ul>
+            <div class="provision-banner <?php echo htmlspecialchars($banner['class']); ?>">
+                <?php echo htmlspecialchars($banner['message']); ?>
+            </div>
+            <?php if ($is_admin_viewer && !empty($provision_summary['result'])): ?>
+            <details class="provision-debug" <?php echo !empty($provision_summary['result']['failed_count']) ? 'open' : ''; ?>>
+                <summary>Provisioning Debug Summary</summary>
+                <p><strong>Provisioning started:</strong> <?php echo !empty($provision_summary['order_ids']) ? 'yes' : 'no'; ?></p>
+                <p><strong>Provisioning succeeded:</strong> <?php echo intval($provision_summary['result']['failed_count'] ?? 0) === 0 ? 'yes' : 'no'; ?></p>
+                <p><strong>Provisioning failed:</strong> <?php echo intval($provision_summary['result']['failed_count'] ?? 0) > 0 ? 'yes' : 'no'; ?></p>
+                <p><strong>Log file path:</strong> <?php echo htmlspecialchars($provision_summary['result']['trace_log_path'] ?? 'modules/billing/logs/provisioning_trace.log'); ?></p>
+                <?php if (!empty($provision_summary['result']['trace_error'])): ?>
+                <p><strong>Trace error:</strong> <?php echo htmlspecialchars($provision_summary['result']['trace_error']); ?></p>
+                <?php endif; ?>
+                <?php if (!empty($provision_summary['result']['details']) && is_array($provision_summary['result']['details'])): ?>
+                <table class="provision-debug-table">
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Status</th>
+                            <th>Home ID</th>
+                            <th>Mod ID</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($provision_summary['result']['details'] as $detail): ?>
+                        <tr>
+                            <td>#<?php echo htmlspecialchars((string)($detail['order_id'] ?? '0')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($detail['install_result'] ?? 'pending')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($detail['home_id'] ?? '0')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($detail['mod_id'] ?? '0')); ?></td>
+                            <td><?php echo htmlspecialchars((string)($detail['error'] ?? $detail['install_message'] ?? '')); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?php endif; ?>
+            </details>
+            <?php elseif ($success_source === 'free' && !empty($provision_summary['result'])): ?>
+            <div style="margin-top:14px;color:#555;font-size:0.95em;">
+                Free checkout completed. <?php echo htmlspecialchars($banner['message']); ?>
+            </div>
+            <?php endif; ?>
         </div>
 
         <?php if (count((array)$orders) > 0): ?>

@@ -12,6 +12,218 @@ if (!defined('BILLING_CPU_AFFINITY_NA')) {
 if (!defined('BILLING_NICE_DEFAULT')) {
 	define('BILLING_NICE_DEFAULT', '0');
 }
+if (!defined('BILLING_PROVISION_TRACE_LOG')) {
+	define('BILLING_PROVISION_TRACE_LOG', 'modules/billing/logs/provisioning_trace.log');
+}
+
+if (!function_exists('billing_provision_trace_relative_path')) {
+	function billing_provision_trace_relative_path(): string
+	{
+		return BILLING_PROVISION_TRACE_LOG;
+	}
+}
+
+if (!function_exists('billing_provision_trace_path')) {
+	function billing_provision_trace_path(): string
+	{
+		return __DIR__ . '/logs/provisioning_trace.log';
+	}
+}
+
+if (!function_exists('billing_set_trace_error')) {
+	function billing_set_trace_error(string $message): void
+	{
+		$GLOBALS['BILLING_PROVISION_TRACE_ERROR'] = $message;
+		error_log('billing_provision_trace: ' . $message);
+	}
+}
+
+if (!function_exists('billing_format_trace_value')) {
+	function billing_format_trace_value($value): string
+	{
+		if (is_bool($value)) {
+			return $value ? 'true' : 'false';
+		}
+		if ($value === null) {
+			return 'null';
+		}
+		if (is_scalar($value)) {
+			return (string)$value;
+		}
+		$json = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		return $json === false ? '[unserializable]' : $json;
+	}
+}
+
+if (!function_exists('billing_ensure_trace_log_ready')) {
+	function billing_ensure_trace_log_ready(): array
+	{
+		$logFile = billing_provision_trace_path();
+		$logDir = dirname($logFile);
+		if (!is_dir($logDir) && !@mkdir($logDir, 0755, true) && !is_dir($logDir)) {
+			$error = "Could not create billing trace log directory: {$logDir}";
+			billing_set_trace_error($error);
+			return array('ok' => false, 'error' => $error, 'path' => $logFile);
+		}
+		if (!is_writable($logDir)) {
+			$error = "Billing trace log directory is not writable: {$logDir}";
+			billing_set_trace_error($error);
+			return array('ok' => false, 'error' => $error, 'path' => $logFile);
+		}
+		if (!file_exists($logFile)) {
+			$result = @file_put_contents($logFile, '', FILE_APPEND | LOCK_EX);
+			if ($result === false) {
+				$error = "Could not create billing trace log file: {$logFile}";
+				billing_set_trace_error($error);
+				return array('ok' => false, 'error' => $error, 'path' => $logFile);
+			}
+		}
+		if (!is_writable($logFile)) {
+			$error = "Billing trace log file is not writable: {$logFile}";
+			billing_set_trace_error($error);
+			return array('ok' => false, 'error' => $error, 'path' => $logFile);
+		}
+		return array('ok' => true, 'path' => $logFile);
+	}
+}
+
+if (!function_exists('billing_provision_trace')) {
+	function billing_provision_trace($message, array $context = array()): bool
+	{
+		$ready = billing_ensure_trace_log_ready();
+		if (empty($ready['ok'])) {
+			return false;
+		}
+		$baseContext = isset($GLOBALS['BILLING_PROVISION_TRACE_CONTEXT']) && is_array($GLOBALS['BILLING_PROVISION_TRACE_CONTEXT'])
+			? $GLOBALS['BILLING_PROVISION_TRACE_CONTEXT']
+			: array();
+		$merged = array_merge($baseContext, $context);
+		$line = '[' . date('Y-m-d H:i:s') . '] ' . trim((string)$message);
+		if (!empty($merged)) {
+			$parts = array();
+			foreach ($merged as $key => $value) {
+				$parts[] = $key . '=' . billing_format_trace_value($value);
+			}
+			$line .= ' | ' . implode(' | ', $parts);
+		}
+		$result = @file_put_contents($ready['path'], $line . PHP_EOL, FILE_APPEND | LOCK_EX);
+		if ($result === false) {
+			billing_set_trace_error('Failed to append billing trace log: ' . $ready['path']);
+			return false;
+		}
+		return true;
+	}
+}
+
+if (!function_exists('billing_get_server_home_row')) {
+	function billing_get_server_home_row($db, string $db_prefix, int $home_id): array
+	{
+		if ($home_id <= 0) {
+			return array();
+		}
+		$row = $db->resultQuery(
+			"SELECT * FROM `{$db_prefix}server_homes`
+			 WHERE home_id=" . $db->realEscapeSingle($home_id) . "
+			 LIMIT 1"
+		);
+		return !empty($row[0]) ? (array)$row[0] : array();
+	}
+}
+
+if (!function_exists('billing_trace_home_info_summary')) {
+	function billing_trace_home_info_summary(array $home_info): array
+	{
+		$mods = array();
+		foreach ((array)($home_info['mods'] ?? array()) as $modId => $modInfo) {
+			$mods[] = array(
+				'mod_id' => intval($modId),
+				'mod_key' => $modInfo['mod_key'] ?? '',
+			);
+		}
+		return array(
+			'home_id' => intval($home_info['home_id'] ?? 0),
+			'home_cfg_id' => intval($home_info['home_cfg_id'] ?? 0),
+			'home_cfg_file' => $home_info['home_cfg_file'] ?? '',
+			'remote_server_id' => intval($home_info['remote_server_id'] ?? 0),
+			'home_path' => $home_info['home_path'] ?? '',
+			'agent_ip' => $home_info['agent_ip'] ?? '',
+			'agent_port' => $home_info['agent_port'] ?? '',
+			'mods' => $mods,
+		);
+	}
+}
+
+if (!function_exists('billing_trace_settings_summary')) {
+	function billing_trace_settings_summary(array $settings): array
+	{
+		return array(
+			'panel_name' => $settings['panel_name'] ?? '',
+			'steam_user_configured' => !empty($settings['steam_user']),
+			'steam_guard_configured' => !empty($settings['steam_guard']),
+		);
+	}
+}
+
+if (!function_exists('billing_detect_install_state')) {
+	function billing_detect_install_state(array $home_info): array
+	{
+		$state = array(
+			'complete' => false,
+			'remote_status' => 'unknown',
+			'update_active' => false,
+			'exec_path' => '',
+			'exec_exists' => false,
+			'reason' => '',
+		);
+		if (empty($home_info['home_id'])) {
+			$state['reason'] = 'home_info is missing home_id.';
+			return $state;
+		}
+		if (empty($home_info['home_cfg_file'])) {
+			$state['reason'] = 'home_cfg_file is missing; install completion cannot be verified.';
+			return $state;
+		}
+		$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
+		if (!$server_xml) {
+			$state['reason'] = 'Could not read server config XML; install completion cannot be verified.';
+			return $state;
+		}
+		$server_exec_name = trim((string)($server_xml->server_exec_name ?? ''));
+		if ($server_exec_name === '') {
+			$state['reason'] = 'server_exec_name is empty; install completion cannot be verified.';
+			return $state;
+		}
+		$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
+		$hostStat = $remote->status_chk();
+		$state['remote_status'] = ($hostStat === 1) ? 'online' : 'offline';
+		if ($hostStat !== 1) {
+			$state['reason'] = 'Agent is offline; install completion cannot be verified.';
+			return $state;
+		}
+		$log_txt = '';
+		$update_active = $remote->get_log(OGP_SCREEN_TYPE_UPDATE, intval($home_info['home_id']), clean_path($home_info['home_path']), $log_txt);
+		$state['update_active'] = ($update_active == 1);
+		$state['update_log'] = $log_txt;
+		$execFolder = clean_path($home_info['home_path'] . "/" . (string)($server_xml->exe_location ?? ''));
+		$execPath = clean_path($execFolder . "/" . $server_exec_name);
+		$state['exec_path'] = $execPath;
+		$state['exec_exists'] = ($remote->rfile_exists($execPath) === 1);
+		$state['complete'] = $state['exec_exists'];
+		$state['reason'] = $state['exec_exists']
+			? 'Expected executable already exists on the remote server.'
+			: 'Expected executable is missing on the remote server.';
+		return $state;
+	}
+}
+
+if (!function_exists('billing_store_provision_session_result')) {
+	function billing_store_provision_session_result(string $key, array $payload): void
+	{
+		if (session_status() === PHP_SESSION_ACTIVE) {
+			$_SESSION['billing_provision_results'][$key] = $payload;
+		}
+	}
+}
 
 if (!function_exists('billing_generate_provision_password')) {
 	function billing_generate_provision_password()
@@ -26,6 +238,7 @@ if (!function_exists('billing_generate_provision_password')) {
 			}
 			return $password;
 		} catch (Throwable $e) {
+			billing_provision_trace('Password generation fallback after exception.', array('exception' => $e->getMessage()));
 			for ($i = 0; $i < $length; $i++) {
 				$password .= $alphabet[mt_rand(0, $alphabetLen - 1)];
 			}
@@ -58,13 +271,23 @@ if (!function_exists('billing_agent_offline_reason')) {
 if (!function_exists('billing_invoke_provision')) {
 	function billing_invoke_provision(array $options = array())
 	{
+		if (empty($options['caller_source'])) {
+			$trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+			$caller = $trace[1] ?? array();
+			$options['caller_source'] = ($caller['file'] ?? __FILE__) . ':' . intval($caller['line'] ?? 0);
+		}
+		unset($GLOBALS['BILLING_PROVISION_TRACE_ERROR'], $GLOBALS['BILLING_PROVISION_TRACE_CONTEXT']);
 		$GLOBALS['BILLING_PROVISION_OVERRIDE'] = $options;
 		ob_start();
 		exec_ogp_module();
 		$output = ob_get_clean();
 		$result = isset($GLOBALS['BILLING_PROVISION_LAST_RESULT']) ? $GLOBALS['BILLING_PROVISION_LAST_RESULT'] : array();
 		$result['output'] = $output;
-		unset($GLOBALS['BILLING_PROVISION_OVERRIDE'], $GLOBALS['BILLING_PROVISION_LAST_RESULT']);
+		$result['trace_log_path'] = billing_provision_trace_relative_path();
+		if (!empty($GLOBALS['BILLING_PROVISION_TRACE_ERROR'])) {
+			$result['trace_error'] = $GLOBALS['BILLING_PROVISION_TRACE_ERROR'];
+		}
+		unset($GLOBALS['BILLING_PROVISION_OVERRIDE'], $GLOBALS['BILLING_PROVISION_LAST_RESULT'], $GLOBALS['BILLING_PROVISION_TRACE_ERROR'], $GLOBALS['BILLING_PROVISION_TRACE_CONTEXT']);
 		return $result;
 	}
 }
@@ -90,7 +313,18 @@ if (!function_exists('billing_allocate_home_port')) {
 	function billing_allocate_home_port($db, string $db_prefix, int $home_id, int $remote_server_id, int $home_cfg_id): array
 	{
 		$ipIds = billing_get_remote_ip_ids($db, $db_prefix, $remote_server_id);
+		billing_provision_trace('Resolved remote server IP IDs for port allocation.', array(
+			'home_id' => $home_id,
+			'selected_remote_server_id' => $remote_server_id,
+			'selected_home_cfg_id' => $home_cfg_id,
+			'ip_ids' => $ipIds,
+		));
 		if (empty($ipIds)) {
+			billing_provision_trace('Port allocation failed because no remote_server_ips rows were found.', array(
+				'home_id' => $home_id,
+				'selected_remote_server_id' => $remote_server_id,
+				'selected_home_cfg_id' => $home_cfg_id,
+			));
 			return array('ok' => false, 'error' => "No IP addresses are configured for remote server #{$remote_server_id}.");
 		}
 
@@ -115,8 +349,18 @@ if (!function_exists('billing_allocate_home_port')) {
 			}
 			if (empty($ranges)) {
 				$ips_with_no_range[] = $ipId;
+				billing_provision_trace('No port range found for current ip_id.', array(
+					'home_id' => $home_id,
+					'selected_ip_id' => $ipId,
+					'selected_home_cfg_id' => $home_cfg_id,
+				));
 				continue;
 			}
+			billing_provision_trace('Loaded port ranges for current ip_id.', array(
+				'home_id' => $home_id,
+				'selected_ip_id' => $ipId,
+				'port_ranges_used' => $ranges,
+			));
 
 			$usedRows = $db->resultQuery(
 				"SELECT port FROM `{$db_prefix}home_ip_ports` WHERE ip_id=" . $db->realEscapeSingle($ipId)
@@ -152,6 +396,12 @@ if (!function_exists('billing_allocate_home_port')) {
 							  AND port = {$safePort}
 						 )"
 					);
+					billing_provision_trace('Attempted home_ip_ports insert.', array(
+						'home_id' => $home_id,
+						'selected_ip_id' => $ipId,
+						'selected_port' => $port,
+						'home_ip_ports_insert_succeeded' => (bool)$insertOk,
+					));
 					if (!$insertOk) {
 						continue;
 					}
@@ -163,6 +413,12 @@ if (!function_exists('billing_allocate_home_port')) {
 						 LIMIT 1"
 					);
 					if (!empty($verify)) {
+						billing_provision_trace('Port allocation succeeded.', array(
+							'home_id' => $home_id,
+							'selected_ip_id' => $ipId,
+							'selected_port' => $port,
+							'home_ip_ports_insert_succeeded' => true,
+						));
 						return array('ok' => true, 'ip_id' => $ipId, 'port' => intval($port));
 					}
 				}
@@ -171,8 +427,19 @@ if (!function_exists('billing_allocate_home_port')) {
 		}
 
 		if (!empty($ips_with_no_range) && count($ips_with_no_range) === count($ipIds)) {
+			billing_provision_trace('Port allocation failed because no matching arrange_ports ranges were found.', array(
+				'home_id' => $home_id,
+				'selected_remote_server_id' => $remote_server_id,
+				'ips_with_no_range' => $ips_with_no_range,
+			));
 			return array('ok' => false, 'error' => "No port range found for home_cfg_id #{$home_cfg_id} on ip_id(s) [" . implode(',', $ips_with_no_range) . "] for remote server #{$remote_server_id}.");
 		}
+		billing_provision_trace('Port allocation failed because all ranges were exhausted.', array(
+			'home_id' => $home_id,
+			'selected_remote_server_id' => $remote_server_id,
+			'selected_home_cfg_id' => $home_cfg_id,
+			'ips_exhausted' => !empty($ips_exhausted) ? $ips_exhausted : $ipIds,
+		));
 		return array('ok' => false, 'error' => "No available port in arrange_ports for remote server #{$remote_server_id}, home_cfg_id #{$home_cfg_id}, ip_id(s) [" . implode(',', !empty($ips_exhausted) ? $ips_exhausted : $ipIds) . "].");
 	}
 }
@@ -181,7 +448,15 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 	function billing_resolve_mod_cfg_id($db, int $home_cfg_id, int $preferred_mod_cfg_id): array
 	{
 		$mods = $db->getCfgMods($home_cfg_id);
+		billing_provision_trace('Loaded config mods for home_cfg_id.', array(
+			'selected_home_cfg_id' => $home_cfg_id,
+			'preferred_mod_cfg_id' => $preferred_mod_cfg_id,
+			'cfg_mod_rows' => $mods,
+		));
 		if (empty($mods)) {
+			billing_provision_trace('No config mods found for home_cfg_id.', array(
+				'selected_home_cfg_id' => $home_cfg_id,
+			));
 			return array('ok' => false, 'error' => "No config_mods rows found for home_cfg_id #{$home_cfg_id}.");
 		}
 
@@ -197,14 +472,26 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 				$first = $modCfgId;
 			}
 			if ($preferred_mod_cfg_id > 0 && $modCfgId === $preferred_mod_cfg_id) {
+				billing_provision_trace('Selected preferred mod_cfg_id for provisioning.', array(
+					'selected_home_cfg_id' => $home_cfg_id,
+					'selected_mod_cfg_id' => $modCfgId,
+				));
 				return array('ok' => true, 'mod_cfg_id' => $modCfgId);
 			}
 		}
 
 		if ($first !== null) {
+			billing_provision_trace('Selected fallback mod_cfg_id for provisioning.', array(
+				'selected_home_cfg_id' => $home_cfg_id,
+				'selected_mod_cfg_id' => $first,
+			));
 			return array('ok' => true, 'mod_cfg_id' => $first);
 		}
 
+		billing_provision_trace('No usable mod_cfg_id was found for provisioning.', array(
+			'selected_home_cfg_id' => $home_cfg_id,
+			'available_mod_cfg_ids' => $available_mod_cfg_ids,
+		));
 		return array('ok' => false, 'error' => "No usable mod_cfg_id found for home_cfg_id #{$home_cfg_id}. Available mod_cfg_id values: [" . implode(',', $available_mod_cfg_ids) . "].");
 	}
 }
@@ -263,6 +550,9 @@ function exec_ogp_module()
 	$user_id = isset($override['user_id']) ? intval($override['user_id']) : (isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0);
 	$isAdmin = isset($override['is_admin']) ? (bool)$override['is_admin'] : $db->isAdmin($user_id);
 	$provision_all = $override ? !empty($override['provision_all']) : isset($_POST['provision_all']);
+	$caller_source = $override['caller_source'] ?? (__FILE__ . ':0');
+	$dbNameRow = $db->resultQuery("SELECT DATABASE() AS db_name");
+	$active_db_name = $dbNameRow[0]['db_name'] ?? '';
 	$orderIds = array();
 	if ($override && !empty($override['order_ids'])) {
 		$orderIds = array_map('intval', (array)$override['order_ids']);
@@ -279,20 +569,44 @@ function exec_ogp_module()
 			$orderIds = array(intval($order_id));
 		}
 	}
+	$traceReady = billing_ensure_trace_log_ready();
+	if (empty($traceReady['ok'])) {
+		echo "<div class='failure'><p>" . htmlspecialchars((string)$traceReady['error'], ENT_QUOTES, 'UTF-8') . "</p></div>";
+		$GLOBALS['BILLING_PROVISION_LAST_RESULT'] = array(
+			'provisioned_count' => 0,
+			'failed_count' => 1,
+			'orders' => array(),
+			'details' => array(),
+			'trace_log_path' => billing_provision_trace_relative_path(),
+			'trace_error' => $traceReady['error'],
+		);
+		return;
+	}
+	billing_provision_trace('START provisioning attempt', array(
+		'caller_source' => $caller_source,
+		'order_ids_received' => $orderIds,
+		'user_id_received' => $user_id,
+		'is_admin' => $isAdmin,
+		'provision_all' => $provision_all,
+		'active_db_name' => $active_db_name,
+		'db_prefix' => $db_prefix,
+	));
 	
 	// Handle provision_all request - provision all Active (paid) orders for this user
 	if ($provision_all) {
 		if ( $isAdmin ){
-			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
+			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE status='Active' ORDER BY order_id" );
 		} else {
-			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='Active' AND (home_id='0' OR home_id='') ORDER BY order_id" );
+			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE user_id=".$db->realEscapeSingle($user_id)." AND status='Active' ORDER BY order_id" );
 		}
+		billing_provision_trace('Loaded orders for provision_all request.', array('loaded_order_count' => count((array)$orders)));
 	}
 	// Handle provision_single or order_id parameter - provision specific order
 	else {
 		if (empty($orderIds)) {
+			billing_provision_trace('END failure: provisioning request returned early because no order ID was supplied.');
 			echo "<div class='failure'>No order ID specified.</div>";
-			$GLOBALS['BILLING_PROVISION_LAST_RESULT'] = array('provisioned_count'=>0,'failed_count'=>0,'orders'=>array());
+			$GLOBALS['BILLING_PROVISION_LAST_RESULT'] = array('provisioned_count'=>0,'failed_count'=>0,'orders'=>array(),'details'=>array(),'trace_log_path'=>billing_provision_trace_relative_path());
 			return;
 		}
 		$idList = implode(',', array_map('intval', $orderIds));
@@ -301,8 +615,10 @@ function exec_ogp_module()
 		} else {
 			$orders = $db->resultQuery( "SELECT * FROM `{$db_prefix}billing_orders` WHERE order_id IN ($idList) AND user_id=".$db->realEscapeSingle($user_id)." AND status='Active'" );
 		}
+		billing_provision_trace('Loaded explicit order list for provisioning.', array('loaded_order_count' => count((array)$orders)));
 	}
 	$processed_orders = array();
+	$order_results = array();
 	if( !empty($orders) )
 	{
 		$provisioned_count = 0;
@@ -311,6 +627,13 @@ function exec_ogp_module()
 		
 		foreach ((array)$orders as $order)
 		{
+			$trace_id = uniqid('prov_', true);
+			$GLOBALS['BILLING_PROVISION_TRACE_CONTEXT'] = array(
+				'trace_id' => $trace_id,
+				'order_id' => intval($order['order_id'] ?? 0),
+			);
+			billing_provision_trace('Loaded billing order for provisioning.', array('order_row' => $order));
+			try {
 			$home_id = 0;
 			$order_failed = false;
 			$order_failure_reason = '';
@@ -343,7 +666,12 @@ function exec_ogp_module()
 			$install_message = '';
 			$install_attempted = false;
 			$needs_existing_home_retry = false;
+			$skip_reason = '';
 			$home_info = array();
+			$home_row_before = array();
+			$home_row_after = array();
+			$install_state = array();
+			$autoInstall = array();
 			$invoiceRow = $db->resultQuery(
 				"SELECT invoice_id
 				 FROM `{$db_prefix}billing_invoices`
@@ -354,10 +682,16 @@ function exec_ogp_module()
 			if (!empty($invoiceRow[0]['invoice_id'])) {
 				$provision_invoice_id = intval($invoiceRow[0]['invoice_id']);
 			}
+			billing_provision_trace('Resolved latest invoice row for order.', array('invoice_row' => $invoiceRow));
 			//Query service info	
 			$service = $db->resultQuery( "SELECT * 
 							   FROM `{$db_prefix}billing_services` 
 							   WHERE service_id=".$db->realEscapeSingle($service_id) );
+			billing_provision_trace('Loaded billing service row.', array(
+				'service_id' => intval($service_id),
+				'service_row_found' => !empty($service[0]),
+				'service_row' => !empty($service[0]) ? $service[0] : array(),
+			));
 							   
 			if( !empty( $service[0] ) )
 			{
@@ -371,6 +705,13 @@ function exec_ogp_module()
 				$install_method = $service[0]['install_method'];
 				$manual_url = $service[0]['manual_url'];
 				$access_rights = $service[0]['access_rights'];
+				billing_provision_trace('Provisioning inputs resolved from order and service.', array(
+					'service_id' => intval($service_id),
+					'order_status' => $order['status'] ?? '',
+					'order_home_id_before_provisioning' => intval($order['home_id'] ?? 0),
+					'selected_home_cfg_id' => intval($home_cfg_id),
+					'selected_remote_server_id' => intval($remote_server_id),
+				));
 				if (intval($home_cfg_id) <= 0) {
 					$order_failed = true;
 					$order_failure_reason = "Invalid home_cfg_id '{$home_cfg_id}' for service_id {$service_id}.";
@@ -384,52 +725,81 @@ function exec_ogp_module()
 			{
 				$order_failed = true;
 				$order_failure_reason = "Service ID {$service_id} not found.";
+				billing_provision_trace('Eligibility skip: billing service row is missing.', array('service_id' => intval($service_id)));
 			}
 						
 			if(!$order_failed && $already_provisioned)
 			{
 				$home_id = intval($order['home_id']);
+				$home_row_before = billing_get_server_home_row($db, $db_prefix, $home_id);
+				billing_provision_trace('Existing home_id detected on billing order.', array(
+					'order_home_id_before_provisioning' => intval($order['home_id'] ?? 0),
+					'server_homes_row_before' => $home_row_before,
+				));
 				$home_info = $db->getGameHome($home_id);
-				if (empty($home_info)) {
+				if (empty($home_row_before) || empty($home_info)) {
 					$order_failed = true;
 					$order_failure_reason = "Order #{$order_id} references home_id {$home_id} but server_homes row is missing.";
 					$db->logger('BILLING PROVISION DATA INTEGRITY ERROR: ' . $order_failure_reason);
+					billing_provision_trace('Eligibility failure: existing home_id is linked but server_homes row is missing.', array('home_id_after_creation_or_lookup' => $home_id));
 				}
 				$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
 				if (!empty($existingIpPort['ok'])) {
 					$selected_ip_id = intval($existingIpPort['ip_id']);
 					$selected_port = intval($existingIpPort['port']);
 				}
+				billing_provision_trace('Existing home IP:port lookup completed.', array(
+					'home_id_after_creation_or_lookup' => $home_id,
+					'ip_port_row_found' => !empty($existingIpPort['ok']),
+					'selected_ip_id' => intval($selected_ip_id),
+					'selected_port' => intval($selected_port),
+				));
 				$has_ip_port = !empty($existingIpPort['ok']);
 				$has_mods = !empty($home_info['mods']) && is_array($home_info['mods']);
 				if (!$order_failed && (!$has_ip_port || !$has_mods)) {
 					$needs_existing_home_retry = true;
 					$install_message = "Existing home #{$home_id} requires provisioning completion (ip_port=" . ($has_ip_port ? 'yes' : 'no') . ", mods=" . ($has_mods ? 'yes' : 'no') . ").";
+					billing_provision_trace('Existing home requires provisioning retry because prerequisites are incomplete.', array(
+						'home_id_after_creation_or_lookup' => $home_id,
+						'has_ip_port' => $has_ip_port,
+						'has_mods' => $has_mods,
+					));
 				}
 				if (!$order_failed && !$needs_existing_home_retry) {
-					$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
-					if ($server_xml && !empty((string)$server_xml->server_exec_name)) {
-						$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
-						if ($remote->status_chk() === 1) {
-							$exec_path = clean_path($home_info['home_path'] . "/" . (string)$server_xml->exe_location . "/" . (string)$server_xml->server_exec_name);
-							if ($remote->rfile_exists($exec_path) !== 1) {
-								$needs_existing_home_retry = true;
-								$install_message = "Existing home #{$home_id} missing expected executable '" . basename($exec_path) . "'; retrying install.";
-							}
-						}
+					$install_state = billing_detect_install_state((array)$home_info);
+					billing_provision_trace('Existing home install state verification completed.', array(
+						'home_id_after_creation_or_lookup' => $home_id,
+						'install_state' => $install_state,
+					));
+					if (empty($install_state['complete'])) {
+						$needs_existing_home_retry = true;
+						$install_message = "Existing home #{$home_id} is not fully installed yet. " . ($install_state['reason'] ?? 'Install completion could not be verified.');
 					}
 				}
-				if (!$order_failed && !$needs_existing_home_retry) {
+				if (!$order_failed && !$needs_existing_home_retry && !empty($install_state['complete'])) {
 					$install_result = 'completed';
 					$install_message = $install_message !== '' ? $install_message : "Order #{$order_id} already provisioned and installed; no action required.";
+					$skip_reason = $install_message;
+					billing_provision_trace('Eligibility skip: existing home is already provisioned and install is complete.', array(
+						'home_id_after_creation_or_lookup' => $home_id,
+						'skip_reason' => $skip_reason,
+					));
 				}
 			}
 			elseif(!$order_failed && $extended)
 			{
 				$home_id = $order['home_id'];
+				billing_provision_trace('Processing renewal for existing billing order.', array(
+					'home_id_after_creation_or_lookup' => intval($home_id),
+				));
 				
 				//Get The home info without mods in 1 array (Necesary for remote connection).
 				$home_info = $db->getGameHomeWithoutMods($home_id);
+				$home_row_before = billing_get_server_home_row($db, $db_prefix, intval($home_id));
+				billing_provision_trace('Loaded renewal home state.', array(
+					'server_homes_row_before' => $home_row_before,
+					'home_info_summary' => billing_trace_home_info_summary((array)$home_info),
+				));
 				
 				//Create the remote connection
 				$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
@@ -472,6 +842,9 @@ function exec_ogp_module()
 			}
 			elseif(!$order_failed)
 			{
+				billing_provision_trace('Provisioning new home because billing order has no completed install yet.', array(
+					'order_home_id_before_provisioning' => intval($order['home_id'] ?? 0),
+				));
 				//OPTIONS, change it at your choice;
 				$extra_params = "";//no extra params defined by default
 				$cpu_affinity = "NA";//Affinity to one core/thread of the cpu by number, use NA to disable it
@@ -483,14 +856,28 @@ function exec_ogp_module()
 				if (empty($rserver)) {
 					$order_failed = true;
 					$order_failure_reason = "Remote server #{$remote_server_id} not found for order #{$order_id} (service_id {$service_id}).";
+					billing_provision_trace('Eligibility failure: selected remote server row is missing.', array(
+						'selected_remote_server_id' => intval($remote_server_id),
+					));
 				}
 				$game_path = "/home/gameserver/";
 				if (!$order_failed) {
 					$home_id = $db->addGameHome($remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
+					billing_provision_trace('Attempted server_homes creation for billing order.', array(
+						'selected_remote_server_id' => intval($remote_server_id),
+						'selected_home_cfg_id' => intval($home_cfg_id),
+						'home_id_after_creation_or_lookup' => intval($home_id),
+					));
 				}
 				if (!$order_failed && (!$home_id || intval($home_id) <= 0)) {
 					$order_failed = true;
 					$order_failure_reason = "Could not create server_homes row for order #{$order_id}.";
+				}
+				if (!$order_failed) {
+					$home_row_before = billing_get_server_home_row($db, $db_prefix, intval($home_id));
+					billing_provision_trace('Loaded server_homes row immediately after creation.', array(
+						'server_homes_row_before' => $home_row_before,
+					));
 				}
 				if (!$order_failed) {
 					// Billing storefront defaults FTP to enabled for newly provisioned homes so panel/account flows stay consistent after checkout.
@@ -509,6 +896,10 @@ function exec_ogp_module()
 					} else {
 						$selected_ip_id = intval($allocatedPort['ip_id'] ?? 0);
 						$selected_port = intval($allocatedPort['port'] ?? 0);
+						billing_provision_trace('Selected IP:port for new home.', array(
+							'selected_ip_id' => $selected_ip_id,
+							'selected_port' => $selected_port,
+						));
 					}
 				}
 				
@@ -528,6 +919,11 @@ function exec_ogp_module()
 				$mod_id = false;
 				if (!$order_failed) {
 					$mod_id = $db->addModToGameHome( $home_id, $resolved_mod_cfg_id );
+					billing_provision_trace('Attempted game_mods attach for home.', array(
+						'home_id_after_creation_or_lookup' => intval($home_id),
+						'selected_mod_cfg_id' => intval($resolved_mod_cfg_id),
+						'selected_mod_id' => intval($mod_id),
+					));
 					if ($mod_id === false) {
 						$order_failed = true;
 						$order_failure_reason = "Could not attach mod_cfg_id {$resolved_mod_cfg_id} to home #{$home_id}.";
@@ -539,6 +935,11 @@ function exec_ogp_module()
 					$db->updateGameModParams( $max_players, $extra_params, $cpu_affinity, $nice, $home_id, $resolved_mod_cfg_id );
 					$db->assignHomeTo( "user", $user_id, $home_id, $access_rights );
 					$selected_mod_id = intval($mod_id);
+					billing_provision_trace('Updated game_mod params and assigned home to user.', array(
+						'home_id_after_creation_or_lookup' => intval($home_id),
+						'selected_mod_id' => intval($selected_mod_id),
+						'user_id_received' => intval($user_id),
+					));
 				}
 				
 				//Get The home info without mods in 1 array (Necesary for remote connection).
@@ -573,16 +974,31 @@ function exec_ogp_module()
 				{
 					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $home_info['home_path']);
 					$db->changeFtpStatus('enabled',$home_info['home_id']);
+					billing_provision_trace('Enabled FTP account for provisioned home.', array(
+						'home_id_after_creation_or_lookup' => intval($home_info['home_id']),
+					));
 				}
 
 				if (!$order_failed) {
 					$install_attempted = true;
+					billing_provision_trace('Calling gamemanager_trigger_update_install for newly provisioned home.', array(
+						'exact_call' => "gamemanager_trigger_update_install(\$db, \$home_info, {$mod_id}, ['settings' => ...])",
+						'home_id_after_creation_or_lookup' => intval($home_id),
+						'selected_mod_id' => intval($mod_id),
+						'home_info_summary' => billing_trace_home_info_summary((array)$home_info),
+						'selected_settings' => billing_trace_settings_summary((array)$settings),
+					));
 					$autoInstall = gamemanager_trigger_update_install(
 						$db,
 						$home_info,
 						intval($mod_id),
 						array('settings' => $settings)
 					);
+					billing_provision_trace('gamemanager_trigger_update_install returned for newly provisioned home.', array(
+						'home_id_after_creation_or_lookup' => intval($home_id),
+						'selected_mod_id' => intval($mod_id),
+						'gamemanager_trigger_update_install_result' => $autoInstall,
+					));
 					$mod_id = intval($autoInstall['mod_id'] ?? $mod_id);
 					$selected_mod_id = intval($mod_id);
 					$install_message = (string)($autoInstall['message'] ?? '');
@@ -641,11 +1057,20 @@ function exec_ogp_module()
 
 			// Retry install for orders that already have home_id but never triggered installation.
 			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0 && (!$already_provisioned || $needs_existing_home_retry)) {
+				billing_provision_trace('Continuing provisioning for existing home because install is incomplete.', array(
+					'home_id_after_creation_or_lookup' => intval($home_id),
+					'needs_existing_home_retry' => $needs_existing_home_retry,
+					'install_message' => $install_message,
+				));
 				if ($selected_ip_id <= 0 || $selected_port <= 0) {
 					$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
 					if (!empty($existingIpPort['ok'])) {
 						$selected_ip_id = intval($existingIpPort['ip_id']);
 						$selected_port = intval($existingIpPort['port']);
+						billing_provision_trace('Reused existing IP:port for existing home retry.', array(
+							'selected_ip_id' => $selected_ip_id,
+							'selected_port' => $selected_port,
+						));
 					} else {
 						$allocatedPort = billing_allocate_home_port($db, $db_prefix, intval($home_id), intval($remote_server_id), intval($home_cfg_id));
 						if (empty($allocatedPort['ok'])) {
@@ -656,6 +1081,10 @@ function exec_ogp_module()
 						} else {
 							$selected_ip_id = intval($allocatedPort['ip_id'] ?? 0);
 							$selected_port = intval($allocatedPort['port'] ?? 0);
+							billing_provision_trace('Allocated new IP:port for existing home retry.', array(
+								'selected_ip_id' => $selected_ip_id,
+								'selected_port' => $selected_port,
+							));
 						}
 					}
 				}
@@ -680,6 +1109,11 @@ function exec_ogp_module()
 					} else {
 						$resolved_mod_cfg_id = intval($modResolution['mod_cfg_id']);
 						$selected_mod_id = intval($db->addModToGameHome(intval($home_id), intval($resolved_mod_cfg_id)));
+						billing_provision_trace('Attempted to attach missing mod during existing home retry.', array(
+							'home_id_after_creation_or_lookup' => intval($home_id),
+							'selected_mod_cfg_id' => intval($resolved_mod_cfg_id),
+							'selected_mod_id' => intval($selected_mod_id),
+						));
 						if ($selected_mod_id <= 0) {
 							$order_failed = true;
 							$order_failure_reason = "Could not attach mod_cfg_id {$resolved_mod_cfg_id} to home #{$home_id}.";
@@ -695,12 +1129,24 @@ function exec_ogp_module()
 				if (!$order_failed) {
 					$selected_mod_id = intval(gamemanager_choose_mod_id((array)$home_info, intval($selected_mod_id)));
 					$install_attempted = true;
+					billing_provision_trace('Calling gamemanager_trigger_update_install for existing home retry.', array(
+						'exact_call' => "gamemanager_trigger_update_install(\$db, \$home_info, {$selected_mod_id}, ['settings' => ...])",
+						'home_id_after_creation_or_lookup' => intval($home_id),
+						'selected_mod_id' => intval($selected_mod_id),
+						'home_info_summary' => billing_trace_home_info_summary((array)$home_info),
+						'selected_settings' => billing_trace_settings_summary((array)$settings),
+					));
 					$autoInstall = gamemanager_trigger_update_install(
 						$db,
 						(array)$home_info,
 						intval($selected_mod_id),
 						array('settings' => $settings)
 					);
+					billing_provision_trace('gamemanager_trigger_update_install returned for existing home retry.', array(
+						'home_id_after_creation_or_lookup' => intval($home_id),
+						'selected_mod_id' => intval($selected_mod_id),
+						'gamemanager_trigger_update_install_result' => $autoInstall,
+					));
 					$selected_mod_id = intval($autoInstall['mod_id'] ?? $selected_mod_id);
 					$install_message = (string)($autoInstall['message'] ?? '');
 					if (!empty($autoInstall['already_running'])) {
@@ -757,6 +1203,12 @@ function exec_ogp_module()
 				if ($order_failure_reason === '') {
 					$order_failure_reason = "No home_id was produced for order #{$order_id}.";
 				}
+				billing_provision_trace('Eligibility failure: provisioning finished without a valid home_id.', array(
+					'home_id_after_creation_or_lookup' => intval($home_id),
+				));
+			}
+			if ($home_id > 0 && empty($home_row_before)) {
+				$home_row_before = billing_get_server_home_row($db, $db_prefix, intval($home_id));
 			}
 
 			// Set order status to 'Active' (billing active even if install is pending)
@@ -772,14 +1224,22 @@ function exec_ogp_module()
 						WHERE order_id=".$db->realEscapeSingle($order_id));
 						
 			// Save home_id created by this order
-			$db->query("UPDATE `{$db_prefix}billing_orders`
+			$orderHomeUpdateOk = $db->query("UPDATE `{$db_prefix}billing_orders`
 						SET home_id='" . $db->realEscapeSingle($home_id) . "' WHERE order_id=".$db->realEscapeSingle($order_id));
+			billing_provision_trace('Updated billing_orders.home_id.', array(
+				'home_id_after_creation_or_lookup' => intval($home_id),
+				'billing_orders_home_id_updated' => (bool)$orderHomeUpdateOk,
+			));
 
-			$db->query("UPDATE `{$db_prefix}billing_invoices`
+			$invoiceHomeUpdateOk = $db->query("UPDATE `{$db_prefix}billing_invoices`
 						SET home_id=" . $db->realEscapeSingle($home_id) . ",
 							billing_status='Active',
 							status='paid'
 						WHERE order_id=" . $db->realEscapeSingle($order_id));
+			billing_provision_trace('Updated billing_invoices.home_id and billing status.', array(
+				'home_id_after_creation_or_lookup' => intval($home_id),
+				'billing_invoices_home_id_updated' => (bool)$invoiceHomeUpdateOk,
+			));
 
 			$db->query("UPDATE `{$db_prefix}billing_transactions`
 						SET home_id=" . $db->realEscapeSingle($home_id) . "
@@ -798,6 +1258,10 @@ function exec_ogp_module()
 								next_invoice_date  = '" . $db->realEscapeSingle($end_date_str) . "',
 								billing_enabled    = 1
 							WHERE home_id = " . $db->realEscapeSingle($home_id));
+				$home_row_after = billing_get_server_home_row($db, $db_prefix, intval($home_id));
+				billing_provision_trace('Loaded server_homes row after billing linkage updates.', array(
+					'server_homes_row_after' => $home_row_after,
+				));
 			}
 
 			$provisionContext = array(
@@ -813,6 +1277,7 @@ function exec_ogp_module()
 				'install_result' => $order_failed ? 'failed' : (string)$install_result,
 				'error' => $order_failed ? (string)$order_failure_reason : '',
 				'message' => (string)$install_message,
+				'skip_reason' => (string)$skip_reason,
 			);
 			billing_write_provision_log($provisionContext);
 			$db->logger(
@@ -833,9 +1298,51 @@ function exec_ogp_module()
 				$failed_count++;
 				$failed_messages[] = "Order #{$order_id}: {$order_failure_reason}";
 				$db->logger("Provisioning pending install for order #{$order_id}: {$order_failure_reason}");
+				billing_provision_trace('END failure', array(
+					'home_id_after_creation_or_lookup' => intval($home_id),
+					'end_reason' => $order_failure_reason,
+				));
 			} else {
 				$provisioned_count++;
+				billing_provision_trace('END success', array(
+					'home_id_after_creation_or_lookup' => intval($home_id),
+					'install_result' => (string)$install_result,
+				));
 			}
+			$order_results[] = array(
+				'trace_id' => $trace_id,
+				'order_id' => intval($order_id),
+				'user_id' => intval($user_id),
+				'service_id' => intval($service_id),
+				'home_id' => intval($home_id),
+				'mod_id' => intval($selected_mod_id),
+				'install_result' => $order_failed ? 'failed' : (string)$install_result,
+				'install_message' => (string)$install_message,
+				'error' => $order_failed ? (string)$order_failure_reason : '',
+				'trace_log_path' => billing_provision_trace_relative_path(),
+			);
+			} catch (Throwable $e) {
+				$failed_count++;
+				$order_id = intval($order['order_id'] ?? 0);
+				$message = "Order #{$order_id} threw an exception during provisioning: " . $e->getMessage();
+				$failed_messages[] = $message;
+				$db->logger('BILLING PROVISION EXCEPTION: ' . $message);
+				billing_provision_trace('Provisioning exception caught.', array('exception' => $e->getMessage()));
+				billing_provision_trace('END failure', array('end_reason' => $message));
+				$order_results[] = array(
+					'trace_id' => $trace_id,
+					'order_id' => $order_id,
+					'user_id' => intval($order['user_id'] ?? 0),
+					'service_id' => intval($order['service_id'] ?? 0),
+					'home_id' => intval($order['home_id'] ?? 0),
+					'mod_id' => 0,
+					'install_result' => 'failed',
+					'install_message' => '',
+					'error' => $e->getMessage(),
+					'trace_log_path' => billing_provision_trace_relative_path(),
+				);
+			}
+			unset($GLOBALS['BILLING_PROVISION_TRACE_CONTEXT']);
 						
 		}
 
@@ -872,6 +1379,10 @@ function exec_ogp_module()
 	}
 	
 	} else {
+		billing_provision_trace('END failure: no paid orders matched provisioning request.', array(
+			'caller_source' => $caller_source,
+			'order_ids_received' => $orderIds,
+		));
 		echo "<div class='failure'>";
 		echo "<p>No paid orders found to provision.</p>";
 		echo "</div>";
@@ -883,6 +1394,13 @@ function exec_ogp_module()
 		'provisioned_count' => isset($provisioned_count) ? $provisioned_count : 0,
 		'failed_count' => isset($failed_count) ? $failed_count : 0,
 		'orders' => $processed_orders,
+		'details' => $order_results,
+		'trace_log_path' => billing_provision_trace_relative_path(),
+		'trace_error' => $GLOBALS['BILLING_PROVISION_TRACE_ERROR'] ?? '',
 	);
+	billing_provision_trace('END provisioning attempt', array(
+		'provisioned_count' => intval($GLOBALS['BILLING_PROVISION_LAST_RESULT']['provisioned_count'] ?? 0),
+		'failed_count' => intval($GLOBALS['BILLING_PROVISION_LAST_RESULT']['failed_count'] ?? 0),
+	));
 }
 ?>
