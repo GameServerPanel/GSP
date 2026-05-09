@@ -3,6 +3,16 @@ require_once __DIR__ . '/../../includes/lib_remote.php';
 require_once __DIR__ . '/../config_games/server_config_parser.php';
 require_once __DIR__ . '/../gamemanager/update_actions.php';
 
+if (!defined('BILLING_INSTALL_MECHANISM')) {
+	define('BILLING_INSTALL_MECHANISM', 'gamemanager_trigger_update_install');
+}
+if (!defined('BILLING_CPU_AFFINITY_NA')) {
+	define('BILLING_CPU_AFFINITY_NA', 'NA');
+}
+if (!defined('BILLING_NICE_DEFAULT')) {
+	define('BILLING_NICE_DEFAULT', '0');
+}
+
 if (!function_exists('billing_generate_provision_password')) {
 	function billing_generate_provision_password(int $bytes = 12)
 	{
@@ -159,6 +169,47 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 	}
 }
 
+if (!function_exists('billing_get_home_ip_port')) {
+	function billing_get_home_ip_port($db, string $db_prefix, int $home_id): array
+	{
+		$row = $db->resultQuery(
+			"SELECT ip_id, port
+			 FROM `{$db_prefix}home_ip_ports`
+			 WHERE home_id=" . $db->realEscapeSingle($home_id) . "
+			 ORDER BY ip_id ASC, port ASC
+			 LIMIT 1"
+		);
+		if (!empty($row[0])) {
+			return array(
+				'ok' => true,
+				'ip_id' => intval($row[0]['ip_id'] ?? 0),
+				'port' => intval($row[0]['port'] ?? 0),
+			);
+		}
+		return array('ok' => false, 'ip_id' => 0, 'port' => 0);
+	}
+}
+
+if (!function_exists('billing_write_provision_log')) {
+	/**
+	 * Writes one JSON line per provisioning attempt to modules/billing/logs/provisioning.log.
+	 * Fields include order/invoice/user/home/home_cfg/mod/ip/port/mechanism/install_result/error/message.
+	 */
+	function billing_write_provision_log(array $context): void
+	{
+		$logDir = __DIR__ . '/logs';
+		if (!is_dir($logDir)) {
+			mkdir($logDir, 0755, true);
+		}
+		$status = strtoupper((string)($context['install_result'] ?? 'INFO'));
+		$line = '[' . date('Y-m-d H:i:s') . '] [' . $status . '] ' . json_encode($context, JSON_UNESCAPED_SLASHES) . PHP_EOL;
+		$result = file_put_contents($logDir . '/provisioning.log', $line, FILE_APPEND | LOCK_EX);
+		if ($result === false) {
+			error_log('billing_write_provision_log: failed to append provisioning.log');
+		}
+	}
+}
+
 function exec_ogp_module()
 {
 	global $db,$view,$settings,$table_prefix;
@@ -242,6 +293,26 @@ function exec_ogp_module()
 			$user_id = $order['user_id'];
 			$extended = isset($order['extended']) && $order['extended'] == "1" ? TRUE : FALSE;
 			$alreadyProvisioned = !$extended && intval($order['home_id'] ?? 0) > 0;
+			$provision_invoice_id = 0;
+			$selected_ip_id = 0;
+			$selected_port = 0;
+			$selected_mod_id = 0;
+			$resolved_mod_cfg_id = 0;
+			$install_mechanism = BILLING_INSTALL_MECHANISM;
+			$install_result = 'pending';
+			$install_message = '';
+			$install_attempted = false;
+			$home_info = array();
+			$invoiceRow = $db->resultQuery(
+				"SELECT invoice_id
+				 FROM `{$db_prefix}billing_invoices`
+				 WHERE order_id=" . $db->realEscapeSingle($order_id) . "
+				 ORDER BY invoice_id DESC
+				 LIMIT 1"
+			);
+			if (!empty($invoiceRow[0]['invoice_id'])) {
+				$provision_invoice_id = intval($invoiceRow[0]['invoice_id']);
+			}
 			//Query service info	
 			$service = $db->resultQuery( "SELECT * 
 							   FROM `{$db_prefix}billing_services` 
@@ -269,6 +340,17 @@ function exec_ogp_module()
 			if(!$order_failed && $alreadyProvisioned)
 			{
 				$home_id = intval($order['home_id']);
+				$home_info = $db->getGameHome($home_id);
+				if (empty($home_info)) {
+					$order_failed = true;
+					$order_failure_reason = "Order #{$order_id} references home_id {$home_id} but server_homes row is missing.";
+					$db->logger('BILLING PROVISION DATA INTEGRITY ERROR: ' . $order_failure_reason);
+				}
+				$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
+				if (!empty($existingIpPort['ok'])) {
+					$selected_ip_id = intval($existingIpPort['ip_id']);
+					$selected_port = intval($existingIpPort['port']);
+				}
 			}
 			elseif(!$order_failed && $extended)
 			{
@@ -340,6 +422,11 @@ function exec_ogp_module()
 						$order_failed = true;
 						$order_failure_reason = (string)($allocatedPort['error'] ?? 'Port allocation failed.');
 						$db->logger("Provisioning pending install for order #{$order_id}: {$order_failure_reason}");
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
+					} else {
+						$selected_ip_id = intval($allocatedPort['ip_id'] ?? 0);
+						$selected_port = intval($allocatedPort['port'] ?? 0);
 					}
 				}
 				
@@ -350,6 +437,8 @@ function exec_ogp_module()
 					if (empty($modResolution['ok'])) {
 						$order_failed = true;
 						$order_failure_reason = (string)($modResolution['error'] ?? 'No mod profile available for base install.');
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
 					} else {
 						$resolved_mod_cfg_id = intval($modResolution['mod_cfg_id']);
 					}
@@ -360,11 +449,14 @@ function exec_ogp_module()
 					if ($mod_id === false) {
 						$order_failed = true;
 						$order_failure_reason = "Could not attach mod_cfg_id {$resolved_mod_cfg_id} to home #{$home_id}.";
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
 					}
 				}
 				if (!$order_failed) {
 					$db->updateGameModParams( $max_players, $extra_params, $cpu_affinity, $nice, $home_id, $resolved_mod_cfg_id );
 					$db->assignHomeTo( "user", $user_id, $home_id, $access_rights );
+					$selected_mod_id = intval($mod_id);
 				}
 				
 				//Get The home info without mods in 1 array (Necesary for remote connection).
@@ -373,6 +465,8 @@ function exec_ogp_module()
 					if (empty($home_info)) {
 						$order_failed = true;
 						$order_failure_reason = "Could not load home info for home #{$home_id}.";
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
 					}
 				}
 				
@@ -387,6 +481,8 @@ function exec_ogp_module()
 					if (empty($home_info) || empty($home_info['mods'])) {
 						$order_failed = true;
 						$order_failure_reason = "Mods are not configured for home #{$home_id}; base install profile could not be resolved.";
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
 					}
 				}
 				
@@ -398,6 +494,7 @@ function exec_ogp_module()
 				}
 
 				if (!$order_failed) {
+					$install_attempted = true;
 					$autoInstall = gamemanager_trigger_update_install(
 						$db,
 						$home_info,
@@ -405,9 +502,22 @@ function exec_ogp_module()
 						array('settings' => $settings)
 					);
 					$mod_id = intval($autoInstall['mod_id'] ?? $mod_id);
+					$selected_mod_id = intval($mod_id);
+					$install_message = (string)($autoInstall['message'] ?? '');
+					if (!empty($autoInstall['already_running'])) {
+						$install_result = 'already_running';
+					} elseif (!empty($autoInstall['started'])) {
+						$install_result = 'started';
+					} elseif (!empty($autoInstall['completed'])) {
+						$install_result = 'completed';
+					} else {
+						$install_result = 'pending';
+					}
 					if (empty($autoInstall['ok'])) {
 						$order_failed = true;
 						$order_failure_reason = "Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.');
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
 					}
 				}
 				if (!$order_failed) {
@@ -442,6 +552,88 @@ function exec_ogp_module()
 				// END EMAIL
 				
 				
+			}
+
+			// Retry install for orders that already have home_id but never triggered installation.
+			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0) {
+				if ($selected_ip_id <= 0 || $selected_port <= 0) {
+					$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
+					if (!empty($existingIpPort['ok'])) {
+						$selected_ip_id = intval($existingIpPort['ip_id']);
+						$selected_port = intval($existingIpPort['port']);
+					} else {
+						$allocatedPort = billing_allocate_home_port($db, $db_prefix, intval($home_id), intval($remote_server_id), intval($home_cfg_id));
+						if (empty($allocatedPort['ok'])) {
+							$order_failed = true;
+							$order_failure_reason = (string)($allocatedPort['error'] ?? 'Port allocation failed for existing home.');
+							$install_result = 'failed';
+							$install_message = $order_failure_reason;
+						} else {
+							$selected_ip_id = intval($allocatedPort['ip_id'] ?? 0);
+							$selected_port = intval($allocatedPort['port'] ?? 0);
+						}
+					}
+				}
+				if (!$order_failed) {
+					if (empty($home_info)) {
+						$home_info = $db->getGameHome(intval($home_id));
+					}
+					if (empty($home_info)) {
+						$order_failed = true;
+						$order_failure_reason = "Could not load home info for home #{$home_id}.";
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
+					}
+				}
+				if (!$order_failed && empty($home_info['mods'])) {
+					$modResolution = billing_resolve_mod_cfg_id($db, intval($home_cfg_id), intval($mod_cfg_id));
+					if (empty($modResolution['ok'])) {
+						$order_failed = true;
+						$order_failure_reason = (string)($modResolution['error'] ?? "Mods are not configured for home #{$home_id}; base install profile could not be resolved.");
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
+					} else {
+						$resolved_mod_cfg_id = intval($modResolution['mod_cfg_id']);
+						$selected_mod_id = intval($db->addModToGameHome(intval($home_id), intval($resolved_mod_cfg_id)));
+						if ($selected_mod_id <= 0) {
+							$order_failed = true;
+							$order_failure_reason = "Could not attach mod_cfg_id {$resolved_mod_cfg_id} to home #{$home_id}.";
+							$install_result = 'failed';
+							$install_message = $order_failure_reason;
+						} else {
+							$db->updateGameModParams($max_players, '', BILLING_CPU_AFFINITY_NA, BILLING_NICE_DEFAULT, intval($home_id), intval($resolved_mod_cfg_id));
+							$db->assignHomeTo("user", $user_id, intval($home_id), $access_rights);
+							$home_info = $db->getGameHome(intval($home_id));
+						}
+					}
+				}
+				if (!$order_failed) {
+					$selected_mod_id = intval(gamemanager_choose_mod_id((array)$home_info, intval($selected_mod_id)));
+					$install_attempted = true;
+					$autoInstall = gamemanager_trigger_update_install(
+						$db,
+						(array)$home_info,
+						intval($selected_mod_id),
+						array('settings' => $settings)
+					);
+					$selected_mod_id = intval($autoInstall['mod_id'] ?? $selected_mod_id);
+					$install_message = (string)($autoInstall['message'] ?? '');
+					if (!empty($autoInstall['already_running'])) {
+						$install_result = 'already_running';
+					} elseif (!empty($autoInstall['started'])) {
+						$install_result = 'started';
+					} elseif (!empty($autoInstall['completed'])) {
+						$install_result = 'completed';
+					} else {
+						$install_result = 'pending';
+					}
+					if (empty($autoInstall['ok'])) {
+						$order_failed = true;
+						$order_failure_reason = "Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.');
+						$install_result = 'failed';
+						$install_message = $order_failure_reason;
+					}
+				}
 			}
 			// Set expiration date in panel database
 			// Status values: Active (provisioned & current), Invoiced (renewal invoice open),
@@ -519,6 +711,35 @@ function exec_ogp_module()
 								billing_enabled    = 1
 							WHERE home_id = " . $db->realEscapeSingle($home_id));
 			}
+
+			$provisionContext = array(
+				'order_id' => intval($order_id),
+				'invoice_id' => intval($provision_invoice_id),
+				'user_id' => intval($user_id),
+				'home_id' => intval($home_id),
+				'home_cfg_id' => intval($home_cfg_id ?? 0),
+				'mod_id' => intval($selected_mod_id),
+				'ip_id' => intval($selected_ip_id),
+				'port' => intval($selected_port),
+				'mechanism' => $install_mechanism,
+				'install_result' => $order_failed ? 'failed' : (string)$install_result,
+				'error' => $order_failed ? (string)$order_failure_reason : '',
+				'message' => (string)$install_message,
+			);
+			billing_write_provision_log($provisionContext);
+			$db->logger(
+				'BILLING PROVISION RESULT order_id=' . intval($order_id)
+				. ' invoice_id=' . intval($provision_invoice_id)
+				. ' user_id=' . intval($user_id)
+				. ' home_id=' . intval($home_id)
+				. ' home_cfg_id=' . intval($home_cfg_id ?? 0)
+				. ' mod_id=' . intval($selected_mod_id)
+				. ' ip_id=' . intval($selected_ip_id)
+				. ' port=' . intval($selected_port)
+				. ' mechanism=' . $install_mechanism
+				. ' install_result=' . ($order_failed ? 'failed' : (string)$install_result)
+				. ($order_failed ? ' error=' . (string)$order_failure_reason : '')
+			);
 
 			if ($order_failed) {
 				$failed_count++;

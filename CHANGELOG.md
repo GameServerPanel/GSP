@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-05-09
+- **Billing docs + auto-provision/install reliability:** Updated Game Monitor and Support documentation links to always open `https://gameservers.world/docs/` (game-specific path when available) in a new tab, and hardened billing provisioning so existing `home_id` orders can retry install automatically via the shared gamemanager update trigger (no manual Update Server click required). Added structured provisioning logs (`modules/billing/logs/provisioning.log`) and enriched panel log context with order/invoice/user/home/home_cfg/mod/ip/port/mechanism/result/error fields; PayPal webhook renewals now auto-provision when an order still has no `home_id`.
+- **Payment success provisioning visibility:** Expanded `modules/billing/payment_success.php` to show per-order provisioning state (install started/pending/failed) using live order/home/IP-port/mod consistency checks, so users/admins can immediately see provisioning outcomes instead of silent failures.
+
 ## 2026-05-08
 - **Auto-install trigger + monthly-only billing pricing:** Refactored Game Monitor update/install into a shared callable (`modules/gamemanager/update_actions.php`) reused by billing provisioning so new paid/free/admin-created homes auto-trigger the same install/update path used by `m=gamemanager&p=update&update=refresh` without manual clicks. Billing now treats monthly pricing (`price_monthly`) as canonical across admin service config, add-to-cart, free checkout, PayPal capture, and provisioning end-date math (31-day months), while preserving legacy daily/yearly columns for backward compatibility.
 - **LiteFM PHP 8.3 compatibility and install-pending UX:** Removed deprecated `${var}` interpolation usage, guarded missing `fm_cwd_*` session keys and `dirname()` null paths, and replaced directory-not-found warning output with a clear message when server files are not installed yet.

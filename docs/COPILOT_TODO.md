@@ -10,3 +10,4 @@
 - Complete a full pass over all `modules/billing/docs/*` game guides to standardize OS/Workshop/RCON capability statements against current XML-backed server support.
 - Add an automated billing provisioning integration test fixture that verifies arrange_ports exact/fallback allocation, duplicate-port protection, and home_id linkage after paid/free checkout.
 - Add a billing UI badge/filter that distinguishes "pending install" vs "installed" states directly in customer/server order views.
+- Add an admin billing orders "provisioning details" drawer that reads `modules/billing/logs/provisioning.log` and shows the latest mechanism/result/error per order without leaving the panel.

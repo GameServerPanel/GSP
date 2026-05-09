@@ -29,6 +29,10 @@ require_once("modules/config_games/server_config_parser.php");
 require_once("includes/refreshed.php");
 require_once('includes/lib_remote.php');
 
+if (!defined('GSP_WEBSITE_DOCS_BASE_URL')) {
+	define('GSP_WEBSITE_DOCS_BASE_URL', 'https://gameservers.world/docs/');
+}
+
 function renderParam($param, $last_param, $param_access_enabled, $home_id)
 {
 	global $db;
@@ -156,14 +160,15 @@ function get_sync_name($server_xml)
 
 function gsp_docs_url_for_game_key($game_key)
 {
+	$baseDocsUrl = rtrim(GSP_WEBSITE_DOCS_BASE_URL, '/');
 	$game_key = trim((string)$game_key);
 	if ($game_key !== '') {
 		$docPath = __DIR__ . '/../billing/docs/' . $game_key . '/index.php';
 		if (is_file($docPath)) {
-			return '/docs.php?action=view&doc=' . rawurlencode($game_key);
+			return $baseDocsUrl . '/' . rawurlencode($game_key) . '/';
 		}
 	}
-	return '/docs.php';
+	return $baseDocsUrl . '/';
 }
 
 function exec_ogp_module() {
@@ -272,7 +277,7 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 		$show_all = FALSE;
 	}
 
-	$docsTarget = '/docs.php';
+	$docsTarget = GSP_WEBSITE_DOCS_BASE_URL;
 	if (is_array($home_info) && !empty($home_info['game_key'])) {
 		$docsTarget = gsp_docs_url_for_game_key($home_info['game_key']);
 	}

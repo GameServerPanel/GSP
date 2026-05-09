@@ -20,18 +20,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- */
+*/
+
+if (!defined('GSP_WEBSITE_DOCS_BASE_URL')) {
+	define('GSP_WEBSITE_DOCS_BASE_URL', 'https://gameservers.world/docs/');
+}
 
 function gsp_support_docs_url_for_game_key($game_key)
 {
+	$baseDocsUrl = rtrim(GSP_WEBSITE_DOCS_BASE_URL, '/');
 	$game_key = trim((string)$game_key);
 	if ($game_key !== '') {
 		$docPath = __DIR__ . '/../billing/docs/' . $game_key . '/index.php';
 		if (is_file($docPath)) {
-			return '/docs.php?action=view&doc=' . rawurlencode($game_key);
+			return $baseDocsUrl . '/' . rawurlencode($game_key) . '/';
 		}
 	}
-	return '/docs.php';
+	return $baseDocsUrl . '/';
 }
 
 function exec_ogp_module() {
@@ -93,7 +98,7 @@ if (!empty($webhook)) {
 	} // end if submit
 	echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />';
 	echo "<h2>".get_lang('support')."</h2>";
-	$defaultDocsUrl = '/docs.php';
+	$defaultDocsUrl = GSP_WEBSITE_DOCS_BASE_URL;
 	if (!empty($server_homes) && is_array($server_homes)) {
 		foreach ((array)$server_homes as $server_home_row) {
 			if (!empty($server_home_row['game_key'])) {
@@ -167,7 +172,7 @@ if (!empty($webhook)) {
 	$(document).ready(function(){
 		function updateSupportDocLink(){
 			var selected = $('#gameserver option:selected');
-			var url = selected.data('doc-url') || '/docs.php';
+			var url = selected.data('doc-url') || '<?php echo GSP_WEBSITE_DOCS_BASE_URL; ?>';
 			$('#support-doc-link').attr('href', url);
 		}
 		$('#gameserver').on('change', updateSupportDocLink);
