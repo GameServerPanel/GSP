@@ -191,7 +191,8 @@ if (!function_exists('billing_write_provision_log')) {
 		if (!is_dir($logDir)) {
 			mkdir($logDir, 0755, true);
 		}
-		$line = '[' . date('Y-m-d H:i:s') . '] ' . json_encode($context, JSON_UNESCAPED_SLASHES) . PHP_EOL;
+		$status = strtoupper((string)($context['install_result'] ?? 'INFO'));
+		$line = '[' . date('Y-m-d H:i:s') . '] [' . $status . '] ' . json_encode($context, JSON_UNESCAPED_SLASHES) . PHP_EOL;
 		$result = file_put_contents($logDir . '/provisioning.log', $line, FILE_APPEND | LOCK_EX);
 		if ($result === false) {
 			error_log('billing_write_provision_log: failed to append provisioning.log');
@@ -333,6 +334,7 @@ function exec_ogp_module()
 				if (empty($home_info)) {
 					$order_failed = true;
 					$order_failure_reason = "Order #{$order_id} references home_id {$home_id} but server_homes row is missing.";
+					$db->logger('BILLING PROVISION DATA INTEGRITY ERROR: ' . $order_failure_reason);
 				}
 				$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
 				if (!empty($existingIpPort['ok'])) {
