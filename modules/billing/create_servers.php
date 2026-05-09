@@ -87,8 +87,8 @@ if (!function_exists('billing_allocate_home_port')) {
 			return array('ok' => false, 'error' => "No IP addresses are configured for remote server #{$remote_server_id}.");
 		}
 
-		$ipsWithNoRange = array();
-		$ipsExhausted = array();
+		$ips_with_no_range = array();
+		$ips_exhausted = array();
 		foreach ($ipIds as $ipId) {
 			$ranges = $db->resultQuery(
 				"SELECT start_port, end_port, port_increment
@@ -107,7 +107,7 @@ if (!function_exists('billing_allocate_home_port')) {
 				);
 			}
 			if (empty($ranges)) {
-				$ipsWithNoRange[] = $ipId;
+				$ips_with_no_range[] = $ipId;
 				continue;
 			}
 
@@ -160,13 +160,13 @@ if (!function_exists('billing_allocate_home_port')) {
 					}
 				}
 			}
-			$ipsExhausted[] = $ipId;
+			$ips_exhausted[] = $ipId;
 		}
 
-		if (!empty($ipsWithNoRange) && count($ipsWithNoRange) === count($ipIds)) {
-			return array('ok' => false, 'error' => "No port range found for home_cfg_id #{$home_cfg_id} on ip_id(s) [" . implode(',', $ipsWithNoRange) . "] for remote server #{$remote_server_id}.");
+		if (!empty($ips_with_no_range) && count($ips_with_no_range) === count($ipIds)) {
+			return array('ok' => false, 'error' => "No port range found for home_cfg_id #{$home_cfg_id} on ip_id(s) [" . implode(',', $ips_with_no_range) . "] for remote server #{$remote_server_id}.");
 		}
-		return array('ok' => false, 'error' => "No available port in arrange_ports for remote server #{$remote_server_id}, home_cfg_id #{$home_cfg_id}, ip_id(s) [" . implode(',', !empty($ipsExhausted) ? $ipsExhausted : $ipIds) . "].");
+		return array('ok' => false, 'error' => "No available port in arrange_ports for remote server #{$remote_server_id}, home_cfg_id #{$home_cfg_id}, ip_id(s) [" . implode(',', !empty($ips_exhausted) ? $ips_exhausted : $ipIds) . "].");
 	}
 }
 
@@ -179,13 +179,13 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 		}
 
 		$first = null;
-		$availableModCfgIds = array();
+		$available_mod_cfg_ids = array();
 		foreach ((array)$mods as $mod) {
 			$modCfgId = intval($mod['mod_cfg_id'] ?? 0);
 			if ($modCfgId <= 0) {
 				continue;
 			}
-			$availableModCfgIds[] = $modCfgId;
+			$available_mod_cfg_ids[] = $modCfgId;
 			if ($first === null) {
 				$first = $modCfgId;
 			}
@@ -198,7 +198,7 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 			return array('ok' => true, 'mod_cfg_id' => $first);
 		}
 
-		return array('ok' => false, 'error' => "No usable mod_cfg_id found for home_cfg_id #{$home_cfg_id}. Available mod_cfg_id values: [" . implode(',', $availableModCfgIds) . "].");
+		return array('ok' => false, 'error' => "No usable mod_cfg_id found for home_cfg_id #{$home_cfg_id}. Available mod_cfg_id values: [" . implode(',', $available_mod_cfg_ids) . "].");
 	}
 }
 
@@ -325,7 +325,7 @@ function exec_ogp_module()
 			$max_players = $order['max_players'];
 			$user_id = $order['user_id'];
 			$extended = isset($order['extended']) && $order['extended'] == "1" ? TRUE : FALSE;
-			$alreadyProvisioned = !$extended && intval($order['home_id'] ?? 0) > 0;
+			$already_provisioned = !$extended && intval($order['home_id'] ?? 0) > 0;
 			$provision_invoice_id = 0;
 			$selected_ip_id = 0;
 			$selected_port = 0;
@@ -379,7 +379,7 @@ function exec_ogp_module()
 				$order_failure_reason = "Service ID {$service_id} not found.";
 			}
 						
-			if(!$order_failed && $alreadyProvisioned)
+			if(!$order_failed && $already_provisioned)
 			{
 				$home_id = intval($order['home_id']);
 				$home_info = $db->getGameHome($home_id);
@@ -407,13 +407,13 @@ function exec_ogp_module()
 							$exec_path = clean_path($home_info['home_path'] . "/" . (string)$server_xml->exe_location . "/" . (string)$server_xml->server_exec_name);
 							if ($remote->rfile_exists($exec_path) !== 1) {
 								$needs_existing_home_retry = true;
-								$install_message = "Existing home #{$home_id} missing expected executable at {$exec_path}; retrying install.";
+								$install_message = "Existing home #{$home_id} missing expected executable '" . basename($exec_path) . "'; retrying install.";
 							}
 						}
 					}
 				}
 				if (!$order_failed && !$needs_existing_home_retry) {
-					$install_result = 'already_provisioned';
+					$install_result = 'completed';
 					$install_message = $install_message !== '' ? $install_message : "Order #{$order_id} already provisioned and installed; no action required.";
 				}
 			}
@@ -632,7 +632,7 @@ function exec_ogp_module()
 			}
 
 			// Retry install for orders that already have home_id but never triggered installation.
-			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0 && (!$alreadyProvisioned || $needs_existing_home_retry)) {
+			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0 && (!$already_provisioned || $needs_existing_home_retry)) {
 				if ($selected_ip_id <= 0 || $selected_port <= 0) {
 					$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
 					if (!empty($existingIpPort['ok'])) {
@@ -719,7 +719,7 @@ function exec_ogp_module()
 			// Status values: Active (provisioned & current), Invoiced (renewal invoice open),
 			//                 Expired (past due and awaiting deletion)
 			// end_date / next_invoice_date: when the next renewal invoice should be generated
-			if ($alreadyProvisioned)
+			if ($already_provisioned)
 			{
 				$existing_end = strtotime((string)($order['end_date'] ?? ''));
 				if ($existing_end === false || $existing_end <= 0) {
