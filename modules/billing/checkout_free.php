@@ -180,7 +180,8 @@ foreach ($invoices as $inv) {
         ]);
         if ($currentHomeId > 0) {
             $repo->updateInvoiceFields($invoiceId, ['home_id' => $currentHomeId]);
-        } else {
+        }
+        if (!in_array($orderId, $newOrderIds, true)) {
             $newOrderIds[] = $orderId;
         }
     } else {
@@ -206,7 +207,9 @@ foreach ($invoices as $inv) {
         if ($newOrderId > 0) {
             $repo->updateInvoiceOrderId($invoiceId, $newOrderId);
             $repo->updateInvoiceFields($invoiceId, ['order_id' => $newOrderId]);
-            $newOrderIds[] = $newOrderId;
+            if (!in_array($newOrderId, $newOrderIds, true)) {
+                $newOrderIds[] = $newOrderId;
+            }
         }
     }
 }

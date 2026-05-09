@@ -11,3 +11,4 @@
 - Add an automated billing provisioning integration test fixture that verifies arrange_ports exact/fallback allocation, duplicate-port protection, and home_id linkage after paid/free checkout.
 - Add a billing UI badge/filter that distinguishes "pending install" vs "installed" states directly in customer/server order views.
 - Add an admin billing orders "provisioning details" drawer that reads `modules/billing/logs/provisioning.log` and shows the latest mechanism/result/error per order without leaving the panel.
+- Add an automated end-to-end check that verifies `create_servers.php` skips already-installed homes while still retrying existing-home orders with missing executable/IP-port/mod prerequisites.

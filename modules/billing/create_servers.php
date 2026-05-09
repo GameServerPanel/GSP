@@ -14,13 +14,44 @@ if (!defined('BILLING_NICE_DEFAULT')) {
 }
 
 if (!function_exists('billing_generate_provision_password')) {
-	function billing_generate_provision_password(int $bytes = 12)
+	function billing_generate_provision_password()
 	{
+		$length = 6;
+		$alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+		$alphabetLen = strlen($alphabet);
+		$password = '';
 		try {
-			return substr(bin2hex(random_bytes($bytes)), 0, $bytes * 2);
+			for ($i = 0; $i < $length; $i++) {
+				$password .= $alphabet[random_int(0, $alphabetLen - 1)];
+			}
+			return $password;
 		} catch (Throwable $e) {
-			return substr(hash('sha256', uniqid('gsp-provision', true) . microtime(true)), 0, $bytes * 2);
+			for ($i = 0; $i < $length; $i++) {
+				$password .= $alphabet[mt_rand(0, $alphabetLen - 1)];
+			}
+			return $password;
 		}
+	}
+}
+
+if (!function_exists('billing_is_valid_provision_password')) {
+	function billing_is_valid_provision_password($value): bool
+	{
+		return is_string($value) && preg_match('/^[A-Za-z0-9]{6}$/', $value) === 1;
+	}
+}
+
+if (!function_exists('billing_should_regenerate_provision_password')) {
+	function billing_should_regenerate_provision_password($value): bool
+	{
+		return !billing_is_valid_provision_password($value) || strcasecmp((string)$value, 'ChangeMe') === 0;
+	}
+}
+
+if (!function_exists('billing_agent_offline_reason')) {
+	function billing_agent_offline_reason(int $remote_server_id, array $home_info): string
+	{
+		return "Agent is offline for remote server #{$remote_server_id} (" . ($home_info['agent_ip'] ?? 'unknown') . ":" . ($home_info['agent_port'] ?? 'unknown') . ").";
 	}
 }
 
@@ -63,6 +94,8 @@ if (!function_exists('billing_allocate_home_port')) {
 			return array('ok' => false, 'error' => "No IP addresses are configured for remote server #{$remote_server_id}.");
 		}
 
+		$ips_with_no_range = array();
+		$ips_exhausted = array();
 		foreach ($ipIds as $ipId) {
 			$ranges = $db->resultQuery(
 				"SELECT start_port, end_port, port_increment
@@ -81,6 +114,7 @@ if (!function_exists('billing_allocate_home_port')) {
 				);
 			}
 			if (empty($ranges)) {
+				$ips_with_no_range[] = $ipId;
 				continue;
 			}
 
@@ -133,9 +167,13 @@ if (!function_exists('billing_allocate_home_port')) {
 					}
 				}
 			}
+			$ips_exhausted[] = $ipId;
 		}
 
-		return array('ok' => false, 'error' => "No available port in arrange_ports for remote server #{$remote_server_id} and home_cfg_id #{$home_cfg_id}.");
+		if (!empty($ips_with_no_range) && count($ips_with_no_range) === count($ipIds)) {
+			return array('ok' => false, 'error' => "No port range found for home_cfg_id #{$home_cfg_id} on ip_id(s) [" . implode(',', $ips_with_no_range) . "] for remote server #{$remote_server_id}.");
+		}
+		return array('ok' => false, 'error' => "No available port in arrange_ports for remote server #{$remote_server_id}, home_cfg_id #{$home_cfg_id}, ip_id(s) [" . implode(',', !empty($ips_exhausted) ? $ips_exhausted : $ipIds) . "].");
 	}
 }
 
@@ -148,11 +186,13 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 		}
 
 		$first = null;
+		$available_mod_cfg_ids = array();
 		foreach ((array)$mods as $mod) {
 			$modCfgId = intval($mod['mod_cfg_id'] ?? 0);
 			if ($modCfgId <= 0) {
 				continue;
 			}
+			$available_mod_cfg_ids[] = $modCfgId;
 			if ($first === null) {
 				$first = $modCfgId;
 			}
@@ -165,7 +205,7 @@ if (!function_exists('billing_resolve_mod_cfg_id')) {
 			return array('ok' => true, 'mod_cfg_id' => $first);
 		}
 
-		return array('ok' => false, 'error' => "No usable mod_cfg_id found for home_cfg_id #{$home_cfg_id}.");
+		return array('ok' => false, 'error' => "No usable mod_cfg_id found for home_cfg_id #{$home_cfg_id}. Available mod_cfg_id values: [" . implode(',', $available_mod_cfg_ids) . "].");
 	}
 }
 
@@ -282,17 +322,17 @@ function exec_ogp_module()
 			$home_name = $order['home_name'];
 			$remote_control_password = $order['remote_control_password'];
 			$ftp_password = $order['ftp_password'];
-			if ($remote_control_password === '' || strcasecmp((string)$remote_control_password, 'ChangeMe') === 0) {
+			if (billing_should_regenerate_provision_password($remote_control_password)) {
 				$remote_control_password = billing_generate_provision_password();
 			}
-			if ($ftp_password === '' || strcasecmp((string)$ftp_password, 'ChangeMe') === 0) {
+			if (billing_should_regenerate_provision_password($ftp_password)) {
 				$ftp_password = billing_generate_provision_password();
 			}
 			$ip = $order['ip'];
 			$max_players = $order['max_players'];
 			$user_id = $order['user_id'];
 			$extended = isset($order['extended']) && $order['extended'] == "1" ? TRUE : FALSE;
-			$alreadyProvisioned = !$extended && intval($order['home_id'] ?? 0) > 0;
+			$already_provisioned = !$extended && intval($order['home_id'] ?? 0) > 0;
 			$provision_invoice_id = 0;
 			$selected_ip_id = 0;
 			$selected_port = 0;
@@ -302,6 +342,7 @@ function exec_ogp_module()
 			$install_result = 'pending';
 			$install_message = '';
 			$install_attempted = false;
+			$needs_existing_home_retry = false;
 			$home_info = array();
 			$invoiceRow = $db->resultQuery(
 				"SELECT invoice_id
@@ -330,6 +371,14 @@ function exec_ogp_module()
 				$install_method = $service[0]['install_method'];
 				$manual_url = $service[0]['manual_url'];
 				$access_rights = $service[0]['access_rights'];
+				if (intval($home_cfg_id) <= 0) {
+					$order_failed = true;
+					$order_failure_reason = "Invalid home_cfg_id '{$home_cfg_id}' for service_id {$service_id}.";
+				}
+				if (!$order_failed && intval($remote_server_id) <= 0) {
+					$order_failed = true;
+					$order_failure_reason = "Invalid remote server selection '{$remote_server_id}' on order #{$order_id} for service_id {$service_id}.";
+				}
 			}
 			else
 			{
@@ -337,7 +386,7 @@ function exec_ogp_module()
 				$order_failure_reason = "Service ID {$service_id} not found.";
 			}
 						
-			if(!$order_failed && $alreadyProvisioned)
+			if(!$order_failed && $already_provisioned)
 			{
 				$home_id = intval($order['home_id']);
 				$home_info = $db->getGameHome($home_id);
@@ -350,6 +399,29 @@ function exec_ogp_module()
 				if (!empty($existingIpPort['ok'])) {
 					$selected_ip_id = intval($existingIpPort['ip_id']);
 					$selected_port = intval($existingIpPort['port']);
+				}
+				$has_ip_port = !empty($existingIpPort['ok']);
+				$has_mods = !empty($home_info['mods']) && is_array($home_info['mods']);
+				if (!$order_failed && (!$has_ip_port || !$has_mods)) {
+					$needs_existing_home_retry = true;
+					$install_message = "Existing home #{$home_id} requires provisioning completion (ip_port=" . ($has_ip_port ? 'yes' : 'no') . ", mods=" . ($has_mods ? 'yes' : 'no') . ").";
+				}
+				if (!$order_failed && !$needs_existing_home_retry) {
+					$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
+					if ($server_xml && !empty((string)$server_xml->server_exec_name)) {
+						$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+						if ($remote->status_chk() === 1) {
+							$exec_path = clean_path($home_info['home_path'] . "/" . (string)$server_xml->exe_location . "/" . (string)$server_xml->server_exec_name);
+							if ($remote->rfile_exists($exec_path) !== 1) {
+								$needs_existing_home_retry = true;
+								$install_message = "Existing home #{$home_id} missing expected executable '" . basename($exec_path) . "'; retrying install.";
+							}
+						}
+					}
+				}
+				if (!$order_failed && !$needs_existing_home_retry) {
+					$install_result = 'completed';
+					$install_message = $install_message !== '' ? $install_message : "Order #{$order_id} already provisioned and installed; no action required.";
 				}
 			}
 			elseif(!$order_failed && $extended)
@@ -408,11 +480,21 @@ function exec_ogp_module()
 				//Add Game home to database
 				//HARD CODE TO /home/gameserver/
 				$rserver = $db->getRemoteServer($remote_server_id);
+				if (empty($rserver)) {
+					$order_failed = true;
+					$order_failure_reason = "Remote server #{$remote_server_id} not found for order #{$order_id} (service_id {$service_id}).";
+				}
 				$game_path = "/home/gameserver/";
-				$home_id = $db->addGameHome( $remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
-				if (!$home_id || intval($home_id) <= 0) {
+				if (!$order_failed) {
+					$home_id = $db->addGameHome($remote_server_id, $user_id, $home_cfg_id, $game_path, $home_name, $remote_control_password, $ftp_password);
+				}
+				if (!$order_failed && (!$home_id || intval($home_id) <= 0)) {
 					$order_failed = true;
 					$order_failure_reason = "Could not create server_homes row for order #{$order_id}.";
+				}
+				if (!$order_failed) {
+					// Billing storefront defaults FTP to enabled for newly provisioned homes so panel/account flows stay consistent after checkout.
+					$db->changeFtpStatus('enabled', intval($home_id));
 				}
 				
 				// Add IP:Port pair with arrange_ports exact home_cfg_id preference and home_cfg_id=0 fallback.
@@ -514,8 +596,11 @@ function exec_ogp_module()
 						$install_result = 'pending';
 					}
 					if (empty($autoInstall['ok'])) {
+						if (stripos((string)($autoInstall['message'] ?? ''), 'Agent is offline') !== false) {
+							$order_failure_reason = billing_agent_offline_reason(intval($remote_server_id), (array)$home_info);
+						}
 						$order_failed = true;
-						$order_failure_reason = "Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.');
+						$order_failure_reason = $order_failure_reason !== '' ? $order_failure_reason : ("Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.'));
 						$install_result = 'failed';
 						$install_message = $order_failure_reason;
 					}
@@ -555,7 +640,7 @@ function exec_ogp_module()
 			}
 
 			// Retry install for orders that already have home_id but never triggered installation.
-			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0) {
+			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0 && (!$already_provisioned || $needs_existing_home_retry)) {
 				if ($selected_ip_id <= 0 || $selected_port <= 0) {
 					$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
 					if (!empty($existingIpPort['ok'])) {
@@ -628,8 +713,11 @@ function exec_ogp_module()
 						$install_result = 'pending';
 					}
 					if (empty($autoInstall['ok'])) {
+						if (stripos((string)($autoInstall['message'] ?? ''), 'Agent is offline') !== false) {
+							$order_failure_reason = billing_agent_offline_reason(intval($remote_server_id), (array)$home_info);
+						}
 						$order_failed = true;
-						$order_failure_reason = "Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.');
+						$order_failure_reason = $order_failure_reason !== '' ? $order_failure_reason : ("Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.'));
 						$install_result = 'failed';
 						$install_message = $order_failure_reason;
 					}
@@ -639,7 +727,7 @@ function exec_ogp_module()
 			// Status values: Active (provisioned & current), Invoiced (renewal invoice open),
 			//                 Expired (past due and awaiting deletion)
 			// end_date / next_invoice_date: when the next renewal invoice should be generated
-			if ($alreadyProvisioned)
+			if ($already_provisioned)
 			{
 				$existing_end = strtotime((string)($order['end_date'] ?? ''));
 				if ($existing_end === false || $existing_end <= 0) {

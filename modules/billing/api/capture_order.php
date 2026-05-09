@@ -322,11 +322,10 @@ foreach ($invoices as $inv) {
                 $repo->updateInvoiceFields($invoiceId, ['home_id' => $currentHomeId]);
             }
             $ordersCreated++;
-            // Queue for provisioning only if not yet provisioned (home_id still '0' / empty).
-            if ($currentHomeId <= 0) {
+            if (!in_array($orderId, $newOrderIds, true)) {
                 $newOrderIds[] = $orderId;
-                cap_log('ORDER_QUEUED_PROVISION', ['order_id' => $orderId]);
             }
+            cap_log('ORDER_QUEUED_PROVISION', ['order_id' => $orderId, 'home_id' => $currentHomeId]);
         }
     } else {
         // No billing_orders row yet — create one now so the provisioner can run.
@@ -353,7 +352,9 @@ foreach ($invoices as $inv) {
             // Link invoice → order so retried captures are idempotent.
             $repo->updateInvoiceOrderId($invoiceId, $newOrderId);
             $repo->updateInvoiceFields($invoiceId, ['order_id' => $newOrderId]);
-            $newOrderIds[] = $newOrderId;
+            if (!in_array($newOrderId, $newOrderIds, true)) {
+                $newOrderIds[] = $newOrderId;
+            }
             $ordersCreated++;
             cap_log('ORDER_CREATED', ['invoice_id' => $invoiceId, 'order_id' => $newOrderId]);
         } else {
