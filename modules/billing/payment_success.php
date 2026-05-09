@@ -222,7 +222,7 @@ if ($db && $user_id > 0) {
                     <th>Game</th>
                     <th>Duration</th>
                     <th>Status</th>
-                    <th>Provisioning</th>
+                    <th title="Server Setup Status" aria-label="Server Setup Status">Provisioning</th>
                     <th style="text-align: right;">Price</th>
                 </tr>
             </thead>

@@ -3,6 +3,10 @@ require_once __DIR__ . '/../../includes/lib_remote.php';
 require_once __DIR__ . '/../config_games/server_config_parser.php';
 require_once __DIR__ . '/../gamemanager/update_actions.php';
 
+if (!defined('BILLING_INSTALL_MECHANISM')) {
+	define('BILLING_INSTALL_MECHANISM', 'gamemanager_trigger_update_install');
+}
+
 if (!function_exists('billing_generate_provision_password')) {
 	function billing_generate_provision_password(int $bytes = 12)
 	{
@@ -185,10 +189,13 @@ if (!function_exists('billing_write_provision_log')) {
 	{
 		$logDir = __DIR__ . '/logs';
 		if (!is_dir($logDir)) {
-			@mkdir($logDir, 0755, true);
+			mkdir($logDir, 0755, true);
 		}
 		$line = '[' . date('Y-m-d H:i:s') . '] ' . json_encode($context, JSON_UNESCAPED_SLASHES) . PHP_EOL;
-		@file_put_contents($logDir . '/provisioning.log', $line, FILE_APPEND | LOCK_EX);
+		$result = file_put_contents($logDir . '/provisioning.log', $line, FILE_APPEND | LOCK_EX);
+		if ($result === false) {
+			error_log('billing_write_provision_log: failed to append provisioning.log');
+		}
 	}
 }
 
@@ -280,7 +287,7 @@ function exec_ogp_module()
 			$selected_port = 0;
 			$selected_mod_id = 0;
 			$resolved_mod_cfg_id = 0;
-			$install_mechanism = 'gamemanager_trigger_update_install';
+			$install_mechanism = BILLING_INSTALL_MECHANISM;
 			$install_result = 'pending';
 			$install_message = '';
 			$install_attempted = false;
@@ -535,6 +542,7 @@ function exec_ogp_module()
 				
 			}
 
+			// Retry install for orders that already have home_id but never triggered installation.
 			if (!$order_failed && !$extended && !$install_attempted && intval($home_id) > 0) {
 				if ($selected_ip_id <= 0 || $selected_port <= 0) {
 					$existingIpPort = billing_get_home_ip_port($db, $db_prefix, intval($home_id));
