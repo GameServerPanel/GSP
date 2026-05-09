@@ -20,36 +20,42 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 	{
 		$home_id = intval($home_info['home_id'] ?? 0);
 		$mod_id = gamemanager_choose_mod_id($home_info, $mod_id);
+		$resultBase = array(
+			'trigger' => 'gamemanager_trigger_update_install',
+			'home_id' => $home_id,
+			'mod_id' => $mod_id,
+			'output' => null,
+		);
 		if ($home_id <= 0) {
-			return array('ok' => false, 'pending' => true, 'message' => 'Invalid home_id.', 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => false, 'pending' => true, 'message' => 'Invalid home_id.');
 		}
 		if ($mod_id <= 0 || empty($home_info['mods'][$mod_id])) {
-			return array('ok' => false, 'pending' => true, 'message' => "No mod profile configured for home #{$home_id}.", 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => false, 'pending' => true, 'message' => "No mod profile configured for home #{$home_id}.");
 		}
 
 		$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
 		if (!$server_xml) {
-			return array('ok' => false, 'pending' => true, 'message' => "Could not read server config XML for home #{$home_id}.", 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => false, 'pending' => true, 'message' => "Could not read server config XML for home #{$home_id}.");
 		}
 
 		$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
 		if ($remote->status_chk() === 0) {
-			return array('ok' => false, 'pending' => true, 'message' => 'Agent is offline.', 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => false, 'pending' => true, 'message' => 'Agent is offline.');
 		}
 		if ($remote->is_screen_running(OGP_SCREEN_TYPE_HOME, $home_id) == 1) {
-			return array('ok' => false, 'pending' => false, 'message' => 'Server is running and cannot be updated.', 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => false, 'pending' => false, 'message' => 'Server is running and cannot be updated.');
 		}
 
 		$log_txt = '';
 		$update_active = $remote->get_log(OGP_SCREEN_TYPE_UPDATE, $home_id, clean_path($home_info['home_path']), $log_txt);
 		if ($update_active == 1) {
-			return array('ok' => true, 'started' => true, 'already_running' => true, 'message' => 'Update already in progress.', 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => true, 'started' => true, 'already_running' => true, 'message' => 'Update already in progress.', 'output' => $log_txt);
 		}
 
 		$modkey = $home_info['mods'][$mod_id]['mod_key'] ?? '';
 		$mod_xml = xml_get_mod($server_xml, $modkey);
 		if (!$mod_xml) {
-			return array('ok' => false, 'pending' => true, 'message' => "Mod key '{$modkey}' not found in XML.", 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => false, 'pending' => true, 'message' => "Mod key '{$modkey}' not found in XML.");
 		}
 
 		$installer_name = isset($mod_xml->installer_name) ? (string)$mod_xml->installer_name : (string)$modkey;
@@ -65,17 +71,17 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 		$master_server_home_id = intval($options['master_server_home_id'] ?? 0);
 		if ($master_server_home_id > 0) {
 			if ($db->getMasterServer($home_info['remote_server_id'], $home_info['home_cfg_id']) != $master_server_home_id) {
-				return array('ok' => false, 'pending' => false, 'message' => 'Attempting update from non-master server.', 'mod_id' => $mod_id);
+				return $resultBase + array('ok' => false, 'pending' => false, 'message' => 'Attempting update from non-master server.');
 			}
 			if ($master_server_home_id == $home_id) {
-				return array('ok' => false, 'pending' => false, 'message' => 'Cannot update from own self.', 'mod_id' => $mod_id);
+				return $resultBase + array('ok' => false, 'pending' => false, 'message' => 'Cannot update from own self.');
 			}
 			$ms_info = $db->getGameHome($master_server_home_id);
 			$steam_out = $remote->masterServerUpdate($home_id, $home_info['home_path'], $master_server_home_id, $ms_info['home_path'], $exec_folder_path, $exec_path, $precmd, $postcmd);
 			if ($steam_out === 0) {
-				return array('ok' => false, 'pending' => true, 'message' => 'Failed to start master update.', 'mod_id' => $mod_id);
+				return $resultBase + array('ok' => false, 'pending' => true, 'message' => 'Failed to start master update.', 'output' => $steam_out);
 			}
-			return array('ok' => true, 'started' => true, 'message' => 'Update started.', 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => true, 'started' => true, 'message' => 'Update started.', 'output' => $steam_out);
 		}
 
 		$use_steamcmd = ((string)$server_xml->installer === "steamcmd");
@@ -105,9 +111,9 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 											 $betaname, $betapwd, $login, $pass, $settings['steam_guard'] ?? '',
 											 $exec_folder_path, $exec_path, $precmd, $postcmd, $cfg_os, $lockFiles, $arch);
 			if ($steam_out === 0) {
-				return array('ok' => false, 'pending' => true, 'message' => 'Failed to start SteamCMD update.', 'mod_id' => $mod_id);
+				return $resultBase + array('ok' => false, 'pending' => true, 'message' => 'Failed to start SteamCMD update.', 'output' => $steam_out);
 			}
-			return array('ok' => true, 'started' => true, 'message' => 'Update started.', 'mod_id' => $mod_id);
+			return $resultBase + array('ok' => true, 'started' => true, 'message' => 'Update started.', 'output' => $steam_out);
 		}
 
 		$ran_scripts = false;
@@ -120,11 +126,17 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 			$ran_scripts = true;
 		}
 		return array(
+			'trigger' => 'gamemanager_trigger_update_install',
 			'ok' => true,
 			'started' => $ran_scripts,
 			'completed' => !$ran_scripts,
 			'message' => $ran_scripts ? 'Script install started.' : 'No installer command was required.',
-			'mod_id' => $mod_id
+			'mod_id' => $mod_id,
+			'home_id' => $home_id,
+			'output' => array(
+				'precmd' => (string)$precmd,
+				'postcmd' => (string)$postcmd,
+			),
 		);
 	}
 }

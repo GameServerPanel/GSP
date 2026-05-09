@@ -397,7 +397,22 @@ if (!empty($newOrderIds)) {
         }
     } else {
         cap_log('AUTO_PROVISION_SKIPPED', 'panel bootstrap failed — orders require manual provisioning: ' . implode(',', $newOrderIds));
+        $autoProvision = [
+            'provisioned_count' => 0,
+            'failed_count' => count($newOrderIds),
+            'details' => [],
+            'trace_log_path' => 'modules/billing/logs/provisioning_trace.log',
+            'trace_error' => 'Panel bootstrap failed before billing provisioning could start.',
+        ];
     }
+}
+if (function_exists('billing_store_provision_session_result')) {
+    billing_store_provision_session_result($txid, [
+        'source' => 'api/capture_order.php',
+        'txid' => $txid,
+        'order_ids' => $newOrderIds,
+        'result' => $autoProvision,
+    ]);
 }
 
 unset($_SESSION['cart_coupon_code'], $_SESSION['cart_coupon_id']);

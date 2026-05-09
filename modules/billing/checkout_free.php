@@ -224,6 +224,7 @@ if ($couponId > 0 && !empty($invoices)) {
 unset($_SESSION['cart_coupon_code'], $_SESSION['cart_coupon_id']);
 
 // Attempt automatic provisioning via panel bridge
+$autoProvision = ['provisioned_count' => 0, 'failed_count' => 0, 'details' => [], 'trace_log_path' => 'modules/billing/logs/provisioning_trace.log'];
 if (!empty($newOrderIds)) {
     require_once __DIR__ . '/includes/panel_bridge.php';
     $panelCtx = billing_panel_bootstrap();
@@ -231,14 +232,30 @@ if (!empty($newOrderIds)) {
         $GLOBALS['db']       = $panelCtx['db'];
         $GLOBALS['settings'] = $panelCtx['settings'];
         require_once __DIR__ . '/create_servers.php';
-        billing_invoke_provision(['order_ids' => $newOrderIds, 'user_id' => $userId, 'is_admin' => true]);
+        $autoProvision = billing_invoke_provision(['order_ids' => $newOrderIds, 'user_id' => $userId, 'is_admin' => true]);
+    } else {
+        $autoProvision = [
+            'provisioned_count' => 0,
+            'failed_count' => count($newOrderIds),
+            'details' => [],
+            'trace_log_path' => 'modules/billing/logs/provisioning_trace.log',
+            'trace_error' => 'Panel bootstrap failed before billing provisioning could start.',
+        ];
     }
     // If panel bootstrap fails the order is Active and admins can provision via the orders panel.
+}
+if (function_exists('billing_store_provision_session_result')) {
+    billing_store_provision_session_result($txid, [
+        'source' => 'checkout_free.php',
+        'txid' => $txid,
+        'order_ids' => $newOrderIds,
+        'result' => $autoProvision,
+    ]);
 }
 
 if ($mysqli instanceof mysqli) {
     mysqli_close($mysqli);
 }
 
-header('Location: /payment_success.php?order_id=' . urlencode($txid));
+header('Location: /payment_success.php?order_id=' . urlencode($txid) . '&source=free');
 exit;
