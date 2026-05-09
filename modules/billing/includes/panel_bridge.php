@@ -35,6 +35,10 @@ if (!function_exists('billing_panel_bootstrap')) {
         static $includeInjected = false;
         if (!$includeInjected) {
             set_include_path($root . PATH_SEPARATOR . get_include_path());
+            // Change CWD to the panel root so that SERVER_CONFIG_LOCATION and other
+            // relative paths (e.g. XML_SCHEMA) resolve correctly when billing endpoints
+            // run outside of home.php (e.g. api/capture_order.php, PayPal webhooks).
+            chdir($root);
             $includeInjected = true;
         }
 

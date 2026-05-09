@@ -183,9 +183,27 @@ if (!function_exists('billing_detect_install_state')) {
 			$state['reason'] = 'home_cfg_file is missing; install completion cannot be verified.';
 			return $state;
 		}
-		$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
+		$xml_cfg_file = $home_info['home_cfg_file'] ?? '';
+		$xml_rel = rtrim(SERVER_CONFIG_LOCATION, '/') . '/' . $xml_cfg_file;
+		$xml_abs = $xml_rel;
+		if (!is_readable($xml_rel)) {
+			$panel_root = realpath(__DIR__ . '/../../');
+			if ($panel_root !== false) {
+				$xml_abs = $panel_root . '/' . ltrim($xml_rel, '/');
+			}
+		}
+		billing_provision_trace('billing_detect_install_state: XML path resolution.', array(
+			'home_id'         => intval($home_info['home_id'] ?? 0),
+			'home_cfg_file'   => $xml_cfg_file,
+			'xml_rel_path'    => $xml_rel,
+			'xml_abs_path'    => $xml_abs,
+			'cwd'             => getcwd(),
+			'xml_file_exists' => file_exists($xml_abs),
+			'xml_is_readable' => is_readable($xml_abs),
+		));
+		$server_xml = read_server_config($xml_abs);
 		if (!$server_xml) {
-			$state['reason'] = 'Could not read server config XML; install completion cannot be verified.';
+			$state['reason'] = "Could not read server config XML; install completion cannot be verified. Tried: {$xml_abs}";
 			return $state;
 		}
 		$server_exec_name = trim((string)($server_xml->server_exec_name ?? ''));
@@ -1252,11 +1270,14 @@ function exec_ogp_module()
 			}
 
 			if ($home_id > 0) {
-				// Set billing_status and next_invoice_date on server_homes
+				// Set billing_status, next_invoice_date, and server_expiration_date on server_homes.
+				// server_expiration_date must match end_date so the billing cron can determine
+				// when to suspend / delete the server.
 				$db->query("UPDATE `{$db_prefix}server_homes`
-							SET billing_status     = 'Active',
-								next_invoice_date  = '" . $db->realEscapeSingle($end_date_str) . "',
-								billing_enabled    = 1
+							SET billing_status          = 'Active',
+								next_invoice_date       = '" . $db->realEscapeSingle($end_date_str) . "',
+								server_expiration_date  = '" . $db->realEscapeSingle($end_date_str) . "',
+								billing_enabled         = 1
 							WHERE home_id = " . $db->realEscapeSingle($home_id));
 				$home_row_after = billing_get_server_home_row($db, $db_prefix, intval($home_id));
 				billing_provision_trace('Loaded server_homes row after billing linkage updates.', array(

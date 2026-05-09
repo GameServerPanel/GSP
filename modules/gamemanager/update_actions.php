@@ -33,9 +33,36 @@ if (!function_exists('gamemanager_trigger_update_install')) {
 			return $resultBase + array('ok' => false, 'pending' => true, 'message' => "No mod profile configured for home #{$home_id}.");
 		}
 
-		$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
+		// Build the XML path and resolve it to an absolute location so provisioning
+		// paths that do not run from the panel root CWD (e.g. billing capture_order.php)
+		// can still locate the file.  SERVER_CONFIG_LOCATION is a relative constant
+		// ("modules/config_games/server_configs/") that only works when CWD equals the
+		// panel root; update_actions.php lives in modules/gamemanager/ so the panel
+		// root is __DIR__ . '/../../'.
+		$xml_cfg_file = $home_info['home_cfg_file'] ?? '';
+		$xml_rel = rtrim(SERVER_CONFIG_LOCATION, '/') . '/' . $xml_cfg_file;
+		$xml_abs = $xml_rel;
+		if (!is_readable($xml_rel)) {
+			$panel_root = realpath(__DIR__ . '/../../');
+			if ($panel_root !== false) {
+				$xml_abs = $panel_root . '/' . ltrim($xml_rel, '/');
+			}
+		}
+		if (function_exists('billing_provision_trace')) {
+			billing_provision_trace('gamemanager_trigger_update_install: XML path resolution.', array(
+				'home_id'               => $home_id,
+				'home_cfg_file'         => $xml_cfg_file,
+				'server_config_location' => SERVER_CONFIG_LOCATION,
+				'xml_rel_path'          => $xml_rel,
+				'xml_abs_path'          => $xml_abs,
+				'cwd'                   => getcwd(),
+				'xml_file_exists'       => file_exists($xml_abs),
+				'xml_is_readable'       => is_readable($xml_abs),
+			));
+		}
+		$server_xml = read_server_config($xml_abs);
 		if (!$server_xml) {
-			return $resultBase + array('ok' => false, 'pending' => true, 'message' => "Could not read server config XML for home #{$home_id}.");
+			return $resultBase + array('ok' => false, 'pending' => true, 'message' => "Could not read server config XML for home #{$home_id}. Tried: {$xml_abs}");
 		}
 
 		$remote = new OGPRemoteLibrary($home_info['agent_ip'], $home_info['agent_port'], $home_info['encryption_key'], $home_info['timeout']);
