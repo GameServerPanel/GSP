@@ -192,15 +192,17 @@ if (!function_exists('billing_detect_install_state')) {
 				$xml_abs = $panel_root . '/' . ltrim($xml_rel, '/');
 			}
 		}
-		billing_provision_trace('billing_detect_install_state: XML path resolution.', array(
-			'home_id'         => intval($home_info['home_id'] ?? 0),
-			'home_cfg_file'   => $xml_cfg_file,
-			'xml_rel_path'    => $xml_rel,
-			'xml_abs_path'    => $xml_abs,
-			'cwd'             => getcwd(),
-			'xml_file_exists' => file_exists($xml_abs),
-			'xml_is_readable' => is_readable($xml_abs),
-		));
+		if (function_exists('billing_provision_trace')) {
+			billing_provision_trace('billing_detect_install_state: XML path resolution.', array(
+				'home_id'         => intval($home_info['home_id'] ?? 0),
+				'home_cfg_file'   => $xml_cfg_file,
+				'xml_rel_path'    => $xml_rel,
+				'xml_abs_path'    => $xml_abs,
+				'cwd'             => getcwd(),
+				'xml_file_exists' => file_exists($xml_abs),
+				'xml_is_readable' => is_readable($xml_abs),
+			));
+		}
 		$server_xml = read_server_config($xml_abs);
 		if (!$server_xml) {
 			$state['reason'] = "Could not read server config XML; install completion cannot be verified. Tried: {$xml_abs}";

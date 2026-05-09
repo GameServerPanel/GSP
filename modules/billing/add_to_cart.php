@@ -23,17 +23,14 @@ function billing_generate_password(): string
     $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     $len = strlen($alphabet);
     $password = '';
-    try {
-        for ($i = 0; $i < 6; $i++) {
+    for ($i = 0; $i < 6; $i++) {
+        try {
             $password .= $alphabet[random_int(0, $len - 1)];
-        }
-        return $password;
-    } catch (Throwable $e) {
-        for ($i = 0; $i < 6; $i++) {
+        } catch (Throwable $e) {
             $password .= $alphabet[mt_rand(0, $len - 1)];
         }
-        return $password;
     }
+    return $password;
 }
 
 function billing_normalize_duration(string $duration): array
