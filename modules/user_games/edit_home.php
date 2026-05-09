@@ -710,12 +710,14 @@ function exec_ogp_module()
 	echo "<input type=submit name='change_name' value='". get_lang("change_name") ."' />";
 	echo "</form></td></tr>";
 	echo "<tr><td colspan='2' class='info'>". get_lang("change_name_info") ."</td></tr>";
+	$copy_password_js = "if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(this.form[this.getAttribute('data-copy-field')].value);}else{this.form[this.getAttribute('data-copy-field')].select();document.execCommand('copy');}";
 
 	// Form to edit control password
 	echo "<tr><td class='right'>". get_lang("game_control_password") .":</td><td class='left'>";
 	echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>";
 	echo "<input type='hidden' name='home_id' value=\"$home_id\" />\n";
-	echo "<input type='password' size='30' name='control_password' value=\"".str_replace('"', "&quot;", $home_info['control_password'])."\" />";
+	echo "<input type='text' size='30' name='control_password' value=\"".str_replace('"', "&quot;", $home_info['control_password'])."\" />";
+	echo "<button type='button' data-copy-field='control_password' aria-label=\"".str_replace('"', "&quot;", get_lang("copy")." ".get_lang("game_control_password"))."\" onclick=\"".$copy_password_js."\">". get_lang("copy") ."</button>";
 	echo "<input type='submit' name='change_control_password' value='". get_lang("change_control_password") ."' />";
 	echo "</form></td></tr>";
 	echo "<tr><td colspan='2' class='info'>". get_lang("change_control_password_info") ."</td></tr>";
@@ -754,7 +756,8 @@ function exec_ogp_module()
 		// Form to edit control ftp password
 		echo "<tr><td class='right'>". get_lang("server_ftp_password") .":</td><td class='left'>";
 		echo "<form action='?m=user_games&p=edit&home_id=".$home_id."' method='post'>";
-		echo "<input type='password' size='30' name='ftp_password' value=\"".str_replace('"', "&quot;", $home_info['ftp_password'])."\" />";
+		echo "<input type='text' size='30' name='ftp_password' value=\"".str_replace('"', "&quot;", $home_info['ftp_password'])."\" />";
+		echo "<button type='button' data-copy-field='ftp_password' aria-label=\"".str_replace('"', "&quot;", get_lang("copy")." ".get_lang("server_ftp_password"))."\" onclick=\"".$copy_password_js."\">". get_lang("copy") ."</button>";
 		echo "<input type='submit' name='change_ftp_password' value='". get_lang("change_ftp_password") ."' />";
 		echo "</form></td></tr>";
 		echo "<tr><td  colspan='2' class='info'>". get_lang("change_ftp_password_info") ."</td></tr>";
