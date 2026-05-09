@@ -173,6 +173,8 @@ function exec_ogp_module()
 						billing_invoke_provision(array(
 							'order_ids' => array(intval($billing_order_id)),
 							'user_id' => intval($web_user_id),
+							// Trusted internal panel flow; allows admin-context provisioning
+							// without requiring a customer session/login redirect trigger.
 							'is_admin' => true
 						));
 					}

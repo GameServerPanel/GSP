@@ -449,6 +449,8 @@ echo "<table id='servermonitor' class='tablesorter' data-sortlist='[[0,0],[3,1]]
 			if (empty($server_home['ip']) || empty($server_home['port'])) {
 				$home_ip_ports = $db->getHomeIpPorts(intval($server_home['home_id']));
 				if (!empty($home_ip_ports) && is_array($home_ip_ports)) {
+					// Preference order: exact mod-specific mapping, generic force_mod_id=0 mapping,
+					// then first available mapping so newly provisioned homes always show an endpoint.
 					$fallback_ip_port = null;
 					foreach ((array)$home_ip_ports as $ip_port_row) {
 						if (intval($ip_port_row['force_mod_id'] ?? 0) === intval($server_home['mod_id'] ?? 0)) {

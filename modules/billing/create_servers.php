@@ -48,6 +48,13 @@ if (!function_exists('billing_should_regenerate_provision_password')) {
 	}
 }
 
+if (!function_exists('billing_agent_offline_reason')) {
+	function billing_agent_offline_reason(int $remote_server_id, array $home_info): string
+	{
+		return "Agent is offline for remote server #{$remote_server_id} (" . ($home_info['agent_ip'] ?? 'unknown') . ":" . ($home_info['agent_port'] ?? 'unknown') . ").";
+	}
+}
+
 if (!function_exists('billing_invoke_provision')) {
 	function billing_invoke_provision(array $options = array())
 	{
@@ -486,6 +493,8 @@ function exec_ogp_module()
 					$order_failure_reason = "Could not create server_homes row for order #{$order_id}.";
 				}
 				if (!$order_failed) {
+					// Billing storefront defaults to FTP enabled for newly provisioned homes
+					// so panel/account flows remain consistent immediately after checkout.
 					$db->changeFtpStatus('enabled', intval($home_id));
 				}
 				
@@ -589,7 +598,7 @@ function exec_ogp_module()
 					}
 					if (empty($autoInstall['ok'])) {
 						if (stripos((string)($autoInstall['message'] ?? ''), 'Agent is offline') !== false) {
-							$order_failure_reason = "Agent is offline for remote server #{$remote_server_id} (" . ($home_info['agent_ip'] ?? 'unknown') . ":" . ($home_info['agent_port'] ?? 'unknown') . ").";
+							$order_failure_reason = billing_agent_offline_reason(intval($remote_server_id), (array)$home_info);
 						}
 						$order_failed = true;
 						$order_failure_reason = $order_failure_reason !== '' ? $order_failure_reason : ("Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.'));
@@ -706,7 +715,7 @@ function exec_ogp_module()
 					}
 					if (empty($autoInstall['ok'])) {
 						if (stripos((string)($autoInstall['message'] ?? ''), 'Agent is offline') !== false) {
-							$order_failure_reason = "Agent is offline for remote server #{$remote_server_id} (" . ($home_info['agent_ip'] ?? 'unknown') . ":" . ($home_info['agent_port'] ?? 'unknown') . ").";
+							$order_failure_reason = billing_agent_offline_reason(intval($remote_server_id), (array)$home_info);
 						}
 						$order_failed = true;
 						$order_failure_reason = $order_failure_reason !== '' ? $order_failure_reason : ("Server files have not been installed yet. " . ($autoInstall['message'] ?? 'Auto install could not be started.'));
