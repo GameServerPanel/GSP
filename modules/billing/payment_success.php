@@ -26,11 +26,34 @@ $db = mysqli_connect($db_host, $db_user, $db_pass, $db_name, isset($db_port) ? (
 $orders = [];
 $total_paid = 0;
 
+function billing_payment_success_provision_state(array $order): array
+{
+    $homeId = intval($order['home_id'] ?? 0);
+    $hasHome = intval($order['has_home'] ?? 0) > 0;
+    $ipPortCount = intval($order['ip_port_count'] ?? 0);
+    $modCount = intval($order['mod_count'] ?? 0);
+
+    if ($homeId <= 0) {
+        return ['label' => 'PENDING', 'message' => 'Server record is queued for provisioning.', 'class' => 'status-badge status-pending'];
+    }
+    if (!$hasHome) {
+        return ['label' => 'FAILED', 'message' => 'Provisioning error: billing order references a missing server home.', 'class' => 'status-badge status-failed'];
+    }
+    if ($ipPortCount <= 0 || $modCount <= 0) {
+        return ['label' => 'PENDING', 'message' => 'Server created; install is pending final IP/mod setup.', 'class' => 'status-badge status-pending'];
+    }
+    return ['label' => 'INSTALL STARTED', 'message' => 'Server created and install/update trigger has been started or queued.', 'class' => 'status-badge'];
+}
+
 if ($db && $user_id > 0) {
     // Get recent orders for this user (just paid)
-    $query = "SELECT o.*, s.service_name 
+    $query = "SELECT o.*, s.service_name,
+                     CASE WHEN sh.home_id IS NULL THEN 0 ELSE 1 END AS has_home,
+                     (SELECT COUNT(*) FROM {$table_prefix}home_ip_ports hip WHERE hip.home_id = o.home_id) AS ip_port_count,
+                     (SELECT COUNT(*) FROM {$table_prefix}game_mods gm WHERE gm.home_id = o.home_id) AS mod_count
               FROM {$table_prefix}billing_orders o
               LEFT JOIN {$table_prefix}billing_services s ON o.service_id = s.service_id
+              LEFT JOIN {$table_prefix}server_homes sh ON sh.home_id = o.home_id
               WHERE o.user_id = $user_id 
               AND o.status = 'Active'
               ORDER BY o.order_date DESC 
@@ -39,6 +62,7 @@ if ($db && $user_id > 0) {
     $result = mysqli_query($db, $query);
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
+            $row['provision_state'] = billing_payment_success_provision_state($row);
             $orders[] = $row;
             $total_paid += floatval($row['price']);
         }
@@ -132,6 +156,12 @@ if ($db && $user_id > 0) {
             background: #28a745;
             color: white;
         }
+        .status-pending {
+            background: #f0ad4e;
+        }
+        .status-failed {
+            background: #d9534f;
+        }
         .btn {
             display: inline-block;
             padding: 12px 24px;
@@ -192,6 +222,7 @@ if ($db && $user_id > 0) {
                     <th>Game</th>
                     <th>Duration</th>
                     <th>Status</th>
+                    <th>Provisioning</th>
                     <th style="text-align: right;">Price</th>
                 </tr>
             </thead>
@@ -203,6 +234,14 @@ if ($db && $user_id > 0) {
                     <td><?php echo htmlspecialchars($order['service_name'] ?? 'Game Server'); ?></td>
                     <td><?php echo htmlspecialchars($order['qty']); ?>x <?php echo htmlspecialchars($order['invoice_duration']); ?></td>
                     <td><span class="status-badge">PAID</span></td>
+                    <td>
+                        <span class="<?php echo htmlspecialchars($order['provision_state']['class'] ?? 'status-badge'); ?>">
+                            <?php echo htmlspecialchars($order['provision_state']['label'] ?? 'PENDING'); ?>
+                        </span>
+                        <div style="margin-top:6px;color:#555;font-size:0.9em;">
+                            <?php echo htmlspecialchars($order['provision_state']['message'] ?? 'Provisioning state unavailable.'); ?>
+                        </div>
+                    </td>
                     <td style="text-align: right; font-weight: 600; color: #28a745;">
                         $<?php echo number_format(floatval($order['price']), 2); ?>
                     </td>

@@ -156,14 +156,15 @@ function get_sync_name($server_xml)
 
 function gsp_docs_url_for_game_key($game_key)
 {
+	$baseDocsUrl = 'https://gameservers.world/docs';
 	$game_key = trim((string)$game_key);
 	if ($game_key !== '') {
 		$docPath = __DIR__ . '/../billing/docs/' . $game_key . '/index.php';
 		if (is_file($docPath)) {
-			return '/docs.php?action=view&doc=' . rawurlencode($game_key);
+			return $baseDocsUrl . '/' . rawurlencode($game_key) . '/';
 		}
 	}
-	return '/docs.php';
+	return $baseDocsUrl . '/';
 }
 
 function exec_ogp_module() {
@@ -272,7 +273,7 @@ $home_info = $db->getGameHomeWithoutMods($home_id);
 		$show_all = FALSE;
 	}
 
-	$docsTarget = '/docs.php';
+	$docsTarget = 'https://gameservers.world/docs/';
 	if (is_array($home_info) && !empty($home_info['game_key'])) {
 		$docsTarget = gsp_docs_url_for_game_key($home_info['game_key']);
 	}

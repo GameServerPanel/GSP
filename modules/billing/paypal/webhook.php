@@ -556,7 +556,12 @@ function wh_fulfill_payment(mysqli $db, string $pfx, array $payment, string $bil
                     mysqli_stmt_close($stmt);
                 }
                 $last_order_id = $order_id;
-                wh_log('info', 'order_renewed', ['order_id' => $order_id, 'new_end' => $new_end]);
+                $existing_home_id = intval($row['home_id'] ?? 0);
+                wh_log('info', 'order_renewed', ['order_id' => $order_id, 'new_end' => $new_end, 'home_id' => $existing_home_id]);
+                if ($existing_home_id <= 0) {
+                    $dir = ($billing_dir !== '') ? $billing_dir : dirname(__DIR__);
+                    wh_try_provision($dir, $order_id, $user_id);
+                }
             }
         } else {
             // New order: create billing_orders row
