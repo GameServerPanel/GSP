@@ -18,13 +18,19 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-function billing_generate_password(int $bytes = 12): string
+function billing_generate_password(): string
 {
-    try {
-        return substr(bin2hex(random_bytes($bytes)), 0, $bytes * 2);
-    } catch (Throwable $e) {
-        return substr(hash('sha256', uniqid('gsp', true) . microtime(true)), 0, $bytes * 2);
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $len = strlen($alphabet);
+    $password = '';
+    for ($i = 0; $i < 6; $i++) {
+        try {
+            $password .= $alphabet[random_int(0, $len - 1)];
+        } catch (Throwable $e) {
+            $password .= $alphabet[mt_rand(0, $len - 1)];
+        }
     }
+    return $password;
 }
 
 function billing_normalize_duration(string $duration): array
