@@ -6,6 +6,12 @@ require_once __DIR__ . '/../gamemanager/update_actions.php';
 if (!defined('BILLING_INSTALL_MECHANISM')) {
 	define('BILLING_INSTALL_MECHANISM', 'gamemanager_trigger_update_install');
 }
+if (!defined('BILLING_CPU_AFFINITY_NA')) {
+	define('BILLING_CPU_AFFINITY_NA', 'NA');
+}
+if (!defined('BILLING_NICE_DEFAULT')) {
+	define('BILLING_NICE_DEFAULT', '0');
+}
 
 if (!function_exists('billing_generate_provision_password')) {
 	function billing_generate_provision_password(int $bytes = 12)
@@ -185,6 +191,10 @@ if (!function_exists('billing_get_home_ip_port')) {
 }
 
 if (!function_exists('billing_write_provision_log')) {
+	/**
+	 * Writes one JSON line per provisioning attempt to modules/billing/logs/provisioning.log.
+	 * Fields include order/invoice/user/home/home_cfg/mod/ip/port/mechanism/install_result/error/message.
+	 */
 	function billing_write_provision_log(array $context): void
 	{
 		$logDir = __DIR__ . '/logs';
@@ -591,7 +601,7 @@ function exec_ogp_module()
 							$install_result = 'failed';
 							$install_message = $order_failure_reason;
 						} else {
-							$db->updateGameModParams($max_players, '', 'NA', '0', intval($home_id), intval($resolved_mod_cfg_id));
+							$db->updateGameModParams($max_players, '', BILLING_CPU_AFFINITY_NA, BILLING_NICE_DEFAULT, intval($home_id), intval($resolved_mod_cfg_id));
 							$db->assignHomeTo("user", $user_id, intval($home_id), $access_rights);
 							$home_info = $db->getGameHome(intval($home_id));
 						}

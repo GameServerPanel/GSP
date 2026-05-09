@@ -38,7 +38,7 @@ function billing_payment_success_provision_state(array $order): array
     }
     // home_id exists but server_homes row does not: orphaned consistency failure.
     if (!$hasHome) {
-        return ['label' => 'FAILED', 'message' => 'Provisioning error: billing order references a missing server home.', 'class' => 'status-badge status-failed'];
+        return ['label' => 'FAILED', 'message' => 'Server setup failed. Please contact support with your order ID.', 'class' => 'status-badge status-failed'];
     }
     if ($ipPortCount <= 0 || $modCount <= 0) {
         return ['label' => 'PENDING', 'message' => 'Server created; install is pending final IP/mod setup.', 'class' => 'status-badge status-pending'];
