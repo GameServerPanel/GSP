@@ -1,16 +1,16 @@
 # Ignore database configuration files with sensitive credentials
-modules/billing/includes/config.inc.php
-includes/config.inc.php
-status/api/config.php
-status_api_local.php
+Website/includes/config.inc.php
+Panel/includes/config.inc.php
+Panel/status/api/config.php
+Panel/status_api_local.php
 
 # Ignore logs
-modules/billing/logs/*.log
-modules/billing/logs/*.txt
+Website/logs/*.log
+Website/logs/*.txt
 
 # Ignore data directory (payment JSONs)
-modules/billing/data/*.json
-!modules/billing/data/.gitkeep
+Website/data/*.json
+!Website/data/.gitkeep
 
 # Ignore backup files
 *.backup
@@ -30,5 +30,5 @@ Thumbs.db
 # Ignore temporary files
 /tmp/
 *.tmp
-modules/billing/data/*.log
-tools/__pycache__/
+Website/data/*.log
+Panel/tools/__pycache__/
