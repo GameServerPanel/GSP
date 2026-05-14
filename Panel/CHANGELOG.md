@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-13
+- **Root Apache vhost template for split Panel/Website layout:** Added `SITES_AVAILABLE_EXAMPLE.conf` at repo root with ready-to-copy `sites-available` examples for both `Panel/` and `Website/`, covering HTTP→HTTPS redirects, SSL vhosts, example domains/paths, required Apache modules, Certbot (`--apache` and `--webroot`) commands, and verification/reload steps.
+- **Per-site Apache examples for direct deployment:** Added `examples/apache/panel.example.com.conf` and `examples/apache/website.example.com.conf` so each site can be copied directly into `/etc/apache2/sites-available/` with minimal edits.
+- **Apache install helper script:** Added `examples/apache/install-sites-available.sh` to copy vhost examples into `sites-available`, optionally run `a2enmod`, `a2ensite`, `apache2ctl configtest`, and reload Apache in one flow.
+
 ## 2026-05-09
 - **Billing OS-variant rollback + exact-service provisioning:** Removed storefront canonical Linux/Windows deduping and order-time OS service auto-switching so each enabled `billing_services` row is sold as its own variant. Checkout/provision now preserve the exact selected `service_id`/`home_cfg_id`/XML, enforce location OS compatibility without silent swapping, log selected XML context in provisioning traces, and show “Server installation is in progress.” instead of immediate executable-missing wording while update installs are active. Also replaced deprecated `utf8_encode()` usage in `modules/gamemanager/view_server_log.php` for PHP 8.3 compatibility.
 - **Mandatory provisioning trace log + existing-home install retry:** Added visible fail-closed trace logging to `modules/billing/logs/provisioning_trace.log`, threaded detailed per-order provisioning results into checkout success flows, and changed billing provisioning so `Active` orders with an existing `home_id` only skip when the install is already complete. Incomplete existing homes now keep allocating missing IP/mod data and re-use `gamemanager_trigger_update_install()` with traced inputs/outputs instead of silently requiring a manual Game Monitor update.
