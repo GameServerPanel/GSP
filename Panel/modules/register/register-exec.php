@@ -34,9 +34,11 @@ function checkEmail($email) {
 }
 
 require_once("includes/functions.php");
+require_once(dirname(__FILE__) . '/register_helpers.php');
 function exec_ogp_module()
 {
 	global $db,$view,$settings;
+	startSession();
 		
 	$adminEmailList = '';
 	// Get email address of all admins to inform him when a user has registered.
@@ -68,14 +70,16 @@ function exec_ogp_module()
 	}
 		
 	//Sanitize the POST values
-	$users_fname = sanitizeInputStr($_POST['users_fname']);
-	$users_lname = sanitizeInputStr($_POST['users_lname']);
-	$users_login = sanitizeInputStr($_POST['login_name']);
-	$users_passwd = clean($_POST['users_passwd']);
-	$users_cpasswd = clean($_POST['users_cpasswd']);
-	$users_email = clean($_POST['users_email']);
-	$users_comment = clean($_POST['users_comment']);
-	$gRecaptchaResponse = clean($_POST['g-recaptcha-response']);
+	$users_fname = sanitizeInputStr(isset($_POST['users_fname']) ? $_POST['users_fname'] : '');
+	$users_lname = sanitizeInputStr(isset($_POST['users_lname']) ? $_POST['users_lname'] : '');
+	$users_login = sanitizeInputStr(isset($_POST['login_name']) ? $_POST['login_name'] : '');
+	$users_passwd = clean(isset($_POST['users_passwd']) ? $_POST['users_passwd'] : '');
+	$users_cpasswd = clean(isset($_POST['users_cpasswd']) ? $_POST['users_cpasswd'] : '');
+	$users_email = clean(isset($_POST['users_email']) ? $_POST['users_email'] : '');
+	$users_comment = clean(isset($_POST['users_comment']) ? $_POST['users_comment'] : '');
+	$gRecaptchaResponse = clean(isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '');
+	$recaptcha_widget_error = clean(isset($_POST['recaptcha_widget_error']) ? $_POST['recaptcha_widget_error'] : '0');
+	register_log_event('registration_started', array('username' => $users_login, 'email' => $users_email));
 
 	if( !empty($users_fname) ) {
 	$input['users_fname'] = $users_fname;
@@ -115,6 +119,12 @@ function exec_ogp_module()
 		$errmsg_arr[] = get_lang('err_login_name');
 		$errflag = true;
 	}
+	elseif($db->getUser($users_login) != FALSE)
+	{
+		$errmsg_arr[] = get_lang('err_login_name');
+		$errflag = true;
+		register_log_event('registration_validation_failed', array('reason' => 'duplicate_username', 'username' => $users_login));
+	}
 	if($users_passwd == '') {
 		$errmsg_arr[] = get_lang('err_password');
 		$errflag = true;
@@ -137,21 +147,33 @@ function exec_ogp_module()
 		$errflag = true;
 	}
 	
-	if(!empty($settings['recaptcha_site_key']) && !empty($settings['recaptcha_secret_key'])){
-		$sitekey = $settings['recaptcha_site_key'];
-		$secretkey = $settings['recaptcha_secret_key'];
-	}else{
-		require_once('captchakeys.php');
-	}
-	
-	require('includes/classes/recaptcha/autoload.php');
-	$recaptcha = new \ReCaptcha\ReCaptcha($secretkey);
-	$resp = $recaptcha->verify($gRecaptchaResponse, $_SERVER["REMOTE_ADDR"]);
-
-	if (empty($gRecaptchaResponse) || !$resp->isSuccess())
+	$recaptcha = register_get_recaptcha_config($settings);
+	if($recaptcha['enabled'] && $recaptcha_widget_error !== '1')
 	{
-		$errmsg_arr[] = get_lang('err_captcha');
-		$errflag = true;
+		require_once('includes/classes/recaptcha/autoload.php');
+		try {
+			$captcha = new \ReCaptcha\ReCaptcha($recaptcha['secretkey']);
+			$resp = $captcha->verify($gRecaptchaResponse, isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : '');
+			if (empty($gRecaptchaResponse) || !$resp->isSuccess())
+			{
+				$errmsg_arr[] = get_lang('err_captcha');
+				$errflag = true;
+				register_log_event('registration_captcha_failed', array('username' => $users_login));
+			}
+			else
+			{
+				register_log_event('registration_captcha_validated', array('username' => $users_login));
+			}
+		}
+		catch (Exception $e)
+		{
+			register_log_event('registration_captcha_exception', array('error' => $e->getMessage()));
+			register_log_event('registration_captcha_skipped', array('reason' => 'verification_exception'));
+		}
+	}
+	else
+	{
+		register_log_event('registration_captcha_skipped', array('reason' => $recaptcha['reason'], 'widget_error' => $recaptcha_widget_error));
 	}
 	
 	//Create INSERT query
@@ -161,11 +183,23 @@ function exec_ogp_module()
 		{
 			$errmsg_arr[] = get_lang('err_login_name');
 			$errflag = true;
+			register_log_event('registration_db_insert_failed', array('username' => $users_login));
 		}
 		else
 		{
 			$user = $db->getUser($users_login);
 			$user_id = $user['user_id'];
+			register_log_event('registration_db_insert_succeeded', array('username' => $users_login, 'user_id' => $user_id));
+
+			$users_pass_hash = password_hash($users_passwd, PASSWORD_DEFAULT);
+			if($users_pass_hash !== false)
+			{
+				$hash_column = $db->resultQuery("SHOW COLUMNS FROM `OGP_DB_PREFIXusers` LIKE 'users_pass_hash';");
+				if($hash_column)
+				{
+					$db->query("UPDATE `OGP_DB_PREFIXusers` SET `users_pass_hash` = '".$db->realEscapeSingle($users_pass_hash)."' WHERE `user_id` = ".(int)$user_id." LIMIT 1;");
+				}
+			}
 
 			$fields['users_fname'] = $users_fname;
 			$fields['users_lname'] = $users_lname;
@@ -195,19 +229,21 @@ function exec_ogp_module()
 				if($mail)
 				{
 					print_success(get_lang_f('your_account_details_has_been_sent_by_email_to',$users_email));
-					$view->refresh("http://xpgame.host,8);
+					$view->refresh("index.php",8);
 				}else{
-					$view->refresh("http://xpgame.host",8);
 					print_success(get_lang('account_created'));
+					$view->refresh("index.php",8);
 				}
+				register_log_event('registration_completed', array('username' => $users_login, 'user_id' => $user_id));
 			}
 			else
 			{
 				$user = $db->getUser($users_login);
 				$user_id = $user['user_id'];
 				$db->delUser($user_id);
-				print_failure('FAILURE: Unable to set user details, try again.');
+				print_failure('Unable to complete registration details. Please try again.');
 				$view->refresh("index.php?m=register&p=form&".$lang_switch,8);
+				register_log_event('registration_profile_update_failed', array('username' => $users_login, 'user_id' => $user_id));
 			}
 		}
 	}
@@ -215,8 +251,8 @@ function exec_ogp_module()
 	if($errflag) {
 		$_SESSION['ERRMSG_ARR'] = $errmsg_arr;
 		$_SESSION['INPUT'] = $input;
+		register_log_event('registration_validation_failed', array('username' => $users_login, 'errors' => $errmsg_arr));
 		$view->refresh("index.php?m=register&p=form&".$lang_switch,0);
 	}
 }
 ?>
-

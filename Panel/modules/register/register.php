@@ -25,8 +25,7 @@
 //Open Game Panel Free User Registration Add On By
 //  MarkDogg18769
 
-define("RECAPTCHA_API_SERVER", "http://www.google.com/recaptcha/api");
-define("RECAPTCHA_API_SECURE_SERVER", "https://www.google.com/recaptcha/api");
+require_once(dirname(__FILE__) . '/register_helpers.php');
 
 function exec_ogp_module()
 {
@@ -83,14 +82,22 @@ function exec_ogp_module()
 	$ft->add_field_hidden('users_comment',get_lang_f('registered_on', date("d/m/Y")) );
 	echo "<tr><td>&nbsp;</td><td align='right'>";
 	
-	if(!empty($settings['recaptcha_site_key']) && !empty($settings['recaptcha_secret_key'])){
-		$sitekey = $settings['recaptcha_site_key'];
-		$secretkey = $settings['recaptcha_secret_key'];
+	$recaptcha = register_get_recaptcha_config($settings);
+	if($recaptcha['enabled']){
+		echo recaptcha_get_html($recaptcha['sitekey']);
+		echo '<input type="hidden" id="recaptcha_widget_error" name="recaptcha_widget_error" value="0" />';
+		echo '<script type="text/javascript">
+		function registerRecaptchaWidgetError() {
+			var flag = document.getElementById("recaptcha_widget_error");
+			if (flag) flag.value = "1";
+		}
+		</script>';
+		register_log_event('registration_form_captcha_enabled');
 	}else{
-		require_once('captchakeys.php');
+		echo "<div style='color:#f8e58c;font-size:12px;'>Captcha is temporarily unavailable. Registration is still available.</div>";
+		echo '<input type="hidden" id="recaptcha_widget_error" name="recaptcha_widget_error" value="1" />';
+		register_log_event('registration_form_captcha_disabled', array('reason' => $recaptcha['reason']));
 	}
-	$use_ssl = ( isset($_SERVER['HTTPS']) and  get_true_boolean($_SERVER['HTTPS']) ) ? true : false;
-	echo recaptcha_get_html($sitekey,null,$use_ssl);
 	echo "</td></tr>";
     $ft->end_table();
     $ft->add_button("submit","Submit",get_lang('register_a_new_user'));
@@ -100,21 +107,15 @@ function exec_ogp_module()
 function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
 {
 	if ($pubkey == null || $pubkey == '') {
-		die ("To use reCAPTCHA you must get an API key from <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>");
-	}
-	
-	if ($use_ssl) {
-		$server = RECAPTCHA_API_SECURE_SERVER;
-	} else {
-		$server = RECAPTCHA_API_SERVER;
+		return "";
 	}
 
 	$errorpart = "";
 	if ($error) {
 		$errorpart = "&amp;error=" . $error;
 	}
-      
-	return "<script src='" . $server . ".js'></script><div style='display: inline-block;' class='g-recaptcha' data-sitekey='" . $pubkey . "'></div>";
-       
+
+	return "<script src='https://www.google.com/recaptcha/api.js' async defer></script><div style='display: inline-block;' class='g-recaptcha' data-sitekey='" . $pubkey . "' data-error-callback='registerRecaptchaWidgetError'></div>";
+        
 }
 ?>
