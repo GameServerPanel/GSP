@@ -40,7 +40,7 @@ This file captures how the control panel, storefront, agents, and helper scripts
 | `extras`, `addonsmanager` | Workshop/add-on management. | Hooks into game homes after provisioning. |
 | `litefm`, `ftp`, `TS3Admin` | File managers and TeamSpeak controllers. | Depend on homes and remote server credentials set during provisioning. |
 | `news`, `circular`, `faq` | Content modules for panel UI. | Use standard MVC wrappers, share session/auth. |
-| `cron` | Scheduler UI feeding `scripts/` commands. | Maintains job metadata that OS cron reads. |
+| `cron` | Scheduler UI feeding `scripts/` commands. | Maintains job metadata that OS cron reads, including scheduler-triggered Server Content actions via `ogp_api.php?server_content/run_scheduled_action` and `modules/addonsmanager/server_content_actions.php`. |
 
 ## Storefront (`Panel/modules/billing` runtime + `Website/` compatibility wrappers)
 

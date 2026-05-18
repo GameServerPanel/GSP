@@ -77,19 +77,12 @@ function exec_ogp_module()
 			$mod_key = $game_home['mod_key'];
 			$token = $db->getApiToken($_SESSION['user_id']);
 				
-			switch ($_POST['action']) {
-				case "stop":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/stop&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
-					break;
-				case "start":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/start&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
-					break;
-				case "restart":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/restart&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
-					break;
-				case "steam_auto_update":
-					$command = "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/update&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
-					break;
+			$command = build_cron_scheduler_command($panelURL, $token, $game_home, $_POST['action']);
+			if($command === false)
+			{
+				print_failure(get_lang('bad_inputs'));
+				$view->refresh('?m=cron&p=cron',2);
+				return;
 			}
 			
 			$remote = new OGPRemoteLibrary( $game_home['agent_ip'], $game_home['agent_port'],
