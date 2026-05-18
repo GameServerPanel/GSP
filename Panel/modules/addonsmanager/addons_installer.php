@@ -111,6 +111,7 @@ require_once("modules/config_games/server_config_parser.php");
 require_once("protocol/lgsl/lgsl_protocol.php");
 // Central category map — all valid addon_type values and their labels.
 require_once(dirname(__FILE__) . '/server_content_categories.php');
+require_once(dirname(__FILE__) . '/server_content_helpers.php');
 
 function exec_ogp_module() {
 
@@ -325,6 +326,11 @@ function exec_ogp_module() {
 
     		return;
     	}
+		if ($addon_type === 'workshop') {
+			scm_ensure_workshop_schema($db);
+			$view->refresh('?m=addonsmanager&p=workshop_content&home_id='.(int)$home_id.'&mod_id='.(int)$mod_id.'&ip='.urlencode((string)$ip).'&port='.urlencode((string)$port), 0);
+			return;
+		}
 
 		?>
 			<h2><?php echo htmlentities($home_info['home_name'])."&nbsp;".get_lang($addon_type) ;?></h2>
