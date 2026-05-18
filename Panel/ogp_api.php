@@ -51,6 +51,9 @@ ogp_api.php?addonsmanager/install			(POST/GET {token}{ip}{port}{mod_key}{addon_i
 
 ______________ Steam Workshop
 ogp_api.php?steam_workshop/install 			(POST/GET {token}{ip}{port}{mods_list})
+
+______________ Server Content
+ogp_api.php?server_content/run_scheduled_action 	(POST/GET {token}{home_id}{action}{options})
 * 
  ______________ Panel Setting
 ogp_api.php?setting/get 			(POST/GET {token}{setting_name})
@@ -1472,6 +1475,44 @@ function api_addonsmanager()
 	}
 	
 	return array("status" => $status, "message" => $message);
+}
+
+function api_server_content()
+{
+	global $request, $db;
+	if($db->isModuleInstalled('addonsmanager') === FALSE)
+		return array("status" => '349', "message" => "This function is not available because the module is not installed.");
+
+	if($request[0] == "run_scheduled_action")
+	{
+		require_once(MODULES.'addonsmanager/server_content_actions.php');
+		$home_id = (int)$_POST['home_id'];
+		$action = isset($_POST['action']) ? trim((string)$_POST['action']) : '';
+		$options = array();
+		if(isset($_POST['options']))
+		{
+			$decoded_options = json_decode((string)$_POST['options'], true);
+			if(is_array($decoded_options))
+				$options = $decoded_options;
+		}
+		$passthrough_keys = array('triggered_by', 'cron_id', 'safe_restart', 'restart_delay_seconds', 'check_only', 'notify_only');
+		foreach ((array)$passthrough_keys as $key)
+		{
+			if(isset($_POST[$key]))
+				$options[$key] = $_POST[$key];
+		}
+
+		$result = server_content_run_scheduled_action($home_id, $action, $options);
+		$status = isset($result['status']) ? $result['status'] : 'failed';
+		$http_status = ($status === 'failed') ? "500" : "200";
+		return array(
+			"status" => $http_status,
+			"message" => isset($result['message']) ? $result['message'] : 'Server content scheduled action completed.',
+			"result" => $result
+		);
+	}
+
+	return array("status" => "400", "message" => "BAD REQUEST");
 }
 
 function api_steam_workshop()

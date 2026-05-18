@@ -18,3 +18,4 @@
 - Add an automated deployment check that fails when `Website/timestamp.txt` and `modules/billing/timestamp.txt` diverge after storefront/content changes.
 - Add an admin preview/diff panel for Apache path repairs so staff can review exact vhost line changes before confirming `Fix Apache Paths`.
 - Add Phase 2 Workshop Content UX in `addonsmanager`: browse/search/select Workshop items with metadata while reusing the Phase 1 per-home saved-ID action pipeline.
+- Add localized language strings/tooltips for the new cron scheduler `server_content_*` action labels across all supported panel locales.
