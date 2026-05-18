@@ -22,49 +22,61 @@
  *
  */
 
-define('LANG_install_plugin', "Install Plugins");
-define('LANG_install_mappack', "Install Maps");
-define('LANG_install_config', "Install Configs");
+// --- Server Content Manager (formerly Addons Manager) ---
+// UI labels are updated to use "Server Content" terminology.
+// Internal keys remain unchanged for backward compatibility with other languages.
+
+define('LANG_install_plugin', "Install Plugin / Mod");
+define('LANG_install_mappack', "Install Map Pack");
+define('LANG_install_config', "Install Config Pack");
 define('LANG_game_name', "Game Name");
 define('LANG_directory', "Directory Path");
 define('LANG_remote_server', "Remote server");
-define('LANG_select_addon', "Select Addon");
+define('LANG_select_addon', "Select Server Content Item");
 define('LANG_install', "Install");
 define('LANG_failed_to_start_file_download', "Failed to start file download.");
 define('LANG_no_games_servers_available', "There are no game servers available in your account.");
-define('LANG_addon_installed_successfully', "Addon installed successfully");
+define('LANG_addon_installed_successfully', "Server content item installed successfully");
 define('LANG_path', "Path");
 define('LANG_wait_while_decompressing', "Wait while the file %s is decompressed.");
-define('LANG_addon_name', "Addon Name");
+define('LANG_addon_name', "Content Item Name");
 define('LANG_url', "URL");
 define('LANG_select_game_type', "Select Game Type");
-define('LANG_plugin', "Plugin");
-define('LANG_mappack', "MapPack");
-define('LANG_config', "Config");
-define('LANG_type', "Addon Type");
+define('LANG_plugin', "Plugins / Mods");
+define('LANG_mappack', "Map Packs");
+define('LANG_config', "Config Packs");
+// Additional category labels (for future content types already defined in server_content_categories.php)
+define('LANG_version', "Server Versions");
+define('LANG_modpack', "Modpacks");
+define('LANG_workshop', "Workshop Content");
+define('LANG_script', "Scripted Installer");
+define('LANG_profile', "Server Profiles");
+define('LANG_type', "Content Type");
 define('LANG_game', "Game");
-define('LANG_show_all_addons', "Show All Addons");
-define('LANG_show_addons_for_selected_type', "Show Addons For Selected Type");
-define('LANG_show_addons_for_selected_game', "Show Addons For Selected Game");
+define('LANG_show_all_addons', "Show All Server Content");
+define('LANG_show_addons_for_selected_type', "Show Content For Selected Type");
+define('LANG_show_addons_for_selected_game', "Show Content For Selected Game");
 define('LANG_linux_games', "Linux Games:");
 define('LANG_windows_games', "Windows Games:");
-define('LANG_create_addon', "Create Addon");
-define('LANG_addons_db', "Addons Database");
-define('LANG_addon_has_been_created', "The addon %s has been created.");
-define('LANG_remove_addon', "Remove Addon");
-define('LANG_fill_the_url_address_to_a_compressed_file', "Please, fill an URL address for a compressed file.");
-define('LANG_fill_the_addon_name', "Please, fill a name for the addon package.");
-define('LANG_select_an_addon_type', "Please, select an addon type.");
-define('LANG_select_a_game_type', "Please, select a game type.");
-define('LANG_edit_addon', "Edit Addon");
-define('LANG_post-script', "Post-install script(bash)");
+define('LANG_create_addon', "Create Server Content Item");
+define('LANG_addons_db', "Server Content Database");
+define('LANG_addon_has_been_created', "The server content item \"%s\" has been created.");
+define('LANG_remove_addon', "Remove");
+define('LANG_fill_the_url_address_to_a_compressed_file', "Please enter a URL for the compressed file to download.");
+define('LANG_fill_the_addon_name', "Please enter a name for the server content item.");
+define('LANG_select_an_addon_type', "Please select a content type.");
+define('LANG_select_a_game_type', "Please select a game type.");
+define('LANG_edit_addon', "Edit");
+define('LANG_invalid_addon', "Invalid server content item or access denied.");
+define('LANG_invalid_addon_type', "Invalid content type selected.");
+define('LANG_post-script', "Post-install script (bash)");
 define('LANG_replacements', "Replacements:");
-define('LANG_addon_name_info', "Enter a name for this addon, this is the name that the user sees.");
-define('LANG_url_info', "Enter a web address that contains a file to download, if compressed in zip or tar.gz will be unpacked in the root directory of the server or on the path given below.");
-define('LANG_path_info', "The path must be relative to the server folder and contain no slashes at the beginning or end, eg: cstrike/cfg. If left blank will use the server root path.");
-define('LANG_post-script_info', "Enter Bash language code, this will be executed as a script, you can use text replacements to customize the installation, they will be replaced by data from the server on which you install the addon. The script will start from the root folder of the server or the specified path.");
+define('LANG_addon_name_info', "Enter a display name for this server content item.");
+define('LANG_url_info', "Enter a download URL for a compressed file (.zip or .tar.gz). It will be extracted into the server root or the path specified below.");
+define('LANG_path_info', "Path relative to the server folder, with no leading or trailing slashes (e.g. cstrike/cfg). Leave blank to use the server root.");
+define('LANG_post-script_info', "Enter a Bash script to run after installation. Use the replacement variables listed on the left to inject server-specific values. The script runs from the server root or the specified path.");
 define('LANG_show_to_group', "Show to group");
 define('LANG_all_groups', "All groups");
-define('LANG_show_addons_for_selected_group', "Show addons for selected group");
+define('LANG_show_addons_for_selected_group', "Show content for selected group");
 define('LANG_group', "Group");
 ?>
