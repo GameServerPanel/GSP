@@ -432,7 +432,7 @@ class OGPDatabaseMySQL extends OGPDatabase
 		$user_id = mysqli_insert_id($this->link);
 		if( !$user_id )
 		{
-			echo mysqli_errno($this->link) . ": " . mysqli_error($this->link);
+			error_log("OGP addUser failed: " . mysqli_errno($this->link) . ": " . mysqli_error($this->link));
 			return false;
 		}
 		else

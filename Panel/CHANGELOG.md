@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-05-18
+- **Panel registration stability + captcha fallback hardening:** Fixed a fatal syntax error in `modules/register/register-exec.php`, removed hardcoded/legacy registration redirects, added structured registration logging to `modules/register/logs/register.log` (auto-creates missing log dir), added duplicate username checks, added optional `users_pass_hash` write for PHP 8.3-compatible auth upgrades, and implemented graceful reCAPTCHA fallback when keys are missing/legacy-invalid or the widget reports an error so the themed registration flow no longer crashes with raw PHP errors.
+
 ## 2026-05-13
 - **Root Apache vhost template for split Panel/Website layout:** Added `SITES_AVAILABLE_EXAMPLE.conf` at repo root with ready-to-copy `sites-available` examples for both `Panel/` and `Website/`, covering HTTP→HTTPS redirects, SSL vhosts, example domains/paths, required Apache modules, Certbot (`--apache` and `--webroot`) commands, and verification/reload steps.
 - **Per-site Apache examples for direct deployment:** Added `examples/apache/panel.example.com.conf` and `examples/apache/website.example.com.conf` so each site can be copied directly into `/etc/apache2/sites-available/` with minimal edits.
