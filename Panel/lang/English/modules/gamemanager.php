@@ -128,7 +128,7 @@ define('LANG_server_cant_start', "server can not start");
 define('LANG_server_cant_stop', "server can not stop");
 define('LANG_error_occured_remote_host', "Error occurred on the remote host");
 define('LANG_follow_server_status', "You can follow the server status from");
-define('LANG_addons', "Addons");
+define('LANG_addons', "Server Content");
 define('LANG_hostname', "Hostname");
 define('LANG_ping', "Ping");
 define('LANG_team', "Team");
