@@ -161,7 +161,7 @@ function exec_ogp_module() {
     {
         $addon_id = (int)$_REQUEST['addon_id'];
 		
-		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
+		$addons_rows = $db->resultQuery("SELECT url, path, post_script, addon_type, install_method, content_version, requires_stop, restart_after_install FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
 		if (!is_array($addons_rows)) {
 			$addons_rows = [];
 		}
@@ -174,7 +174,23 @@ function exec_ogp_module() {
 		
 		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		
-		$addon_info = $addons_rows[0];
+		$addon_info    = $addons_rows[0];
+		$install_method  = isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip';
+		$content_version = isset($addon_info['content_version']) ? $addon_info['content_version'] : '';
+		$requires_stop   = !empty($addon_info['requires_stop']) ? 1 : 0;
+
+		// ── requires_stop guard ───────────────────────────────────────────────
+		// If the content item requires the server to be stopped first, check
+		// whether the server is currently running and block the install if so.
+		// (Phase 2 blocks install; automatic stop/start is Phase 3.)
+		if ( $state == "start" && $requires_stop ) {
+			$is_running = $remote->is_screen_running( $home_info['home_name'], $home_info['home_id'] );
+			if ( $is_running === 1 ) {
+				print_failure('This content item requires the server to be stopped before installing. Please stop the server and try again.');
+				echo "<p><a href=\"?m=addonsmanager&amp;p=addons&amp;addon_type=".urlencode($addon_info['addon_type'] ?? '')."&amp;home_id=$home_id&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
+				return;
+			}
+		}
 		$url = $addon_info['url'];
 		$filename = basename($url);
 		#### Replace template variables in the post-install script with
@@ -231,8 +247,22 @@ function exec_ogp_module() {
 		}
 
 		#### end of replacements
-		if ( $state == "start" AND $addon_id != "" )
+		if ( $state == "start" AND $addon_id != "" ) {
+			// Record install attempt in history before triggering download.
+			$cache_mode = scm_get_cache_mode($db);
+			$history_id = scm_record_install_start(
+				$db,
+				$home_id,
+				$addon_id,
+				$user_id,
+				$addon_info['url'],
+				$content_version,
+				$install_method,
+				$cache_mode
+			);
+			$_SESSION['scm_history_id_' . $home_id . '_' . $addon_id] = $history_id;
 			$pid = $remote->start_file_download( $addon_info['url'], $home_info['home_path']."/".$addon_info['path'], $filename, "uncompress", $post_script);
+		}
 
 		$headers = get_headers($url, 1);
 
@@ -301,6 +331,19 @@ function exec_ogp_module() {
 			elseif( $remote->is_file_download_in_progress($pid) === 0 AND $remote->is_screen_running("post_script",$pid) === 0 )
 			{
 				print_success(get_lang('addon_installed_successfully'));
+				// Update install history and manifest on successful completion.
+				$history_key = 'scm_history_id_' . $home_id . '_' . $addon_id;
+				if (!empty($_SESSION[$history_key])) {
+					scm_record_install_done($db, (int)$_SESSION[$history_key], 'installed', 0);
+					unset($_SESSION[$history_key]);
+				}
+				scm_upsert_manifest($db, $home_id, $addon_id, array(
+					'install_method'  => $install_method,
+					'content_version' => $content_version,
+					'install_state'   => 'installed',
+					'source_url'      => $addon_info['url'],
+					'installed_by'    => $user_id,
+				));
 				echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id".
 					 "&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
 				$view->refresh("?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id".

@@ -25,16 +25,21 @@
 
 // Central category map — defines all valid addon_type values and their labels.
 require_once(dirname(__FILE__) . '/server_content_categories.php');
+require_once(dirname(__FILE__) . '/server_content_helpers.php');
 
 function exec_ogp_module() {
 
 	global $db;
+
+	// Ensure Phase 2 schema is present (idempotent).
+	scm_ensure_phase2_schema($db);
 
 	// Build the complete list of allowed content types from the category map.
 	// Admins can create items of any registered type; the original three types
 	// (plugin, mappack, config) are always included.
 	$addon_types       = get_server_content_type_keys();        // all keys
 	$addon_type_labels = get_server_content_categories();       // key => label
+	$install_methods   = scm_get_install_methods();             // install_method keys => labels
 
 	if (isset($_POST['create_addon']) AND isset($_POST['name']) AND $_POST['url']=="")
 	{
@@ -54,13 +59,21 @@ function exec_ogp_module() {
 	}
 	elseif (isset($_POST['create_addon']) AND isset($_POST['name']) AND isset($_POST['url']) AND isset($_POST['addon_type']) and isset($_POST['home_cfg_id']) )
 	{	
-		$fields['name']        = $_POST['name'];
-		$fields['url']         = $_POST['url'];
-		$fields['path']        = $_POST['path'];
-		$fields['addon_type']  = $_POST['addon_type'];
-		$fields['home_cfg_id'] = $_POST['home_cfg_id'];
-		$fields['post_script'] = $_POST['post_script'];
-		$fields['group_id']    = $_POST['group_id'];
+		$valid_install_methods = array_keys($install_methods);
+		$fields['name']                = $_POST['name'];
+		$fields['url']                 = $_POST['url'];
+		$fields['path']                = $_POST['path'];
+		$fields['addon_type']          = $_POST['addon_type'];
+		$fields['home_cfg_id']         = $_POST['home_cfg_id'];
+		$fields['post_script']         = $_POST['post_script'];
+		$fields['group_id']            = $_POST['group_id'];
+		$fields['install_method']      = in_array($_POST['install_method'], $valid_install_methods) ? $_POST['install_method'] : 'download_zip';
+		$fields['content_version']     = isset($_POST['content_version'])     ? $_POST['content_version']              : '';
+		$fields['requires_stop']       = !empty($_POST['requires_stop'])       ? 1 : 0;
+		$fields['backup_before_install'] = !empty($_POST['backup_before_install']) ? 1 : 0;
+		$fields['restart_after_install'] = !empty($_POST['restart_after_install']) ? 1 : 0;
+		$fields['is_cacheable']        = !empty($_POST['is_cacheable'])        ? 1 : 0;
+		$fields['description']         = isset($_POST['description'])         ? $_POST['description']                  : '';
 		if( is_numeric($db->resultInsertId( 'addons', $fields )) )
 		{
 			print_success(get_lang_f("addon_has_been_created",$_POST['name']));
@@ -70,13 +83,20 @@ function exec_ogp_module() {
 	}
 
 	echo "<h2>".get_lang('addons_manager')."</h2>";
-	$name        = isset($_POST['name'])        ? $_POST['name']        : "";
-	$url         = isset($_POST['url'])         ? $_POST['url']         : "";
-	$path        = isset($_POST['path'])        ? $_POST['path']        : "";
-	$post_script = isset($_POST['post_script']) ? $_POST['post_script'] : "";
-	$home_cfg_id = isset($_POST['home_cfg_id']) ? $_POST['home_cfg_id'] : "";
-	$addon_type  = isset($_POST['addon_type'])  ? $_POST['addon_type']  : "";
-	$group_id    = isset($_POST['group_id'])    ? $_POST['group_id']    : "";
+	$name                  = isset($_POST['name'])                  ? $_POST['name']                  : "";
+	$url                   = isset($_POST['url'])                   ? $_POST['url']                   : "";
+	$path                  = isset($_POST['path'])                  ? $_POST['path']                  : "";
+	$post_script           = isset($_POST['post_script'])           ? $_POST['post_script']           : "";
+	$home_cfg_id           = isset($_POST['home_cfg_id'])           ? $_POST['home_cfg_id']           : "";
+	$addon_type            = isset($_POST['addon_type'])            ? $_POST['addon_type']            : "";
+	$group_id              = isset($_POST['group_id'])              ? $_POST['group_id']              : "";
+	$install_method        = isset($_POST['install_method'])        ? $_POST['install_method']        : "download_zip";
+	$content_version       = isset($_POST['content_version'])       ? $_POST['content_version']       : "";
+	$requires_stop         = isset($_POST['requires_stop'])         ? (int)$_POST['requires_stop']    : 1;
+	$backup_before_install = isset($_POST['backup_before_install']) ? (int)$_POST['backup_before_install'] : 1;
+	$restart_after_install = isset($_POST['restart_after_install']) ? (int)$_POST['restart_after_install'] : 0;
+	$is_cacheable          = isset($_POST['is_cacheable'])          ? (int)$_POST['is_cacheable']     : 0;
+	$description           = isset($_POST['description'])           ? $_POST['description']           : "";
 
 	if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
 	{
@@ -84,14 +104,21 @@ function exec_ogp_module() {
 		if (!is_array($addons_rows)) {
 			$addons_rows = [];
 		}
-		$addon_info  = $addons_rows[0];
-		$name        = isset($addon_info['name'])        ? $addon_info['name']        : "";
-		$url         = isset($addon_info['url'])         ? $addon_info['url']         : "";
-		$path        = isset($addon_info['path'])        ? $addon_info['path']        : "";
-		$post_script = isset($addon_info['post_script']) ? $addon_info['post_script'] : "";
-		$home_cfg_id = isset($addon_info['home_cfg_id']) ? $addon_info['home_cfg_id'] : "";
-		$addon_type  = isset($addon_info['addon_type'])  ? $addon_info['addon_type']  : "";
-		$group_id    = isset($addon_info['group_id'])    ? $addon_info['group_id']    : "";
+		$addon_info            = $addons_rows[0];
+		$name                  = isset($addon_info['name'])                  ? $addon_info['name']                  : "";
+		$url                   = isset($addon_info['url'])                   ? $addon_info['url']                   : "";
+		$path                  = isset($addon_info['path'])                  ? $addon_info['path']                  : "";
+		$post_script           = isset($addon_info['post_script'])           ? $addon_info['post_script']           : "";
+		$home_cfg_id           = isset($addon_info['home_cfg_id'])           ? $addon_info['home_cfg_id']           : "";
+		$addon_type            = isset($addon_info['addon_type'])            ? $addon_info['addon_type']            : "";
+		$group_id              = isset($addon_info['group_id'])              ? $addon_info['group_id']              : "";
+		$install_method        = isset($addon_info['install_method'])        ? $addon_info['install_method']        : "download_zip";
+		$content_version       = isset($addon_info['content_version'])       ? $addon_info['content_version']       : "";
+		$requires_stop         = isset($addon_info['requires_stop'])         ? (int)$addon_info['requires_stop']    : 1;
+		$backup_before_install = isset($addon_info['backup_before_install']) ? (int)$addon_info['backup_before_install'] : 1;
+		$restart_after_install = isset($addon_info['restart_after_install']) ? (int)$addon_info['restart_after_install'] : 0;
+		$is_cacheable          = isset($addon_info['is_cacheable'])          ? (int)$addon_info['is_cacheable']     : 0;
+		$description           = isset($addon_info['description'])           ? $addon_info['description']           : "";
 	}
 	?>
 	<form action="" method="post">
@@ -214,6 +241,79 @@ function exec_ogp_module() {
 				</select>
 				</td>
 			</tr>
+			<!-- ── Phase 2 fields ────────────────────────────────────────────────── -->
+			<tr>
+				<td align="right">
+					<b>Install Method</b>
+				</td>
+				<td align="left">
+					<select name="install_method">
+					<?php
+					foreach ((array)$install_methods as $method_key => $method_label) {
+						$sel = ($method_key == $install_method) ? 'selected="selected"' : '';
+						echo '<option value="'.htmlspecialchars($method_key).'" '.$sel.'>'.htmlspecialchars($method_label).'</option>'."\n";
+					}
+					?>
+					</select>
+					<small style="color:#666;"> The mechanism used to deliver this content to the server.</small>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<b>Content Version</b>
+				</td>
+				<td align="left">
+					<input type="text" value="<?php echo htmlspecialchars($content_version, ENT_QUOTES, 'UTF-8'); ?>" name="content_version" size="40" placeholder="e.g. 1.21.1 or 2024-05-01" />
+					<small style="color:#666;"> Optional version tag shown in the installed-content list.</small>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<b>Description</b>
+				</td>
+				<td align="left">
+					<textarea name="description" style="width:99%;height:60px;" placeholder="Short description shown to users."><?php echo htmlspecialchars($description, ENT_QUOTES, 'UTF-8'); ?></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<b>Behaviour Options</b>
+				</td>
+				<td align="left">
+					<label>
+						<input type="checkbox" name="requires_stop" value="1" <?php echo $requires_stop       ? 'checked' : ''; ?> />
+						Stop server before installing
+					</label>
+					&nbsp;&nbsp;
+					<label>
+						<input type="checkbox" name="backup_before_install" value="1" <?php echo $backup_before_install ? 'checked' : ''; ?> />
+						Backup target path before installing
+					</label>
+					&nbsp;&nbsp;
+					<label>
+						<input type="checkbox" name="restart_after_install" value="1" <?php echo $restart_after_install ? 'checked' : ''; ?> />
+						Restart server after successful install
+					</label>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<b>Content Reuse</b>
+				</td>
+				<td align="left">
+					<label>
+						<input type="checkbox" name="is_cacheable" value="1" <?php echo $is_cacheable ? 'checked' : ''; ?> />
+						Mark as cacheable / reusable
+					</label>
+					<small style="color:#666;">
+						Only check this for public, non-sensitive content (maps, mods, jars).
+						<strong>Never</strong> check for configs, saves, credentials, or user-edited files.
+						Caching only activates when the <em>Server Content Cache Mode</em> panel
+						setting (in Panel Settings) is set to something other than <em>Disabled</em>.
+					</small>
+				</td>
+			</tr>
+			<!-- ── end Phase 2 fields ─────────────────────────────────────────────── -->
 			<tr>
 				<td colspan="2" align="center">
 				<?php 
