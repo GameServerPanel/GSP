@@ -376,7 +376,13 @@ function exec_ogp_module() {
 		}
 
 		?>
-			<h2><?php echo htmlentities($home_info['home_name'])."&nbsp;".get_lang($addon_type) ;?></h2>
+			<?php
+				$addon_type_lang_key = "server_content_".$addon_type;
+				$addon_type_lang = get_lang($addon_type_lang_key);
+				if($addon_type_lang === "_".$addon_type_lang_key."_")
+					$addon_type_lang = get_lang($addon_type);
+			?>
+			<h2><?php echo htmlentities($home_info['home_name'])."&nbsp;".$addon_type_lang ;?></h2>
             <table class='center'>
 			<form method='get'>
 			<input type='hidden' name='m' value='addonsmanager' />
