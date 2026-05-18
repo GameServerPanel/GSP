@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Unreal Tournament 3 game servers",
+    "name": "Unreal Tournament 3",
+    "order": 128,
+    "category": "game",
+    "complete": true
+}

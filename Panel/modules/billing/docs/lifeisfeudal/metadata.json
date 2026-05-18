@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Life is Feudal game servers",
+    "name": "Life is Feudal",
+    "order": 32,
+    "category": "game",
+    "complete": true
+}

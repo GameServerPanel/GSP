@@ -1,16 +1,22 @@
 # Ignore database configuration files with sensitive credentials
 Website/includes/config.inc.php
 Panel/includes/config.inc.php
+Panel/modules/billing/includes/config.inc.php
+Panel/modules/billing/site_config.local.php
 Panel/status/api/config.php
 Panel/status_api_local.php
 
 # Ignore logs
 Website/logs/*.log
 Website/logs/*.txt
+Panel/modules/billing/logs/*.log
+Panel/modules/billing/logs/*.txt
 
 # Ignore data directory (payment JSONs)
 Website/data/*.json
 !Website/data/.gitkeep
+Panel/modules/billing/data/*.json
+!Panel/modules/billing/data/.gitkeep
 
 # Ignore backup files
 *.backup

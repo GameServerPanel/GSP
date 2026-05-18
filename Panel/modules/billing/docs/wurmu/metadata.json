@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Wurm Unlimited game servers",
+    "name": "Wurm Unlimited",
+    "order": 145,
+    "category": "game",
+    "complete": true
+}

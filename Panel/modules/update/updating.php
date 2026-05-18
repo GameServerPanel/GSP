@@ -37,14 +37,15 @@ function rmdir_recurse($path) {
 
 function exec_ogp_module()
 {
-	define('REPONAME', 'OGP-Website');
+	global $db, $settings;
+	$repoName = !empty($settings["gsp_repo_name"]) ? $settings["gsp_repo_name"] : 'GSP';
+	if(!defined('REPONAME')) define('REPONAME', $repoName);
 	if($_SESSION['users_group'] != "admin")
 	{
 		print_failure( get_lang("no_access") );
 		return;
 	}
 
-	global $db, $settings;
 	global $view;
 	
 	// GitHub URL
@@ -52,7 +53,7 @@ function exec_ogp_module()
 		$gitHubUsername = $settings["custom_github_update_username"];	
 		$gitHubURL = getOGPGitHubURL($gitHubUsername, REPONAME);
 	}else{
-		$gitHubURL = "https://github.com/OpenGamePanel/";
+		$gitHubURL = "https://github.com/GameServerPanel/";
 	}
 	
 	$vtype = "HubGit";
@@ -155,7 +156,20 @@ function exec_ogp_module()
 			$i = 0;
 			foreach ((array)$result['extracted_files'] as $file)
 			{
-				$filename = str_replace( $unwanted_path, "" , $file['filename'] );				
+				$filename = str_replace( $unwanted_path, "" , $file['filename'] );
+				$filename = str_replace("\\", "/", $filename);
+				// New repository layout uses /panel as source subtree; ignore everything else.
+				if (strpos($filename, '/panel/') === 0) {
+					$filename = substr($filename, strlen('/panel'));
+				} elseif (strpos($filename, 'panel/') === 0) {
+					$filename = substr($filename, strlen('panel'));
+					if ($filename === '' || $filename[0] !== '/') $filename = '/' . $filename;
+				} else {
+					continue;
+				}
+				if ($filename === '') {
+					continue;
+				}
 				$temp_file = $extract_path . DIRECTORY_SEPARATOR . $filename;
 				$web_file = $baseDir . $filename;
 

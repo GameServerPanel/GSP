@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Roadkill game servers",
+    "name": "Roadkill",
+    "order": 75,
+    "category": "game",
+    "complete": true
+}
