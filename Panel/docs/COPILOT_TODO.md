@@ -19,3 +19,4 @@
 - Add an admin preview/diff panel for Apache path repairs so staff can review exact vhost line changes before confirming `Fix Apache Paths`.
 - Add Phase 2 Workshop Content UX in `addonsmanager`: browse/search/select Workshop items with metadata while reusing the Phase 1 per-home saved-ID action pipeline.
 - Add localized language strings/tooltips for the new cron scheduler `server_content_*` action labels across all supported panel locales.
+- Add a Game Manager "Live Server Status" panel that consumes `Panel/protocol/gsp_query.php` and shows banner preview plus copyable embed code.
