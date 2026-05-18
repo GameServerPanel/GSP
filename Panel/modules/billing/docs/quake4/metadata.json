@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Quake 4 game servers",
+    "name": "Quake 4",
+    "order": 70,
+    "category": "game",
+    "complete": true
+}

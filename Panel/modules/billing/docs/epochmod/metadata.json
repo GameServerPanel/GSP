@@ -1,0 +1,7 @@
+{
+    "description": "Comprehensive guide for DayZ Epoch servers with base building (plot poles), trader NPCs, banking system, vehicle spawns, dynamic economy, and database maintenance",
+    "name": "DayZ Epoch Mod",
+    "order": 61,
+    "category": "mods",
+    "complete": true
+}

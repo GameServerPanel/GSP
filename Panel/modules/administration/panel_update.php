@@ -22,6 +22,37 @@ defined('GSP_UPDATE_LOG')   || define('GSP_UPDATE_LOG',  GSP_PANEL_DIR . '/logs/
 defined('GSP_VERSION_FILE') || define('GSP_VERSION_FILE', GSP_PANEL_DIR . '/includes/panel_version.php');
 defined('GSP_VERSION_JSON') || define('GSP_VERSION_JSON', GSP_PANEL_DIR . '/version.json');
 
+function gsp_detect_repo_root()
+{
+	$panelGit = GSP_PANEL_DIR . '/.git';
+	if (is_dir($panelGit) || is_file($panelGit)) {
+		return GSP_PANEL_DIR;
+	}
+	$parent = dirname(GSP_PANEL_DIR);
+	$parentGit = $parent . '/.git';
+	if (is_dir($parentGit) || is_file($parentGit)) {
+		return $parent;
+	}
+	return null;
+}
+
+function gsp_locate_panel_source_dir($root_dir)
+{
+	$root = realpath($root_dir);
+	if ($root === false) {
+		return null;
+	}
+	// New layout: repo root contains /panel subtree.
+	if (is_dir($root . '/panel/includes') && is_dir($root . '/panel/modules')) {
+		return realpath($root . '/panel');
+	}
+	// Legacy layout: panel is at repository root.
+	if (is_dir($root . '/includes') && is_dir($root . '/modules')) {
+		return $root;
+	}
+	return null;
+}
+
 // ---------------------------------------------------------------------------
 // Helper: write a line to the panel update log
 // ---------------------------------------------------------------------------
@@ -80,6 +111,15 @@ function gsp_get_current_version()
 
 function gsp_get_current_branch()
 {
+	$repo_root = gsp_detect_repo_root();
+	if ($repo_root && function_exists('exec')) {
+		$out = [];
+		$ret = 0;
+		exec('git -C ' . escapeshellarg($repo_root) . ' rev-parse --abbrev-ref HEAD 2>/dev/null', $out, $ret);
+		if ($ret === 0 && !empty($out[0])) {
+			return trim($out[0]);
+		}
+	}
 	if (file_exists(GSP_VERSION_FILE)) {
 		$code = file_get_contents(GSP_VERSION_FILE);
 		if (preg_match("/define\('GSP_BRANCH',\s*'([^']+)'\)/", $code, $m)) {
@@ -87,7 +127,8 @@ function gsp_get_current_branch()
 		}
 	}
 	// Fall back to reading .git/HEAD
-	$git_head = GSP_PANEL_DIR . '/.git/HEAD';
+	$repo_root = gsp_detect_repo_root() ?: GSP_PANEL_DIR;
+	$git_head = $repo_root . '/.git/HEAD';
 	if (file_exists($git_head)) {
 		$content = trim(file_get_contents($git_head));
 		if (preg_match('/^ref: refs\/heads\/(.+)$/', $content, $m)) {
@@ -99,13 +140,14 @@ function gsp_get_current_branch()
 
 function gsp_get_git_commit()
 {
-	$git_head = GSP_PANEL_DIR . '/.git/HEAD';
+	$repo_root = gsp_detect_repo_root() ?: GSP_PANEL_DIR;
+	$git_head = $repo_root . '/.git/HEAD';
 	if (!file_exists($git_head)) {
 		return null;
 	}
 	$content = trim(file_get_contents($git_head));
 	if (preg_match('/^ref: refs\/heads\/(.+)$/', $content, $m)) {
-		$branch_file = GSP_PANEL_DIR . '/.git/refs/heads/' . $m[1];
+		$branch_file = $repo_root . '/.git/refs/heads/' . $m[1];
 		if (file_exists($branch_file)) {
 			return trim(file_get_contents($branch_file));
 		}
@@ -620,7 +662,14 @@ function gsp_apply_update($zip_file)
 		$src_dir = $subdirs[0];
 	}
 
-	// Copy files from the extracted source into the panel directory
+	$panel_src = gsp_locate_panel_source_dir($src_dir);
+	if ($panel_src === null) {
+		gsp_rmdir_recursive($temp_dir);
+		return ['success' => false, 'error' => 'Update archive does not contain a valid panel source directory.'];
+	}
+	$src_dir = $panel_src;
+
+	// Copy files from the extracted panel source into the panel directory
 	$copied = 0;
 	$iter   = new RecursiveIteratorIterator(
 		new RecursiveDirectoryIterator($src_dir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -747,11 +796,18 @@ function gsp_get_available_backups()
 // ---------------------------------------------------------------------------
 function gsp_try_git_update($branch)
 {
-	if (!function_exists('exec') || !is_dir(GSP_PANEL_DIR . '/.git')) {
+	$repo_root = gsp_detect_repo_root();
+	if (!function_exists('exec') || !$repo_root) {
 		return null;
 	}
 
-	$panel_arg  = escapeshellarg(GSP_PANEL_DIR);
+	$panel_source = gsp_locate_panel_source_dir($repo_root);
+	if ($panel_source === null) {
+		gsp_update_log("Git update aborted: panel source directory not found under repo root {$repo_root}");
+		return null;
+	}
+
+	$panel_arg  = escapeshellarg($repo_root);
 	$branch_arg = escapeshellarg($branch);
 	$origin_ref = escapeshellarg('origin/' . $branch);
 

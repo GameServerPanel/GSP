@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Medal Of Honor: Spearhead Demo Server (Windows) game servers",
+    "name": "Medal Of Honor: Spearhead Demo Server (Windows)",
+    "order": 45,
+    "category": "game",
+    "complete": true
+}

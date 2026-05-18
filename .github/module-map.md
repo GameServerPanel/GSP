@@ -42,18 +42,18 @@ This file captures how the control panel, storefront, agents, and helper scripts
 | `news`, `circular`, `faq` | Content modules for panel UI. | Use standard MVC wrappers, share session/auth. |
 | `cron` | Scheduler UI feeding `scripts/` commands. | Maintains job metadata that OS cron reads. |
 
-## Storefront (Website/)
+## Storefront (`Panel/modules/billing` runtime + `Website/` compatibility wrappers)
 
 | Area | Key files | Notes |
 | --- | --- | --- |
-| Public pages | `index.php`, `serverlist.php`, `order.php`, `cart.php`, `payment_success.php`, `docs.php` | All include `bootstrap.php`, header/footer, shared CSS. Links remain root-relative. |
-| Auth | `login.php`, `register.php`, `reset_password.php`, `forgot_password.php`, `includes/login_required.php`, `includes/admin_auth.php` | Share `opengamepanel_web` session, call into panel DB to validate roles. |
-| Admin | `admin.php`, `adminserverlist.php`, `admin_orders.php`, `admin_coupons.php`, `admin_config.php`, `my_orders_panel.php` | Manage services, coupons, prices, and provisioning. `adminserverlist.php` controls service availability per node. |
-| PayPal API | `api/create_order.php`, `api/capture_order.php`, `webhook.php`, `logs/payment_capture.log` | Implements REST checkout. The cart stamps PayPal `custom_id` with the exact invoice IDs being purchased; capture/webhook handlers use that to mark the correct invoices paid, create/extend orders, and kick provisioning idempotently. |
-| Provisioning bridge | `create_servers.php`, `includes/provisioner.php`, `Website/includes/panel_bridge.php` | Shared between panel module and storefront backend. Encapsulates whole server creation/renewal pipeline. |
-| Cron helpers | `cron-shop.php`, `diag_remote.php` | Automations for renewals, diagnostics, health checks. |
-| Documentation | `docs.php`, `docs/*`, `docs/admin_xml_notes.php` (PHP mirror of XML wiki) | Provide guidance for editing XML and game configs directly inside repo. |
-| Logs/data | `logs/`, `data/`, `timestamp.txt` | Payment JSON archives, debug traces, and "Last updated" canonical string. |
+| Public pages | `Panel/modules/billing/index.php`, `serverlist.php`, `order.php`, `cart.php`, `payment_success.php`, `docs.php` | Runtime now lives under `Panel/modules/billing`. `Website/*.php` wrappers proxy legacy paths to these files. |
+| Auth | `Panel/modules/billing/login.php`, `register.php`, `reset_password.php`, `forgot_password.php`, `includes/login_required.php`, `includes/admin_auth.php` | Share `opengamepanel_web` session, call into panel DB to validate roles. |
+| Admin | `Panel/modules/billing/admin.php`, `adminserverlist.php`, `admin_orders.php`, `admin_coupons.php`, `admin_config.php`, `my_orders_panel.php` | Manage services, coupons, prices, and provisioning. `adminserverlist.php` controls service availability per node. |
+| PayPal API | `Panel/modules/billing/api/create_order.php`, `api/capture_order.php`, `paypal/webhook.php`, `logs/payment_capture.log` | Implements REST checkout. Legacy `Website/api/*` and `Website/paypal/webhook.php` wrappers proxy to module runtime. |
+| Provisioning bridge | `Panel/modules/billing/create_servers.php`, `includes/provisioner.php`, `includes/panel_bridge.php` | Shared between panel module and storefront backend. Encapsulates whole server creation/renewal pipeline. |
+| Cron helpers | `Panel/modules/billing/cron-shop.php`, `diag_remote.php` | Automations for renewals, diagnostics, health checks. |
+| Documentation | `Panel/modules/billing/docs.php`, `docs/*`, `docs/admin_xml_notes.php` (PHP mirror of XML wiki) | Provide guidance for editing XML and game configs directly inside repo. |
+| Logs/data | `Panel/modules/billing/logs/`, `data/`, `timestamp.txt` | Payment JSON archives, debug traces, and runtime timestamp (synced from canonical `Website/timestamp.txt`). |
 
 ## External/agent side
 

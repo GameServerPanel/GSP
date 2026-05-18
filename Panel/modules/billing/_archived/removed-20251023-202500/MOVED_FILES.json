@@ -1,0 +1,75 @@
+{
+  "moved_at": "2025-10-23T20:25:00Z",
+  "kept": {
+    "logs": "_website/logs/",
+    "docs": "_website/docs/"
+  },
+  "files": [
+    {
+      "original": "_website/ai.php",
+      "archived": "_website/_archived/removed-20251023-202500/ai.php",
+      "size_bytes": null,
+      "note": "archived sample and tools; size omitted"
+    },
+    {
+      "original": "_website/test_db_connection.php",
+      "archived": "_website/_archived/removed-20251023-202500/test_db_connection.php",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/tools/simulate_webhook.php",
+      "archived": "_website/_archived/removed-20251023-202500/tools/simulate_webhook.php",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/tools/check_db_user.php",
+      "archived": "_website/_archived/removed-20251023-202500/tools/check_db_user.php",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/tools/check_invoices_redirect.php",
+      "archived": "_website/_archived/removed-20251023-202500/tools/check_invoices_redirect.php",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/tools/debug_invoices_redirect.php",
+      "archived": "_website/_archived/removed-20251023-202500/tools/debug_invoices_redirect.php",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/tools/check_logout_redirect.php",
+      "archived": "_website/_archived/removed-20251023-202500/tools/check_logout_redirect.php",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/data/SIMULATED-WEBHOOK-20251022-101500.json",
+      "archived": "_website/_archived/removed-20251023-202500/data/SIMULATED-WEBHOOK-20251022-101500.json",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/data/NO-INVOICE.json",
+      "archived": "_website/_archived/removed-20251023-202500/data/NO-INVOICE.json",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/data/INV-20250825-174311-0a7993.json",
+      "archived": "_website/_archived/removed-20251023-202500/data/INV-20250825-174311-0a7993.json",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/data/INV-20250825-170438-e37518.json",
+      "archived": "_website/_archived/removed-20251023-202500/data/INV-20250825-170438-e37518.json",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/data/FREE-549-1761246925.json",
+      "archived": "_website/_archived/removed-20251023-202500/data/FREE-549-1761246925.json",
+      "size_bytes": null
+    },
+    {
+      "original": "_website/data/FREE-548-1761171178.json",
+      "archived": "_website/_archived/removed-20251023-202500/data/FREE-548-1761171178.json",
+      "size_bytes": null
+    }
+  ]
+}

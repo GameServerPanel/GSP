@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Squad game servers",
+    "name": "Squad",
+    "order": 97,
+    "category": "game",
+    "complete": true
+}

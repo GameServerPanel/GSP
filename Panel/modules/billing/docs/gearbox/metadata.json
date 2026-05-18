@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Gearbox game servers",
+    "name": "Gearbox",
+    "order": 0,
+    "category": "game",
+    "complete": true
+}

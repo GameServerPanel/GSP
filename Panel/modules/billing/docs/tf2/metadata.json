@@ -1,0 +1,7 @@
+{
+    "description": "Comprehensive guide for TF2 dedicated servers with SourceMod plugins, all game modes, competitive configs, and class-based FPS hosting",
+    "name": "Team Fortress 2",
+    "order": 15,
+    "category": "game",
+    "complete": true
+}

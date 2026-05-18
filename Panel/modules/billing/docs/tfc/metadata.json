@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Team Fortress Classic game servers",
+    "name": "Team Fortress Classic",
+    "order": 112,
+    "category": "game",
+    "complete": true
+}
