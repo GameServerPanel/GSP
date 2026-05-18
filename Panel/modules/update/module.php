@@ -25,7 +25,7 @@
 // Module general information
 $module_title = "Update";
 $module_version = "1.0";
-$db_version = 3; // avoid 'duplicate table' error message.
+$db_version = 4;
 $module_required = TRUE;
 $module_menus = array(
     array( 'subpage' => '', 'name'=>'Update', 'group'=>'admin' )
@@ -60,6 +60,16 @@ $install_queries[3] = array(
   `started_at` datetime NOT NULL,
   `finished_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+);
+$install_queries[4] = array(
+"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."update_patches` (
+  `patch_id` varchar(191) NOT NULL,
+  `status` varchar(32) NOT NULL,
+  `details` text DEFAULT NULL,
+  `updater_version` varchar(80) DEFAULT NULL,
+  `applied_at` datetime NOT NULL,
+  PRIMARY KEY (`patch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 );
 ?>
