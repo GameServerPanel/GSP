@@ -137,17 +137,17 @@ function build_cron_scheduler_command($panelURL, $token, $game_home, $action) {
 			$options['restart_delay_seconds'] = 60;
 		}
 		$options_json = urlencode(json_encode($options));
-		return "wget -qO- \"${panelURL}/ogp_api.php?server_content/run_scheduled_action&token=${token}&home_id=${home_id}&action=${action}&options=${options_json}\" --no-check-certificate > /dev/null 2>&1";
+		return "wget -qO- \"{$panelURL}/ogp_api.php?server_content/run_scheduled_action&token={$token}&home_id={$home_id}&action={$action}&options={$options_json}\" --no-check-certificate > /dev/null 2>&1";
 	}
 	switch ($action) {
 		case "stop":
-			return "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/stop&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/stop&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}\" --no-check-certificate > /dev/null 2>&1";
 		case "start":
-			return "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/start&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/start&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}\" --no-check-certificate > /dev/null 2>&1";
 		case "restart":
-			return "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/restart&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}\" --no-check-certificate > /dev/null 2>&1";
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/restart&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}\" --no-check-certificate > /dev/null 2>&1";
 		case "steam_auto_update":
-			return "wget -qO- \"${panelURL}/ogp_api.php?gamemanager/update&token=${token}&ip=${ip}&port=${port}&mod_key=${mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/update&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
 	}
 	return false;
 }
