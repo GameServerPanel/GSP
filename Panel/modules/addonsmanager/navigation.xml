@@ -2,4 +2,5 @@
   <page key="user_addons" file="user_addons.php" access="admin,user" />
   <page key="addons_manager" file="addons_manager.php" access="admin" />
   <page key="addons" file="addons_installer.php" access="admin,user" />
+  <page key="workshop_content" file="workshop_content.php" access="admin,user" />
 </navigation>

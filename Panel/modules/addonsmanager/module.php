@@ -18,8 +18,8 @@
 
 // Module general information
 $module_title   = "Server Content Manager";
-$module_version = "2.0";
-$db_version     = 2;
+$module_version = "2.1";
+$db_version     = 3;
 $module_required = TRUE;
 $module_menus   = array(
     array( 'subpage' => 'addons_manager', 'name' => 'Server Content Manager', 'group' => 'admin' )
@@ -47,5 +47,29 @@ $install_queries[0] = array(
 $install_queries[1] = array(
     "ALTER TABLE `".OGP_DB_PREFIX."addons`
         MODIFY `addon_type` VARCHAR(32) NOT NULL;"
+);
+
+// ── db_version 3 : workshop item selections per server home ───────────────────
+$install_queries[2] = array(
+    "CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."server_content_workshop` (
+        `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `home_id` INT NOT NULL,
+        `home_cfg_id` INT NOT NULL,
+        `remote_server_id` INT NULL,
+        `workshop_app_id` VARCHAR(32) NULL,
+        `workshop_item_id` VARCHAR(64) NOT NULL,
+        `title` VARCHAR(255) NULL,
+        `install_state` VARCHAR(32) NOT NULL DEFAULT 'selected',
+        `last_installed_at` DATETIME NULL,
+        `last_updated_at` DATETIME NULL,
+        `last_error` TEXT NULL,
+        `created_by` INT NULL,
+        `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_at` DATETIME NULL,
+        UNIQUE KEY `uniq_home_workshop_item` (`home_id`, `workshop_item_id`),
+        KEY `idx_home_id` (`home_id`),
+        KEY `idx_home_cfg_id` (`home_cfg_id`),
+        KEY `idx_install_state` (`install_state`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;"
 );
 ?>
