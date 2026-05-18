@@ -46,7 +46,7 @@ define('LANG_plugin', "Plugins / Mods");
 define('LANG_mappack', "Map Packs");
 define('LANG_config', "Config Packs");
 // Additional category labels (for future content types already defined in server_content_categories.php)
-define('LANG_version', "Server Versions");
+define('LANG_server_content_version', "Server Versions");
 define('LANG_modpack', "Modpacks");
 define('LANG_workshop', "Workshop Content");
 define('LANG_script', "Scripted Installer");

@@ -45,4 +45,18 @@ define('LANG_cron_no_servers_tied_to_account', "There are no servers directly as
 define('LANG_cron_admin_link_display_text', "Cron Administration (All Servers)");
 define('LANG_cron_admin_no_ogp_servers_to_display', "There aren't any servers currently configured in OGP.");
 define('LANG_bad_inputs', "Scheduled time contains invalid characters.");
+define('LANG_server_content_check_updates', 'Check Server Content Updates');
+define('LANG_server_content_check_workshop_updates', 'Check Workshop Updates');
+define('LANG_server_content_install_updates', 'Install Server Content Updates');
+define('LANG_server_content_install_updates_if_stopped', 'Install Updates If Server Is Stopped');
+define('LANG_server_content_install_updates_next_restart', 'Install Updates On Next Restart');
+define('LANG_server_content_install_updates_now', 'Install Updates Now');
+define('LANG_server_content_install_updates_and_restart', 'Install Updates And Restart');
+define('LANG_server_content_notify_updates_only', 'Notify Updates Only');
+define('LANG_server_content_update_all', 'Update All Server Content');
+define('LANG_server_content_validate_files', 'Validate Server Content Files');
+define('LANG_server_content_backup_before_update', 'Backup Before Server Content Update');
+define('LANG_safe_restart', 'Safe Restart');
+define('LANG_workshop_content', 'Workshop Content');
+define('LANG_server_content', 'Server Content');
 ?>
