@@ -16,11 +16,22 @@
  */
 
 // Panel root is two directories up from this file (modules/administration/panel_update.php)
-defined('GSP_PANEL_DIR')    || define('GSP_PANEL_DIR',   realpath(dirname(__FILE__) . '/../../'));
-defined('GSP_BACKUP_BASE')  || define('GSP_BACKUP_BASE', GSP_PANEL_DIR . '/backups');
-defined('GSP_UPDATE_LOG')   || define('GSP_UPDATE_LOG',  GSP_PANEL_DIR . '/logs/panel_updates.log');
-defined('GSP_VERSION_FILE') || define('GSP_VERSION_FILE', GSP_PANEL_DIR . '/includes/panel_version.php');
-defined('GSP_VERSION_JSON') || define('GSP_VERSION_JSON', GSP_PANEL_DIR . '/version.json');
+$__gsp_panel_real = realpath(dirname(__FILE__) . '/../../');
+$__gsp_panel_dir  = $__gsp_panel_real !== false ? $__gsp_panel_real : dirname(__FILE__) . '/../../';
+$__gsp_root_real  = realpath(dirname($__gsp_panel_dir));
+$__gsp_root_dir   = $__gsp_root_real !== false ? $__gsp_root_real : dirname($__gsp_panel_dir);
+
+defined('GSP_PANEL_DIR')      || define('GSP_PANEL_DIR', $__gsp_panel_dir);
+defined('GSP_ROOT_DIR')       || define('GSP_ROOT_DIR', $__gsp_root_dir);
+defined('GSP_WEBSITE_DIR')    || define('GSP_WEBSITE_DIR', GSP_ROOT_DIR . '/Website');
+defined('GSP_BACKUP_BASE')    || define('GSP_BACKUP_BASE', GSP_ROOT_DIR . '/backups');
+defined('GSP_UPDATE_LOG_DIR') || define('GSP_UPDATE_LOG_DIR', GSP_ROOT_DIR . '/logs');
+defined('GSP_UPDATE_LOG')     || define('GSP_UPDATE_LOG', GSP_UPDATE_LOG_DIR . '/update_trace.log');
+defined('GSP_VERSION_FILE')   || define('GSP_VERSION_FILE', GSP_PANEL_DIR . '/includes/panel_version.php');
+defined('GSP_VERSION_JSON')   || define('GSP_VERSION_JSON', GSP_ROOT_DIR . '/version.json');
+defined('GSP_PATCH_DIR')      || define('GSP_PATCH_DIR', GSP_PANEL_DIR . '/modules/update/patches');
+defined('GSP_PATCH_STATE')    || define('GSP_PATCH_STATE', GSP_ROOT_DIR . '/includes/update_patch_state.json');
+defined('GSP_APACHE_SITES')   || define('GSP_APACHE_SITES', '/etc/apache2/sites-available');
 
 function gsp_detect_repo_root()
 {
@@ -42,7 +53,11 @@ function gsp_locate_panel_source_dir($root_dir)
 	if ($root === false) {
 		return null;
 	}
-	// New layout: repo root contains /panel subtree.
+	// Canonical layout: repo root contains /Panel subtree.
+	if (is_dir($root . '/Panel/includes') && is_dir($root . '/Panel/modules')) {
+		return realpath($root . '/Panel');
+	}
+	// Transitional layout: repo root contains /panel subtree.
 	if (is_dir($root . '/panel/includes') && is_dir($root . '/panel/modules')) {
 		return realpath($root . '/panel');
 	}
@@ -51,6 +66,78 @@ function gsp_locate_panel_source_dir($root_dir)
 		return $root;
 	}
 	return null;
+}
+
+function gsp_detect_source_root($root_dir)
+{
+	$root = realpath($root_dir);
+	if ($root === false) {
+		return null;
+	}
+	if (is_dir($root . '/Panel') || is_dir($root . '/Website') || is_file($root . '/version.json')) {
+		return ['mode' => 'repo_root', 'source' => $root];
+	}
+	if (is_dir($root . '/panel') || is_dir($root . '/website')) {
+		return ['mode' => 'repo_root_lowercase', 'source' => $root];
+	}
+	$panel_src = gsp_locate_panel_source_dir($root);
+	if ($panel_src !== null) {
+		return ['mode' => 'panel_only', 'source' => $panel_src];
+	}
+	return null;
+}
+
+function gsp_run_preflight_check($create_backup_dir = true)
+{
+	$checks = [];
+	$ok = true;
+
+	$cwd = getcwd();
+	$cwd_real = $cwd ? realpath($cwd) : false;
+	$cwd_ok = $cwd_real !== false
+		&& ($cwd_real === GSP_ROOT_DIR || $cwd_real === GSP_PANEL_DIR || strpos($cwd_real, GSP_ROOT_DIR . '/') === 0);
+	$checks[] = ['name' => 'Current working directory', 'value' => $cwd_real ?: '(unavailable)', 'ok' => $cwd_ok];
+	$ok = $ok && $cwd_ok;
+
+	$root_ok = is_dir(GSP_ROOT_DIR);
+	$checks[] = ['name' => 'Detected GSP root', 'value' => GSP_ROOT_DIR, 'ok' => $root_ok];
+	$ok = $ok && $root_ok;
+
+	$panel_ok = is_dir(GSP_PANEL_DIR);
+	$checks[] = ['name' => 'Detected Panel path', 'value' => GSP_PANEL_DIR, 'ok' => $panel_ok];
+	$ok = $ok && $panel_ok;
+
+	$website_ok = is_dir(GSP_WEBSITE_DIR);
+	$checks[] = ['name' => 'Detected Website path', 'value' => GSP_WEBSITE_DIR, 'ok' => $website_ok];
+	$ok = $ok && $website_ok;
+
+	$config_path = GSP_PANEL_DIR . '/includes/config.inc.php';
+	$config_ok = is_file($config_path) && is_readable($config_path);
+	$checks[] = ['name' => 'Panel config preserve target', 'value' => $config_path, 'ok' => $config_ok];
+	$ok = $ok && $config_ok;
+
+	$backups_exists = is_dir(GSP_BACKUP_BASE);
+	if (!$backups_exists && $create_backup_dir) {
+		$backups_exists = @mkdir(GSP_BACKUP_BASE, 0755, true);
+	}
+	$checks[] = ['name' => 'Backups directory', 'value' => GSP_BACKUP_BASE, 'ok' => $backups_exists];
+	$ok = $ok && $backups_exists;
+
+	$write_targets = [GSP_ROOT_DIR, GSP_PANEL_DIR, GSP_WEBSITE_DIR, GSP_BACKUP_BASE];
+	foreach ($write_targets as $target) {
+		$w_ok = is_dir($target) && is_writable($target);
+		$checks[] = ['name' => 'Writable path', 'value' => $target, 'ok' => $w_ok];
+		$ok = $ok && $w_ok;
+	}
+
+	if (!is_dir(GSP_UPDATE_LOG_DIR)) {
+		@mkdir(GSP_UPDATE_LOG_DIR, 0755, true);
+	}
+	$log_ok = is_dir(GSP_UPDATE_LOG_DIR) && is_writable(GSP_UPDATE_LOG_DIR);
+	$checks[] = ['name' => 'Update log directory', 'value' => GSP_UPDATE_LOG_DIR, 'ok' => $log_ok];
+	$ok = $ok && $log_ok;
+
+	return ['success' => $ok, 'checks' => $checks];
 }
 
 // ---------------------------------------------------------------------------
@@ -390,7 +477,7 @@ function create_database_backup($backup_dir, $db_config)
 // Backup: tar-gzip the panel root into $backup_dir/panel-files.tar.gz
 // Returns ['success'=>bool, 'error'=>string, 'file'=>string]
 // ---------------------------------------------------------------------------
-function create_panel_files_archive($backup_dir, $panel_root)
+function create_directory_archive($backup_dir, $source_root, $archive_name, array $exclude_dirs = [], array $exclude_globs = [])
 {
 	// Verify tar is available
 	$check_out = [];
@@ -400,12 +487,7 @@ function create_panel_files_archive($backup_dir, $panel_root)
 		return ['success' => false, 'error' => 'tar is not installed or not in PATH.'];
 	}
 
-	$tar_file = $backup_dir . '/panel-files.tar.gz';
-
-	// Top-level directories are anchored with ./ so they only match at the
-	// archive root; wildcard patterns match at any depth.
-	$exclude_dirs  = ['./backups', './.git', './logs', './cache', './tmp', './node_modules', './vendor'];
-	$exclude_globs = ['*.log', '*.sql'];
+	$tar_file = $backup_dir . '/' . $archive_name;
 
 	$exclude_args = '';
 	foreach ($exclude_dirs as $dir) {
@@ -415,10 +497,10 @@ function create_panel_files_archive($backup_dir, $panel_root)
 		$exclude_args .= ' --exclude=' . escapeshellarg($glob);
 	}
 
-	// -C panel_root . preserves relative paths (./home.php, ./modules/…)
+	// -C source_root . preserves relative paths.
 	$command = 'tar -czf ' . escapeshellarg($tar_file)
 	         . $exclude_args
-	         . ' -C ' . escapeshellarg($panel_root)
+	         . ' -C ' . escapeshellarg($source_root)
 	         . ' . 2>&1';
 
 	$out = [];
@@ -439,6 +521,54 @@ function create_panel_files_archive($backup_dir, $panel_root)
 	}
 
 	return ['success' => true, 'file' => $tar_file];
+}
+
+function create_panel_files_archive($backup_dir, $panel_root)
+{
+	return create_directory_archive(
+		$backup_dir,
+		$panel_root,
+		'panel-files.tar.gz',
+		['./backups', './.git', './logs', './cache', './tmp', './node_modules', './vendor'],
+		['*.log', '*.sql']
+	);
+}
+
+function create_website_files_archive($backup_dir, $website_root)
+{
+	return create_directory_archive(
+		$backup_dir,
+		$website_root,
+		'website-files.tar.gz',
+		['./backups', './.git', './logs', './cache', './tmp', './node_modules', './vendor'],
+		['*.log']
+	);
+}
+
+function gsp_enforce_backup_retention($max_keep = 5)
+{
+	if (!is_dir(GSP_BACKUP_BASE) || $max_keep < 1) {
+		return;
+	}
+	$entries = [];
+	foreach ((array)scandir(GSP_BACKUP_BASE) as $entry) {
+		if ($entry === '.' || $entry === '..') {
+			continue;
+		}
+		if (!preg_match('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}$/', $entry)) {
+			continue;
+		}
+		$full = GSP_BACKUP_BASE . '/' . $entry;
+		if (is_dir($full)) {
+			$entries[] = $entry;
+		}
+	}
+	rsort($entries, SORT_STRING);
+	$remove = array_slice($entries, $max_keep);
+	foreach ($remove as $entry) {
+		gsp_rmdir_recursive(GSP_BACKUP_BASE . '/' . $entry);
+		gsp_update_log("Backup retention: removed old backup {$entry}");
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -494,7 +624,9 @@ function gsp_create_full_backup($update_target_type, $update_target_version)
 	}
 
 	$append_log("Backup started. Target: {$update_target_type} / {$update_target_version}");
+	$append_log("GSP root: " . GSP_ROOT_DIR);
 	$append_log("Panel root: " . GSP_PANEL_DIR);
+	$append_log("Website root: " . GSP_WEBSITE_DIR);
 	$append_log("Backup directory: {$backup_dir}");
 
 	// 3. Load DB configuration from includes/config.inc.php
@@ -527,11 +659,39 @@ function gsp_create_full_backup($update_target_type, $update_target_version)
 	}
 	$append_log("Panel files archive complete: panel-files.tar.gz (" . filesize($tar_result['file']) . " bytes)");
 
-	// 6. Write backup.json metadata
+	// 6. Website files archive — stops the update if it fails
+	if (!is_dir(GSP_WEBSITE_DIR)) {
+		$append_log("ERROR: Website directory not found at " . GSP_WEBSITE_DIR);
+		return ['success' => false, 'error' => 'Website directory missing: ' . GSP_WEBSITE_DIR];
+	}
+	$append_log("Starting website files archive (tar gzip)...");
+	$website_result = create_website_files_archive($backup_dir, GSP_WEBSITE_DIR);
+	if (!$website_result['success']) {
+		$append_log("ERROR: Website files archive failed: " . $website_result['error']);
+		return ['success' => false, 'error' => $website_result['error']];
+	}
+	$append_log("Website files archive complete: website-files.tar.gz (" . filesize($website_result['file']) . " bytes)");
+
+	// 7. Repo version.json backup
+	$version_backup_path = $backup_dir . '/version.json';
+	if (file_exists(GSP_VERSION_JSON)) {
+		if (!@copy(GSP_VERSION_JSON, $version_backup_path)) {
+			$append_log("ERROR: Failed to copy version.json from " . GSP_VERSION_JSON);
+			return ['success' => false, 'error' => 'Failed to backup version.json'];
+		}
+		$append_log("version.json backup complete.");
+	} else {
+		@file_put_contents($version_backup_path, "{}\n");
+		$append_log("version.json was not present; placeholder file written.");
+	}
+
+	// 8. Write backup.json metadata
 	$vinfo    = gsp_read_version_json();
 	$metadata = [
 		'backup_timestamp'      => $ts,
+		'gsp_root'              => GSP_ROOT_DIR,
 		'panel_root'            => GSP_PANEL_DIR,
+		'website_root'          => GSP_WEBSITE_DIR,
 		'database_host'         => $db_config['host'],
 		'database_name'         => $db_config['name'],
 		'installed_version'     => $vinfo
@@ -546,9 +706,10 @@ function gsp_create_full_backup($update_target_type, $update_target_version)
 	write_backup_metadata($backup_dir, $metadata);
 	$append_log("Backup metadata written (backup.json).");
 
-	// 7. Final validation — both required files must be present and non-empty
+	// 9. Final validation — required files must be present and non-empty
 	$sql_file = $backup_dir . '/database.sql';
 	$tar_file = $backup_dir . '/panel-files.tar.gz';
+	$website_file = $backup_dir . '/website-files.tar.gz';
 
 	if (!file_exists($sql_file) || filesize($sql_file) < 100) {
 		$append_log("ERROR: Validation failed — database.sql is missing or empty.");
@@ -558,8 +719,13 @@ function gsp_create_full_backup($update_target_type, $update_target_version)
 		$append_log("ERROR: Validation failed — panel-files.tar.gz is missing or empty.");
 		return ['success' => false, 'error' => 'Backup validation failed: panel-files.tar.gz is missing or empty.'];
 	}
+	if (!file_exists($website_file) || filesize($website_file) < 100) {
+		$append_log("ERROR: Validation failed — website-files.tar.gz is missing or empty.");
+		return ['success' => false, 'error' => 'Backup validation failed: website-files.tar.gz is missing or empty.'];
+	}
 
 	$append_log("Backup validated and complete.");
+	gsp_enforce_backup_retention(5);
 
 	return [
 		'success'    => true,
@@ -619,90 +785,161 @@ function gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir)
 }
 
 // ---------------------------------------------------------------------------
-// Update: apply the downloaded zip to the panel directory
+// Update: extract GitHub zipball into a normalized source payload
 // ---------------------------------------------------------------------------
-function gsp_apply_update($zip_file)
+function gsp_extract_update_archive($zip_file)
 {
-	$panel_dir = GSP_PANEL_DIR;
-
-	// Files to never overwrite when applying an update
-	$preserve = [
-		'includes/config.inc.php',
-		'modules/gamemanager/rsync_sites_local.list',
-		'install.php',
-	];
-
-	// Merge with the DB update-blacklist (strip leading slash from stored paths)
-	global $db;
-	$blacklisted = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
-	if ($blacklisted !== false) {
-		foreach ((array)$blacklisted as $bf) {
-			$preserve[] = ltrim($bf['file_path'], '/');
-		}
-	}
-
-	// Extract ZIP to a temporary directory
-	$temp_dir = sys_get_temp_dir() . '/gsp_upd_' . time();
-	if (!@mkdir($temp_dir, 0750)) {
+	$temp_dir = sys_get_temp_dir() . '/gsp_upd_' . time() . '_' . mt_rand(1000, 9999);
+	if (!@mkdir($temp_dir, 0750, true)) {
 		return ['success' => false, 'error' => 'Cannot create temporary extraction directory.'];
 	}
 
-	require_once($panel_dir . '/modules/update/unzip.php');
+	require_once(GSP_PANEL_DIR . '/modules/update/unzip.php');
 	$result = extractZip($zip_file, $temp_dir);
 	if (!is_array($result)) {
 		gsp_rmdir_recursive($temp_dir);
 		return ['success' => false, 'error' => 'ZIP extraction failed: ' . $result];
 	}
 
-	// GitHub archives place all files under a single subdirectory (e.g. "Owner-Repo-sha/")
-	// Detect that prefix directory
-	$src_dir  = $temp_dir;
-	$subdirs  = glob($temp_dir . '/*', GLOB_ONLYDIR);
+	$src_dir = $temp_dir;
+	$subdirs = glob($temp_dir . '/*', GLOB_ONLYDIR);
 	if ($subdirs && count($subdirs) === 1) {
 		$src_dir = $subdirs[0];
 	}
 
-	$panel_src = gsp_locate_panel_source_dir($src_dir);
-	if ($panel_src === null) {
+	$detected = gsp_detect_source_root($src_dir);
+	if ($detected === null) {
 		gsp_rmdir_recursive($temp_dir);
-		return ['success' => false, 'error' => 'Update archive does not contain a valid panel source directory.'];
+		return ['success' => false, 'error' => 'Update archive does not contain a recognized GSP source layout.'];
 	}
-	$src_dir = $panel_src;
 
-	// Copy files from the extracted panel source into the panel directory
+	return [
+		'success'     => true,
+		'temp_dir'    => $temp_dir,
+		'source_root' => $detected['source'],
+		'source_mode' => $detected['mode'],
+	];
+}
+
+function gsp_normalize_source_relpath($rel, $mode)
+{
+	$rel = ltrim(str_replace('\\', '/', $rel), '/');
+	if ($mode === 'repo_root_lowercase') {
+		if (strpos($rel, 'panel/') === 0) {
+			return 'Panel/' . substr($rel, strlen('panel/'));
+		}
+		if (strpos($rel, 'website/') === 0) {
+			return 'Website/' . substr($rel, strlen('website/'));
+		}
+	}
+	return $rel;
+}
+
+function gsp_get_preserve_rules($source_mode)
+{
+	$exact = [
+		'Panel/includes/config.inc.php',
+		'Website/includes/config.inc.php',
+		'includes/config.inc.php',
+		'Panel/modules/gamemanager/rsync_sites_local.list',
+		'Panel/install.php',
+		'logs/update_trace.log',
+	];
+	$prefix = [
+		'backups/',
+		'logs/',
+		'Panel/logs/',
+		'Panel/backups/',
+		'Website/logs/',
+		'Website/backups/',
+		'Website/uploads/',
+	];
+
+	global $db;
+	$blacklisted = $db->resultQuery('SELECT file_path FROM `OGP_DB_PREFIXupdate_blacklist`;');
+	if ($blacklisted !== false) {
+		foreach ((array) $blacklisted as $bf) {
+			$raw = ltrim((string) $bf['file_path'], '/');
+			if ($raw === '') {
+				continue;
+			}
+			$exact[] = $raw;
+			if ($source_mode !== 'panel_only') {
+				$exact[] = 'Panel/' . $raw;
+			}
+		}
+	}
+
+	return ['exact' => array_values(array_unique($exact)), 'prefix' => array_values(array_unique($prefix))];
+}
+
+function gsp_is_preserved_relpath($rel, array $preserve_rules)
+{
+	$rel = ltrim(str_replace('\\', '/', $rel), '/');
+	if (in_array($rel, $preserve_rules['exact'], true)) {
+		return true;
+	}
+	foreach ($preserve_rules['prefix'] as $prefix) {
+		if (strpos($rel, $prefix) === 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function gsp_copy_update_tree($src_root, $dst_root, $source_mode, array $preserve_rules)
+{
 	$copied = 0;
-	$iter   = new RecursiveIteratorIterator(
-		new RecursiveDirectoryIterator($src_dir, RecursiveDirectoryIterator::SKIP_DOTS),
+	$skipped = 0;
+	$iter = new RecursiveIteratorIterator(
+		new RecursiveDirectoryIterator($src_root, RecursiveDirectoryIterator::SKIP_DOTS),
 		RecursiveIteratorIterator::SELF_FIRST
 	);
 
 	foreach ($iter as $item) {
-		$rel = str_replace('\\', '/', substr($item->getPathname(), strlen($src_dir) + 1));
-
-		// Skip preserved/blacklisted files
-		if (in_array($rel, $preserve)) {
+		$rel_raw = substr($item->getPathname(), strlen($src_root) + 1);
+		$rel = gsp_normalize_source_relpath($rel_raw, $source_mode);
+		if ($rel === '' || strpos($rel, '.git/') === 0 || $rel === '.git') {
+			continue;
+		}
+		if (gsp_is_preserved_relpath($rel, $preserve_rules)) {
+			$skipped++;
 			continue;
 		}
 
-		$dst = $panel_dir . '/' . $rel;
-
+		$dst = $dst_root . '/' . $rel;
 		if ($item->isDir()) {
 			if (!is_dir($dst)) {
 				@mkdir($dst, 0755, true);
 			}
-		} else {
-			$dst_parent = dirname($dst);
-			if (!is_dir($dst_parent)) {
-				@mkdir($dst_parent, 0755, true);
-			}
-			if (@copy($item->getPathname(), $dst)) {
-				$copied++;
-			}
+			continue;
+		}
+		$dst_parent = dirname($dst);
+		if (!is_dir($dst_parent)) {
+			@mkdir($dst_parent, 0755, true);
+		}
+		if (@copy($item->getPathname(), $dst)) {
+			$copied++;
 		}
 	}
 
-	gsp_rmdir_recursive($temp_dir);
-	return ['success' => true, 'files_copied' => $copied];
+	return ['success' => true, 'files_copied' => $copied, 'files_skipped' => $skipped];
+}
+
+function gsp_apply_update_from_source($source_root, $source_mode)
+{
+	$target_root = ($source_mode === 'panel_only') ? GSP_PANEL_DIR : GSP_ROOT_DIR;
+	$preserve_rules = gsp_get_preserve_rules($source_mode);
+	$result = gsp_copy_update_tree($source_root, $target_root, $source_mode, $preserve_rules);
+	if (!$result['success']) {
+		return $result;
+	}
+
+	gsp_update_log(
+		"Applied source sync mode={$source_mode}, src={$source_root}, dst={$target_root},"
+		. " copied={$result['files_copied']}, preserved={$result['files_skipped']}"
+	);
+	return $result;
 }
 
 // ---------------------------------------------------------------------------
@@ -725,6 +962,324 @@ function gsp_rmdir_recursive($dir)
 		}
 	}
 	@rmdir($dir);
+}
+
+function gsp_read_patch_state()
+{
+	if (!file_exists(GSP_PATCH_STATE)) {
+		return ['applied' => []];
+	}
+	$data = json_decode((string) file_get_contents(GSP_PATCH_STATE), true);
+	if (!is_array($data) || !isset($data['applied']) || !is_array($data['applied'])) {
+		return ['applied' => []];
+	}
+	return $data;
+}
+
+function gsp_write_patch_state(array $state)
+{
+	$dir = dirname(GSP_PATCH_STATE);
+	if (!is_dir($dir) && !@mkdir($dir, 0755, true)) {
+		return false;
+	}
+	$json = json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+	return @file_put_contents(GSP_PATCH_STATE, $json . PHP_EOL, LOCK_EX) !== false;
+}
+
+function gsp_get_patch_definitions()
+{
+	$patches = [];
+	if (!is_dir(GSP_PATCH_DIR)) {
+		return $patches;
+	}
+	$files = glob(GSP_PATCH_DIR . '/*.php') ?: [];
+	sort($files, SORT_STRING);
+	foreach ($files as $file) {
+		$patch = include $file;
+		if (!is_array($patch) || empty($patch['id']) || empty($patch['handler'])) {
+			continue;
+		}
+		$patch['file'] = $file;
+		$patch['required'] = isset($patch['required']) ? (bool) $patch['required'] : true;
+		$patches[] = $patch;
+	}
+	return $patches;
+}
+
+function gsp_apply_required_patches($explicit = false)
+{
+	$state = gsp_read_patch_state();
+	$applied = isset($state['applied']) && is_array($state['applied']) ? $state['applied'] : [];
+	$patches = gsp_get_patch_definitions();
+
+	$summary = [
+		'success' => true,
+		'applied' => [],
+		'skipped' => [],
+		'pending' => [],
+		'error' => null,
+	];
+
+	foreach ($patches as $patch) {
+		$id = (string) $patch['id'];
+		$is_required = !empty($patch['required']);
+		$already = isset($applied[$id]);
+		if ($already) {
+			$summary['skipped'][] = $id;
+			continue;
+		}
+		if (!$is_required && !$explicit) {
+			$summary['pending'][] = $id;
+			continue;
+		}
+		$handler = $patch['handler'];
+		if (!is_callable($handler)) {
+			$summary['success'] = false;
+			$summary['error'] = "Patch handler not callable for {$id}";
+			gsp_update_log("Patch {$id} failed: handler not callable");
+			break;
+		}
+		gsp_update_log("Running patch {$id}");
+		$result = call_user_func($handler, ['root' => GSP_ROOT_DIR, 'panel' => GSP_PANEL_DIR, 'website' => GSP_WEBSITE_DIR]);
+		$patch_success = is_array($result) ? !empty($result['success']) : (bool) $result;
+		$patch_message = is_array($result) && isset($result['message']) ? $result['message'] : '';
+		if (!$patch_success) {
+			$summary['success'] = false;
+			$summary['error'] = $patch_message !== '' ? $patch_message : "Patch {$id} failed";
+			gsp_update_log("Patch {$id} failed: {$summary['error']}");
+			break;
+		}
+		$applied[$id] = ['applied_at' => date('Y-m-d H:i:s'), 'message' => $patch_message];
+		$state['applied'] = $applied;
+		if (!gsp_write_patch_state($state)) {
+			$summary['success'] = false;
+			$summary['error'] = 'Failed to persist patch state file.';
+			gsp_update_log("Patch {$id} failed: could not persist patch state file");
+			break;
+		}
+		$summary['applied'][] = $id;
+		gsp_update_log("Patch {$id} applied successfully");
+	}
+
+	return $summary;
+}
+
+function gsp_get_pending_required_patches()
+{
+	$state = gsp_read_patch_state();
+	$applied = isset($state['applied']) && is_array($state['applied']) ? $state['applied'] : [];
+	$pending = [];
+	foreach (gsp_get_patch_definitions() as $patch) {
+		$id = (string) $patch['id'];
+		if (!empty($patch['required']) && !isset($applied[$id])) {
+			$pending[] = $id;
+		}
+	}
+	return $pending;
+}
+
+function gsp_scan_apache_paths()
+{
+	$result = [
+		'available' => is_dir(GSP_APACHE_SITES),
+		'files' => [],
+		'stale_count' => 0,
+	];
+	if (!$result['available']) {
+		return $result;
+	}
+
+	$stale_map = [
+		'/var/www/html/panel' => '/var/www/html/GSP/Panel',
+		'/var/www/html/GSP/Panel/GSP/Panel' => '/var/www/html/GSP/Panel',
+		'/var/www/html/GSP/Panel/modules/billing' => '/var/www/html/GSP/Website',
+	];
+
+	foreach (glob(GSP_APACHE_SITES . '/*.conf') ?: [] as $conf) {
+		$content = @file_get_contents($conf);
+		if ($content === false) {
+			continue;
+		}
+		$issues = [];
+		foreach ($stale_map as $old => $new) {
+			if (strpos($content, $old) !== false) {
+				$issues[] = ['from' => $old, 'to' => $new];
+				$result['stale_count']++;
+			}
+		}
+		$result['files'][] = ['path' => $conf, 'issues' => $issues];
+	}
+
+	return $result;
+}
+
+function gsp_backup_apache_sites($label = null)
+{
+	if (!is_dir(GSP_APACHE_SITES)) {
+		return ['success' => false, 'error' => 'Apache sites-available directory not found.'];
+	}
+	$ts = $label ?: date('Y-m-d_H-i-s');
+	$backup_dir = GSP_BACKUP_BASE . '/apache_' . $ts;
+	if (!@mkdir($backup_dir, 0755, true)) {
+		return ['success' => false, 'error' => 'Cannot create Apache backup directory: ' . $backup_dir];
+	}
+
+	foreach (glob(GSP_APACHE_SITES . '/*.conf') ?: [] as $file) {
+		@copy($file, $backup_dir . '/' . basename($file));
+	}
+	return ['success' => true, 'backup_dir' => $backup_dir];
+}
+
+function gsp_fix_apache_paths($confirmed = false, $reload_after = false)
+{
+	if (!$confirmed) {
+		return ['success' => false, 'error' => 'Apache path repair was not explicitly confirmed.'];
+	}
+	$scan = gsp_scan_apache_paths();
+	if (empty($scan['available'])) {
+		return ['success' => false, 'error' => 'Apache sites-available directory is not available.'];
+	}
+	if (empty($scan['stale_count'])) {
+		return ['success' => true, 'message' => 'No stale Apache paths detected.', 'changed' => 0];
+	}
+
+	$backup = gsp_backup_apache_sites();
+	if (!$backup['success']) {
+		return $backup;
+	}
+
+	$replacements = [
+		'/var/www/html/panel' => '/var/www/html/GSP/Panel',
+		'/var/www/html/GSP/Panel/GSP/Panel' => '/var/www/html/GSP/Panel',
+		'/var/www/html/GSP/Panel/modules/billing' => '/var/www/html/GSP/Website',
+	];
+
+	$changed = 0;
+	foreach ($scan['files'] as $fileInfo) {
+		if (empty($fileInfo['issues'])) {
+			continue;
+		}
+		$path = $fileInfo['path'];
+		$content = (string) @file_get_contents($path);
+		$newContent = str_replace(array_keys($replacements), array_values($replacements), $content);
+		if ($newContent !== $content && @file_put_contents($path, $newContent) !== false) {
+			$changed++;
+		}
+	}
+
+	$testOut = [];
+	$testRet = 0;
+	exec('apache2ctl configtest 2>&1', $testOut, $testRet);
+	if ($testRet !== 0) {
+		foreach (glob($backup['backup_dir'] . '/*.conf') ?: [] as $backupFile) {
+			@copy($backupFile, GSP_APACHE_SITES . '/' . basename($backupFile));
+		}
+		return [
+			'success' => false,
+			'error' => 'Apache configtest failed after path repair: ' . implode(' | ', $testOut),
+			'backup_dir' => $backup['backup_dir'],
+		];
+	}
+
+	$reload_output = '';
+	if ($reload_after) {
+		$reloadOut = [];
+		$reloadRet = 0;
+		exec('apache2ctl graceful 2>&1', $reloadOut, $reloadRet);
+		$reload_output = implode(' | ', $reloadOut);
+		if ($reloadRet !== 0) {
+			return [
+				'success' => false,
+				'error' => 'Apache reload failed after configtest success: ' . $reload_output,
+				'backup_dir' => $backup['backup_dir'],
+			];
+		}
+	}
+
+	gsp_update_log(
+		"Apache path fix applied. changed={$changed}, backup={$backup['backup_dir']},"
+		. " configtest=ok, reload=" . ($reload_after ? 'yes' : 'no')
+	);
+	return [
+		'success' => true,
+		'changed' => $changed,
+		'backup_dir' => $backup['backup_dir'],
+		'configtest' => implode(' | ', $testOut),
+		'reload_output' => $reload_output,
+	];
+}
+
+function gsp_get_updater_candidates($source_mode)
+{
+	$target_rel = [
+		'Panel/modules/administration/panel_update.php',
+		'Panel/modules/update/update.php',
+		'Panel/modules/update/post_update.php',
+	];
+	$candidates = [];
+	foreach ($target_rel as $target) {
+		$source_rel = $target;
+		if ($source_mode === 'repo_root_lowercase') {
+			$source_rel = 'panel/' . substr($target, strlen('Panel/'));
+		} elseif ($source_mode === 'panel_only') {
+			$source_rel = substr($target, strlen('Panel/'));
+		}
+		$candidates[] = ['source_rel' => $source_rel, 'target_rel' => $target];
+	}
+	return $candidates;
+}
+
+function gsp_collect_updater_changes($source_root, $source_mode)
+{
+	$changes = [];
+	foreach (gsp_get_updater_candidates($source_mode) as $entry) {
+		$src = $source_root . '/' . $entry['source_rel'];
+		$dst = GSP_ROOT_DIR . '/' . $entry['target_rel'];
+		if (!is_file($src)) {
+			continue;
+		}
+		$needs_copy = !is_file($dst) || hash_file('sha256', $src) !== hash_file('sha256', $dst);
+		if ($needs_copy) {
+			$changes[] = ['src' => $src, 'dst' => $dst, 'rel' => $entry['target_rel']];
+		}
+	}
+
+	$patch_dir_src = $source_root . '/' . (($source_mode === 'panel_only') ? 'modules/update/patches' : (($source_mode === 'repo_root_lowercase') ? 'panel/modules/update/patches' : 'Panel/modules/update/patches'));
+	if (is_dir($patch_dir_src)) {
+		$iter = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($patch_dir_src, RecursiveDirectoryIterator::SKIP_DOTS),
+			RecursiveIteratorIterator::LEAVES_ONLY
+		);
+		foreach ($iter as $item) {
+			if ($item->isDir()) {
+				continue;
+			}
+			$rel = str_replace('\\', '/', substr($item->getPathname(), strlen($patch_dir_src) + 1));
+			$dst = GSP_PATCH_DIR . '/' . $rel;
+			$needs_copy = !is_file($dst) || hash_file('sha256', $item->getPathname()) !== hash_file('sha256', $dst);
+			if ($needs_copy) {
+				$changes[] = ['src' => $item->getPathname(), 'dst' => $dst, 'rel' => 'Panel/modules/update/patches/' . $rel];
+			}
+		}
+	}
+
+	return $changes;
+}
+
+function gsp_apply_updater_changes(array $changes)
+{
+	$copied = 0;
+	foreach ($changes as $change) {
+		$parent = dirname($change['dst']);
+		if (!is_dir($parent)) {
+			@mkdir($parent, 0755, true);
+		}
+		if (@copy($change['src'], $change['dst'])) {
+			$copied++;
+			gsp_update_log('Updater self-update copied: ' . $change['rel']);
+		}
+	}
+	return $copied;
 }
 
 // ---------------------------------------------------------------------------
@@ -845,10 +1400,28 @@ function gsp_try_git_update($branch)
 // ---------------------------------------------------------------------------
 // Orchestrate a full update
 // ---------------------------------------------------------------------------
-function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
+function gsp_do_update($repo_owner, $repo_name, $ref, $update_type, $skip_self_update = false)
 {
 	global $db;
 	$panel_dir = GSP_PANEL_DIR;
+
+	$preflight = gsp_run_preflight_check(true);
+	gsp_update_log("Update request: type={$update_type}, ref={$ref}, repo={$repo_owner}/{$repo_name}");
+	gsp_update_log('Detected layout: root=' . GSP_ROOT_DIR . ', panel=' . GSP_PANEL_DIR . ', website=' . GSP_WEBSITE_DIR);
+	foreach ($preflight['checks'] as $check) {
+		gsp_update_log("Preflight: {$check['name']} => {$check['value']} [" . ($check['ok'] ? 'ok' : 'fail') . "]");
+	}
+	if (!$preflight['success']) {
+		return ['success' => false, 'error' => 'Preflight checks failed. Fix layout/permissions and retry.'];
+	}
+
+	$patch_summary = gsp_apply_required_patches(false);
+	gsp_update_log('Patch check: available=' . count(gsp_get_patch_definitions()) . ', pending_required=' . count(gsp_get_pending_required_patches()));
+	if (!$patch_summary['success']) {
+		return ['success' => false, 'error' => 'Required pre-update patch failed: ' . $patch_summary['error']];
+	}
+	$apache_scan = gsp_scan_apache_paths();
+	gsp_update_log('Apache scan before update: available=' . (!empty($apache_scan['available']) ? 'yes' : 'no') . ', stale_paths=' . intval($apache_scan['stale_count']));
 
 	// Step 1 — backup
 	$backup = gsp_create_full_backup($update_type, $ref);
@@ -857,47 +1430,60 @@ function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
 	}
 	gsp_update_log("Backup created at {$backup['backup_ts']} before {$update_type} update to {$ref}");
 
-	// Step 2 — try git for branch updates; fall back to ZIP download
+	// Step 2 — download ZIP payload
 	$commit_after = null;
 	$files_copied = 0;
-	$used_git     = false;
+	$temp_dir = sys_get_temp_dir() . '/gsp_dl_' . time() . '_' . mt_rand(1000, 9999);
+	@mkdir($temp_dir, 0750, true);
+	$zip_file = gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir);
+	if (!$zip_file) {
+		@rmdir($temp_dir);
+		return [
+			'success' => false,
+			'error'   => 'Failed to download update ZIP from GitHub. Check network connectivity.',
+		];
+	}
+	gsp_update_log("Downloaded update ZIP for ref={$ref}");
 
-	if ($update_type !== 'release') {
-		$git_result = gsp_try_git_update($ref);
-		if ($git_result && $git_result['success']) {
-			$commit_after = $git_result['commit'];
-			$used_git     = true;
-			gsp_update_log("Updated via git to {$ref}: " . $git_result['output']);
-		} else {
-			gsp_update_log("Git update not available or failed for {$ref}; falling back to ZIP download");
-		}
+	$payload = gsp_extract_update_archive($zip_file);
+	@unlink($zip_file);
+	@rmdir($temp_dir);
+	if (!$payload['success']) {
+		return $payload;
 	}
 
-	if (!$used_git) {
-		$temp_dir = sys_get_temp_dir() . '/gsp_dl_' . time();
-		@mkdir($temp_dir, 0750);
-		$zip_file = gsp_download_zip($repo_owner, $repo_name, $ref, $temp_dir);
-		if (!$zip_file) {
-			@rmdir($temp_dir);
+	// Step 3 — updater self-check
+	if (!$skip_self_update) {
+		$updater_changes = gsp_collect_updater_changes($payload['source_root'], $payload['source_mode']);
+		if (!empty($updater_changes)) {
+			$copied = gsp_apply_updater_changes($updater_changes);
+			gsp_rmdir_recursive($payload['temp_dir']);
+			gsp_update_log("Updater self-check detected " . count($updater_changes) . " file change(s); copied {$copied} and requesting restart.");
 			return [
 				'success' => false,
-				'error'   => 'Failed to download update ZIP from GitHub. Check network connectivity.',
+				'restart_required' => true,
+				'error' => 'Updater code changed and was refreshed. Update will resume automatically.',
+				'backup_dir' => $backup['backup_dir'],
+				'pending_update' => [
+					'repo_owner' => $repo_owner,
+					'repo_name' => $repo_name,
+					'ref' => $ref,
+					'update_type' => $update_type,
+				],
 			];
 		}
-		gsp_update_log("Downloaded update ZIP for ref={$ref}");
-
-		$apply = gsp_apply_update($zip_file);
-		@unlink($zip_file);
-		@rmdir($temp_dir);
-		if (!$apply['success']) {
-			return $apply;
-		}
-		$files_copied = $apply['files_copied'];
-		$commit_after = gsp_get_git_commit();
-		gsp_update_log("Applied update via ZIP: {$apply['files_copied']} files written");
 	}
 
-	// Step 3 — housekeeping
+	$apply = gsp_apply_update_from_source($payload['source_root'], $payload['source_mode']);
+	gsp_rmdir_recursive($payload['temp_dir']);
+	if (!$apply['success']) {
+		return $apply;
+	}
+	$files_copied = $apply['files_copied'];
+	$commit_after = gsp_get_git_commit();
+	gsp_update_log("Applied update via ZIP: {$apply['files_copied']} files written, {$apply['files_skipped']} preserved");
+
+	// Step 4 — housekeeping
 	gsp_fix_permissions($panel_dir);
 	gsp_clear_panel_cache($panel_dir);
 	gsp_write_version_file($ref, $update_type);
@@ -909,7 +1495,7 @@ function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
 
 	$db->setSettings(['ogp_version' => $ref, 'version_type' => $update_type]);
 
-	// Step 4 — post-update module handling (mirrors updating.php behaviour)
+	// Step 5 — post-update module handling (mirrors updating.php behaviour)
 	if (file_exists($panel_dir . '/modules/modulemanager/module_handling.php')) {
 		require_once($panel_dir . '/modules/modulemanager/module_handling.php');
 	}
@@ -920,17 +1506,18 @@ function gsp_do_update($repo_owner, $repo_name, $ref, $update_type)
 		runPostUpdateOperations();
 	}
 
-	gsp_update_log("Update to {$ref} (type={$update_type}) complete");
+	gsp_update_log("Update to {$ref} (type={$update_type}) complete.");
 	return ['success' => true, 'files_copied' => $files_copied, 'backup_dir' => $backup['backup_dir']];
 }
 
 // ---------------------------------------------------------------------------
 // Orchestrate a revert to a previous backup
 // ---------------------------------------------------------------------------
-function gsp_do_revert($backup_ts)
+function gsp_do_revert($backup_ts, $restore_apache = false)
 {
 	global $db;
 	$panel_dir  = GSP_PANEL_DIR;
+	$website_dir = GSP_WEBSITE_DIR;
 	$backup_dir = GSP_BACKUP_BASE . '/' . $backup_ts;
 
 	if (!is_dir($backup_dir)) {
@@ -939,6 +1526,7 @@ function gsp_do_revert($backup_ts)
 
 	// Detect backup format: new (panel-files.tar.gz) or legacy (files/ directory)
 	$tar_archive      = $backup_dir . '/panel-files.tar.gz';
+	$website_archive  = $backup_dir . '/website-files.tar.gz';
 	$legacy_files_dir = $backup_dir . '/files';
 	$use_tar          = file_exists($tar_archive);
 
@@ -1008,6 +1596,24 @@ function gsp_do_revert($backup_ts)
 		gsp_update_log("Revert: restored {$files_restored} files from legacy backup {$backup_ts}");
 	}
 
+	// Restore Website files from archive when available
+	if (file_exists($website_archive) && is_dir($website_dir)) {
+		$out = [];
+		$ret = 0;
+		exec('tar -xzf ' . escapeshellarg($website_archive) . ' -C ' . escapeshellarg($website_dir) . ' 2>&1', $out, $ret);
+		if ($ret === 0) {
+			gsp_update_log("Revert: extracted website-files.tar.gz to {$website_dir}");
+		} else {
+			gsp_update_log("Revert warning: website tar extraction exited with code {$ret}: " . implode(' | ', $out));
+		}
+	}
+
+	// Restore version.json
+	$version_backup = $backup_dir . '/version.json';
+	if (file_exists($version_backup)) {
+		@copy($version_backup, GSP_VERSION_JSON);
+	}
+
 	// Restore database using credentials from config
 	$db_config = load_panel_db_config();
 	if ($db_config !== null) {
@@ -1044,6 +1650,16 @@ function gsp_do_revert($backup_ts)
 	gsp_fix_permissions($panel_dir);
 	gsp_clear_panel_cache($panel_dir);
 
+	if ($restore_apache) {
+		$apache_backup_dir = $backup_dir . '/apache_sites';
+		if (is_dir($apache_backup_dir) && is_dir(GSP_APACHE_SITES)) {
+			foreach (glob($apache_backup_dir . '/*.conf') ?: [] as $file) {
+				@copy($file, GSP_APACHE_SITES . '/' . basename($file));
+			}
+			gsp_update_log("Revert: restored Apache site configs from {$apache_backup_dir}");
+		}
+	}
+
 	// Turn off maintenance mode (unless it was already on before we started)
 	if (!$had_maintenance) {
 		$db->setSettings(['maintenance_mode' => '0']);
@@ -1077,6 +1693,24 @@ function gsp_panel_update_section()
 	}
 	$csrf_token = $_SESSION['gsp_update_csrf'];
 
+	if (!isset($_POST['gsp_update_action']) && !empty($_SESSION['gsp_pending_update']) && is_array($_SESSION['gsp_pending_update'])) {
+		$pending = $_SESSION['gsp_pending_update'];
+		unset($_SESSION['gsp_pending_update']);
+		$resume = gsp_do_update(
+			$pending['repo_owner'],
+			$pending['repo_name'],
+			$pending['ref'],
+			$pending['update_type'],
+			true
+		);
+		if ($resume['success']) {
+			print_success('Updater self-refresh completed and update resumed successfully. '
+				. intval($resume['files_copied']) . ' file(s) updated.');
+		} else {
+			print_failure('Auto-resumed update failed: ' . htmlspecialchars($resume['error']));
+		}
+	}
+
 	// ---- Handle POST actions ------------------------------------------------
 	if (isset($_POST['gsp_update_action'])) {
 		$submitted_csrf = isset($_POST['gsp_update_csrf']) ? $_POST['gsp_update_csrf'] : '';
@@ -1089,7 +1723,49 @@ function gsp_panel_update_section()
 			$user_label = htmlspecialchars($_SESSION['users_login'])
 				. ' (IP: ' . htmlspecialchars($_SERVER['REMOTE_ADDR']) . ')';
 
-			if ($action === 'backup_only') {
+			if ($action === 'preflight_check') {
+				$preflight = gsp_run_preflight_check(true);
+				$failed = [];
+				foreach ($preflight['checks'] as $check) {
+					if (!$check['ok']) {
+						$failed[] = $check['name'];
+					}
+					gsp_update_log("Manual preflight by {$user_label}: {$check['name']} => {$check['value']} [" . ($check['ok'] ? 'ok' : 'fail') . "]");
+				}
+				if ($preflight['success']) {
+					print_success('Preflight check passed.');
+				} else {
+					print_failure('Preflight failed: ' . htmlspecialchars(implode(', ', $failed)));
+				}
+
+			} elseif ($action === 'apply_required_patches') {
+				$patches = gsp_apply_required_patches(true);
+				if ($patches['success']) {
+					$msg = 'Patches complete. Applied: ' . count($patches['applied']) . ', Skipped: ' . count($patches['skipped']);
+					if (!empty($patches['pending'])) {
+						$msg .= ', Pending optional: ' . count($patches['pending']);
+					}
+					print_success($msg);
+				} else {
+					print_failure('Patch execution failed: ' . htmlspecialchars($patches['error']));
+				}
+
+			} elseif ($action === 'fix_apache_paths') {
+				$reload = !empty($_POST['gsp_apache_reload']);
+				$apache_fix = gsp_fix_apache_paths(true, $reload);
+				if ($apache_fix['success']) {
+					$msg = isset($apache_fix['message'])
+						? $apache_fix['message']
+						: ('Apache path repair complete. Changed files: ' . intval($apache_fix['changed']));
+					if (!empty($apache_fix['backup_dir'])) {
+						$msg .= ' Backup: ' . htmlspecialchars($apache_fix['backup_dir']) . '.';
+					}
+					print_success($msg);
+				} else {
+					print_failure('Apache path repair failed: ' . htmlspecialchars($apache_fix['error']));
+				}
+
+			} elseif ($action === 'backup_only') {
 				$started_at = date('Y-m-d H:i:s');
 				$result = gsp_create_full_backup('backup-only', 'manual');
 				$finished_at = date('Y-m-d H:i:s');
@@ -1137,6 +1813,10 @@ function gsp_panel_update_section()
 							isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
 							$started_at, $finished_at
 						);
+					} elseif (!empty($result['restart_required']) && !empty($result['pending_update'])) {
+						$_SESSION['gsp_pending_update'] = $result['pending_update'];
+						print_success('Updater files changed and were refreshed. Resuming update with new updater logic...');
+						echo "<script>setTimeout(function(){ window.location.reload(); }, 600);</script>";
 					} else {
 						print_failure('Update failed: ' . htmlspecialchars($result['error']));
 						gsp_update_log("Admin {$user_label} update to release {$version} FAILED: {$result['error']}");
@@ -1167,6 +1847,10 @@ function gsp_panel_update_section()
 						isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
 						$started_at, $finished_at
 					);
+				} elseif (!empty($result['restart_required']) && !empty($result['pending_update'])) {
+					$_SESSION['gsp_pending_update'] = $result['pending_update'];
+					print_success('Updater files changed and were refreshed. Resuming update with new updater logic...');
+					echo "<script>setTimeout(function(){ window.location.reload(); }, 600);</script>";
 				} else {
 					print_failure('Update failed: ' . htmlspecialchars($result['error']));
 					gsp_update_log("Admin {$user_label} update to GitHub Stable branch {$stable_branch} FAILED: {$result['error']}");
@@ -1196,6 +1880,10 @@ function gsp_panel_update_section()
 						isset($result['backup_dir']) ? $result['backup_dir'] . '/panel-files.tar.gz': null,
 						$started_at, $finished_at
 					);
+				} elseif (!empty($result['restart_required']) && !empty($result['pending_update'])) {
+					$_SESSION['gsp_pending_update'] = $result['pending_update'];
+					print_success('Updater files changed and were refreshed. Resuming update with new updater logic...');
+					echo "<script>setTimeout(function(){ window.location.reload(); }, 600);</script>";
 				} else {
 					print_failure('Update failed: ' . htmlspecialchars($result['error']));
 					gsp_update_log("Admin {$user_label} update to GitHub Unstable branch {$unstable_branch} FAILED: {$result['error']}");
@@ -1208,11 +1896,12 @@ function gsp_panel_update_section()
 
 			} elseif ($action === 'revert') {
 				$backup_ts = isset($_POST['gsp_revert_backup']) ? trim($_POST['gsp_revert_backup']) : '';
+				$restore_apache = !empty($_POST['gsp_restore_apache']);
 				if (!preg_match('/^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}$/', $backup_ts)) {
 					print_failure('Invalid backup timestamp selected.');
 				} else {
 					$started_at = date('Y-m-d H:i:s');
-					$result = gsp_do_revert($backup_ts);
+					$result = gsp_do_revert($backup_ts, $restore_apache);
 					$finished_at = date('Y-m-d H:i:s');
 					if ($result['success']) {
 						print_success(
@@ -1257,6 +1946,10 @@ function gsp_panel_update_section()
 		? htmlspecialchars($releases[0]['tag_name'] ?? 'N/A')
 		: 'N/A (could not reach GitHub)';
 	$backups          = gsp_get_available_backups();
+	$preflight_status = gsp_run_preflight_check(true);
+	$patch_defs       = gsp_get_patch_definitions();
+	$pending_patches  = gsp_get_pending_required_patches();
+	$apache_scan      = gsp_scan_apache_paths();
 
 	// ---- Render UI ----------------------------------------------------------
 	echo "<h2>Panel Updates</h2>\n";
@@ -1285,6 +1978,22 @@ function gsp_panel_update_section()
 	echo "<tr><td><strong>Latest Release on GitHub:</strong></td><td>" . $latest_release . "</td></tr>\n";
 	echo "<tr><td><strong>Repository:</strong></td><td>"
 	   . htmlspecialchars("{$repo_owner}/{$repo_name}") . "</td></tr>\n";
+	echo "<tr><td><strong>Detected GSP Root:</strong></td><td><code>" . htmlspecialchars(GSP_ROOT_DIR) . "</code></td></tr>\n";
+	echo "<tr><td><strong>Detected Panel Path:</strong></td><td><code>" . htmlspecialchars(GSP_PANEL_DIR) . "</code></td></tr>\n";
+	echo "<tr><td><strong>Detected Website Path:</strong></td><td><code>" . htmlspecialchars(GSP_WEBSITE_DIR) . "</code></td></tr>\n";
+	echo "<tr><td><strong>Preflight Status:</strong></td><td>"
+	   . ($preflight_status['success'] ? '<span style="color:#1a7f37;">PASS</span>' : '<span style="color:#b42318;">FAIL</span>')
+	   . "</td></tr>\n";
+	echo "<tr><td><strong>Available Updater Patches:</strong></td><td>" . intval(count($patch_defs)) . "</td></tr>\n";
+	echo "<tr><td><strong>Pending Required Patches:</strong></td><td>"
+	   . (empty($pending_patches) ? 'None' : htmlspecialchars(implode(', ', $pending_patches))) . "</td></tr>\n";
+	$apache_status = 'Unavailable';
+	if (!empty($apache_scan['available'])) {
+		$apache_status = intval($apache_scan['stale_count']) > 0
+			? ('Stale paths detected: ' . intval($apache_scan['stale_count']))
+			: 'OK (no stale paths detected)';
+	}
+	echo "<tr><td><strong>Apache Configuration Status:</strong></td><td>" . htmlspecialchars($apache_status) . "</td></tr>\n";
 	// Backup status rows
 	echo "<tr><td><strong>Backup Directory:</strong></td><td><code>"
 	   . htmlspecialchars(GSP_BACKUP_BASE) . "</code></td></tr>\n";
@@ -1301,6 +2010,27 @@ function gsp_panel_update_section()
 	}
 	echo "</table>\n<br>\n";
 
+	// ---- Preflight / Patch / Apache actions ----------------------------------
+	echo "<h3>Pre-Update Actions</h3>\n";
+	echo "<form method='POST' style='margin-bottom:8px;'>\n";
+	echo "<input type='hidden' name='gsp_update_action' value='preflight_check'>\n";
+	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
+	echo "<button type='submit'>Run Preflight Check</button>\n";
+	echo "</form>\n";
+
+	echo "<form method='POST' style='margin-bottom:8px;'>\n";
+	echo "<input type='hidden' name='gsp_update_action' value='apply_required_patches'>\n";
+	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
+	echo "<button type='submit' onclick='return confirm(\"Apply required pre-update patches now?\");'>Apply Required Patches</button>\n";
+	echo "</form>\n";
+
+	echo "<form method='POST' style='margin-bottom:16px;'>\n";
+	echo "<input type='hidden' name='gsp_update_action' value='fix_apache_paths'>\n";
+	echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>\n";
+	echo "<label style='margin-right:8px;'><input type='checkbox' name='gsp_apache_reload' value='1'> Reload Apache after successful configtest</label>";
+	echo "<button type='submit' onclick='return confirm(\"Fix stale Apache paths now? Existing files will be backed up first.\");'>Fix Apache Paths</button>\n";
+	echo "</form>\n";
+
 	// ---- Backup Only --------------------------------------------------------
 	echo "<h3>Create Backup</h3>\n";
 	echo "<form method='POST'>\n";
@@ -1316,6 +2046,7 @@ function gsp_panel_update_section()
 	echo "<br>\n";
 
 	// ---- Numbered Releases --------------------------------------------------
+	echo "<h3>Update Panel</h3>\n";
 	echo "<h3>Numbered Releases</h3>\n";
 	if (is_array($releases) && !empty($releases)) {
 		echo "<form method='POST'>\n";
@@ -1396,9 +2127,10 @@ function gsp_panel_update_section()
 			echo "<option value='" . htmlspecialchars($bk['ts']) . "'>{$label}</option>\n";
 		}
 		echo "</select>\n";
+		echo "<br><label style='display:inline-block;margin:8px 0;'><input type='checkbox' name='gsp_restore_apache' value='1'> Restore Apache configs from selected backup (if available)</label><br>\n";
 		echo " <button type='submit'"
 		   . " onclick='return confirm(\"This will RESTORE panel files AND the database from the selected backup.\\n\\nAll changes since that backup will be lost. Are you sure?\");'>"
-		   . "Revert Panel Update</button>\n";
+		   . "Rollback</button>\n";
 		echo "</form>\n";
 	}
 

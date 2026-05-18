@@ -16,3 +16,4 @@
 - Add an admin/serverlist UI badge that shows detected service OS variant (Windows/Linux/Any) from XML metadata next to each purchasable service row.
 - Add a panel settings health check that validates reCAPTCHA site/secret keys against active panel/storefront domains and warns admins before registration users see widget errors.
 - Add an automated deployment check that fails when `Website/timestamp.txt` and `modules/billing/timestamp.txt` diverge after storefront/content changes.
+- Add an integration smoke test that exercises updater preflight, required patch state persistence, Apache path scan output, and rollback restore of Panel/Website/version.json artifacts.
