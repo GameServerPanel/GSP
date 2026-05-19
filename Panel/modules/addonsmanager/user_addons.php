@@ -60,24 +60,6 @@ function exec_ogp_module() {
 
 		foreach ((array)$categories as $type_key => $type_label)
 		{
-			if ($type_key === 'workshop')
-			{
-				$workshop_count = scm_get_workshop_saved_count($db, (int)$home_id);
-				if ($printed_any_cell)
-					echo "</td><td>\n";
-				else
-					echo "<td>\n";
-				$printed_any_cell = true;
-				echo "<a href='?m=addonsmanager&amp;p=workshop_content" .
-					 "&amp;home_id=" . (int)$home_id .
-					 "&amp;mod_id=" . (int)$mod_id .
-					 "&amp;ip=" . htmlspecialchars($ip) .
-					 "&amp;port=" . htmlspecialchars($port) . "'>" .
-					 "Workshop Content (" . (int)$workshop_count . ")" .
-					 "</a>\n";
-				continue;
-			}
-
 			$items = $db->resultQuery(
 				"SELECT DISTINCT addon_id, name, game_name " .
 				"FROM OGP_DB_PREFIXaddons " .

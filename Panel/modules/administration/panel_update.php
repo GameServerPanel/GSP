@@ -379,19 +379,41 @@ return ['success' => true, 'file' => $archive_file];
 
 function gsp_backup_apache_configs($backup_dir)
 {
-$apache_source = '/etc/apache2/sites-available';
-if (!is_dir($apache_source)) {
-return ['success' => false, 'error' => 'Apache sites-available path not found: ' . $apache_source];
+$available_source = '/etc/apache2/sites-available';
+$enabled_source = '/etc/apache2/sites-enabled';
+if (!is_dir($available_source)) {
+return ['success' => false, 'error' => 'Apache sites-available path not found: ' . $available_source];
 }
-$dest = $backup_dir . '/apache-sites-available';
-if (!@mkdir($dest, 0755, true) && !is_dir($dest)) {
+$dest = $backup_dir . '/apache-configs';
+$dest_available = $dest . '/sites-available';
+$dest_enabled = $dest . '/sites-enabled';
+if (!@mkdir($dest_available, 0755, true) && !is_dir($dest_available)) {
 return ['success' => false, 'error' => 'Cannot create apache backup directory.'];
 }
-$files = glob($apache_source . '/*.conf') ?: [];
-foreach ($files as $file) {
-@copy($file, $dest . '/' . basename($file));
+if (!@mkdir($dest_enabled, 0755, true) && !is_dir($dest_enabled)) {
+return ['success' => false, 'error' => 'Cannot create apache enabled backup directory.'];
 }
-return ['success' => true, 'path' => $dest, 'count' => count($files)];
+$count = 0;
+foreach ((glob($available_source . '/*.conf') ?: []) as $file) {
+if (@copy($file, $dest_available . '/' . basename($file))) {
+$count++;
+}
+}
+if (is_dir($enabled_source)) {
+foreach ((glob($enabled_source . '/*') ?: []) as $file) {
+$dst = $dest_enabled . '/' . basename($file);
+if (is_link($file)) {
+$target = @readlink($file);
+if ($target !== false) {
+@symlink($target, $dst);
+$count++;
+}
+} elseif (is_file($file) && @copy($file, $dst)) {
+$count++;
+}
+}
+}
+return ['success' => true, 'path' => $dest, 'count' => $count];
 }
 
 function gsp_prune_old_backups($max_backups = 5)
@@ -593,6 +615,7 @@ function gsp_copy_tree($src_root, $dst_root, $base_rel = '')
 {
 $copied = 0;
 $skipped = [];
+$copied_files = [];
 $source = rtrim($src_root, '/');
 $iter = new RecursiveIteratorIterator(
 new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -613,9 +636,12 @@ continue;
 }
 if (gsp_copy_file($item->getPathname(), $dst)) {
 $copied++;
+if (count($copied_files) < 200) {
+$copied_files[] = $rel;
 }
 }
-return ['copied' => $copied, 'skipped' => $skipped];
+}
+return ['copied' => $copied, 'skipped' => $skipped, 'copied_files' => $copied_files];
 }
 
 function gsp_updater_watch_list()
@@ -694,7 +720,11 @@ function gsp_apply_layout_sync($source_root)
 $top_level = scandir($source_root);
 $skip = ['.', '..', '.git', '.github', '.gitignore', '.vscode'];
 $copied = 0;
+$panel_copied = 0;
+$website_copied = 0;
 $skipped = [];
+$copied_files = [];
+gsp_update_log('Layout sync source mapping: ' . $source_root . '/Panel => ' . GSP_PANEL_DIR . ' ; ' . $source_root . '/Website => ' . GSP_WEBSITE_DIR);
 foreach ((array)$top_level as $entry) {
 if (in_array($entry, $skip, true)) {
 continue;
@@ -713,19 +743,32 @@ continue;
 }
 if (gsp_copy_file($src, $dst)) {
 $copied++;
+if (count($copied_files) < 200) {
+$copied_files[] = $rel;
+}
 }
 continue;
 }
 if (is_dir($src)) {
 $part = gsp_copy_tree($src, GSP_ROOT_DIR, $entry);
 $copied += $part['copied'];
+$copied_files = array_merge($copied_files, array_slice((array)$part['copied_files'], 0, max(0, 200 - count($copied_files))));
+if ($entry === 'Panel') {
+$panel_copied += $part['copied'];
+}
+if ($entry === 'Website') {
+$website_copied += $part['copied'];
+}
 $skipped = array_merge($skipped, $part['skipped']);
 }
 }
 return [
 'success' => true,
 'files_copied' => $copied,
+'panel_files_copied' => $panel_copied,
+'website_files_copied' => $website_copied,
 'skipped' => array_values(array_unique($skipped)),
+'copied_files' => array_slice(array_values(array_unique($copied_files)), 0, 200),
 ];
 }
 
@@ -792,13 +835,27 @@ if (!$sync['success']) {
 return $sync;
 }
 gsp_update_log('Layout sync complete: copied=' . $sync['files_copied'] . ', skipped=' . count($sync['skipped']));
+gsp_update_log('Layout sync totals: Panel=' . intval($sync['panel_files_copied']) . ', Website=' . intval($sync['website_files_copied']));
 if (!empty($sync['skipped'])) {
 gsp_update_log('Preserved paths: ' . implode(', ', array_slice($sync['skipped'], 0, 50)));
+}
+if (!empty($sync['copied_files'])) {
+$copied_sample = array_slice((array)$sync['copied_files'], 0, 50);
+gsp_update_log('Copied file sample: ' . implode(', ', $copied_sample));
+$addons_updates = array_values(array_filter((array)$sync['copied_files'], function ($rel) {
+return strpos($rel, 'Panel/modules/addonsmanager/') === 0;
+}));
+if (!empty($addons_updates)) {
+gsp_update_log('Addonsmanager files copied: ' . implode(', ', array_slice($addons_updates, 0, 50)));
+}
 }
 return [
 'success' => true,
 'files_copied' => $sync['files_copied'],
+'panel_files_copied' => $sync['panel_files_copied'],
+'website_files_copied' => $sync['website_files_copied'],
 'preserved' => $sync['skipped'],
+'copied_files' => $sync['copied_files'],
 'patches' => $patches['run'],
 ];
 }
@@ -885,6 +942,9 @@ gsp_update_log("Update to {$ref} (type={$update_type}) complete");
 return [
 'success' => true,
 'files_copied' => $apply['files_copied'],
+'panel_files_copied' => isset($apply['panel_files_copied']) ? $apply['panel_files_copied'] : 0,
+'website_files_copied' => isset($apply['website_files_copied']) ? $apply['website_files_copied'] : 0,
+'copied_files' => isset($apply['copied_files']) ? $apply['copied_files'] : [],
 'backup_dir' => $backup['backup_dir'],
 'preserved' => $apply['preserved'],
 'patches' => $apply['patches'],
@@ -1016,8 +1076,9 @@ if (!$db_restore['success']) {
 gsp_update_log('Revert warning: ' . $db_restore['error']);
 }
 
-if ($restore_apache && is_dir($backup_dir . '/apache-sites-available')) {
-$apache_restore = gsp_restore_apache_backup($backup_dir . '/apache-sites-available', true);
+if ($restore_apache && (is_dir($backup_dir . '/apache-configs') || is_dir($backup_dir . '/apache-sites-available'))) {
+$apache_backup_dir = is_dir($backup_dir . '/apache-configs') ? ($backup_dir . '/apache-configs') : ($backup_dir . '/apache-sites-available');
+$apache_restore = gsp_restore_apache_backup($apache_backup_dir, true);
 if (!$apache_restore['success']) {
 gsp_update_log('Revert apache restore warning: ' . $apache_restore['error']);
 }
@@ -1033,6 +1094,46 @@ gsp_update_log('Revert complete: ' . $backup_ts);
 return ['success' => true, 'files_restored' => 0];
 }
 
+function gsp_get_apache_vhost_target_path($filename)
+{
+$name = strtolower((string)$filename);
+if (strpos($name, 'panel.') === 0) {
+return GSP_PANEL_DIR;
+}
+if (strpos($name, 'gameservers.world') !== false) {
+return GSP_WEBSITE_DIR;
+}
+return null;
+}
+
+function gsp_is_apache_stale_path($path)
+{
+$path = trim((string)$path);
+$stale = [
+'/var/www/html/panel',
+'/var/www/html/GSP/Panel/GSP/Panel',
+'/var/www/html/GSP/Panel/modules/billing',
+];
+if (in_array($path, $stale, true)) {
+return true;
+}
+return (strpos($path, '/var/www/html/panel/') === 0 || strpos($path, '/var/www/html/GSP/Panel/modules/billing/') === 0);
+}
+
+function gsp_parse_apache_cert_error_line($line)
+{
+$line = trim((string)$line);
+if (preg_match("/(SSLCertificate(?:File|KeyFile)):\\s*file '([^']+)' (does not exist(?: or is empty)?|is empty)/i", $line, $m)) {
+return [
+'directive' => $m[1],
+'path' => $m[2],
+'reason' => $m[3],
+'line' => $line,
+];
+}
+return null;
+}
+
 function gsp_scan_apache_configs()
 {
 $base = '/etc/apache2/sites-available';
@@ -1042,6 +1143,9 @@ $result = [
 'base' => $base,
 'files' => [],
 'issues' => [],
+'stale_issues' => [],
+'ssl_issues' => [],
+'planned_replacements' => [],
 'recommendations' => [],
 ];
 if (!$result['available']) {
@@ -1049,64 +1153,156 @@ $result['success'] = false;
 $result['issues'][] = 'Apache sites-available directory not found.';
 return $result;
 }
-$stale = [
-'/var/www/html/panel',
-'/var/www/html/GSP/Panel/GSP/Panel',
-'/var/www/html/GSP/Panel/modules/billing',
-];
 $files = glob($base . '/*.conf') ?: [];
 foreach ($files as $file) {
 $lines = @file($file, FILE_IGNORE_NEW_LINES);
 if (!is_array($lines)) {
 continue;
 }
-$file_info = ['file' => $file, 'document_roots' => [], 'directories' => [], 'stale_hits' => []];
-foreach ($lines as $line) {
+$vhost = basename($file);
+$target = gsp_get_apache_vhost_target_path($vhost);
+$file_info = [
+'file' => $file,
+'vhost' => $vhost,
+'target' => $target,
+'document_roots' => [],
+'directories' => [],
+'stale_hits' => [],
+'ssl_hits' => [],
+];
+foreach ($lines as $line_number => $line) {
 if (preg_match('/^\s*DocumentRoot\s+(.+)$/i', $line, $m)) {
 $path = trim($m[1], "\"' ");
 $file_info['document_roots'][] = $path;
+if ($target !== null && $path !== $target && gsp_is_apache_stale_path($path)) {
+$msg = $vhost . ' stale DocumentRoot: ' . $path . ' -> ' . $target;
+$result['stale_issues'][] = $msg;
+$result['issues'][] = $msg;
+$result['planned_replacements'][] = ['vhost' => $vhost, 'directive' => 'DocumentRoot', 'from' => $path, 'to' => $target];
+$file_info['stale_hits'][] = $path;
+}
 }
 if (preg_match('/^\s*<Directory\s+(.+)>/i', $line, $m)) {
 $path = trim($m[1], "\"' ");
 $file_info['directories'][] = $path;
+if ($target !== null && $path !== $target && gsp_is_apache_stale_path($path)) {
+$msg = $vhost . ' stale <Directory>: ' . $path . ' -> ' . $target;
+$result['stale_issues'][] = $msg;
+$result['issues'][] = $msg;
+$result['planned_replacements'][] = ['vhost' => $vhost, 'directive' => '<Directory>', 'from' => $path, 'to' => $target];
+$file_info['stale_hits'][] = $path;
 }
-foreach ($stale as $stalePath) {
-if (strpos($line, $stalePath) !== false) {
-$file_info['stale_hits'][] = $stalePath;
-$result['issues'][] = basename($file) . ' contains stale path: ' . $stalePath;
+}
+if (preg_match('/^\s*(SSLCertificate(?:File|KeyFile))\s+(.+)$/i', $line, $m)) {
+$directive = $m[1];
+$path = trim($m[2], "\"' ");
+if ($path !== '' && (!file_exists($path) || @filesize($path) === 0)) {
+$reason = !file_exists($path) ? 'missing' : 'empty';
+$msg = $vhost . ' ' . $directive . ' ' . $path . ' is ' . $reason;
+$issue = ['vhost' => $vhost, 'directive' => $directive, 'path' => $path, 'reason' => $reason, 'line' => ($line_number + 1), 'message' => $msg];
+$result['ssl_issues'][] = $issue;
+$result['issues'][] = $msg;
+$file_info['ssl_hits'][] = $issue;
 }
 }
 }
-if (!empty($file_info['stale_hits'])) {
-if (stripos($file, 'gameservers.world') !== false) {
-$result['recommendations'][] = basename($file) . ' should target ' . GSP_WEBSITE_DIR;
-} else {
-$result['recommendations'][] = basename($file) . ' should target ' . GSP_PANEL_DIR;
-}
+if ($target !== null) {
+$result['recommendations'][] = $vhost . ' should target ' . $target;
 }
 $result['files'][] = $file_info;
 }
+$result['stale_issues'] = array_values(array_unique($result['stale_issues']));
+$result['issues'] = array_values(array_unique($result['issues']));
 return $result;
+}
+
+function gsp_apache_configtest_only_cert_failures($configtest_output)
+{
+$lines = preg_split('/\r\n|\r|\n/', (string)$configtest_output);
+$seen = 0;
+foreach ((array)$lines as $line) {
+$line = trim((string)$line);
+if ($line === '') {
+continue;
+}
+if (stripos($line, 'Syntax OK') !== false) {
+continue;
+}
+if (preg_match('/^AH[0-9]+:\s+/i', $line) && stripos($line, 'Could not reliably determine') !== false) {
+continue;
+}
+if (gsp_parse_apache_cert_error_line($line) !== null) {
+$seen++;
+continue;
+}
+return false;
+}
+return $seen > 0;
+}
+
+function gsp_extract_apache_configtest_cert_issues($configtest_output)
+{
+$issues = [];
+$lines = preg_split('/\r\n|\r|\n/', (string)$configtest_output);
+foreach ((array)$lines as $line) {
+$parsed = gsp_parse_apache_cert_error_line($line);
+if ($parsed !== null) {
+$issues[] = $parsed;
+}
+}
+return $issues;
 }
 
 function gsp_restore_apache_backup($backup_dir, $reload_apache)
 {
-$target = '/etc/apache2/sites-available';
+$available_target = '/etc/apache2/sites-available';
+$enabled_target = '/etc/apache2/sites-enabled';
 if (!is_dir($backup_dir)) {
 return ['success' => false, 'error' => 'Apache backup folder not found.'];
 }
-$files = glob($backup_dir . '/*.conf') ?: [];
-foreach ($files as $file) {
-@copy($file, $target . '/' . basename($file));
+$available_backup = is_dir($backup_dir . '/sites-available') ? $backup_dir . '/sites-available' : $backup_dir;
+$enabled_backup = $backup_dir . '/sites-enabled';
+$restored = 0;
+foreach ((glob($available_backup . '/*.conf') ?: []) as $file) {
+if (@copy($file, $available_target . '/' . basename($file))) {
+$restored++;
+}
+}
+if (is_dir($enabled_backup)) {
+foreach ((glob($enabled_backup . '/*') ?: []) as $file) {
+$dst = $enabled_target . '/' . basename($file);
+if (is_link($dst) || is_file($dst)) {
+@unlink($dst);
+}
+if (is_link($file)) {
+$link_target = @readlink($file);
+if ($link_target !== false) {
+@symlink($link_target, $dst);
+$restored++;
+}
+} elseif (is_file($file) && @copy($file, $dst)) {
+$restored++;
+}
+}
 }
 $test = gsp_apache_configtest();
 if (!$test['success']) {
+if (gsp_apache_configtest_only_cert_failures($test['output'])) {
+return [
+'success' => true,
+'restored' => $restored,
+'configtest' => $test,
+'warnings' => ['Apache config restore completed, but SSL certificate file(s) are missing.'],
+'ssl_issues' => gsp_extract_apache_configtest_cert_issues($test['output']),
+];
+}
 return ['success' => false, 'error' => 'apache2ctl configtest failed after restore: ' . $test['output']];
 }
+$reload = ['success' => true, 'output' => 'Apache reload skipped'];
 if ($reload_apache) {
-gsp_apache_reload();
+$reload = gsp_apache_reload();
 }
-return ['success' => true, 'restored' => count($files)];
+return ['success' => true, 'restored' => $restored, 'configtest' => $test, 'reload' => $reload];
 }
 
 function gsp_apache_configtest()
@@ -1136,6 +1332,31 @@ function gsp_fix_apache_paths($confirmed, $reload_apache)
 if (!$confirmed) {
 return ['success' => false, 'error' => 'Apache path fix requires explicit confirmation.'];
 }
+
+function gsp_disable_ssl_vhost($vhost_file, $confirmed)
+{
+if (!$confirmed) {
+return ['success' => false, 'error' => 'SSL vhost disable requires confirmation.'];
+}
+$vhost = basename((string)$vhost_file);
+if (!preg_match('/\.conf$/', $vhost) || strpos($vhost, '-ssl') === false) {
+return ['success' => false, 'error' => 'Only SSL vhost .conf files can be disabled from this action.'];
+}
+$enabled_path = '/etc/apache2/sites-enabled/' . $vhost;
+if (!file_exists($enabled_path) && !is_link($enabled_path)) {
+return ['success' => true, 'message' => $vhost . ' is already disabled.'];
+}
+if (!@unlink($enabled_path)) {
+return ['success' => false, 'error' => 'Failed to disable SSL site: ' . $vhost];
+}
+$test = gsp_apache_configtest();
+if (!$test['success']) {
+return ['success' => false, 'error' => 'Disabled site but apache2ctl configtest still failed: ' . $test['output']];
+}
+$reload = gsp_apache_reload();
+gsp_update_log('Disabled SSL vhost in sites-enabled: ' . $vhost);
+return ['success' => true, 'configtest' => $test, 'reload' => $reload, 'message' => 'Disabled SSL vhost: ' . $vhost];
+}
 $scan = gsp_scan_apache_configs();
 if (!$scan['available']) {
 return ['success' => false, 'error' => 'Apache config folder not available.'];
@@ -1148,18 +1369,34 @@ return ['success' => false, 'error' => 'Could not create backup before apache fi
 
 $base = '/etc/apache2/sites-available';
 $files = glob($base . '/*.conf') ?: [];
-$replace = [
-'/var/www/html/panel' => GSP_PANEL_DIR,
-'/var/www/html/GSP/Panel/GSP/Panel' => GSP_PANEL_DIR,
-'/var/www/html/GSP/Panel/modules/billing' => GSP_WEBSITE_DIR,
-];
 $changed = [];
+$planned = [];
 foreach ($files as $file) {
 $orig = @file_get_contents($file);
 if ($orig === false) {
 continue;
 }
-$new = strtr($orig, $replace);
+$vhost = basename($file);
+$target = gsp_get_apache_vhost_target_path($vhost);
+if ($target === null) {
+continue;
+}
+$new = preg_replace_callback('/(^\s*DocumentRoot\s+)(["\']?)([^"\']+)(\2\s*$)/mi', function ($m) use ($target, $vhost, &$planned) {
+$current = trim((string)$m[3]);
+if ($current === $target || !gsp_is_apache_stale_path($current)) {
+return $m[0];
+}
+$planned[] = ['vhost' => $vhost, 'directive' => 'DocumentRoot', 'from' => $current, 'to' => $target];
+return $m[1] . $m[2] . $target . $m[2];
+}, $orig);
+$new = preg_replace_callback('/(^\s*<Directory\s+)(["\']?)([^"\'>]+)(\2\s*>)/mi', function ($m) use ($target, $vhost, &$planned) {
+$current = trim((string)$m[3]);
+if ($current === $target || !gsp_is_apache_stale_path($current)) {
+return $m[0];
+}
+$planned[] = ['vhost' => $vhost, 'directive' => '<Directory>', 'from' => $current, 'to' => $target];
+return $m[1] . $m[2] . $target . $m[2] . '>';
+}, $new);
 if ($new !== $orig) {
 @file_put_contents($file, $new);
 $changed[] = $file;
@@ -1168,11 +1405,25 @@ $changed[] = $file;
 
 $test = gsp_apache_configtest();
 if (!$test['success']) {
-$restore = gsp_restore_apache_backup($backup['backup_dir'] . '/apache-sites-available', false);
+$cert_only = gsp_apache_configtest_only_cert_failures($test['output']);
+if (!$cert_only) {
+$restore = gsp_restore_apache_backup($backup['backup_dir'] . '/apache-configs', false);
 return [
 'success' => false,
 'error' => 'apache2ctl configtest failed; restored backup. Output: ' . $test['output']
 . ($restore['success'] ? '' : (' | restore failed: ' . $restore['error'])),
+];
+}
+gsp_update_log('Apache path fix completed but SSL certificates are missing: ' . $test['output']);
+return [
+'success' => true,
+'warning' => 'Apache paths fixed, but SSL certificate is missing.',
+'changed_files' => $changed,
+'backup_dir' => $backup['backup_dir'],
+'configtest' => $test,
+'planned_replacements' => $planned,
+'ssl_issues' => gsp_extract_apache_configtest_cert_issues($test['output']),
+'reload' => ['success' => false, 'output' => 'Apache reload skipped because SSL certificate files are missing.'],
 ];
 }
 
@@ -1182,12 +1433,19 @@ $reload = gsp_apache_reload();
 }
 
 gsp_update_log('Apache path fix changed ' . count($changed) . ' file(s).');
+if (!empty($planned)) {
+$samples = array_slice($planned, 0, 20);
+foreach ($samples as $entry) {
+gsp_update_log('Apache replacement planned/applied: ' . $entry['vhost'] . ' ' . $entry['directive'] . ' ' . $entry['from'] . ' => ' . $entry['to']);
+}
+}
 return [
 'success' => true,
 'changed_files' => $changed,
 'backup_dir' => $backup['backup_dir'],
 'configtest' => $test,
 'reload' => $reload,
+'planned_replacements' => $planned,
 ];
 }
 
@@ -1293,9 +1551,25 @@ print_failure('Patch application failed: ' . htmlspecialchars($run['error']));
 } elseif ($action === 'fix_apache') {
 $apache_fix = gsp_fix_apache_paths(true, true);
 if ($apache_fix['success']) {
+if (!empty($apache_fix['warning'])) {
+print_success(htmlspecialchars($apache_fix['warning']) . ' Updated files: ' . intval(count($apache_fix['changed_files'])) . '.');
+echo "<p style='color:#8a6d3b;'><strong>Renew SSL certificate:</strong> <code>certbot --apache -d gameservers.world -d www.gameservers.world</code></p>\n";
+} else {
 print_success('Apache paths fixed successfully. Updated files: ' . intval(count($apache_fix['changed_files'])) . '.');
+}
+if (!empty($apache_fix['configtest']['output'])) {
+echo "<p><strong>apache2ctl configtest output:</strong><br><pre style='white-space:pre-wrap;max-height:220px;overflow:auto;'>" . htmlspecialchars($apache_fix['configtest']['output']) . "</pre></p>\n";
+}
 } else {
 print_failure('Apache path fix failed: ' . htmlspecialchars($apache_fix['error']));
+}
+} elseif ($action === 'disable_ssl_vhost') {
+$vhost = isset($_POST['gsp_ssl_vhost']) ? trim($_POST['gsp_ssl_vhost']) : '';
+$disable = gsp_disable_ssl_vhost($vhost, true);
+if ($disable['success']) {
+print_success(htmlspecialchars(isset($disable['message']) ? $disable['message'] : 'SSL vhost disabled.'));
+} else {
+print_failure('Disable SSL vhost failed: ' . htmlspecialchars($disable['error']));
 }
 } elseif ($action === 'backup_only') {
 $result = gsp_create_full_backup('backup-only', 'manual', false);
@@ -1315,7 +1589,7 @@ print_success('Updater files changed and were updated first. Restarting update w
 $auto_restart_payload = ['action' => 'update_release', 'nonce' => $result['restart_nonce'], 'version' => $version];
 } elseif ($result['success']) {
 print_success('Panel updated to release <strong>' . htmlspecialchars($version) . '</strong>. '
-. intval($result['files_copied']) . ' file(s) copied.');
+. intval($result['files_copied']) . ' file(s) copied (Panel: ' . intval($result['panel_files_copied']) . ', Website: ' . intval($result['website_files_copied']) . ').');
 } else {
 print_failure('Update failed: ' . htmlspecialchars($result['error']));
 }
@@ -1327,7 +1601,7 @@ print_success('Updater files changed and were updated first. Restarting stable u
 $auto_restart_payload = ['action' => 'update_stable', 'nonce' => $result['restart_nonce']];
 } elseif ($result['success']) {
 print_success('Panel updated to GitHub Stable (<strong>' . htmlspecialchars($stable_branch) . '</strong>). '
-. intval($result['files_copied']) . ' file(s) copied.');
+. intval($result['files_copied']) . ' file(s) copied (Panel: ' . intval($result['panel_files_copied']) . ', Website: ' . intval($result['website_files_copied']) . ').');
 } else {
 print_failure('Update failed: ' . htmlspecialchars($result['error']));
 }
@@ -1338,7 +1612,7 @@ print_success('Updater files changed and were updated first. Restarting unstable
 $auto_restart_payload = ['action' => 'update_unstable', 'nonce' => $result['restart_nonce']];
 } elseif ($result['success']) {
 print_success('Panel updated to GitHub Unstable (<strong>' . htmlspecialchars($unstable_branch) . '</strong>). '
-. intval($result['files_copied']) . ' file(s) copied.');
+. intval($result['files_copied']) . ' file(s) copied (Panel: ' . intval($result['panel_files_copied']) . ', Website: ' . intval($result['website_files_copied']) . ').');
 } else {
 print_failure('Update failed: ' . htmlspecialchars($result['error']));
 }
@@ -1438,12 +1712,40 @@ echo "<br><br><h3>Apache Configuration Status</h3>\n";
 echo "<table class='center'>\n";
 echo "<tr><td><strong>Config Directory:</strong></td><td><code>" . htmlspecialchars($apache_scan_result['base']) . "</code></td></tr>\n";
 echo "<tr><td><strong>Configs Found:</strong></td><td>" . intval(count($apache_scan_result['files'])) . "</td></tr>\n";
-echo "<tr><td><strong>Stale Path Hits:</strong></td><td>" . intval(count($apache_scan_result['issues'])) . "</td></tr>\n";
+echo "<tr><td><strong>Stale Path Hits:</strong></td><td>" . intval(count($apache_scan_result['stale_issues'])) . "</td></tr>\n";
+echo "<tr><td><strong>SSL Certificate Issues:</strong></td><td>" . intval(count($apache_scan_result['ssl_issues'])) . "</td></tr>\n";
 echo "<tr><td><strong>Recommended Panel Path:</strong></td><td><code>" . htmlspecialchars(GSP_PANEL_DIR) . "</code></td></tr>\n";
 echo "<tr><td><strong>Recommended Website Path:</strong></td><td><code>" . htmlspecialchars(GSP_WEBSITE_DIR) . "</code></td></tr>\n";
 echo "</table>\n";
-if (!empty($apache_scan_result['issues'])) {
-echo "<p style='color:#a94442;'><strong>Apache path issues:</strong><br>" . implode('<br>', array_map('htmlspecialchars', array_unique($apache_scan_result['issues']))) . "</p>\n";
+if (!empty($apache_scan_result['stale_issues'])) {
+echo "<p style='color:#a94442;'><strong>Apache stale path issues:</strong><br>" . implode('<br>', array_map('htmlspecialchars', array_unique($apache_scan_result['stale_issues']))) . "</p>\n";
+}
+if (!empty($apache_scan_result['planned_replacements'])) {
+echo "<p><strong>Planned replacements:</strong></p><table class='center'><tr><th>Vhost</th><th>Directive</th><th>Current</th><th>Replacement</th></tr>";
+foreach ((array)$apache_scan_result['planned_replacements'] as $plan_row) {
+echo "<tr><td>" . htmlspecialchars($plan_row['vhost']) . "</td><td>" . htmlspecialchars($plan_row['directive']) . "</td><td><code>" . htmlspecialchars($plan_row['from']) . "</code></td><td><code>" . htmlspecialchars($plan_row['to']) . "</code></td></tr>";
+}
+echo "</table>";
+}
+if (!empty($apache_scan_result['ssl_issues'])) {
+echo "<p style='color:#8a6d3b;'><strong>SSL certificate issues:</strong><br>";
+foreach ((array)$apache_scan_result['ssl_issues'] as $ssl_issue) {
+echo htmlspecialchars($ssl_issue['vhost'] . ' ' . $ssl_issue['directive'] . ': ' . $ssl_issue['path'] . ' (' . $ssl_issue['reason'] . ')') . "<br>";
+}
+echo "</p>\n";
+echo "<p style='color:#8a6d3b;'><strong>Renew certificate command:</strong> <code>certbot --apache -d gameservers.world -d www.gameservers.world</code></p>";
+foreach ((array)$apache_scan_result['ssl_issues'] as $ssl_issue) {
+$vhost = basename((string)$ssl_issue['vhost']);
+if (strpos($vhost, '-ssl.conf') === false) {
+continue;
+}
+echo "<form method='POST' style='display:inline-block;margin-right:8px;'>";
+echo "<input type='hidden' name='gsp_update_action' value='disable_ssl_vhost'>";
+echo "<input type='hidden' name='gsp_update_csrf' value='" . htmlspecialchars($csrf_token) . "'>";
+echo "<input type='hidden' name='gsp_ssl_vhost' value='" . htmlspecialchars($vhost) . "'>";
+echo "<button type='submit' onclick='return confirm(\"Disable broken SSL site " . htmlspecialchars($vhost) . " in sites-enabled?\\n\\nThis keeps path fixes while SSL certs are missing.\");'>Disable Broken SSL Vhost: " . htmlspecialchars($vhost) . "</button>";
+echo "</form>";
+}
 }
 echo "<form method='POST'>\n";
 echo "<input type='hidden' name='gsp_update_action' value='fix_apache'>\n";

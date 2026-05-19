@@ -40,17 +40,10 @@
 function get_server_content_categories()
 {
     return array(
-        // ── Original types (must remain for backward compatibility) ──────────
-        'plugin'   => 'Plugins / Mods',
-        'mappack'  => 'Map Packs',
-        'config'   => 'Config Packs',
-
-        // ── Extended types (require addon_type VARCHAR(32) – db_version 2) ──
-        'version'  => 'Server Versions',     // e.g. Minecraft jar switcher
-        'modpack'  => 'Modpacks',            // e.g. CurseForge / ATLauncher packs
-        'workshop' => 'Workshop Content',    // Steam Workshop item bundles
-        'script'   => 'Scripted Installer',  // Admin-defined install-only scripts
-        'profile'  => 'Server Profiles',     // Full profile: configs + mods + scripts
+        'file_download'      => 'File Download / Archive',
+        'workshop_item'      => 'Steam Workshop Item',
+        'config_edit'        => 'Config Edit',
+        'scripted_installer' => 'Scripted Installer',
     );
 }
 
@@ -79,4 +72,35 @@ function get_legacy_addon_types()
 function get_server_content_type_keys()
 {
     return array_keys(get_server_content_categories());
+}
+
+function scm_get_addon_type_from_install_method($install_method)
+{
+    $install_method = trim((string)$install_method);
+    $map = array(
+        'download_zip'   => 'file_download',
+        'steam_workshop' => 'workshop_item',
+        'config_edit'    => 'config_edit',
+        'post_script'    => 'scripted_installer',
+    );
+    return isset($map[$install_method]) ? $map[$install_method] : 'file_download';
+}
+
+function scm_normalize_addon_type($addon_type, $install_method = '')
+{
+    $addon_type = trim((string)$addon_type);
+    $categories = get_server_content_categories();
+    if (isset($categories[$addon_type])) {
+        return $addon_type;
+    }
+    if ($addon_type === 'workshop') {
+        return 'workshop_item';
+    }
+    if ($addon_type === 'script') {
+        return 'scripted_installer';
+    }
+    if ($addon_type === 'config') {
+        return 'config_edit';
+    }
+    return scm_get_addon_type_from_install_method($install_method);
 }
