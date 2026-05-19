@@ -19,6 +19,7 @@
 - Add an integration smoke test that exercises updater preflight, required patch state persistence, Apache path scan output, and rollback restore of Panel/Website/version.json artifacts.
 - Add an admin preview/diff panel for Apache path repairs so staff can review exact vhost line changes before confirming `Fix Apache Paths`.
 - Add Phase 2 Workshop Content UX in `addonsmanager`: browse/search/select Workshop items with metadata while reusing the Phase 1 per-home saved-ID action pipeline.
+- Add a live progress/status panel for addonsmanager Workshop installs so users can watch queued/downloading/copying/completed steps without leaving the page.
 - Add localized language strings/tooltips for the new cron scheduler `server_content_*` action labels across all supported panel locales.
 - Add a Game Manager "Live Server Status" panel that consumes `Panel/protocol/gsp_query.php` and shows banner preview plus copyable embed code.
 - Add an updater admin UI table that renders the full deployment preflight path map (temp checkout, source repo/panel/website, destination panel/website) directly from the new layout detection payload for one-click operator verification.

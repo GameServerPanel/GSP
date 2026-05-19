@@ -37,7 +37,7 @@ This file captures how the control panel, storefront, agents, and helper scripts
 | `server` | `modules/server/*` | Remote server management (agents, IPs, ports, reinstall keys). Billing uses these tables for available nodes/locations. |
 | `modulemanager` | Manage module install/uninstall/menus. Billing module registers `navigation.xml` to surface `create_servers.php` & admin pages. |
 | `tickets`, `support` | Support ticketing/email utilities. | Pulls user info and logger records. |
-| `extras`, `addonsmanager` | Workshop/add-on management. | Hooks into game homes after provisioning. |
+| `extras`, `addonsmanager` | Workshop/add-on management. Server Content workshop installs now share validation/runtime helpers across admin, user, and API flows, and sync bundled workshop scripts into each home’s `gsp_server_content/scripts/workshop/` directory before execution. | Hooks into game homes after provisioning and uses agent-side SteamCMD copy/install workflows. |
 | `litefm`, `ftp`, `TS3Admin` | File managers and TeamSpeak controllers. | Depend on homes and remote server credentials set during provisioning. |
 | `news`, `circular`, `faq` | Content modules for panel UI. | Use standard MVC wrappers, share session/auth. |
 | `cron` | Scheduler UI feeding `scripts/` commands. | Maintains job metadata that OS cron reads, including scheduler-triggered Server Content actions via `ogp_api.php?server_content/run_scheduled_action` and `modules/addonsmanager/server_content_actions.php`. |
