@@ -33,14 +33,14 @@ This file captures how the control panel, storefront, agents, and helper scripts
 | `config_games` | `modules/config_games/add_mod.php`, `server_config_parser.php`, XML files under `server_configs/` | Admin UI for XML definitions. Controls what appears in storefront/service catalog. | Feeds `gamemanager`, billing catalog, cron installers. |
 | `steam_workshop` | `modules/steam_workshop/admin.php`, `user.php`, `Panel/includes/functions.php`, `navigation.xml` | Admin profile defaults + per-home mod management. Profile defaults can now be refreshed from game XML and the user route is explicitly exposed via `p=user`. | Uses `config_games` XML metadata + `server_homes`/assignment tables; feeds workshop agent updater. |
 | `user_games` | `modules/user_games/add_home.php`, `assign_home.php`, `edit_home.php` | Admin workflow to add homes manually or edit assignments. Shares DB tables with billing provisioner. | Uses `game_homes`, `remote_servers`, `billing_orders`. |
-| `administration` / `user_admin` | CRUD around users, groups, permissions, expire dates. Also hosts the panel updater (`modules/administration/panel_update.php`) with preflight checks, required pre-update patches (`modules/update/patches`), root-layout sync, backup/rollback, and Apache path scan/repair helpers. | Sets roles consumed by storefront admin guard and provisioning ACLs; updater now coordinates root `Panel/` + `Website/` deployment safety. |
+| `administration` / `user_admin` | CRUD around users, groups, permissions, expire dates. `modules/administration/panel_update.php` now also runs repository-layout-aware panel updates, preflight checks, updater self-refresh, backup/rollback for Panel+Website, patch execution, and Apache path scan/fix helpers. | Sets roles consumed by storefront admin guard and provisioning ACLs; writes update lifecycle traces to root `logs/update_trace.log` and patch state via `modules/update/patches` + `update_patches` tracking. |
 | `server` | `modules/server/*` | Remote server management (agents, IPs, ports, reinstall keys). Billing uses these tables for available nodes/locations. |
 | `modulemanager` | Manage module install/uninstall/menus. Billing module registers `navigation.xml` to surface `create_servers.php` & admin pages. |
 | `tickets`, `support` | Support ticketing/email utilities. | Pulls user info and logger records. |
 | `extras`, `addonsmanager` | Workshop/add-on management. | Hooks into game homes after provisioning. |
 | `litefm`, `ftp`, `TS3Admin` | File managers and TeamSpeak controllers. | Depend on homes and remote server credentials set during provisioning. |
 | `news`, `circular`, `faq` | Content modules for panel UI. | Use standard MVC wrappers, share session/auth. |
-| `cron` | Scheduler UI feeding `scripts/` commands. | Maintains job metadata that OS cron reads. |
+| `cron` | Scheduler UI feeding `scripts/` commands. | Maintains job metadata that OS cron reads, including scheduler-triggered Server Content actions via `ogp_api.php?server_content/run_scheduled_action` and `modules/addonsmanager/server_content_actions.php`. |
 
 ## Storefront (`Panel/modules/billing` runtime + `Website/` compatibility wrappers)
 

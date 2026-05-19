@@ -47,10 +47,17 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 						list($wget,$wget_args,$url,$wget_nocert,$gt,$devnull,$err2out) =  explode(" ", $command, 7);
 						
 						parse_str(parse_url(trim($url,'"'), PHP_URL_QUERY), $url_query);
-						
-						if(!isset($url_query['ip']) or !isset($url_query['port']))
+						$home_info = false;
+						if(isset($url_query['ip']) && isset($url_query['port']))
+						{
+							$home_info = $db->getGameHomeByIP($url_query['ip'], $url_query['port']);
+						}
+						elseif(isset($url_query['home_id']))
+						{
+							$home_info = $db->getGameHome((int)$url_query['home_id'], true);
+						}
+						if(!$home_info)
 							continue;
-						$home_info = $db->getGameHomeByIP($url_query['ip'], $url_query['port']);
 						if(!$getAllJobs && !hasAccess($home_info))
 							continue;
 						
@@ -63,6 +70,8 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 							$action = "start";
 						}else if($action == "gamemanager/restart"){
 							$action = "restart";
+						}else if($action == "server_content/run_scheduled_action" && isset($url_query['action']) && $url_query['action'] != ""){
+							$action = $url_query['action'];
 						}
 						
 						$jobsArray[$rhost_id][$jobId] = array( 'job' => $job, 
@@ -76,7 +85,7 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 															   'home_id' => $home_info['home_id'],
 															   'ip' => $home_info['ip'],
 															   'port' => $home_info['port'],
-															   'mod_key' => $url_query['mod_key']);
+															   'mod_key' => isset($url_query['mod_key']) ? $url_query['mod_key'] : '');
 					}
 					else
 					{	
@@ -97,6 +106,50 @@ function reloadJobs($server_homes, $remote_servers, $getAllJobs = true)
 		}
 	}
 	return array($jobsArray, $remote_servers_offline);
+}
+
+function get_server_content_scheduled_actions() {
+	return array(
+		'server_content_check_updates',
+		'server_content_check_workshop_updates',
+		'server_content_install_updates_if_stopped',
+		'server_content_install_updates_next_restart',
+		'server_content_install_updates_now',
+		'server_content_install_updates_and_restart',
+		'server_content_notify_updates_only',
+		'server_content_update_all',
+		'server_content_validate_files',
+		'server_content_backup_before_update',
+	);
+}
+
+function build_cron_scheduler_command($panelURL, $token, $game_home, $action) {
+	$ip = $game_home['ip'];
+	$port = $game_home['port'];
+	$mod_key = isset($game_home['mod_key']) ? $game_home['mod_key'] : '';
+	$home_id = isset($game_home['home_id']) ? (int)$game_home['home_id'] : 0;
+	if(in_array($action, get_server_content_scheduled_actions()))
+	{
+		$options = array('triggered_by' => 'scheduler');
+		if($action == 'server_content_install_updates_and_restart')
+		{
+			$options['safe_restart'] = true;
+			$options['restart_delay_seconds'] = 60;
+		}
+		$options_json = urlencode(json_encode($options));
+		return "wget -qO- \"{$panelURL}/ogp_api.php?server_content/run_scheduled_action&token={$token}&home_id={$home_id}&action={$action}&options={$options_json}\" --no-check-certificate > /dev/null 2>&1";
+	}
+	switch ($action) {
+		case "stop":
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/stop&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}\" --no-check-certificate > /dev/null 2>&1";
+		case "start":
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/start&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}\" --no-check-certificate > /dev/null 2>&1";
+		case "restart":
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/restart&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}\" --no-check-certificate > /dev/null 2>&1";
+		case "steam_auto_update":
+			return "wget -qO- \"{$panelURL}/ogp_api.php?gamemanager/update&token={$token}&ip={$ip}&port={$port}&mod_key={$mod_key}&type=steam\" --no-check-certificate > /dev/null 2>&1";
+	}
+	return false;
 }
 
 function updateCronJobTokens($old_token, $token){
@@ -151,6 +204,11 @@ function get_action_selector($action = false, $server_homes = false, $homeid_ip_
 		$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$server_homes[$homeid_ip_port]['home_cfg_file']);
 		if( $server_xml->installer == "steamcmd" )
 			$server_actions[] = 'steam_auto_update';
+	}
+	global $db;
+	if($db->isModuleInstalled('addonsmanager'))
+	{
+		$server_actions = array_merge($server_actions, get_server_content_scheduled_actions());
 	}
 	$select_action = '<select name="action" style="width: 100%;">';
 	foreach ((array)$server_actions as $server_action)

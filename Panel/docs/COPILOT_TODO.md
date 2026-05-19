@@ -17,3 +17,7 @@
 - Add a panel settings health check that validates reCAPTCHA site/secret keys against active panel/storefront domains and warns admins before registration users see widget errors.
 - Add an automated deployment check that fails when `Website/timestamp.txt` and `modules/billing/timestamp.txt` diverge after storefront/content changes.
 - Add an integration smoke test that exercises updater preflight, required patch state persistence, Apache path scan output, and rollback restore of Panel/Website/version.json artifacts.
+- Add an admin preview/diff panel for Apache path repairs so staff can review exact vhost line changes before confirming `Fix Apache Paths`.
+- Add Phase 2 Workshop Content UX in `addonsmanager`: browse/search/select Workshop items with metadata while reusing the Phase 1 per-home saved-ID action pipeline.
+- Add localized language strings/tooltips for the new cron scheduler `server_content_*` action labels across all supported panel locales.
+- Add a Game Manager "Live Server Status" panel that consumes `Panel/protocol/gsp_query.php` and shows banner preview plus copyable embed code.

@@ -1,25 +1,93 @@
 <?php
 /*
  *
- * OGP - Open Game Panel
- * Copyright (C) 2008 - 2018 The OGP Development Team
+ * GSP - Game Server Panel (a heavily customized fork of OGP maintained by WDS)
  *
- * http://www.opengamepanel.org/
+ * Server Content Installer (module: addonsmanager, page: addons)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * This file handles the actual download+extraction and post-install script
+ * execution for a Server Content item selected by a user.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or any later version.
+ * CURRENT FLOW:
+ *   1. User selects a content type (plugin / mappack / config / ...) from
+ *      user_addons.php which links here with addon_type=<type>.
+ *   2. User picks a specific content item from a dropdown.
+ *   3. On form submit, state=start is set and start_file_download() is called
+ *      on the remote agent with the configured URL and target path.
+ *   4. The agent downloads and extracts the archive.
+ *   5. If a post_script is defined it is run on the agent after extraction.
+ *   6. The page auto-refreshes (state=refresh) to show download/script progress.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * POST-INSTALL SCRIPT REPLACEMENT VARIABLES:
+ *   %home_path%        – absolute path of the game server home directory
+ *   %home_name%        – display name of the game server home
+ *   %control_password% – RCON / control password for this server instance
+ *   %max_players%      – maximum player count configured for this mod slot
+ *   %ip%               – IP address bound to this server instance
+ *   %port%             – game port bound to this server instance
+ *   %query_port%       – query/status port (derived from game XML rules)
+ *   %incremental%      – internal incremental run counter for this mod/home
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * SECURITY NOTES:
+ *   - Users CANNOT supply arbitrary scripts; only the admin-defined post_script
+ *     is executed.  Users only pick from the approved list.
+ *   - Paths are passed to the agent which is responsible for enforcing that
+ *     all paths stay inside the assigned home directory.
+ *   - TODO (next phase): add explicit server-side path validation before
+ *     sending the command to the agent to block ../  traversal at the panel.
  *
+ * ─── FUTURE WORK (TODO – next phase) ────────────────────────────────────────
+ * The items below are intentionally NOT implemented here yet.  They are
+ * documented so the next contributor knows exactly where to add them.
+ *
+ * TODO: requires_stop flag
+ *   If the content item sets requires_stop=1, stop the server before
+ *   initiating the download.  Poll is_server_running() and abort if it
+ *   cannot be stopped within a timeout.
+ *
+ * TODO: backup_before_install flag
+ *   If backup_before_install=1, call the agent's backup function or
+ *   compress the target path into a timestamped .tar.gz before extraction.
+ *
+ * TODO: restart_after_install flag
+ *   If restart_after_install=1, trigger a server start after a successful
+ *   install (i.e. after post_script completes with exit code 0).
+ *
+ * TODO: install_method field
+ *   Current method is always 'download_zip'.  Future methods:
+ *     'download_file'  – single-file download, no extraction
+ *     'post_script'    – run only the post_script, no download
+ *     'steam_workshop' – pass workshop item IDs to the agent's workshop helper
+ *     'minecraft_jar'  – download a Minecraft server jar + update start script
+ *     'profile_copy'   – copy a profile directory tree into the server home
+ *
+ * TODO: content_version field
+ *   Store the installed version tag so the UI can display "installed: 1.21.1"
+ *   and detect whether an update is available.
+ *
+ * TODO: safe script templates
+ *   Provide a set of admin-approved script templates so admins do not have to
+ *   write raw bash from scratch.  Templates are stored in the DB and referenced
+ *   by content items.
+ *
+ * TODO: install history / logging
+ *   Write a row to a new install_history table (or log file) each time a
+ *   content item is installed:
+ *     home_id, addon_id, installed_by (user_id), installed_at, result, log_output
+ *
+ * TODO: user-friendly status output
+ *   Replace the raw progress-bar with a card-style status block showing:
+ *     content item name, version, download progress, script output, final status.
+ *
+ * TODO: Steam Workshop integration
+ *   When install_method='steam_workshop', pass the workshop item ID list to
+ *   the agent.  See SERVER_CONTENT_ROADMAP.md – Part 6 for the full design.
+ *
+ * TODO: Minecraft jar / version switching
+ *   When install_method='minecraft_jar', download the jar from Mojang/Paper/
+ *   Purpur/Fabric API, place it at the configured server path, and patch the
+ *   startup command line.  See SERVER_CONTENT_ROADMAP.md – Part 7.
+ * ─────────────────────────────────────────────────────────────────────────────
  */
 
 function do_progress($kbytes,$totalsize)
@@ -41,14 +109,17 @@ function do_progress($kbytes,$totalsize)
 require_once("includes/lib_remote.php");
 require_once("modules/config_games/server_config_parser.php");
 require_once("protocol/lgsl/lgsl_protocol.php");
+// Central category map — all valid addon_type values and their labels.
+require_once(dirname(__FILE__) . '/server_content_categories.php');
+require_once(dirname(__FILE__) . '/server_content_helpers.php');
 
 function exec_ogp_module() {
 
     global $db,$view;
 	$home_id = $_REQUEST['home_id'];
-	$mod_id = $_REQUEST['mod_id'];
-	$ip = $_REQUEST['ip'];
-	$port = $_REQUEST['port'];
+	$mod_id  = $_REQUEST['mod_id'];
+	$ip      = $_REQUEST['ip'];
+	$port    = $_REQUEST['port'];
 	$user_id = $_SESSION['user_id'];
 	
     $isAdmin = $db->isAdmin( $_SESSION['user_id'] );
@@ -76,19 +147,21 @@ function exec_ogp_module() {
     }
 	
 	$home_cfg_id = $home_info['home_cfg_id'];
-	$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
+	$server_xml  = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
 	
-	$addon_types = array('plugin', 'mappack', 'config');
-	$addon_type = isset($_REQUEST['addon_type']) ? $_REQUEST['addon_type'] : "";
+	// Use the full category map so newly added types are accepted without
+	// editing this file.  The original three types are always present.
+	$addon_types = get_server_content_type_keys();
+	$addon_type  = isset($_REQUEST['addon_type']) ? $_REQUEST['addon_type'] : "";
 
     $state = isset($_REQUEST['state']) ? $_REQUEST['state'] : "";
-    $pid = isset($_REQUEST['pid']) ? $_REQUEST['pid'] : -1;
+    $pid   = isset($_REQUEST['pid'])   ? $_REQUEST['pid']   : -1;
 	
     if ( $state != "" )
     {
         $addon_id = (int)$_REQUEST['addon_id'];
 		
-		$addons_rows = $db->resultQuery("SELECT url, path, post_script FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
+		$addons_rows = $db->resultQuery("SELECT url, path, post_script, addon_type, install_method, content_version, requires_stop, restart_after_install FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
 		if (!is_array($addons_rows)) {
 			$addons_rows = [];
 		}
@@ -101,10 +174,30 @@ function exec_ogp_module() {
 		
 		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		
-		$addon_info = $addons_rows[0];
+		$addon_info    = $addons_rows[0];
+		$install_method  = isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip';
+		$content_version = isset($addon_info['content_version']) ? $addon_info['content_version'] : '';
+		$requires_stop   = !empty($addon_info['requires_stop']) ? 1 : 0;
+
+		// ── requires_stop guard ───────────────────────────────────────────────
+		// If the content item requires the server to be stopped first, check
+		// whether the server is currently running and block the install if so.
+		// (Phase 2 blocks install; automatic stop/start is Phase 3.)
+		if ( $state == "start" && $requires_stop ) {
+			$is_running = $remote->is_screen_running( $home_info['home_name'], $home_info['home_id'] );
+			if ( $is_running === 1 ) {
+				print_failure('This content item requires the server to be stopped before installing. Please stop the server and try again.');
+				echo "<p><a href=\"?m=addonsmanager&amp;p=addons&amp;addon_type=".urlencode($addon_info['addon_type'] ?? '')."&amp;home_id=$home_id&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
+				return;
+			}
+		}
 		$url = $addon_info['url'];
 		$filename = basename($url);
-		#### This makes replacements to the bash script:
+		#### Replace template variables in the post-install script with
+		#### live server data before sending to the agent.
+		#### Each variable is replaced case-insensitively.
+		#### SECURITY: only admin-defined variables are substituted; users
+		#### cannot inject additional commands through these fields.
 		if($addon_info['post_script'] != "")
 		{
 			$addon_info['post_script'] = strip_real_escape_string($addon_info['post_script']);
@@ -153,9 +246,23 @@ function exec_ogp_module() {
 			}
 		}
 
-		#### end of replacememnts
-		if ( $state == "start" AND $addon_id != "" )
+		#### end of replacements
+		if ( $state == "start" AND $addon_id != "" ) {
+			// Record install attempt in history before triggering download.
+			$cache_mode = scm_get_cache_mode($db);
+			$history_id = scm_record_install_start(
+				$db,
+				$home_id,
+				$addon_id,
+				$user_id,
+				$addon_info['url'],
+				$content_version,
+				$install_method,
+				$cache_mode
+			);
+			$_SESSION['scm_history_id_' . $home_id . '_' . $addon_id] = $history_id;
 			$pid = $remote->start_file_download( $addon_info['url'], $home_info['home_path']."/".$addon_info['path'], $filename, "uncompress", $post_script);
+		}
 
 		$headers = get_headers($url, 1);
 
@@ -224,6 +331,19 @@ function exec_ogp_module() {
 			elseif( $remote->is_file_download_in_progress($pid) === 0 AND $remote->is_screen_running("post_script",$pid) === 0 )
 			{
 				print_success(get_lang('addon_installed_successfully'));
+				// Update install history and manifest on successful completion.
+				$history_key = 'scm_history_id_' . $home_id . '_' . $addon_id;
+				if (!empty($_SESSION[$history_key])) {
+					scm_record_install_done($db, (int)$_SESSION[$history_key], 'installed', 0);
+					unset($_SESSION[$history_key]);
+				}
+				scm_upsert_manifest($db, $home_id, $addon_id, array(
+					'install_method'  => $install_method,
+					'content_version' => $content_version,
+					'install_state'   => 'installed',
+					'source_url'      => $addon_info['url'],
+					'installed_by'    => $user_id,
+				));
 				echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id".
 					 "&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
 				$view->refresh("?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id".
@@ -249,9 +369,20 @@ function exec_ogp_module() {
 
     		return;
     	}
+		if ($addon_type === 'workshop') {
+			scm_ensure_workshop_schema($db);
+			$view->refresh('?m=addonsmanager&p=workshop_content&home_id='.(int)$home_id.'&mod_id='.(int)$mod_id.'&ip='.urlencode((string)$ip).'&port='.urlencode((string)$port), 0);
+			return;
+		}
 
 		?>
-			<h2><?php echo htmlentities($home_info['home_name'])."&nbsp;".get_lang($addon_type) ;?></h2>
+			<?php
+				$addon_type_lang_key = "server_content_".$addon_type;
+				$addon_type_lang = get_lang($addon_type_lang_key);
+				if($addon_type_lang === "_".$addon_type_lang_key."_")
+					$addon_type_lang = get_lang($addon_type);
+			?>
+			<h2><?php echo htmlentities($home_info['home_name'])."&nbsp;".$addon_type_lang ;?></h2>
             <table class='center'>
 			<form method='get'>
 			<input type='hidden' name='m' value='addonsmanager' />

@@ -77,7 +77,9 @@ function exec_ogp_module()
 			"discord_webhook_main"   => $_REQUEST['discord_webhook_main'],
 			"discord_webhook_admin"  => $_REQUEST['discord_webhook_admin'],
 			// Debug
-			"debug_level"            => $_REQUEST['debug_level'] ?? '1'
+			"debug_level"            => $_REQUEST['debug_level'] ?? '1',
+			// Server Content
+			"server_content_cache_mode" => $_REQUEST['server_content_cache_mode'] ?? 'disabled',
 		);
 		
 		$db->setSettings($settings);
@@ -208,8 +210,24 @@ function exec_ogp_module()
 	$ft->add_custom_field('debug_level',
 		create_drop_box_from_array($debug_level_options, 'debug_level', @$row['debug_level'] ?? '1', false));
 
+	// Server Content cache mode
+	// Controls whether the agent may copy cacheable content from other servers
+	// or a shared cache instead of always re-downloading from the source.
+	// Default: disabled (safest – no copying of any content between servers).
+	// See addonsmanager/SERVER_CONTENT_ROADMAP.md for full description.
+	$cache_mode_options = array(
+		'disabled'                => 'Disabled (always install from source — default)',
+		'search_existing_servers' => 'Search existing servers (copy cacheable content from local game-server folders)',
+		'shared_cache'            => 'Shared cache (store and reuse cacheable content in a shared cache folder)',
+		'shared_cache_and_search' => 'Shared cache + search existing servers',
+	);
+	$current_cache_mode = isset($row['server_content_cache_mode']) && array_key_exists($row['server_content_cache_mode'], $cache_mode_options)
+		? $row['server_content_cache_mode'] : 'disabled';
+	$ft->add_custom_field('server_content_cache_mode',
+		create_drop_box_from_array($cache_mode_options, 'server_content_cache_mode', $current_cache_mode, false));
+
 	// Add option to reset game server order to default
-	$ft->add_field('checkbox','reset_game_server_order','0');	
+	$ft->add_field('checkbox','reset_game_server_order','0');
 	
 	$ft->end_table();
 	$ft->add_button("submit","update_settings",get_lang('update_settings'));
