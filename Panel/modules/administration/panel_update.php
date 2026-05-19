@@ -23,6 +23,10 @@ defined('GSP_VERSION_FILE') || define('GSP_VERSION_FILE', GSP_PANEL_DIR . '/incl
 defined('GSP_VERSION_JSON') || define('GSP_VERSION_JSON', GSP_ROOT_DIR . '/version.json');
 defined('GSP_PATCH_DIR') || define('GSP_PATCH_DIR', GSP_PANEL_DIR . '/modules/update/patches');
 defined('GSP_EXPECTED_ROOT') || define('GSP_EXPECTED_ROOT', '/var/www/html/GSP');
+defined('GSP_EXPECTED_PANEL') || define('GSP_EXPECTED_PANEL', GSP_EXPECTED_ROOT . '/Panel');
+defined('GSP_EXPECTED_WEBSITE') || define('GSP_EXPECTED_WEBSITE', GSP_EXPECTED_ROOT . '/Website');
+defined('GSP_CANONICAL_TIMESTAMP_FILE') || define('GSP_CANONICAL_TIMESTAMP_FILE', GSP_WEBSITE_DIR . '/timestamp.txt');
+defined('GSP_BILLING_TIMESTAMP_FILE') || define('GSP_BILLING_TIMESTAMP_FILE', GSP_PANEL_DIR . '/modules/billing/timestamp.txt');
 
 $gspPatchManager = GSP_PANEL_DIR . '/modules/update/patch_manager.php';
 if (file_exists($gspPatchManager)) {
@@ -207,32 +211,54 @@ function gsp_preflight_check()
 {
 $errors = [];
 $warnings = [];
+$cwd = getcwd();
+$cwd_real = $cwd ? (realpath($cwd) ?: $cwd) : '';
+$root_real = realpath(GSP_ROOT_DIR) ?: GSP_ROOT_DIR;
+$panel_real = realpath(GSP_PANEL_DIR) ?: GSP_PANEL_DIR;
+$website_real = realpath(GSP_WEBSITE_DIR) ?: GSP_WEBSITE_DIR;
+$expected_root_real = realpath(GSP_EXPECTED_ROOT) ?: GSP_EXPECTED_ROOT;
+$expected_panel_real = realpath(GSP_EXPECTED_PANEL) ?: GSP_EXPECTED_PANEL;
+$expected_website_real = realpath(GSP_EXPECTED_WEBSITE) ?: GSP_EXPECTED_WEBSITE;
 $layout = [
-'cwd' => getcwd(),
+'cwd' => $cwd,
+'cwd_real' => $cwd_real,
 'expected_root' => GSP_EXPECTED_ROOT,
+'expected_panel' => GSP_EXPECTED_PANEL,
+'expected_website' => GSP_EXPECTED_WEBSITE,
 'gsp_root' => GSP_ROOT_DIR,
+'gsp_root_real' => $root_real,
 'panel_dir' => GSP_PANEL_DIR,
+'panel_dir_real' => $panel_real,
 'website_dir' => GSP_WEBSITE_DIR,
+'website_dir_real' => $website_real,
 'backup_dir' => GSP_BACKUP_BASE,
 'config_file' => GSP_PANEL_DIR . '/includes/config.inc.php',
+'destination_panel' => GSP_PANEL_DIR,
+'destination_website' => GSP_WEBSITE_DIR,
 ];
 
 if (!$layout['cwd']) {
 $errors[] = 'Unable to read current working directory.';
-} elseif (strpos(realpath($layout['cwd']) ?: $layout['cwd'], GSP_ROOT_DIR) !== 0) {
-$errors[] = 'Current working directory is outside detected GSP root.';
+} elseif (strpos($cwd_real, $panel_real) !== 0) {
+$errors[] = 'Current working directory must be under live Panel path: ' . $panel_real;
 }
 if (!is_dir(GSP_ROOT_DIR)) {
 $errors[] = 'Detected GSP root path is missing.';
 }
-if (realpath(GSP_ROOT_DIR) !== false && realpath(GSP_ROOT_DIR) !== GSP_EXPECTED_ROOT) {
-$warnings[] = 'Detected root differs from expected production path: ' . GSP_EXPECTED_ROOT;
+if ($root_real !== $expected_root_real) {
+$errors[] = 'Detected GSP root does not match expected live root: ' . GSP_EXPECTED_ROOT;
 }
 if (!is_dir(GSP_PANEL_DIR)) {
 $errors[] = 'Panel directory is missing.';
 }
+if ($panel_real !== $expected_panel_real) {
+$errors[] = 'Detected Panel path does not match expected live Panel path: ' . GSP_EXPECTED_PANEL;
+}
 if (!is_dir(GSP_WEBSITE_DIR)) {
 $errors[] = 'Website directory is missing.';
+}
+if ($website_real !== $expected_website_real) {
+$errors[] = 'Detected Website path does not match expected live Website path: ' . GSP_EXPECTED_WEBSITE;
 }
 if (!file_exists($layout['config_file'])) {
 $errors[] = 'Panel includes/config.inc.php was not found and cannot be preserved.';
@@ -567,6 +593,78 @@ $source_root = $subdirs[0];
 return ['success' => true, 'temp_dir' => $temp_dir, 'source_root' => $source_root];
 }
 
+function gsp_resolve_source_layout($temp_checkout_path, $source_root)
+{
+$source_root_real = realpath($source_root) ?: $source_root;
+$candidates = [$source_root_real];
+if (basename($source_root_real) === 'Panel' || basename($source_root_real) === 'Website') {
+$candidates[] = dirname($source_root_real);
+}
+$candidates = array_values(array_unique(array_filter($candidates)));
+$repo_root = null;
+foreach ($candidates as $candidate) {
+if (is_dir($candidate . '/Panel') && is_dir($candidate . '/Website')) {
+$repo_root = realpath($candidate) ?: $candidate;
+break;
+}
+}
+
+$layout = [
+'cwd' => getcwd() ?: '',
+'live_gsp_root' => GSP_ROOT_DIR,
+'live_panel_path' => GSP_PANEL_DIR,
+'live_website_path' => GSP_WEBSITE_DIR,
+'temporary_git_checkout_path' => $temp_checkout_path,
+'source_root' => $source_root_real,
+'source_repo_root' => $repo_root,
+'source_panel_path' => $repo_root ? ($repo_root . '/Panel') : '',
+'source_website_path' => $repo_root ? ($repo_root . '/Website') : '',
+'destination_panel_path' => GSP_PANEL_DIR,
+'destination_website_path' => GSP_WEBSITE_DIR,
+];
+
+$errors = [];
+if (!$repo_root) {
+$errors[] = 'Unable to resolve source repository root containing both Panel/ and Website/.';
+} else {
+if (!is_dir($layout['source_panel_path'])) {
+$errors[] = 'Source Panel path is missing: ' . $layout['source_panel_path'];
+}
+if (!is_dir($layout['source_website_path'])) {
+$errors[] = 'Source Website path is missing: ' . $layout['source_website_path'];
+}
+}
+if (strpos((string)$layout['destination_panel_path'], '/Panel/Panel') !== false) {
+$errors[] = 'Destination Panel path is nested incorrectly: ' . $layout['destination_panel_path'];
+}
+if (strpos((string)$layout['destination_website_path'], '/Website/Website') !== false) {
+$errors[] = 'Destination Website path is nested incorrectly: ' . $layout['destination_website_path'];
+}
+if ((realpath(GSP_ROOT_DIR) ?: GSP_ROOT_DIR) !== (realpath(GSP_EXPECTED_ROOT) ?: GSP_EXPECTED_ROOT)) {
+$errors[] = 'Live root mismatch. Expected ' . GSP_EXPECTED_ROOT . ' but detected ' . GSP_ROOT_DIR;
+}
+if ((realpath(GSP_PANEL_DIR) ?: GSP_PANEL_DIR) !== (realpath(GSP_EXPECTED_PANEL) ?: GSP_EXPECTED_PANEL)) {
+$errors[] = 'Live Panel mismatch. Expected ' . GSP_EXPECTED_PANEL . ' but detected ' . GSP_PANEL_DIR;
+}
+if ((realpath(GSP_WEBSITE_DIR) ?: GSP_WEBSITE_DIR) !== (realpath(GSP_EXPECTED_WEBSITE) ?: GSP_EXPECTED_WEBSITE)) {
+$errors[] = 'Live Website mismatch. Expected ' . GSP_EXPECTED_WEBSITE . ' but detected ' . GSP_WEBSITE_DIR;
+}
+if (strpos((realpath($layout['cwd']) ?: $layout['cwd']), (realpath(GSP_PANEL_DIR) ?: GSP_PANEL_DIR)) !== 0) {
+$errors[] = 'Updater must run from a working directory under the live Panel path.';
+}
+
+gsp_update_log('Deployment layout detection: ' . json_encode($layout));
+foreach ($errors as $error) {
+gsp_update_log('Deployment layout error: ' . $error);
+}
+
+return [
+'success' => empty($errors),
+'errors' => $errors,
+'layout' => $layout,
+];
+}
+
 function gsp_normalize_rel($path)
 {
 $path = str_replace('\\', '/', $path);
@@ -715,8 +813,13 @@ $copied++;
 return $copied;
 }
 
-function gsp_apply_layout_sync($source_root)
+function gsp_apply_layout_sync(array $layout)
 {
+$source_root = $layout['source_repo_root'];
+$source_panel = $layout['source_panel_path'];
+$source_website = $layout['source_website_path'];
+$destination_panel = $layout['destination_panel_path'];
+$destination_website = $layout['destination_website_path'];
 $top_level = scandir($source_root);
 $skip = ['.', '..', '.git', '.github', '.gitignore', '.vscode'];
 $copied = 0;
@@ -724,17 +827,16 @@ $panel_copied = 0;
 $website_copied = 0;
 $skipped = [];
 $copied_files = [];
-gsp_update_log('Layout sync source mapping: ' . $source_root . '/Panel => ' . GSP_PANEL_DIR . ' ; ' . $source_root . '/Website => ' . GSP_WEBSITE_DIR);
+gsp_update_log('Layout sync source mapping: ' . $source_panel . ' => ' . $destination_panel . ' ; ' . $source_website . ' => ' . $destination_website);
 foreach ((array)$top_level as $entry) {
 if (in_array($entry, $skip, true)) {
 continue;
 }
-$src = rtrim($source_root, '/') . '/' . $entry;
-$dst = GSP_ROOT_DIR . '/' . $entry;
-if ($entry === 'backups') {
-$skipped[] = 'backups/';
+if ($entry === 'Panel' || $entry === 'Website' || $entry === 'backups' || $entry === 'logs') {
 continue;
 }
+$src = rtrim($source_root, '/') . '/' . $entry;
+$dst = GSP_ROOT_DIR . '/' . $entry;
 if (is_file($src)) {
 $rel = gsp_normalize_rel($entry);
 if (gsp_is_preserved_path($rel)) {
@@ -753,15 +855,21 @@ if (is_dir($src)) {
 $part = gsp_copy_tree($src, GSP_ROOT_DIR, $entry);
 $copied += $part['copied'];
 $copied_files = array_merge($copied_files, array_slice((array)$part['copied_files'], 0, max(0, 200 - count($copied_files))));
-if ($entry === 'Panel') {
-$panel_copied += $part['copied'];
-}
-if ($entry === 'Website') {
-$website_copied += $part['copied'];
-}
 $skipped = array_merge($skipped, $part['skipped']);
 }
 }
+$panel_part = gsp_copy_tree($source_panel, dirname($destination_panel), basename($destination_panel));
+$copied += $panel_part['copied'];
+$panel_copied += $panel_part['copied'];
+$copied_files = array_merge($copied_files, array_slice((array)$panel_part['copied_files'], 0, max(0, 200 - count($copied_files))));
+$skipped = array_merge($skipped, $panel_part['skipped']);
+
+$website_part = gsp_copy_tree($source_website, dirname($destination_website), basename($destination_website));
+$copied += $website_part['copied'];
+$website_copied += $website_part['copied'];
+$copied_files = array_merge($copied_files, array_slice((array)$website_part['copied_files'], 0, max(0, 200 - count($copied_files))));
+$skipped = array_merge($skipped, $website_part['skipped']);
+
 return [
 'success' => true,
 'files_copied' => $copied,
@@ -770,6 +878,62 @@ return [
 'skipped' => array_values(array_unique($skipped)),
 'copied_files' => array_slice(array_values(array_unique($copied_files)), 0, 200),
 ];
+}
+
+function gsp_validate_layout_sync_result(array $layout, array $sync)
+{
+$errors = [];
+$checks = [
+'Panel/modules/administration/panel_update.php',
+'Panel/modules/addonsmanager/addons_manager.php',
+'Website/index.php',
+];
+foreach ($checks as $rel) {
+$src = rtrim($layout['source_repo_root'], '/') . '/' . $rel;
+$dst = rtrim(GSP_ROOT_DIR, '/') . '/' . $rel;
+if (!is_file($src)) {
+continue;
+}
+if (!is_file($dst)) {
+$errors[] = 'Missing deployed file: ' . $rel;
+continue;
+}
+$src_hash = @hash_file('sha256', $src);
+$dst_hash = @hash_file('sha256', $dst);
+if ($src_hash === false || $dst_hash === false || $src_hash !== $dst_hash) {
+$errors[] = 'Copied file verification failed: ' . $rel;
+}
+}
+if (!empty($sync['copied_files']) && intval($sync['panel_files_copied']) === 0) {
+$errors[] = 'No Panel files were copied during layout sync.';
+}
+if (!empty($sync['copied_files']) && intval($sync['website_files_copied']) === 0) {
+$errors[] = 'No Website files were copied during layout sync.';
+}
+foreach ($errors as $error) {
+gsp_update_log('Layout sync validation error: ' . $error);
+}
+return [
+'success' => empty($errors),
+'errors' => $errors,
+];
+}
+
+function gsp_write_last_update_markers()
+{
+$line = 'Last Updated at ' . date('g:ia') . ' on ' . date('Y-m-d');
+$targets = [GSP_CANONICAL_TIMESTAMP_FILE, GSP_BILLING_TIMESTAMP_FILE];
+foreach ($targets as $target) {
+$dir = dirname($target);
+if (!is_dir($dir)) {
+@mkdir($dir, 0775, true);
+}
+if (is_writable($dir) || is_writable($target)) {
+@file_put_contents($target, $line . PHP_EOL, LOCK_EX);
+}
+}
+gsp_update_log('Last-update marker files written: ' . implode(', ', $targets));
+return $line;
 }
 
 function gsp_run_required_patches($updater_version)
@@ -797,11 +961,17 @@ return $extract;
 }
 $temp_dir = $extract['temp_dir'];
 $source_root = $extract['source_root'];
-$updater_version = substr((string)@hash_file('sha256', $source_root . '/Panel/modules/administration/panel_update.php'), 0, 12);
+$resolved_layout = gsp_resolve_source_layout($temp_dir, $source_root);
+if (!$resolved_layout['success']) {
+gsp_rmdir_recursive($temp_dir);
+return ['success' => false, 'error' => 'Deployment layout validation failed: ' . implode(' | ', $resolved_layout['errors'])];
+}
+$layout = $resolved_layout['layout'];
+$updater_version = substr((string)@hash_file('sha256', $layout['source_panel_path'] . '/modules/administration/panel_update.php'), 0, 12);
 
-$drift_files = gsp_detect_updater_drift_files($source_root, GSP_ROOT_DIR);
+$drift_files = gsp_detect_updater_drift_files($layout['source_repo_root'], GSP_ROOT_DIR);
 if (!empty($drift_files) && empty($restart_nonce)) {
-$copied = gsp_apply_updater_files_only($source_root, GSP_ROOT_DIR, $drift_files);
+$copied = gsp_apply_updater_files_only($layout['source_repo_root'], GSP_ROOT_DIR, $drift_files);
 $nonce = gsp_random_token(12);
 $_SESSION['gsp_update_restart_nonce'] = $nonce;
 gsp_update_log('Updater self-update applied (' . $copied . ' files); restart nonce=' . $nonce);
@@ -829,10 +999,14 @@ gsp_rmdir_recursive($temp_dir);
 return ['success' => false, 'error' => $patches['error']];
 }
 
-$sync = gsp_apply_layout_sync($source_root);
+$sync = gsp_apply_layout_sync($layout);
 gsp_rmdir_recursive($temp_dir);
 if (!$sync['success']) {
 return $sync;
+}
+$sync_validation = gsp_validate_layout_sync_result($layout, $sync);
+if (!$sync_validation['success']) {
+return ['success' => false, 'error' => 'Deployed file validation failed: ' . implode(' | ', $sync_validation['errors'])];
 }
 gsp_update_log('Layout sync complete: copied=' . $sync['files_copied'] . ', skipped=' . count($sync['skipped']));
 gsp_update_log('Layout sync totals: Panel=' . intval($sync['panel_files_copied']) . ', Website=' . intval($sync['website_files_copied']));
@@ -926,6 +1100,7 @@ gsp_write_version_file($ref, $update_type);
 $vsource = ($update_type === 'release') ? 'GitHub Releases' : $ref;
 $vversion = ($update_type === 'release') ? $ref : ($commit_after ?: $ref);
 gsp_write_version_json($update_type, $vsource, $vversion, $commit_after);
+gsp_write_last_update_markers();
 $db->setSettings(['ogp_version' => $ref, 'version_type' => $update_type]);
 
 if (file_exists(GSP_PANEL_DIR . '/modules/modulemanager/module_handling.php')) {
