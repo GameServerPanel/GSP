@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-05-19
+- **Workshop content script path fix:** Updated addonsmanager default Workshop script paths to the panel module script location under `/var/www/html/GSP/Panel/modules/addonsmanager/scripts/workshop/` so Workshop actions no longer use the incorrect game-home-mixed path on the agent host.
+
 ## 2026-05-18
 - **Protocol/image upgrade Phase 1 scaffolding (non-breaking):** Added `protocol/gsp_query.php` normalized query wrapper (LGSL default provider with future-provider placeholders), documented current protocol integration and migration plan in `protocol/PROTOCOL_UPGRADE_REVIEW.md`, and documented image module comparison/unification direction in `modules/SERVER_IMAGE_MODULE_REVIEW.md` without removing LGSL, dsi, or `lgsl_with_img_mod`.
 - **Cron ↔ Server Content action hook integration:** Added scheduler-callable Server Content hooks in `modules/addonsmanager/server_content_actions.php`, exposed API route `server_content/run_scheduled_action`, and wired cron/user-cron action builders/parsing to support server content scheduled actions (check/install/queue/restart/validate/backup flows) without embedding game-specific install logic in the scheduler.

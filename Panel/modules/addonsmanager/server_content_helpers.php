@@ -6,10 +6,10 @@
  */
 
 if (!defined('SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT')) {
-	define('SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT', '/home/gameserver/OGP_User_Files/modules/addonsmanager/scripts/workshop/generic_steam_workshop_linux.sh');
+	define('SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT', '/var/www/html/GSP/Panel/modules/addonsmanager/scripts/workshop/generic_steam_workshop_linux.sh');
 }
 if (!defined('SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT')) {
-	define('SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT', '/home/gameserver/OGP_User_Files/modules/addonsmanager/scripts/workshop/generic_steam_workshop_windows_cygwin.sh');
+	define('SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT', '/var/www/html/GSP/Panel/modules/addonsmanager/scripts/workshop/generic_steam_workshop_windows_cygwin.sh');
 }
 
 function scm_ensure_workshop_schema($db)
