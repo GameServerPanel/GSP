@@ -255,13 +255,144 @@ function scm_get_cache_mode($db)
 function scm_get_install_methods()
 {
 	return array(
-		'download_zip'   => 'Download & extract archive (.zip / .tar.gz)',
-		'download_file'  => 'Download single file (no extraction)',
-		'post_script'    => 'Run post-script only (no download)',
-		'steam_workshop' => 'Steam Workshop (via agent SteamCMD)',
-		'minecraft_jar'  => 'Minecraft server jar / version switcher',
-		'profile_copy'   => 'Copy stored profile directory',
+		'download_zip'   => 'Compressed file download',
+		'download_file'  => 'Direct file download',
+		'steam_workshop' => 'Steam Workshop item',
+		'post_script'    => 'Script/action only',
+		'config_edit'    => 'Config edit only',
+		'create_folder'  => 'Folder/create path only',
 	);
+}
+
+function scm_get_install_method_help_text()
+{
+	return array(
+		'download_zip'   => 'Downloads and extracts an archive into the target path.',
+		'download_file'  => 'Downloads a single file to the target path without extraction.',
+		'steam_workshop' => 'Downloads/updates a Steam Workshop item and applies it to the server path.',
+		'post_script'    => 'Runs only the post-install script/action body (no download).',
+		'config_edit'    => 'Applies config edit rules to a target config file/path.',
+		'create_folder'  => 'Creates the target directory path only.',
+	);
+}
+
+function scm_get_install_method_required_fields()
+{
+	return array(
+		'download_zip' => array('url', 'path'),
+		'download_file' => array('url', 'path'),
+		'steam_workshop' => array('workshop_item_id', 'target_path_template'),
+		'post_script' => array('post_script'),
+		'config_edit' => array('path', 'config_edit_rule'),
+		'create_folder' => array('path'),
+	);
+}
+
+function scm_get_install_method_validation_errors()
+{
+	return array(
+		'url' => 'Please enter a download URL.',
+		'workshop_item_id' => 'Please enter a Workshop ID.',
+		'target_path_template' => 'Please select a target install path.',
+		'post_script' => 'Please enter a script/action body.',
+		'config_edit_rule' => 'Please enter a config edit rule.',
+		'path' => 'Please select a target install path.',
+	);
+}
+
+function scm_get_install_method_default($value = '')
+{
+	$methods = scm_get_install_methods();
+	$value = trim((string)$value);
+	return isset($methods[$value]) ? $value : 'download_zip';
+}
+
+function scm_validate_install_method_payload($install_method, array $payload, &$message = '')
+{
+	$install_method = scm_get_install_method_default($install_method);
+	$required = scm_get_install_method_required_fields();
+	$errors = scm_get_install_method_validation_errors();
+	if (!isset($required[$install_method])) {
+		$message = 'Invalid install/content type selected.';
+		return false;
+	}
+	foreach ($required[$install_method] as $field) {
+		$value = isset($payload[$field]) ? trim((string)$payload[$field]) : '';
+		if ($value === '') {
+			$message = isset($errors[$field]) ? $errors[$field] : 'Missing required field.';
+			return false;
+		}
+	}
+	if ($install_method === 'steam_workshop') {
+		$wid = isset($payload['workshop_item_id']) ? trim((string)$payload['workshop_item_id']) : '';
+		if ($wid === '' || !preg_match('/^[0-9]+$/', $wid)) {
+			$message = 'Please enter a Workshop ID.';
+			return false;
+		}
+	}
+	$message = '';
+	return true;
+}
+
+function scm_build_placeholder_map(array $home_info, array $server_context = array(), array $overrides = array())
+{
+	$home_id = (int)(isset($home_info['home_id']) ? $home_info['home_id'] : 0);
+	$server_root = rtrim(clean_path((string)(isset($home_info['home_path']) ? $home_info['home_path'] : '')), '/');
+	$game_root = $server_root;
+	if (!empty($server_context['exe_location'])) {
+		$exe_location = clean_path((string)$server_context['exe_location']);
+		$exe_dir = dirname($exe_location);
+		if ($exe_dir !== '.' && $exe_dir !== '/') {
+			$game_root = clean_path($server_root . '/' . ltrim($exe_dir, '/'));
+		}
+	}
+	$map = array(
+		'{HOME_ID}' => (string)$home_id,
+		'{SERVER_ROOT}' => $server_root,
+		'{GAME_ROOT}' => $game_root,
+		'{WORKSHOP_ID}' => '',
+		'{WORKSHOP_APP_ID}' => '',
+		'{STEAM_APP_ID}' => '',
+	);
+	foreach ($overrides as $key => $value) {
+		$token = '{' . strtoupper(trim((string)$key, '{}')) . '}';
+		$map[$token] = (string)$value;
+	}
+	return $map;
+}
+
+function scm_apply_placeholders($template, array $placeholder_map)
+{
+	$template = (string)$template;
+	if ($template === '') {
+		return '';
+	}
+	return str_replace(array_keys($placeholder_map), array_values($placeholder_map), $template);
+}
+
+function scm_content_logs_dir()
+{
+	return dirname(__FILE__) . '/logs';
+}
+
+function scm_content_log_file()
+{
+	return scm_content_logs_dir() . '/content_install.log';
+}
+
+function scm_log_content_install_action(array $context)
+{
+	$dir = scm_content_logs_dir();
+	if (!is_dir($dir)) {
+		@mkdir($dir, 0775, true);
+	}
+	$context['logged_at'] = date('Y-m-d H:i:s');
+	$line = json_encode($context);
+	if ($line === false) {
+		$line = '{"logged_at":"' . date('Y-m-d H:i:s') . '","error":"json_encode_failed"}';
+	}
+	@error_log($line . PHP_EOL, 3, scm_content_log_file());
+	return true;
 }
 
 /**
@@ -290,6 +421,12 @@ function scm_ensure_phase2_schema($db)
 		'restart_after_install' => "TINYINT(1) NOT NULL DEFAULT 0",
 		'is_cacheable'          => "TINYINT(1) NOT NULL DEFAULT 0",
 		'description'           => "TEXT NULL",
+		'workshop_item_id'      => "VARCHAR(64) NULL",
+		'workshop_app_id'       => "VARCHAR(32) NULL",
+		'target_path_template'  => "VARCHAR(255) NULL",
+		'optional_folder_name'  => "VARCHAR(255) NULL",
+		'config_edit_rule'      => "TEXT NULL",
+		'launch_param_additions'=> "VARCHAR(255) NULL",
 	);
 	foreach ($new_columns as $col => $definition) {
 		$escaped_col   = $db->realEscapeSingle($col);
@@ -489,4 +626,3 @@ function scm_upsert_manifest($db, $home_id, $addon_id, array $fields = array())
 		    updated_at      = NOW()"
 	);
 }
-

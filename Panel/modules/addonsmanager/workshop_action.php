@@ -67,7 +67,7 @@ function scm_workshop_filter_existing_ids($db, $home_id, array $item_ids)
 	return array_values($allowed);
 }
 
-function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml, $action, array $item_ids, &$error = '')
+function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml, $action, array $item_ids, &$error = '', array $extra_manifest = array())
 {
 	$error = '';
 	if (empty($item_ids)) {
@@ -102,6 +102,9 @@ function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml,
 		'workshop_app_id' => scm_extract_workshop_app_id($server_xml),
 		'items' => array_values($item_ids),
 	);
+	if (!empty($extra_manifest)) {
+		$manifest['extra'] = $extra_manifest;
+	}
 	$manifest_json = json_encode($manifest);
 	if ($manifest_json === false) {
 		$error = 'Failed to encode workshop manifest JSON.';
@@ -274,4 +277,3 @@ function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $r
 	$message = 'Invalid workshop action.';
 	return false;
 }
-

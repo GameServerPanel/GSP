@@ -1357,6 +1357,10 @@ function api_litefm()
 function api_addonsmanager()
 {
 	global $request, $db, $user_info;
+	require_once(MODULES.'addonsmanager/server_content_helpers.php');
+	require_once(MODULES.'addonsmanager/workshop_action.php');
+	if (file_exists(MODULES.'steam_workshop/includes/functions.php'))
+		require_once(MODULES.'steam_workshop/includes/functions.php');
 	
 	if($db->isModuleInstalled('addonsmanager') === FALSE)
 		return array("status" => '349', "message" => "This function is not available because the module is not installed.");
@@ -1427,9 +1431,22 @@ function api_addonsmanager()
 		
 		$addon_info = $addons_rows[0];
 		
+		$install_method = scm_get_install_method_default(isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip');
+		$validation_payload = array(
+			'url' => isset($addon_info['url']) ? $addon_info['url'] : '',
+			'path' => isset($addon_info['path']) ? $addon_info['path'] : '',
+			'workshop_item_id' => isset($addon_info['workshop_item_id']) ? $addon_info['workshop_item_id'] : '',
+			'target_path_template' => isset($addon_info['target_path_template']) ? $addon_info['target_path_template'] : '',
+			'post_script' => isset($addon_info['post_script']) ? $addon_info['post_script'] : '',
+			'config_edit_rule' => isset($addon_info['config_edit_rule']) ? $addon_info['config_edit_rule'] : '',
+		);
+		$validation_message = '';
+		if (!scm_validate_install_method_payload($install_method, $validation_payload, $validation_message))
+			return array("status" => '422', "message" => $validation_message);
 		$url = $addon_info['url'];
 		$filename = basename($url);
 		
+		$post_script = '';
 		if($addon_info['post_script'] != "")
 		{
 			$addon_info['post_script'] = strip_real_escape_string($addon_info['post_script']);
@@ -1461,7 +1478,45 @@ function api_addonsmanager()
 			$post_script = preg_replace( "/\%incremental\%/i", $home_info['incremental'], $post_script);
 		}
 
-		$pid = $remote->start_file_download($addon_info['url'], $home_info['home_path']."/".$addon_info['path'], $filename, "uncompress", $post_script);
+		if ($install_method === 'steam_workshop') {
+			scm_ensure_workshop_schema($db);
+			$workshop_item_id = trim((string)$addon_info['workshop_item_id']);
+			$workshop_error = '';
+			$extra_manifest = array(
+				'addon_id' => (int)$addon_id,
+				'target_path_template' => isset($addon_info['target_path_template']) ? (string)$addon_info['target_path_template'] : '',
+				'optional_folder_name' => isset($addon_info['optional_folder_name']) ? (string)$addon_info['optional_folder_name'] : '',
+				'config_edit_rule' => isset($addon_info['config_edit_rule']) ? (string)$addon_info['config_edit_rule'] : '',
+				'launch_param_additions' => isset($addon_info['launch_param_additions']) ? (string)$addon_info['launch_param_additions'] : '',
+			);
+			$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'install', array($workshop_item_id), $workshop_error, $extra_manifest);
+			if ($ok)
+				return array("status" => "200", "message" => "Workshop content installed successfully.");
+			return array("status" => "342", "message" => "Workshop install failed: ".$workshop_error);
+		}
+		if ($install_method === 'post_script') {
+			$output = $remote->exec("cd " . escapeshellarg($home_info['home_path']) . " && /bin/bash -lc " . escapeshellarg((string)$post_script) . " ; echo __GSP_SCRIPT_EXIT:$?");
+			if (is_string($output) && preg_match('/__GSP_SCRIPT_EXIT:(\d+)/', $output, $m) && (int)$m[1] === 0)
+				return array("status" => "200", "message" => "Script/action completed.");
+			return array("status" => "342", "message" => "Script/action failed.");
+		}
+		if ($install_method === 'config_edit' || $install_method === 'create_folder') {
+			$path = trim((string)$addon_info['path']);
+			if ($path === '')
+				return array("status" => "422", "message" => "Please select a target install path.");
+			$target = (strpos($path, '/') === 0) ? $path : clean_path(rtrim($home_info['home_path'], '/') . '/' . ltrim($path, '/'));
+			if ($install_method === 'create_folder')
+				$out = $remote->exec("mkdir -p " . escapeshellarg($target) . " && echo __GSP_FOLDER_OK");
+			else {
+				$rule = trim((string)$addon_info['config_edit_rule']);
+				$out = $remote->exec("mkdir -p " . escapeshellarg(dirname($target)) . " && touch " . escapeshellarg($target) . " && printf %s " . escapeshellarg($rule . PHP_EOL) . " >> " . escapeshellarg($target) . " && echo __GSP_CONFIG_OK");
+			}
+			if (is_string($out))
+				return array("status" => "200", "message" => "Content action completed.");
+			return array("status" => "342", "message" => "Content action failed.");
+		}
+		$download_action = ($install_method === 'download_file') ? "" : "uncompress";
+		$pid = $remote->start_file_download($addon_info['url'], $home_info['home_path']."/".$addon_info['path'], $filename, $download_action, $post_script);
 		if($pid > 0)
 		{
 			$status = "200";

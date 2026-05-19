@@ -577,3 +577,61 @@ function sw_apply_detected_profile_defaults($db, array $profile, array $detected
     );
     return $updated;
 }
+
+function steam_workshop_resolve_paths($db, array $home_info, $workshop_id, $target_path_template = '', $optional_folder_name = '', $workshop_app_id_override = '')
+{
+    $profile = sw_get_profile_for_home($db, (int)$home_info['home_id']);
+    if (!$profile || !is_array($profile)) {
+        return array('ok' => false, 'error' => 'No enabled Steam Workshop profile for this server home.');
+    }
+    $workshop_id = trim((string)$workshop_id);
+    if ($workshop_id === '' || !preg_match('/^[0-9]+$/', $workshop_id)) {
+        return array('ok' => false, 'error' => 'Invalid Workshop ID.');
+    }
+    $workshop_app_id = trim((string)$workshop_app_id_override);
+    if ($workshop_app_id === '') {
+        $workshop_app_id = (string)$profile['workshop_app_id'];
+    }
+    $folder_name = trim((string)$optional_folder_name);
+    if ($folder_name === '') {
+        $folder_name = '@' . $workshop_id;
+    }
+    $vars = array(
+        'HOME_ID' => (int)$home_info['home_id'],
+        'SERVER_ROOT' => rtrim((string)$home_info['home_path'], '/'),
+        'GAME_ROOT' => rtrim((string)$home_info['home_path'], '/'),
+        'WORKSHOP_ID' => $workshop_id,
+        'WORKSHOP_APP_ID' => $workshop_app_id,
+        'STEAM_APP_ID' => (string)$profile['steam_app_id'],
+        'FOLDER_NAME' => $folder_name,
+        'MOD_FOLDER' => $folder_name,
+    );
+    $target_template = trim((string)$target_path_template);
+    if ($target_template === '') {
+        $target_template = !empty($profile['install_path_template']) ? (string)$profile['install_path_template'] : '{SERVER_ROOT}/{MOD_FOLDER}';
+    }
+    $resolved_target = sw_apply_template($target_template, $vars);
+    return array(
+        'ok' => true,
+        'profile' => $profile,
+        'workshop_id' => $workshop_id,
+        'workshop_app_id' => $workshop_app_id,
+        'steam_app_id' => (string)$profile['steam_app_id'],
+        'folder_name' => $folder_name,
+        'target_path_template' => $target_template,
+        'target_path_resolved' => $resolved_target,
+        'vars' => $vars,
+    );
+}
+
+function steam_workshop_download_item($db, array $home_info, $workshop_id, $target_path_template = '', array $options = array())
+{
+    $optional_folder_name = isset($options['optional_folder_name']) ? $options['optional_folder_name'] : '';
+    $workshop_app_id = isset($options['workshop_app_id']) ? $options['workshop_app_id'] : '';
+    return steam_workshop_resolve_paths($db, $home_info, $workshop_id, $target_path_template, $optional_folder_name, $workshop_app_id);
+}
+
+function steam_workshop_install_item_to_home($db, array $home_info, $workshop_id, $target_path_template = '', array $options = array())
+{
+    return steam_workshop_download_item($db, $home_info, $workshop_id, $target_path_template, $options);
+}
