@@ -967,6 +967,7 @@ gsp_rmdir_recursive($temp_dir);
 return ['success' => false, 'error' => 'Deployment layout validation failed: ' . implode(' | ', $resolved_layout['errors'])];
 }
 $layout = $resolved_layout['layout'];
+$_SESSION['gsp_last_update_layout'] = $layout;
 $updater_version = substr((string)@hash_file('sha256', $layout['source_panel_path'] . '/modules/administration/panel_update.php'), 0, 12);
 
 $drift_files = gsp_detect_updater_drift_files($layout['source_repo_root'], GSP_ROOT_DIR);
@@ -1816,6 +1817,9 @@ $csrf_token = $_SESSION['gsp_update_csrf'];
 $current_version = gsp_get_current_version();
 $current_branch = gsp_get_current_branch();
 $git_commit = gsp_get_git_commit();
+$last_layout = isset($_SESSION['gsp_last_update_layout']) && is_array($_SESSION['gsp_last_update_layout'])
+? $_SESSION['gsp_last_update_layout']
+: null;
 $vinfo = gsp_read_version_json();
 $releases = gsp_fetch_github_releases($repo_owner, $repo_name);
 $latest_release = (is_array($releases) && !empty($releases)) ? htmlspecialchars($releases[0]['tag_name']) : 'N/A';
@@ -1836,7 +1840,14 @@ echo "<tr><td><strong>Expected Root:</strong></td><td><code>" . htmlspecialchars
 echo "<tr><td><strong>Detected GSP Root:</strong></td><td><code>" . htmlspecialchars(GSP_ROOT_DIR) . "</code></td></tr>\n";
 echo "<tr><td><strong>Panel Path:</strong></td><td><code>" . htmlspecialchars(GSP_PANEL_DIR) . "</code></td></tr>\n";
 echo "<tr><td><strong>Website Path:</strong></td><td><code>" . htmlspecialchars(GSP_WEBSITE_DIR) . "</code></td></tr>\n";
+echo "<tr><td><strong>Configured Stable Branch:</strong></td><td><code>" . htmlspecialchars($stable_branch) . "</code></td></tr>\n";
+echo "<tr><td><strong>Configured Unstable Branch:</strong></td><td><code>" . htmlspecialchars($unstable_branch) . "</code></td></tr>\n";
 echo "<tr><td><strong>Update Trace Log:</strong></td><td><code>" . htmlspecialchars(GSP_UPDATE_LOG) . "</code></td></tr>\n";
+if ($last_layout) {
+echo "<tr><td><strong>Last Temp Checkout Path:</strong></td><td><code>" . htmlspecialchars(isset($last_layout['temporary_git_checkout_path']) ? $last_layout['temporary_git_checkout_path'] : '') . "</code></td></tr>\n";
+echo "<tr><td><strong>Last Source Repo Root:</strong></td><td><code>" . htmlspecialchars(isset($last_layout['source_repo_root']) ? $last_layout['source_repo_root'] : '') . "</code></td></tr>\n";
+echo "<tr><td><strong>Last Source Panel Path:</strong></td><td><code>" . htmlspecialchars(isset($last_layout['source_panel_path']) ? $last_layout['source_panel_path'] : '') . "</code></td></tr>\n";
+}
 echo "</table><br>\n";
 
 echo "<h3>Current Installation</h3>\n";

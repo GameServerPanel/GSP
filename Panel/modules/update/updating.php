@@ -156,21 +156,20 @@ function exec_ogp_module()
 			$i = 0;
 			foreach ((array)$result['extracted_files'] as $file)
 			{
-				$filename = str_replace( $unwanted_path, "" , $file['filename'] );
-				$filename = str_replace("\\", "/", $filename);
-				// New repository layout uses /panel as source subtree; ignore everything else.
-				if (strpos($filename, '/panel/') === 0) {
-					$filename = substr($filename, strlen('/panel'));
-				} elseif (strpos($filename, 'panel/') === 0) {
-					$filename = substr($filename, strlen('panel'));
-					if ($filename === '' || $filename[0] !== '/') $filename = '/' . $filename;
-				} else {
+				$zip_filename = str_replace("\\", "/", $file['filename']);
+				$source_relative = str_replace( $unwanted_path, "" , $zip_filename );
+				$source_relative = ltrim($source_relative, "/");
+				// Repository layout uses Panel/ (uppercase in current zipballs, lowercase in some legacy builds).
+				if (stripos($source_relative, 'panel/') !== 0) {
 					continue;
 				}
-				if ($filename === '') {
+				$panel_relative = substr($source_relative, strlen('panel/'));
+				$panel_relative = ltrim((string)$panel_relative, "/");
+				if ($panel_relative === '') {
 					continue;
 				}
-				$temp_file = $extract_path . DIRECTORY_SEPARATOR . $filename;
+				$filename = '/' . $panel_relative;
+				$temp_file = $extract_path . DIRECTORY_SEPARATOR . $source_relative;
 				$web_file = $baseDir . $filename;
 
 				if( file_exists( $web_file ) )
