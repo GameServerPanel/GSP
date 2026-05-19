@@ -81,13 +81,6 @@ function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml,
 		return false;
 	}
 
-	$script_path = scm_get_workshop_script_path($home_info, $server_xml);
-	$script_path = trim((string)$script_path);
-	if ($script_path === '' || !preg_match('/^[^\\r\\n\\0]+$/', $script_path)) {
-		$error = 'Workshop script path is invalid.';
-		return false;
-	}
-
 	$home_path = rtrim(clean_path((string)$home_info['home_path']), '/');
 	if (!scm_path_is_under_home($home_path, $manifest_path)) {
 		$error = 'Manifest path is outside of the server home.';
@@ -99,8 +92,10 @@ function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml,
 		'action' => (string)$action,
 		'home_id' => (int)$home_info['home_id'],
 		'home_cfg_id' => (int)$home_info['home_cfg_id'],
-		'workshop_app_id' => scm_extract_workshop_app_id($server_xml),
+		'workshop_app_id' => (!empty($extra_manifest['workshop_app_id']) ? (string)$extra_manifest['workshop_app_id'] : scm_extract_workshop_app_id($server_xml)),
+		'steam_app_id' => !empty($extra_manifest['steam_app_id']) ? (string)$extra_manifest['steam_app_id'] : '',
 		'items' => array_values($item_ids),
+		'generated_at' => date('Y-m-d H:i:s'),
 	);
 	if (!empty($extra_manifest)) {
 		$manifest['extra'] = $extra_manifest;
@@ -123,8 +118,8 @@ function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml,
 		$error = 'Failed to write workshop manifest to remote server.';
 		return false;
 	}
-	if ((int)$remote->rfile_exists($script_path) !== 1) {
-		$error = 'Configured workshop script not found on agent host: ' . $script_path;
+	$script_path = scm_prepare_workshop_script_for_agent($remote, $home_info, $server_xml, $error);
+	if ($script_path === false) {
 		return false;
 	}
 

@@ -1432,14 +1432,7 @@ function api_addonsmanager()
 		$addon_info = $addons_rows[0];
 		
 		$install_method = scm_get_install_method_default(isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip');
-		$validation_payload = array(
-			'url' => isset($addon_info['url']) ? $addon_info['url'] : '',
-			'path' => isset($addon_info['path']) ? $addon_info['path'] : '',
-			'workshop_item_id' => isset($addon_info['workshop_item_id']) ? $addon_info['workshop_item_id'] : '',
-			'target_path_template' => isset($addon_info['target_path_template']) ? $addon_info['target_path_template'] : '',
-			'post_script' => isset($addon_info['post_script']) ? $addon_info['post_script'] : '',
-			'config_edit_rule' => isset($addon_info['config_edit_rule']) ? $addon_info['config_edit_rule'] : '',
-		);
+		$validation_payload = scm_collect_install_payload($addon_info);
 		$validation_message = '';
 		if (!scm_validate_install_method_payload($install_method, $validation_payload, $validation_message))
 			return array("status" => '422', "message" => $validation_message);
@@ -1480,14 +1473,24 @@ function api_addonsmanager()
 
 		if ($install_method === 'steam_workshop') {
 			scm_ensure_workshop_schema($db);
-			$workshop_item_id = trim((string)$addon_info['workshop_item_id']);
+			$workshop_runtime = scm_build_workshop_runtime_context($db, $home_info, $server_xml, $validation_payload, $validation_message);
+			if ($workshop_runtime === false)
+				return array("status" => '422', "message" => $validation_message);
+			$workshop_item_id = (string)$workshop_runtime['workshop_item_id'];
 			$workshop_error = '';
 			$extra_manifest = array(
 				'addon_id' => (int)$addon_id,
-				'target_path_template' => isset($addon_info['target_path_template']) ? (string)$addon_info['target_path_template'] : '',
-				'optional_folder_name' => isset($addon_info['optional_folder_name']) ? (string)$addon_info['optional_folder_name'] : '',
+				'target_path_template' => (string)$workshop_runtime['target_path_template'],
+				'target_path_resolved' => (string)$workshop_runtime['target_path_resolved'],
+				'optional_folder_name' => isset($validation_payload['optional_folder_name']) ? (string)$validation_payload['optional_folder_name'] : '',
 				'config_edit_rule' => isset($addon_info['config_edit_rule']) ? (string)$addon_info['config_edit_rule'] : '',
 				'launch_param_additions' => isset($addon_info['launch_param_additions']) ? (string)$addon_info['launch_param_additions'] : '',
+				'workshop_app_id' => (string)$workshop_runtime['workshop_app_id'],
+				'steam_app_id' => (string)$workshop_runtime['steam_app_id'],
+				'steamcmd_path' => isset($workshop_runtime['steamcmd_path']) ? (string)$workshop_runtime['steamcmd_path'] : '',
+				'workshop_download_dir' => isset($workshop_runtime['workshop_download_dir']) ? (string)$workshop_runtime['workshop_download_dir'] : '',
+				'server_root' => isset($workshop_runtime['server_root']) ? (string)$workshop_runtime['server_root'] : rtrim((string)$home_info['home_path'], '/'),
+				'post_install_script' => trim((string)$post_script),
 			);
 			$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'install', array($workshop_item_id), $workshop_error, $extra_manifest);
 			if ($ok)

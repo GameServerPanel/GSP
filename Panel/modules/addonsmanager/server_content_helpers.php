@@ -6,10 +6,10 @@
  */
 
 if (!defined('SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT')) {
-	define('SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT', '/var/www/html/GSP/Panel/modules/addonsmanager/scripts/workshop/generic_steam_workshop_linux.sh');
+	define('SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT', 'generic_steam_workshop_linux.sh');
 }
 if (!defined('SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT')) {
-	define('SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT', '/var/www/html/GSP/Panel/modules/addonsmanager/scripts/workshop/generic_steam_workshop_windows_cygwin.sh');
+	define('SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT', 'generic_steam_workshop_windows_cygwin.sh');
 }
 
 function scm_ensure_workshop_schema($db)
@@ -182,6 +182,73 @@ function scm_get_workshop_script_path(array $home_info, $server_xml)
 	return scm_is_windows_home($home_info) ? SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT : SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT;
 }
 
+function scm_get_bundled_workshop_script_source(array $home_info)
+{
+	$filename = scm_is_windows_home($home_info) ? SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT : SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT;
+	return dirname(__FILE__) . '/scripts/workshop/' . $filename;
+}
+
+function scm_is_legacy_panel_workshop_script_path($script_path)
+{
+	$script_path = trim((string)$script_path);
+	if ($script_path === '') {
+		return false;
+	}
+	return (strpos($script_path, '/var/www/html/') === 0 && strpos($script_path, '/Panel/modules/addonsmanager/scripts/workshop/') !== false)
+		|| (strpos($script_path, '/OGP_User_Files/modules/addonsmanager/scripts/') !== false);
+}
+
+function scm_get_agent_managed_workshop_script_path(array $home_info)
+{
+	$home_path = rtrim(clean_path((string)$home_info['home_path']), '/');
+	$filename = scm_is_windows_home($home_info) ? SCM_WORKSHOP_SCRIPT_WINDOWS_DEFAULT : SCM_WORKSHOP_SCRIPT_LINUX_DEFAULT;
+	$remote_path = clean_path($home_path . '/gsp_server_content/scripts/workshop/' . $filename);
+	if (!scm_path_is_under_home($home_path, $remote_path)) {
+		return false;
+	}
+	return $remote_path;
+}
+
+function scm_prepare_workshop_script_for_agent($remote, array $home_info, $server_xml, &$error = '')
+{
+	$error = '';
+	$configured_path = trim((string)scm_get_workshop_script_path($home_info, $server_xml));
+	if ($configured_path !== '' && !scm_is_legacy_panel_workshop_script_path($configured_path) && preg_match('/^[^\\r\\n\\0]+$/', $configured_path)) {
+		if ((int)$remote->rfile_exists($configured_path) === 1) {
+			return $configured_path;
+		}
+		$error = 'Configured workshop script not found on agent host: ' . $configured_path;
+		return false;
+	}
+
+	$source_path = scm_get_bundled_workshop_script_source($home_info);
+	if (!is_file($source_path)) {
+		$error = 'Bundled workshop script is missing from the panel: ' . $source_path;
+		return false;
+	}
+
+	$remote_path = scm_get_agent_managed_workshop_script_path($home_info);
+	if ($remote_path === false) {
+		$error = 'Unable to resolve an agent-managed workshop script path for this server.';
+		return false;
+	}
+
+	$script_body = @file_get_contents($source_path);
+	if ($script_body === false || $script_body === '') {
+		$error = 'Failed to read bundled workshop script: ' . $source_path;
+		return false;
+	}
+
+	$remote_dir = dirname($remote_path);
+	$remote->exec("mkdir -p " . escapeshellarg($remote_dir));
+	if ((int)$remote->remote_writefile($remote_path, $script_body) !== 1) {
+		$error = 'Failed to sync workshop script to agent host.';
+		return false;
+	}
+	$remote->exec("chmod 755 " . escapeshellarg($remote_path) . " >/dev/null 2>&1 || true");
+	return $remote_path;
+}
+
 function scm_get_csrf_token()
 {
 	if (empty($_SESSION['addonsmanager_workshop_csrf'])) {
@@ -255,9 +322,9 @@ function scm_get_cache_mode($db)
 function scm_get_install_methods()
 {
 	return array(
-		'download_zip'   => 'File Download / Archive',
+		'download_zip'   => 'Downloadable Mod',
 		'steam_workshop' => 'Steam Workshop Item',
-		'config_edit'    => 'Config Edit',
+		'config_edit'    => 'Configuration Package',
 		'post_script'    => 'Scripted Installer',
 	);
 }
@@ -265,10 +332,10 @@ function scm_get_install_methods()
 function scm_get_install_method_help_text()
 {
 	return array(
-		'download_zip'   => 'Downloads an archive or file from URL; extract path is optional.',
-		'steam_workshop' => 'Installs a Steam Workshop item by Workshop ID without requiring URL.',
-		'config_edit'    => 'Applies config edits to the target file/path without requiring URL.',
-		'post_script'    => 'Runs an installer script/action body without requiring URL.',
+		'download_zip'   => 'Download and extract a ZIP, RAR, or archive file.',
+		'steam_workshop' => 'Install a Steam Workshop mod using Workshop ID.',
+		'config_edit'    => 'Install configuration files, profiles, or templates.',
+		'post_script'    => 'Run a custom scripted installation process.',
 	);
 }
 
@@ -305,50 +372,199 @@ function scm_get_install_method_default($value = '')
 	return isset($methods[$value]) ? $value : 'download_zip';
 }
 
-function scm_validate_install_method_payload($install_method, array $payload, &$message = '')
+function scm_get_install_payload_keys()
 {
-	$install_method = scm_get_install_method_default($install_method);
-	$required = scm_get_install_method_required_fields();
-	$errors = scm_get_install_method_validation_errors();
-	if (!isset($required[$install_method])) {
-		$message = 'Invalid install/content type selected.';
+	return array(
+		'url',
+		'path',
+		'workshop_item_id',
+		'workshop_app_id',
+		'target_path_template',
+		'optional_folder_name',
+		'post_script',
+		'config_edit_rule',
+		'launch_param_additions',
+	);
+}
+
+function scm_collect_install_payload(array $defaults = array(), array $request = array(), array $override_keys = array())
+{
+	$payload = array();
+	foreach (scm_get_install_payload_keys() as $key) {
+		$payload[$key] = isset($defaults[$key]) ? trim((string)$defaults[$key]) : '';
+	}
+	foreach ($override_keys as $key) {
+		if (array_key_exists($key, $request)) {
+			$payload[$key] = trim((string)$request[$key]);
+		}
+	}
+	return $payload;
+}
+
+function scm_validate_numeric_content_value($value, $error_message, &$message, $allow_blank = false)
+{
+	$value = trim((string)$value);
+	if ($value === '') {
+		if ($allow_blank) {
+			$message = '';
+			return true;
+		}
+		$message = $error_message;
 		return false;
 	}
-	if ($install_method === 'config_edit') {
-		$path = isset($payload['path']) ? trim((string)$payload['path']) : '';
-		$rule = isset($payload['config_edit_rule']) ? trim((string)$payload['config_edit_rule']) : '';
-		if ($path === '' || $rule === '') {
-			$message = $errors['config_edit'];
-			return false;
-		}
-		$message = '';
-		return true;
-	}
-	if ($install_method === 'post_script') {
-		$script = isset($payload['post_script']) ? trim((string)$payload['post_script']) : '';
-		if ($script === '') {
-			$message = $errors['post_script'];
-			return false;
-		}
-		$message = '';
-		return true;
-	}
-	foreach ($required[$install_method] as $field) {
-		$value = isset($payload[$field]) ? trim((string)$payload[$field]) : '';
-		if ($value === '') {
-			$message = isset($errors[$install_method]) ? $errors[$install_method] : 'Missing required field.';
-			return false;
-		}
-	}
-	if ($install_method === 'steam_workshop') {
-		$wid = isset($payload['workshop_item_id']) ? trim((string)$payload['workshop_item_id']) : '';
-		if ($wid === '' || !preg_match('/^[0-9]+$/', $wid)) {
-			$message = 'Please enter a Workshop ID.';
-			return false;
-		}
+	if (!preg_match('/^[0-9]+$/', $value)) {
+		$message = $error_message;
+		return false;
 	}
 	$message = '';
 	return true;
+}
+
+function scm_validate_download_content(array $payload, &$message = '')
+{
+	$url = isset($payload['url']) ? trim((string)$payload['url']) : '';
+	if ($url === '') {
+		$message = 'Please enter a download URL.';
+		return false;
+	}
+	$message = '';
+	return true;
+}
+
+function scm_validate_workshop_content(array $payload, &$message = '')
+{
+	if (!scm_validate_numeric_content_value(isset($payload['workshop_item_id']) ? $payload['workshop_item_id'] : '', 'Please enter a Workshop ID.', $message, false)) {
+		return false;
+	}
+	if (!scm_validate_numeric_content_value(isset($payload['workshop_app_id']) ? $payload['workshop_app_id'] : '', 'Workshop App ID must be numeric.', $message, true)) {
+		return false;
+	}
+	$folder_name = isset($payload['optional_folder_name']) ? trim((string)$payload['optional_folder_name']) : '';
+	if ($folder_name !== '' && (strpos($folder_name, '..') !== false || preg_match('/[\\\\\\/]/', $folder_name))) {
+		$message = 'Optional folder name must be a single folder name.';
+		return false;
+	}
+	$message = '';
+	return true;
+}
+
+function scm_validate_scripted_installer(array $payload, &$message = '')
+{
+	$script = isset($payload['post_script']) ? trim((string)$payload['post_script']) : '';
+	if ($script === '') {
+		$message = 'Please enter the installer script/action.';
+		return false;
+	}
+	$message = '';
+	return true;
+}
+
+function scm_validate_configuration_package(array $payload, &$message = '')
+{
+	$path = isset($payload['path']) ? trim((string)$payload['path']) : '';
+	$rule = isset($payload['config_edit_rule']) ? trim((string)$payload['config_edit_rule']) : '';
+	if ($path === '' || $rule === '') {
+		$message = 'Please enter the config target and edit action.';
+		return false;
+	}
+	$message = '';
+	return true;
+}
+
+function scm_validate_install_method_payload($install_method, array $payload, &$message = '')
+{
+	$install_method = scm_get_install_method_default($install_method);
+	if (!isset(scm_get_install_method_required_fields()[$install_method])) {
+		$message = 'Invalid install/content type selected.';
+		return false;
+	}
+
+	if ($install_method === 'download_zip') {
+		return scm_validate_download_content($payload, $message);
+	}
+	if ($install_method === 'steam_workshop') {
+		return scm_validate_workshop_content($payload, $message);
+	}
+	if ($install_method === 'post_script') {
+		return scm_validate_scripted_installer($payload, $message);
+	}
+	if ($install_method === 'config_edit') {
+		return scm_validate_configuration_package($payload, $message);
+	}
+	$message = '';
+	return true;
+}
+
+function scm_build_workshop_runtime_context($db, array $home_info, $server_xml, array $payload, &$message = '')
+{
+	if (!scm_validate_workshop_content($payload, $message)) {
+		return false;
+	}
+
+	$workshop_item_id = trim((string)$payload['workshop_item_id']);
+	$target_path_template = trim((string)$payload['target_path_template']);
+	$optional_folder_name = trim((string)$payload['optional_folder_name']);
+	$workshop_app_id_override = trim((string)$payload['workshop_app_id']);
+	$fallback_profile = function_exists('sw_get_profile_for_home') ? sw_get_profile_for_home($db, (int)$home_info['home_id']) : false;
+	$resolved = function_exists('steam_workshop_install_item_to_home')
+		? steam_workshop_install_item_to_home($db, $home_info, $workshop_item_id, $target_path_template, array(
+			'optional_folder_name' => $optional_folder_name,
+			'workshop_app_id' => $workshop_app_id_override,
+		))
+		: array('ok' => false);
+
+	if (!empty($resolved['ok'])) {
+		$profile = (isset($resolved['profile']) && is_array($resolved['profile'])) ? $resolved['profile'] : array();
+		$message = '';
+		return array(
+			'workshop_item_id' => $workshop_item_id,
+			'workshop_app_id' => isset($resolved['workshop_app_id']) ? (string)$resolved['workshop_app_id'] : '',
+			'steam_app_id' => isset($resolved['steam_app_id']) ? (string)$resolved['steam_app_id'] : '',
+			'folder_name' => isset($resolved['folder_name']) ? (string)$resolved['folder_name'] : ($optional_folder_name !== '' ? $optional_folder_name : '@' . $workshop_item_id),
+			'target_path_template' => isset($resolved['target_path_template']) ? (string)$resolved['target_path_template'] : $target_path_template,
+			'target_path_resolved' => isset($resolved['target_path_resolved']) ? (string)$resolved['target_path_resolved'] : '',
+			'server_root' => rtrim((string)$home_info['home_path'], '/'),
+			'steamcmd_path' => isset($profile['steamcmd_path']) ? trim((string)$profile['steamcmd_path']) : '',
+			'workshop_download_dir' => (isset($profile['workshop_download_dir_template']) && trim((string)$profile['workshop_download_dir_template']) !== '')
+				? sw_apply_template((string)$profile['workshop_download_dir_template'], (array)$resolved['vars'])
+				: '',
+		);
+	}
+
+	$fallback_workshop_app_id = $workshop_app_id_override;
+	if ($fallback_workshop_app_id === '' && is_array($fallback_profile) && !empty($fallback_profile['workshop_app_id'])) {
+		$fallback_workshop_app_id = (string)$fallback_profile['workshop_app_id'];
+	}
+	if ($fallback_workshop_app_id === '') {
+		$fallback_workshop_app_id = scm_extract_workshop_app_id($server_xml);
+	}
+	$steam_app_id = (is_array($fallback_profile) && !empty($fallback_profile['steam_app_id'])) ? (string)$fallback_profile['steam_app_id'] : '';
+	$folder_name = ($optional_folder_name !== '') ? $optional_folder_name : '@' . $workshop_item_id;
+	$effective_template = $target_path_template;
+	if ($effective_template === '') {
+		$effective_template = (is_array($fallback_profile) && !empty($fallback_profile['install_path_template']))
+			? (string)$fallback_profile['install_path_template']
+			: '{SERVER_ROOT}/{MOD_FOLDER}';
+	}
+	$placeholder_map = scm_build_placeholder_map($home_info, array('exe_location' => isset($server_xml->exe_location) ? (string)$server_xml->exe_location : ''), array(
+		'WORKSHOP_ID' => $workshop_item_id,
+		'WORKSHOP_APP_ID' => $fallback_workshop_app_id,
+		'STEAM_APP_ID' => $steam_app_id,
+		'FOLDER_NAME' => $folder_name,
+		'MOD_FOLDER' => $folder_name,
+	));
+	$message = '';
+	return array(
+		'workshop_item_id' => $workshop_item_id,
+		'workshop_app_id' => $fallback_workshop_app_id,
+		'steam_app_id' => $steam_app_id,
+		'folder_name' => $folder_name,
+		'target_path_template' => $effective_template,
+		'target_path_resolved' => scm_apply_placeholders($effective_template, $placeholder_map),
+		'server_root' => rtrim((string)$home_info['home_path'], '/'),
+		'steamcmd_path' => (is_array($fallback_profile) && !empty($fallback_profile['steamcmd_path'])) ? (string)$fallback_profile['steamcmd_path'] : '',
+		'workshop_download_dir' => '',
+	);
 }
 
 function scm_build_placeholder_map(array $home_info, array $server_context = array(), array $overrides = array())
@@ -370,6 +586,8 @@ function scm_build_placeholder_map(array $home_info, array $server_context = arr
 		'{WORKSHOP_ID}' => '',
 		'{WORKSHOP_APP_ID}' => '',
 		'{STEAM_APP_ID}' => '',
+		'{FOLDER_NAME}' => '',
+		'{MOD_FOLDER}' => '',
 	);
 	foreach ($overrides as $key => $value) {
 		$token = '{' . strtoupper(trim((string)$key, '{}')) . '}';

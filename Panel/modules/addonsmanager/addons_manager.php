@@ -202,6 +202,7 @@ function exec_ogp_module() {
 				</td>
 				<td align="left">
 					<input type="text" value="<?php echo htmlspecialchars($workshop_item_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_item_id" size="85" placeholder="e.g. 450814997" />
+					<small style="color:#666;">Example Arma 3 Workshop ID: 450814997</small>
 				</td>
 			</tr>
 			<tr id="scm-row-workshop-app-id">
@@ -217,8 +218,8 @@ function exec_ogp_module() {
 					<b><?php print_lang('target_path_template'); ?></b>
 				</td>
 				<td align="left">
-					<input type="text" value="<?php echo htmlspecialchars($target_path_template, ENT_QUOTES, 'UTF-8'); ?>" name="target_path_template" size="85" placeholder="{SERVER_ROOT}/mods/{WORKSHOP_ID}" />
-					<small style="color:#666;">Supported placeholders: {HOME_ID}, {SERVER_ROOT}, {GAME_ROOT}, {WORKSHOP_ID}, {WORKSHOP_APP_ID}, {STEAM_APP_ID}</small>
+					<input type="text" value="<?php echo htmlspecialchars($target_path_template, ENT_QUOTES, 'UTF-8'); ?>" name="target_path_template" size="85" placeholder="{SERVER_ROOT}/{MOD_FOLDER}" />
+					<small style="color:#666;">Supported placeholders: {HOME_ID}, {SERVER_ROOT}, {GAME_ROOT}, {WORKSHOP_ID}, {WORKSHOP_APP_ID}, {STEAM_APP_ID}, {FOLDER_NAME}, {MOD_FOLDER}</small>
 				</td>
 			</tr>
 			<tr id="scm-row-optional-folder-name">

@@ -42,9 +42,9 @@ define('LANG_wait_while_decompressing', "Wait while the file %s is decompressed.
 define('LANG_addon_name', "Content Item Name");
 define('LANG_url', "URL");
 define('LANG_select_game_type', "Select Game Type");
-define('LANG_plugin', "Plugins / Mods");
-define('LANG_mappack', "Map Packs");
-define('LANG_config', "Config Packs");
+define('LANG_plugin', "Downloadable Mod");
+define('LANG_mappack', "Steam Workshop Item");
+define('LANG_config', "Configuration Package");
 if (!defined('LANG_version')) {
 	define('LANG_version', "Version");
 }
@@ -93,8 +93,8 @@ define('LANG_target_path_template', "Target Path");
 define('LANG_optional_folder_name', "Optional Folder Name");
 define('LANG_config_edit_rule', "Config Edit Rule");
 define('LANG_launch_param_additions', "Launch Parameter Additions");
-define('LANG_content_type_help_download_zip', "Downloads an archive/file from URL; extract path is optional.");
-define('LANG_content_type_help_steam_workshop', "Installs/updates a Workshop item with Workshop ID (no URL required).");
-define('LANG_content_type_help_post_script', "Runs a scripted installer action (no URL required).");
-define('LANG_content_type_help_config_edit', "Edits config at target path using provided action/rules (no URL required).");
+define('LANG_content_type_help_download_zip', "Download and extract a ZIP, RAR, or archive file.");
+define('LANG_content_type_help_steam_workshop', "Install a Steam Workshop mod using Workshop ID.");
+define('LANG_content_type_help_post_script', "Run a custom scripted installation process.");
+define('LANG_content_type_help_config_edit', "Install configuration files, profiles, or templates.");
 ?>
