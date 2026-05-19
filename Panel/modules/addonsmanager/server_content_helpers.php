@@ -255,55 +255,53 @@ function scm_get_cache_mode($db)
 function scm_get_install_methods()
 {
 	return array(
-		'download_zip'   => 'Compressed file download',
-		'download_file'  => 'Direct file download',
-		'steam_workshop' => 'Steam Workshop item',
-		'post_script'    => 'Script/action only',
-		'config_edit'    => 'Config edit only',
-		'create_folder'  => 'Folder/create path only',
+		'download_zip'   => 'File Download / Archive',
+		'steam_workshop' => 'Steam Workshop Item',
+		'config_edit'    => 'Config Edit',
+		'post_script'    => 'Scripted Installer',
 	);
 }
 
 function scm_get_install_method_help_text()
 {
 	return array(
-		'download_zip'   => 'Downloads and extracts an archive into the target path.',
-		'download_file'  => 'Downloads a single file to the target path without extraction.',
-		'steam_workshop' => 'Downloads/updates a Steam Workshop item and applies it to the server path.',
-		'post_script'    => 'Runs only the post-install script/action body (no download).',
-		'config_edit'    => 'Applies config edit rules to a target config file/path.',
-		'create_folder'  => 'Creates the target directory path only.',
+		'download_zip'   => 'Downloads an archive or file from URL; extract path is optional.',
+		'steam_workshop' => 'Installs a Steam Workshop item by Workshop ID without requiring URL.',
+		'config_edit'    => 'Applies config edits to the target file/path without requiring URL.',
+		'post_script'    => 'Runs an installer script/action body without requiring URL.',
 	);
 }
 
 function scm_get_install_method_required_fields()
 {
 	return array(
-		'download_zip' => array('url', 'path'),
-		'download_file' => array('url', 'path'),
-		'steam_workshop' => array('workshop_item_id', 'target_path_template'),
+		'download_zip' => array('url'),
+		'steam_workshop' => array('workshop_item_id'),
 		'post_script' => array('post_script'),
 		'config_edit' => array('path', 'config_edit_rule'),
-		'create_folder' => array('path'),
 	);
 }
 
 function scm_get_install_method_validation_errors()
 {
 	return array(
-		'url' => 'Please enter a download URL.',
-		'workshop_item_id' => 'Please enter a Workshop ID.',
-		'target_path_template' => 'Please select a target install path.',
-		'post_script' => 'Please enter a script/action body.',
-		'config_edit_rule' => 'Please enter a config edit rule.',
-		'path' => 'Please select a target install path.',
+		'download_zip' => 'Please enter a download URL.',
+		'steam_workshop' => 'Please enter a Workshop ID.',
+		'config_edit' => 'Please enter the config target and edit action.',
+		'post_script' => 'Please enter the installer script/action.',
 	);
 }
 
 function scm_get_install_method_default($value = '')
 {
-	$methods = scm_get_install_methods();
 	$value = trim((string)$value);
+	if ($value === 'download_file') {
+		$value = 'download_zip';
+	}
+	if ($value === 'create_folder') {
+		$value = 'config_edit';
+	}
+	$methods = scm_get_install_methods();
 	return isset($methods[$value]) ? $value : 'download_zip';
 }
 
@@ -316,10 +314,29 @@ function scm_validate_install_method_payload($install_method, array $payload, &$
 		$message = 'Invalid install/content type selected.';
 		return false;
 	}
+	if ($install_method === 'config_edit') {
+		$path = isset($payload['path']) ? trim((string)$payload['path']) : '';
+		$rule = isset($payload['config_edit_rule']) ? trim((string)$payload['config_edit_rule']) : '';
+		if ($path === '' || $rule === '') {
+			$message = $errors['config_edit'];
+			return false;
+		}
+		$message = '';
+		return true;
+	}
+	if ($install_method === 'post_script') {
+		$script = isset($payload['post_script']) ? trim((string)$payload['post_script']) : '';
+		if ($script === '') {
+			$message = $errors['post_script'];
+			return false;
+		}
+		$message = '';
+		return true;
+	}
 	foreach ($required[$install_method] as $field) {
 		$value = isset($payload[$field]) ? trim((string)$payload[$field]) : '';
 		if ($value === '') {
-			$message = isset($errors[$field]) ? $errors[$field] : 'Missing required field.';
+			$message = isset($errors[$install_method]) ? $errors[$install_method] : 'Missing required field.';
 			return false;
 		}
 	}

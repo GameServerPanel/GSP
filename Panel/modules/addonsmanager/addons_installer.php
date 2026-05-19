@@ -156,7 +156,7 @@ function exec_ogp_module() {
 	// Use the full category map so newly added types are accepted without
 	// editing this file.  The original three types are always present.
 	$addon_types = get_server_content_type_keys();
-	$addon_type  = isset($_REQUEST['addon_type']) ? $_REQUEST['addon_type'] : "";
+	$addon_type  = isset($_REQUEST['addon_type']) ? scm_normalize_addon_type($_REQUEST['addon_type']) : "";
 
     $state = isset($_REQUEST['state']) ? $_REQUEST['state'] : "";
     $pid   = isset($_REQUEST['pid'])   ? $_REQUEST['pid']   : -1;
@@ -556,12 +556,6 @@ function exec_ogp_module() {
 
     		return;
     	}
-		if ($addon_type === 'workshop') {
-			scm_ensure_workshop_schema($db);
-			$view->refresh('?m=addonsmanager&p=workshop_content&home_id='.(int)$home_id.'&mod_id='.(int)$mod_id.'&ip='.urlencode((string)$ip).'&port='.urlencode((string)$port), 0);
-			return;
-		}
-
 		?>
 			<?php
 				$addon_type_lang_key = "server_content_".$addon_type;

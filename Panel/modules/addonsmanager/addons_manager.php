@@ -47,11 +47,12 @@ function exec_ogp_module() {
 		$fields['name']                = isset($_POST['name']) ? trim((string)$_POST['name']) : '';
 		$fields['url']                 = isset($_POST['url']) ? trim((string)$_POST['url']) : '';
 		$fields['path']                = isset($_POST['path']) ? trim((string)$_POST['path']) : '';
-		$fields['addon_type']          = isset($_POST['addon_type']) ? trim((string)$_POST['addon_type']) : '';
+		$fields['addon_type']          = '';
 		$fields['home_cfg_id']         = isset($_POST['home_cfg_id']) ? (int)$_POST['home_cfg_id'] : 0;
 		$fields['post_script']         = isset($_POST['post_script']) ? trim((string)$_POST['post_script']) : '';
 		$fields['group_id']            = isset($_POST['group_id']) ? (int)$_POST['group_id'] : 0;
-		$fields['install_method']      = in_array($_POST['install_method'], $valid_install_methods) ? $_POST['install_method'] : 'download_zip';
+		$posted_install_method         = isset($_POST['install_method']) ? $_POST['install_method'] : '';
+		$fields['install_method']      = in_array($posted_install_method, $valid_install_methods) ? $posted_install_method : 'download_zip';
 		$fields['content_version']     = isset($_POST['content_version'])     ? $_POST['content_version']              : '';
 		$fields['requires_stop']       = !empty($_POST['requires_stop'])       ? 1 : 0;
 		$fields['backup_before_install'] = !empty($_POST['backup_before_install']) ? 1 : 0;
@@ -64,14 +65,11 @@ function exec_ogp_module() {
 		$fields['optional_folder_name']= isset($_POST['optional_folder_name']) ? trim((string)$_POST['optional_folder_name']) : '';
 		$fields['config_edit_rule']    = isset($_POST['config_edit_rule']) ? trim((string)$_POST['config_edit_rule']) : '';
 		$fields['launch_param_additions'] = isset($_POST['launch_param_additions']) ? trim((string)$_POST['launch_param_additions']) : '';
+		$fields['addon_type']          = scm_get_addon_type_from_install_method($fields['install_method']);
 
 		if ($fields['name'] === '')
 		{
 			print_failure(get_lang("fill_the_addon_name"));
-		}
-		elseif (empty($fields['addon_type']) || !in_array($fields['addon_type'], $addon_types))
-		{
-			print_failure(get_lang("select_an_addon_type"));
 		}
 		elseif (empty($fields['home_cfg_id']))
 		{
@@ -135,7 +133,7 @@ function exec_ogp_module() {
 		$path                  = isset($addon_info['path'])                  ? $addon_info['path']                  : "";
 		$post_script           = isset($addon_info['post_script'])           ? $addon_info['post_script']           : "";
 		$home_cfg_id           = isset($addon_info['home_cfg_id'])           ? $addon_info['home_cfg_id']           : "";
-		$addon_type            = isset($addon_info['addon_type'])            ? $addon_info['addon_type']            : "";
+		$addon_type            = scm_normalize_addon_type(isset($addon_info['addon_type']) ? $addon_info['addon_type'] : "", $install_method);
 		$group_id              = isset($addon_info['group_id'])              ? $addon_info['group_id']              : "";
 		$install_method        = isset($addon_info['install_method'])        ? $addon_info['install_method']        : "download_zip";
 		$content_version       = isset($addon_info['content_version'])       ? $addon_info['content_version']       : "";
@@ -208,10 +206,10 @@ function exec_ogp_module() {
 			</tr>
 			<tr id="scm-row-workshop-app-id">
 				<td align="right">
-					<b>Workshop App ID</b>
+					<b>Game Compatibility (Workshop App ID)</b>
 				</td>
 				<td align="left">
-					<input type="text" value="<?php echo htmlspecialchars($workshop_app_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_app_id" size="85" placeholder="Optional override, e.g. 221100" />
+					<input type="text" value="<?php echo htmlspecialchars($workshop_app_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_app_id" size="85" placeholder="Optional App ID override, e.g. 221100" />
 				</td>
 			</tr>
 			<tr id="scm-row-target-path-template">
@@ -300,22 +298,6 @@ function exec_ogp_module() {
 		}
 		?>
 				</select>
-				</td>
-			</tr>
-			<tr>
-				<td align="right">
-				<b><?php print_lang('type'); ?></b>	
-				</td>
-				<td align="left">
-		<?php
-		// Render a radio button for every registered content type.
-		// New types automatically appear here once added to server_content_categories.php.
-		foreach ((array)$addon_type_labels as $type_key => $type_label)
-		{
-			$checked = ( isset($addon_type) AND $type_key == $addon_type) ? 'checked' : '';
-			echo '<input type="radio" name="addon_type" value="'.htmlspecialchars($type_key).'" '.$checked.'>'.htmlspecialchars($type_label).' &nbsp; ';
-		}
-		?>
 				</td>
 			</tr>
 			<tr>
@@ -514,7 +496,6 @@ function exec_ogp_module() {
 	}
 	
 	$home_cfg_id = !empty($_GET['home_cfg_id']) && (int)$_GET['home_cfg_id'] > 0 ? (int)$_GET['home_cfg_id'] : 0;
-	// Validate the requested addon_type against the full category map so new types are accepted.
 	$addon_type  = !empty($_GET['addon_type']) && in_array($_GET['addon_type'], $addon_types) ? $_GET['addon_type'] : "";
 	$group_id    = isset($_GET['group_id']) && is_numeric($_GET['group_id']) ? (int)$_GET['group_id'] : 0;
 	
