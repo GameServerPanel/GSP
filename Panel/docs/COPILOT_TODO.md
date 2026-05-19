@@ -22,3 +22,4 @@
 - Add localized language strings/tooltips for the new cron scheduler `server_content_*` action labels across all supported panel locales.
 - Add a Game Manager "Live Server Status" panel that consumes `Panel/protocol/gsp_query.php` and shows banner preview plus copyable embed code.
 - Add an updater admin UI table that renders the full deployment preflight path map (temp checkout, source repo/panel/website, destination panel/website) directly from the new layout detection payload for one-click operator verification.
+- Add an updater integration test fixture that calls both `home.php?m=update` and legacy `home.php?m=update&p=updating&version=<branch>` against a `Panel-unstable` zipball and asserts changed `Panel/modules/` files are actually copied.
