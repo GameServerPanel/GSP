@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2026-05-19
+- **Updater deployment layout enforcement + marker file writes:** Hardened `modules/administration/panel_update.php` to require the live `/var/www/html/GSP` root with explicit `/Panel` and `/Website` destinations, log full source/destination path detection (including temp checkout/source roots), stop on invalid mapping, copy Panel/Website via explicit subtree mapping (preventing nested `Panel/Panel` or `Website/Website`), validate key copied files after sync, and write both `Website/timestamp.txt` and `modules/billing/timestamp.txt` marker files on successful updates.
 - **Workshop content script path fix:** Updated addonsmanager default Workshop script paths to the panel module script location under `/var/www/html/GSP/Panel/modules/addonsmanager/scripts/workshop/` so Workshop actions no longer use the incorrect game-home-mixed path on the agent host.
 
 ## 2026-05-18
