@@ -176,7 +176,15 @@ function server_content_execute_manifest($home_id, $manifest_path, $script_key, 
 	if ($remote->status_chk() !== 1) {
 		return server_content_result('failed', 'Agent is offline.', array('remote_server_id' => (int)$home_info['remote_server_id']));
 	}
-	if ((int)$remote->rfile_exists($script_path) !== 1) {
+	if ($script_key === 'workshop') {
+		$prepare_error = '';
+		$prepared_path = scm_prepare_workshop_script_for_agent($remote, $home_info, $server_xml, $prepare_error);
+		if ($prepared_path === false) {
+			return server_content_result('failed', $prepare_error, array('script_key' => (string)$script_key));
+		}
+		$script_path = $prepared_path;
+	}
+	elseif ((int)$remote->rfile_exists($script_path) !== 1) {
 		return server_content_result('failed', 'Server content script was not found on agent host.', array('script_path' => $script_path));
 	}
 	$command = "bash " . escapeshellarg($script_path) . " " . escapeshellarg((string)$manifest_path) . " ; echo __GSP_SERVER_CONTENT_EXIT:$?";
@@ -469,4 +477,3 @@ function server_content_run_scheduled_action($home_id, $action, $options = array
 	server_content_log_action($home_id, $action, $result['status'], $result['message'], $result['details']);
 	return $result;
 }
-

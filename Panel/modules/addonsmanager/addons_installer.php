@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/modules/addonsmanager.js"></script>
 <?php
 /*
  *
@@ -182,17 +183,13 @@ function exec_ogp_module() {
 		$install_method  = scm_get_install_method_default(isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip');
 		$content_version = isset($addon_info['content_version']) ? $addon_info['content_version'] : '';
 		$requires_stop   = !empty($addon_info['requires_stop']) ? 1 : 0;
+		$user_override_keys = ($install_method === 'steam_workshop')
+			? array('workshop_item_id', 'workshop_app_id', 'target_path_template', 'optional_folder_name')
+			: array();
+		$install_payload = scm_collect_install_payload($addon_info, $_REQUEST, $user_override_keys);
 		$post_script = '';
-		$validation_payload = array(
-			'url' => isset($addon_info['url']) ? $addon_info['url'] : '',
-			'path' => isset($addon_info['path']) ? $addon_info['path'] : '',
-			'workshop_item_id' => isset($addon_info['workshop_item_id']) ? $addon_info['workshop_item_id'] : '',
-			'target_path_template' => isset($addon_info['target_path_template']) ? $addon_info['target_path_template'] : '',
-			'post_script' => isset($addon_info['post_script']) ? $addon_info['post_script'] : '',
-			'config_edit_rule' => isset($addon_info['config_edit_rule']) ? $addon_info['config_edit_rule'] : '',
-		);
 		$validation_message = '';
-		if ($state == "start" && !scm_validate_install_method_payload($install_method, $validation_payload, $validation_message)) {
+		if ($state == "start" && !scm_validate_install_method_payload($install_method, $install_payload, $validation_message)) {
 			print_failure($validation_message);
 			return;
 		}
@@ -209,7 +206,7 @@ function exec_ogp_module() {
 				return;
 			}
 		}
-		$url = $addon_info['url'];
+		$url = $install_payload['url'];
 		$filename = basename($url);
 		#### Replace template variables in the post-install script with
 		#### live server data before sending to the agent.
@@ -285,52 +282,38 @@ function exec_ogp_module() {
 				'content_type' => $install_method,
 				'home_id' => (int)$home_id,
 				'home_cfg_id' => (int)$home_info['home_cfg_id'],
-				'workshop_id' => isset($addon_info['workshop_item_id']) ? (string)$addon_info['workshop_item_id'] : '',
-				'target_path' => isset($addon_info['target_path_template']) ? (string)$addon_info['target_path_template'] : (string)$addon_info['path'],
+				'workshop_id' => isset($install_payload['workshop_item_id']) ? (string)$install_payload['workshop_item_id'] : '',
+				'target_path' => ($install_method === 'steam_workshop')
+					? (string)$install_payload['target_path_template']
+					: (string)$install_payload['path'],
 				'action' => 'started',
 			));
 			if ($install_method === 'steam_workshop') {
 				scm_ensure_workshop_schema($db);
-				$workshop_item_id = trim((string)$addon_info['workshop_item_id']);
-				$target_path_template = trim((string)$addon_info['target_path_template']);
-				$resolved = function_exists('steam_workshop_install_item_to_home')
-					? steam_workshop_install_item_to_home($db, $home_info, $workshop_item_id, $target_path_template, array(
-						'optional_folder_name' => trim((string)$addon_info['optional_folder_name']),
-						'workshop_app_id' => trim((string)$addon_info['workshop_app_id']),
-					))
-					: array('ok' => false);
-				if (empty($resolved['ok'])) {
-					$fallback_profile = function_exists('sw_get_profile_for_home') ? sw_get_profile_for_home($db, (int)$home_id) : false;
-					$fallback_workshop_app_id = trim((string)$addon_info['workshop_app_id']);
-					if ($fallback_workshop_app_id === '' && is_array($fallback_profile) && !empty($fallback_profile['workshop_app_id'])) {
-						$fallback_workshop_app_id = (string)$fallback_profile['workshop_app_id'];
-					}
-					if ($fallback_workshop_app_id === '') {
-						$fallback_workshop_app_id = scm_extract_workshop_app_id($server_xml);
-					}
-					$placeholder_map = scm_build_placeholder_map($home_info, array('exe_location' => (string)$server_xml->exe_location), array(
-						'WORKSHOP_ID' => $workshop_item_id,
-						'WORKSHOP_APP_ID' => $fallback_workshop_app_id,
-						'STEAM_APP_ID' => (is_array($fallback_profile) && !empty($fallback_profile['steam_app_id'])) ? (string)$fallback_profile['steam_app_id'] : '',
-					));
-					$resolved = array(
-						'workshop_app_id' => $fallback_workshop_app_id,
-						'steam_app_id' => (is_array($fallback_profile) && !empty($fallback_profile['steam_app_id'])) ? (string)$fallback_profile['steam_app_id'] : '',
-						'target_path_resolved' => scm_apply_placeholders($target_path_template, $placeholder_map),
-					);
+				$workshop_runtime = scm_build_workshop_runtime_context($db, $home_info, $server_xml, $install_payload, $validation_message);
+				if ($workshop_runtime === false) {
+					print_failure($validation_message);
+					echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
+					return;
 				}
-				$workshop_app_id = isset($resolved['workshop_app_id']) ? (string)$resolved['workshop_app_id'] : '';
-				$steam_app_id = isset($resolved['steam_app_id']) ? (string)$resolved['steam_app_id'] : '';
-				$target_path_resolved = isset($resolved['target_path_resolved']) ? (string)$resolved['target_path_resolved'] : '';
+				$workshop_item_id = (string)$workshop_runtime['workshop_item_id'];
+				$target_path_template = (string)$workshop_runtime['target_path_template'];
+				$workshop_app_id = (string)$workshop_runtime['workshop_app_id'];
+				$steam_app_id = (string)$workshop_runtime['steam_app_id'];
+				$target_path_resolved = (string)$workshop_runtime['target_path_resolved'];
 				$extra_manifest = array(
 					'addon_id' => (int)$addon_id,
 					'target_path_template' => $target_path_template,
 					'target_path_resolved' => $target_path_resolved,
-					'optional_folder_name' => trim((string)$addon_info['optional_folder_name']),
+					'optional_folder_name' => trim((string)$install_payload['optional_folder_name']),
 					'config_edit_rule' => trim((string)$addon_info['config_edit_rule']),
 					'launch_param_additions' => trim((string)$addon_info['launch_param_additions']),
 					'workshop_app_id' => $workshop_app_id,
 					'steam_app_id' => $steam_app_id,
+					'steamcmd_path' => isset($workshop_runtime['steamcmd_path']) ? (string)$workshop_runtime['steamcmd_path'] : '',
+					'workshop_download_dir' => isset($workshop_runtime['workshop_download_dir']) ? (string)$workshop_runtime['workshop_download_dir'] : '',
+					'server_root' => isset($workshop_runtime['server_root']) ? (string)$workshop_runtime['server_root'] : rtrim((string)$home_info['home_path'], '/'),
+					'post_install_script' => trim((string)$post_script),
 				);
 				$workshop_error = '';
 				$workshop_ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'install', array($workshop_item_id), $workshop_error, $extra_manifest);
@@ -350,7 +333,10 @@ function exec_ogp_module() {
 						'home_id' => (int)$home_id,
 						'home_cfg_id' => (int)$home_info['home_cfg_id'],
 						'workshop_id' => $workshop_item_id,
+						'steam_app_id' => $steam_app_id,
+						'workshop_app_id' => $workshop_app_id,
 						'target_path' => $target_path_resolved,
+						'final_folder_path' => $target_path_resolved,
 						'action' => 'succeeded',
 					));
 					print_success(get_lang('addon_installed_successfully'));
@@ -363,6 +349,8 @@ function exec_ogp_module() {
 						'home_id' => (int)$home_id,
 						'home_cfg_id' => (int)$home_info['home_cfg_id'],
 						'workshop_id' => $workshop_item_id,
+						'steam_app_id' => $steam_app_id,
+						'workshop_app_id' => $workshop_app_id,
 						'target_path' => $target_path_resolved,
 						'action' => 'failed',
 						'error' => $workshop_error,
@@ -558,10 +546,28 @@ function exec_ogp_module() {
     	}
 		?>
 			<?php
-				$addon_type_lang_key = "server_content_".$addon_type;
-				$addon_type_lang = get_lang($addon_type_lang_key);
-				if($addon_type_lang === "_".$addon_type_lang_key."_")
-					$addon_type_lang = get_lang($addon_type);
+				$category_labels = get_server_content_categories();
+				$addon_type_lang = isset($category_labels[$addon_type]) ? $category_labels[$addon_type] : ucfirst(str_replace('_', ' ', $addon_type));
+				$addons = $db->resultQuery(
+					"SELECT addon_id, name, install_method, workshop_item_id, workshop_app_id, target_path_template, optional_folder_name
+					   FROM OGP_DB_PREFIXaddons
+					  WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . "
+					  ORDER BY name ASC"
+				);
+				if (!is_array($addons)) {
+					$addons = [];
+				}
+				$selected_addon = isset($addons[0]) ? $addons[0] : array();
+				$default_install_method = isset($selected_addon['install_method']) ? scm_get_install_method_default($selected_addon['install_method']) : '';
+				$is_workshop_default = ($default_install_method === 'steam_workshop');
+				$workshop_profile = function_exists('sw_get_profile_for_home') ? sw_get_profile_for_home($db, (int)$home_id) : false;
+				$default_workshop_app_id = !empty($selected_addon['workshop_app_id'])
+					? trim((string)$selected_addon['workshop_app_id'])
+					: ((is_array($workshop_profile) && !empty($workshop_profile['workshop_app_id'])) ? (string)$workshop_profile['workshop_app_id'] : scm_extract_workshop_app_id($server_xml));
+				$default_target_template = !empty($selected_addon['target_path_template'])
+					? trim((string)$selected_addon['target_path_template'])
+					: ((is_array($workshop_profile) && !empty($workshop_profile['install_path_template'])) ? (string)$workshop_profile['install_path_template'] : '{SERVER_ROOT}/{MOD_FOLDER}');
+				$default_optional_folder_name = !empty($selected_addon['optional_folder_name']) ? trim((string)$selected_addon['optional_folder_name']) : '';
 			?>
 			<h2><?php echo htmlentities($home_info['home_name'])."&nbsp;".$addon_type_lang ;?></h2>
             <table class='center'>
@@ -579,20 +585,39 @@ function exec_ogp_module() {
             <td align='left'><?php  echo "$home_info[remote_server_name] ($home_info[agent_ip]:$home_info[agent_port])"; ?></td></tr>
             <tr><td align='right'><?php print_lang('select_addon'); ?>: </td>
             <td align='left'>
-			<select name="addon_id">
-			<?php
-			$addons = $db->resultQuery("SELECT addon_id, name FROM OGP_DB_PREFIXaddons WHERE addon_type='".$addon_type."' AND home_cfg_id=" . $home_cfg_id . $query_groups . " ORDER BY name ASC");
-			if (!is_array($addons)) {
-				$addons = [];
-			}
-			foreach ((array)$addons as $addon) 
-			{
-			?>
-			<option value="<?php echo $addon['addon_id']; ?>"><?php echo $addon['name']; ?></option>
-			<?php 
-			}
-			?>
+			<select name="addon_id" id="scm-user-addon-select">
+			<?php foreach ((array)$addons as $addon) { ?>
+			<option
+				value="<?php echo (int)$addon['addon_id']; ?>"
+				data-install-method="<?php echo htmlspecialchars(scm_get_install_method_default(isset($addon['install_method']) ? $addon['install_method'] : ''), ENT_QUOTES, 'UTF-8'); ?>"
+				data-workshop-item-id="<?php echo htmlspecialchars(isset($addon['workshop_item_id']) ? $addon['workshop_item_id'] : '', ENT_QUOTES, 'UTF-8'); ?>"
+				data-workshop-app-id="<?php echo htmlspecialchars(isset($addon['workshop_app_id']) ? $addon['workshop_app_id'] : '', ENT_QUOTES, 'UTF-8'); ?>"
+				data-target-path-template="<?php echo htmlspecialchars(isset($addon['target_path_template']) ? $addon['target_path_template'] : '', ENT_QUOTES, 'UTF-8'); ?>"
+				data-optional-folder-name="<?php echo htmlspecialchars(isset($addon['optional_folder_name']) ? $addon['optional_folder_name'] : '', ENT_QUOTES, 'UTF-8'); ?>"
+			><?php echo htmlspecialchars($addon['name']); ?></option>
+			<?php } ?>
 			</select>
+			</td></tr>
+            <tr class="scm-user-workshop-row" <?php echo $is_workshop_default ? '' : 'style="display:none;"'; ?>><td align='right'><strong><?php print_lang('workshop_id'); ?></strong></td><td align='left'>
+				<input type="text" id="scm-user-workshop-id" name="workshop_item_id" size="50" value="<?php echo htmlspecialchars(isset($selected_addon['workshop_item_id']) ? $selected_addon['workshop_item_id'] : '', ENT_QUOTES, 'UTF-8'); ?>" placeholder="Example Arma 3 Workshop ID: 450814997" />
+				<div class="info" style="margin-top:4px;">Install a Steam Workshop mod using Workshop ID. URL is not required.</div>
+			</td></tr>
+            <tr class="scm-user-workshop-row" <?php echo $is_workshop_default ? '' : 'style="display:none;"'; ?>><td align='right'><strong>Workshop App ID Override</strong></td><td align='left'>
+				<input type="text" id="scm-user-workshop-app-id" name="workshop_app_id" size="50" value="<?php echo htmlspecialchars($default_workshop_app_id, ENT_QUOTES, 'UTF-8'); ?>" data-default-app-id="<?php echo htmlspecialchars($default_workshop_app_id, ENT_QUOTES, 'UTF-8'); ?>" placeholder="Optional App ID override" />
+			</td></tr>
+            <tr class="scm-user-workshop-row" <?php echo $is_workshop_default ? '' : 'style="display:none;"'; ?>><td align='right'><strong><?php print_lang('optional_folder_name'); ?></strong></td><td align='left'>
+				<input type="text" id="scm-user-optional-folder-name" name="optional_folder_name" size="50" value="<?php echo htmlspecialchars($default_optional_folder_name, ENT_QUOTES, 'UTF-8'); ?>" placeholder="@myWorkshopMod (optional)" />
+			</td></tr>
+            <tr class="scm-user-workshop-row" <?php echo $is_workshop_default ? '' : 'style="display:none;"'; ?>><td align='right'><strong><?php print_lang('target_path_template'); ?></strong></td><td align='left'>
+				<input type="text" id="scm-user-target-path-template" name="target_path_template" size="85" value="<?php echo htmlspecialchars($default_target_template, ENT_QUOTES, 'UTF-8'); ?>" data-default-template="<?php echo htmlspecialchars($default_target_template, ENT_QUOTES, 'UTF-8'); ?>" placeholder="{SERVER_ROOT}/{MOD_FOLDER}" />
+				<div class="info" style="margin-top:4px;">Supported placeholders: {SERVER_ROOT}, {GAME_ROOT}, {WORKSHOP_ID}, {WORKSHOP_APP_ID}, {STEAM_APP_ID}, {FOLDER_NAME}, {MOD_FOLDER}</div>
+			</td></tr>
+            <tr class="scm-user-workshop-row" <?php echo $is_workshop_default ? '' : 'style="display:none;"'; ?>><td align='right'><strong>Target Path Preview</strong></td><td align='left'>
+				<code id="scm-user-target-path-preview"
+					data-server-root="<?php echo htmlspecialchars(rtrim((string)$home_info['home_path'], '/'), ENT_QUOTES, 'UTF-8'); ?>"
+					data-game-root="<?php echo htmlspecialchars(rtrim((string)$home_info['home_path'], '/'), ENT_QUOTES, 'UTF-8'); ?>"
+					data-steam-app-id="<?php echo htmlspecialchars((is_array($workshop_profile) && !empty($workshop_profile['steam_app_id'])) ? (string)$workshop_profile['steam_app_id'] : '', ENT_QUOTES, 'UTF-8'); ?>"
+				><?php echo htmlspecialchars($default_target_template, ENT_QUOTES, 'UTF-8'); ?></code>
 			</td></tr>
             <tr><td colspan='2' class='info'>&nbsp;</td></tr>
             <td align='left'>

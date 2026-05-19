@@ -40,9 +40,9 @@
 function get_server_content_categories()
 {
     return array(
-        'file_download'      => 'File Download / Archive',
+        'file_download'      => 'Downloadable Mod',
         'workshop_item'      => 'Steam Workshop Item',
-        'config_edit'        => 'Config Edit',
+        'config_edit'        => 'Configuration Package',
         'scripted_installer' => 'Scripted Installer',
     );
 }

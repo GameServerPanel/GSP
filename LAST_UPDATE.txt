@@ -1,0 +1,20 @@
+2026-05-19 22:26:47
+Branch: copilot/normalize-workshop-installs
+Commit: d0c7a5a
+Updated files:
+- Panel/js/modules/addonsmanager.js
+- Panel/lang/English/modules/addonsmanager.php
+- Panel/modules/addonsmanager/addons_installer.php
+- Panel/modules/addonsmanager/addons_manager.php
+- Panel/modules/addonsmanager/scripts/workshop/generic_steam_workshop_linux.sh
+- Panel/modules/addonsmanager/scripts/workshop/generic_steam_workshop_windows_cygwin.sh
+- Panel/modules/addonsmanager/server_content_actions.php
+- Panel/modules/addonsmanager/server_content_categories.php
+- Panel/modules/addonsmanager/server_content_helpers.php
+- Panel/modules/addonsmanager/workshop_action.php
+- Panel/ogp_api.php
+- Panel/CHANGELOG.md
+- Panel/docs/COPILOT_TODO.md
+- .github/module-map.md
+- LAST_UPDATE.txt
+Summary: Normalized Steam Workshop content installs across shared validation, the user installer UI, API execution, and agent-side SteamCMD script syncing/logging.
