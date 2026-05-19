@@ -41,32 +41,16 @@ function exec_ogp_module() {
 	$addon_type_labels = get_server_content_categories();       // key => label
 	$install_methods   = scm_get_install_methods();             // install_method keys => labels
 
-	if (isset($_POST['create_addon']) AND isset($_POST['name']) AND $_POST['url']=="")
+	if (isset($_POST['create_addon']))
 	{
-		print_failure(get_lang("fill_the_url_address_to_a_compressed_file"));
-	}
-	elseif(isset($_POST['create_addon']) AND isset($_POST['url']) AND $_POST['name']=="")
-	{
-		print_failure(get_lang("fill_the_addon_name"));
-	}	
-	elseif(isset($_POST['create_addon']) AND isset($_POST['name']) and isset($_POST['url']) and empty($_POST['addon_type']) )	
-	{	
-		print_failure(get_lang("select_an_addon_type"));
-	}
-	elseif(isset($_POST['create_addon']) AND isset($_POST['name']) and isset($_POST['url']) and isset($_POST['addon_type']) and empty($_POST['home_cfg_id']) )	
-	{	
-		print_failure(get_lang("select_a_game_type"));
-	}
-	elseif (isset($_POST['create_addon']) AND isset($_POST['name']) AND isset($_POST['url']) AND isset($_POST['addon_type']) and isset($_POST['home_cfg_id']) )
-	{	
 		$valid_install_methods = array_keys($install_methods);
-		$fields['name']                = $_POST['name'];
-		$fields['url']                 = $_POST['url'];
-		$fields['path']                = $_POST['path'];
-		$fields['addon_type']          = $_POST['addon_type'];
-		$fields['home_cfg_id']         = $_POST['home_cfg_id'];
-		$fields['post_script']         = $_POST['post_script'];
-		$fields['group_id']            = $_POST['group_id'];
+		$fields['name']                = isset($_POST['name']) ? trim((string)$_POST['name']) : '';
+		$fields['url']                 = isset($_POST['url']) ? trim((string)$_POST['url']) : '';
+		$fields['path']                = isset($_POST['path']) ? trim((string)$_POST['path']) : '';
+		$fields['addon_type']          = isset($_POST['addon_type']) ? trim((string)$_POST['addon_type']) : '';
+		$fields['home_cfg_id']         = isset($_POST['home_cfg_id']) ? (int)$_POST['home_cfg_id'] : 0;
+		$fields['post_script']         = isset($_POST['post_script']) ? trim((string)$_POST['post_script']) : '';
+		$fields['group_id']            = isset($_POST['group_id']) ? (int)$_POST['group_id'] : 0;
 		$fields['install_method']      = in_array($_POST['install_method'], $valid_install_methods) ? $_POST['install_method'] : 'download_zip';
 		$fields['content_version']     = isset($_POST['content_version'])     ? $_POST['content_version']              : '';
 		$fields['requires_stop']       = !empty($_POST['requires_stop'])       ? 1 : 0;
@@ -74,11 +58,46 @@ function exec_ogp_module() {
 		$fields['restart_after_install'] = !empty($_POST['restart_after_install']) ? 1 : 0;
 		$fields['is_cacheable']        = !empty($_POST['is_cacheable'])        ? 1 : 0;
 		$fields['description']         = isset($_POST['description'])         ? $_POST['description']                  : '';
-		if( is_numeric($db->resultInsertId( 'addons', $fields )) )
+		$fields['workshop_item_id']    = isset($_POST['workshop_item_id']) ? trim((string)$_POST['workshop_item_id']) : '';
+		$fields['workshop_app_id']     = isset($_POST['workshop_app_id']) ? trim((string)$_POST['workshop_app_id']) : '';
+		$fields['target_path_template']= isset($_POST['target_path_template']) ? trim((string)$_POST['target_path_template']) : '';
+		$fields['optional_folder_name']= isset($_POST['optional_folder_name']) ? trim((string)$_POST['optional_folder_name']) : '';
+		$fields['config_edit_rule']    = isset($_POST['config_edit_rule']) ? trim((string)$_POST['config_edit_rule']) : '';
+		$fields['launch_param_additions'] = isset($_POST['launch_param_additions']) ? trim((string)$_POST['launch_param_additions']) : '';
+
+		if ($fields['name'] === '')
 		{
-			print_success(get_lang_f("addon_has_been_created",$_POST['name']));
-			if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
-				$db->query("DELETE FROM OGP_DB_PREFIXaddons WHERE addon_id=" . (int)$_POST['addon_id']);
+			print_failure(get_lang("fill_the_addon_name"));
+		}
+		elseif (empty($fields['addon_type']) || !in_array($fields['addon_type'], $addon_types))
+		{
+			print_failure(get_lang("select_an_addon_type"));
+		}
+		elseif (empty($fields['home_cfg_id']))
+		{
+			print_failure(get_lang("select_a_game_type"));
+		}
+		else
+		{
+			$validation_payload = array(
+				'url' => $fields['url'],
+				'path' => $fields['path'],
+				'workshop_item_id' => $fields['workshop_item_id'],
+				'target_path_template' => $fields['target_path_template'],
+				'post_script' => $fields['post_script'],
+				'config_edit_rule' => $fields['config_edit_rule'],
+			);
+			$validation_message = '';
+			if (!scm_validate_install_method_payload($fields['install_method'], $validation_payload, $validation_message))
+			{
+				print_failure($validation_message);
+			}
+			elseif (is_numeric($db->resultInsertId('addons', $fields)))
+			{
+				print_success(get_lang_f("addon_has_been_created", $fields['name']));
+				if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
+					$db->query("DELETE FROM OGP_DB_PREFIXaddons WHERE addon_id=" . (int)$_POST['addon_id']);
+			}
 		}
 	}
 
@@ -97,6 +116,12 @@ function exec_ogp_module() {
 	$restart_after_install = isset($_POST['restart_after_install']) ? (int)$_POST['restart_after_install'] : 0;
 	$is_cacheable          = isset($_POST['is_cacheable'])          ? (int)$_POST['is_cacheable']     : 0;
 	$description           = isset($_POST['description'])           ? $_POST['description']           : "";
+	$workshop_item_id      = isset($_POST['workshop_item_id'])      ? $_POST['workshop_item_id']      : "";
+	$workshop_app_id       = isset($_POST['workshop_app_id'])       ? $_POST['workshop_app_id']       : "";
+	$target_path_template  = isset($_POST['target_path_template'])  ? $_POST['target_path_template']  : "";
+	$optional_folder_name  = isset($_POST['optional_folder_name'])  ? $_POST['optional_folder_name']  : "";
+	$config_edit_rule      = isset($_POST['config_edit_rule'])      ? $_POST['config_edit_rule']      : "";
+	$launch_param_additions = isset($_POST['launch_param_additions']) ? $_POST['launch_param_additions'] : "";
 
 	if (isset($_POST['addon_id']) && (int)$_POST['addon_id'] > 0 && isset($_POST['edit']))
 	{
@@ -119,6 +144,12 @@ function exec_ogp_module() {
 		$restart_after_install = isset($addon_info['restart_after_install']) ? (int)$addon_info['restart_after_install'] : 0;
 		$is_cacheable          = isset($addon_info['is_cacheable'])          ? (int)$addon_info['is_cacheable']     : 0;
 		$description           = isset($addon_info['description'])           ? $addon_info['description']           : "";
+		$workshop_item_id      = isset($addon_info['workshop_item_id'])      ? $addon_info['workshop_item_id']      : "";
+		$workshop_app_id       = isset($addon_info['workshop_app_id'])       ? $addon_info['workshop_app_id']       : "";
+		$target_path_template  = isset($addon_info['target_path_template'])  ? $addon_info['target_path_template']  : "";
+		$optional_folder_name  = isset($addon_info['optional_folder_name'])  ? $addon_info['optional_folder_name']  : "";
+		$config_edit_rule      = isset($addon_info['config_edit_rule'])      ? $addon_info['config_edit_rule']      : "";
+		$launch_param_additions = isset($addon_info['launch_param_additions']) ? $addon_info['launch_param_additions'] : "";
 	}
 	?>
 	<form action="" method="post">
@@ -131,7 +162,25 @@ function exec_ogp_module() {
 					<input type="text" value="<?php echo $name; ?>" name="name" size="85" title="<?php print_lang('addon_name_info'); ?>" />
 				</td>
 			</tr>
-			<tr>					
+			<tr id="scm-row-install-method">
+				<td align="right">
+					<b><?php print_lang('content_type'); ?></b>
+				</td>
+				<td align="left">
+					<select name="install_method" id="scm-install-method">
+					<?php
+					$install_help = scm_get_install_method_help_text();
+					foreach ((array)$install_methods as $method_key => $method_label) {
+						$sel = ($method_key == $install_method) ? 'selected="selected"' : '';
+						$help = isset($install_help[$method_key]) ? $install_help[$method_key] : '';
+						echo '<option value="'.htmlspecialchars($method_key).'" data-help="'.htmlspecialchars($help, ENT_QUOTES, 'UTF-8').'" '.$sel.'>'.htmlspecialchars($method_label).'</option>'."\n";
+					}
+					?>
+					</select>
+					<div id="scm-install-method-help" style="color:#666;margin-top:4px;"></div>
+				</td>
+			</tr>
+			<tr id="scm-row-url">					
 				<td align="right">
 					<b><?php print_lang('url'); ?></b>
 				</td>
@@ -141,17 +190,50 @@ function exec_ogp_module() {
 			</tr>
 			<!-- Destination path — must be relative to the game server home directory.
 			     Path traversal (../) is not allowed; the agent enforces this. -->
-			<tr>					
+			<tr id="scm-row-path">					
 				<td align="right">
-					<b><?php print_lang('path'); ?></b>
+					<b id="scm-path-label"><?php print_lang('path'); ?></b>
 					</td>
 					<td align="left">
 					<input type="text" value="<?php echo $path; ?>" name="path" size="85" title="<?php print_lang('path_info'); ?>" />
 				</td>
 			</tr>
-			<tr>					
+			<tr id="scm-row-workshop-id">
 				<td align="right">
-					<b><?php print_lang('post-script'); ?></b><br>
+					<b><?php print_lang('workshop_id'); ?></b>
+				</td>
+				<td align="left">
+					<input type="text" value="<?php echo htmlspecialchars($workshop_item_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_item_id" size="85" placeholder="e.g. 450814997" />
+				</td>
+			</tr>
+			<tr id="scm-row-workshop-app-id">
+				<td align="right">
+					<b>Workshop App ID</b>
+				</td>
+				<td align="left">
+					<input type="text" value="<?php echo htmlspecialchars($workshop_app_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_app_id" size="85" placeholder="Optional override, e.g. 221100" />
+				</td>
+			</tr>
+			<tr id="scm-row-target-path-template">
+				<td align="right">
+					<b><?php print_lang('target_path_template'); ?></b>
+				</td>
+				<td align="left">
+					<input type="text" value="<?php echo htmlspecialchars($target_path_template, ENT_QUOTES, 'UTF-8'); ?>" name="target_path_template" size="85" placeholder="{SERVER_ROOT}/mods/{WORKSHOP_ID}" />
+					<small style="color:#666;">Supported placeholders: {HOME_ID}, {SERVER_ROOT}, {GAME_ROOT}, {WORKSHOP_ID}, {WORKSHOP_APP_ID}, {STEAM_APP_ID}</small>
+				</td>
+			</tr>
+			<tr id="scm-row-optional-folder-name">
+				<td align="right">
+					<b><?php print_lang('optional_folder_name'); ?></b>
+				</td>
+				<td align="left">
+					<input type="text" value="<?php echo htmlspecialchars($optional_folder_name, ENT_QUOTES, 'UTF-8'); ?>" name="optional_folder_name" size="85" placeholder="@MyWorkshopMod" />
+				</td>
+			</tr>
+			<tr id="scm-row-post-script">					
+				<td align="right">
+					<b>Post-Install Script / Action</b><br>
 					<u><?php print_lang('replacements'); ?></u><br>
 					%home_path%<br>
 					%home_name%<br>
@@ -164,6 +246,22 @@ function exec_ogp_module() {
 				</td>
 				<td align="left">
 					<textarea name="post_script" style="width:99%;height:175px;" title="<?php print_lang('post-script_info'); ?>" ><?php echo strip_real_escape_string($post_script); ?></textarea>
+				</td>
+			</tr>
+			<tr id="scm-row-config-edit-rule">
+				<td align="right">
+					<b><?php print_lang('config_edit_rule'); ?></b>
+				</td>
+				<td align="left">
+					<textarea name="config_edit_rule" style="width:99%;height:90px;" placeholder="Text/rules to append or apply to the target config."><?php echo htmlspecialchars($config_edit_rule, ENT_QUOTES, 'UTF-8'); ?></textarea>
+				</td>
+			</tr>
+			<tr id="scm-row-launch-param-additions">
+				<td align="right">
+					<b><?php print_lang('launch_param_additions'); ?></b>
+				</td>
+				<td align="left">
+					<input type="text" value="<?php echo htmlspecialchars($launch_param_additions, ENT_QUOTES, 'UTF-8'); ?>" name="launch_param_additions" size="85" placeholder="-mod=@myMod;@anotherMod" />
 				</td>
 			</tr>
 			<tr>
@@ -241,23 +339,6 @@ function exec_ogp_module() {
 				</select>
 				</td>
 			</tr>
-			<!-- ── Phase 2 fields ────────────────────────────────────────────────── -->
-			<tr>
-				<td align="right">
-					<b>Install Method</b>
-				</td>
-				<td align="left">
-					<select name="install_method">
-					<?php
-					foreach ((array)$install_methods as $method_key => $method_label) {
-						$sel = ($method_key == $install_method) ? 'selected="selected"' : '';
-						echo '<option value="'.htmlspecialchars($method_key).'" '.$sel.'>'.htmlspecialchars($method_label).'</option>'."\n";
-					}
-					?>
-					</select>
-					<small style="color:#666;"> The mechanism used to deliver this content to the server.</small>
-				</td>
-			</tr>
 			<tr>
 				<td align="right">
 					<b>Content Version</b>
@@ -313,7 +394,6 @@ function exec_ogp_module() {
 					</small>
 				</td>
 			</tr>
-			<!-- ── end Phase 2 fields ─────────────────────────────────────────────── -->
 			<tr>
 				<td colspan="2" align="center">
 				<?php 

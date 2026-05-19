@@ -23,8 +23,8 @@
 
 // Module general information
 $module_title   = "Server Content Manager";
-$module_version = "2.2";
-$db_version     = 4;
+$module_version = "2.3";
+$db_version     = 5;
 $module_required = TRUE;
 $module_menus   = array(
     array( 'subpage' => 'addons_manager', 'name' => 'Server Content Manager', 'group' => 'admin' )
@@ -162,6 +162,37 @@ $install_queries[3] = array(
             return false;
         }
 
+        return true;
+    },
+);
+
+// ── db_version 5 : content-type specific metadata for Workshop/config/folder actions ──
+$install_queries[4] = array(
+    function ($db) {
+        $prefix = OGP_DB_PREFIX;
+        $new_columns = array(
+            'workshop_item_id'       => "VARCHAR(64) NULL AFTER `description`",
+            'workshop_app_id'        => "VARCHAR(32) NULL AFTER `workshop_item_id`",
+            'target_path_template'   => "VARCHAR(255) NULL AFTER `workshop_app_id`",
+            'optional_folder_name'   => "VARCHAR(255) NULL AFTER `target_path_template`",
+            'config_edit_rule'       => "TEXT NULL AFTER `optional_folder_name`",
+            'launch_param_additions' => "VARCHAR(255) NULL AFTER `config_edit_rule`",
+        );
+        foreach ($new_columns as $col => $definition) {
+            $escaped_col   = $db->realEscapeSingle($col);
+            $escaped_table = $db->realEscapeSingle($prefix . 'addons');
+            $check = $db->resultQuery(
+                "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME   = '{$escaped_table}'
+                    AND COLUMN_NAME  = '{$escaped_col}'"
+            );
+            if (empty($check)) {
+                if (!$db->query("ALTER TABLE `{$prefix}addons` ADD COLUMN `{$col}` {$definition}")) {
+                    return false;
+                }
+            }
+        }
         return true;
     },
 );

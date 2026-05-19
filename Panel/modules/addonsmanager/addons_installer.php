@@ -112,6 +112,10 @@ require_once("protocol/lgsl/lgsl_protocol.php");
 // Central category map — all valid addon_type values and their labels.
 require_once(dirname(__FILE__) . '/server_content_categories.php');
 require_once(dirname(__FILE__) . '/server_content_helpers.php');
+require_once(dirname(__FILE__) . '/workshop_action.php');
+if (file_exists(dirname(__FILE__) . '/../steam_workshop/includes/functions.php')) {
+	require_once(dirname(__FILE__) . '/../steam_workshop/includes/functions.php');
+}
 
 function exec_ogp_module() {
 
@@ -161,7 +165,7 @@ function exec_ogp_module() {
     {
         $addon_id = (int)$_REQUEST['addon_id'];
 		
-		$addons_rows = $db->resultQuery("SELECT url, path, post_script, addon_type, install_method, content_version, requires_stop, restart_after_install FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
+		$addons_rows = $db->resultQuery("SELECT url, path, post_script, addon_type, install_method, content_version, requires_stop, restart_after_install, workshop_item_id, workshop_app_id, target_path_template, optional_folder_name, config_edit_rule, launch_param_additions, name FROM OGP_DB_PREFIXaddons WHERE addon_id=".$addon_id.$query_groups);
 		if (!is_array($addons_rows)) {
 			$addons_rows = [];
 		}
@@ -174,10 +178,24 @@ function exec_ogp_module() {
 		
 		$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
 		
-		$addon_info    = $addons_rows[0];
-		$install_method  = isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip';
+		$addon_info      = $addons_rows[0];
+		$install_method  = scm_get_install_method_default(isset($addon_info['install_method']) ? $addon_info['install_method'] : 'download_zip');
 		$content_version = isset($addon_info['content_version']) ? $addon_info['content_version'] : '';
 		$requires_stop   = !empty($addon_info['requires_stop']) ? 1 : 0;
+		$post_script = '';
+		$validation_payload = array(
+			'url' => isset($addon_info['url']) ? $addon_info['url'] : '',
+			'path' => isset($addon_info['path']) ? $addon_info['path'] : '',
+			'workshop_item_id' => isset($addon_info['workshop_item_id']) ? $addon_info['workshop_item_id'] : '',
+			'target_path_template' => isset($addon_info['target_path_template']) ? $addon_info['target_path_template'] : '',
+			'post_script' => isset($addon_info['post_script']) ? $addon_info['post_script'] : '',
+			'config_edit_rule' => isset($addon_info['config_edit_rule']) ? $addon_info['config_edit_rule'] : '',
+		);
+		$validation_message = '';
+		if ($state == "start" && !scm_validate_install_method_payload($install_method, $validation_payload, $validation_message)) {
+			print_failure($validation_message);
+			return;
+		}
 
 		// ── requires_stop guard ───────────────────────────────────────────────
 		// If the content item requires the server to be stopped first, check
@@ -261,7 +279,155 @@ function exec_ogp_module() {
 				$cache_mode
 			);
 			$_SESSION['scm_history_id_' . $home_id . '_' . $addon_id] = $history_id;
-			$pid = $remote->start_file_download( $addon_info['url'], $home_info['home_path']."/".$addon_info['path'], $filename, "uncompress", $post_script);
+			scm_log_content_install_action(array(
+				'addon_id' => (int)$addon_id,
+				'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '',
+				'content_type' => $install_method,
+				'home_id' => (int)$home_id,
+				'home_cfg_id' => (int)$home_info['home_cfg_id'],
+				'workshop_id' => isset($addon_info['workshop_item_id']) ? (string)$addon_info['workshop_item_id'] : '',
+				'target_path' => isset($addon_info['target_path_template']) ? (string)$addon_info['target_path_template'] : (string)$addon_info['path'],
+				'action' => 'started',
+			));
+			if ($install_method === 'steam_workshop') {
+				scm_ensure_workshop_schema($db);
+				$workshop_item_id = trim((string)$addon_info['workshop_item_id']);
+				$target_path_template = trim((string)$addon_info['target_path_template']);
+				$resolved = function_exists('steam_workshop_install_item_to_home')
+					? steam_workshop_install_item_to_home($db, $home_info, $workshop_item_id, $target_path_template, array(
+						'optional_folder_name' => trim((string)$addon_info['optional_folder_name']),
+						'workshop_app_id' => trim((string)$addon_info['workshop_app_id']),
+					))
+					: array('ok' => false);
+				if (empty($resolved['ok'])) {
+					$fallback_profile = function_exists('sw_get_profile_for_home') ? sw_get_profile_for_home($db, (int)$home_id) : false;
+					$fallback_workshop_app_id = trim((string)$addon_info['workshop_app_id']);
+					if ($fallback_workshop_app_id === '' && is_array($fallback_profile) && !empty($fallback_profile['workshop_app_id'])) {
+						$fallback_workshop_app_id = (string)$fallback_profile['workshop_app_id'];
+					}
+					if ($fallback_workshop_app_id === '') {
+						$fallback_workshop_app_id = scm_extract_workshop_app_id($server_xml);
+					}
+					$placeholder_map = scm_build_placeholder_map($home_info, array('exe_location' => (string)$server_xml->exe_location), array(
+						'WORKSHOP_ID' => $workshop_item_id,
+						'WORKSHOP_APP_ID' => $fallback_workshop_app_id,
+						'STEAM_APP_ID' => (is_array($fallback_profile) && !empty($fallback_profile['steam_app_id'])) ? (string)$fallback_profile['steam_app_id'] : '',
+					));
+					$resolved = array(
+						'workshop_app_id' => $fallback_workshop_app_id,
+						'steam_app_id' => (is_array($fallback_profile) && !empty($fallback_profile['steam_app_id'])) ? (string)$fallback_profile['steam_app_id'] : '',
+						'target_path_resolved' => scm_apply_placeholders($target_path_template, $placeholder_map),
+					);
+				}
+				$workshop_app_id = isset($resolved['workshop_app_id']) ? (string)$resolved['workshop_app_id'] : '';
+				$steam_app_id = isset($resolved['steam_app_id']) ? (string)$resolved['steam_app_id'] : '';
+				$target_path_resolved = isset($resolved['target_path_resolved']) ? (string)$resolved['target_path_resolved'] : '';
+				$extra_manifest = array(
+					'addon_id' => (int)$addon_id,
+					'target_path_template' => $target_path_template,
+					'target_path_resolved' => $target_path_resolved,
+					'optional_folder_name' => trim((string)$addon_info['optional_folder_name']),
+					'config_edit_rule' => trim((string)$addon_info['config_edit_rule']),
+					'launch_param_additions' => trim((string)$addon_info['launch_param_additions']),
+					'workshop_app_id' => $workshop_app_id,
+					'steam_app_id' => $steam_app_id,
+				);
+				$workshop_error = '';
+				$workshop_ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'install', array($workshop_item_id), $workshop_error, $extra_manifest);
+				if ($workshop_ok) {
+					scm_record_install_done($db, (int)$history_id, 'installed', 0, 'workshop_install_ok');
+					scm_upsert_manifest($db, $home_id, $addon_id, array(
+						'install_method' => $install_method,
+						'content_version' => $content_version,
+						'install_state' => 'installed',
+						'source_url' => 'steam://workshop/' . $workshop_item_id,
+						'installed_by' => $user_id,
+					));
+					scm_log_content_install_action(array(
+						'addon_id' => (int)$addon_id,
+						'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '',
+						'content_type' => $install_method,
+						'home_id' => (int)$home_id,
+						'home_cfg_id' => (int)$home_info['home_cfg_id'],
+						'workshop_id' => $workshop_item_id,
+						'target_path' => $target_path_resolved,
+						'action' => 'succeeded',
+					));
+					print_success(get_lang('addon_installed_successfully'));
+				} else {
+					scm_record_install_done($db, (int)$history_id, 'failed', 1, $workshop_error);
+					scm_log_content_install_action(array(
+						'addon_id' => (int)$addon_id,
+						'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '',
+						'content_type' => $install_method,
+						'home_id' => (int)$home_id,
+						'home_cfg_id' => (int)$home_info['home_cfg_id'],
+						'workshop_id' => $workshop_item_id,
+						'target_path' => $target_path_resolved,
+						'action' => 'failed',
+						'error' => $workshop_error,
+					));
+					print_failure($workshop_error);
+				}
+				echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
+				return;
+			}
+			if ($install_method === 'post_script') {
+				$script_command = "cd " . escapeshellarg($home_info['home_path']) . " && /bin/bash -lc " . escapeshellarg((string)$post_script) . " ; echo __GSP_SCRIPT_EXIT:$?";
+				$script_output = $remote->exec($script_command);
+				$script_ok = is_string($script_output) && preg_match('/__GSP_SCRIPT_EXIT:(\d+)/', $script_output, $sm) && (int)$sm[1] === 0;
+				if ($script_ok) {
+					scm_record_install_done($db, (int)$history_id, 'installed', 0, trim((string)$script_output));
+					scm_upsert_manifest($db, $home_id, $addon_id, array(
+						'install_method' => $install_method,
+						'content_version' => $content_version,
+						'install_state' => 'installed',
+						'source_url' => '',
+						'installed_by' => $user_id,
+					));
+					scm_log_content_install_action(array('addon_id' => (int)$addon_id, 'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '', 'content_type' => $install_method, 'home_id' => (int)$home_id, 'home_cfg_id' => (int)$home_info['home_cfg_id'], 'action' => 'succeeded'));
+					print_success(get_lang('addon_installed_successfully'));
+				} else {
+					$error_msg = 'Script/action failed.';
+					scm_record_install_done($db, (int)$history_id, 'failed', 1, trim((string)$script_output));
+					scm_log_content_install_action(array('addon_id' => (int)$addon_id, 'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '', 'content_type' => $install_method, 'home_id' => (int)$home_id, 'home_cfg_id' => (int)$home_info['home_cfg_id'], 'action' => 'failed', 'error' => trim((string)$script_output)));
+					print_failure($error_msg);
+				}
+				echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
+				return;
+			}
+			if ($install_method === 'config_edit' || $install_method === 'create_folder') {
+				$placeholder_map = scm_build_placeholder_map($home_info, array('exe_location' => (string)$server_xml->exe_location));
+				$target_template = trim((string)$addon_info['path']);
+				$resolved_path = scm_apply_placeholders($target_template, $placeholder_map);
+				if ($resolved_path === '' || strpos($resolved_path, '/') !== 0) {
+					$resolved_path = clean_path(rtrim($home_info['home_path'], '/') . '/' . ltrim($resolved_path, '/'));
+				}
+				$ok = false;
+				if ($install_method === 'create_folder') {
+					$ok = is_string($remote->exec("mkdir -p " . escapeshellarg($resolved_path) . " && echo __GSP_FOLDER_OK"));
+				} else {
+					$config_rule = trim((string)$addon_info['config_edit_rule']);
+					$dir = dirname($resolved_path);
+					$cmd = "mkdir -p " . escapeshellarg($dir) . " && touch " . escapeshellarg($resolved_path) . " && printf %s " . escapeshellarg($config_rule . PHP_EOL) . " >> " . escapeshellarg($resolved_path) . " && echo __GSP_CONFIG_OK";
+					$out = $remote->exec($cmd);
+					$ok = is_string($out) && strpos($out, '__GSP_CONFIG_OK') !== false;
+				}
+				if ($ok) {
+					scm_record_install_done($db, (int)$history_id, 'installed', 0, $install_method . '_ok');
+					scm_upsert_manifest($db, $home_id, $addon_id, array('install_method' => $install_method, 'content_version' => $content_version, 'install_state' => 'installed', 'source_url' => '', 'installed_by' => $user_id));
+					scm_log_content_install_action(array('addon_id' => (int)$addon_id, 'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '', 'content_type' => $install_method, 'home_id' => (int)$home_id, 'home_cfg_id' => (int)$home_info['home_cfg_id'], 'target_path' => $resolved_path, 'action' => 'succeeded'));
+					print_success(get_lang('addon_installed_successfully'));
+				} else {
+					scm_record_install_done($db, (int)$history_id, 'failed', 1, $install_method . '_failed');
+					scm_log_content_install_action(array('addon_id' => (int)$addon_id, 'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '', 'content_type' => $install_method, 'home_id' => (int)$home_id, 'home_cfg_id' => (int)$home_info['home_cfg_id'], 'target_path' => $resolved_path, 'action' => 'failed', 'error' => $install_method . '_failed'));
+					print_failure('Content action failed.');
+				}
+				echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
+				return;
+			}
+			$download_action = ($install_method === 'download_file') ? "" : "uncompress";
+			$pid = $remote->start_file_download( $addon_info['url'], $home_info['home_path']."/".$addon_info['path'], $filename, $download_action, $post_script);
 		}
 
 		$headers = get_headers($url, 1);
@@ -319,10 +485,22 @@ function exec_ogp_module() {
 			if(!$download_available)
 			{
 				print_failure(get_lang('failed_to_start_file_download'));
+				scm_log_content_install_action(array(
+					'addon_id' => (int)$addon_id,
+					'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '',
+					'content_type' => $install_method,
+					'home_id' => (int)$home_id,
+					'home_cfg_id' => (int)$home_info['home_cfg_id'],
+					'action' => 'failed',
+					'error' => 'failed_to_start_file_download',
+				));
 			}
 			elseif( $remote->is_file_download_in_progress($pid) === 1 )
 			{
-				print_success(get_lang_f('wait_while_decompressing', $filename));
+				if ($install_method === 'download_zip')
+					print_success(get_lang_f('wait_while_decompressing', $filename));
+				else
+					print_success(get_lang('install') . " " . $filename . "...");
 				echo "<p><a href=\"?m=addonsmanager&amp;p=addons&amp;state=refresh&amp;home_id=$home_id&amp;mod_id=$mod_id".
 					 "&amp;ip=$ip&amp;port=$port&amp;addon_id=$addon_id&amp;pid=$pid\">".get_lang('refresh')."</a></p>";
 				$view->refresh("?m=addonsmanager&amp;p=addons&amp;state=refresh&amp;home_id=$home_id&amp;mod_id=$mod_id".
@@ -343,6 +521,15 @@ function exec_ogp_module() {
 					'install_state'   => 'installed',
 					'source_url'      => $addon_info['url'],
 					'installed_by'    => $user_id,
+				));
+				scm_log_content_install_action(array(
+					'addon_id' => (int)$addon_id,
+					'addon_name' => isset($addon_info['name']) ? $addon_info['name'] : '',
+					'content_type' => $install_method,
+					'home_id' => (int)$home_id,
+					'home_cfg_id' => (int)$home_info['home_cfg_id'],
+					'target_path' => isset($addon_info['path']) ? (string)$addon_info['path'] : '',
+					'action' => 'succeeded',
 				));
 				echo "<p><a href=\"?m=addonsmanager&amp;p=user_addons&amp;home_id=$home_id".
 					 "&amp;mod_id=$mod_id&amp;ip=$ip&amp;port=$port\">".get_lang('back')."</a></p>";
