@@ -41,7 +41,7 @@ function get_server_content_categories()
 {
     return array(
         'file_download'      => 'Downloadable Mod',
-        'workshop_item'      => 'Steam Workshop Item',
+        'workshop_item'      => 'Steam Workshop Mods',
         'config_edit'        => 'Configuration Package',
         'scripted_installer' => 'Scripted Installer',
     );

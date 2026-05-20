@@ -9,7 +9,7 @@ $(function() {
 
 	var methodToRows = {
 		download_zip: ['#scm-row-url', '#scm-row-path'],
-		steam_workshop: ['#scm-row-workshop-id', '#scm-row-workshop-app-id', '#scm-row-target-path-template', '#scm-row-optional-folder-name', '#scm-row-post-script', '#scm-row-launch-param-additions'],
+		steam_workshop: ['#scm-row-workshop-app-id', '#scm-row-target-path-template', '#scm-row-optional-folder-name', '#scm-row-post-script', '#scm-row-launch-param-additions'],
 		post_script: ['#scm-row-post-script'],
 		config_edit: ['#scm-row-path', '#scm-row-config-edit-rule']
 	};

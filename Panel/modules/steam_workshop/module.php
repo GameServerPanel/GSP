@@ -10,12 +10,15 @@
  */
 
 $module_title   = "Steam Workshop";
-$module_version = "3.2";
+$module_version = "3.3";
 $db_version     = 5;
 $module_required = FALSE;
-$module_menus   = array(
-    array('subpage' => 'admin', 'name' => 'Steam Workshop', 'group' => 'admin'),
-);
+// DEPRECATED: The Steam Workshop standalone module has been superseded by
+// Server Content Manager (addonsmanager).  Navigation access is removed so
+// users are directed to the new unified workshop workflow.  The DB tables
+// and helper functions are preserved for backward compatibility.
+// See Panel/modules/addonsmanager/ for the replacement implementation.
+$module_menus   = array();
 
 if (!function_exists('sw_module_db_prefix')) {
     function sw_module_db_prefix()

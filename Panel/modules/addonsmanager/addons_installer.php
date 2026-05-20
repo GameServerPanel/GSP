@@ -544,6 +544,27 @@ function exec_ogp_module() {
 
     		return;
     	}
+
+		// Workshop items are managed through the dedicated workshop_content page
+		// where users enter their own Workshop IDs.  Redirect there immediately.
+		if ($addon_type === 'workshop_item') {
+			$first_addon_id = 0;
+			$wk_addons = $db->resultQuery(
+				"SELECT addon_id FROM OGP_DB_PREFIXaddons
+				  WHERE addon_type='workshop_item' AND home_cfg_id=" . (int)$home_cfg_id . $query_groups . "
+				  ORDER BY name ASC LIMIT 1"
+			);
+			if (is_array($wk_addons) && !empty($wk_addons[0]['addon_id'])) {
+				$first_addon_id = (int)$wk_addons[0]['addon_id'];
+			}
+			$redirect = "?m=addonsmanager&p=workshop_content&home_id=" . (int)$home_id .
+				"&mod_id=" . (int)$mod_id . "&ip=" . urlencode($ip) . "&port=" . urlencode($port) .
+				($first_addon_id > 0 ? "&addon_id=" . $first_addon_id : '');
+			$view->refresh($redirect);
+			echo "<p>Redirecting to Workshop Content manager…<br>";
+			echo "<a href='" . htmlspecialchars($redirect, ENT_QUOTES, 'UTF-8') . "'>Click here if not redirected.</a></p>";
+			return;
+		}
 		?>
 			<?php
 				$category_labels = get_server_content_categories();

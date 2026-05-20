@@ -198,11 +198,11 @@ function exec_ogp_module() {
 			</tr>
 			<tr id="scm-row-workshop-id">
 				<td align="right">
-					<b><?php print_lang('workshop_id'); ?></b>
+					<b>Default Workshop IDs (Optional)</b>
 				</td>
 				<td align="left">
-					<input type="text" value="<?php echo htmlspecialchars($workshop_item_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_item_id" size="85" placeholder="e.g. 450814997" />
-					<small style="color:#666;">Example Arma 3 Workshop ID: 450814997</small>
+					<input type="text" value="<?php echo htmlspecialchars($workshop_item_id, ENT_QUOTES, 'UTF-8'); ?>" name="workshop_item_id" size="85" placeholder="Leave blank – users enter Workshop IDs on their server page" />
+					<small style="color:#666;">Optional. Users enter the actual Workshop IDs they want installed from their own server page. This field is not required.</small>
 				</td>
 			</tr>
 			<tr id="scm-row-workshop-app-id">

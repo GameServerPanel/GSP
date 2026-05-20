@@ -1,7 +1,10 @@
 <?php
 /*
  *
- * GSP - Server Content Workshop page (Phase 1)
+ * GSP - Server Content Workshop page
+ *
+ * Users enter Steam Workshop IDs to install on their server.
+ * The admin defines the content template (game, app ID, install path).
  *
  */
 
@@ -16,6 +19,7 @@ function exec_ogp_module() {
 	$mod_id  = isset($_REQUEST['mod_id']) ? (int)$_REQUEST['mod_id'] : 0;
 	$ip      = isset($_REQUEST['ip']) ? (string)$_REQUEST['ip'] : '';
 	$port    = isset($_REQUEST['port']) ? (string)$_REQUEST['port'] : '';
+	$addon_id = isset($_REQUEST['addon_id']) ? (int)$_REQUEST['addon_id'] : 0;
 
 	if ($home_id <= 0 || $user_id <= 0) {
 		print_failure(get_lang('no_rights'));
@@ -35,6 +39,19 @@ function exec_ogp_module() {
 		return;
 	}
 
+	// Load the admin content template if an addon_id was provided.
+	$addon_template = null;
+	if ($addon_id > 0) {
+		$template_rows = $db->resultQuery(
+			"SELECT addon_id, name, workshop_app_id, target_path_template, optional_folder_name, description
+			   FROM `" . OGP_DB_PREFIX . "addons`
+			  WHERE addon_id=" . $addon_id . " AND install_method='steam_workshop'"
+		);
+		if (is_array($template_rows) && !empty($template_rows)) {
+			$addon_template = $template_rows[0];
+		}
+	}
+
 	$message = '';
 	$is_error = false;
 	$entered_ids = '';
@@ -45,6 +62,7 @@ function exec_ogp_module() {
 		$entered_ids = isset($_POST['workshop_ids']) ? (string)$_POST['workshop_ids'] : '';
 		$selected_ids = isset($_POST['selected_ids']) ? $_POST['selected_ids'] : array();
 		$action = isset($_POST['workshop_action']) ? (string)$_POST['workshop_action'] : '';
+		$posted_addon_id = isset($_POST['addon_id']) ? (int)$_POST['addon_id'] : 0;
 
 		if ($posted_home_id !== $home_id) {
 			$is_error = true;
@@ -55,14 +73,22 @@ function exec_ogp_module() {
 			$message = 'Invalid CSRF token for workshop action.';
 		}
 		else {
-			scm_workshop_handle_action($db, $home_info, $user_id, $action, $entered_ids, (array)$selected_ids, $message, $is_error);
+			scm_workshop_handle_action($db, $home_info, $user_id, $action, $entered_ids, (array)$selected_ids, $message, $is_error, $posted_addon_id > 0 ? $posted_addon_id : $addon_id);
 		}
 	}
 
 	$rows = scm_get_workshop_rows($db, $home_id);
 	$csrf_token = scm_get_csrf_token();
 
-	echo "<h2>Workshop Content: ".scm_h($home_info['home_name'])."</h2>";
+	echo "<h2>Workshop Mods: " . scm_h($home_info['home_name']) . "</h2>";
+	if ($addon_template !== null) {
+		echo "<p class='info'>Content template: <strong>" . scm_h($addon_template['name']) . "</strong>";
+		if (!empty($addon_template['description'])) {
+			echo " – " . scm_h($addon_template['description']);
+		}
+		echo "</p>";
+	}
+
 	if ($message !== '') {
 		if ($is_error) {
 			print_failure($message);
@@ -83,16 +109,18 @@ function exec_ogp_module() {
 		<input type='hidden' name='mod_id' value='<?php echo (int)$mod_id; ?>' />
 		<input type='hidden' name='ip' value='<?php echo scm_h($ip); ?>' />
 		<input type='hidden' name='port' value='<?php echo scm_h($port); ?>' />
+		<input type='hidden' name='addon_id' value='<?php echo (int)$addon_id; ?>' />
 		<input type='hidden' name='workshop_csrf' value='<?php echo scm_h($csrf_token); ?>' />
 
 		<table class='center'>
 			<tr>
-				<td align='right'><strong>Enter Workshop IDs</strong></td>
+				<td align='right'><strong>Workshop Item IDs</strong></td>
 				<td align='left'>
-					<input type='text' name='workshop_ids' size='72' value='<?php echo scm_h($entered_ids); ?>' placeholder='1234567890, 9876543210, 555555555' />
+					<textarea name='workshop_ids' rows='4' cols='72' placeholder='450814997&#10;463939057&#10;...'><?php echo scm_h($entered_ids); ?></textarea>
+					<br><small style="color:#666;">Enter one or more Steam Workshop IDs, one per line or comma-separated.<br>Example for Arma 3 CBA_A3: <code>450814997</code></small>
 				</td>
-				<td align='left'>
-					<button type='submit' name='workshop_action' value='install_new'>Install New</button>
+				<td align='left' style='vertical-align:top;padding-top:4px;'>
+					<button type='submit' name='workshop_action' value='install_new'>Install / Queue</button>
 				</td>
 			</tr>
 		</table>
