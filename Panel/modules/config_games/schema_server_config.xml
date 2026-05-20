@@ -36,6 +36,14 @@
       <xs:enumeration value="QUERY_PORT" />
       <xs:enumeration value="BASE_PATH" />
       <xs:enumeration value="HOME_PATH" />
+      <xs:enumeration value="HOME_ID" />
+      <xs:enumeration value="GAME_PATH" />
+      <xs:enumeration value="GAME_ROOT" />
+      <xs:enumeration value="CONTROL_PATH" />
+      <xs:enumeration value="GSP_CONTROL_PATH" />
+      <xs:enumeration value="PID_DIR" />
+      <xs:enumeration value="LOG_DIR" />
+      <xs:enumeration value="BACKUP_PATH" />
       <xs:enumeration value="SAVE_PATH" />
       <xs:enumeration value="OUTPUT_PATH" />
       <xs:enumeration value="USER_PATH" />
@@ -268,6 +276,21 @@
       <xs:element name="file" type="files_type" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
+
+  <xs:complexType name="companion_program_type">
+    <xs:attribute name="key" type="nonEmptyString" use="required" />
+    <xs:attribute name="name" type="xs:string" />
+    <xs:attribute name="executable" type="xs:string" />
+    <xs:attribute name="run_dir" type="xs:string" />
+    <xs:attribute name="args" type="xs:string" />
+    <xs:attribute name="enabled" type="xs:boolean" />
+  </xs:complexType>
+
+  <xs:complexType name="companion_programs_type">
+    <xs:sequence>
+      <xs:element name="program" type="companion_program_type" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
   
   <!-- The main of the template -->
   <xs:complexType name="server_config_type">
@@ -306,6 +329,7 @@
       <xs:element name="environment_variables" type="nonEmptyString" minOccurs="0" />
       <xs:element name="lock_files" type="nonEmptyString" minOccurs="0" />
       <xs:element name="configuration_files" type="configuration_files_type" minOccurs="0" />
+      <xs:element name="companion_programs" type="companion_programs_type" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

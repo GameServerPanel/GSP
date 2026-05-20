@@ -50,9 +50,9 @@ $_sw_profile = $db->resultQuery(
 );
 
 if (!empty($_sw_profile)) {
-    $module_buttons[] = "<a class='monitorbutton' href='home.php?m=steam_workshop&amp;p=user&amp;home_id=" . (int)$server_home['home_id'] . "'>
+    $module_buttons[] = "<a class='monitorbutton' href='home.php?m=addonsmanager&amp;p=user_addons&amp;home_id=" . (int)$server_home['home_id'] . "&amp;mod_id=" . (int)$server_home['mod_id'] . "&amp;ip=" . urlencode((string)$server_home['ip']) . "&amp;port=" . urlencode((string)$server_home['port']) . "'>
 		<img src='" . htmlspecialchars(check_theme_image("images/steam_workshop.png"), ENT_QUOTES, 'UTF-8') . "' title='Steam Workshop'>
-		<span>Steam Workshop</span>
+        <span>Server Content</span>
 	</a>";
 }
 

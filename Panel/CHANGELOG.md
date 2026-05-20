@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-05-20
+- **Standalone Steam Workshop module route deprecation:** Disabled legacy `steam_workshop` navigation routes, redirected legacy monitor entrypoints to Server Content Manager (`addonsmanager`), and replaced standalone UI access with deprecation messaging so workshop workflows run through the unified SCM path.
+- **XML path variable modernization (Panel + Agents):** Added new path variable support (`HOME_ID`, `GAME_PATH`, `GAME_ROOT`, `CONTROL_PATH`, `GSP_CONTROL_PATH`, `PID_DIR`, `LOG_DIR`, `BACKUP_PATH`) in panel CLI resolver and both agents’ runtime variable replacement; added schema support for these IDs and optional `companion_programs` XML section.
+- **New layout scaffolding for provisioning:** API and billing provisioning paths now create/ensure `gamefiles` and `gsp_control/{pids,logs,backups}` and prefer `gamefiles` as FTP root when present; legacy servers continue to work without auto-migration.
+
 ## 2026-05-19
 - **Server Content Workshop normalization:** Centralized install-method validation helpers, updated the user Server Content installer to prompt for Workshop ID/app/path overrides with live target previews, normalized workshop execution across UI/API flows, and switched agent execution to synced home-local workshop scripts that run real SteamCMD download/copy/post-install steps on Linux and Cygwin.
 - **Updater deployment diagnostics + legacy updater Panel path compatibility:** Update UI now surfaces configured stable/unstable branches plus the last resolved temporary checkout/source repo paths used during deployment, and `modules/update/updating.php` now treats `Panel/` and `panel/` zip paths equivalently so legacy update routes no longer skip panel files from current GitHub zip layouts.

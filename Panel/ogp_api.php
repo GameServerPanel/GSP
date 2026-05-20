@@ -379,6 +379,43 @@ function api_server()
 function api_user_games()
 {
 	global $request, $db, $user_info, $settings;
+
+	if (!function_exists('gsp_build_home_layout_paths_from_root')) {
+		function gsp_build_home_layout_paths_from_root($home_root)
+		{
+			$home_root = rtrim((string)$home_root, '/');
+			return array(
+				'home_path' => $home_root,
+				'game_path' => $home_root . '/gamefiles',
+				'control_path' => $home_root . '/gsp_control',
+				'pid_dir' => $home_root . '/gsp_control/pids',
+				'log_dir' => $home_root . '/gsp_control/logs',
+				'backup_path' => $home_root . '/gsp_control/backups',
+			);
+		}
+	}
+
+	if (!function_exists('gsp_ensure_home_layout_on_remote')) {
+		function gsp_ensure_home_layout_on_remote($remote, $home_root)
+		{
+			$paths = gsp_build_home_layout_paths_from_root($home_root);
+			$remote->exec('mkdir -p ' . escapeshellarg($paths['home_path']));
+			$remote->exec('mkdir -p ' . escapeshellarg($paths['game_path']));
+			$remote->exec('mkdir -p ' . escapeshellarg($paths['pid_dir']));
+			$remote->exec('mkdir -p ' . escapeshellarg($paths['log_dir']));
+			$remote->exec('mkdir -p ' . escapeshellarg($paths['backup_path']));
+			return $paths;
+		}
+	}
+
+	if (!function_exists('gsp_pick_ftp_root_path')) {
+		function gsp_pick_ftp_root_path($remote, $home_root)
+		{
+			$paths = gsp_build_home_layout_paths_from_root($home_root);
+			$has_gamefiles = trim((string)$remote->exec('[ -d ' . escapeshellarg($paths['game_path']) . ' ] && echo 1 || echo 0')) === '1';
+			return $has_gamefiles ? $paths['game_path'] : $paths['home_path'];
+		}
+	}
 	
 	if($user_info['users_role'] != "admin")
 		return array("status" => '350', "message" => "This function is restricted to administrator accounts.");
@@ -541,11 +578,12 @@ function api_user_games()
 				
 		// Create new home directory if it doesn't already exist	
 		$game_path = $game_path . (!$skipId ? $home_id : "");
-		$remote->exec("mkdir -p " . $game_path);
+		$layout_paths = gsp_ensure_home_layout_on_remote($remote, $game_path);
+		$ftp_root = gsp_pick_ftp_root_path($remote, $game_path);
 		
 		if($enable_ftp == "1")
 		{
-			$remote->ftp_mgr("useradd", $home_id, $ftp_password, $game_path);
+			$remote->ftp_mgr("useradd", $home_id, $ftp_password, $ftp_root);
 			$db->changeFtpStatus('enabled',$home_id);
 		}
 		
@@ -636,11 +674,12 @@ function api_user_games()
 		
 		// Create new home directory if it doesn't already exist	
 		$game_path = $game_path . (!$skipId ? $clone_home_id : "");
-		$remote->exec("mkdir -p " . $game_path);
+		$layout_paths = gsp_ensure_home_layout_on_remote($remote, $game_path);
+		$ftp_root = gsp_pick_ftp_root_path($remote, $game_path);
 		
 		if($enable_ftp == "1")
 		{
-			$remote->ftp_mgr("useradd", $clone_home_id, $ftp_password, $game_path);
+			$remote->ftp_mgr("useradd", $clone_home_id, $ftp_password, $ftp_root);
 			$db->changeFtpStatus('enabled', $clone_home_id);
 		}
 		

@@ -79,6 +79,74 @@ function get_query_port($server_xml, $server_port)
 	return $server_port;
 }
 
+function gsp_get_home_layout_paths($remote, $home_info)
+{
+	$home_path = rtrim((string)$home_info['home_path'], '/\\');
+	$home_id = isset($home_info['home_id']) ? (int)$home_info['home_id'] : 0;
+	$layout = array(
+		'home_id' => $home_id,
+		'home_path' => $home_path,
+		'is_new_layout' => false,
+		'game_path' => $home_path,
+		'game_root' => $home_path,
+		'control_path' => $home_path . '/gsp_control',
+		'gsp_control_path' => $home_path . '/gsp_control',
+		'pid_dir' => $home_path . '/gsp_control/pids',
+		'log_dir' => $home_path . '/gsp_control/logs',
+		'backup_path' => $home_path . '/gsp_control/backups',
+	);
+
+	if ($home_path === '') {
+		return $layout;
+	}
+
+	$home_path_escaped = escapeshellarg($home_path . '/gamefiles');
+	$check_cmd = '[ -d ' . $home_path_escaped . ' ] && echo 1 || echo 0';
+	$has_gamefiles = trim((string)$remote->exec($check_cmd)) === '1';
+
+	if ($has_gamefiles) {
+		$layout['is_new_layout'] = true;
+		$layout['game_path'] = $home_path . '/gamefiles';
+		$layout['game_root'] = $home_path . '/gamefiles';
+	}
+
+	return $layout;
+}
+
+function gsp_convert_layout_for_cli($remote, $layout, $os, $home_info)
+{
+	$is_windows_binary_on_linux = preg_match('/_win(32|64)?$/', (string)$home_info['game_key']) && preg_match('/Linux/', $os);
+	$is_cygwin = preg_match('/CYGWIN/', $os);
+
+	if (!$is_windows_binary_on_linux && !$is_cygwin) {
+		return $layout;
+	}
+
+	$converter = $is_windows_binary_on_linux ? 'winepath -w ' : 'cygpath -w ';
+	$home_cli = trim((string)$remote->exec($converter . escapeshellarg($layout['home_path'])));
+	$home_cli = str_replace('\\', '\\\\', $home_cli);
+
+	$to_windows_path = function ($raw_path) use ($layout, $home_cli) {
+		if ($raw_path === $layout['home_path']) {
+			return $home_cli;
+		}
+		$suffix = substr($raw_path, strlen($layout['home_path']));
+		$suffix = ltrim(str_replace('/', '\\\\', $suffix), '\\\\');
+		return $suffix === '' ? $home_cli : $home_cli . '\\\\' . $suffix;
+	};
+
+	$layout['home_path'] = $to_windows_path($layout['home_path']);
+	$layout['game_path'] = $to_windows_path($layout['game_path']);
+	$layout['game_root'] = $to_windows_path($layout['game_root']);
+	$layout['control_path'] = $to_windows_path($layout['control_path']);
+	$layout['gsp_control_path'] = $to_windows_path($layout['gsp_control_path']);
+	$layout['pid_dir'] = $to_windows_path($layout['pid_dir']);
+	$layout['log_dir'] = $to_windows_path($layout['log_dir']);
+	$layout['backup_path'] = $to_windows_path($layout['backup_path']);
+
+	return $layout;
+}
+
 function get_start_cmd($user_info,$remote,$server_xml,$home_info,$mod_id,$ip,$port,$db)
 {	
 	$last_param = json_decode($home_info['last_param'], True);
@@ -95,42 +163,22 @@ function get_start_cmd($user_info,$remote,$server_xml,$home_info,$mod_id,$ip,$po
 	$cli_param_data['PORT'] = $port;
 	$cli_param_data['HOSTNAME'] = $home_info['home_name'];
 	$cli_param_data['PID_FILE'] = "ogp_game_startup.pid";
-	
-	// Linux
-	if( preg_match("/Linux/", $os) )
-	{
-		if(preg_match("/_win(32|64)?$/", $home_info['game_key']))
-		{
-			$home_path_wine = $remote->exec("winepath -w ".$home_info['home_path']);
-			$home_path_wine = str_replace("\\","\\\\", $home_path_wine);
-			$home_path_wine = trim($home_path_wine);
-			$cli_param_data['BASE_PATH'] = $home_path_wine;
-			$cli_param_data['HOME_PATH'] = $home_path_wine;
-			$cli_param_data['SAVE_PATH'] = $home_path_wine;
-			$cli_param_data['OUTPUT_PATH'] = $home_path_wine;
-			$cli_param_data['USER_PATH'] = $home_path_wine;
-		}
-		else
-		{
-			$cli_param_data['BASE_PATH'] = $home_info['home_path'];
-			$cli_param_data['HOME_PATH'] = $home_info['home_path'];
-			$cli_param_data['SAVE_PATH'] = $home_info['home_path'];
-			$cli_param_data['OUTPUT_PATH'] = $home_info['home_path'];
-			$cli_param_data['USER_PATH'] = $home_info['home_path'];
-		}
-	}
-	// Windows
-	elseif( preg_match("/CYGWIN/", $os) )
-	{
-		$home_path_win = $remote->exec("cygpath -w ".$home_info['home_path']);
-		$home_path_win = str_replace("\\","\\\\", $home_path_win);
-		$home_path_win = trim($home_path_win);
-		$cli_param_data['BASE_PATH'] = $home_path_win;
-		$cli_param_data['HOME_PATH'] = $home_path_win;
-		$cli_param_data['SAVE_PATH'] = $home_path_win;
-		$cli_param_data['OUTPUT_PATH'] = $home_path_win;
-		$cli_param_data['USER_PATH'] = $home_path_win;
-	}
+	$layout = gsp_get_home_layout_paths($remote, $home_info);
+	$layout = gsp_convert_layout_for_cli($remote, $layout, $os, $home_info);
+
+	$cli_param_data['HOME_ID'] = (string)$layout['home_id'];
+	$cli_param_data['BASE_PATH'] = $layout['home_path'];
+	$cli_param_data['HOME_PATH'] = $layout['home_path'];
+	$cli_param_data['GAME_PATH'] = $layout['game_path'];
+	$cli_param_data['GAME_ROOT'] = $layout['game_root'];
+	$cli_param_data['CONTROL_PATH'] = $layout['control_path'];
+	$cli_param_data['GSP_CONTROL_PATH'] = $layout['gsp_control_path'];
+	$cli_param_data['PID_DIR'] = $layout['pid_dir'];
+	$cli_param_data['LOG_DIR'] = $layout['log_dir'];
+	$cli_param_data['BACKUP_PATH'] = $layout['backup_path'];
+	$cli_param_data['SAVE_PATH'] = $layout['is_new_layout'] ? $layout['game_path'] : $layout['home_path'];
+	$cli_param_data['OUTPUT_PATH'] = $layout['is_new_layout'] ? $layout['log_dir'] : $layout['home_path'];
+	$cli_param_data['USER_PATH'] = $layout['is_new_layout'] ? $layout['game_path'] : $layout['home_path'];
 	
 	if ($server_xml->protocol == "gameq")
 	{

@@ -551,6 +551,39 @@ sub replace_OGP_Env_Vars{
 	# Handle home directory replacement
 	if(defined $homepath && $homepath ne ""){
 		$exec_cmd =~ s/{OGP_HOME_DIR}/$homepath/g;
+		my $layout_home = $homepath;
+		$layout_home =~ s#/$##;
+		my $home_id_val = $homeid;
+		if (!defined $home_id_val || $home_id_val eq "") {
+			($home_id_val) = $layout_home =~ m#/([0-9]+)$#;
+			$home_id_val = "" unless defined $home_id_val;
+		}
+
+		my $is_new_layout = (-d $layout_home . '/gamefiles') ? 1 : 0;
+		my $game_path = $is_new_layout ? ($layout_home . '/gamefiles') : $layout_home;
+		my $control_path = $layout_home . '/gsp_control';
+		my $pid_dir = $control_path . '/pids';
+		my $log_dir = $control_path . '/logs';
+		my $backup_path = $control_path . '/backups';
+		my $save_path = $game_path;
+		my $output_path = $is_new_layout ? $log_dir : $layout_home;
+
+		$exec_cmd =~ s/{OGP_GAME_DIR}/$game_path/g;
+		$exec_cmd =~ s/{OGP_GAME_ROOT}/$game_path/g;
+		$exec_cmd =~ s/{OGP_CONTROL_DIR}/$control_path/g;
+
+		$exec_cmd =~ s/%HOME_ID%/$home_id_val/g;
+		$exec_cmd =~ s/%HOME_PATH%/$layout_home/g;
+		$exec_cmd =~ s/%BASE_PATH%/$layout_home/g;
+		$exec_cmd =~ s/%GAME_PATH%/$game_path/g;
+		$exec_cmd =~ s/%GAME_ROOT%/$game_path/g;
+		$exec_cmd =~ s/%CONTROL_PATH%/$control_path/g;
+		$exec_cmd =~ s/%GSP_CONTROL_PATH%/$control_path/g;
+		$exec_cmd =~ s/%PID_DIR%/$pid_dir/g;
+		$exec_cmd =~ s/%LOG_DIR%/$log_dir/g;
+		$exec_cmd =~ s/%BACKUP_PATH%/$backup_path/g;
+		$exec_cmd =~ s/%SAVE_PATH%/$save_path/g;
+		$exec_cmd =~ s/%OUTPUT_PATH%/$output_path/g;
 	}
 	
 	# Handle windows directory replacement

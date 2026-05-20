@@ -130,6 +130,41 @@ if (!function_exists('billing_get_server_home_row')) {
 	}
 }
 
+if (!function_exists('billing_build_layout_paths')) {
+	function billing_build_layout_paths(string $home_path): array
+	{
+		$home_path = rtrim($home_path, '/');
+		return array(
+			'home_path' => $home_path,
+			'game_path' => $home_path . '/gamefiles',
+			'pid_dir' => $home_path . '/gsp_control/pids',
+			'log_dir' => $home_path . '/gsp_control/logs',
+			'backup_path' => $home_path . '/gsp_control/backups',
+		);
+	}
+}
+
+if (!function_exists('billing_ensure_home_layout')) {
+	function billing_ensure_home_layout($remote, string $home_path): void
+	{
+		$paths = billing_build_layout_paths($home_path);
+		$remote->exec('mkdir -p ' . escapeshellarg($paths['home_path']));
+		$remote->exec('mkdir -p ' . escapeshellarg($paths['game_path']));
+		$remote->exec('mkdir -p ' . escapeshellarg($paths['pid_dir']));
+		$remote->exec('mkdir -p ' . escapeshellarg($paths['log_dir']));
+		$remote->exec('mkdir -p ' . escapeshellarg($paths['backup_path']));
+	}
+}
+
+if (!function_exists('billing_get_ftp_root_path')) {
+	function billing_get_ftp_root_path($remote, string $home_path): string
+	{
+		$paths = billing_build_layout_paths($home_path);
+		$has_gamefiles = trim((string)$remote->exec('[ -d ' . escapeshellarg($paths['game_path']) . ' ] && echo 1 || echo 0')) === '1';
+		return $has_gamefiles ? $paths['game_path'] : $paths['home_path'];
+	}
+}
+
 if (!function_exists('billing_trace_home_info_summary')) {
 	function billing_trace_home_info_summary(array $home_info): array
 	{
@@ -932,7 +967,9 @@ function exec_ogp_module()
 				//Reenable the FTP account
 				if ($ftp == "enabled")
 				{
-					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $home_info['home_path']);
+					billing_ensure_home_layout($remote, (string)$home_info['home_path']);
+					$ftp_root = billing_get_ftp_root_path($remote, (string)$home_info['home_path']);
+					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $ftp_root);
 					$db->changeFtpStatus('enabled',$home_info['home_id']);
 				}
 				echo "<h4>Server Installed, Check your Email for Details</h4><br>";
@@ -1078,6 +1115,7 @@ function exec_ogp_module()
 				//Create the remote connection
 				if (!$order_failed) {
 					$remote = new OGPRemoteLibrary($home_info['agent_ip'],$home_info['agent_port'],$home_info['encryption_key'],$home_info['timeout']);
+					billing_ensure_home_layout($remote, (string)$home_info['home_path']);
 				}
 								
 				//Get Full home info in 1 array
@@ -1094,7 +1132,9 @@ function exec_ogp_module()
 				//Enable FTP account in remote server
 				if (!$order_failed && $ftp == "enabled")
 				{
-					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $home_info['home_path']);
+					billing_ensure_home_layout($remote, (string)$home_info['home_path']);
+					$ftp_root = billing_get_ftp_root_path($remote, (string)$home_info['home_path']);
+					$remote->ftp_mgr("useradd", $home_info['home_id'], $home_info['ftp_password'], $ftp_root);
 					$db->changeFtpStatus('enabled',$home_info['home_id']);
 					billing_provision_trace('Enabled FTP account for provisioned home.', array(
 						'home_id_after_creation_or_lookup' => intval($home_info['home_id']),

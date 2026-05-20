@@ -281,6 +281,54 @@ function exec_ogp_module() {
 	  <input type="text" name="pid_file_cli" value=""/>
 	 </td>
 	</tr>
+	<tr>
+	 <td>
+	  HOME ID
+	 </td>
+	 <td>
+	  <input type="text" name="home_id_cli" value=""/>
+	 </td>
+	</tr>
+	<tr>
+	 <td>
+	  HOME PATH (compat)
+	 </td>
+	 <td>
+	  <input type="text" name="home_path_cli" value=""/>
+	 </td>
+	</tr>
+	<tr>
+	 <td>
+	  GAME PATH / GAME ROOT
+	 </td>
+	 <td>
+	  <input type="text" name="game_path_cli" value=""/>
+	 </td>
+	</tr>
+	<tr>
+	 <td>
+	  CONTROL PATH / GSP CONTROL PATH
+	 </td>
+	 <td>
+	  <input type="text" name="control_path_cli" value=""/>
+	 </td>
+	</tr>
+	<tr>
+	 <td>
+	  PID DIR / LOG DIR / BACKUP PATH
+	 </td>
+	 <td>
+	  <input type="text" name="control_dirs_cli" value=""/>
+	 </td>
+	</tr>
+	<tr>
+	 <td colspan="2">
+	  <small>
+	   New layout variables: HOME_PATH=agent home root, GAME_PATH/GAME_ROOT=player gamefiles root, CONTROL_PATH/GSP_CONTROL_PATH=private runtime root.<br>
+	   Compatibility variables remain valid: BASE_PATH follows HOME_PATH; SAVE_PATH maps to GAME_PATH when available; OUTPUT_PATH maps to LOG_DIR when available.
+	  </small>
+	 </td>
+	</tr>
 	</table>
 	</td>
 	</tr>
