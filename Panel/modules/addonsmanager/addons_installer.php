@@ -114,9 +114,6 @@ require_once("protocol/lgsl/lgsl_protocol.php");
 require_once(dirname(__FILE__) . '/server_content_categories.php');
 require_once(dirname(__FILE__) . '/server_content_helpers.php');
 require_once(dirname(__FILE__) . '/workshop_action.php');
-if (file_exists(dirname(__FILE__) . '/../steam_workshop/includes/functions.php')) {
-	require_once(dirname(__FILE__) . '/../steam_workshop/includes/functions.php');
-}
 
 function exec_ogp_module() {
 

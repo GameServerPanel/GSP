@@ -53,9 +53,6 @@ function get_function_args($main_request)
 	$functions["addonsmanager/list"] = array("token" => true);
 	$functions["addonsmanager/install"] = array("token" => true, "ip" => true, "port" => true, "addon_id" => true);
 
-	//______________ Steam Workshop
-	$functions["steam_workshop/install"] = array("token" => true, "ip" => true, "port" => true, "mod_key" => false, "mods_list" => true);
-
 	//______________ Server Content
 	$functions["server_content/run_scheduled_action"] = array("token" => true, "home_id" => true, "action" => true, "options" => false);
 	

@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-05-20
-- **Standalone Steam Workshop module route deprecation:** Disabled legacy `steam_workshop` navigation routes, redirected legacy monitor entrypoints to Server Content Manager (`addonsmanager`), and replaced standalone UI access with deprecation messaging so workshop workflows run through the unified SCM path.
+- **Standalone Steam Workshop module removal:** Removed the legacy `steam_workshop` module files, route/API mappings, module language packs, and theme-specific module assets. Steam Workshop management is now handled only through Server Content Manager (`addonsmanager`).
 - **XML path variable modernization (Panel + Agents):** Added new path variable support (`HOME_ID`, `GAME_PATH`, `GAME_ROOT`, `CONTROL_PATH`, `GSP_CONTROL_PATH`, `PID_DIR`, `LOG_DIR`, `BACKUP_PATH`) in panel CLI resolver and both agents’ runtime variable replacement; added schema support for these IDs and optional `companion_programs` XML section.
 - **New layout scaffolding for provisioning:** API and billing provisioning paths now create/ensure `gamefiles` and `gsp_control/{pids,logs,backups}` and prefer `gamefiles` as FTP root when present; legacy servers continue to work without auto-migration.
 

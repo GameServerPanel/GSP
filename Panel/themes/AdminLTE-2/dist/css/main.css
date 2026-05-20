@@ -326,9 +326,6 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 }
 
 /* Brands */
-.nav-sidebar [href^="?m=steam_workshop"] > .nav-icon,
-.administration-table [href^="?m=steam_workshop"]:before,
-.monitorButtonContainer [href^="?m=steam_workshop"]:before,
 .monitorButtonContainer [href^="?m=gamemanager&p=update"]:before,
 .nav-sidebar [href="?m=TS3Admin"] > .nav-icon
 {
@@ -374,9 +371,6 @@ table.tablesorter thead tr .tablesorter-headerDesc {
 .nav-sidebar [href="?m=update"] > .nav-icon:before,
 .administration-table [href="?m=update"]:before { content: "\f021"; }
 .nav-sidebar [href^="?m=gamemanager&p=update"] > .nav-icon:before,
-.nav-sidebar [href^="?m=steam_workshop"] > .nav-icon:before,
-.administration-table [href^="?m=steam_workshop"]:before,
-.monitorButtonContainer [href^="?m=steam_workshop"]:before,
 .monitorButtonContainer [href^="?m=gamemanager&p=update"]:before { content: "\f1b6"; }
 .nav-sidebar [href^="?m=user_admin"] > .nav-icon:before,
 .nav-sidebar [link^="?m=user_admin"] > .nav-icon:before,
