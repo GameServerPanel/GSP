@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Synergy game servers",
+    "name": "Synergy",
+    "order": 4,
+    "category": "game",
+    "complete": true
+}

@@ -1,0 +1,7 @@
+{
+    "description": "Self-hosted Ricochet dedicated server reference (Linux/Windows)",
+    "name": "Ricochet",
+    "order": 73,
+    "category": "game",
+    "complete": true
+}

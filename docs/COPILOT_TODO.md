@@ -1,6 +1,0 @@
-- Auto-detect which server configs actually support Steam Workshop before showing adapter controls.
-- Allow players/admins to reorder selected Workshop mods in the new picker UI so load order matches game expectations.
-- Surface pagination controls in the Workshop picker so users can request additional batches from the new Steam Web API search endpoint.
-- Add an admin-facing toggle that makes it clear when the HTML scraper fallback is in use and lets staff force API-only mode if Valve ever objects.
-- Add Workshop result preview thumbnails and author links in the picker for easier browsing.
-- Add a lightweight admin UI report that flags remaining PHP files still relying on legacy PHP 7 constructs not covered by the automated compatibility pass.

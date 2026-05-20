@@ -1,0 +1,35 @@
+.administration-buttons div{
+	padding: 15px 10px 5px 20px;
+	transition: all 0.5s;
+	-webkit-transition: all 0.5s;
+	min-width:125px;
+	min-height:100px;
+}
+.administration-buttons div:hover {
+	transition: all 0.1s;
+	-webkit-transition: all 0.1s;
+	background-color: #428bca;
+	text-decoration:none;
+	cursor:pointer;
+	box-shadow: inset 1px 1px 1px 1px #428bca;
+	color: white;
+}
+.administration-buttons div:active {
+	background-color: #428bca;
+	box-shadow: inset 0px 0px 0px 0px #428bca;
+}
+.administration-buttons div:active  img{
+	position:relative;
+	top:0.5px;
+	left:0.5px;
+	color: white;
+}
+.administration-buttons, .administration-buttons:hover, .administration-buttons :active {
+	text-decoration:none;
+}
+.administration-buttons-hmargin{
+	width:40px;
+}
+.administration-buttons-vmargin{
+	height:40px;
+}

@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Nexuiz game servers",
+    "name": "Nexuiz",
+    "order": 55,
+    "category": "game",
+    "complete": true
+}

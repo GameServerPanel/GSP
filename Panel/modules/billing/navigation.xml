@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Panel-side navigation for billing module.
+These pages are accessible within the panel for server provisioning and management.
+-->
+<root>
+	<!-- Admin pages for server provisioning -->
+	<page key="provision_servers" file="create_servers.php" access="admin,user">
+		<menu>Provision Servers</menu>
+	</page>
+	
+	<page key="my_orders" file="my_orders_panel.php" access="admin,user">
+		<menu>My Orders</menu>
+	</page>
+	
+	<page key="admin_orders" file="admin_orders.php" access="admin">
+		<menu>Manage All Orders</menu>
+	</page>
+	
+	<page key="test_integration" file="test_integration.php" access="admin,user">
+		<menu>Test Integration</menu>
+	</page>
+</root>

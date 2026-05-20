@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for FreeCol game servers",
+    "name": "FreeCol",
+    "order": 86,
+    "category": "game",
+    "complete": true
+}

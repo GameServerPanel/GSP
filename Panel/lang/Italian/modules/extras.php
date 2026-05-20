@@ -1,0 +1,43 @@
+<?php
+/*
+ *
+ * OGP - Open Game Panel
+ * Copyright (C) 2008 - 2018 The OGP Development Team
+ *
+ * http://www.opengamepanel.org/
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
+
+include 'update.php';
+define('LANG_unable_download', "Unable to download %s.");
+define('LANG_md5_failed', "MD5 test failed for %s, try again.");
+define('LANG_uninstall', "Uninstall");
+define('LANG_install', "Install");
+define('LANG_uptodate', "Up-to-date");
+define('LANG_update_available', "Update available");
+define('LANG_not_installed', "Not installed");
+define('LANG_installed', "Installed");
+define('LANG_download_update', "Download/Update");
+define('LANG_are_you_sure', "Are you sure");
+define('LANG_uninstalling_module_dataloss', "By uninstalling a module you will lose all data related to it.");
+define('LANG_remove_files_for', "Would you like to remove all files for");
+define('LANG_confirm', "Confirm");
+define('LANG_cancel', "Cancel");
+define('LANG_extra_themes', "Extra themes");
+define('LANG_extra_modules', "Extra modules");
+define('LANG_search_for_updates', "Check for updates");
+?>

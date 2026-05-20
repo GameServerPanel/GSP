@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for Wreckfest game servers",
+    "name": "Wreckfest",
+    "order": 144,
+    "category": "game",
+    "complete": true
+}

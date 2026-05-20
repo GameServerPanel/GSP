@@ -1,0 +1,7 @@
+{
+    "description": "Comprehensive guide for CS:GO and CS2 dedicated servers with ports, 128-tick setup, SourceMod plugins, and troubleshooting",
+    "name": "Counter-Strike: Global Offensive & CS2",
+    "order": 50,
+    "category": "game",
+    "complete": true
+}

@@ -1,0 +1,7 @@
+{
+    "description": "Setup and configuration guide for OpenTTD game servers",
+    "name": "OpenTTD",
+    "order": 63,
+    "category": "game",
+    "complete": true
+}

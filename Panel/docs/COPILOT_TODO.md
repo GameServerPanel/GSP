@@ -1,0 +1,26 @@
+- Auto-detect which server configs actually support Steam Workshop before showing adapter controls.
+- Allow players/admins to reorder selected Workshop mods in the new picker UI so load order matches game expectations.
+- Surface pagination controls in the Workshop picker so users can request additional batches from the new Steam Web API search endpoint.
+- Add an admin-facing toggle that makes it clear when the HTML scraper fallback is in use and lets staff force API-only mode if Valve ever objects.
+- Add Workshop result preview thumbnails and author links in the picker for easier browsing.
+- Add a lightweight admin UI report that flags remaining PHP files still relying on legacy PHP 7 constructs not covered by the automated compatibility pass.
+- Add a side-by-side before/after diff preview panel to the config_games top-level XML section editor before section saves.
+- Add an integration smoke test that exercises paid checkout, free checkout, and add-to-cart on installs with/without `period_start` to prevent billing schema drift regressions.
+- Add a storefront visual-regression check at 375px and 430px breakpoints covering login, order, and cart pages to prevent mobile overflow regressions.
+- Complete a full pass over all `modules/billing/docs/*` game guides to standardize OS/Workshop/RCON capability statements against current XML-backed server support.
+- Add an automated billing provisioning integration test fixture that verifies arrange_ports exact/fallback allocation, duplicate-port protection, and home_id linkage after paid/free checkout.
+- Add a billing UI badge/filter that distinguishes "pending install" vs "installed" states directly in customer/server order views.
+- Add an admin billing orders "provisioning details" drawer that reads `modules/billing/logs/provisioning.log` and shows the latest mechanism/result/error per order without leaving the panel.
+- Add an automated end-to-end check that verifies `create_servers.php` skips already-installed homes while still retrying existing-home orders with missing executable/IP-port/mod prerequisites.
+- Add a repeatable QA fixture that exercises `modules/billing/logs/provisioning_trace.log` writability failures and verifies payment success pages surface the traced provision result for paid and free orders.
+- Add an admin/serverlist UI badge that shows detected service OS variant (Windows/Linux/Any) from XML metadata next to each purchasable service row.
+- Add a panel settings health check that validates reCAPTCHA site/secret keys against active panel/storefront domains and warns admins before registration users see widget errors.
+- Add an automated deployment check that fails when `Website/timestamp.txt` and `modules/billing/timestamp.txt` diverge after storefront/content changes.
+- Add an integration smoke test that exercises updater preflight, required patch state persistence, Apache path scan output, and rollback restore of Panel/Website/version.json artifacts.
+- Add an admin preview/diff panel for Apache path repairs so staff can review exact vhost line changes before confirming `Fix Apache Paths`.
+- Add Phase 2 Workshop Content UX in `addonsmanager`: browse/search/select Workshop items with metadata while reusing the Phase 1 per-home saved-ID action pipeline.
+- Add a live progress/status panel for addonsmanager Workshop installs so users can watch queued/downloading/copying/completed steps without leaving the page.
+- Add localized language strings/tooltips for the new cron scheduler `server_content_*` action labels across all supported panel locales.
+- Add a Game Manager "Live Server Status" panel that consumes `Panel/protocol/gsp_query.php` and shows banner preview plus copyable embed code.
+- Add an updater admin UI table that renders the full deployment preflight path map (temp checkout, source repo/panel/website, destination panel/website) directly from the new layout detection payload for one-click operator verification.
+- Add an updater integration test fixture that calls both `home.php?m=update` and legacy `home.php?m=update&p=updating&version=<branch>` against a `Panel-unstable` zipball and asserts changed `Panel/modules/` files are actually copied.
