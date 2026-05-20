@@ -1,0 +1,411 @@
+#!/bin/bash
+#
+#
+#	A wrapper script for the OGP agent perl script.
+#	Performs auto-restarting of the agent on crash. You can
+#	extend this to log crashes and more.
+#
+# The ogp_agent_run script should be at the top level of the agent tree
+# Make sure we are in that directory since the script assumes this is the case
+
+#####################
+#  Important VARS   #
+#####################
+
+AGENTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASH_PREFS_CONF="$AGENTDIR/Cfg/bash_prefs.cfg"
+REPONAME=OGP-Agent-Linux
+GitHubUsername="OpenGamePanel"
+
+#####################
+#     FUNCTIONS     #
+#####################
+
+setupOGPDirPerms(){
+	
+	chmod -Rf ug+rw $AGENTDIR 2>/dev/null
+	if [ -d "$AGENTDIR/steamcmd" ]; then
+		chmod ug+x $AGENTDIR/steamcmd/linux32/* 2>/dev/null
+		chmod ug+x $AGENTDIR/steamcmd/*.sh 2>/dev/null
+	fi
+	if [ -d "$AGENTDIR/screenlogs" ]; then
+		chmod -Rf ug=rwx $AGENTDIR/screenlogs
+	fi
+	chmod ug+x $AGENTDIR/ogp_agent.pl 2>/dev/null
+	chmod ug+x $AGENTDIR/ogp_agent_run 2>/dev/null
+	chmod ug+x $AGENTDIR/agent_conf.sh 2>/dev/null
+
+	if test `id -u` -eq 0; then
+		echo
+		echo
+		echo "************** WARNING ***************"
+		echo "Running OGP's agent as root  "
+		echo "is highly discouraged. It is generally"
+		echo "unnecessary to use root privileges to "
+		echo "execute the agent.         "
+		echo "**************************************"
+		echo
+		echo
+		timeout=10
+		while test $timeout -gt 0; do
+			echo -n "The agent will continue to launch in $timeout seconds\r"
+			timeout=`expr $timeout - 1`
+			sleep 1
+		done
+	fi
+}
+
+ogpGitCleanup(){
+	echo "Cleaning up..."
+	rm -Rf ${REPONAME}-* &> /dev/null
+	if [ -e "ogp_agent_latest.zip" ]; then
+		rm -f "ogp_agent_latest.zip"
+	fi
+}
+
+getSudoPassword(){
+	sudoPass=$(cat "$AGENTDIR/Cfg/Config.pm" | grep -o "sudo_password.*" | grep -ow "[^sudo_password( \)*=>( \)*].*" | grep -o "[^'].*[^',]")
+}
+
+detectSystemD(){
+	replaceSystemDService=false
+	# Ops require sudo
+	if [ ! -z "$sudoPass" ]; then
+		initProcessStr=$(ps -p 1 | awk '{print $4}' | tail -n 1)
+		if [ "$initProcessStr" == "systemd" ]; then
+			systemdPresent=1
+			if [ -e "/lib/systemd/system" ]; then
+				SystemDDir="/lib/systemd/system"
+			elif [ -e "/etc/systemd/system" ]; then
+				SystemDDir="/etc/systemd/system"
+			else
+				checkDir=$(ps -eaf|grep '[s]ystemd' | head -n 1 | awk '{print $8}' | grep -o ".*systemd/")
+				if [ -e "${checkDir}system" ]; then
+					SystemDDir="$checkDir"
+				else
+					# Can't find systemd dir
+					systemdPresent=
+					SystemDDir=
+				fi
+			fi
+		fi
+		
+		if [ -e "${AGENTDIR}/systemd/ogp_agent.service" ]; then
+			if [ ! -z "$systemdPresent" ] && [ ! -z "$SystemDDir" ]; then
+				echo -e "systemd detected as the init system with a directory of $SystemDDir."
+				if [ -e "/etc/init.d/ogp_agent" ] && [ ! -e "${AGENTDIR}/ogp_agent_init" ]; then
+					echo -e "Taking care of existing OGP files."
+					# Kill any remaining ogp agent process
+					ogpPID=$(ps -ef | grep -v grep | grep ogp_agent.pl | head -n 1 | awk '{print $3}')
+					if [ ! -z "$ogpPID" ]; then
+						echo "$sudoPass" | sudo -S -p "" kill -9 "$ogpPID"
+					fi
+					echo "$sudoPass" | sudo -S -p "" cp "/etc/init.d/ogp_agent" "${AGENTDIR}/ogp_agent_init"
+					echo "$sudoPass" | sudo -S -p "" chmod +x "${AGENTDIR}/ogp_agent_init"
+					echo "$sudoPass" | sudo -S -p "" update-rc.d ogp_agent disable
+					echo "$sudoPass" | sudo -S -p "" chkconfig ogp_agent off
+					echo "$sudoPass" | sudo -S -p "" rm -rf "/etc/init.d/ogp_agent"
+					replaceSystemDService=true
+				fi
+				
+				# Update service to use oneshot and not forking
+				if [ -e "$SystemDDir/ogp_agent.service" ]; then
+					# Check to see if it's using oneshot
+					usingOneShot=$(echo "$sudoPass" | sudo -S -p "" cat "$SystemDDir/ogp_agent.service" | grep -o "oneshot")
+					if [ -z "$usingOneShot" ]; then
+						replaceSystemDService=true
+					fi
+				fi
+				
+				if [ ! -e "$SystemDDir/ogp_agent.service" ] || [ "$replaceSystemDService" = true ]; then
+					echo -e "Updating OGP agent systemd service init script."
+					echo -e "Copying ogp_agent systemd service file to $SystemDDir"
+					echo "$sudoPass" | sudo -S -p "" cp "${AGENTDIR}/systemd/ogp_agent.service" "$SystemDDir"
+					echo "$sudoPass" | sudo -S -p "" sed -i "s#{OGP_AGENT_PATH}#$AGENTDIR#g" "${SystemDDir}/ogp_agent.service"
+					echo "$sudoPass" | sudo -S -p "" systemctl daemon-reload
+					echo "$sudoPass" | sudo -S -p "" systemctl enable ogp_agent.service
+					echo "$sudoPass" | sudo -S -p "" service ogp_agent restart
+					exit 0
+				fi
+			fi
+		fi
+	fi
+}
+
+init() {
+	RESTART="yes"
+	AGENT="$AGENTDIR/ogp_agent.pl"
+	TIMEOUT=10 # time to wait after a crash (in seconds)
+	PID_FILE=""
+	
+	# Should we perform an automatic update?
+	if [ -e $BASH_PREFS_CONF ]
+	then
+		source "$BASH_PREFS_CONF"
+		
+		if [ "$agent_auto_update" -eq "1" ]
+		then
+			AUTO_UPDATE="yes"
+		fi
+		
+		# Use custom github update address
+		if [ ! -z "$github_update_username" ]; then
+			REVISIONTest=`curl -s https://github.com/${github_update_username}/${REPONAME}/commits/master.atom | egrep -o "([a-f0-9]{40})" | awk 'NR==1{print $1}'`
+			if [ ! -z "$REVISIONTest" ]; then
+				GitHubUsername=${github_update_username}
+			fi
+		fi
+		
+	else
+		AUTO_UPDATE="yes"
+	fi
+	
+	while test $# -gt 0; do
+		case "$1" in
+		"-pidfile")
+			PID_FILE="$2"
+			PID_FILE_SET=1
+			echo $$ > $PID_FILE
+			shift ;;
+		esac
+		shift
+	done
+
+	if test ! -f "$AGENT"; then
+		echo "ERROR: '$AGENT' not found, exiting"
+		quit 1
+	elif test ! -x "$AGENT"; then
+		# Could try chmod but dont know what we will be
+		# chmoding so just fail.
+		echo "ERROR: '$AGENT' not executable, exiting"
+		quit 1
+	fi
+
+	CMD="perl $AGENT"
+}
+
+syntax () {
+	# Prints script syntax
+	echo "Syntax:"
+	echo "$0"
+}
+
+checkDepends() {
+	CURL=`which curl 2>/dev/null`
+	if test "$?" -gt 0; then
+		echo "WARNING: Failed to locate curl binary."
+	else
+		echo "INFO: Located curl: $CURL"
+	fi
+	UNZIP=`which unzip 2>/dev/null`
+	if test "$?" -gt 0; then
+		echo "WARNING: Failed to locate unzip binary."
+	else
+		echo "INFO: Located unzip: $UNZIP"
+	fi
+}
+
+update() {
+	# Check to see if limited ogpuser exists
+	generateOGPLimitedUser
+	
+	# Run the update
+	if test -n "$AUTO_UPDATE"; then
+		if [ -z "$CURL" -o -z "$UNZIP" ]; then
+			checkDepends
+		fi
+		if [ -f "$CURL" -a -x "$CURL" ] && [ -f "$UNZIP" -a -x "$UNZIP" ]; then
+			cd $AGENTDIR
+			if [ ! -d tmp ]; then
+				mkdir tmp
+			fi
+			cd tmp
+			REVISION=`curl -s https://github.com/${GitHubUsername}/${REPONAME}/commits/master.atom | egrep -o "([a-f0-9]{40})" | awk 'NR==1{print $1}'`
+			curl -Os https://raw.githubusercontent.com/${GitHubUsername}/${REPONAME}/${REVISION}/ogp_agent_run
+			currentOGPAgentRunContent=$(cat "./ogp_agent_run")
+			# Check to make sure ogp_agent_run downloaded successfully from GitHub before we attempt to replace it.
+			# This should fix random 404 people have been experiencing
+			if [ -s "./ogp_agent_run" ] && [ "$(echo "$currentOGPAgentRunContent" | head -n 1)" != "404: Not Found" ] && [ ! -z "$(echo "$currentOGPAgentRunContent" | grep "ogp_agent.pl")" ]; then
+				diff ./ogp_agent_run $AGENTDIR/ogp_agent_run &>/dev/null
+				if test $? -ne 0; then
+					cp -f ./ogp_agent_run $AGENTDIR/ogp_agent_run &> /dev/null
+					if test $? -eq 0; then
+						cd $AGENTDIR
+						chmod ug+x ogp_agent_run 2>/dev/null
+						echo "`date`: The agent updater has been changed, relaunching..."
+						rm -Rf tmp
+						./ogp_agent_run
+						exit 0
+					fi
+				fi
+			fi
+			cd $AGENTDIR
+			CURRENT=$(cat $AGENTDIR/Cfg/Config.pm | grep version | grep -Eo '[0-9a-f]{40}')
+			if [ "$CURRENT" == "$REVISION" ]; then
+				echo "The agent is up to date."
+			else
+				URL=https://github.com/${GitHubUsername}/${REPONAME}/archive/${REVISION}.zip
+				HEAD=$(curl -L -s --head -w "%{http_code}" "$URL" -o "ogp_agent_latest.zip")
+				if [ "$HEAD" == "200" ]; then
+					echo "Updating agent using curl."
+					curl -L -s "$URL" -o "ogp_agent_latest.zip"
+					if test $? -ne 0; then
+						echo "`date`: curl failed to download the update package."
+					else
+						unzip -oq "ogp_agent_latest.zip"
+						if test $? -ne 0; then
+							echo "`date`: Unable to unzip the update package."
+							ogpGitCleanup
+						else
+							cd ${REPONAME}-${REVISION}
+							cp -avf systemd Frontier ArmaBE Minecraft Schedule Time FastDownload php-query ogp_agent.pl ogp_screenrc ogp_screenrc_bk ogp_agent_run agent_conf.sh $AGENTDIR &> /dev/null
+							if test $? -ne 0; then
+								echo "`date`: The agent files cannot be overwritten."
+								cd ..
+								ogpGitCleanup
+								echo "Agent update failed."
+							else
+								if test ! -d "$AGENTDIR/IspConfig"; then
+									cp -Rf IspConfig $AGENTDIR/IspConfig &> /dev/null
+								fi
+								if test ! -d "$AGENTDIR/EHCP"; then
+									cp -Rf EHCP $AGENTDIR/EHCP &> /dev/null
+								fi
+								if test ! -f "$AGENTDIR/Cfg/Preferences.pm"; then
+									cp -f Cfg/Preferences.pm $AGENTDIR/Cfg/Preferences.pm &> /dev/null
+								fi
+								echo "Fixing permissions..."
+								chmod ug+x $AGENTDIR/ogp_agent.pl &> /dev/null
+								chmod ug+x $AGENTDIR/ogp_agent_run &> /dev/null
+								chmod ug+x $AGENTDIR/agent_conf.sh &> /dev/null
+								cd ..
+								ogpGitCleanup
+								sed -i "s/version.*/version => '${REVISION}',/" $AGENTDIR/Cfg/Config.pm
+								echo "Agent updated successfully."
+							fi
+						fi
+					fi
+				else
+					echo "There is a update available (${REVISION}) but the download source is not ready.";
+					echo "Try again later."
+				fi
+			fi
+		else
+			echo "Update failed."
+		fi
+	fi
+	return 0
+}
+	
+run() {
+	getSudoPassword
+	restrictAccess
+	update
+	detectSystemD
+	if test -n "$RESTART" ; then
+		echo "Agent will auto-restart if there is a crash."
+		#loop forever
+		while true
+		do
+			# Run
+			$CMD
+			echo "`date`: Agent restart in $TIMEOUT seconds"
+			# don't thrash the hard disk if the agent dies, wait a little
+			sleep $TIMEOUT
+		done # while true
+	else
+		$CMD
+	fi
+}
+
+quit() {
+	# Exits with the give error code, 1
+	# if none specified.
+	# exit code 2 also prints syntax
+	exitcode="$1"
+
+	# default to failure
+	if test -z "$exitcode"; then
+		exitcode=1
+	fi
+
+	case "$exitcode" in
+	0)
+		echo "`date`: OGP Agent Quit" ;;
+	2)
+		syntax ;;
+	*)
+		echo "`date`: OGP Agent Failed" ;;
+	esac
+
+	# Remove pid file
+	if test -n "$PID_FILE" && test -f "$PID_FILE" ; then
+		# The specified pid file
+		rm -f $PID_FILE
+	fi
+
+	# reset SIGINT and then kill ourselves properly
+	trap - 2
+	kill -2 $$
+}
+
+function generatePassword(){
+	if [ ! -z "$1" ]; then
+		PLENGTH="$1"
+	else
+		PLENGTH="10"
+	fi
+  
+	#rPass=$(date +%s | sha256sum | base64 | head -c "$PLENGTH")
+	rPass=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | head -c "$PLENGTH")
+}
+
+function generateOGPLimitedUser(){
+	ogpUSER="ogp_server_runner"
+	echo "$sudoPass" | sudo -S -p "<prompt>" id -u "$ogpUSER"
+	if [ $? -eq 1 ]; then
+		echo "Creating ogp limited user for running servers and additional security..."
+		echo "$sudoPass" | sudo -S -p "<prompt>" groupdel ${ogpUSER}
+		echo "$sudoPass" | sudo -S -p "<prompt>" groupadd ${ogpUSER}
+		generatePassword "15"
+		ogpPass="$rPass"
+		echo "$sudoPass" | sudo -S -p "<prompt>" useradd --home "/home/$ogpUSER" -g ${ogpUSER} -m "$ogpUSER"
+		echo "$sudoPass" | sudo -S -p "<prompt>" sh -c "echo '${ogpUSER}:${ogpPass}' | chpasswd"
+		# Use /bin/bash shell by default per request from Omano
+		echo "$sudoPass" | sudo -S -p "<prompt>" usermod -s /bin/bash ${ogpUSER}
+		echo "$sudoPass" | sudo -S -p "<prompt>" sh -c "echo 'limited_ogp_user=${ogpUSER}
+password=${ogpPass}' > /root/ogp_server_runner_info"
+		agentUser="$(whoami)"
+		echo "$sudoPass" | sudo -S -p "<prompt>" usermod -a -G "$ogpUSER" "$agentUser"
+		# Reload perms so we don't have to reboot system for new group to apply right now...
+		echo "$sudoPass" | sudo -S -p "<prompt>" exec su -l "$agentUser"
+	fi
+	
+	# Set servers to run under their own user by default:
+	hasLinuxUser=$(cat "$AGENTDIR/Cfg/Preferences.pm" | grep -o "linux_user_per_game_server")
+	if [ -z "$hasLinuxUser" ]; then
+		 sed -i "\$i \\\\tlinux_user_per_game_server => '1'," "$AGENTDIR/Cfg/Preferences.pm"
+	fi
+}
+
+function restrictAccess(){
+	echo "$sudoPass" | sudo -S -p "<prompt>" chmod 750 "$AGENTDIR/Cfg/Config.pm"
+	echo "$sudoPass" | sudo -S -p "<prompt>" chmod 750 "$AGENTDIR/Cfg/Preferences.pm"
+	echo "$sudoPass" | sudo -S -p "<prompt>" chmod 750 "$AGENTDIR/Cfg/bash_prefs.cfg"
+}
+
+#####################
+#   MAIN APP CODE   #
+#####################
+
+# Setup OGP and Read Preferences
+setupOGPDirPerms
+
+# Initialise
+init $*
+
+# Run
+run
+
+# Quit normally
+quit 0

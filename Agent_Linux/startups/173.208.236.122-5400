@@ -1,0 +1,1 @@
+1518,/home/gameserver/1518,srcds_run,,-game cstrike -pidfile ../ogp_game_startup.pid +map cs_assault +ip 173.208.236.122 -port 5400 +maxplayers 64 -condebug  -nohltv -tickrate "64",5400,173.208.236.122,NA,0,,,css_linux32,console.loggameserver@gs-kansascity-01

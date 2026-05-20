@@ -1,0 +1,1 @@
+2001,/home/gameserver/2001,minecraft_server.jar,,java -Xmx2048M -Xms1024M -jar minecraft_server.jar nogui,25565,192.168.1.100,NA,0,,,minecraft,console.log
