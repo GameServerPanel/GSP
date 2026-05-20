@@ -141,7 +141,7 @@ function scm_workshop_write_manifest_and_run($db, array $home_info, $server_xml,
 	return true;
 }
 
-function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $raw_ids, array $selected_ids, &$message, &$is_error)
+function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $raw_ids, array $selected_ids, &$message, &$is_error, $addon_id = 0)
 {
 	$message = '';
 	$is_error = true;
@@ -150,12 +150,30 @@ function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $r
 		return false;
 	}
 
-	$home_id = (int)$home_info['home_id'];
-	$user_id = (int)$user_id;
+	$home_id  = (int)$home_info['home_id'];
+	$user_id  = (int)$user_id;
+	$addon_id = (int)$addon_id;
 	$server_xml = read_server_config(SERVER_CONFIG_LOCATION . "/" . $home_info['home_cfg_file']);
 	if ($server_xml === false) {
 		$message = 'Unable to read server configuration for workshop action.';
 		return false;
+	}
+
+	// Resolve the workshop_app_id: prefer the admin content template, fall
+	// back to the game XML.
+	$template_workshop_app_id = '';
+	if ($addon_id > 0) {
+		$tpl = $db->resultQuery(
+			"SELECT workshop_app_id FROM `" . OGP_DB_PREFIX . "addons`
+			  WHERE addon_id=" . $addon_id . " AND install_method='steam_workshop'"
+		);
+		if (is_array($tpl) && !empty($tpl[0]['workshop_app_id'])) {
+			$template_workshop_app_id = trim((string)$tpl[0]['workshop_app_id']);
+		}
+	}
+	$extra_manifest = array();
+	if ($template_workshop_app_id !== '') {
+		$extra_manifest['workshop_app_id'] = $template_workshop_app_id;
 	}
 
 	if ($action === 'install_new') {
@@ -170,19 +188,36 @@ function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $r
 			return false;
 		}
 
+		// Determine the resolved workshop_app_id for storage (template first, then XML).
+		$resolved_app_id = $template_workshop_app_id !== ''
+			? $template_workshop_app_id
+			: scm_extract_workshop_app_id($server_xml);
+
+		// Check whether the content_id column exists (added in db_version 6).
+		$has_content_id_col = (bool)$db->resultQuery(
+			"SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+			  WHERE TABLE_SCHEMA = DATABASE()
+			    AND TABLE_NAME   = '" . $db->realEscapeSingle(OGP_DB_PREFIX . 'server_content_workshop') . "'
+			    AND COLUMN_NAME  = 'content_id'"
+		);
+
 		foreach ($item_ids as $item_id) {
+			$content_id_col = $has_content_id_col && $addon_id > 0 ? ", content_id" : '';
+			$content_id_val = $has_content_id_col && $addon_id > 0 ? ", " . $addon_id : '';
+			$content_id_upd = $has_content_id_col && $addon_id > 0 ? ", content_id=VALUES(content_id)" : '';
 			$query = "INSERT INTO `".OGP_DB_PREFIX."server_content_workshop`
-				(home_id, home_cfg_id, remote_server_id, workshop_app_id, workshop_item_id, install_state, created_by, created_at, updated_at)
+				(home_id, home_cfg_id, remote_server_id, workshop_app_id, workshop_item_id, install_state, created_by, created_at, updated_at" . $content_id_col . ")
 				VALUES (
 					".$home_id.",
 					".(int)$home_info['home_cfg_id'].",
 					".(int)$home_info['remote_server_id'].",
-					'".$db->realEscapeSingle(scm_extract_workshop_app_id($server_xml))."',
+					'".$db->realEscapeSingle($resolved_app_id)."',
 					'".$db->realEscapeSingle($item_id)."',
 					'selected',
 					".$user_id.",
 					NOW(),
 					NOW()
+					" . $content_id_val . "
 				)
 				ON DUPLICATE KEY UPDATE
 					home_cfg_id=VALUES(home_cfg_id),
@@ -190,22 +225,22 @@ function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $r
 					workshop_app_id=VALUES(workshop_app_id),
 					install_state='selected',
 					last_error=NULL,
-					updated_at=NOW()";
+					updated_at=NOW()" . $content_id_upd;
 			$db->query($query);
 		}
 
 		scm_workshop_update_rows_state($db, $home_id, $item_ids, 'installing', null, false, false);
 		$error = '';
-		$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'install', $item_ids, $error);
+		$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'install', $item_ids, $error, $extra_manifest);
 		if ($ok) {
 			scm_workshop_update_rows_state($db, $home_id, $item_ids, 'installed', null, true, true);
-			scm_workshop_log_action($db, $home_id, $user_id, "install_new ids=".implode(',', $item_ids)." status=success");
+			scm_workshop_log_action($db, $home_id, $user_id, "install_new ids=".implode(',', $item_ids)." addon_id=".$addon_id." status=success");
 			$is_error = false;
 			$message = 'Workshop IDs installed successfully.';
 			return true;
 		}
 		scm_workshop_update_rows_state($db, $home_id, $item_ids, 'failed', $error, false, false);
-		scm_workshop_log_action($db, $home_id, $user_id, "install_new ids=".implode(',', $item_ids)." status=failed error=".$error);
+		scm_workshop_log_action($db, $home_id, $user_id, "install_new ids=".implode(',', $item_ids)." addon_id=".$addon_id." status=failed error=".$error);
 		$message = $error;
 		return false;
 	}
@@ -219,20 +254,20 @@ function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $r
 		$target_action = ($action === 'remove_selected') ? 'remove' : 'update';
 		scm_workshop_update_rows_state($db, $home_id, $item_ids, 'installing', null, false, false);
 		$error = '';
-		$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, $target_action, $item_ids, $error);
+		$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, $target_action, $item_ids, $error, $extra_manifest);
 		if ($ok) {
 			if ($target_action === 'remove') {
 				scm_workshop_update_rows_state($db, $home_id, $item_ids, 'removed', null, false, true);
 			} else {
 				scm_workshop_update_rows_state($db, $home_id, $item_ids, 'installed', null, false, true);
 			}
-			scm_workshop_log_action($db, $home_id, $user_id, $action." ids=".implode(',', $item_ids)." status=success");
+			scm_workshop_log_action($db, $home_id, $user_id, $action." ids=".implode(',', $item_ids)." addon_id=".$addon_id." status=success");
 			$is_error = false;
 			$message = ($target_action === 'remove') ? 'Selected Workshop IDs marked removed.' : 'Selected Workshop IDs updated successfully.';
 			return true;
 		}
 		scm_workshop_update_rows_state($db, $home_id, $item_ids, 'failed', $error, false, false);
-		scm_workshop_log_action($db, $home_id, $user_id, $action." ids=".implode(',', $item_ids)." status=failed error=".$error);
+		scm_workshop_log_action($db, $home_id, $user_id, $action." ids=".implode(',', $item_ids)." addon_id=".$addon_id." status=failed error=".$error);
 		$message = $error;
 		return false;
 	}
@@ -255,16 +290,16 @@ function scm_workshop_handle_action($db, array $home_info, $user_id, $action, $r
 		}
 		scm_workshop_update_rows_state($db, $home_id, $item_ids, 'installing', null, false, false);
 		$error = '';
-		$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'update', $item_ids, $error);
+		$ok = scm_workshop_write_manifest_and_run($db, $home_info, $server_xml, 'update', $item_ids, $error, $extra_manifest);
 		if ($ok) {
 			scm_workshop_update_rows_state($db, $home_id, $item_ids, 'installed', null, false, true);
-			scm_workshop_log_action($db, $home_id, $user_id, "update_all ids=".implode(',', $item_ids)." status=success");
+			scm_workshop_log_action($db, $home_id, $user_id, "update_all ids=".implode(',', $item_ids)." addon_id=".$addon_id." status=success");
 			$is_error = false;
 			$message = 'All saved Workshop IDs updated successfully.';
 			return true;
 		}
 		scm_workshop_update_rows_state($db, $home_id, $item_ids, 'failed', $error, false, false);
-		scm_workshop_log_action($db, $home_id, $user_id, "update_all ids=".implode(',', $item_ids)." status=failed error=".$error);
+		scm_workshop_log_action($db, $home_id, $user_id, "update_all ids=".implode(',', $item_ids)." addon_id=".$addon_id." status=failed error=".$error);
 		$message = $error;
 		return false;
 	}

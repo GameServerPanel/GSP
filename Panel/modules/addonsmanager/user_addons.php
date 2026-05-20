@@ -75,16 +75,28 @@ function exec_ogp_module() {
 				else
 					echo "<td>\n";
 				$printed_any_cell = true;
-				// Display label comes from the category map; the internal
-				// addon_type key is passed in the URL for backward compatibility.
-				echo "<a href='?m=addonsmanager&amp;p=addons" .
-					 "&amp;home_id=" . (int)$home_id .
-					 "&amp;mod_id=" . (int)$mod_id .
-					 "&amp;addon_type=" . urlencode($type_key) .
-					 "&amp;ip=" . htmlspecialchars($ip) .
-					 "&amp;port=" . htmlspecialchars($port) . "'>" .
-					 htmlspecialchars($type_label) . " (" . $items_qty . ")" .
-					 "</a>\n";
+				// Workshop items route to the workshop_content page where users
+				// enter their own Workshop IDs.  All other types use the installer.
+				if ($type_key === 'workshop_item') {
+					$first_addon_id = isset($items[0]['addon_id']) ? (int)$items[0]['addon_id'] : 0;
+					echo "<a href='?m=addonsmanager&amp;p=workshop_content" .
+						 "&amp;home_id=" . (int)$home_id .
+						 "&amp;mod_id=" . (int)$mod_id .
+						 ($first_addon_id > 0 ? "&amp;addon_id=" . $first_addon_id : '') .
+						 "&amp;ip=" . htmlspecialchars($ip) .
+						 "&amp;port=" . htmlspecialchars($port) . "'>" .
+						 htmlspecialchars($type_label) . " (" . $items_qty . ")" .
+						 "</a>\n";
+				} else {
+					echo "<a href='?m=addonsmanager&amp;p=addons" .
+						 "&amp;home_id=" . (int)$home_id .
+						 "&amp;mod_id=" . (int)$mod_id .
+						 "&amp;addon_type=" . urlencode($type_key) .
+						 "&amp;ip=" . htmlspecialchars($ip) .
+						 "&amp;port=" . htmlspecialchars($port) . "'>" .
+						 htmlspecialchars($type_label) . " (" . $items_qty . ")" .
+						 "</a>\n";
+				}
 			}
 		}
 

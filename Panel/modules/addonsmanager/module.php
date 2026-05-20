@@ -18,13 +18,20 @@
  *       backup_before_install / restart_after_install / is_cacheable /
  *       description columns to addons table; add server_content_manifest
  *       and server_content_install_history tables
+ *   5 – add workshop_item_id / workshop_app_id / target_path_template /
+ *       optional_folder_name / config_edit_rule / launch_param_additions
+ *       columns to addons table
+ *   6 – add admin template policy columns to addons table
+ *       (allow_user_workshop_ids, max_workshop_ids, required_workshop_ids,
+ *       blocked_workshop_ids); add content_id column to
+ *       server_content_workshop so user installs link to their template
  *
  */
 
 // Module general information
 $module_title   = "Server Content Manager";
-$module_version = "2.3";
-$db_version     = 5;
+$module_version = "2.4";
+$db_version     = 6;
 $module_required = TRUE;
 $module_menus   = array(
     array( 'subpage' => 'addons_manager', 'name' => 'Server Content Manager', 'group' => 'admin' )
@@ -193,6 +200,63 @@ $install_queries[4] = array(
                 }
             }
         }
+        return true;
+    },
+);
+// ── db_version 6 : admin template policy columns + content_id on workshop rows ──
+//
+// allow_user_workshop_ids – whether users may enter their own IDs (default 1)
+// max_workshop_ids        – optional cap on how many IDs a user may install
+// required_workshop_ids   – JSON list of IDs that must always be installed
+// blocked_workshop_ids    – JSON list of IDs that must not be installed
+// content_id on server_content_workshop – links a user install row back to
+//   the admin content template so the correct workshop_app_id is used.
+//
+$install_queries[5] = array(
+    function ($db) {
+        $prefix = OGP_DB_PREFIX;
+
+        // ── New policy columns on the addons (content template) table ─────────
+        $addon_columns = array(
+            'allow_user_workshop_ids' => "TINYINT(1) NOT NULL DEFAULT 1 AFTER `blocked_workshop_ids`",
+            'max_workshop_ids'        => "INT NULL AFTER `allow_user_workshop_ids`",
+            'required_workshop_ids'   => "TEXT NULL AFTER `max_workshop_ids`",
+            'blocked_workshop_ids'    => "TEXT NULL AFTER `launch_param_additions`",
+        );
+        foreach ($addon_columns as $col => $definition) {
+            $escaped_col   = $db->realEscapeSingle($col);
+            $escaped_table = $db->realEscapeSingle($prefix . 'addons');
+            $check = $db->resultQuery(
+                "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME   = '{$escaped_table}'
+                    AND COLUMN_NAME  = '{$escaped_col}'"
+            );
+            if (empty($check)) {
+                if (!$db->query("ALTER TABLE `{$prefix}addons` ADD COLUMN `{$col}` {$definition}")) {
+                    return false;
+                }
+            }
+        }
+
+        // ── content_id on server_content_workshop ─────────────────────────────
+        $wk_table = $db->realEscapeSingle($prefix . 'server_content_workshop');
+        $col_check = $db->resultQuery(
+            "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+              WHERE TABLE_SCHEMA = DATABASE()
+                AND TABLE_NAME   = '{$wk_table}'
+                AND COLUMN_NAME  = 'content_id'"
+        );
+        if (empty($col_check)) {
+            if (!$db->query(
+                "ALTER TABLE `{$prefix}server_content_workshop`
+                 ADD COLUMN `content_id` INT NULL AFTER `id`,
+                 ADD KEY `idx_content_id` (`content_id`)"
+            )) {
+                return false;
+            }
+        }
+
         return true;
     },
 );

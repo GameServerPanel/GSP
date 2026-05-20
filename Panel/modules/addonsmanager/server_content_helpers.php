@@ -21,7 +21,7 @@ function scm_ensure_workshop_schema($db)
 	$schema_checked = true;
 
 	$db->query("ALTER TABLE `".OGP_DB_PREFIX."addons` MODIFY `addon_type` VARCHAR(32) NOT NULL");
-	return (bool)$db->query(
+	$ok = (bool)$db->query(
 		"CREATE TABLE IF NOT EXISTS `".OGP_DB_PREFIX."server_content_workshop` (
 			`id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			`home_id` INT NOT NULL,
@@ -43,6 +43,24 @@ function scm_ensure_workshop_schema($db)
 			KEY `idx_install_state` (`install_state`)
 		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
 	);
+
+	// Idempotently add content_id column (db_version 6).
+	$wk_table = $db->realEscapeSingle(OGP_DB_PREFIX . 'server_content_workshop');
+	$col_check = $db->resultQuery(
+		"SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+		  WHERE TABLE_SCHEMA = DATABASE()
+		    AND TABLE_NAME   = '{$wk_table}'
+		    AND COLUMN_NAME  = 'content_id'"
+	);
+	if (empty($col_check)) {
+		$db->query(
+			"ALTER TABLE `".OGP_DB_PREFIX."server_content_workshop`
+			 ADD COLUMN `content_id` INT NULL AFTER `id`,
+			 ADD KEY `idx_content_id` (`content_id`)"
+		);
+	}
+
+	return $ok;
 }
 
 function scm_get_home_for_user($db, $home_id, $user_id)
@@ -89,7 +107,9 @@ function scm_parse_workshop_ids($raw, &$invalid = array())
 {
 	$invalid = array();
 	$ids = array();
-	$parts = explode(',', (string)$raw);
+	// Accept IDs separated by commas, newlines, or a mix of both.
+	$normalized = str_replace(array("\r\n", "\r", "\n"), ',', (string)$raw);
+	$parts = explode(',', $normalized);
 	foreach ((array)$parts as $part) {
 		$value = trim((string)$part);
 		if ($value === '') {
@@ -323,7 +343,7 @@ function scm_get_install_methods()
 {
 	return array(
 		'download_zip'   => 'Downloadable Mod',
-		'steam_workshop' => 'Steam Workshop Item',
+		'steam_workshop' => 'Steam Workshop Mods',
 		'config_edit'    => 'Configuration Package',
 		'post_script'    => 'Scripted Installer',
 	);
@@ -333,7 +353,7 @@ function scm_get_install_method_help_text()
 {
 	return array(
 		'download_zip'   => 'Download and extract a ZIP, RAR, or archive file.',
-		'steam_workshop' => 'Install a Steam Workshop mod using Workshop ID.',
+		'steam_workshop' => 'Configure how users may install Steam Workshop items for this game. Users enter the actual Workshop IDs from their server page.',
 		'config_edit'    => 'Install configuration files, profiles, or templates.',
 		'post_script'    => 'Run a custom scripted installation process.',
 	);
@@ -342,20 +362,20 @@ function scm_get_install_method_help_text()
 function scm_get_install_method_required_fields()
 {
 	return array(
-		'download_zip' => array('url'),
-		'steam_workshop' => array('workshop_item_id'),
-		'post_script' => array('post_script'),
-		'config_edit' => array('path', 'config_edit_rule'),
+		'download_zip'   => array('url'),
+		'steam_workshop' => array(),  // No required fields; users provide Workshop IDs on their server page
+		'post_script'    => array('post_script'),
+		'config_edit'    => array('path', 'config_edit_rule'),
 	);
 }
 
 function scm_get_install_method_validation_errors()
 {
 	return array(
-		'download_zip' => 'Please enter a download URL.',
-		'steam_workshop' => 'Please enter a Workshop ID.',
-		'config_edit' => 'Please enter the config target and edit action.',
-		'post_script' => 'Please enter the installer script/action.',
+		'download_zip'   => 'Please enter a download URL.',
+		'steam_workshop' => 'Please configure Workshop App ID or ensure the game XML provides one.',
+		'config_edit'    => 'Please enter the config target and edit action.',
+		'post_script'    => 'Please enter the installer script/action.',
 	);
 }
 
@@ -433,15 +453,30 @@ function scm_validate_download_content(array $payload, &$message = '')
 
 function scm_validate_workshop_content(array $payload, &$message = '')
 {
-	if (!scm_validate_numeric_content_value(isset($payload['workshop_item_id']) ? $payload['workshop_item_id'] : '', 'Please enter a Workshop ID.', $message, false)) {
-		return false;
-	}
+	// workshop_item_id is NOT required for admin content templates.
+	// Users supply Workshop IDs on their server page (workshop_content.php).
 	if (!scm_validate_numeric_content_value(isset($payload['workshop_app_id']) ? $payload['workshop_app_id'] : '', 'Workshop App ID must be numeric.', $message, true)) {
 		return false;
 	}
 	$folder_name = isset($payload['optional_folder_name']) ? trim((string)$payload['optional_folder_name']) : '';
 	if ($folder_name !== '' && (strpos($folder_name, '..') !== false || preg_match('/[\\\\\\/]/', $folder_name))) {
 		$message = 'Optional folder name must be a single folder name.';
+		return false;
+	}
+	$message = '';
+	return true;
+}
+
+function scm_validate_workshop_user_ids($raw_ids, &$message = '')
+{
+	$invalid = array();
+	$ids = scm_parse_workshop_ids($raw_ids, $invalid);
+	if (!empty($invalid)) {
+		$message = 'Invalid Workshop IDs: ' . implode(', ', $invalid);
+		return false;
+	}
+	if (empty($ids)) {
+		$message = 'Enter at least one numeric Workshop ID.';
 		return false;
 	}
 	$message = '';
@@ -497,11 +532,13 @@ function scm_validate_install_method_payload($install_method, array $payload, &$
 
 function scm_build_workshop_runtime_context($db, array $home_info, $server_xml, array $payload, &$message = '')
 {
+	// workshop_item_id is now optional in admin templates; validate only the
+	// numeric format constraints (workshop_app_id, optional_folder_name).
 	if (!scm_validate_workshop_content($payload, $message)) {
 		return false;
 	}
 
-	$workshop_item_id = trim((string)$payload['workshop_item_id']);
+	$workshop_item_id = trim((string)(isset($payload['workshop_item_id']) ? $payload['workshop_item_id'] : ''));
 	$target_path_template = trim((string)$payload['target_path_template']);
 	$optional_folder_name = trim((string)$payload['optional_folder_name']);
 	$workshop_app_id_override = trim((string)$payload['workshop_app_id']);
@@ -662,6 +699,10 @@ function scm_ensure_phase2_schema($db)
 		'optional_folder_name'  => "VARCHAR(255) NULL",
 		'config_edit_rule'      => "TEXT NULL",
 		'launch_param_additions'=> "VARCHAR(255) NULL",
+		'allow_user_workshop_ids' => "TINYINT(1) NOT NULL DEFAULT 1",
+		'max_workshop_ids'      => "INT NULL",
+		'required_workshop_ids' => "TEXT NULL",
+		'blocked_workshop_ids'  => "TEXT NULL",
 	);
 	foreach ($new_columns as $col => $definition) {
 		$escaped_col   = $db->realEscapeSingle($col);
