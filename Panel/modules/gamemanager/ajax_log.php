@@ -99,7 +99,7 @@ if ($log_retval == 1 || $log_retval == 2) {
 		if (function_exists('mb_convert_encoding')) {
 			$home_log = mb_convert_encoding($home_log, 'UTF-8', 'ISO-8859-1');
 		} elseif (function_exists('iconv')) {
-			$converted_log = @iconv('ISO-8859-1', 'UTF-8//IGNORE', $home_log);
+			$converted_log = iconv('ISO-8859-1', 'UTF-8//IGNORE', $home_log);
 			if ($converted_log !== false) {
 				$home_log = $converted_log;
 			}
