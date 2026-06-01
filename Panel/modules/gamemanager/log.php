@@ -73,81 +73,138 @@ require_once("modules/config_games/server_config_parser.php");
 			$home_log = utf8_encode($home_log);
 		}
 		
-		// Using the refreshed class
-		if( isset($_GET['refreshed']) )
+		echo "<h2>".htmlentities($home_info['home_name'])."</h2>";
+		if($log_retval == 1)
 		{
-			echo "<pre class='log'>".htmlentities($home_log)."</pre>";
-		}
-		else
-		{
-			echo "<h2>".htmlentities($home_info['home_name'])."</h2>";
-			if($log_retval == 1)
+			if( isset( $_GET['size'] ) and $_GET['size'] == "+" )
 			{
-				require_once("includes/refreshed.php");
-				
-				$control = '<form method="GET" >
-							<input type="hidden" name="m" value="gamemanager" />
-							<input type="hidden" name="p" value="log" />
-							<input type="hidden" name="home_id-mod_id-ip-port" value="'.$_GET['home_id-mod_id-ip-port'].'" />';
-				if(isset($_GET['setInterval']))
-					$control .= "<input type='hidden' name='setInterval' value='" . $_GET['setInterval'] . "' />";
-				if(isset($_GET['view_player_commands']))
-					$control .= "<input type='hidden' name='view_player_commands' value='" . $_GET['view_player_commands'] . "' />";
-				$control .= '<input type="submit" name="size" value="';
-				if( isset( $_GET['size'] ) and $_GET['size'] == "+" )
-				{
-					$height = "100%";
-					$control .= '-';
-				}	
-				else
-				{
-					$height = "500px";
-					$control .= '+';
-				}
-				$control .= '" /></form>';
-				
-				$intervals = array( "4s" => "4000",
-									"8s" => "8000",
-									"30s" => "30000",
-									"2m" => "120000",
-									"5m" => "300000" );
-									
-				$intSel = '<form action="" method="GET" >
-						   <input type="hidden" name="m" value="gamemanager" />
-						   <input type="hidden" name="p" value="log" />
-						   <input type="hidden" name="home_id-mod_id-ip-port" value="'.$_GET['home_id-mod_id-ip-port'].'" />';
-				if(isset($_GET['size']))
-					$intSel .= "<input type='hidden' name='size' value='" . $_GET['size'] . "' />";
-				if(isset($_GET['view_player_commands']))
-					$intSel .= "<input type='hidden' name='view_player_commands' value='" . $_GET['view_player_commands'] . "' />";
-				$intSel .= get_lang("refresh_interval") . ':<select name="setInterval" onchange="this.form.submit();">';
-				foreach ((array)$intervals as $interval => $value )
-				{
-					$selected = "";
-					if ( isset( $_GET['setInterval'] ) AND $_GET['setInterval'] == $value )
-						$selected = 'selected="selected"';
-					$intSel .= '<option value="'.$value.'" '.$selected.' >'.$interval.'</option>';
-				}					
-				$intSel .= "</select></form>";
-										
-				$setInterval = isset($_GET['setInterval']) ? $_GET['setInterval'] : 4000;
-				$refresh = new refreshed();
-				$pos = $refresh->add("home.php?m=gamemanager&p=log&type=cleared&refreshed&home_id-mod_id-ip-port=". $_GET['home_id-mod_id-ip-port']);
-				echo $refresh->getdiv($pos,"height:".$height.";overflow:auto;max-width:1600px;");
-				?><script type="text/javascript">$(document).ready(function(){ <?php echo $refresh->build("$setInterval"); ?>} ); </script><?php
-				echo "<table class='center' ><tr><td>$intSel</td><td>$control</td></tr></table>";
-				if(	($server_xml->control_protocol and preg_match("/^r?l?con2?$/", $server_xml->control_protocol)) OR
-					($server_xml->gameq_query_name and $server_xml->gameq_query_name == "minecraft") OR 
-					($server_xml->lgsl_query_name  and $server_xml->lgsl_query_name == "7dtd") )
-					require('modules/gamemanager/rcon.php');
+				$height = "100%";
+				$size_control = "-";
 			}
 			else
 			{
-				echo "<pre class='log'>" . htmlentities($home_log) . "</pre>";
-				print_failure( get_lang("server_not_running") );
+				$height = "500px";
+				$size_control = "+";
 			}
-			echo create_back_button( $_GET['m'], 'game_monitor&home_id-mod_id-ip-port='.$_GET['home_id-mod_id-ip-port'] );
+			
+			$intervals = array( "1s" => "1000",
+								"2s" => "2000",
+								"4s" => "4000",
+								"8s" => "8000",
+								"30s" => "30000",
+								"2m" => "120000",
+								"5m" => "300000" );
+			$allowed_intervals = array_values($intervals);
+			$setInterval = isset($_GET['setInterval']) ? (int)$_GET['setInterval'] : 4000;
+			if( !in_array((string)$setInterval, $allowed_intervals, true) )
+			{
+				$setInterval = 4000;
+			}
+
+			$intSel = get_lang("refresh_interval") . ':<select id="gm-log-refresh-interval" name="setInterval">';
+			foreach ((array)$intervals as $interval => $value )
+			{
+				$selected = ($setInterval == (int)$value) ? 'selected="selected"' : "";
+				$intSel .= '<option value="'.$value.'" '.$selected.' >'.$interval.'</option>';
+			}
+			$intSel .= "</select>";
+
+			$ajax_home_id = isset($home_id) ? (int)$home_id : 0;
+			$ajax_mod_id = isset($mod_id) ? (int)$mod_id : 0;
+			$ajax_ip = isset($ip) ? rawurlencode($ip) : "";
+			$ajax_port = isset($port) ? rawurlencode($port) : "";
+			$ajax_log_url = "modules/gamemanager/ajax_log.php?home_id=".$ajax_home_id."&mod_id=".$ajax_mod_id."&ip=".$ajax_ip."&port=".$ajax_port;
+
+			echo "<table class='center' ><tr><td>$intSel</td><td><button type='button' id='gm-log-size-toggle'>".$size_control."</button></td></tr></table>";
+			echo "<pre id='gm-log-output' class='log' style='height:".$height.";overflow:auto;max-width:1600px;'>".htmlentities($home_log)."</pre>";
+			?>
+			<script type="text/javascript">
+			(function($) {
+				var $log = $('#gm-log-output');
+				var $interval = $('#gm-log-refresh-interval');
+				var $sizeToggle = $('#gm-log-size-toggle');
+				var endpoint = '<?php echo $ajax_log_url; ?>';
+				var pollTimer = null;
+				var lastLogText = $log.text();
+
+				function isFollowingBottom() {
+					var node = $log.get(0);
+					return (node.scrollHeight - node.scrollTop - node.clientHeight) <= 50;
+				}
+
+				function scrollToBottom() {
+					var node = $log.get(0);
+					node.scrollTop = node.scrollHeight;
+				}
+
+				function refreshLog() {
+					console.log('Log refresh started...');
+					var shouldFollow = isFollowingBottom();
+					$.ajax({
+						url: endpoint,
+						cache: false,
+						dataType: 'text'
+					}).done(function(data) {
+						if (typeof data !== 'string') {
+							data = '';
+						}
+						if (data !== lastLogText) {
+							$log.text(data);
+							lastLogText = data;
+							if (shouldFollow) {
+								scrollToBottom();
+							}
+						}
+						console.log('Log refresh successful...');
+					}).fail(function(jqXHR, textStatus, errorThrown) {
+						console.log('Log refresh failed...', textStatus, errorThrown);
+					});
+				}
+
+				function restartPolling() {
+					var selectedInterval = parseInt($interval.val(), 10);
+					if (isNaN(selectedInterval) || selectedInterval < 1000) {
+						selectedInterval = 4000;
+						$interval.val('4000');
+					}
+					if (pollTimer !== null) {
+						clearInterval(pollTimer);
+					}
+					pollTimer = setInterval(refreshLog, selectedInterval);
+				}
+
+				$interval.on('change', function() {
+					restartPolling();
+					refreshLog();
+				});
+
+				$sizeToggle.on('click', function() {
+					var expanded = $log.css('height') === '500px';
+					if (expanded) {
+						$log.css('height', '100%');
+						$sizeToggle.text('-');
+					} else {
+						$log.css('height', '500px');
+						$sizeToggle.text('+');
+					}
+				});
+
+				scrollToBottom();
+				restartPolling();
+			})(jQuery);
+			</script>
+			<?php
+			if(	($server_xml->control_protocol and preg_match("/^r?l?con2?$/", $server_xml->control_protocol)) OR
+				($server_xml->gameq_query_name and $server_xml->gameq_query_name == "minecraft") OR 
+				($server_xml->lgsl_query_name  and $server_xml->lgsl_query_name == "7dtd") )
+				require('modules/gamemanager/rcon.php');
 		}
+		else
+		{
+			echo "<pre class='log'>" . htmlentities($home_log) . "</pre>";
+			print_failure( get_lang("server_not_running") );
+		}
+		echo create_back_button( $_GET['m'], 'game_monitor&home_id-mod_id-ip-port='.$_GET['home_id-mod_id-ip-port'] );
     }
     else
     {
