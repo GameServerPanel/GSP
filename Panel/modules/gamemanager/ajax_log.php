@@ -1,6 +1,10 @@
 <?php
 
 $panel_root = realpath(__DIR__ . '/../../');
+if ($panel_root === false || !is_dir($panel_root)) {
+	http_response_code(500);
+	exit;
+}
 
 require_once($panel_root . '/includes/functions.php');
 require_once($panel_root . '/includes/helpers.php');
@@ -22,17 +26,18 @@ if (!isset($_SESSION['user_id'])) {
 
 $home_id = isset($_GET['home_id']) ? (int)$_GET['home_id'] : 0;
 $mod_id = isset($_GET['mod_id']) ? (int)$_GET['mod_id'] : 0;
-$ip = isset($_GET['ip']) ? sanitizeInputStr($_GET['ip']) : '';
+$raw_ip = isset($_GET['ip']) ? trim($_GET['ip']) : '';
 $port = isset($_GET['port']) ? (int)$_GET['port'] : 0;
 
 if ($home_id <= 0 || $mod_id <= 0) {
 	http_response_code(400);
 	exit;
 }
-if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP) === false) {
+if ($raw_ip !== '' && filter_var($raw_ip, FILTER_VALIDATE_IP) === false) {
 	http_response_code(400);
 	exit;
 }
+$ip = $raw_ip !== '' ? sanitizeInputStr($raw_ip) : '';
 
 $db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
 if (!$db instanceof OGPDatabase) {

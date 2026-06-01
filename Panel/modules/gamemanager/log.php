@@ -94,10 +94,10 @@ require_once("modules/config_games/server_config_parser.php");
 								"30s" => "30000",
 								"2m" => "120000",
 								"5m" => "300000" );
-			$allowed_intervals = array_values($intervals);
+			$allowed_intervals = array_map('intval', array_values($intervals));
 			$minimum_interval = (int)min($allowed_intervals);
 			$setInterval = isset($_GET['setInterval']) ? (int)$_GET['setInterval'] : 4000;
-			if( !in_array((string)$setInterval, $allowed_intervals, true) )
+			if( !in_array($setInterval, $allowed_intervals, true) )
 			{
 				$setInterval = 4000;
 			}
@@ -116,7 +116,8 @@ require_once("modules/config_games/server_config_parser.php");
 			$ajax_port = isset($port) ? rawurlencode($port) : "";
 			$ajax_log_url = "modules/gamemanager/ajax_log.php?home_id=".$ajax_home_id."&mod_id=".$ajax_mod_id."&ip=".$ajax_ip."&port=".$ajax_port;
 
-			echo "<table class='center' ><tr><td>$intSel</td><td><button type='button' id='gm-log-size-toggle'>".$size_control."</button></td></tr></table>";
+			$is_collapsed = $height == "500px" ? "1" : "0";
+			echo "<table class='center' ><tr><td>$intSel</td><td><button type='button' id='gm-log-size-toggle' data-collapsed='".$is_collapsed."'>".$size_control."</button></td></tr></table>";
 			echo "<pre id='gm-log-output' class='log' style='height:".$height.";overflow:auto;max-width:1600px;'>".htmlentities($home_log)."</pre>";
 			?>
 			<script type="text/javascript">
@@ -181,13 +182,15 @@ require_once("modules/config_games/server_config_parser.php");
 				});
 
 				$sizeToggle.on('click', function() {
-					var isCollapsed = $log.css('height') === '500px';
+					var isCollapsed = $sizeToggle.data('collapsed') == 1;
 					if (isCollapsed) {
 						$log.css('height', '100%');
 						$sizeToggle.text('-');
+						$sizeToggle.data('collapsed', 0);
 					} else {
 						$log.css('height', '500px');
 						$sizeToggle.text('+');
+						$sizeToggle.data('collapsed', 1);
 					}
 				});
 
