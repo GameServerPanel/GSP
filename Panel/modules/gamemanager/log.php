@@ -181,8 +181,8 @@ require_once("modules/config_games/server_config_parser.php");
 				});
 
 				$sizeToggle.on('click', function() {
-					var expanded = $log.css('height') === '500px';
-					if (expanded) {
+					var isCollapsed = $log.css('height') === '500px';
+					if (isCollapsed) {
 						$log.css('height', '100%');
 						$sizeToggle.text('-');
 					} else {

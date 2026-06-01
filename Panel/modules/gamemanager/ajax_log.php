@@ -29,6 +29,10 @@ if ($home_id <= 0 || $mod_id <= 0) {
 	http_response_code(400);
 	exit;
 }
+if ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP) === false) {
+	http_response_code(400);
+	exit;
+}
 
 $db = createDatabaseConnection($db_type, $db_host, $db_user, $db_pass, $db_name, $table_prefix, isset($db_port) ? $db_port : NULL);
 if (!$db instanceof OGPDatabase) {
