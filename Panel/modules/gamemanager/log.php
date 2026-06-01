@@ -95,6 +95,7 @@ require_once("modules/config_games/server_config_parser.php");
 								"2m" => "120000",
 								"5m" => "300000" );
 			$allowed_intervals = array_values($intervals);
+			$minimum_interval = (int)min($allowed_intervals);
 			$setInterval = isset($_GET['setInterval']) ? (int)$_GET['setInterval'] : 4000;
 			if( !in_array((string)$setInterval, $allowed_intervals, true) )
 			{
@@ -125,6 +126,7 @@ require_once("modules/config_games/server_config_parser.php");
 				var $sizeToggle = $('#gm-log-size-toggle');
 				var endpoint = '<?php echo $ajax_log_url; ?>';
 				var pollTimer = null;
+				var minimumInterval = <?php echo $minimum_interval; ?>;
 				var lastLogText = $log.text();
 
 				function isFollowingBottom() {
@@ -163,7 +165,7 @@ require_once("modules/config_games/server_config_parser.php");
 
 				function restartPolling() {
 					var selectedInterval = parseInt($interval.val(), 10);
-					if (isNaN(selectedInterval) || selectedInterval < 1000) {
+					if (isNaN(selectedInterval) || selectedInterval < minimumInterval) {
 						selectedInterval = 4000;
 						$interval.val('4000');
 					}
